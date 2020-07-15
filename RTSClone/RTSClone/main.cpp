@@ -1,5 +1,6 @@
 #include "glm/glm.hpp"
 #include "glad.h"
+#include "Camera.h"
 #include <iostream>
 #include <SFML/Graphics.hpp>
 
@@ -16,9 +17,9 @@ int main()
 	sf::Window window(sf::VideoMode(windowSize.x, windowSize.y), "RTS Clone", sf::Style::Default, settings);
 	window.setFramerateLimit(60);
 	gladLoadGL();
-
-
 	glViewport(0, 0, windowSize.x, windowSize.y);
+
+	Camera camera;
 
 	while (window.isOpen())
 	{
@@ -30,6 +31,12 @@ int main()
 				window.close();
 			}
 		}
+
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+		camera.update(window);
+
+		window.display();
 	}
 
 	return 0;
