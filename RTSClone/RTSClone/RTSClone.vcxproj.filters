@@ -24,6 +24,9 @@
     <ClCompile Include="Camera.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="ShaderHandler.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="glad.h">
@@ -41,5 +44,15 @@
     <ClInclude Include="NonMovable.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="ShaderHandler.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Globals.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Shaders\VertexShader.glsl" />
+    <None Include="Shaders\FragmentShader.glsl" />
   </ItemGroup>
 </Project>

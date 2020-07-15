@@ -1,6 +1,7 @@
 #include "glm/glm.hpp"
 #include "glad.h"
 #include "Camera.h"
+#include "ShaderHandler.h"
 #include <iostream>
 #include <SFML/Graphics.hpp>
 
@@ -20,6 +21,13 @@ int main()
 	glViewport(0, 0, windowSize.x, windowSize.y);
 
 	Camera camera;
+	std::unique_ptr<ShaderHandler> shaderHandler = ShaderHandler::create();
+	assert(shaderHandler);
+	if (!shaderHandler)
+	{
+		std::cout << "Failed to load ShaderHandler\n";
+		return -1;
+	}
 
 	while (window.isOpen())
 	{
