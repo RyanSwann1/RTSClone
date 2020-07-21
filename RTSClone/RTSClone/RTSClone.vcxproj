@@ -21,7 +21,7 @@
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{db0a85ac-8953-471c-8b6d-126e85a58192}</ProjectGuid>
+    <ProjectGuid>{0b217460-4ced-479a-ad60-c0ced735288d}</ProjectGuid>
     <RootNamespace>RTSClone</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
@@ -79,7 +79,9 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
@@ -114,10 +116,13 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>$(ProjectDir)tiny_obj_loader.h;$(ProjectDir)SFML-2.5.1\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>sfml-window-d.lib;sfml-graphics-d.lib;sfml-system-d.lib;sfml-network-d.lib;winmm.lib;opengl32.lib;freetype.lib;vorbis.lib;vorbisenc.lib;vorbisfile.lib;openal32.lib;sfml-audio-d.lib;flac.lib;ogg.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>opengl32.lib;$(ProjectDir)SFML-2.5.1\lib;$(ProjectDir)assimp\lib;</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -128,15 +133,15 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(ProjectDir)assimp\include;$(ProjectDir)SFML-2.5.1\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)SFML-2.5.1\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(ProjectDir)assimp\lib;opengl32.lib;$(ProjectDir)SFML-2.5.1\lib</AdditionalLibraryDirectories>
-      <AdditionalDependencies>sfml-window.lib;sfml-graphics.lib;sfml-system.lib;sfml-network.lib;winmm.lib;opengl32.lib;freetype.lib;vorbis.lib;vorbisenc.lib;vorbisfile.lib;openal32.lib;sfml-audio-d.lib;flac.lib;ogg.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;assimp-vc141-mtd.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>opengl32.lib;$(ProjectDir)SFML-2.5.1\lib;$(ProjectDir)assimp\lib;</AdditionalLibraryDirectories>
+      <AdditionalDependencies>sfml-window.lib;sfml-graphics.lib;sfml-system.lib;sfml-network.lib;winmm.lib;opengl32.lib;freetype.lib;vorbis.lib;vorbisenc.lib;vorbisfile.lib;openal32.lib;sfml-audio-d.lib;flac.lib;ogg.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -145,18 +150,69 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Mesh.cpp" />
     <ClCompile Include="ShaderHandler.cpp" />
+    <ClCompile Include="Texture.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="assimp\include\ai_assert.h" />
+    <ClInclude Include="assimp\include\anim.h" />
+    <ClInclude Include="assimp\include\camera.h" />
+    <ClInclude Include="assimp\include\cexport.h" />
+    <ClInclude Include="assimp\include\cfileio.h" />
+    <ClInclude Include="assimp\include\cimport.h" />
+    <ClInclude Include="assimp\include\color4.h" />
+    <ClInclude Include="assimp\include\Compiler\poppack1.h" />
+    <ClInclude Include="assimp\include\Compiler\pstdint.h" />
+    <ClInclude Include="assimp\include\Compiler\pushpack1.h" />
+    <ClInclude Include="assimp\include\config.h" />
+    <ClInclude Include="assimp\include\DefaultIOStream.h" />
+    <ClInclude Include="assimp\include\DefaultIOSystem.h" />
+    <ClInclude Include="assimp\include\DefaultLogger.hpp" />
+    <ClInclude Include="assimp\include\Defines.h" />
+    <ClInclude Include="assimp\include\defs.h" />
+    <ClInclude Include="assimp\include\Exporter.hpp" />
+    <ClInclude Include="assimp\include\Importer.hpp" />
+    <ClInclude Include="assimp\include\importerdesc.h" />
+    <ClInclude Include="assimp\include\IOStream.hpp" />
+    <ClInclude Include="assimp\include\IOSystem.hpp" />
+    <ClInclude Include="assimp\include\light.h" />
+    <ClInclude Include="assimp\include\Logger.hpp" />
+    <ClInclude Include="assimp\include\LogStream.hpp" />
+    <ClInclude Include="assimp\include\material.h" />
+    <ClInclude Include="assimp\include\matrix3x3.h" />
+    <ClInclude Include="assimp\include\matrix4x4.h" />
+    <ClInclude Include="assimp\include\mesh.h" />
+    <ClInclude Include="assimp\include\metadata.h" />
+    <ClInclude Include="assimp\include\NullLogger.hpp" />
+    <ClInclude Include="assimp\include\port\AndroidJNI\AndroidJNIIOSystem.h" />
+    <ClInclude Include="assimp\include\postprocess.h" />
+    <ClInclude Include="assimp\include\ProgressHandler.hpp" />
+    <ClInclude Include="assimp\include\quaternion.h" />
+    <ClInclude Include="assimp\include\scene.h" />
+    <ClInclude Include="assimp\include\SceneCombiner.h" />
+    <ClInclude Include="assimp\include\texture.h" />
+    <ClInclude Include="assimp\include\types.h" />
+    <ClInclude Include="assimp\include\vector2.h" />
+    <ClInclude Include="assimp\include\vector3.h" />
+    <ClInclude Include="assimp\include\version.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="glad.h" />
     <ClInclude Include="Globals.h" />
     <ClInclude Include="khrplatform.h" />
+    <ClInclude Include="Mesh.h" />
     <ClInclude Include="NonCopyable.h" />
     <ClInclude Include="NonMovable.h" />
     <ClInclude Include="ShaderHandler.h" />
-    <ClInclude Include="Mesh.h" />
+    <ClInclude Include="Texture.h" />
+    <ClInclude Include="tiny_obj_loader.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="assimp\include\color4.inl" />
+    <None Include="assimp\include\material.inl" />
+    <None Include="assimp\include\matrix3x3.inl" />
+    <None Include="assimp\include\matrix4x4.inl" />
+    <None Include="assimp\include\quaternion.inl" />
+    <None Include="assimp\include\vector2.inl" />
+    <None Include="assimp\include\vector3.inl" />
     <None Include="Shaders\FragmentShader.glsl" />
     <None Include="Shaders\VertexShader.glsl" />
   </ItemGroup>

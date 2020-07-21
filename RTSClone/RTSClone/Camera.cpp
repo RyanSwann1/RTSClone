@@ -17,7 +17,7 @@ Camera::Camera()
 	front(),
 	right(),
 	up(),
-	rotation(0.f, -90.f),
+	rotation(0.f, 0.f),
 	position(0, 0, 0)
 {
 	front = { 0.0f, -1.0f, 0.0f };
@@ -54,6 +54,8 @@ void Camera::update(const sf::Window& window)
 
 	rotation.x += (static_cast<int>(window.getSize().y / 2) - sf::Mouse::getPosition(window).y) * sensitivity;
 	rotation.y += (sf::Mouse::getPosition(window).x - static_cast<int>(window.getSize().x / 2)) * sensitivity;
+
+	sf::Mouse::setPosition(sf::Vector2i(window.getSize().x / 2, window.getSize().y / 2), window);
 
 	// make sure that when pitch is out of bounds, screen doesn't get flipped
 	if (rotation.x > 89.0f)
