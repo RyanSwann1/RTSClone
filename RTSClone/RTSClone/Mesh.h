@@ -1,40 +1,37 @@
 #pragma once
 
-#include "glm/glm.hpp"
 #include "NonCopyable.h"
 #include "NonMovable.h"
+#include "glm/glm.hpp"
 #include <vector>
-#include <string>
 
 struct Vertex
 {
-    Vertex();
+	Vertex()
+		: position(),
+		textCoords()
+	{}
 
-    std::vector<glm::vec3> positions;
-    std::vector<glm::vec3> normals;
-    std::vector<glm::vec2> textCoords;
+	bool operator==(const Vertex& other) const {
+		return position == other.position && textCoords == other.textCoords;
+	}
+
+	glm::vec3 position;
+	glm::vec2 textCoords;
 };
 
-struct Texture 
+struct Mesh : private NonMovable, private NonCopyable
 {
-    Texture();
+	Mesh();
+	~Mesh();
 
-    unsigned int ID;
-    std::string type;
-};
+	void bind() const;
+	void attachToVAO();
+	void render() const;
 
-class ShaderHandler;
-struct Mesh final : private NonCopyable, private NonMovable
-{
-    Mesh();
-    ~Mesh();
-
-    void render(ShaderHandler& shaderHandler) const;
-
-    std::vector<Vertex> vertices;
-    std::vector<unsigned int> indices;
-    std::vector<Texture> textures;
-    unsigned int vaoID;
-    unsigned int vboID;
-    unsigned int indiciesID;
+	unsigned int m_vaoID;
+	unsigned int m_vboID;
+	unsigned int m_indicesID;
+	std::vector<Vertex> m_vertices;
+	std::vector<unsigned int> m_indices;
 };
