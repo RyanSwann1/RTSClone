@@ -9,6 +9,10 @@
 #include "Texture.h"
 #include "Camera.h"
 
+#include <assimp/Importer.hpp>
+#include <assimp/scene.h>
+#include <assimp/postprocess.h>
+
 int main()
 {
 	sf::ContextSettings settings;
@@ -22,6 +26,16 @@ int main()
 	sf::Window window(sf::VideoMode(windowSize.x, windowSize.y), "RTS Clone", sf::Style::Default, settings);
 	window.setFramerateLimit(60);
 	gladLoadGL();
+
+	std::string name = "Path";
+	Assimp::Importer importer;
+	const aiScene* scene = importer.ReadFile(name, aiProcess_Triangulate | aiProcess_FlipUVs);
+	assert(scene);
+	if (!scene)
+	{
+		std::cout << "Failed to load model\n";
+		return -1;
+	}
 
 	glViewport(0, 0, windowSize.x, windowSize.y);
 	glEnable(GL_DEPTH_TEST);
