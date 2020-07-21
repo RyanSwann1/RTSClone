@@ -24,6 +24,7 @@ namespace
 		while (getline(stream, line))
 		{
 			stringStream << line << "\n";
+			std::cout << line << "\n";
 		}
 
 		shaderSource = stringStream.str();
@@ -105,15 +106,15 @@ std::unique_ptr<ShaderHandler> ShaderHandler::create()
 {
 	std::unique_ptr<ShaderHandler> shaderHandler = std::unique_ptr<ShaderHandler>(new ShaderHandler());
 	bool shaderLoaded = false;
-	for (const auto& shader : shaderHandler->m_shader)
+	for (const auto& shader : shaderHandler->m_shaders)
 	{
 		switch (shader.getType())
 		{
 		case eShaderType::Default:
 			shaderLoaded = createShaderProgram(shader.getID(), "VertexShader.glsl", "FragmentShader.glsl");
 			break;
-		default:
-			assert(false);
+		//default:
+			//assert(false);
 		}
 	}
 
@@ -124,7 +125,7 @@ std::unique_ptr<ShaderHandler> ShaderHandler::create()
 void ShaderHandler::setUniformMat4f(eShaderType shaderType, const std::string& uniformName, const glm::mat4& matrix)
 {
 	assert(shaderType == m_currentShaderType);
-	int uniformLocation = m_shader[static_cast<int>(shaderType)].getUniformLocation(uniformName);
+	int uniformLocation = m_shaders[static_cast<int>(shaderType)].getUniformLocation(uniformName);
 	assert(uniformLocation != INVALID_UNIFORM_LOCATION);
 	glUniformMatrix4fv(uniformLocation, 1, GL_FALSE, glm::value_ptr(matrix));
 }
@@ -132,7 +133,7 @@ void ShaderHandler::setUniformMat4f(eShaderType shaderType, const std::string& u
 void ShaderHandler::setUniformVec3(eShaderType shaderType, const std::string& uniformName, const glm::vec3& v)
 {
 	assert(shaderType == m_currentShaderType);
-	int uniformLocation = m_shader[static_cast<int>(shaderType)].getUniformLocation(uniformName);
+	int uniformLocation = m_shaders[static_cast<int>(shaderType)].getUniformLocation(uniformName);
 	assert(uniformLocation != INVALID_UNIFORM_LOCATION);
 	glUniform3fv(uniformLocation, 1, &v[0]);
 }
@@ -140,7 +141,7 @@ void ShaderHandler::setUniformVec3(eShaderType shaderType, const std::string& un
 void ShaderHandler::setUniform1i(eShaderType shaderType, const std::string& uniformName, int value)
 {
 	assert(shaderType == m_currentShaderType);
-	int uniformLocation = m_shader[static_cast<int>(shaderType)].getUniformLocation(uniformName);
+	int uniformLocation = m_shaders[static_cast<int>(shaderType)].getUniformLocation(uniformName);
 	assert(uniformLocation != INVALID_UNIFORM_LOCATION);
 	glUniform1i(uniformLocation, value);
 }
@@ -148,16 +149,16 @@ void ShaderHandler::setUniform1i(eShaderType shaderType, const std::string& unif
 void ShaderHandler::setUniform1f(eShaderType shaderType, const std::string& uniformName, float value)
 {
 	assert(shaderType == m_currentShaderType);
-	int uniformLocation = m_shader[static_cast<int>(shaderType)].getUniformLocation(uniformName);
+	int uniformLocation = m_shaders[static_cast<int>(shaderType)].getUniformLocation(uniformName);
 	assert(uniformLocation != INVALID_UNIFORM_LOCATION);
 	glUniform1f(uniformLocation, value);
 }
 
 void ShaderHandler::switchToShader(eShaderType shaderType)
 {
-	assert(shaderType != m_currentShaderType);
+	//assert(shaderType != m_currentShaderType);
 	m_currentShaderType = shaderType;
-	glUseProgram(m_shader[static_cast<int>(shaderType)].getID());
+	glUseProgram(m_shaders[static_cast<int>(shaderType)].getID());
 }
 
 //Shader
@@ -165,30 +166,14 @@ ShaderHandler::Shader::Shader(eShaderType shaderType)
 	: m_itemID(glCreateProgram()),
 	m_type(shaderType),
 	m_uniformLocations()
-{}
-
-ShaderHandler::Shader::Shader(Shader&& orig) noexcept
-	: m_itemID(orig.m_itemID),
-	m_type(orig.m_type),
-	m_uniformLocations(std::move(orig.m_uniformLocations))
 {
-	orig.m_itemID = Globals::INVALID_OPENGL_ID;
-}
-
-ShaderHandler::Shader& ShaderHandler::Shader::operator=(Shader&& orig) noexcept
-{
-	m_itemID = orig.m_itemID;
-	m_type = orig.m_type;
-	m_uniformLocations = std::move(orig.m_uniformLocations);
-
-	orig.m_itemID = Globals::INVALID_OPENGL_ID;
-
-	return *this;
+	//std::cout << m_itemID << "\n";
+	//std::cout << "HIHI\n";
 }
 
 ShaderHandler::Shader::~Shader()
 {
-	assert(m_item != Globals::INVALID_OPENGL_ID);
+	assert(m_itemID != Globals::INVALID_OPENGL_ID);
 	glDeleteProgram(m_itemID);
 }
 

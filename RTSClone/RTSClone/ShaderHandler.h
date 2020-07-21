@@ -2,7 +2,6 @@
 
 #include "NonCopyable.h"
 #include "NonMovable.h"
-#include "ShaderHandler.h"
 #include "glm/glm.hpp"
 #include <memory>
 #include <array>
@@ -22,8 +21,6 @@ class ShaderHandler final : private NonCopyable, private NonMovable
 	{
 	public:
 		Shader(eShaderType shaderType);
-		Shader(Shader&&) noexcept;
-		Shader& operator=(Shader&&) noexcept;
 		~Shader();
 
 		unsigned int getID() const;
@@ -49,7 +46,7 @@ private:
 	ShaderHandler();
 	eShaderType m_currentShaderType;
 
-	std::array<Shader, static_cast<int>(eShaderType::Max) + 1> m_shader =
+	std::array<Shader, static_cast<int>(eShaderType::Max) + 1> m_shaders =
 	{
 		eShaderType::Default
 	};
