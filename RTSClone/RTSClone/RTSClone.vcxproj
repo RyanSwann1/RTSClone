@@ -207,7 +207,6 @@
     <ClInclude Include="NonMovable.h" />
     <ClInclude Include="ShaderHandler.h" />
     <ClInclude Include="Texture.h" />
-    <ClInclude Include="tiny_obj_loader.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="assimp\include\color4.inl" />
