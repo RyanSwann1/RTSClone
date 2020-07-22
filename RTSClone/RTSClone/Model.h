@@ -12,5 +12,5 @@ struct Model
 	void render(ShaderHandler& shaderHandler) const;
 
 	std::vector<Mesh> meshes;
-    std::vector<TextureDetails> textures;
+    std::vector<MeshTextureDetails> textures;
 };

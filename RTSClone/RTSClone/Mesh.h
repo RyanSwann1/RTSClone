@@ -8,9 +8,9 @@
 
 //https://vulkan-tutorial.com/Loading_models
 
-struct TextureDetails
+struct MeshTextureDetails
 {
-	TextureDetails()
+	MeshTextureDetails()
 		: id(),
 		type(),
 		path()
@@ -35,7 +35,7 @@ struct Vertex
 class ShaderHandler;
 struct Mesh : private NonCopyable
 {
-	Mesh(std::vector<Vertex>&& vertices, std::vector<unsigned int>&& indices, std::vector<TextureDetails>&& textures);
+	Mesh(std::vector<Vertex>&& vertices, std::vector<unsigned int>&& indices, std::vector<MeshTextureDetails>&& textures);
 	Mesh(Mesh&&) noexcept;
 	Mesh& operator=(Mesh&&) noexcept;
 	~Mesh();
@@ -49,5 +49,5 @@ struct Mesh : private NonCopyable
 	unsigned int m_indicesID;
 	std::vector<Vertex> m_vertices;
 	std::vector<unsigned int> m_indices;
-	std::vector<TextureDetails> m_textures;
+	std::vector<MeshTextureDetails> m_textures;
 };

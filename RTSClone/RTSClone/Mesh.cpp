@@ -3,7 +3,7 @@
 #include "glad.h"
 #include "ShaderHandler.h"
 
-Mesh::Mesh(std::vector<Vertex>&& vertices, std::vector<unsigned int>&& indices, std::vector<TextureDetails>&& textures)
+Mesh::Mesh(std::vector<Vertex>&& vertices, std::vector<unsigned int>&& indices, std::vector<MeshTextureDetails>&& textures)
 	: m_vaoID(Globals::INVALID_OPENGL_ID),
 	m_vboID(Globals::INVALID_OPENGL_ID),
 	m_indicesID(Globals::INVALID_OPENGL_ID),

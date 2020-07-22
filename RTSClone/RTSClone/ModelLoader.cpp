@@ -7,15 +7,15 @@
 #include <iostream>
 #include <SFML/Graphics.hpp>
 
-void processNode(aiNode* node, const aiScene* scene, Model& model, std::vector<TextureDetails>& loadedTextures, const std::string& directory);
-Mesh processMesh(aiMesh* mesh, const aiScene* scene, std::vector<TextureDetails>& loadedTextures, const std::string& directory);
+void processNode(aiNode* node, const aiScene* scene, Model& model, std::vector<MeshTextureDetails>& loadedTextures, const std::string& directory);
+Mesh processMesh(aiMesh* mesh, const aiScene* scene, std::vector<MeshTextureDetails>& loadedTextures, const std::string& directory);
 unsigned int TextureFromFile(const char* path, const std::string& directory);
-std::vector<TextureDetails> loadMaterialTextures(aiMaterial* mat, aiTextureType type, std::string typeName, 
-    std::vector<TextureDetails>& loadedTextures, const std::string& directory);
+std::vector<MeshTextureDetails> loadMaterialTextures(aiMaterial* mat, aiTextureType type, std::string typeName, 
+    std::vector<MeshTextureDetails>& loadedTextures, const std::string& directory);
 
 bool ModelLoader::loadModel(const std::string& filePath, Model& model)
 {
-    std::vector<TextureDetails> loadedTextures;
+    std::vector<MeshTextureDetails> loadedTextures;
     Assimp::Importer importer;
     const aiScene* scene = importer.ReadFile(filePath, aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_CalcTangentSpace);
     if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
@@ -31,7 +31,7 @@ bool ModelLoader::loadModel(const std::string& filePath, Model& model)
 }
 
 // processes a node in a recursive fashion. Processes each individual mesh located at the node and repeats this process on its children nodes (if any).
-void processNode(aiNode* node, const aiScene* scene, Model& model, std::vector<TextureDetails>& loadedTextures, const std::string& directory)
+void processNode(aiNode* node, const aiScene* scene, Model& model, std::vector<MeshTextureDetails>& loadedTextures, const std::string& directory)
 {
     // process each mesh located at the current node
     for (unsigned int i = 0; i < node->mNumMeshes; i++)
@@ -48,11 +48,11 @@ void processNode(aiNode* node, const aiScene* scene, Model& model, std::vector<T
     }
 }
 
-Mesh processMesh(aiMesh* mesh, const aiScene* scene, std::vector<TextureDetails>& loadedTextures, const std::string& directory)
+Mesh processMesh(aiMesh* mesh, const aiScene* scene, std::vector<MeshTextureDetails>& loadedTextures, const std::string& directory)
 {
     std::vector<Vertex> vertices;
     std::vector<unsigned int> indices;
-    std::vector<TextureDetails> textures;
+    std::vector<MeshTextureDetails> textures;
 
     // walk through each of the mesh's vertices
     for (unsigned int i = 0; i < mesh->mNumVertices; i++)
@@ -117,7 +117,7 @@ Mesh processMesh(aiMesh* mesh, const aiScene* scene, std::vector<TextureDetails>
     // normal: texture_normalN
 
     // 1. diffuse maps
-    std::vector<TextureDetails> diffuseMaps = loadMaterialTextures(material, aiTextureType_DIFFUSE, "texture_diffuse", loadedTextures, directory);
+    std::vector<MeshTextureDetails> diffuseMaps = loadMaterialTextures(material, aiTextureType_DIFFUSE, "texture_diffuse", loadedTextures, directory);
     textures.insert(textures.end(), diffuseMaps.begin(), diffuseMaps.end());
     //// 2. specular maps
     //std::vector<Texture> specularMaps = loadMaterialTextures(material, aiTextureType_SPECULAR, "texture_specular", loadedTextures, directory);
@@ -135,10 +135,10 @@ Mesh processMesh(aiMesh* mesh, const aiScene* scene, std::vector<TextureDetails>
 
 // checks all material textures of a given type and loads the textures if they're not loaded yet.
 // the required info is returned as a Texture struct.
-std::vector<TextureDetails> loadMaterialTextures(aiMaterial* mat, aiTextureType type, std::string typeName,
-    std::vector<TextureDetails>& loadedTextures, const std::string& directory)
+std::vector<MeshTextureDetails> loadMaterialTextures(aiMaterial* mat, aiTextureType type, std::string typeName,
+    std::vector<MeshTextureDetails>& loadedTextures, const std::string& directory)
 {
-    std::vector<TextureDetails> textures;
+    std::vector<MeshTextureDetails> textures;
     for (unsigned int i = 0; i < mat->GetTextureCount(type); i++)
     {
         aiString str;
@@ -156,7 +156,7 @@ std::vector<TextureDetails> loadMaterialTextures(aiMaterial* mat, aiTextureType 
         }
         if (!skip)
         {   // if texture hasn't been loaded already, load it
-            TextureDetails texture;
+            MeshTextureDetails texture;
             texture.id = TextureFromFile(str.C_Str(), directory);
             texture.type = typeName;
             texture.path = str.C_Str();
