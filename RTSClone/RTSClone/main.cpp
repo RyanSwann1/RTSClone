@@ -2,16 +2,16 @@
 #include "glm/gtc/matrix_transform.hpp"
 #include "glad.h"
 #include <SFML/Graphics.hpp>
-#include "Mesh.h"
+#include "Model.h"
+#include "ModelLoader.h"
 #include "ShaderHandler.h"
-#define TINYOBJLOADER_IMPLEMENTATION
-#include "tiny_obj_loader.h"
+//#define TINYOBJLOADER_IMPLEMENTATION
+//#include "tiny_obj_loader.h"
 #include "Texture.h"
 #include "Camera.h"
 
-#include <assimp/Importer.hpp>
-#include <assimp/scene.h>
-#include <assimp/postprocess.h>
+//OpenGL Debug
+//https://gist.github.com/qookei/76586d33238f0fa918c499dc7fb5ed04
 
 int main()
 {
@@ -25,17 +25,9 @@ int main()
 	glm::uvec2 windowSize(1280, 800);
 	sf::Window window(sf::VideoMode(windowSize.x, windowSize.y), "RTS Clone", sf::Style::Default, settings);
 	window.setFramerateLimit(60);
+	window.setMouseCursorVisible(false);
+	window.setMouseCursorGrabbed(true);
 	gladLoadGL();
-
-	std::string name = "Path";
-	Assimp::Importer importer;
-	const aiScene* scene = importer.ReadFile(name, aiProcess_Triangulate | aiProcess_FlipUVs);
-	assert(scene);
-	if (!scene)
-	{
-		std::cout << "Failed to load model\n";
-		return -1;
-	}
 
 	glViewport(0, 0, windowSize.x, windowSize.y);
 	glEnable(GL_DEPTH_TEST);
@@ -50,66 +42,18 @@ int main()
 		return -1;
 	}
 
-	std::unique_ptr<Texture> vikingRoomTexture = Texture::create("textures/viking_room.png");
-	assert(vikingRoomTexture);
-	if (!vikingRoomTexture)
-	{
-		std::cout << "viking_room.png not found\n";
-		return -1;
-	}
-
-	vikingRoomTexture->bind();
-
+	glm::vec3 startingPosition = { 0.0f, 0.0f, 0.0f };
+	int modelCount = 50;
 	Camera camera;
-	Mesh mesh;
-	std::string modelName = { "models/viking_room.obj" };
-	tinyobj::attrib_t attrib;
-	std::vector<tinyobj::shape_t> shapes;
-	std::vector<tinyobj::material_t> materials;
-	std::string warn, err;
-
-	if (!tinyobj::LoadObj(&attrib, &shapes, &materials, &warn, &err, modelName.c_str())) 
+	Model backpackModel;
+	if (!ModelLoader::loadModel("models/backpack.obj", backpackModel))
 	{
-		std::cout << "Couldn't load model\n";
+		std::cout << "Failed to load model: " << "backpack.obj\n";
 		return -1;
 	}
 
-	//if (!warn.empty()) {
-	//	std::cout << warn << std::endl;
-	//}
+	backpackModel.attachMeshesToVAO();
 
-	//if (!err.empty()) {
-	//	std::cerr << err << std::endl;
-	//}
-
-	for (const auto& shape : shapes) 
-	{
-		for (const auto& index : shape.mesh.indices) 
-		{
-			Vertex vertex;
-
-			vertex.position = {
-				attrib.vertices[3 * index.vertex_index + 0],
-				attrib.vertices[3 * index.vertex_index + 1],
-				attrib.vertices[3 * index.vertex_index + 2]
-			};
-
-			vertex.textCoords = {
-				attrib.texcoords[2 * index.texcoord_index + 0],
-				1.0f - attrib.texcoords[2 * index.texcoord_index + 1]
-			};
-
-			//vertex.textCoords = {
-			//	attrib.texcoords[2 * index.texcoord_index + 0],
-			//	attrib.texcoords[2 * index.texcoord_index + 1]
-			//};
-
-			mesh.m_vertices.push_back(vertex);
-			mesh.m_indices.push_back(mesh.m_indices.size());
-		}
-	}
-
-	mesh.attachToVAO();
 
 	std::cout << glGetError() << "\n";
 	std::cout << glGetError() << "\n";
@@ -133,7 +77,6 @@ int main()
 			}
 		}
 
-
 		camera.update(window);
 
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -144,11 +87,22 @@ int main()
 			static_cast<float>(windowSize.x) / static_cast<float>(windowSize.y), camera.nearPlaneDistance, camera.farPlaneDistance);
 
 		shaderHandler->switchToShader(eShaderType::Default);
-		shaderHandler->setUniformMat4f(eShaderType::Default, "uModel", model);
+		
 		shaderHandler->setUniformMat4f(eShaderType::Default, "uView", view);
 		shaderHandler->setUniformMat4f(eShaderType::Default, "uProjection", projection);
 
-		mesh.render();
+		float zOffset = 10.0f;
+		for (int i = 0; i < modelCount; ++i)
+		{
+			glm::mat4 model = glm::translate(glm::mat4(1.0f), startingPosition);
+			shaderHandler->setUniformMat4f(eShaderType::Default, "uModel", model);
+
+
+			backpackModel.render(*shaderHandler);
+			startingPosition.z += zOffset;
+		}
+		
+		startingPosition = glm::vec3();
 
 		window.display();
 	}
