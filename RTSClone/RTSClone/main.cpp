@@ -31,8 +31,8 @@ int main()
 
 	glViewport(0, 0, windowSize.x, windowSize.y);
 	glEnable(GL_DEPTH_TEST);
-	//glEnable(GL_CULL_FACE);
-	//glCullFace(GL_BACK);
+	glEnable(GL_CULL_FACE);
+	glCullFace(GL_BACK);
 
 	std::unique_ptr<ShaderHandler> shaderHandler = ShaderHandler::create();
 	assert(shaderHandler);
@@ -53,7 +53,6 @@ int main()
 	}
 
 	backpackModel.attachMeshesToVAO();
-
 
 	std::cout << glGetError() << "\n";
 	std::cout << glGetError() << "\n";

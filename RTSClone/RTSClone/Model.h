@@ -8,9 +8,8 @@ struct Model
 {
 	Model();
 
-	void attachMeshesToVAO();
+	void attachMeshesToVAO() const;
 	void render(ShaderHandler& shaderHandler) const;
-	
 
 	std::vector<Mesh> meshes;
     std::vector<TextureDetails> textures;

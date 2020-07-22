@@ -6,9 +6,9 @@ Model::Model()
 	textures()
 {}
 
-void Model::attachMeshesToVAO()
+void Model::attachMeshesToVAO() const
 {
-	for (auto& mesh : meshes)
+	for (const auto& mesh : meshes)
 	{
 		mesh.attachToVAO();
 	}

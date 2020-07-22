@@ -68,7 +68,7 @@ void Mesh::bind() const
     glBindVertexArray(m_vaoID);
 }
 
-void Mesh::attachToVAO()
+void Mesh::attachToVAO() const
 {
     bind();
 
