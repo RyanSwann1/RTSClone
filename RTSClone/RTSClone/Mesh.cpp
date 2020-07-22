@@ -90,9 +90,20 @@ void Mesh::attachToVAO() const
 void Mesh::render(ShaderHandler& shaderHandler) const
 {
 	assert(m_textures.size() == static_cast<size_t>(1));
-	glBindTexture(GL_TEXTURE_2D, m_textures.front().id);
+	glBindTexture(GL_TEXTURE_2D, m_textures.front().ID);
 
     bind();
 	assert(!m_indices.empty());
     glDrawElements(GL_TRIANGLES, m_indices.size(), GL_UNSIGNED_INT, nullptr);
 }
+
+Vertex::Vertex(const glm::vec3& position, const glm::vec2& textCoords)
+	: position(position),
+	textCoords(textCoords)
+{}
+
+MeshTextureDetails::MeshTextureDetails(unsigned int ID, const std::string& type, const std::string& path)
+	: ID(ID),
+	type(type),
+	path(path)
+{}

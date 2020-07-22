@@ -10,23 +10,16 @@
 
 struct MeshTextureDetails
 {
-	MeshTextureDetails()
-		: id(),
-		type(),
-		path()
-	{}
+	MeshTextureDetails(unsigned int ID, const std::string& type, const std::string& path);
 
-	unsigned int id;
+	unsigned int ID;
 	std::string type;
 	std::string path;  // we store the path of the texture to compare with other textures
 };
 
 struct Vertex
 {
-	Vertex()
-		: position(),
-		textCoords()
-	{}
+	Vertex(const glm::vec3& position, const glm::vec2& textCoords);
 
 	glm::vec3 position;
 	glm::vec2 textCoords;
