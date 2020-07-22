@@ -4,6 +4,22 @@
 #include "NonMovable.h"
 #include "glm/glm.hpp"
 #include <vector>
+#include <string>
+
+//https://vulkan-tutorial.com/Loading_models
+
+struct TextureDetails
+{
+	TextureDetails()
+		: id(),
+		type(),
+		path()
+	{}
+
+	unsigned int id;
+	std::string type;
+	std::string path;  // we store the path of the texture to compare with other textures
+};
 
 struct Vertex
 {
@@ -12,26 +28,26 @@ struct Vertex
 		textCoords()
 	{}
 
-	bool operator==(const Vertex& other) const {
-		return position == other.position && textCoords == other.textCoords;
-	}
-
 	glm::vec3 position;
 	glm::vec2 textCoords;
 };
 
-struct Mesh : private NonMovable, private NonCopyable
+class ShaderHandler;
+struct Mesh : private NonCopyable
 {
-	Mesh();
+	Mesh(std::vector<Vertex>&& vertices, std::vector<unsigned int>&& indices, std::vector<TextureDetails>&& textures);
+	Mesh(Mesh&&) noexcept;
+	Mesh& operator=(Mesh&&) noexcept;
 	~Mesh();
 
 	void bind() const;
 	void attachToVAO();
-	void render() const;
+	void render(ShaderHandler& shaderHandler) const;
 
 	unsigned int m_vaoID;
 	unsigned int m_vboID;
 	unsigned int m_indicesID;
 	std::vector<Vertex> m_vertices;
 	std::vector<unsigned int> m_indices;
+	std::vector<TextureDetails> m_textures;
 };
