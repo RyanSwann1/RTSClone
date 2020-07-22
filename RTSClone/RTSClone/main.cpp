@@ -7,6 +7,7 @@
 #include "ShaderHandler.h"
 #include "Texture.h"
 #include "Camera.h"
+#include "Unit.h"
 
 //OpenGL Debug
 //https://gist.github.com/qookei/76586d33238f0fa918c499dc7fb5ed04
@@ -38,18 +39,19 @@ int main()
 		std::cout << "Shader Handler not loaded\n";
 		return -1;
 	}
-
-	float deltaTime = 0.0f;
-	sf::Clock gameClock;
-	glm::vec3 startingPosition = { 0.0f, 0.0f, 25.0f };
-	int modelCount = 50;
-	Camera camera;
+	
 	Model backpackModel;
 	if (!ModelLoader::loadModel("models/backpack.obj", backpackModel))
 	{
 		std::cout << "Failed to load model: " << "backpack.obj\n";
 		return -1;
 	}
+
+	sf::Clock gameClock;
+	glm::vec3 startingPosition = { 0.0f, 0.0f, 25.0f };
+	int modelCount = 50;
+	Camera camera;
+	Unit unit(startingPosition, eUnitType::Default);
 
 	backpackModel.attachMeshesToVAO();
 
@@ -59,7 +61,7 @@ int main()
 
 	while (window.isOpen())
 	{
-		deltaTime = gameClock.restart().asSeconds();
+		float deltaTime = gameClock.restart().asSeconds();
 		sf::Event currentSFMLEvent;
 		while (window.pollEvent(currentSFMLEvent))
 		{
@@ -86,12 +88,10 @@ int main()
 			static_cast<float>(windowSize.x) / static_cast<float>(windowSize.y), camera.nearPlaneDistance, camera.farPlaneDistance);
 
 		shaderHandler->switchToShader(eShaderType::Default);
-		
 		shaderHandler->setUniformMat4f(eShaderType::Default, "uView", view);
 		shaderHandler->setUniformMat4f(eShaderType::Default, "uProjection", projection);
-		shaderHandler->setUniformMat4f(eShaderType::Default, "uModel", model);
 
-		backpackModel.render(*shaderHandler);
+		unit.render(*shaderHandler, backpackModel);
 
 		window.display();
 	}

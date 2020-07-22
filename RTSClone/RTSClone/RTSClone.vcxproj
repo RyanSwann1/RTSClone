@@ -153,6 +153,7 @@
     <ClCompile Include="ModelLoader.cpp" />
     <ClCompile Include="ShaderHandler.cpp" />
     <ClCompile Include="Texture.cpp" />
+    <ClCompile Include="Unit.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="assimp\include\ai_assert.h" />
@@ -207,6 +208,7 @@
     <ClInclude Include="NonMovable.h" />
     <ClInclude Include="ShaderHandler.h" />
     <ClInclude Include="Texture.h" />
+    <ClInclude Include="Unit.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="assimp\include\color4.inl" />
