@@ -1,10 +1,12 @@
 #pragma once
 
+#include "NonCopyable.h"
+#include "NonMovable.h"
 #include "Mesh.h"
 #include <string>
 
 class ShaderHandler;
-struct Model
+struct Model : private NonMovable, private NonCopyable
 {
 	Model();
 
