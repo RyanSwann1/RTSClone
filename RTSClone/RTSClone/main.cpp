@@ -89,19 +89,9 @@ int main()
 		
 		shaderHandler->setUniformMat4f(eShaderType::Default, "uView", view);
 		shaderHandler->setUniformMat4f(eShaderType::Default, "uProjection", projection);
+		shaderHandler->setUniformMat4f(eShaderType::Default, "uModel", model);
 
-		float zOffset = 10.0f;
-		for (int i = 0; i < modelCount; ++i)
-		{
-			glm::mat4 model = glm::translate(glm::mat4(1.0f), startingPosition);
-			shaderHandler->setUniformMat4f(eShaderType::Default, "uModel", model);
-
-
-			backpackModel.render(*shaderHandler);
-			startingPosition.z += zOffset;
-		}
-		
-		startingPosition = glm::vec3();
+		backpackModel.render(*shaderHandler);
 
 		window.display();
 	}
