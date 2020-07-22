@@ -5,8 +5,6 @@
 #include "Model.h"
 #include "ModelLoader.h"
 #include "ShaderHandler.h"
-//#define TINYOBJLOADER_IMPLEMENTATION
-//#include "tiny_obj_loader.h"
 #include "Texture.h"
 #include "Camera.h"
 
@@ -25,7 +23,6 @@ int main()
 	glm::uvec2 windowSize(1280, 800);
 	sf::Window window(sf::VideoMode(windowSize.x, windowSize.y), "RTS Clone", sf::Style::Default, settings);
 	window.setFramerateLimit(60);
-	window.setMouseCursorVisible(false);
 	window.setMouseCursorGrabbed(true);
 	gladLoadGL();
 
@@ -42,7 +39,9 @@ int main()
 		return -1;
 	}
 
-	glm::vec3 startingPosition = { 0.0f, 0.0f, 0.0f };
+	float deltaTime = 0.0f;
+	sf::Clock gameClock;
+	glm::vec3 startingPosition = { 0.0f, 0.0f, 25.0f };
 	int modelCount = 50;
 	Camera camera;
 	Model backpackModel;
@@ -60,6 +59,7 @@ int main()
 
 	while (window.isOpen())
 	{
+		deltaTime = gameClock.restart().asSeconds();
 		sf::Event currentSFMLEvent;
 		while (window.pollEvent(currentSFMLEvent))
 		{
@@ -76,11 +76,11 @@ int main()
 			}
 		}
 
-		camera.update(window);
+		camera.update(window, deltaTime);
 
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 0.0f));
+		glm::mat4 model = glm::translate(glm::mat4(1.0f), startingPosition);
 		glm::mat4 view = glm::lookAt(camera.position, camera.position + camera.front, camera.up);
 		glm::mat4 projection = glm::perspective(glm::radians(camera.FOV),
 			static_cast<float>(windowSize.x) / static_cast<float>(windowSize.y), camera.nearPlaneDistance, camera.farPlaneDistance);
@@ -95,7 +95,6 @@ int main()
 
 		window.display();
 	}
-
 
 	return 0;
 }

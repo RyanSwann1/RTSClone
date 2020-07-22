@@ -15,7 +15,6 @@ void loadMaterialTextures(aiMaterial* mat, aiTextureType type, const std::string
 
 bool ModelLoader::loadModel(const std::string& filePath, Model& model)
 {
-    std::vector<MeshTextureDetails> loadedTextures;
     Assimp::Importer importer;
     const aiScene* scene = importer.ReadFile(filePath, aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_CalcTangentSpace);
     if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
@@ -25,6 +24,7 @@ bool ModelLoader::loadModel(const std::string& filePath, Model& model)
     }
 
     std::string directory = filePath.substr(0, filePath.find_last_of('/'));
+    std::vector<MeshTextureDetails> loadedTextures;
     processNode(scene->mRootNode, scene, model, loadedTextures, directory);
 
     return true;

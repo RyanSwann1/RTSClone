@@ -9,7 +9,7 @@ struct Camera : private NonCopyable, private NonMovable
 {
 	Camera();
 
-	void update(const sf::Window& window);
+	void update(const sf::Window& window, float deltaTime);
 
 	const float FOV;
 	const float sensitivity;
@@ -20,4 +20,7 @@ struct Camera : private NonCopyable, private NonMovable
 	glm::vec3 up;
 	glm::vec2 rotation;
 	glm::vec3 position;
+
+private:
+	void moveByArrowKeys(float deltaTime);
 };
