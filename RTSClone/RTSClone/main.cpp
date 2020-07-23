@@ -35,8 +35,6 @@ int main()
 
 	glViewport(0, 0, windowSize.x, windowSize.y);
 	glEnable(GL_DEPTH_TEST);
-	glEnable(GL_CULL_FACE);
-	glCullFace(GL_BACK);
 
 	std::unique_ptr<ShaderHandler> shaderHandler = ShaderHandler::create();
 	assert(shaderHandler);
@@ -45,18 +43,11 @@ int main()
 		std::cout << "Shader Handler not loaded\n";
 		return -1;
 	}
-	//
-	//Model backpackModel;
-	//if (!ModelLoader::loadModel("models/backpack.obj", backpackModel))
-	//{
-	//	std::cout << "Failed to load model: " << "backpack.obj\n";
-	//	return -1;
-	//}
 
-	Model spaceCraftModel;
-	if (!ModelLoader::loadModel("models/spaceCraft1.obj", spaceCraftModel))
-	{ 
-		std::cout << "Failed to load : " << "spaceCraft1.obj\n";
+	Model backpackModel;
+	if (!ModelLoader::loadModel("models/backpack.obj", backpackModel))
+	{
+		std::cout << "Failed to load model: " << "backpack.obj\n";
 		return -1;
 	}
 
@@ -64,15 +55,19 @@ int main()
 	sf::Clock gameClock;
 	Camera camera;
 	glm::vec3 startingPosition = { 0.0f, 0.0f, 0.0f };
-	//std::vector<Unit> units;
-	//for (int i = 0; i < 20; ++i)
-	//{
-	//	units.emplace_back(glm::vec3(startingPosition.x, startingPosition.y, startingPosition.z), eUnitType::Default);
-	//	startingPosition.z += 2.0f;
-	//}
+	std::vector<Unit> units;
+	for (int i = 0; i < 20; ++i)
+	{
+		units.emplace_back(glm::vec3(startingPosition.x, startingPosition.y, startingPosition.z), eUnitType::Default);
+		startingPosition.z += 5.0f;
+	}
 
-	//backpackModel.attachMeshesToVAO();
-	spaceCraftModel.attachMeshesToVAO();
+	backpackModel.attachMeshesToVAO();
+
+	glm::mat4 orthographic = glm::ortho(0.0f, static_cast<float>(windowSize.x),
+		static_cast<float>(windowSize.y), 0.0f);
+	shaderHandler->switchToShader(eShaderType::SelectionBox);
+	shaderHandler->setUniformMat4f(eShaderType::SelectionBox, "uOrthographic", orthographic);
 
 	std::cout << glGetError() << "\n";
 	std::cout << glGetError() << "\n";
@@ -112,12 +107,11 @@ int main()
 		shaderHandler->setUniformMat4f(eShaderType::Default, "uView", view);
 		shaderHandler->setUniformMat4f(eShaderType::Default, "uProjection", projection);
 
-		//for (const auto& unit : units)
-		//{
-		//	//unit.render(*shaderHandler, backpackModel);
-		//}
+		for (const auto& unit : units)
+		{
+			unit.render(*shaderHandler, backpackModel);
+		}
 
-		spaceCraftModel.render(*shaderHandler);
 		shaderHandler->switchToShader(eShaderType::SelectionBox);
 		selectionBox.render(window);
 

@@ -11,12 +11,12 @@ namespace
     {
         return
         {
-            glm::ivec2(startingPosition.x, startingPosition.y + size.y),
-            glm::ivec2(startingPosition.x + size.x, startingPosition.y + size.y),
-            glm::ivec2(startingPosition.x + size.x, startingPosition.y),
-            glm::ivec2(startingPosition.x + size.x, startingPosition.y),
-            glm::ivec2(startingPosition.x, startingPosition.y),
-            glm::ivec2(startingPosition.x, startingPosition.y + size.y)
+            glm::ivec2(glm::min(startingPosition.x, startingPosition.x + size.x), glm::max(startingPosition.y, startingPosition.y + size.y)),
+            glm::ivec2(glm::max(startingPosition.x, startingPosition.x + size.x), glm::max(startingPosition.y, startingPosition.y + size.y)),
+            glm::ivec2(glm::max(startingPosition.x, startingPosition.x + size.x), glm::min(startingPosition.y, startingPosition.y + size.y)),
+            glm::ivec2(glm::max(startingPosition.x, startingPosition.x + size.x), glm::min(startingPosition.y, startingPosition.y + size.y)),
+            glm::ivec2(glm::min(startingPosition.x, startingPosition.x + size.x), glm::min(startingPosition.y, startingPosition.y + size.y)),
+            glm::ivec2(glm::min(startingPosition.x, startingPosition.x + size.x), glm::max(startingPosition.y, startingPosition.y + size.y))
         };
     };
 };
@@ -64,10 +64,8 @@ void SelectionBox::render(const sf::Window& window) const
     if (m_active)
     {
         glm::ivec2 endingPosition = { sf::Mouse::getPosition(window).x, sf::Mouse::getPosition(window).y };
-        glm::ivec2 size = endingPosition - m_startingPosition;
-
-        std::array<glm::ivec2, 6> quadCoords = getQuadCoords(m_startingPosition, size);
-
+        std::array<glm::ivec2, 6> quadCoords = getQuadCoords(m_startingPosition, endingPosition - m_startingPosition);
+        
         glBindVertexArray(m_vaoID);
         glBindBuffer(GL_ARRAY_BUFFER, m_vboID);
         glBufferData(GL_ARRAY_BUFFER, quadCoords.size() * sizeof(glm::ivec2), quadCoords.data(), GL_STATIC_DRAW);

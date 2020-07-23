@@ -19,5 +19,4 @@ private:
 	glm::ivec2 m_startingPosition;
 	unsigned int m_vaoID;
 	unsigned int m_vboID;
-	
 };
