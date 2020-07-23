@@ -8,9 +8,15 @@
 #include "Texture.h"
 #include "Camera.h"
 #include "Unit.h"
+#include "SelectionBox.h"
 
 //OpenGL Debug
 //https://gist.github.com/qookei/76586d33238f0fa918c499dc7fb5ed04
+//A*
+//https://www.youtube.com/watch?v=icZj67PTFhc
+
+//Pathfinding Playlist
+//https://www.youtube.com/playlist?list=PLFt_AvWsXl0cq5Umv3pMC9SPnKjfp9eGW
 
 int main()
 {
@@ -39,21 +45,34 @@ int main()
 		std::cout << "Shader Handler not loaded\n";
 		return -1;
 	}
-	
-	Model backpackModel;
-	if (!ModelLoader::loadModel("models/backpack.obj", backpackModel))
-	{
-		std::cout << "Failed to load model: " << "backpack.obj\n";
+	//
+	//Model backpackModel;
+	//if (!ModelLoader::loadModel("models/backpack.obj", backpackModel))
+	//{
+	//	std::cout << "Failed to load model: " << "backpack.obj\n";
+	//	return -1;
+	//}
+
+	Model spaceCraftModel;
+	if (!ModelLoader::loadModel("models/spaceCraft1.obj", spaceCraftModel))
+	{ 
+		std::cout << "Failed to load : " << "spaceCraft1.obj\n";
 		return -1;
 	}
 
+	SelectionBox selectionBox;
 	sf::Clock gameClock;
-	glm::vec3 startingPosition = { 0.0f, 0.0f, 25.0f };
-	int modelCount = 50;
 	Camera camera;
-	Unit unit(startingPosition, eUnitType::Default);
+	glm::vec3 startingPosition = { 0.0f, 0.0f, 0.0f };
+	//std::vector<Unit> units;
+	//for (int i = 0; i < 20; ++i)
+	//{
+	//	units.emplace_back(glm::vec3(startingPosition.x, startingPosition.y, startingPosition.z), eUnitType::Default);
+	//	startingPosition.z += 2.0f;
+	//}
 
-	backpackModel.attachMeshesToVAO();
+	//backpackModel.attachMeshesToVAO();
+	spaceCraftModel.attachMeshesToVAO();
 
 	std::cout << glGetError() << "\n";
 	std::cout << glGetError() << "\n";
@@ -76,6 +95,8 @@ int main()
 					window.close();
 				}
 			}
+
+			selectionBox.handleInputEvents(currentSFMLEvent, window);
 		}
 
 		camera.update(window, deltaTime);
@@ -91,7 +112,14 @@ int main()
 		shaderHandler->setUniformMat4f(eShaderType::Default, "uView", view);
 		shaderHandler->setUniformMat4f(eShaderType::Default, "uProjection", projection);
 
-		unit.render(*shaderHandler, backpackModel);
+		//for (const auto& unit : units)
+		//{
+		//	//unit.render(*shaderHandler, backpackModel);
+		//}
+
+		spaceCraftModel.render(*shaderHandler);
+		shaderHandler->switchToShader(eShaderType::SelectionBox);
+		selectionBox.render(window);
 
 		window.display();
 	}

@@ -148,9 +148,11 @@
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="glad.c" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="Map.cpp" />
     <ClCompile Include="Mesh.cpp" />
     <ClCompile Include="Model.cpp" />
     <ClCompile Include="ModelLoader.cpp" />
+    <ClCompile Include="SelectionBox.cpp" />
     <ClCompile Include="ShaderHandler.cpp" />
     <ClCompile Include="Texture.cpp" />
     <ClCompile Include="Unit.cpp" />
@@ -201,11 +203,13 @@
     <ClInclude Include="glad.h" />
     <ClInclude Include="Globals.h" />
     <ClInclude Include="khrplatform.h" />
+    <ClInclude Include="Map.h" />
     <ClInclude Include="Mesh.h" />
     <ClInclude Include="Model.h" />
     <ClInclude Include="ModelLoader.h" />
     <ClInclude Include="NonCopyable.h" />
     <ClInclude Include="NonMovable.h" />
+    <ClInclude Include="SelectionBox.h" />
     <ClInclude Include="ShaderHandler.h" />
     <ClInclude Include="Texture.h" />
     <ClInclude Include="Unit.h" />
@@ -219,6 +223,8 @@
     <None Include="assimp\include\vector2.inl" />
     <None Include="assimp\include\vector3.inl" />
     <None Include="Shaders\FragmentShader.glsl" />
+    <None Include="Shaders\SelectionBoxFragmentShader.glsl" />
+    <None Include="Shaders\SelectionBoxVertexShader.glsl" />
     <None Include="Shaders\VertexShader.glsl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

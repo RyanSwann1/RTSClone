@@ -113,8 +113,11 @@ std::unique_ptr<ShaderHandler> ShaderHandler::create()
 		case eShaderType::Default:
 			shaderLoaded = createShaderProgram(shader.getID(), "VertexShader.glsl", "FragmentShader.glsl");
 			break;
-		//default:
-			//assert(false);
+		case eShaderType::SelectionBox:
+			shaderLoaded = createShaderProgram(shader.getID(), "SelectionBoxVertexShader.glsl", "SelectionBoxFragmentShader.glsl");
+			break;
+		default:
+			assert(false);
 		}
 	}
 
