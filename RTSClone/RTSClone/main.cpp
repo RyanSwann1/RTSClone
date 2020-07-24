@@ -119,8 +119,11 @@ int main()
 		shaderHandler->setUniformMat4f(eShaderType::Ground, "uProjection", projection);
 		ground.render();
 
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		shaderHandler->switchToShader(eShaderType::SelectionBox);
 		selectionBox.render(window);
+		glDisable(GL_BLEND);
 
 		window.display();
 	}

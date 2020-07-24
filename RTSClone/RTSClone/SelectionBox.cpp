@@ -74,7 +74,6 @@ namespace
 
         assert(false);
     }
-
 };
 
 SelectionBox::SelectionBox()
