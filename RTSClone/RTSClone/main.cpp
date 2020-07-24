@@ -9,6 +9,7 @@
 #include "Camera.h"
 #include "Unit.h"
 #include "SelectionBox.h"
+#include "Ground.h"
 
 //OpenGL Debug
 //https://gist.github.com/qookei/76586d33238f0fa918c499dc7fb5ed04
@@ -51,12 +52,13 @@ int main()
 		return -1;
 	}
 
+	Ground ground;
 	SelectionBox selectionBox;
 	sf::Clock gameClock;
 	Camera camera;
 	glm::vec3 startingPosition = { 0.0f, 0.0f, 0.0f };
 	std::vector<Unit> units;
-	for (int i = 0; i < 20; ++i)
+	for (int i = 0; i < 5; ++i)
 	{
 		units.emplace_back(glm::vec3(startingPosition.x, startingPosition.y, startingPosition.z), eUnitType::Default);
 		startingPosition.z += 5.0f;
@@ -93,24 +95,29 @@ int main()
 
 			selectionBox.handleInputEvents(currentSFMLEvent, window);
 		}
-
+		
 		camera.update(window, deltaTime);
-
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		glm::mat4 model = glm::translate(glm::mat4(1.0f), startingPosition);
 		glm::mat4 view = glm::lookAt(camera.position, camera.position + camera.front, camera.up);
 		glm::mat4 projection = glm::perspective(glm::radians(camera.FOV),
 			static_cast<float>(windowSize.x) / static_cast<float>(windowSize.y), camera.nearPlaneDistance, camera.farPlaneDistance);
+		selectionBox.update(projection, view, camera, window);
 
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		shaderHandler->switchToShader(eShaderType::Default);
 		shaderHandler->setUniformMat4f(eShaderType::Default, "uView", view);
 		shaderHandler->setUniformMat4f(eShaderType::Default, "uProjection", projection);
 
-		for (const auto& unit : units)
-		{
+		for (auto& unit : units)
+		{			
 			unit.render(*shaderHandler, backpackModel);
 		}
+		
+		shaderHandler->switchToShader(eShaderType::Ground);
+		shaderHandler->setUniformMat4f(eShaderType::Ground, "uView", view);
+		shaderHandler->setUniformMat4f(eShaderType::Ground, "uProjection", projection);
+		ground.render();
 
 		shaderHandler->switchToShader(eShaderType::SelectionBox);
 		selectionBox.render(window);
