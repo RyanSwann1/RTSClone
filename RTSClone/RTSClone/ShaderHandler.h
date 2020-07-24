@@ -13,7 +13,8 @@ enum class eShaderType
 {
 	Default = 0,
 	SelectionBox,
-	Max = SelectionBox
+	Ground,
+	Max = Ground
 };
 
 class ShaderHandler final : private NonCopyable, private NonMovable
@@ -50,6 +51,7 @@ private:
 	std::array<Shader, static_cast<int>(eShaderType::Max) + 1> m_shaders =
 	{
 		eShaderType::Default,
-		eShaderType::SelectionBox
+		eShaderType::SelectionBox,
+		eShaderType::Ground
 	};
 };

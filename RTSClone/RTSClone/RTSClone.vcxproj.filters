@@ -48,6 +48,12 @@
     <ClCompile Include="SelectionBox.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Rectangle2D.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Ground.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="assimp\include\Compiler\poppack1.h">
@@ -215,6 +221,12 @@
     <ClInclude Include="SelectionBox.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Rectangle2D.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Ground.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="assimp\include\color4.inl">
@@ -242,5 +254,7 @@
     <None Include="Shaders\FragmentShader.glsl" />
     <None Include="Shaders\SelectionBoxVertexShader.glsl" />
     <None Include="Shaders\SelectionBoxFragmentShader.glsl" />
+    <None Include="Shaders\GroundVertexShader.glsl" />
+    <None Include="Shaders\GroundFragmentShader.glsl" />
   </ItemGroup>
 </Project>
