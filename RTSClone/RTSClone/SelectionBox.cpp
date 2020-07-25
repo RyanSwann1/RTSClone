@@ -98,19 +98,17 @@ SelectionBox::~SelectionBox()
 }
 
 void SelectionBox::update(const glm::mat4& projection, const glm::mat4& view, const Camera& camera, const sf::Window& window,
-    std::vector<Unit>& units)
+    Unit& unit)
 {
     if (m_active)
     {
         m_selectionBox.reset(m_startingPositionWorldPosition, 
             getMouseToGroundPosition(projection, view, camera, window) - m_startingPositionWorldPosition);
 
-        for (auto& unit : units)
+
+        if (unit.m_AABB.contains(m_selectionBox))
         {
-            if (m_selectionBox.contains(unit.m_AABB))
-            {
-                unit.m_position = { 0.0f, Globals::GROUND_HEIGHT, 0.0f };
-            }
+            unit.m_selected = true;
         }
     }
 }

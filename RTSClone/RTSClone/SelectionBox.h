@@ -16,7 +16,7 @@ public:
 	~SelectionBox();
 
 	void update(const glm::mat4& projection, const glm::mat4& view, const Camera& camera, const sf::Window& window,
-		std::vector<Unit>& units);
+		Unit& unit);
 	void handleInputEvents(const sf::Event& currentSFMLEvent, const sf::Window& window, const glm::mat4& projection,
 		const glm::mat4& view, const Camera& camera);
 	void render(const sf::Window& window) const;

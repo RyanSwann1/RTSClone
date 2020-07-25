@@ -18,4 +18,5 @@ struct Unit
 
 	glm::vec3 m_position;
 	AABB m_AABB;
+	bool m_selected;
 };

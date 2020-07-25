@@ -58,14 +58,7 @@ int main()
 	SelectionBox selectionBox;
 	sf::Clock gameClock;
 	Camera camera;
-	glm::vec3 startingPosition = { 0.0f, Globals::GROUND_HEIGHT, 0.0f };
-	std::vector<Unit> units;
-	for (int i = 0; i < 20; ++i)
-	{
-		units.emplace_back(glm::vec3(startingPosition.x, startingPosition.y, startingPosition.z));
-		startingPosition.z += 12.5f;
-		startingPosition.x += 12.5f;
-	}
+	Unit spacecraft({ 2.5f, Globals::GROUND_HEIGHT, 2.5f });
 
 	glm::mat4 orthographic = glm::ortho(0.0f, static_cast<float>(windowSize.x),
 		static_cast<float>(windowSize.y), 0.0f);
@@ -97,7 +90,7 @@ int main()
 			glm::mat4 view = glm::lookAt(camera.position, camera.position + camera.front, camera.up);
 			glm::mat4 projection = glm::perspective(glm::radians(camera.FOV),
 				static_cast<float>(windowSize.x) / static_cast<float>(windowSize.y), camera.nearPlaneDistance, camera.farPlaneDistance);
-			selectionBox.update(projection, view, camera, window, units);
+			selectionBox.update(projection, view, camera, window, spacecraft);
 			selectionBox.handleInputEvents(currentSFMLEvent, window, projection, view, camera);
 		}
 		
@@ -106,21 +99,19 @@ int main()
 		glm::mat4 view = glm::lookAt(camera.position, camera.position + camera.front, camera.up);
 		glm::mat4 projection = glm::perspective(glm::radians(camera.FOV),
 			static_cast<float>(windowSize.x) / static_cast<float>(windowSize.y), camera.nearPlaneDistance, camera.farPlaneDistance);
-		selectionBox.update(projection, view, camera, window, units);
+		selectionBox.update(projection, view, camera, window, spacecraft);
 
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		shaderHandler->switchToShader(eShaderType::Default);
 		shaderHandler->setUniformMat4f(eShaderType::Default, "uView", view);
 		shaderHandler->setUniformMat4f(eShaderType::Default, "uProjection", projection);
-
-		for (auto& unit : units)
-		{			
-			unit.render(*shaderHandler, *spacecraftModel);
-		}
+	
+		spacecraft.render(*shaderHandler, *spacecraftModel);
 
 		shaderHandler->switchToShader(eShaderType::Ground);
 		shaderHandler->setUniformMat4f(eShaderType::Ground, "uView", view);
 		shaderHandler->setUniformMat4f(eShaderType::Ground, "uProjection", projection);
+		
 		ground.render();
 
 		glEnable(GL_BLEND);
