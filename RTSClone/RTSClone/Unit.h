@@ -1,6 +1,7 @@
 #pragma once
 
 #include "glm/glm.hpp"
+#include "Rectangle2D.h" 
 
 enum class eUnitType
 {
@@ -17,4 +18,5 @@ struct Unit
 
 	glm::vec3 m_position;
 	eUnitType m_type;
+	Rectangle2D m_AABB;
 };

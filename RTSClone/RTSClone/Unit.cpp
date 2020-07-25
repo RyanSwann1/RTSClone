@@ -4,8 +4,9 @@
 #include "glm/gtc/matrix_transform.hpp"
 
 Unit::Unit(const glm::vec3& startingPosition, eUnitType type)
-	: m_position(startingPosition),
-	m_type(type)
+	: m_position(startingPosition), 
+	m_type(type),
+	m_AABB(startingPosition, 2.5f)
 {}
 
 void Unit::render(ShaderHandler & shaderHandler, const Model & model) const

@@ -3,9 +3,9 @@
 #include "glad.h"
 #include "Camera.h"
 #include "glm/gtc/matrix_transform.hpp"
+#include "Unit.h"
 #include <assert.h>
 #include <array>
-#include <iostream>
 
 namespace
 {
@@ -68,7 +68,7 @@ namespace
             glm::vec3 pos = rayPositionFromMouse * i + camera.position;
             if (pos.y <= 0)
             {
-                return { pos.x, 0.0f, pos.z };
+                return { pos.x, Globals::GROUND_HEIGHT, pos.z };
             }
         }
 
@@ -77,8 +77,10 @@ namespace
 };
 
 SelectionBox::SelectionBox()
-    : m_active(false),
-    m_startingPosition(),
+    : m_selectionBox(),
+    m_active(false),
+    m_startingPositionScreenPosition(),
+    m_startingPositionWorldPosition(),
     m_vaoID(Globals::INVALID_OPENGL_ID),
     m_vboID(Globals::INVALID_OPENGL_ID)
 {
@@ -95,18 +97,35 @@ SelectionBox::~SelectionBox()
     glDeleteBuffers(1, &m_vboID);
 }
 
-void SelectionBox::update(const glm::mat4& projection, const glm::mat4& view, const Camera& camera, const sf::Window& window)
+void SelectionBox::update(const glm::mat4& projection, const glm::mat4& view, const Camera& camera, const sf::Window& window,
+    std::vector<Unit>& units)
 {
+    if (m_active)
+    {
+        glm::vec3 mouseToGroundPosition = getMouseToGroundPosition(projection, view, camera, window);
+        m_selectionBox.reset(m_startingPositionWorldPosition, 
+            glm::vec2(mouseToGroundPosition.x, mouseToGroundPosition.z) - m_startingPositionWorldPosition);
 
+        for (auto& unit : units)
+        {
+            if (m_selectionBox.contains(unit.m_AABB))
+            {
+                unit.m_position = { 0.0f, Globals::GROUND_HEIGHT, 0.0f };
+            }
+        }
+    }
 }
 
-void SelectionBox::handleInputEvents(const sf::Event& currentSFMLEvent, const sf::Window& window)
+void SelectionBox::handleInputEvents(const sf::Event& currentSFMLEvent, const sf::Window& window, const glm::mat4& projection, 
+    const glm::mat4& view, const Camera& camera)
 {
     if (currentSFMLEvent.type == sf::Event::MouseButtonPressed)
     {
         if (currentSFMLEvent.mouseButton.button == sf::Mouse::Left)
         {
-            m_startingPosition = { sf::Mouse::getPosition(window).x, sf::Mouse::getPosition(window).y };
+            glm::vec3 position = getMouseToGroundPosition(projection, view, camera, window);
+            m_startingPositionWorldPosition = { position.x, position.z };
+            m_startingPositionScreenPosition = { sf::Mouse::getPosition(window).x, sf::Mouse::getPosition(window).y };
             m_active = true;
         }
     }
@@ -115,6 +134,7 @@ void SelectionBox::handleInputEvents(const sf::Event& currentSFMLEvent, const sf
         if (currentSFMLEvent.mouseButton.button == sf::Mouse::Left)
         {
             m_active = false;
+            m_selectionBox.reset();
         }
     }
 }
@@ -123,8 +143,8 @@ void SelectionBox::render(const sf::Window& window) const
 {
     if (m_active)
     {
-        glm::ivec2 endingPosition = { sf::Mouse::getPosition(window).x, sf::Mouse::getPosition(window).y };
-        std::array<glm::ivec2, 6> quadCoords = getQuadCoords(m_startingPosition, endingPosition - m_startingPosition);
+        glm::vec2 endingPosition = { sf::Mouse::getPosition(window).x, sf::Mouse::getPosition(window).y };
+        std::array<glm::ivec2, 6> quadCoords = getQuadCoords(m_startingPositionScreenPosition, endingPosition - m_startingPositionScreenPosition);
         
         glBindVertexArray(m_vaoID);
         glBindBuffer(GL_ARRAY_BUFFER, m_vboID);
