@@ -67,7 +67,6 @@ int main()
 		startingPosition.x += 12.5f;
 	}
 
-
 	glm::mat4 orthographic = glm::ortho(0.0f, static_cast<float>(windowSize.x),
 		static_cast<float>(windowSize.y), 0.0f);
 	shaderHandler->switchToShader(eShaderType::SelectionBox);

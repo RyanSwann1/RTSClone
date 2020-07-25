@@ -88,8 +88,6 @@ void Mesh::attachToVAO() const
 	glEnableVertexAttribArray(2);
 	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const void*)offsetof(Vertex, textCoords));
 
-
-  
 	assert(!m_indices.empty());
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indicesID);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_indices.size() * sizeof(unsigned int), m_indices.data(), GL_STATIC_DRAW);

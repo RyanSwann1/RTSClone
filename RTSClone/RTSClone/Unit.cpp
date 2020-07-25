@@ -6,7 +6,7 @@
 
 Unit::Unit(const glm::vec3& startingPosition)
 	: m_position(startingPosition), 
-	m_AABB(startingPosition, 1.0f)
+	m_AABB(startingPosition, 5.0f)
 {}
 
 void Unit::render(ShaderHandler& shaderHandler, const Model& renderModel) const

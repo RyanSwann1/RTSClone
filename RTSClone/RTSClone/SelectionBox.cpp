@@ -102,9 +102,8 @@ void SelectionBox::update(const glm::mat4& projection, const glm::mat4& view, co
 {
     if (m_active)
     {
-        glm::vec3 mouseToGroundPosition = getMouseToGroundPosition(projection, view, camera, window);
         m_selectionBox.reset(m_startingPositionWorldPosition, 
-            glm::vec2(mouseToGroundPosition.x, mouseToGroundPosition.z) - m_startingPositionWorldPosition);
+            getMouseToGroundPosition(projection, view, camera, window) - m_startingPositionWorldPosition);
 
         for (auto& unit : units)
         {
@@ -123,8 +122,7 @@ void SelectionBox::handleInputEvents(const sf::Event& currentSFMLEvent, const sf
     {
         if (currentSFMLEvent.mouseButton.button == sf::Mouse::Left)
         {
-            glm::vec3 position = getMouseToGroundPosition(projection, view, camera, window);
-            m_startingPositionWorldPosition = { position.x, position.z };
+            m_startingPositionWorldPosition = getMouseToGroundPosition(projection, view, camera, window);
             m_startingPositionScreenPosition = { sf::Mouse::getPosition(window).x, sf::Mouse::getPosition(window).y };
             m_active = true;
         }

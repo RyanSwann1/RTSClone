@@ -3,7 +3,7 @@
 #include "glm/glm.hpp"
 #include "NonCopyable.h"
 #include "NonMovable.h"
-#include "Rectangle2D.h"
+#include "AABB.h"
 #include <SFML/Graphics.hpp>
 #include <vector>
 
@@ -22,10 +22,10 @@ public:
 	void render(const sf::Window& window) const;
 
 private:
-	Rectangle2D m_selectionBox;
+	AABB m_selectionBox;
 	bool m_active;
 	glm::vec2 m_startingPositionScreenPosition;
-	glm::vec2 m_startingPositionWorldPosition;
+	glm::vec3 m_startingPositionWorldPosition;
 	unsigned int m_vaoID;
 	unsigned int m_vboID;
 };

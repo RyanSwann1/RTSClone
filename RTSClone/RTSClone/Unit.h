@@ -1,7 +1,7 @@
 #pragma once
 
 #include "glm/glm.hpp"
-#include "Rectangle2D.h" 
+#include "AABB.h"
 
 enum class eUnitType
 {
@@ -17,5 +17,5 @@ struct Unit
 	void render(ShaderHandler& shaderHandler, const Model& renderModel) const;
 
 	glm::vec3 m_position;
-	Rectangle2D m_AABB;
+	AABB m_AABB;
 };
