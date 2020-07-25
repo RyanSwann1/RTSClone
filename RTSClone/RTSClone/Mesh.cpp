@@ -3,13 +3,14 @@
 #include "glad.h"
 #include "ShaderHandler.h"
 
-Mesh::Mesh(std::vector<Vertex>&& vertices, std::vector<unsigned int>&& indices, std::vector<MeshTextureDetails>&& textures)
+Mesh::Mesh(std::vector<Vertex>&& vertices, std::vector<unsigned int>&& indices, std::vector<MeshTextureDetails>&& textures, const Material& material)
 	: m_vaoID(Globals::INVALID_OPENGL_ID),
 	m_vboID(Globals::INVALID_OPENGL_ID),
 	m_indicesID(Globals::INVALID_OPENGL_ID),
 	m_vertices(std::move(vertices)),
 	m_indices(std::move(indices)),
-	m_textures(std::move(textures))
+	m_textures(std::move(textures)),
+	m_material(material)
 {
 	glGenVertexArrays(1, &m_vaoID);
 	glGenBuffers(1, &m_vboID);
@@ -22,7 +23,8 @@ Mesh::Mesh(Mesh&& orig) noexcept
 	m_indicesID(orig.m_indicesID),
 	m_vertices(std::move(orig.m_vertices)),
 	m_indices(std::move(orig.m_indices)),
-	m_textures(std::move(orig.m_textures))
+	m_textures(std::move(orig.m_textures)),
+	m_material(orig.m_material)
 {
 	orig.m_vaoID = Globals::INVALID_OPENGL_ID;
 	orig.m_vboID = Globals::INVALID_OPENGL_ID;
@@ -37,6 +39,7 @@ Mesh& Mesh::operator=(Mesh&& orig) noexcept
 	m_vertices = std::move(orig.m_vertices);
 	m_indices = std::move(orig.m_indices);
 	m_textures = std::move(orig.m_textures);
+	m_material = orig.m_material;
 
 	orig.m_vaoID = Globals::INVALID_OPENGL_ID;
 	orig.m_vboID = Globals::INVALID_OPENGL_ID;
@@ -79,8 +82,13 @@ void Mesh::attachToVAO() const
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const void*)offsetof(Vertex, position));
 	
-    glEnableVertexAttribArray(1);
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const void*)offsetof(Vertex, textCoords));
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const void*)offsetof(Vertex, normal));
+
+	glEnableVertexAttribArray(2);
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const void*)offsetof(Vertex, textCoords));
+
+
   
 	assert(!m_indices.empty());
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indicesID);
@@ -89,16 +97,28 @@ void Mesh::attachToVAO() const
 
 void Mesh::render(ShaderHandler& shaderHandler) const
 {
-	assert(m_textures.size() == static_cast<size_t>(1));
-	glBindTexture(GL_TEXTURE_2D, m_textures.front().ID);
+	if (!m_textures.empty())
+	{
+		assert(m_textures.size() == static_cast<size_t>(1));
+		glBindTexture(GL_TEXTURE_2D, m_textures.front().ID);
 
-    bind();
-	assert(!m_indices.empty());
-    glDrawElements(GL_TRIANGLES, m_indices.size(), GL_UNSIGNED_INT, nullptr);
+		assert(!m_indices.empty());
+		bind();
+		shaderHandler.setUniformVec3(eShaderType::Default, "uMaterialColour", { 1.0f, 1.0f, 1.0f });
+		glDrawElements(GL_TRIANGLES, m_indices.size(), GL_UNSIGNED_INT, nullptr);
+	}
+	else
+	{
+		assert(!m_indices.empty());
+		bind();
+		shaderHandler.setUniformVec3(eShaderType::Default, "uMaterialColour", m_material.Diffuse);
+		glDrawElements(GL_TRIANGLES, m_indices.size(), GL_UNSIGNED_INT, nullptr);
+	}
 }
 
-Vertex::Vertex(const glm::vec3& position, const glm::vec2& textCoords)
+Vertex::Vertex(const glm::vec3& position, const glm::vec3& normal, const glm::vec2& textCoords)
 	: position(position),
+	normal(normal),
 	textCoords(textCoords)
 {}
 

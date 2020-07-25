@@ -1,11 +1,18 @@
 #version 330 core
 
 out vec4 color;
-uniform sampler2D uTexture;
+
+uniform vec3 uMaterialColour;
 
 in vec2 vTextCoords;
+in vec3 vNormal;
+
+const float ambientFactor = 0.5;
 
 void main()
 {
-	color = texture(uTexture, vTextCoords);
+	float dotFactor = dot(vNormal, vec3(0.0, 1.0, 0.0)) * 0.5 + 0.5;
+	float darkenFactor = ambientFactor + dotFactor * (1.0 - ambientFactor);
+	vec3 outputColour = uMaterialColour * darkenFactor;
+	color = vec4(outputColour, 1.0);
 };

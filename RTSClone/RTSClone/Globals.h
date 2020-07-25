@@ -9,7 +9,8 @@ namespace Globals
 { 
 	constexpr unsigned int INVALID_OPENGL_ID = 0;
 	constexpr float GROUND_HEIGHT = 0.0f;
-	
+	constexpr glm::ivec2 MAP_SIZE = { 50, 50 };
+
 
 	inline void print(const glm::vec3& position)
 	{

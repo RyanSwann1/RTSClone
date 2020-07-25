@@ -8,6 +8,11 @@
 
 //https://vulkan-tutorial.com/Loading_models
 
+struct Material 
+{
+	glm::vec3 Diffuse;
+};
+
 struct MeshTextureDetails
 {
 	MeshTextureDetails(unsigned int ID, const std::string& type, const std::string& path);
@@ -19,16 +24,18 @@ struct MeshTextureDetails
 
 struct Vertex
 {
-	Vertex(const glm::vec3& position, const glm::vec2& textCoords);
+	Vertex(const glm::vec3& position, const glm::vec3& normal, const glm::vec2& textCoords);
 
 	glm::vec3 position;
+	glm::vec3 normal;
 	glm::vec2 textCoords;
+
 };
 
 class ShaderHandler;
 struct Mesh : private NonCopyable
 {
-	Mesh(std::vector<Vertex>&& vertices, std::vector<unsigned int>&& indices, std::vector<MeshTextureDetails>&& textures);
+	Mesh(std::vector<Vertex>&& vertices, std::vector<unsigned int>&& indices, std::vector<MeshTextureDetails>&& textures, const Material& material);
 	Mesh(Mesh&&) noexcept;
 	Mesh& operator=(Mesh&&) noexcept;
 	~Mesh();
@@ -43,4 +50,5 @@ struct Mesh : private NonCopyable
 	std::vector<Vertex> m_vertices;
 	std::vector<unsigned int> m_indices;
 	std::vector<MeshTextureDetails> m_textures;
+	Material m_material;
 };

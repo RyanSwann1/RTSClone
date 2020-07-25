@@ -46,12 +46,24 @@ int main()
 		return -1;
 	}
 
-	Model backpackModel;
-	if (!ModelLoader::loadModel("models/backpack.obj", backpackModel))
+	Model spacecraftModel;
+	if (!ModelLoader::loadModel("models/spacecraft1.obj", spacecraftModel))
 	{
-		std::cout << "Failed to load model: " << "backpack.obj\n";
+		std::cout << "Failed to load spacecraft model\n";
 		return -1;
 	}
+
+	spacecraftModel.attachMeshesToVAO();
+
+	//Model backpackModel;
+	//if (!ModelLoader::loadModel("models/backpack.obj", backpackModel))
+	//{
+	//	std::cout << "Failed to load model: " << "backpack.obj\n";
+	//	return -1;
+	//}
+
+	//backpackModel.attachMeshesToVAO();
+	
 
 	Ground ground;
 	SelectionBox selectionBox;
@@ -62,10 +74,11 @@ int main()
 	for (int i = 0; i < 20; ++i)
 	{
 		units.emplace_back(glm::vec3(startingPosition.x, startingPosition.y, startingPosition.z), eUnitType::Default);
-		startingPosition.z += 5.0f;
+		startingPosition.z += 1.0f;
 	}
 
-	backpackModel.attachMeshesToVAO();
+	Unit spacecraft({ 10.0f, Globals::GROUND_HEIGHT, 10.0f }, eUnitType::Default);
+
 
 	glm::mat4 orthographic = glm::ortho(0.0f, static_cast<float>(windowSize.x),
 		static_cast<float>(windowSize.y), 0.0f);
@@ -115,9 +128,11 @@ int main()
 
 		for (auto& unit : units)
 		{			
-			unit.render(*shaderHandler, backpackModel);
+			//unit.render(*shaderHandler, backpackModel);
 		}
-		
+
+		spacecraft.render(*shaderHandler, spacecraftModel);
+
 		shaderHandler->switchToShader(eShaderType::Ground);
 		shaderHandler->setUniformMat4f(eShaderType::Ground, "uView", view);
 		shaderHandler->setUniformMat4f(eShaderType::Ground, "uProjection", projection);

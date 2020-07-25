@@ -12,6 +12,7 @@ Mesh processMesh(aiMesh* mesh, const aiScene* scene, std::vector<MeshTextureDeta
 unsigned int TextureFromFile(const char* path, const std::string& directory);
 void loadMaterialTextures(aiMaterial* mat, aiTextureType type, const std::string& typeName, std::vector<MeshTextureDetails>& loadedTextures, 
     const std::string& directory, std::vector<MeshTextureDetails>& meshTextureDetails);
+Material loadMaterial(aiMaterial* mat);
 
 bool ModelLoader::loadModel(const std::string& filePath, Model& model)
 {
@@ -55,13 +56,14 @@ Mesh processMesh(aiMesh* mesh, const aiScene* scene, std::vector<MeshTextureDeta
     for (unsigned int i = 0; i < mesh->mNumVertices; i++)
     {
         glm::vec3 position = { mesh->mVertices[i].x, mesh->mVertices[i].y, mesh->mVertices[i].z };
+        glm::vec3 normal = { mesh->mNormals[i].x, mesh->mNormals[i].y, mesh->mNormals[i].z };
         if (mesh->mTextureCoords[0]) // does the mesh contain texture coordinates?
         {
-            vertices.emplace_back(position, glm::vec2(mesh->mTextureCoords[0][i].x, mesh->mTextureCoords[0][i].y ));
+            vertices.emplace_back(position, normal, glm::vec2(mesh->mTextureCoords[0][i].x, mesh->mTextureCoords[0][i].y));
         }
         else
         {
-            vertices.emplace_back(position, glm::vec2(0.0f, 0.0f));
+            vertices.emplace_back(position, normal, glm::vec2(0.0f, 0.0f));
         }
     }
 
@@ -81,7 +83,7 @@ Mesh processMesh(aiMesh* mesh, const aiScene* scene, std::vector<MeshTextureDeta
     std::vector<MeshTextureDetails> textures;
     loadMaterialTextures(material, aiTextureType_DIFFUSE, "texture_diffuse", loadedTextures, directory, textures);
 
-    return Mesh(std::move(vertices), std::move(indices), std::move(textures));
+    return Mesh(std::move(vertices), std::move(indices), std::move(textures), loadMaterial(material));
 }
 
 // checks all material textures of a given type and loads the textures if they're not loaded yet.
@@ -111,6 +113,17 @@ void loadMaterialTextures(aiMaterial* mat, aiTextureType type, const std::string
             loadedTextures.emplace_back(ID, typeName, str.C_Str());
         }
     }
+}
+
+Material loadMaterial(aiMaterial* mat) 
+{
+    Material material;
+    aiColor3D color(0.f, 0.f, 0.f);
+
+    mat->Get(AI_MATKEY_COLOR_DIFFUSE, color);
+    material.Diffuse = glm::vec3(color.r, color.b, color.g);
+
+    return material;
 }
 
 unsigned int TextureFromFile(const char* path, const std::string& directory)
