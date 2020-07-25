@@ -12,11 +12,10 @@ class ShaderHandler;
 struct Model;
 struct Unit
 {
-	Unit(const glm::vec3& startingPosition, eUnitType type);
+	Unit(const glm::vec3& startingPosition);
 
-	void render(ShaderHandler& shaderHandler, const Model& model) const;
+	void render(ShaderHandler& shaderHandler, const Model& renderModel) const;
 
 	glm::vec3 m_position;
-	eUnitType m_type;
 	Rectangle2D m_AABB;
 };

@@ -2,15 +2,17 @@
 #include "ShaderHandler.h"
 #include "Model.h"
 #include "glm/gtc/matrix_transform.hpp"
+#include "glm/gtx/transform.hpp"
 
-Unit::Unit(const glm::vec3& startingPosition, eUnitType type)
+Unit::Unit(const glm::vec3& startingPosition)
 	: m_position(startingPosition), 
-	m_type(type),
-	m_AABB(startingPosition, 2.5f)
+	m_AABB(startingPosition, 1.0f)
 {}
 
-void Unit::render(ShaderHandler & shaderHandler, const Model & model) const
+void Unit::render(ShaderHandler& shaderHandler, const Model& renderModel) const
 {
-	shaderHandler.setUniformMat4f(eShaderType::Default, "uModel", glm::translate(glm::mat4(1.0f), m_position));
-	model.render(shaderHandler);
+	glm::mat4 model = glm::scale(glm::mat4(1.0), glm::vec3(1.0f, 1.0f, 1.0f));
+	model = glm::translate(model, m_position);
+	shaderHandler.setUniformMat4f(eShaderType::Default, "uModel", model);
+	renderModel.render(shaderHandler);
 }
