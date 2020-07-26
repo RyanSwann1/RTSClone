@@ -150,10 +150,10 @@
     <ClCompile Include="glad.c" />
     <ClCompile Include="Ground.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="Map.cpp" />
     <ClCompile Include="Mesh.cpp" />
     <ClCompile Include="Model.cpp" />
     <ClCompile Include="ModelLoader.cpp" />
+    <ClCompile Include="PathFinding.cpp" />
     <ClCompile Include="SelectionBox.cpp" />
     <ClCompile Include="ShaderHandler.cpp" />
     <ClCompile Include="Texture.cpp" />
@@ -207,12 +207,12 @@
     <ClInclude Include="Globals.h" />
     <ClInclude Include="Ground.h" />
     <ClInclude Include="khrplatform.h" />
-    <ClInclude Include="Map.h" />
     <ClInclude Include="Mesh.h" />
     <ClInclude Include="Model.h" />
     <ClInclude Include="ModelLoader.h" />
     <ClInclude Include="NonCopyable.h" />
     <ClInclude Include="NonMovable.h" />
+    <ClInclude Include="PathFinding.h" />
     <ClInclude Include="SelectionBox.h" />
     <ClInclude Include="ShaderHandler.h" />
     <ClInclude Include="Texture.h" />

@@ -16,9 +16,12 @@
 //https://gist.github.com/qookei/76586d33238f0fa918c499dc7fb5ed04
 //A*
 //https://www.youtube.com/watch?v=icZj67PTFhc
-
+//Pathfinding Article
+//http://striketactics.net/devblog/starcraft-1-pathfinding-technical-analysis
 //Pathfinding Playlist
 //https://www.youtube.com/playlist?list=PLFt_AvWsXl0cq5Umv3pMC9SPnKjfp9eGW
+//Smooth Pathfinding
+//https://gamedev.stackexchange.com/questions/42106/2d-pathfinding-finding-smooth-paths
 
 int main()
 {
@@ -91,7 +94,7 @@ int main()
 			glm::mat4 projection = glm::perspective(glm::radians(camera.FOV),
 				static_cast<float>(windowSize.x) / static_cast<float>(windowSize.y), camera.nearPlaneDistance, camera.farPlaneDistance);
 			selectionBox.update(projection, view, camera, window, spacecraft);
-			selectionBox.handleInputEvents(currentSFMLEvent, window, projection, view, camera);
+			selectionBox.handleInputEvents(currentSFMLEvent, window, projection, view, camera, spacecraft);
 		}
 		
 		camera.update(window, deltaTime);

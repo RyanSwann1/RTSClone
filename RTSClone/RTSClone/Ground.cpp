@@ -10,10 +10,10 @@ namespace
         return
         {
             glm::vec3(0, 0, 0),
-            glm::vec3(Globals::MAP_SIZE.x, 0, 0),
-            glm::vec3(Globals::MAP_SIZE.x, 0, Globals::MAP_SIZE.y),
-            glm::vec3(Globals::MAP_SIZE.x, 0, Globals::MAP_SIZE.y),
-            glm::vec3(0, 0, Globals::MAP_SIZE.y),
+            glm::vec3(Globals::MAP_SIZE, 0, 0),
+            glm::vec3(Globals::MAP_SIZE, 0, Globals::MAP_SIZE),
+            glm::vec3(Globals::MAP_SIZE, 0, Globals::MAP_SIZE),
+            glm::vec3(0, 0, Globals::MAP_SIZE),
             glm::vec3(0, 0, 0)
         };
     };
