@@ -3,11 +3,21 @@
 #include "Model.h"
 #include "glm/gtc/matrix_transform.hpp"
 #include "glm/gtx/transform.hpp"
+#include "PathFinding.h"
 
 Unit::Unit(const glm::vec3& startingPosition)
 	: m_position(startingPosition), 
-	m_AABB(startingPosition, 5.0f)
+	m_AABB(startingPosition, 5.0f),
+	m_selected(false),
+	m_pathToPosition()
 {}
+
+//https://answers.unity.com/questions/414829/any-one-know-maths-behind-this-movetowards-functio.html
+void Unit::moveTo(const glm::vec3& position)
+{
+	m_pathToPosition.clear();
+	PathFinding::getInstance().getPathToPosition(m_position, position, m_pathToPosition);
+}
 
 void Unit::render(ShaderHandler& shaderHandler, const Model& renderModel) const
 {
