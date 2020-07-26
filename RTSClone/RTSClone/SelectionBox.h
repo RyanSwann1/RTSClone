@@ -18,12 +18,13 @@ public:
 	void update(const glm::mat4& projection, const glm::mat4& view, const Camera& camera, const sf::Window& window,
 		Unit& unit);
 	void handleInputEvents(const sf::Event& currentSFMLEvent, const sf::Window& window, const glm::mat4& projection,
-		const glm::mat4& view, const Camera& camera);
+		const glm::mat4& view, const Camera& camera, Unit& unit);
 	void render(const sf::Window& window) const;
 
 private:
 	AABB m_selectionBox;
 	bool m_active;
+	glm::vec3 m_mouseToGroundPosition;
 	glm::vec2 m_startingPositionScreenPosition;
 	glm::vec3 m_startingPositionWorldPosition;
 	unsigned int m_vaoID;

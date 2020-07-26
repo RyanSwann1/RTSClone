@@ -79,6 +79,7 @@ namespace
 SelectionBox::SelectionBox()
     : m_selectionBox(),
     m_active(false),
+    m_mouseToGroundPosition(),
     m_startingPositionScreenPosition(),
     m_startingPositionWorldPosition(),
     m_vaoID(Globals::INVALID_OPENGL_ID),
@@ -102,19 +103,15 @@ void SelectionBox::update(const glm::mat4& projection, const glm::mat4& view, co
 {
     if (m_active)
     {
-        m_selectionBox.reset(m_startingPositionWorldPosition, 
-            getMouseToGroundPosition(projection, view, camera, window) - m_startingPositionWorldPosition);
+        m_mouseToGroundPosition = getMouseToGroundPosition(projection, view, camera, window);
+        m_selectionBox.reset(m_startingPositionWorldPosition, m_mouseToGroundPosition - m_startingPositionWorldPosition);
 
-
-        if (unit.m_AABB.contains(m_selectionBox))
-        {
-            unit.m_selected = true;
-        }
+        unit.m_selected = m_selectionBox.contains(unit.m_AABB);
     }
 }
 
 void SelectionBox::handleInputEvents(const sf::Event& currentSFMLEvent, const sf::Window& window, const glm::mat4& projection, 
-    const glm::mat4& view, const Camera& camera)
+    const glm::mat4& view, const Camera& camera, Unit& unit)
 {
     if (currentSFMLEvent.type == sf::Event::MouseButtonPressed)
     {
@@ -123,6 +120,11 @@ void SelectionBox::handleInputEvents(const sf::Event& currentSFMLEvent, const sf
             m_startingPositionWorldPosition = getMouseToGroundPosition(projection, view, camera, window);
             m_startingPositionScreenPosition = { sf::Mouse::getPosition(window).x, sf::Mouse::getPosition(window).y };
             m_active = true;
+        }
+        else if (currentSFMLEvent.mouseButton.button == sf::Mouse::Right && unit.m_selected)
+        {
+            unit.moveTo(getMouseToGroundPosition(projection, view, camera, window));
+            unit.m_selected = false;
         }
     }
     else if (currentSFMLEvent.type == sf::Event::MouseButtonReleased)
