@@ -47,6 +47,16 @@ void AABB::reset(const glm::vec3& position, const glm::vec3& size)
 	m_back = glm::min(position.z, position.z + size.z);
 }
 
+void AABB::reset(const glm::vec3& position, float distance)
+{
+	m_left = position.x - distance;
+	m_right = position.x + distance;
+	m_top = position.y + distance;
+	m_bottom = position.y - distance;
+	m_forward = position.z + distance;
+	m_back = position.z - distance;
+}
+
 void AABB::reset()
 {
 	m_left = 0.0f;

@@ -11,6 +11,7 @@ struct AABB
 	bool contains(const AABB& other) const;
 
 	void reset(const glm::vec3& position, const glm::vec3& size);
+	void reset(const glm::vec3& position, float distance);
 	void reset();
 
 	float m_left;
