@@ -11,14 +11,20 @@ enum class eUnitType
 
 class ShaderHandler;
 struct Model;
-struct Unit
+class Unit
 {
+public:
 	Unit(const glm::vec3& startingPosition);
 
+	const AABB& getAABB() const;
+	bool isSelected() const;
+	
+	void setSelected(bool selected);
 	void moveTo(const glm::vec3& destinationPosition);
-
+	void update(float deltaTime);
 	void render(ShaderHandler& shaderHandler, const Model& renderModel) const;
 
+private:
 	glm::vec3 m_position;
 	AABB m_AABB;
 	bool m_selected;

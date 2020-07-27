@@ -12,11 +12,30 @@ Unit::Unit(const glm::vec3& startingPosition)
 	m_pathToPosition()
 {}
 
+const AABB& Unit::getAABB() const
+{
+	return m_AABB;
+}
+
+bool Unit::isSelected() const
+{
+	return m_selected;
+}
+
+void Unit::setSelected(bool selected)
+{
+	m_selected = selected;
+}
+
 //https://answers.unity.com/questions/414829/any-one-know-maths-behind-this-movetowards-functio.html
 void Unit::moveTo(const glm::vec3& destinationPosition)
 {
 	m_pathToPosition.clear();
 	PathFinding::getInstance().getPathToPosition(m_position, destinationPosition, m_pathToPosition);
+}
+
+void Unit::update(float deltaTime)
+{
 }
 
 void Unit::render(ShaderHandler& shaderHandler, const Model& renderModel) const

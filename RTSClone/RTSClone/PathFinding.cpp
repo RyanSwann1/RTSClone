@@ -209,5 +209,8 @@ void PathFinding::getPathToPosition(const glm::vec3& startingPosition, const glm
 		assert(m_frontier.size() <= Globals::MAP_SIZE * Globals::MAP_SIZE);
 	}
 
-	assert(!pathToPosition.empty());
+	if (pathToPosition.empty())
+	{
+		std::cout << "Path is empty\n";
+	}
 }
