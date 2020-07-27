@@ -35,7 +35,7 @@ public:
 	void addToGraph(const glm::ivec2& position, const glm::ivec2& cameFromPosition);
 
 private:
-	std::array<std::array<GraphNode, Globals::MAP_SIZE>, Globals::MAP_SIZE> m_graph;
+	std::array<GraphNode, static_cast<size_t>(Globals::MAP_SIZE * Globals::MAP_SIZE)> m_graph;
 };
 
 class PathFinding

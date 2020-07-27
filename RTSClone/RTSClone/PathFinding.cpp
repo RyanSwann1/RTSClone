@@ -7,9 +7,9 @@ namespace
 	bool isPositionInMapBounds(const glm::ivec2& position)
 	{
 		return position.x >= 0 &&
-			position.x <= Globals::MAP_SIZE &&
+			position.x < Globals::MAP_SIZE &&
 			position.y >= 0 &&
-			position.y <= Globals::MAP_SIZE;
+			position.y < Globals::MAP_SIZE;
 	}
 
 	bool isPositionWithinNodeSize(const glm::ivec2& nodePosition, const glm::ivec2& position)
@@ -22,7 +22,7 @@ namespace
 
 	int convertTo1D(const glm::ivec2& position)
 	{
-		return position.y * Globals::MAP_SIZE + position.x;
+		return position.x * Globals::MAP_SIZE + position.y;
 	}
 
 	glm::vec3 convertToWorldPosition(const glm::ivec2& position)
@@ -104,10 +104,10 @@ Graph::Graph()
 
 void Graph::addToGraph(const glm::ivec2& position, const glm::ivec2& cameFromPosition)
 {
-	assert(isPositionInMapBounds(position) && !m_graph[position.y][position.x].isVisited());
-	if (isPositionInMapBounds(position) && !m_graph[position.y][position.x].isVisited())
+	assert(isPositionInMapBounds(position) && !m_graph[convertTo1D(position)].isVisited());
+	if (isPositionInMapBounds(position) && !m_graph[convertTo1D(position)].isVisited())
 	{
-		m_graph[position.y][position.x] = GraphNode(cameFromPosition);
+		m_graph[convertTo1D(position)] = GraphNode(cameFromPosition);
 	}
 }
 
@@ -118,10 +118,10 @@ bool Graph::isEmpty() const
 
 const glm::ivec2& Graph::getPreviousPosition(const glm::ivec2& position) const
 {
-	assert(isPositionInMapBounds(position) && m_graph[position.y][position.x].isVisited());
-	if (isPositionInMapBounds(position) && m_graph[position.y][position.x].isVisited())
+	assert(isPositionInMapBounds(position) && m_graph[convertTo1D(position)].isVisited());
+	if (isPositionInMapBounds(position) && m_graph[convertTo1D(position)].isVisited())
 	{
-		return m_graph[position.y][position.x].getCameFrom();
+		return m_graph[convertTo1D(position)].getCameFrom();
 	}
 }
 
@@ -130,18 +130,15 @@ bool Graph::isPositionVisited(const glm::ivec2& position) const
 	assert(isPositionInMapBounds(position));
 	if (isPositionInMapBounds(position))
 	{
-		return m_graph[position.y][position.x].isVisited();
+		return m_graph[convertTo1D(position)].isVisited();
 	}
 }
 
 void Graph::resetGraph()
 {
-	for (int y = 0; y < Globals::MAP_SIZE; ++y)
+	for (auto& i : m_graph)
 	{
-		for (int x = 0; x < Globals::MAP_SIZE; ++x)
-		{
-			m_graph[y][x] = GraphNode();
-		}
+		i = GraphNode();
 	}
 }
 
