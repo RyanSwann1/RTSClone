@@ -124,7 +124,6 @@ void SelectionBox::handleInputEvents(const sf::Event& currentSFMLEvent, const sf
         else if (currentSFMLEvent.mouseButton.button == sf::Mouse::Right && unit.isSelected())
         {
             unit.moveTo(getMouseToGroundPosition(projection, view, camera, window));
-            unit.setSelected(false);
         }
     }
     else if (currentSFMLEvent.type == sf::Event::MouseButtonReleased)
