@@ -61,7 +61,7 @@ int main()
 	SelectionBox selectionBox;
 	sf::Clock gameClock;
 	Camera camera;
-	Unit spacecraft({ 2.5f, Globals::GROUND_HEIGHT, 2.5f });
+	Unit spacecraft({ 20.0f, Globals::GROUND_HEIGHT, 20.0f });
 
 	glm::mat4 orthographic = glm::ortho(0.0f, static_cast<float>(windowSize.x),
 		static_cast<float>(windowSize.y), 0.0f);
@@ -97,6 +97,7 @@ int main()
 			selectionBox.handleInputEvents(currentSFMLEvent, window, projection, view, camera, spacecraft);
 		}
 		
+		spacecraft.update(deltaTime);
 		camera.update(window, deltaTime);
 
 		glm::mat4 view = glm::lookAt(camera.position, camera.position + camera.front, camera.up);
