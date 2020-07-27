@@ -49,11 +49,19 @@ int main()
 		return -1;
 	}
 
-	std::unique_ptr<Model> spacecraftModel = Model::create("models/spaceCraft1.obj");
+	std::unique_ptr<Model> spacecraftModel = Model::create("spaceCraft1.obj");
 	assert(spacecraftModel);
 	if (!spacecraftModel)
 	{
 		std::cout << "Failed to load SpaceCraft model\n";
+		return -1;
+	}
+
+	std::unique_ptr<Model> portalModel = Model::create("portal.obj");
+	assert(portalModel);
+	if (!portalModel)
+	{
+		std::cout << "Failed to load portal model\n";
 		return -1;
 	}
 
@@ -62,6 +70,7 @@ int main()
 	sf::Clock gameClock;
 	Camera camera;
 	Unit spacecraft({ 20.0f, Globals::GROUND_HEIGHT, 20.0f });
+	Unit portal({ 7.5f, Globals::GROUND_HEIGHT, 7.5f });
 
 	glm::mat4 orthographic = glm::ortho(0.0f, static_cast<float>(windowSize.x),
 		static_cast<float>(windowSize.y), 0.0f);
@@ -111,6 +120,7 @@ int main()
 		shaderHandler->setUniformMat4f(eShaderType::Default, "uProjection", projection);
 	
 		spacecraft.render(*shaderHandler, *spacecraftModel);
+		portal.render(*shaderHandler, *portalModel);
 
 		shaderHandler->switchToShader(eShaderType::Ground);
 		shaderHandler->setUniformMat4f(eShaderType::Ground, "uView", view);
