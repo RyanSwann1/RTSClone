@@ -9,7 +9,7 @@ namespace Globals
 { 
 	constexpr unsigned int INVALID_OPENGL_ID = 0;
 	constexpr float GROUND_HEIGHT = 0.0f;
-	constexpr int MAP_SIZE = 50;
+	constexpr int MAP_SIZE = 75;
 	constexpr int NODE_SIZE = 1;
 
 	inline void print(const std::string& text)
