@@ -15,7 +15,7 @@ struct Unit
 {
 	Unit(const glm::vec3& startingPosition);
 
-	void moveTo(const glm::vec3& position);
+	void moveTo(const glm::vec3& destinationPosition);
 
 	void render(ShaderHandler& shaderHandler, const Model& renderModel) const;
 

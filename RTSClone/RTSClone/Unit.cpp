@@ -13,10 +13,10 @@ Unit::Unit(const glm::vec3& startingPosition)
 {}
 
 //https://answers.unity.com/questions/414829/any-one-know-maths-behind-this-movetowards-functio.html
-void Unit::moveTo(const glm::vec3& position)
+void Unit::moveTo(const glm::vec3& destinationPosition)
 {
 	m_pathToPosition.clear();
-	PathFinding::getInstance().getPathToPosition(m_position, position, m_pathToPosition);
+	PathFinding::getInstance().getPathToPosition(m_position, destinationPosition, m_pathToPosition);
 }
 
 void Unit::render(ShaderHandler& shaderHandler, const Model& renderModel) const

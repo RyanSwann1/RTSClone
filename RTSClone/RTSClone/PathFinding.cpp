@@ -85,11 +85,11 @@ namespace
 		return adjacentPositions;
 	}
 
-	void getPathFromVisitedNodes(const glm::ivec2& startingPosition, const glm::ivec2& destination, 
+	void getPathFromVisitedNodes(const glm::ivec2& startingPosition, const glm::ivec2& destinationPositionOnGrid, const glm::vec3& destinationPosition, 
 		std::vector<glm::vec3>& pathToPosition, Graph& graph)
 	{
-		pathToPosition.push_back(convertToWorldPosition(destination));
-		glm::ivec2 position = destination;
+		pathToPosition.push_back(destinationPosition);
+		glm::ivec2 position = graph.getPreviousPosition(destinationPositionOnGrid);
 
 		while (position != startingPosition)
 		{
@@ -199,7 +199,7 @@ void PathFinding::getPathToPosition(const glm::vec3& startingPosition, const glm
 			if (adjacentPosition.valid && adjacentPosition.position == destinationPositionOnGrid)
 			{
 				destinationReached = true;
-				getPathFromVisitedNodes(startingPositionOnGrid, adjacentPosition.position, pathToPosition, m_graph);
+				getPathFromVisitedNodes(startingPositionOnGrid, adjacentPosition.position, destinationPosition, pathToPosition, m_graph);
 				break;
 			}
 		}
