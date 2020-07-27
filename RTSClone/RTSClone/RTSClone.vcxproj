@@ -147,6 +147,7 @@
   <ItemGroup>
     <ClCompile Include="AABB.cpp" />
     <ClCompile Include="Camera.cpp" />
+    <ClCompile Include="Entity.cpp" />
     <ClCompile Include="glad.c" />
     <ClCompile Include="Ground.cpp" />
     <ClCompile Include="main.cpp" />
@@ -203,6 +204,7 @@
     <ClInclude Include="assimp\include\vector3.h" />
     <ClInclude Include="assimp\include\version.h" />
     <ClInclude Include="Camera.h" />
+    <ClInclude Include="Entity.h" />
     <ClInclude Include="glad.h" />
     <ClInclude Include="Globals.h" />
     <ClInclude Include="Ground.h" />
