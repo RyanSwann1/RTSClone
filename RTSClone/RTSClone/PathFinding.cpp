@@ -176,6 +176,8 @@ PathFinding::PathFinding()
 void PathFinding::getPathToPosition(const glm::vec3& startingPosition, const glm::vec3& destinationPosition, std::vector<glm::vec3>& pathToPosition)
 {
 	m_graph.resetGraph();
+	std::queue<glm::ivec2> empty;
+	m_frontier.swap(empty);
 	
 	glm::ivec2 destinationPositionOnGrid = convertToGridPosition(destinationPosition);
 	glm::ivec2 startingPositionOnGrid = convertToGridPosition(startingPosition);
