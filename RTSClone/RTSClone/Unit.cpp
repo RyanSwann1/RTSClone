@@ -117,7 +117,7 @@ void Unit::render(ShaderHandler& shaderHandler, const Model& renderModel) const
 	glm::mat4 model = glm::scale(glm::mat4(1.0), glm::vec3(1.0f, 1.0f, 1.0f));
 	model = glm::translate(model, m_position);
 	shaderHandler.setUniformMat4f(eShaderType::Default, "uModel", model);
-	renderModel.render(shaderHandler);
+	renderModel.render(shaderHandler, m_selected);
 }
 
 #ifdef RENDER_PATHING
@@ -126,7 +126,7 @@ void Unit::renderPathMesh(ShaderHandler& shaderHandler)
 	if (!m_pathToPosition.empty())
 	{
 		shaderHandler.setUniformVec3(eShaderType::Ground, "uColor", PATH_COLOUR);
-		m_renderPathMesh.render(shaderHandler);
+		m_renderPathMesh.render(shaderHandler, m_selected);
 	}
 }
 #endif // RENDER_PATHING

@@ -2,6 +2,11 @@
 #include "ShaderHandler.h"
 #include "ModelLoader.h"
 
+namespace
+{
+	const std::string MODELS_DIRECTORY = "models/";
+}
+
 Model::Model()
 	: meshes(),
 	textures()
@@ -10,7 +15,7 @@ Model::Model()
 std::unique_ptr<Model> Model::create(const std::string & filePath)
 {
 	Model* model = new Model();
-	if (!ModelLoader::loadModel(filePath, *model))
+	if (!ModelLoader::loadModel(MODELS_DIRECTORY + filePath, *model))
 	{
 		delete model;
 		return std::unique_ptr<Model>();
@@ -28,10 +33,10 @@ void Model::attachMeshesToVAO() const
 	}
 }
 
-void Model::render(ShaderHandler & shaderHandler) const
+void Model::render(ShaderHandler & shaderHandler, bool selected) const
 {
 	for (const auto& mesh : meshes)
 	{
-		mesh.render(shaderHandler);
+		mesh.render(shaderHandler, selected);
 	}
 }

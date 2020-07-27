@@ -12,7 +12,7 @@ struct Model : private NonMovable, private NonCopyable
 	static std::unique_ptr<Model> create(const std::string& filePath);
 
 	void attachMeshesToVAO() const;
-	void render(ShaderHandler& shaderHandler) const;
+	void render(ShaderHandler& shaderHandler, bool selected) const;
 
 
 	std::vector<Mesh> meshes;

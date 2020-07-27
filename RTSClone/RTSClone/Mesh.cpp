@@ -3,6 +3,11 @@
 #include "glad.h"
 #include "ShaderHandler.h"
 
+namespace
+{
+	constexpr float SELECTED_MESH_AMPLIFIER = 1.75f;
+}
+
 Mesh::Mesh()
 	: m_vaoID(Globals::INVALID_OPENGL_ID),
 	m_vboID(Globals::INVALID_OPENGL_ID),
@@ -107,7 +112,7 @@ void Mesh::attachToVAO() const
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_indices.size() * sizeof(unsigned int), m_indices.data(), GL_STATIC_DRAW);
 }
 
-void Mesh::render(ShaderHandler& shaderHandler) const
+void Mesh::render(ShaderHandler& shaderHandler, bool selected) const
 {
 	if (!m_textures.empty())
 	{
@@ -135,6 +140,14 @@ void Mesh::render(ShaderHandler& shaderHandler) const
 		{
 		case eShaderType::Default:
 			shaderHandler.setUniformVec3(eShaderType::Default, "uMaterialColour", m_material.Diffuse);
+			if (selected)
+			{
+				shaderHandler.setUniform1f(eShaderType::Default, "uSelectedAmplifier", SELECTED_MESH_AMPLIFIER);
+			}
+			else
+			{
+				shaderHandler.setUniform1f(eShaderType::Default, "uSelectedAmplifier", 1.0f);
+			}
 			break;
 		}
 		glDrawElements(GL_TRIANGLES, m_indices.size(), GL_UNSIGNED_INT, nullptr);
