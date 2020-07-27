@@ -3,6 +3,20 @@
 #include "glad.h"
 #include "ShaderHandler.h"
 
+Mesh::Mesh()
+	: m_vaoID(Globals::INVALID_OPENGL_ID),
+	m_vboID(Globals::INVALID_OPENGL_ID),
+	m_indicesID(Globals::INVALID_OPENGL_ID),
+	m_vertices(),
+	m_indices(),
+	m_textures(),
+	m_material()
+{
+	glGenVertexArrays(1, &m_vaoID);
+	glGenBuffers(1, &m_vboID);
+	glGenBuffers(1, &m_indicesID);
+}
+
 Mesh::Mesh(std::vector<Vertex>&& vertices, std::vector<unsigned int>&& indices, std::vector<MeshTextureDetails>&& textures, const Material& material)
 	: m_vaoID(Globals::INVALID_OPENGL_ID),
 	m_vboID(Globals::INVALID_OPENGL_ID),
@@ -102,17 +116,36 @@ void Mesh::render(ShaderHandler& shaderHandler) const
 
 		assert(!m_indices.empty());
 		bind();
-		shaderHandler.setUniformVec3(eShaderType::Default, "uMaterialColour", { 1.0f, 1.0f, 1.0f });
+		switch (shaderHandler.getActiveShaderType())
+		{
+		case eShaderType::Default:
+			shaderHandler.setUniformVec3(eShaderType::Default, "uMaterialColour", { 1.0f, 1.0f, 1.0f });
+			break;
+		default:
+			assert(false);
+		}
+		
 		glDrawElements(GL_TRIANGLES, m_indices.size(), GL_UNSIGNED_INT, nullptr);
 	}
 	else
 	{
 		assert(!m_indices.empty());
 		bind();
-		shaderHandler.setUniformVec3(eShaderType::Default, "uMaterialColour", m_material.Diffuse);
+		switch (shaderHandler.getActiveShaderType())
+		{
+		case eShaderType::Default:
+			shaderHandler.setUniformVec3(eShaderType::Default, "uMaterialColour", m_material.Diffuse);
+			break;
+		}
 		glDrawElements(GL_TRIANGLES, m_indices.size(), GL_UNSIGNED_INT, nullptr);
 	}
 }
+
+Vertex::Vertex(const glm::vec3& position)
+	: position(position),
+	normal(),
+	textCoords()
+{}
 
 Vertex::Vertex(const glm::vec3& position, const glm::vec3& normal, const glm::vec2& textCoords)
 	: position(position),

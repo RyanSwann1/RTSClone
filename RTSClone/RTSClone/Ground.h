@@ -4,13 +4,14 @@
 #include "NonMovable.h"
 #include "glm/glm.hpp"
 
+class ShaderHandler;
 class Ground : private NonMovable, private NonCopyable
 {
 public:
 	Ground();
 	~Ground();
 
-	void render() const;
+	void render(ShaderHandler& shaderHandler) const;
 
 private:
 	unsigned int m_vaoID;

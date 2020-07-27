@@ -1,10 +1,13 @@
 #include "Ground.h"
 #include "Globals.h"
 #include "glad.h"
+#include "ShaderHandler.h"
 #include <array>
 
 namespace
 {
+    constexpr glm::vec3 GROUND_COLOR = { 0.5f, 0.5f, 0.5f };
+
     std::array<glm::vec3, 6> getQuadCoords()
     {
         return
@@ -42,8 +45,9 @@ Ground::~Ground()
     glDeleteBuffers(1, &m_vboID);
 }
 
-void Ground::render() const
+void Ground::render(ShaderHandler& shaderHandler) const
 {
+    shaderHandler.setUniformVec3(eShaderType::Ground, "uColor", GROUND_COLOR);
     glBindVertexArray(m_vaoID);
     glDrawArrays(GL_TRIANGLES, 0, 6);
 }

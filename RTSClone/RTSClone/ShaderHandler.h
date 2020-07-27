@@ -38,6 +38,8 @@ class ShaderHandler final : private NonCopyable, private NonMovable
 public:
 	static std::unique_ptr<ShaderHandler> create();
 
+	eShaderType getActiveShaderType() const;
+
 	void setUniformMat4f(eShaderType shaderType, const std::string& uniformName, const glm::mat4& matrix);
 	void setUniformVec3(eShaderType shaderType, const std::string& uniformName, const glm::vec3& v);
 	void setUniform1i(eShaderType shaderType, const std::string& uniformName, int value);

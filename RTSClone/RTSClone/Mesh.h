@@ -24,6 +24,7 @@ struct MeshTextureDetails
 
 struct Vertex
 {
+	Vertex(const glm::vec3& position);
 	Vertex(const glm::vec3& position, const glm::vec3& normal, const glm::vec2& textCoords);
 
 	glm::vec3 position;
@@ -34,6 +35,7 @@ struct Vertex
 class ShaderHandler;
 struct Mesh : private NonCopyable
 {
+	Mesh();
 	Mesh(std::vector<Vertex>&& vertices, std::vector<unsigned int>&& indices, std::vector<MeshTextureDetails>&& textures, const Material& material);
 	Mesh(Mesh&&) noexcept;
 	Mesh& operator=(Mesh&&) noexcept;
