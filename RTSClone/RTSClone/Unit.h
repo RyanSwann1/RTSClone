@@ -15,7 +15,7 @@ public:
 	Unit(const glm::vec3& startingPosition);
 
 	void moveTo(const glm::vec3& destinationPosition, const Map& map);
-	void update(float deltaTime) override;
+	void update(float deltaTime);
 
 #ifdef RENDER_PATHING
 	void renderPathMesh(ShaderHandler& shaderHandler);

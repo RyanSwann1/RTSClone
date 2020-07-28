@@ -12,7 +12,7 @@ public:
 	bool isSelected() const;
 	
 	void setSelected(bool selected);
-	virtual void update(float deltaTime) {}
+	void update(float deltaTime) {}
 	void render(ShaderHandler& shaderHandler, const Model& renderModel) const;
 
 #ifdef RENDER_AABB

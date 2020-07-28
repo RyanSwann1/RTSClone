@@ -34,7 +34,10 @@ void Entity::render(ShaderHandler& shaderHandler, const Model& renderModel) cons
 	renderModel.render(shaderHandler, m_selected);
 }
 
+#ifdef RENDER_AABB
 void Entity::renderAABB(ShaderHandler& shaderHandler)
 {
 	m_AABB.render(shaderHandler);
 }
+
+#endif // RENDER_AABB
