@@ -111,7 +111,7 @@ void SelectionBox::update(const glm::mat4& projection, const glm::mat4& view, co
 }
 
 void SelectionBox::handleInputEvents(const sf::Event& currentSFMLEvent, const sf::Window& window, const glm::mat4& projection, 
-    const glm::mat4& view, const Camera& camera, Unit& unit)
+    const glm::mat4& view, const Camera& camera, Unit& unit, const Map& map)
 {
     if (currentSFMLEvent.type == sf::Event::MouseButtonPressed)
     {
@@ -123,7 +123,7 @@ void SelectionBox::handleInputEvents(const sf::Event& currentSFMLEvent, const sf
         }
         else if (currentSFMLEvent.mouseButton.button == sf::Mouse::Right && unit.isSelected())
         {
-            unit.moveTo(getMouseToGroundPosition(projection, view, camera, window));
+            unit.moveTo(getMouseToGroundPosition(projection, view, camera, window), map);
         }
     }
     else if (currentSFMLEvent.type == sf::Event::MouseButtonReleased)

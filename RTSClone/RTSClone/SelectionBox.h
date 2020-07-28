@@ -7,7 +7,9 @@
 #include <SFML/Graphics.hpp>
 #include <vector>
 
-struct Unit;
+class Building;
+class Unit;
+class Map;
 struct Camera;
 class SelectionBox : private NonMovable, private NonCopyable
 {
@@ -18,7 +20,7 @@ public:
 	void update(const glm::mat4& projection, const glm::mat4& view, const Camera& camera, const sf::Window& window,
 		Unit& unit);
 	void handleInputEvents(const sf::Event& currentSFMLEvent, const sf::Window& window, const glm::mat4& projection,
-		const glm::mat4& view, const Camera& camera, Unit& unit);
+		const glm::mat4& view, const Camera& camera, Unit& unit, const Map& map);
 	void render(const sf::Window& window) const;
 
 private:

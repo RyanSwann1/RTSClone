@@ -6,6 +6,7 @@
 #include "Mesh.h"
 #endif // RENDER_PATHING
 
+class Map;
 class ShaderHandler;
 struct Model;
 class Unit : public Entity
@@ -13,7 +14,7 @@ class Unit : public Entity
 public:
 	Unit(const glm::vec3& startingPosition);
 
-	void moveTo(const glm::vec3& destinationPosition);
+	void moveTo(const glm::vec3& destinationPosition, const Map& map);
 	void update(float deltaTime) override;
 
 #ifdef RENDER_PATHING

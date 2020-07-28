@@ -8,9 +8,10 @@
 #include "Texture.h"
 #include "Camera.h"
 #include "Unit.h"
+#include "Building.h"
 #include "SelectionBox.h"
 #include "Ground.h"
-#include "Globals.h"
+#include "Map.h"
 
 //OpenGL Debug
 //https://gist.github.com/qookei/76586d33238f0fa918c499dc7fb5ed04
@@ -65,12 +66,15 @@ int main()
 		return -1;
 	}
 
+	Map map;
 	Ground ground;
 	SelectionBox selectionBox;
 	sf::Clock gameClock;
 	Camera camera;
 	Unit spacecraft({ 20.0f, Globals::GROUND_HEIGHT, 20.0f });
-	Unit portal({ 7.5f, Globals::GROUND_HEIGHT, 7.5f });
+	Building portal({ 37.5f, Globals::GROUND_HEIGHT, 37.5f });
+
+	map.addBuilding(portal);
 
 	glm::mat4 orthographic = glm::ortho(0.0f, static_cast<float>(windowSize.x),
 		static_cast<float>(windowSize.y), 0.0f);
@@ -103,7 +107,7 @@ int main()
 			glm::mat4 projection = glm::perspective(glm::radians(camera.FOV),
 				static_cast<float>(windowSize.x) / static_cast<float>(windowSize.y), camera.nearPlaneDistance, camera.farPlaneDistance);
 			selectionBox.update(projection, view, camera, window, spacecraft);
-			selectionBox.handleInputEvents(currentSFMLEvent, window, projection, view, camera, spacecraft);
+			selectionBox.handleInputEvents(currentSFMLEvent, window, projection, view, camera, spacecraft, map);
 		}
 		
 		spacecraft.update(deltaTime);

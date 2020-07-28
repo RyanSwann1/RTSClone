@@ -70,10 +70,10 @@ Unit::Unit(const glm::vec3& startingPosition)
 	m_pathToPosition()
 {}
 
-void Unit::moveTo(const glm::vec3& destinationPosition)
+void Unit::moveTo(const glm::vec3& destinationPosition, const Map& map)
 {
 	m_pathToPosition.clear();
-	PathFinding::getInstance().getPathToPosition(m_position, destinationPosition, m_pathToPosition);
+	PathFinding::getInstance().getPathToPosition(m_position, destinationPosition, m_pathToPosition, map);
 }
 
 void Unit::update(float deltaTime)

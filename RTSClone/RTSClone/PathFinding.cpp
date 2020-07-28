@@ -1,5 +1,6 @@
 #include "PathFinding.h"
 #include "Globals.h"
+#include "Map.h"
 #include <array>
 
 namespace
@@ -39,11 +40,6 @@ namespace
 			position.y <= nodePosition.y + Globals::NODE_SIZE;
 	}
 
-	int convertTo1D(const glm::ivec2& position)
-	{
-		return position.x * Globals::MAP_SIZE + position.y;
-	}
-
 	glm::vec3 convertToWorldPosition(const glm::ivec2& position)
 	{
 		return { position.x * Globals::NODE_SIZE, Globals::GROUND_HEIGHT, position.y * Globals::NODE_SIZE };
@@ -66,13 +62,13 @@ namespace
 		glm::ivec2(-1, 1)
 	};
 
-	std::array<AdjacentPosition, ALL_DIRECTIONS.size()> getAllAdjacentPositions(const glm::ivec2& position)
+	std::array<AdjacentPosition, ALL_DIRECTIONS.size()> getAllAdjacentPositions(const glm::ivec2& position, const Map& map)
 	{
 		std::array<AdjacentPosition, ALL_DIRECTIONS.size()> adjacentPositions;
 		for (int i = 0; i < adjacentPositions.size(); ++i)
 		{
 			glm::ivec2 newPosition = position + ALL_DIRECTIONS[i];
-			if (isPositionInMapBounds(newPosition))
+			if (isPositionInMapBounds(newPosition) && !map.isPositionOccupied(newPosition))
 			{
 				adjacentPositions[i] = AdjacentPosition(newPosition);
 			}
@@ -129,10 +125,10 @@ Graph::Graph()
 
 void Graph::addToGraph(const glm::ivec2& position, const glm::ivec2& cameFromPosition)
 {
-	assert(isPositionInMapBounds(position) && !m_graph[convertTo1D(position)].isVisited());
-	if (isPositionInMapBounds(position) && !m_graph[convertTo1D(position)].isVisited())
+	assert(isPositionInMapBounds(position) && !m_graph[Globals::convertTo1D(position)].isVisited());
+	if (isPositionInMapBounds(position) && !m_graph[Globals::convertTo1D(position)].isVisited())
 	{
-		m_graph[convertTo1D(position)] = GraphNode(cameFromPosition);
+		m_graph[Globals::convertTo1D(position)] = GraphNode(cameFromPosition);
 	}
 }
 
@@ -143,10 +139,10 @@ bool Graph::isEmpty() const
 
 const glm::ivec2& Graph::getPreviousPosition(const glm::ivec2& position) const
 {
-	assert(isPositionInMapBounds(position) && m_graph[convertTo1D(position)].isVisited());
-	if (isPositionInMapBounds(position) && m_graph[convertTo1D(position)].isVisited())
+	assert(isPositionInMapBounds(position) && m_graph[Globals::convertTo1D(position)].isVisited());
+	if (isPositionInMapBounds(position) && m_graph[Globals::convertTo1D(position)].isVisited())
 	{
-		return m_graph[convertTo1D(position)].getCameFrom();
+		return m_graph[Globals::convertTo1D(position)].getCameFrom();
 	}
 }
 
@@ -155,7 +151,7 @@ bool Graph::isPositionVisited(const glm::ivec2& position) const
 	assert(isPositionInMapBounds(position));
 	if (isPositionInMapBounds(position))
 	{
-		return m_graph[convertTo1D(position)].isVisited();
+		return m_graph[Globals::convertTo1D(position)].isVisited();
 	}
 }
 
@@ -173,7 +169,8 @@ PathFinding::PathFinding()
 	m_frontier()
 {}
 
-void PathFinding::getPathToPosition(const glm::vec3& startingPosition, const glm::vec3& destinationPosition, std::vector<glm::vec3>& pathToPosition)
+void PathFinding::getPathToPosition(const glm::vec3& startingPosition, const glm::vec3& destinationPosition, std::vector<glm::vec3>& pathToPosition,
+	const Map& map)
 {
 	m_graph.resetGraph();
 	std::queue<glm::ivec2> empty;
@@ -189,19 +186,26 @@ void PathFinding::getPathToPosition(const glm::vec3& startingPosition, const glm
 		glm::ivec2 position = m_frontier.front();
 		m_frontier.pop();
 
-		std::array<AdjacentPosition, ALL_DIRECTIONS.size()> adjacentPositions = getAllAdjacentPositions(position);
+		std::array<AdjacentPosition, ALL_DIRECTIONS.size()> adjacentPositions = getAllAdjacentPositions(position, map);
 		float distance = glm::distance(glm::vec2(destinationPositionOnGrid), glm::vec2(startingPositionOnGrid));
 		glm::ivec2 nextPosition;
+		bool positionFound = false;
 		for (const auto& adjacentPosition : adjacentPositions)
 		{
 			if (adjacentPosition.valid && glm::distance(glm::vec2(destinationPositionOnGrid), glm::vec2(adjacentPosition.position)) < distance)
 			{
 				distance = glm::distance(glm::vec2(destinationPositionOnGrid), glm::vec2(adjacentPosition.position));
 				nextPosition = adjacentPosition.position;
+				positionFound = true;
 			}
 		}
 
-		assert(distance != glm::distance(glm::vec2(destinationPositionOnGrid), glm::vec2(startingPositionOnGrid)));
+		if (!positionFound)
+		{
+
+		}
+
+		//assert(distance != glm::distance(glm::vec2(destinationPositionOnGrid), glm::vec2(startingPositionOnGrid)));
 		if (!m_graph.isPositionVisited(nextPosition))
 		{
 			m_graph.addToGraph(nextPosition, position);

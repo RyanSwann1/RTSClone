@@ -35,4 +35,9 @@ namespace Globals
 			clock.restart();
 		}
 	}
+
+	inline int convertTo1D(const glm::ivec2& position)
+	{
+		return position.x * Globals::MAP_SIZE + position.y;
+	}
 }

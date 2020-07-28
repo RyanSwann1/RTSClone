@@ -140,6 +140,7 @@ void Mesh::render(ShaderHandler& shaderHandler, bool selected) const
 		{
 		case eShaderType::Default:
 			shaderHandler.setUniformVec3(eShaderType::Default, "uMaterialColour", m_material.Diffuse);
+
 			if (selected)
 			{
 				shaderHandler.setUniform1f(eShaderType::Default, "uSelectedAmplifier", SELECTED_MESH_AMPLIFIER);
