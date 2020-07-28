@@ -272,7 +272,7 @@
     <None Include="Shaders\FragmentShader.glsl" />
     <None Include="Shaders\SelectionBoxVertexShader.glsl" />
     <None Include="Shaders\SelectionBoxFragmentShader.glsl" />
-    <None Include="Shaders\GroundVertexShader.glsl" />
-    <None Include="Shaders\GroundFragmentShader.glsl" />
+    <None Include="Shaders\DebugFragmentShader.glsl" />
+    <None Include="Shaders\DebugVertexShader.glsl" />
   </ItemGroup>
 </Project>
