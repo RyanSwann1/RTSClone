@@ -13,8 +13,8 @@ enum class eShaderType
 {
 	Default = 0,
 	SelectionBox,
-	Ground,
-	Max = Ground
+	Debug,
+	Max = Debug
 };
 
 class ShaderHandler final : private NonCopyable, private NonMovable
@@ -54,6 +54,6 @@ private:
 	{
 		eShaderType::Default,
 		eShaderType::SelectionBox,
-		eShaderType::Ground
+		eShaderType::Debug
 	};
 };

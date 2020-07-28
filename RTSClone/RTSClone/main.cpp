@@ -10,8 +10,12 @@
 #include "Unit.h"
 #include "Building.h"
 #include "SelectionBox.h"
-#include "Ground.h"
 #include "Map.h"
+
+#define RENDER_GROUND
+#ifdef RENDER_GROUND
+#include "Ground.h"
+#endif // RENDER_GROUND
 
 //OpenGL Debug
 //https://gist.github.com/qookei/76586d33238f0fa918c499dc7fb5ed04
@@ -67,7 +71,9 @@ int main()
 	}
 
 	Map map;
+#ifdef RENDER_GROUND
 	Ground ground;
+#endif // RENDER_GROUND
 	SelectionBox selectionBox;
 	sf::Clock gameClock;
 	Camera camera;
@@ -126,11 +132,13 @@ int main()
 		spacecraft.render(*shaderHandler, *spacecraftModel);
 		portal.render(*shaderHandler, *portalModel);
 
-		shaderHandler->switchToShader(eShaderType::Ground);
-		shaderHandler->setUniformMat4f(eShaderType::Ground, "uView", view);
-		shaderHandler->setUniformMat4f(eShaderType::Ground, "uProjection", projection);
-		
+		shaderHandler->switchToShader(eShaderType::Debug);
+		shaderHandler->setUniformMat4f(eShaderType::Debug, "uView", view);
+		shaderHandler->setUniformMat4f(eShaderType::Debug, "uProjection", projection);
+
+#ifdef RENDER_GROUND
 		ground.render(*shaderHandler);
+#endif // RENDER_GROUND
 
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
