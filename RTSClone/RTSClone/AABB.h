@@ -2,6 +2,11 @@
 
 #include "glm/glm.hpp"
 
+#ifdef RENDER_AABB
+#include "Mesh.h"
+#endif // RENDER_AABB
+
+class ShaderHandler;
 struct AABB
 {
 	AABB();
@@ -14,10 +19,18 @@ struct AABB
 	void reset(const glm::vec3& position, float distance);
 	void reset();
 
+#ifdef RENDER_AABB
+	void render(ShaderHandler& shaderHandler);
+#endif // RENDER_AABB
+
 	float m_left;
 	float m_right;
-	float m_forward;
-	float m_back;
 	float m_top;
 	float m_bottom;
+	float m_forward;
+	float m_back;
+
+#ifdef RENDER_AABB
+	Mesh m_mesh;
+#endif // RENDER_AABB
 };

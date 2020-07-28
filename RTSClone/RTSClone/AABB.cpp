@@ -1,12 +1,50 @@
 #include "AABB.h"
 
+#ifdef RENDER_AABB
+#include "ShaderHandler.h"
+#include "Globals.h"
+#include <array>
+namespace
+{
+	//void generateLeftFace()
+	constexpr glm::vec3 COLOR = { 1.0f, 0.0f, 0.0f };
+	constexpr float OPACITY = 0.4f;
+
+	void generateMesh(const glm::vec3& position, const glm::vec3& size, Mesh& mesh)
+	{
+		mesh.m_vertices.clear();
+		mesh.m_indices.clear();
+
+		const std::array<glm::vec3, 4> CUBE_FACE_TOP =
+		{
+			glm::vec3(position.x - size.x, 1.0f, position.z + size.z),
+			glm::vec3(position.x + size.x, 1.0f, position.z + size.z),
+			glm::vec3(position.x + size.x, 1.0f, position.z - size.z),
+			glm::vec3(position.x - size.x, 1.0f, position.z - size.z)
+		};
+
+		for (const auto& i : CUBE_FACE_TOP)
+		{
+			mesh.m_vertices.emplace_back(i);
+		}
+
+		for (unsigned int i : Globals::CUBE_FACE_INDICIES)
+		{
+			mesh.m_indices.push_back(i);
+		}
+
+		mesh.attachToVAO();
+	}
+}
+#endif // RENDER_AABB
+
 AABB::AABB()
 	: m_left(0.0f),
 	m_right(0.0f),
-	m_forward(0.0f),
-	m_back(0.0f),
 	m_top(0.0f),
-	m_bottom(0.0f)
+	m_bottom(0.0f),
+	m_forward(0.0f),
+	m_back(0.0f)
 {}
 
 AABB::AABB(const glm::vec3& position, const glm::vec3& size)
@@ -66,3 +104,16 @@ void AABB::reset()
 	m_forward = 0.0f;
 	m_back = 0.0f;
 }
+
+#ifdef RENDER_AABB
+void AABB::render(ShaderHandler& shaderHandler)
+{
+	glm::vec3 centrePosition((m_right - (m_right - m_left) / 2.0f), (m_top - (m_top - m_bottom) / 2.0f), (m_forward - (m_forward - m_back) / 2.0f));
+	glm::vec3 distanceFromCentre(m_right - centrePosition.x, m_top - centrePosition.y, m_forward - centrePosition.z);
+	generateMesh(centrePosition, distanceFromCentre, m_mesh);
+
+	shaderHandler.setUniformVec3(eShaderType::Debug, "uColor", COLOR);
+	shaderHandler.setUniform1f(eShaderType::Debug, "uOpacity", OPACITY);
+	m_mesh.render(shaderHandler, false);
+}
+#endif // RENDER_AABB
