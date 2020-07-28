@@ -142,6 +142,10 @@ int main()
 
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+#ifdef RENDER_AABB
+		portal.renderAABB(*shaderHandler);
+		spacecraft.renderAABB(*shaderHandler);
+#endif // RENDER_AABB
 #ifdef RENDER_PATHING
 		spacecraft.renderPathMesh(*shaderHandler);
 #endif // RENDER_PATHING

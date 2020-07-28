@@ -4,6 +4,7 @@
 #include "glm/glm.hpp"
 #include <SFML/Graphics.hpp>
 #include <iostream>
+#include <array>
 
 namespace Globals
 { 
@@ -11,6 +12,13 @@ namespace Globals
 	constexpr float GROUND_HEIGHT = 0.0f;
 	constexpr int MAP_SIZE = 75;
 	constexpr int NODE_SIZE = 1;
+
+	constexpr int CUBE_FACE_INDICIE_COUNT = 4;
+	constexpr std::array<unsigned int, 6> CUBE_FACE_INDICIES =
+	{
+		0, 1, 2,
+		2, 3, 0
+	};
 
 	inline void print(const std::string& text)
 	{

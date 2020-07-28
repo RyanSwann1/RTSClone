@@ -25,13 +25,6 @@ namespace
 
 	void generateRenderPath(const std::vector<glm::vec3>& path, Mesh& mesh)
 	{
-		constexpr int CUBE_FACE_INDICIE_COUNT = 4;
-		constexpr std::array<unsigned int, 6> CUBE_FACE_INDICIES =
-		{
-			0, 1, 2,
-			2, 3, 0
-		};
-
 		constexpr std::array<glm::vec3, 4> CUBE_FACE_TOP =
 		{
 			glm::vec3(0, Globals::NODE_SIZE, Globals::NODE_SIZE),
@@ -51,12 +44,12 @@ namespace
 				mesh.m_vertices.emplace_back(pathNode + i);
 			}
 
-			for (unsigned int i : CUBE_FACE_INDICIES)
+			for (unsigned int i : Globals::CUBE_FACE_INDICIES)
 			{
 				mesh.m_indices.push_back(i + elementCount);
 			}
 
-			elementCount += CUBE_FACE_INDICIE_COUNT;
+			elementCount += Globals::CUBE_FACE_INDICIE_COUNT;
 		}
 
 		mesh.attachToVAO();
