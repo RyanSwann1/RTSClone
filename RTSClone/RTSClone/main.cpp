@@ -130,14 +130,13 @@ int main()
 		shaderHandler->setUniformMat4f(eShaderType::Ground, "uView", view);
 		shaderHandler->setUniformMat4f(eShaderType::Ground, "uProjection", projection);
 		
-#ifdef RENDER_PATHING
-		spacecraft.renderPathMesh(*shaderHandler);
-#endif // RENDER_PATHING
-
 		ground.render(*shaderHandler);
 
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+#ifdef RENDER_PATHING
+		spacecraft.renderPathMesh(*shaderHandler);
+#endif // RENDER_PATHING
 		shaderHandler->switchToShader(eShaderType::SelectionBox);
 		selectionBox.render(window);
 		glDisable(GL_BLEND);

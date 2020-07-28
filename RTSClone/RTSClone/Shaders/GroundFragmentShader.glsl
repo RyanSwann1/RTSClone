@@ -3,8 +3,9 @@
 out vec4 color;
 
 uniform vec3 uColor;
+uniform float uOpacity;
 
 void main()
 {
-	color = vec4(uColor, 1.0); 
+	color = vec4(uColor, uOpacity); 
 };

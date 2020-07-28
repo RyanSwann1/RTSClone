@@ -205,7 +205,7 @@ void PathFinding::getPathToPosition(const glm::vec3& startingPosition, const glm
 
 		}
 
-		//assert(distance != glm::distance(glm::vec2(destinationPositionOnGrid), glm::vec2(startingPositionOnGrid)));
+		assert(distance != glm::distance(glm::vec2(destinationPositionOnGrid), glm::vec2(startingPositionOnGrid)));
 		if (!m_graph.isPositionVisited(nextPosition))
 		{
 			m_graph.addToGraph(nextPosition, position);

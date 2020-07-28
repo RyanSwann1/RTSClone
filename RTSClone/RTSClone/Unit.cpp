@@ -21,6 +21,7 @@ namespace
 
 #ifdef RENDER_PATHING
 	constexpr glm::vec3 PATH_COLOUR = { 1.0f, 0.27f, 0.0f };
+	constexpr float PATH_OPACITY = 0.25f;
 
 	void generateRenderPath(const std::vector<glm::vec3>& path, Mesh& mesh)
 	{
@@ -101,6 +102,7 @@ void Unit::renderPathMesh(ShaderHandler& shaderHandler)
 	if (!m_pathToPosition.empty())
 	{
 		shaderHandler.setUniformVec3(eShaderType::Ground, "uColor", PATH_COLOUR);
+		shaderHandler.setUniform1f(eShaderType::Ground, "uOpacity", PATH_OPACITY);
 		m_renderPathMesh.render(shaderHandler, m_selected);
 	}
 }

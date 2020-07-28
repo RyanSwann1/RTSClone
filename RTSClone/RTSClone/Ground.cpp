@@ -48,6 +48,7 @@ Ground::~Ground()
 void Ground::render(ShaderHandler& shaderHandler) const
 {
     shaderHandler.setUniformVec3(eShaderType::Ground, "uColor", GROUND_COLOR);
+    shaderHandler.setUniform1f(eShaderType::Ground, "uOpacity", 1.0f);
     glBindVertexArray(m_vaoID);
     glDrawArrays(GL_TRIANGLES, 0, 6);
 }
