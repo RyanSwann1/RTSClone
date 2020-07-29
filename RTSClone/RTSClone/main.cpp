@@ -150,7 +150,7 @@ int main()
 		shaderHandler->setUniformMat4f(eShaderType::Default, "uProjection", projection);
 	
 		spacecraft.render(*shaderHandler, *spacecraftModel);
-		headquarters.render(*shaderHandler, *headquartersModel);
+		headquarters.render(*shaderHandler, *headquartersModel, *waypointModel);
 		mineral.render(*shaderHandler, *rocksOreModel);
 		waypoint.render(*shaderHandler, *waypointModel);
 

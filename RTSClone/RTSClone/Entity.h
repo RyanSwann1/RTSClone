@@ -9,6 +9,8 @@ class Entity
 {
 public:
 	Entity(const glm::vec3& startingPosition, const Model& model);
+	
+	const glm::vec3& getPosition() const;
 	const AABB& getAABB() const;
 	bool isSelected() const;
 	

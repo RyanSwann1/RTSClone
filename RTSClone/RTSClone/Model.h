@@ -6,13 +6,14 @@
 #include <string>
 #include <memory>
 
+class Entity;
 class ShaderHandler;
 struct Model : private NonMovable, private NonCopyable
 {
 	static std::unique_ptr<Model> create(const std::string& filePath, bool renderFromCentrePosition, const glm::vec3& sizeFromCentre);
 
 	void attachMeshesToVAO() const;
-	void render(ShaderHandler& shaderHandler, bool selected) const;
+	void render(ShaderHandler& shaderHandler, const Entity& entity) const;
 
 	const bool renderFromCentrePosition;
 	const glm::vec3 sizeFromCentre;
