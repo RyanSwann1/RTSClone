@@ -43,7 +43,7 @@ struct Mesh : private NonCopyable
 
 	void bind() const;
 	void attachToVAO() const;
-	void render(ShaderHandler& shaderHandler, bool selected) const;
+	void render(ShaderHandler& shaderHandler, bool selected = false) const;
 
 	unsigned int m_vaoID;
 	unsigned int m_vboID;

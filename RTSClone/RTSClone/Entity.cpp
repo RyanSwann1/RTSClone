@@ -1,6 +1,5 @@
 #include "Entity.h"
 #include "Model.h"
-
 #include "ShaderHandler.h"
 
 Entity::Entity(const glm::vec3& startingPosition, const Model& model)

@@ -96,7 +96,6 @@ int main()
 	SelectionBox selectionBox;
 	sf::Clock gameClock;
 	Camera camera;
-	Entity waypoint({ 50.0f, Globals::GROUND_HEIGHT, 50.0f }, *waypointModel);
 	Entity mineral({ 10.0, Globals::GROUND_HEIGHT, 10.0f }, *rocksOreModel);
 	Unit spacecraft({ 20.0f, Globals::GROUND_HEIGHT, 20.0f }, *spacecraftModel);
 	Headquarters headquarters({ 37.5f, Globals::GROUND_HEIGHT, 37.5f }, *headquartersModel);
@@ -132,6 +131,7 @@ int main()
 
 			selectionBox.update(camera, window, spacecraft, headquarters);
 			selectionBox.handleInputEvents(currentSFMLEvent, window, camera, spacecraft, map);
+			headquarters.handleInput(currentSFMLEvent, camera, window);
 		}
 		
 		spacecraft.update(deltaTime);
@@ -148,7 +148,6 @@ int main()
 		spacecraft.render(*shaderHandler, *spacecraftModel);
 		headquarters.render(*shaderHandler, *headquartersModel, *waypointModel);
 		mineral.render(*shaderHandler, *rocksOreModel);
-		waypoint.render(*shaderHandler, *waypointModel);
 
 		shaderHandler->switchToShader(eShaderType::Debug);
 		shaderHandler->setUniformMat4f(eShaderType::Debug, "uView", view);

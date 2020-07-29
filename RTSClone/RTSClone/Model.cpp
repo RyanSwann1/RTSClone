@@ -38,6 +38,18 @@ void Model::attachMeshesToVAO() const
 	}
 }
 
+void Model::render(ShaderHandler& shaderHandler, const glm::vec3& position) const
+{
+	glm::mat4 model = glm::scale(glm::mat4(1.0), glm::vec3(1.0f, 1.0f, 1.0f));
+	model = glm::translate(model, position);
+	shaderHandler.setUniformMat4f(eShaderType::Default, "uModel", model);
+
+	for (const auto& mesh : meshes)
+	{
+		mesh.render(shaderHandler);
+	}
+}
+
 void Model::render(ShaderHandler & shaderHandler, const Entity& entity) const
 {
 	glm::vec3 entityPosition = entity.getPosition();
