@@ -1,6 +1,7 @@
 #include "Headquarters.h"
 #include "Camera.h"
 #include "Model.h"
+#include "Globals.h"
 
 Headquarters::Headquarters(const glm::vec3& startingPosition, const Model& model)
 	: Entity(startingPosition, model),
@@ -13,13 +14,16 @@ void Headquarters::handleInput(const sf::Event& currentSFMLEvent, const Camera& 
 		currentSFMLEvent.mouseButton.button == sf::Mouse::Right)
 	{
 		glm::vec3 position = camera.getMouseToGroundPosition(window);
-		if (m_AABB.contains(position))
+		if (Globals::isPositionInMapBounds(position))
 		{
-			m_waypointPosition = m_position;
-		}
-		else
-		{
-			m_waypointPosition = position;
+			if (m_AABB.contains(position))
+			{
+				m_waypointPosition = m_position;
+			}
+			else
+			{
+				m_waypointPosition = position;
+			}
 		}
 	}
 }

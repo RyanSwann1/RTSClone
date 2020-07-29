@@ -20,6 +20,17 @@ namespace Globals
 		2, 3, 0
 	};
 
+	inline bool isPositionInMapBounds(const glm::vec3& position)
+	{
+		return position.x >= 0 &&
+			position.x < Globals::MAP_SIZE &&
+			position.y >= 0 &&
+			position.y < Globals::MAP_SIZE &&
+			position.z >= 0 &&
+			position.z < Globals::MAP_SIZE;
+		
+	}
+
 	inline void print(const std::string& text)
 	{
 		static sf::Clock clock;
