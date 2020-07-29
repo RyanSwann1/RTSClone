@@ -6,10 +6,12 @@
 #include "Mesh.h"
 #endif // RENDER_AABB
 
+struct Model;
 class ShaderHandler;
 struct AABB
 {
 	AABB();
+	AABB(const glm::vec3& position, const Model& model);
 	AABB(const glm::vec3& position, const glm::vec3& size);
 	AABB(const glm::vec3& position, float distance);
 

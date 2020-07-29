@@ -1,4 +1,5 @@
 #include "AABB.h"
+#include "Model.h"
 
 #ifdef RENDER_AABB
 #include "ShaderHandler.h"
@@ -45,6 +46,15 @@ AABB::AABB()
 	m_bottom(0.0f),
 	m_forward(0.0f),
 	m_back(0.0f)
+{}
+
+AABB::AABB(const glm::vec3 & position, const Model & model)
+	: m_left(position.x - model.sizeFromCentre.x),
+	m_right(position.x + model.sizeFromCentre.x),
+	m_top(position.y + model.sizeFromCentre.y),
+	m_bottom(position.y - model.sizeFromCentre.y),
+	m_forward(position.z + model.sizeFromCentre.z),
+	m_back(position.z - model.sizeFromCentre.z)
 {}
 
 AABB::AABB(const glm::vec3& position, const glm::vec3& size)
