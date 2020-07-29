@@ -4,6 +4,7 @@
 #include "Camera.h"
 #include "glm/gtc/matrix_transform.hpp"
 #include "Unit.h"
+#include "Building.h"
 #include <assert.h>
 #include <array>
 
@@ -99,13 +100,14 @@ SelectionBox::~SelectionBox()
 }
 
 void SelectionBox::update(const glm::mat4& projection, const glm::mat4& view, const Camera& camera, const sf::Window& window,
-    Unit& unit)
+    Unit& unit, Building& building)
 {
     if (m_active)
     {
         m_mouseToGroundPosition = getMouseToGroundPosition(projection, view, camera, window);
         m_selectionBox.reset(m_startingPositionWorldPosition, m_mouseToGroundPosition - m_startingPositionWorldPosition);
 
+        building.setSelected(m_selectionBox.contains(building.getAABB()));
         unit.setSelected(m_selectionBox.contains(unit.getAABB()));
     }
 }

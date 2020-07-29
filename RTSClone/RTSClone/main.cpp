@@ -122,7 +122,7 @@ int main()
 			glm::mat4 view = glm::lookAt(camera.position, camera.position + camera.front, camera.up);
 			glm::mat4 projection = glm::perspective(glm::radians(camera.FOV),
 				static_cast<float>(windowSize.x) / static_cast<float>(windowSize.y), camera.nearPlaneDistance, camera.farPlaneDistance);
-			selectionBox.update(projection, view, camera, window, spacecraft);
+			selectionBox.update(projection, view, camera, window, spacecraft, portal);
 			selectionBox.handleInputEvents(currentSFMLEvent, window, projection, view, camera, spacecraft, map);
 		}
 		
@@ -132,7 +132,6 @@ int main()
 		glm::mat4 view = glm::lookAt(camera.position, camera.position + camera.front, camera.up);
 		glm::mat4 projection = glm::perspective(glm::radians(camera.FOV),
 			static_cast<float>(windowSize.x) / static_cast<float>(windowSize.y), camera.nearPlaneDistance, camera.farPlaneDistance);
-		selectionBox.update(projection, view, camera, window, spacecraft);
 
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		shaderHandler->switchToShader(eShaderType::Default);
