@@ -15,6 +15,7 @@ struct AABB
 	AABB(const glm::vec3& position, const glm::vec3& size);
 	AABB(const glm::vec3& position, float distance);
 
+	bool contains(const glm::vec3& position) const;
 	bool contains(const AABB& other) const;
 
 	void reset(const glm::vec3& position, const glm::vec3& size);

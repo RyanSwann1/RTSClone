@@ -75,6 +75,16 @@ AABB::AABB(const glm::vec3& position, float distance)
 	m_back(position.z - distance)
 { }
 
+bool AABB::contains(const glm::vec3& position) const
+{
+	return position.x >= m_left &&
+		position.x <= m_right &&
+		position.y >= m_bottom &&
+		position.y <= m_top &&
+		position.z >= m_back &&
+		position.z <= m_forward;
+}
+
 bool AABB::contains(const AABB& other) const
 {
 	return m_left <= other.m_right &&
