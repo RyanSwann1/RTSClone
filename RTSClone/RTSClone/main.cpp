@@ -27,6 +27,8 @@
 //https://www.youtube.com/playlist?list=PLFt_AvWsXl0cq5Umv3pMC9SPnKjfp9eGW
 //Smooth Pathfinding
 //https://gamedev.stackexchange.com/questions/42106/2d-pathfinding-finding-smooth-paths
+//Design Patterns
+//https://www.youtube.com/watch?v=hQE8lQk9ikE
 
 int main()
 {
@@ -78,6 +80,14 @@ int main()
 		return -1;
 	}
 
+	std::unique_ptr<Model> waypointModel = Model::create("laserSabel.obj", true, glm::vec3(2.0f, 1.0f, 2.0f));
+	assert(waypointModel);
+	if (!waypointModel)
+	{
+		std::cout << "Failed to load laserSabel Model\n";
+		return -1;
+	}
+
 	Map map;
 #ifdef RENDER_GROUND
 	Ground ground;
@@ -85,6 +95,7 @@ int main()
 	SelectionBox selectionBox;
 	sf::Clock gameClock;
 	Camera camera;
+	Entity waypoint({ 50.0f, Globals::GROUND_HEIGHT, 50.0f }, *waypointModel);
 	Entity mineral({ 10.0, Globals::GROUND_HEIGHT, 10.0f }, *rocksOreModel);
 	Unit spacecraft({ 20.0f, Globals::GROUND_HEIGHT, 20.0f }, *spacecraftModel);
 	Headquarters headquarters({ 37.5f, Globals::GROUND_HEIGHT, 37.5f }, *headquartersModel);
@@ -141,6 +152,7 @@ int main()
 		spacecraft.render(*shaderHandler, *spacecraftModel);
 		headquarters.render(*shaderHandler, *headquartersModel);
 		mineral.render(*shaderHandler, *rocksOreModel);
+		waypoint.render(*shaderHandler, *waypointModel);
 
 		shaderHandler->switchToShader(eShaderType::Debug);
 		shaderHandler->setUniformMat4f(eShaderType::Debug, "uView", view);
