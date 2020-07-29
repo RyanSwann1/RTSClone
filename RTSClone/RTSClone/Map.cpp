@@ -1,5 +1,5 @@
 #include "Map.h"
-#include "Building.h"
+#include "Headquarters.h"
 
 //Map
 Map::Map()

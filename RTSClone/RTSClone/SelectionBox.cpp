@@ -4,7 +4,7 @@
 #include "Camera.h"
 #include "glm/gtc/matrix_transform.hpp"
 #include "Unit.h"
-#include "Building.h"
+#include "Headquarters.h"
 #include <assert.h>
 #include <array>
 
@@ -100,7 +100,7 @@ SelectionBox::~SelectionBox()
 }
 
 void SelectionBox::update(const glm::mat4& projection, const glm::mat4& view, const Camera& camera, const sf::Window& window,
-    Unit& unit, Building& building)
+    Unit& unit, Headquarters& building)
 {
     if (m_active)
     {

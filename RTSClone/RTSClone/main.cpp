@@ -8,7 +8,7 @@
 #include "Texture.h"
 #include "Camera.h"
 #include "Unit.h"
-#include "Building.h"
+#include "Headquarters.h"
 #include "SelectionBox.h"
 #include "Map.h"
 
@@ -54,7 +54,7 @@ int main()
 		return -1;
 	}
 
-	std::unique_ptr<Model> spacecraftModel = Model::create("spaceCraft1.obj", false, glm::vec3(5.0f, 1.0f, 5.0f));
+	std::unique_ptr<Model> spacecraftModel = Model::create("spaceCraft1.obj", false, glm::vec3(5.0f, 0.25f, 5.0f));
 	assert(spacecraftModel);
 	if (!spacecraftModel)
 	{
@@ -62,7 +62,7 @@ int main()
 		return -1;
 	}
 
-	std::unique_ptr<Model> headquartersModel = Model::create("portal.obj", true, glm::vec3(5.0f, 1.0f, 3.0f));
+	std::unique_ptr<Model> headquartersModel = Model::create("portal.obj", true, glm::vec3(5.0f, 0.25f, 3.0f));
 	assert(headquartersModel);
 	if (!headquartersModel)
 	{
@@ -70,7 +70,7 @@ int main()
 		return -1;
 	}
 
-	std::unique_ptr<Model> rocksOreModel = Model::create("rocksOre.obj", true, glm::vec3(5.0f, 1.0f, 5.0f));
+	std::unique_ptr<Model> rocksOreModel = Model::create("rocksOre.obj", true, glm::vec3(5.0f, 0.25f, 5.0f));
 	assert(rocksOreModel);
 	if (!rocksOreModel)
 	{
@@ -87,7 +87,7 @@ int main()
 	Camera camera;
 	Entity mineral({ 10.0, Globals::GROUND_HEIGHT, 10.0f }, *rocksOreModel);
 	Unit spacecraft({ 20.0f, Globals::GROUND_HEIGHT, 20.0f }, *spacecraftModel);
-	Building headquarters({ 37.5f, Globals::GROUND_HEIGHT, 37.5f }, *headquartersModel);
+	Headquarters headquarters({ 37.5f, Globals::GROUND_HEIGHT, 37.5f }, *headquartersModel);
 
 	map.addEntityAABB(headquarters.getAABB());
 	map.addEntityAABB(mineral.getAABB());
