@@ -7,14 +7,16 @@ namespace
 	const std::string MODELS_DIRECTORY = "models/";
 }
 
-Model::Model()
-	: meshes(),
+Model::Model(bool renderFromCentrePosition, const glm::vec3& sizeFromCentre)
+	: renderFromCentrePosition(renderFromCentrePosition),
+	sizeFromCentre(sizeFromCentre),
+	meshes(),
 	textures()
 {}
 
-std::unique_ptr<Model> Model::create(const std::string & filePath)
+std::unique_ptr<Model> Model::create(const std::string & filePath, bool renderFromCentrePosition, const glm::vec3& sizeFromCentre)
 {
-	Model* model = new Model();
+	Model* model = new Model(renderFromCentrePosition, sizeFromCentre);
 	if (!ModelLoader::loadModel(MODELS_DIRECTORY + filePath, *model))
 	{
 		delete model;
