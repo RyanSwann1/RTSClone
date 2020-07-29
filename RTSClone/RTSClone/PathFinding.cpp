@@ -198,6 +198,7 @@ void PathFinding::getPathToPosition(const glm::vec3& startingPosition, const glm
 			}
 		}
 
+		//If Shortest Position found
 		if (!m_graph.isPositionVisited(shortestDistancePosition))
 		{
 			m_graph.addToGraph(shortestDistancePosition, position);

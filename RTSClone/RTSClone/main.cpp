@@ -70,6 +70,14 @@ int main()
 		return -1;
 	}
 
+	std::unique_ptr<Model> rocksOreModel = Model::create("rocksOre.obj");
+	assert(rocksOreModel);
+	if (!rocksOreModel)
+	{
+		std::cout << "Rocks Ore Model not found\n";
+		return -1;
+	}
+
 	Map map;
 #ifdef RENDER_GROUND
 	Ground ground;
@@ -77,10 +85,12 @@ int main()
 	SelectionBox selectionBox;
 	sf::Clock gameClock;
 	Camera camera;
+	Entity mineral({ 10.0, Globals::GROUND_HEIGHT, 10.0f });
 	Unit spacecraft({ 20.0f, Globals::GROUND_HEIGHT, 20.0f });
 	Building portal({ 37.5f, Globals::GROUND_HEIGHT, 37.5f });
 
-	map.addBuilding(portal);
+	map.addEntityAABB(portal.getAABB());
+	map.addEntityAABB(mineral.getAABB());
 
 	glm::mat4 orthographic = glm::ortho(0.0f, static_cast<float>(windowSize.x),
 		static_cast<float>(windowSize.y), 0.0f);
@@ -131,6 +141,7 @@ int main()
 	
 		spacecraft.render(*shaderHandler, *spacecraftModel);
 		portal.render(*shaderHandler, *portalModel);
+		mineral.render(*shaderHandler, *rocksOreModel);
 
 		shaderHandler->switchToShader(eShaderType::Debug);
 		shaderHandler->setUniformMat4f(eShaderType::Debug, "uView", view);
@@ -145,6 +156,7 @@ int main()
 #ifdef RENDER_AABB
 		portal.renderAABB(*shaderHandler);
 		spacecraft.renderAABB(*shaderHandler);
+		mineral.renderAABB(*shaderHandler);
 #endif // RENDER_AABB
 #ifdef RENDER_PATHING
 		spacecraft.renderPathMesh(*shaderHandler);

@@ -16,11 +16,10 @@ bool Map::isPositionOccupied(const glm::ivec2& position) const
 	return m_map[Globals::convertTo1D(position)];
 }
 
-void Map::addBuilding(const Building& building)
+void Map::addEntityAABB(const AABB& AABB)
 {
-	glm::ivec2 position(std::floor(building.getAABB().m_left), std::floor(building.getAABB().m_back));
-	glm::ivec2 size(std::floor(building.getAABB().m_right - building.getAABB().m_left), 
-		std::floor(building.getAABB().m_forward - building.getAABB().m_back));
+	glm::ivec2 position(std::floor(AABB.m_left), std::floor(AABB.m_back));
+	glm::ivec2 size(std::floor(AABB.m_right - AABB.m_left), std::floor(AABB.m_forward - AABB.m_back));
 
 	for (int x = position.x; x <= position.x + size.x; ++x)
 	{

@@ -5,7 +5,7 @@
 #include "Globals.h"
 #include <array>
 
-class Building;
+struct AABB;
 class Map : private NonMovable, private NonCopyable
 {
 public:
@@ -13,7 +13,7 @@ public:
 
 	bool isPositionOccupied(const glm::ivec2& position) const;
 
-	void addBuilding(const Building& building);
+	void addEntityAABB(const AABB& AABB);
 
 private:
 	std::array<bool, static_cast<size_t>(Globals::MAP_SIZE * Globals::MAP_SIZE)> m_map;
