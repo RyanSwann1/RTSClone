@@ -5,8 +5,7 @@
 class Building : public Entity
 {
 public:
-	Building(const glm::vec3& startingPosition);
-
+	Building(const glm::vec3& startingPosition, const Model& model);
 
 private:
 };

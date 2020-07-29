@@ -57,8 +57,8 @@ namespace
 #endif // RENDER_PATHING
 }
 
-Unit::Unit(const glm::vec3& startingPosition)
-	: Entity(startingPosition),
+Unit::Unit(const glm::vec3& startingPosition, const Model& model)
+	: Entity(startingPosition, model),
 	m_front(),
 	m_pathToPosition()
 {}

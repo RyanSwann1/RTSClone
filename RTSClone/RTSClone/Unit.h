@@ -8,11 +8,10 @@
 
 class Map;
 class ShaderHandler;
-struct Model;
 class Unit : public Entity
 {
 public:
-	Unit(const glm::vec3& startingPosition);
+	Unit(const glm::vec3& startingPosition, const Model& model);
 
 	void moveTo(const glm::vec3& destinationPosition, const Map& map);
 	void update(float deltaTime);

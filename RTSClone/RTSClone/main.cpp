@@ -54,7 +54,7 @@ int main()
 		return -1;
 	}
 
-	std::unique_ptr<Model> spacecraftModel = Model::create("spaceCraft1.obj");
+	std::unique_ptr<Model> spacecraftModel = Model::create("spaceCraft1.obj", false, glm::vec3(5.0f, 1.0f, 5.0f));
 	assert(spacecraftModel);
 	if (!spacecraftModel)
 	{
@@ -62,15 +62,15 @@ int main()
 		return -1;
 	}
 
-	std::unique_ptr<Model> portalModel = Model::create("portal.obj");
-	assert(portalModel);
-	if (!portalModel)
+	std::unique_ptr<Model> headquartersModel = Model::create("portal.obj", true, glm::vec3(5.0f, 1.0f, 3.0f));
+	assert(headquartersModel);
+	if (!headquartersModel)
 	{
 		std::cout << "Failed to load portal model\n";
 		return -1;
 	}
 
-	std::unique_ptr<Model> rocksOreModel = Model::create("rocksOre.obj");
+	std::unique_ptr<Model> rocksOreModel = Model::create("rocksOre.obj", true, glm::vec3(5.0f, 1.0f, 5.0f));
 	assert(rocksOreModel);
 	if (!rocksOreModel)
 	{
@@ -85,11 +85,11 @@ int main()
 	SelectionBox selectionBox;
 	sf::Clock gameClock;
 	Camera camera;
-	Entity mineral({ 10.0, Globals::GROUND_HEIGHT, 10.0f });
-	Unit spacecraft({ 20.0f, Globals::GROUND_HEIGHT, 20.0f });
-	Building portal({ 37.5f, Globals::GROUND_HEIGHT, 37.5f });
+	Entity mineral({ 10.0, Globals::GROUND_HEIGHT, 10.0f }, *rocksOreModel);
+	Unit spacecraft({ 20.0f, Globals::GROUND_HEIGHT, 20.0f }, *spacecraftModel);
+	Building headquarters({ 37.5f, Globals::GROUND_HEIGHT, 37.5f }, *headquartersModel);
 
-	map.addEntityAABB(portal.getAABB());
+	map.addEntityAABB(headquarters.getAABB());
 	map.addEntityAABB(mineral.getAABB());
 
 	glm::mat4 orthographic = glm::ortho(0.0f, static_cast<float>(windowSize.x),
@@ -122,7 +122,7 @@ int main()
 			glm::mat4 view = glm::lookAt(camera.position, camera.position + camera.front, camera.up);
 			glm::mat4 projection = glm::perspective(glm::radians(camera.FOV),
 				static_cast<float>(windowSize.x) / static_cast<float>(windowSize.y), camera.nearPlaneDistance, camera.farPlaneDistance);
-			selectionBox.update(projection, view, camera, window, spacecraft, portal);
+			selectionBox.update(projection, view, camera, window, spacecraft, headquarters);
 			selectionBox.handleInputEvents(currentSFMLEvent, window, projection, view, camera, spacecraft, map);
 		}
 		
@@ -139,7 +139,7 @@ int main()
 		shaderHandler->setUniformMat4f(eShaderType::Default, "uProjection", projection);
 	
 		spacecraft.render(*shaderHandler, *spacecraftModel);
-		portal.render(*shaderHandler, *portalModel);
+		headquarters.render(*shaderHandler, *headquartersModel);
 		mineral.render(*shaderHandler, *rocksOreModel);
 
 		shaderHandler->switchToShader(eShaderType::Debug);
@@ -153,7 +153,7 @@ int main()
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 #ifdef RENDER_AABB
-		portal.renderAABB(*shaderHandler);
+		headquarters.renderAABB(*shaderHandler);
 		spacecraft.renderAABB(*shaderHandler);
 		mineral.renderAABB(*shaderHandler);
 #endif // RENDER_AABB

@@ -8,7 +8,7 @@ struct Model;
 class Entity
 {
 public:
-	Entity(const glm::vec3& startingPosition);
+	Entity(const glm::vec3& startingPosition, const Model& model);
 	const AABB& getAABB() const;
 	bool isSelected() const;
 	
