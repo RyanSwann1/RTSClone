@@ -1,5 +1,5 @@
 #include <iostream>
-#include "glm/gtc/matrix_transform.hpp"
+
 #include "glad.h"
 #include <SFML/Graphics.hpp>
 #include "Model.h"
@@ -11,6 +11,7 @@
 #include "Headquarters.h"
 #include "SelectionBox.h"
 #include "Map.h"
+#include "glm/gtc/matrix_transform.hpp"
 
 #define RENDER_GROUND
 #ifdef RENDER_GROUND
@@ -103,10 +104,9 @@ int main()
 	map.addEntityAABB(headquarters.getAABB());
 	map.addEntityAABB(mineral.getAABB());
 
-	glm::mat4 orthographic = glm::ortho(0.0f, static_cast<float>(windowSize.x),
-		static_cast<float>(windowSize.y), 0.0f);
 	shaderHandler->switchToShader(eShaderType::SelectionBox);
-	shaderHandler->setUniformMat4f(eShaderType::SelectionBox, "uOrthographic", orthographic);
+	shaderHandler->setUniformMat4f(eShaderType::SelectionBox, "uOrthographic", glm::ortho(0.0f, static_cast<float>(windowSize.x),
+		static_cast<float>(windowSize.y), 0.0f));
 
 	std::cout << glGetError() << "\n";
 	std::cout << glGetError() << "\n";
@@ -130,19 +130,15 @@ int main()
 				}
 			}
 
-			glm::mat4 view = glm::lookAt(camera.position, camera.position + camera.front, camera.up);
-			glm::mat4 projection = glm::perspective(glm::radians(camera.FOV),
-				static_cast<float>(windowSize.x) / static_cast<float>(windowSize.y), camera.nearPlaneDistance, camera.farPlaneDistance);
-			selectionBox.update(projection, view, camera, window, spacecraft, headquarters);
-			selectionBox.handleInputEvents(currentSFMLEvent, window, projection, view, camera, spacecraft, map);
+			selectionBox.update(camera, window, spacecraft, headquarters);
+			selectionBox.handleInputEvents(currentSFMLEvent, window, camera, spacecraft, map);
 		}
 		
 		spacecraft.update(deltaTime);
 		camera.update(window, deltaTime);
 
-		glm::mat4 view = glm::lookAt(camera.position, camera.position + camera.front, camera.up);
-		glm::mat4 projection = glm::perspective(glm::radians(camera.FOV),
-			static_cast<float>(windowSize.x) / static_cast<float>(windowSize.y), camera.nearPlaneDistance, camera.farPlaneDistance);
+		glm::mat4 view = camera.getView(); 
+		glm::mat4 projection = camera.getProjection(window);
 
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		shaderHandler->switchToShader(eShaderType::Default);
