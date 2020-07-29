@@ -1,7 +1,6 @@
 #include "Unit.h"
 #include "ShaderHandler.h"
 #include "Model.h"
-
 #include "PathFinding.h"
 
 namespace

@@ -39,5 +39,4 @@ void Entity::renderAABB(ShaderHandler& shaderHandler)
 {
 	m_AABB.render(shaderHandler);
 }
-
 #endif // RENDER_AABB

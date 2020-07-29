@@ -188,42 +188,47 @@ void PathFinding::getPathToPosition(const glm::vec3& startingPosition, const glm
 
 		std::array<AdjacentPosition, ALL_DIRECTIONS.size()> adjacentPositions = getAllAdjacentPositions(position, map);
 		float distance = glm::distance(glm::vec2(destinationPositionOnGrid), glm::vec2(startingPositionOnGrid));
-		glm::ivec2 nextPosition;
-		bool positionFound = false;
+		glm::ivec2 shortestDistancePosition = position;
 		for (const auto& adjacentPosition : adjacentPositions)
 		{
 			if (adjacentPosition.valid && glm::distance(glm::vec2(destinationPositionOnGrid), glm::vec2(adjacentPosition.position)) < distance)
 			{
 				distance = glm::distance(glm::vec2(destinationPositionOnGrid), glm::vec2(adjacentPosition.position));
-				nextPosition = adjacentPosition.position;
-				positionFound = true;
+				shortestDistancePosition = adjacentPosition.position;
 			}
 		}
 
-		if (!positionFound)
+		if (!m_graph.isPositionVisited(shortestDistancePosition))
 		{
+			m_graph.addToGraph(shortestDistancePosition, position);
+			m_frontier.push(shortestDistancePosition);
 
+			if (shortestDistancePosition == destinationPositionOnGrid)
+			{
+				destinationReached = true;
+				getPathFromVisitedNodes(startingPositionOnGrid, shortestDistancePosition, destinationPosition, pathToPosition, m_graph);
+			}
 		}
-
-		assert(distance != glm::distance(glm::vec2(destinationPositionOnGrid), glm::vec2(startingPositionOnGrid)));
-		if (!m_graph.isPositionVisited(nextPosition))
+		//If shortest position is not found
+		else
 		{
-			m_graph.addToGraph(nextPosition, position);
-			m_frontier.push(nextPosition);
-		}
+			for (const auto& adjacentPosition : adjacentPositions)
+			{
+				if (adjacentPosition.valid && !m_graph.isPositionVisited(adjacentPosition.position))
+				{
+					m_graph.addToGraph(adjacentPosition.position, position);
+					m_frontier.push(adjacentPosition.position);
+				}
 
-		if (nextPosition == destinationPositionOnGrid)
-		{
-			destinationReached = true;
-			getPathFromVisitedNodes(startingPositionOnGrid, nextPosition, destinationPosition, pathToPosition, m_graph);
-			break;
+				if (adjacentPosition.valid && adjacentPosition.position == destinationPositionOnGrid)
+				{
+					destinationReached = true;
+					getPathFromVisitedNodes(startingPositionOnGrid, adjacentPosition.position, destinationPosition, pathToPosition, m_graph);
+					break;
+				}
+			}
 		}
 
 		assert(m_frontier.size() <= Globals::MAP_SIZE * Globals::MAP_SIZE);
-	}
-
-	if (pathToPosition.empty())
-	{
-		std::cout << "Path is empty\n";
 	}
 }
