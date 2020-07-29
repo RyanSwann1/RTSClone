@@ -12,13 +12,21 @@ void Headquarters::handleInput(const sf::Event& currentSFMLEvent, const Camera& 
 	if (m_selected && currentSFMLEvent.type == sf::Event::MouseButtonPressed &&
 		currentSFMLEvent.mouseButton.button == sf::Mouse::Right)
 	{
-		m_waypointPosition = camera.getMouseToGroundPosition(window);
+		glm::vec3 position = camera.getMouseToGroundPosition(window);
+		if (m_AABB.contains(position))
+		{
+			m_waypointPosition = m_position;
+		}
+		else
+		{
+			m_waypointPosition = position;
+		}
 	}
 }
 
 void Headquarters::render(ShaderHandler & shaderHandler, const Model & renderModel, const Model & waypointModel) const
 {
-	if (m_selected)
+	if (m_selected && m_waypointPosition != m_position)
 	{
 		waypointModel.render(shaderHandler, m_waypointPosition);
 	}
