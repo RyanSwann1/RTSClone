@@ -66,9 +66,16 @@ void Faction::handleInput(const sf::Event& currentSFMLEvent, const sf::Window& w
             m_selectionBox.startingPositionScreenPosition = { sf::Mouse::getPosition(window).x, sf::Mouse::getPosition(window).y };
             m_selectionBox.active = true;
         }
-        else if (currentSFMLEvent.mouseButton.button == sf::Mouse::Right && m_unit.isSelected())
+        else if (currentSFMLEvent.mouseButton.button == sf::Mouse::Right)
         {
-            m_unit.moveTo(camera.getMouseToGroundPosition(window), map);
+            if (m_unit.isSelected())
+            {
+                m_unit.moveTo(camera.getMouseToGroundPosition(window), map);
+            }
+            else if (m_HQ.isSelected())
+            {
+                m_HQ.setWaypointPosition(camera.getMouseToGroundPosition(window));
+            }
         }
     }
     else if (currentSFMLEvent.type == sf::Event::MouseButtonReleased)
@@ -79,8 +86,6 @@ void Faction::handleInput(const sf::Event& currentSFMLEvent, const sf::Window& w
             m_selectionBox.AABB.reset();
         }
     }
-
-    m_HQ.handleInput(currentSFMLEvent, camera, window);
 }
 
 void Faction::update(const Camera& camera, const sf::Window& window)
