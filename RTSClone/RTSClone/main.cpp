@@ -124,7 +124,7 @@ int main()
 				}
 			}
 
-			faction.handleInput(currentSFMLEvent, window, camera, map);
+			faction.handleInput(currentSFMLEvent, window, camera, map, *unitModel);
 		}
 
 		faction.update(deltaTime);

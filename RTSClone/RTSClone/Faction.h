@@ -29,7 +29,7 @@ class Faction : private NonMovable, private NonCopyable
 public:
 	Faction(const Model& headquartersModel, const Model& unitModel, Map& map);
 
-	void handleInput(const sf::Event& currentSFMLEvent, const sf::Window& window, const Camera& camera, const Map& map);
+	void handleInput(const sf::Event& currentSFMLEvent, const sf::Window& window, const Camera& camera, Map& map, const Model& unitModel);
 	void update(float deltaTime);
 	void render(ShaderHandler& shaderHandler, const Model& hqModel, const Model& unitModel, const Model& waypointModel) const;
 	void renderSelectionBox(const sf::Window& window) const;
@@ -46,4 +46,7 @@ private:
 	SelectionBox m_selectionBox;
 	Headquarters m_HQ;
 	Unit m_unit;
+	std::vector<Unit> m_harvesters;
+
+	void spawnUnit(const glm::vec3& spawnPosition, const Model& unitModel, Map& map);
 };

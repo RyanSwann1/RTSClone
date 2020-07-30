@@ -51,10 +51,11 @@ SelectionBox::~SelectionBox()
 Faction::Faction(const Model& headquartersModel, const Model& unitModel, Map& map)
     : m_selectionBox(),
     m_HQ({ 37.5f, Globals::GROUND_HEIGHT, 37.5f }, headquartersModel, map),
-    m_unit({ 20.0f, Globals::GROUND_HEIGHT, 20.0f }, unitModel, map)
+    m_unit({ 20.0f, Globals::GROUND_HEIGHT, 20.0f }, unitModel, map),
+    m_harvesters()
 {}
 
-void Faction::handleInput(const sf::Event& currentSFMLEvent, const sf::Window& window, const Camera& camera, const Map& map)
+void Faction::handleInput(const sf::Event& currentSFMLEvent, const sf::Window& window, const Camera& camera, Map& map, const Model& unitModel)
 {
     switch (currentSFMLEvent.type)
     {
@@ -68,16 +69,29 @@ void Faction::handleInput(const sf::Event& currentSFMLEvent, const sf::Window& w
 
             m_HQ.setSelected(m_HQ.getAABB().contains(mouseToGroundPosition));
             m_unit.setSelected(m_unit.getAABB().contains(mouseToGroundPosition));
+            for (auto& harvester : m_harvesters)
+            {
+                harvester.setSelected(harvester.getAABB().contains(mouseToGroundPosition));
+            }
         }
         else if (currentSFMLEvent.mouseButton.button == sf::Mouse::Right)
         {
+            glm::vec3 mouseToGroundPosition = camera.getMouseToGroundPosition(window);
             if (m_unit.isSelected())
             {
-                m_unit.moveTo(camera.getMouseToGroundPosition(window), map);
+                m_unit.moveTo(mouseToGroundPosition, map);
             }
             else if (m_HQ.isSelected())
             {
-                m_HQ.setWaypointPosition(camera.getMouseToGroundPosition(window));
+                m_HQ.setWaypointPosition(mouseToGroundPosition);
+            }
+
+            for (auto& harvester : m_harvesters)
+            {
+                if (harvester.isSelected())
+                {
+                    harvester.moveTo(mouseToGroundPosition, map);
+                }
             }
         }
         break;
@@ -97,6 +111,11 @@ void Faction::handleInput(const sf::Event& currentSFMLEvent, const sf::Window& w
 
             m_HQ.setSelected(m_selectionBox.AABB.contains(m_HQ.getAABB()));
             m_unit.setSelected(m_selectionBox.AABB.contains(m_unit.getAABB()));
+
+            for (auto& harvester : m_harvesters)
+            {
+                harvester.setSelected(m_selectionBox.AABB.contains(harvester.getAABB()));
+            }
         }
         break;
     case sf::Event::KeyPressed:
@@ -104,6 +123,7 @@ void Faction::handleInput(const sf::Event& currentSFMLEvent, const sf::Window& w
         {
         case sf::Keyboard::Num1:
             std::cout << "Spawn Unit\n";
+            spawnUnit(m_HQ.getUnitSpawnPosition(), unitModel, map);
             break;
         }
         break;
@@ -113,12 +133,20 @@ void Faction::handleInput(const sf::Event& currentSFMLEvent, const sf::Window& w
 void Faction::update(float deltaTime)
 {
     m_unit.update(deltaTime);
+    for (auto& harvester : m_harvesters)
+    {
+        harvester.update(deltaTime);
+    }
 }
 
 void Faction::render(ShaderHandler& shaderHandler, const Model& hqModel, const Model& unitModel, const Model& waypointModel) const
 {
     m_HQ.render(shaderHandler, hqModel, waypointModel);
     m_unit.render(shaderHandler, unitModel);
+    for (auto& harvester : m_harvesters)
+    {
+        harvester.render(shaderHandler, unitModel);
+    }
 }
 
 void Faction::renderSelectionBox(const sf::Window& window) const
@@ -144,6 +172,10 @@ void Faction::renderSelectionBox(const sf::Window& window) const
 void Faction::renderPathing(ShaderHandler& shaderHandler)
 {
     m_unit.renderPathMesh(shaderHandler);
+    for (auto& harvester : m_harvesters)
+    {
+        harvester.renderPathMesh(shaderHandler);
+    }
 }
 #endif // RENDER_PATHING
 
@@ -151,6 +183,15 @@ void Faction::renderPathing(ShaderHandler& shaderHandler)
 void Faction::renderAABB(ShaderHandler& shaderHandler)
 {
     m_unit.renderAABB(shaderHandler);
+    for (auto& harvester : m_harvesters)
+    {
+        harvester.renderAABB(shaderHandler);
+    }
     m_HQ.renderAABB(shaderHandler);
 }
 #endif // RENDER_AABB
+
+void Faction::spawnUnit(const glm::vec3& spawnPosition, const Model& unitModel, Map& map)
+{
+    m_harvesters.emplace_back(spawnPosition, unitModel, map);
+}

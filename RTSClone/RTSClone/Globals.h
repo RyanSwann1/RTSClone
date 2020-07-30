@@ -4,6 +4,7 @@
 #include <SFML/Graphics.hpp>
 #include <iostream>
 #include <array>
+#include <random>
 
 namespace Globals
 { 
@@ -41,6 +42,13 @@ namespace Globals
 		}
 	}
 
+	inline void printImmediately(const glm::vec3& position)
+	{
+		std::cout << position.x << "\n";
+		std::cout << position.y << "\n";
+		std::cout << position.z << "\n\n";
+	}
+
 	inline void print(const glm::vec3& position)
 	{
 		static sf::Clock clock;
@@ -57,5 +65,14 @@ namespace Globals
 	inline int convertTo1D(const glm::ivec2& position)
 	{
 		return position.x * Globals::MAP_SIZE + position.y;
+	}
+
+	inline float getRandomNumber(float min, float max)
+	{
+		static std::random_device rd;  //Will be used to obtain a seed for the random number engine
+		static std::mt19937 gen(rd()); //Standard mersenne_twister_engine seeded with rd()
+		std::uniform_int_distribution<> distrib(min, max);
+
+		return distrib(gen);
 	}
 }
