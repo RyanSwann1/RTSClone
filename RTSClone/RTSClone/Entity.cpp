@@ -1,12 +1,19 @@
 #include "Entity.h"
 #include "Model.h"
 #include "ShaderHandler.h"
+#include "Map.h"
 
-Entity::Entity(const glm::vec3& startingPosition, const Model& model)
+Entity::Entity(const glm::vec3& startingPosition, const Model& model, eEntityType entityType, Map& map)
 	: m_position(startingPosition),
 	m_AABB(startingPosition, model),
+	m_type(entityType),
 	m_selected(false)
-{}
+{
+	if (m_type != eEntityType::Unit)
+	{
+		map.addEntityAABB(m_AABB);
+	}
+}
 
 const glm::vec3& Entity::getPosition() const
 {

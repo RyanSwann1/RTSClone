@@ -96,9 +96,7 @@ int main()
 	Faction faction(*headquartersModel, *unitModel, map);
 	sf::Clock gameClock;
 	Camera camera;
-	Entity mineral({ 10.0, Globals::GROUND_HEIGHT, 10.0f }, *rocksOreModel);
-
-	map.addEntityAABB(mineral.getAABB());
+	Entity mineral({ 10.0, Globals::GROUND_HEIGHT, 10.0f }, *rocksOreModel, eEntityType::Mineral, map);
 
 	shaderHandler->switchToShader(eShaderType::SelectionBox);
 	shaderHandler->setUniformMat4f(eShaderType::SelectionBox, "uOrthographic", glm::ortho(0.0f, static_cast<float>(windowSize.x),

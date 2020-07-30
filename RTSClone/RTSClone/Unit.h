@@ -11,7 +11,7 @@ class ShaderHandler;
 class Unit : public Entity
 {
 public:
-	Unit(const glm::vec3& startingPosition, const Model& model);
+	Unit(const glm::vec3& startingPosition, const Model& model, Map& map);
 
 	void moveTo(const glm::vec3& destinationPosition, const Map& map);
 	void update(float deltaTime);

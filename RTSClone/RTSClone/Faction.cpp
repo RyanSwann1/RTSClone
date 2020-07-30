@@ -50,11 +50,9 @@ SelectionBox::~SelectionBox()
 //Faction
 Faction::Faction(const Model& headquartersModel, const Model& unitModel, Map& map)
     : m_selectionBox(),
-    m_HQ({ 37.5f, Globals::GROUND_HEIGHT, 37.5f }, headquartersModel),
-    m_unit({ 20.0f, Globals::GROUND_HEIGHT, 20.0f }, unitModel)
-{
-    map.addEntityAABB(m_HQ.getAABB());
-}
+    m_HQ({ 37.5f, Globals::GROUND_HEIGHT, 37.5f }, headquartersModel, map),
+    m_unit({ 20.0f, Globals::GROUND_HEIGHT, 20.0f }, unitModel, map)
+{}
 
 void Faction::handleInput(const sf::Event& currentSFMLEvent, const sf::Window& window, const Camera& camera, const Map& map)
 {

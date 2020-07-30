@@ -3,13 +3,27 @@
 #include "Model.h"
 #include "Globals.h"
 
-Headquarters::Headquarters(const glm::vec3& startingPosition, const Model& model)
-	: Entity(startingPosition, model),
+namespace
+{
+	
+}
+
+Headquarters::Headquarters(const glm::vec3& startingPosition, const Model& model, Map& map)
+	: Entity(startingPosition, model, eEntityType::Building, map),
 	m_waypointPosition(startingPosition)
 {}
 
+glm::vec3 Headquarters::getUnitSpawnPosition() const
+{
+	assert(m_selected);
+
+
+	return glm::vec3();
+}
+
 void Headquarters::setWaypointPosition(const glm::vec3& position)
 {
+	assert(m_selected);
 	if (Globals::isPositionInMapBounds(position))
 	{
 		if (m_AABB.contains(position))
