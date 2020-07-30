@@ -146,6 +146,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="AABB.cpp" />
+    <ClCompile Include="Faction.cpp" />
     <ClCompile Include="Headquarters.cpp" />
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="Entity.cpp" />
@@ -157,7 +158,6 @@
     <ClCompile Include="Model.cpp" />
     <ClCompile Include="ModelLoader.cpp" />
     <ClCompile Include="PathFinding.cpp" />
-    <ClCompile Include="SelectionBox.cpp" />
     <ClCompile Include="ShaderHandler.cpp" />
     <ClCompile Include="Texture.cpp" />
     <ClCompile Include="Unit.cpp" />
@@ -205,6 +205,7 @@
     <ClInclude Include="assimp\include\vector2.h" />
     <ClInclude Include="assimp\include\vector3.h" />
     <ClInclude Include="assimp\include\version.h" />
+    <ClInclude Include="Faction.h" />
     <ClInclude Include="Headquarters.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="Entity.h" />
@@ -219,7 +220,6 @@
     <ClInclude Include="NonCopyable.h" />
     <ClInclude Include="NonMovable.h" />
     <ClInclude Include="PathFinding.h" />
-    <ClInclude Include="SelectionBox.h" />
     <ClInclude Include="ShaderHandler.h" />
     <ClInclude Include="Texture.h" />
     <ClInclude Include="Unit.h" />

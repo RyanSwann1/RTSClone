@@ -1,6 +1,5 @@
 #pragma once
 
-#include "SelectionBox.h"
 #include "glm/glm.hpp"
 #include <SFML/Graphics.hpp>
 #include <iostream>

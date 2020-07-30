@@ -38,6 +38,7 @@ private:
 	std::array<GraphNode, static_cast<size_t>(Globals::MAP_SIZE * Globals::MAP_SIZE)> m_graph;
 };
 
+class Map;
 class PathFinding
 {
 public:

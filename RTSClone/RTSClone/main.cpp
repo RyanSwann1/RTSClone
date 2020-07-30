@@ -9,9 +9,9 @@
 #include "Camera.h"
 #include "Unit.h"
 #include "Headquarters.h"
-#include "SelectionBox.h"
 #include "Map.h"
 #include "glm/gtc/matrix_transform.hpp"
+#include "Faction.h"
 
 #define RENDER_GROUND
 #ifdef RENDER_GROUND
@@ -89,11 +89,11 @@ int main()
 		return -1;
 	}
 
-	Map map;
 #ifdef RENDER_GROUND
 	Ground ground;
 #endif // RENDER_GROUND
-	SelectionBox selectionBox;
+	Map map;
+	Faction faction;
 	sf::Clock gameClock;
 	Camera camera;
 	Entity mineral({ 10.0, Globals::GROUND_HEIGHT, 10.0f }, *rocksOreModel);
@@ -129,8 +129,8 @@ int main()
 				}
 			}
 
-			selectionBox.update(camera, window, spacecraft, headquarters);
-			selectionBox.handleInputEvents(currentSFMLEvent, window, camera, spacecraft, map);
+			faction.update(camera, window, spacecraft, headquarters);
+			faction.handleInput(currentSFMLEvent, window, camera, spacecraft, map);
 			headquarters.handleInput(currentSFMLEvent, camera, window);
 		}
 		
@@ -159,16 +159,19 @@ int main()
 
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
 #ifdef RENDER_AABB
 		headquarters.renderAABB(*shaderHandler);
 		spacecraft.renderAABB(*shaderHandler);
 		mineral.renderAABB(*shaderHandler);
 #endif // RENDER_AABB
+
 #ifdef RENDER_PATHING
 		spacecraft.renderPathMesh(*shaderHandler);
 #endif // RENDER_PATHING
+		
 		shaderHandler->switchToShader(eShaderType::SelectionBox);
-		selectionBox.render(window);
+		faction.render(window);
 		glDisable(GL_BLEND);
 
 		window.display();
