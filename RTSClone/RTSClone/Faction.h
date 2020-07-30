@@ -31,8 +31,7 @@ public:
 
 	void handleInput(const sf::Event& currentSFMLEvent, const sf::Window& window, const Camera& camera, const Map& map);
 	void update(float deltaTime);
-	void render(ShaderHandler& shaderHandler, const Model& hqModel, const Model& unitModel,
-		const Model& waypointModel) const;
+	void render(ShaderHandler& shaderHandler, const Model& hqModel, const Model& unitModel, const Model& waypointModel) const;
 	void renderSelectionBox(const sf::Window& window) const;
 
 #ifdef RENDER_PATHING

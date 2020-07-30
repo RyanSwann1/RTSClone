@@ -58,13 +58,18 @@ Faction::Faction(const Model& headquartersModel, const Model& unitModel, Map& ma
 
 void Faction::handleInput(const sf::Event& currentSFMLEvent, const sf::Window& window, const Camera& camera, const Map& map)
 {
-    if (currentSFMLEvent.type == sf::Event::MouseButtonPressed)
+    switch (currentSFMLEvent.type)
     {
+    case sf::Event::MouseButtonPressed:
         if (currentSFMLEvent.mouseButton.button == sf::Mouse::Left)
         {
-            m_selectionBox.startingPositionWorldPosition = camera.getMouseToGroundPosition(window);
+            glm::vec3 mouseToGroundPosition = camera.getMouseToGroundPosition(window);
+            m_selectionBox.startingPositionWorldPosition = mouseToGroundPosition;
             m_selectionBox.startingPositionScreenPosition = { sf::Mouse::getPosition(window).x, sf::Mouse::getPosition(window).y };
             m_selectionBox.active = true;
+
+            m_HQ.setSelected(m_HQ.getAABB().contains(mouseToGroundPosition));
+            m_unit.setSelected(m_unit.getAABB().contains(mouseToGroundPosition));
         }
         else if (currentSFMLEvent.mouseButton.button == sf::Mouse::Right)
         {
@@ -77,17 +82,15 @@ void Faction::handleInput(const sf::Event& currentSFMLEvent, const sf::Window& w
                 m_HQ.setWaypointPosition(camera.getMouseToGroundPosition(window));
             }
         }
-    }
-    else if (currentSFMLEvent.type == sf::Event::MouseButtonReleased)
-    {
+        break;
+    case sf::Event::MouseButtonReleased:
         if (currentSFMLEvent.mouseButton.button == sf::Mouse::Left)
         {
             m_selectionBox.active = false;
             m_selectionBox.AABB.reset();
         }
-    }
-    else if (currentSFMLEvent.type == sf::Event::MouseMoved)
-    {
+        break;
+    case sf::Event::MouseMoved:
         if (m_selectionBox.active)
         {
             m_selectionBox.mouseToGroundPosition = camera.getMouseToGroundPosition(window);
@@ -97,6 +100,15 @@ void Faction::handleInput(const sf::Event& currentSFMLEvent, const sf::Window& w
             m_HQ.setSelected(m_selectionBox.AABB.contains(m_HQ.getAABB()));
             m_unit.setSelected(m_selectionBox.AABB.contains(m_unit.getAABB()));
         }
+        break;
+    case sf::Event::KeyPressed:
+        switch (currentSFMLEvent.key.code)
+        {
+        case sf::Keyboard::Num1:
+            std::cout << "Spawn Unit\n";
+            break;
+        }
+        break;
     }
 }
 
