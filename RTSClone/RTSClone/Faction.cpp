@@ -86,18 +86,17 @@ void Faction::handleInput(const sf::Event& currentSFMLEvent, const sf::Window& w
             m_selectionBox.AABB.reset();
         }
     }
-}
-
-void Faction::update(const Camera& camera, const sf::Window& window)
-{
-    if (m_selectionBox.active)
+    else if (currentSFMLEvent.type == sf::Event::MouseMoved)
     {
-        m_selectionBox.mouseToGroundPosition = camera.getMouseToGroundPosition(window);
-        m_selectionBox.AABB.reset(m_selectionBox.startingPositionWorldPosition, 
-            m_selectionBox.mouseToGroundPosition - m_selectionBox.startingPositionWorldPosition);
+        if (m_selectionBox.active)
+        {
+            m_selectionBox.mouseToGroundPosition = camera.getMouseToGroundPosition(window);
+            m_selectionBox.AABB.reset(m_selectionBox.startingPositionWorldPosition,
+                m_selectionBox.mouseToGroundPosition - m_selectionBox.startingPositionWorldPosition);
 
-        m_HQ.setSelected(m_selectionBox.AABB.contains(m_HQ.getAABB()));
-        m_unit.setSelected(m_selectionBox.AABB.contains(m_unit.getAABB()));
+            m_HQ.setSelected(m_selectionBox.AABB.contains(m_HQ.getAABB()));
+            m_unit.setSelected(m_selectionBox.AABB.contains(m_unit.getAABB()));
+        }
     }
 }
 

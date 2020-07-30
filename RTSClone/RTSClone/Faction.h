@@ -30,7 +30,6 @@ public:
 	Faction(const Model& headquartersModel, const Model& unitModel, Map& map);
 
 	void handleInput(const sf::Event& currentSFMLEvent, const sf::Window& window, const Camera& camera, const Map& map);
-	void update(const Camera& camera, const sf::Window& window);
 	void update(float deltaTime);
 	void render(ShaderHandler& shaderHandler, const Model& hqModel, const Model& unitModel,
 		const Model& waypointModel) const;

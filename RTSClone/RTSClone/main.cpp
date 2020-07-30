@@ -126,7 +126,6 @@ int main()
 				}
 			}
 
-			faction.update(camera, window);
 			faction.handleInput(currentSFMLEvent, window, camera, map);
 		}
 
