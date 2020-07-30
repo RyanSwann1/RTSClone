@@ -2,7 +2,6 @@
 
 #include "glad.h"
 #include <SFML/Graphics.hpp>
-#include "Model.h"
 #include "ModelLoader.h"
 #include "ShaderHandler.h"
 #include "Texture.h"
@@ -12,6 +11,7 @@
 #include "Map.h"
 #include "glm/gtc/matrix_transform.hpp"
 #include "Faction.h"
+#include "ModelManager.h"
 
 #define RENDER_GROUND
 #ifdef RENDER_GROUND
@@ -57,35 +57,11 @@ int main()
 		return -1;
 	}
 
-	std::unique_ptr<Model> unitModel = Model::create("spaceCraft1.obj", false, glm::vec3(5.0f, 0.25f, 5.0f));
-	assert(unitModel);
-	if (!unitModel)
+	std::unique_ptr<ModelManager> modelManager = ModelManager::create();
+	assert(modelManager);
+	if (!modelManager)
 	{
-		std::cout << "Failed to load SpaceCraft model\n";
-		return -1;
-	}
-
-	std::unique_ptr<Model> headquartersModel = Model::create("portal.obj", true, glm::vec3(5.0f, 0.25f, 3.0f));
-	assert(headquartersModel);
-	if (!headquartersModel)
-	{
-		std::cout << "Failed to load portal model\n";
-		return -1;
-	}
-
-	std::unique_ptr<Model> rocksOreModel = Model::create("rocksOre.obj", true, glm::vec3(5.0f, 0.25f, 5.0f));
-	assert(rocksOreModel);
-	if (!rocksOreModel)
-	{
-		std::cout << "Rocks Ore Model not found\n";
-		return -1;
-	}
-
-	std::unique_ptr<Model> waypointModel = Model::create("laserSabel.obj", true, glm::vec3(2.0f, 1.0f, 2.0f));
-	assert(waypointModel);
-	if (!waypointModel)
-	{
-		std::cout << "Failed to load laserSabel Model\n";
+		std::cout << "Failed to load all models\n";
 		return -1;
 	}
 
@@ -93,10 +69,10 @@ int main()
 	Ground ground;
 #endif // RENDER_GROUND
 	Map map;
-	Faction faction(*headquartersModel, *unitModel, map);
+	Faction faction(*modelManager, map);
 	sf::Clock gameClock;
 	Camera camera;
-	Entity mineral({ 10.0, Globals::GROUND_HEIGHT, 10.0f }, *rocksOreModel, eEntityType::Mineral, map);
+	Entity mineral({ 10.0, Globals::GROUND_HEIGHT, 10.0f }, modelManager->getModel(eModelName::Mineral), eEntityType::Mineral, map);
 
 	shaderHandler->switchToShader(eShaderType::SelectionBox);
 	shaderHandler->setUniformMat4f(eShaderType::SelectionBox, "uOrthographic", glm::ortho(0.0f, static_cast<float>(windowSize.x),
@@ -124,7 +100,7 @@ int main()
 				}
 			}
 
-			faction.handleInput(currentSFMLEvent, window, camera, map, *unitModel);
+			faction.handleInput(currentSFMLEvent, window, camera, map, *modelManager);
 		}
 
 		faction.update(deltaTime);
@@ -138,8 +114,8 @@ int main()
 		shaderHandler->setUniformMat4f(eShaderType::Default, "uView", view);
 		shaderHandler->setUniformMat4f(eShaderType::Default, "uProjection", projection);
 	
-		faction.render(*shaderHandler, *headquartersModel, *unitModel, *waypointModel);
-		mineral.render(*shaderHandler, *rocksOreModel);
+		faction.render(*shaderHandler, *modelManager);
+		mineral.render(*shaderHandler, modelManager->getModel(eModelName::Mineral));
 
 		shaderHandler->switchToShader(eShaderType::Debug);
 		shaderHandler->setUniformMat4f(eShaderType::Debug, "uView", view);

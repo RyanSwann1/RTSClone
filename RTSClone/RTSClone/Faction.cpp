@@ -5,6 +5,7 @@
 #include "Headquarters.h"
 #include "Camera.h"
 #include "Map.h"
+#include "ModelManager.h"
 #include <assert.h>
 #include <array>
 
@@ -48,14 +49,15 @@ SelectionBox::~SelectionBox()
 }
 
 //Faction
-Faction::Faction(const Model& headquartersModel, const Model& unitModel, Map& map)
+Faction::Faction(const ModelManager& modelManager, Map& map)
     : m_selectionBox(),
-    m_HQ({ 37.5f, Globals::GROUND_HEIGHT, 37.5f }, headquartersModel, map),
-    m_unit({ 20.0f, Globals::GROUND_HEIGHT, 20.0f }, unitModel, map),
+    m_HQ({ 37.5f, Globals::GROUND_HEIGHT, 37.5f }, modelManager.getModel(eModelName::HQ), map),
+    m_unit({ 20.0f, Globals::GROUND_HEIGHT, 20.0f }, modelManager.getModel(eModelName::Unit), map),
     m_harvesters()
 {}
 
-void Faction::handleInput(const sf::Event& currentSFMLEvent, const sf::Window& window, const Camera& camera, Map& map, const Model& unitModel)
+void Faction::handleInput(const sf::Event& currentSFMLEvent, const sf::Window& window, const Camera& camera, Map& map, 
+    const ModelManager& modelManager)
 {
     switch (currentSFMLEvent.type)
     {
@@ -123,7 +125,7 @@ void Faction::handleInput(const sf::Event& currentSFMLEvent, const sf::Window& w
         {
         case sf::Keyboard::Num1:
             std::cout << "Spawn Unit\n";
-            spawnUnit(m_HQ.getUnitSpawnPosition(), unitModel, map);
+            spawnUnit(m_HQ.getUnitSpawnPosition(), modelManager.getModel(eModelName::Harvester), map);
             break;
         }
         break;
@@ -139,13 +141,13 @@ void Faction::update(float deltaTime)
     }
 }
 
-void Faction::render(ShaderHandler& shaderHandler, const Model& hqModel, const Model& unitModel, const Model& waypointModel) const
+void Faction::render(ShaderHandler& shaderHandler, const ModelManager& modelManager) const
 {
-    m_HQ.render(shaderHandler, hqModel, waypointModel);
-    m_unit.render(shaderHandler, unitModel);
+    m_HQ.render(shaderHandler, modelManager.getModel(eModelName::HQ), modelManager.getModel(eModelName::Waypoint));
+    m_unit.render(shaderHandler, modelManager.getModel(eModelName::Unit));
     for (auto& harvester : m_harvesters)
     {
-        harvester.render(shaderHandler, unitModel);
+        harvester.render(shaderHandler, modelManager.getModel(eModelName::Harvester));
     }
 }
 

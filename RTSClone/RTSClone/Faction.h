@@ -21,17 +21,18 @@ struct SelectionBox : private NonMovable, private NonCopyable
 };
 
 class ShaderHandler;
-class Model;
+class ModelManager;
 struct Camera;
 class Map;
 class Faction : private NonMovable, private NonCopyable
 {
 public:
-	Faction(const Model& headquartersModel, const Model& unitModel, Map& map);
+	Faction(const ModelManager& modelManager, Map& map);
 
-	void handleInput(const sf::Event& currentSFMLEvent, const sf::Window& window, const Camera& camera, Map& map, const Model& unitModel);
+	void handleInput(const sf::Event& currentSFMLEvent, const sf::Window& window, const Camera& camera, Map& map, 
+		const ModelManager& modelManager);
 	void update(float deltaTime);
-	void render(ShaderHandler& shaderHandler, const Model& hqModel, const Model& unitModel, const Model& waypointModel) const;
+	void render(ShaderHandler& shaderHandler, const ModelManager& modelManager) const;
 	void renderSelectionBox(const sf::Window& window) const;
 
 #ifdef RENDER_PATHING
