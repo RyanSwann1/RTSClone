@@ -5,7 +5,18 @@
 
 namespace
 {
-	
+	glm::vec3 getSpawnPosition(const AABB& AABB, const glm::vec3& direction, const glm::vec3& startingPosition)
+	{
+		glm::vec3 position = startingPosition;
+		float distance = 1;
+		while (AABB.contains(position))
+		{
+			position = position + direction * distance;
+			++distance;
+		}
+		
+		return position;
+	}
 }
 
 Headquarters::Headquarters(const glm::vec3& startingPosition, const Model& model, Map& map)
@@ -16,9 +27,20 @@ Headquarters::Headquarters(const glm::vec3& startingPosition, const Model& model
 glm::vec3 Headquarters::getUnitSpawnPosition() const
 {
 	assert(m_selected);
+	glm::vec3 unitSpawnPosition;
+	if (m_waypointPosition != m_position)
+	{
+		unitSpawnPosition = getSpawnPosition(m_AABB, glm::normalize(m_waypointPosition - m_position), m_position);
+	}
+	else
+	{
+		unitSpawnPosition = getSpawnPosition(m_AABB, 
+			glm::normalize(glm::vec3(Globals::getRandomNumber(-1.0f, 1.0f), Globals::GROUND_HEIGHT, Globals::getRandomNumber(-1.0f, 1.0f))), 
+			m_position);
+	}
 
-
-	return glm::vec3();
+	Globals::printImmediately(unitSpawnPosition);
+	return unitSpawnPosition;
 }
 
 void Headquarters::setWaypointPosition(const glm::vec3& position)
