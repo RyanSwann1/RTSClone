@@ -4,6 +4,7 @@
 #include "Unit.h"
 #include "Headquarters.h"
 #include "Camera.h"
+#include "Map.h"
 #include <assert.h>
 #include <array>
 
@@ -47,12 +48,15 @@ SelectionBox::~SelectionBox()
 }
 
 //Faction
-Faction::Faction()
-    : m_selectionBox()
+Faction::Faction(const Model& headquartersModel, const Model& unitModel, Map& map)
+    : m_selectionBox(),
+    m_HQ({ 37.5f, Globals::GROUND_HEIGHT, 37.5f }, headquartersModel),
+    m_unit({ 20.0f, Globals::GROUND_HEIGHT, 20.0f }, unitModel)
 {
+    map.addEntityAABB(m_HQ.getAABB());
 }
 
-void Faction::handleInput(const sf::Event& currentSFMLEvent, const sf::Window& window, const Camera& camera, Unit& unit, const Map& map)
+void Faction::handleInput(const sf::Event& currentSFMLEvent, const sf::Window& window, const Camera& camera, const Map& map)
 {
     if (currentSFMLEvent.type == sf::Event::MouseButtonPressed)
     {
@@ -62,9 +66,9 @@ void Faction::handleInput(const sf::Event& currentSFMLEvent, const sf::Window& w
             m_selectionBox.startingPositionScreenPosition = { sf::Mouse::getPosition(window).x, sf::Mouse::getPosition(window).y };
             m_selectionBox.active = true;
         }
-        else if (currentSFMLEvent.mouseButton.button == sf::Mouse::Right && unit.isSelected())
+        else if (currentSFMLEvent.mouseButton.button == sf::Mouse::Right && m_unit.isSelected())
         {
-            unit.moveTo(camera.getMouseToGroundPosition(window), map);
+            m_unit.moveTo(camera.getMouseToGroundPosition(window), map);
         }
     }
     else if (currentSFMLEvent.type == sf::Event::MouseButtonReleased)
@@ -75,9 +79,11 @@ void Faction::handleInput(const sf::Event& currentSFMLEvent, const sf::Window& w
             m_selectionBox.AABB.reset();
         }
     }
+
+    m_HQ.handleInput(currentSFMLEvent, camera, window);
 }
 
-void Faction::update(const Camera& camera, const sf::Window& window, Unit& unit, Headquarters& headquarters)
+void Faction::update(const Camera& camera, const sf::Window& window)
 {
     if (m_selectionBox.active)
     {
@@ -85,12 +91,23 @@ void Faction::update(const Camera& camera, const sf::Window& window, Unit& unit,
         m_selectionBox.AABB.reset(m_selectionBox.startingPositionWorldPosition, 
             m_selectionBox.mouseToGroundPosition - m_selectionBox.startingPositionWorldPosition);
 
-        headquarters.setSelected(m_selectionBox.AABB.contains(headquarters.getAABB()));
-        unit.setSelected(m_selectionBox.AABB.contains(unit.getAABB()));
+        m_HQ.setSelected(m_selectionBox.AABB.contains(m_HQ.getAABB()));
+        m_unit.setSelected(m_selectionBox.AABB.contains(m_unit.getAABB()));
     }
 }
 
-void Faction::render(const sf::Window& window) const
+void Faction::update(float deltaTime)
+{
+    m_unit.update(deltaTime);
+}
+
+void Faction::render(ShaderHandler& shaderHandler, const Model& hqModel, const Model& unitModel, const Model& waypointModel) const
+{
+    m_HQ.render(shaderHandler, hqModel, waypointModel);
+    m_unit.render(shaderHandler, unitModel);
+}
+
+void Faction::renderSelectionBox(const sf::Window& window) const
 {
     if (m_selectionBox.active)
     {
@@ -108,3 +125,18 @@ void Faction::render(const sf::Window& window) const
         glDrawArrays(GL_TRIANGLES, 0, 6);
     }
 }
+
+#ifdef RENDER_PATHING
+void Faction::renderPathing(ShaderHandler& shaderHandler)
+{
+    m_unit.renderPathMesh(shaderHandler);
+}
+#endif // RENDER_PATHING
+
+#ifdef RENDER_AABB
+void Faction::renderAABB(ShaderHandler& shaderHandler)
+{
+    m_unit.renderAABB(shaderHandler);
+    m_HQ.renderAABB(shaderHandler);
+}
+#endif // RENDER_AABB

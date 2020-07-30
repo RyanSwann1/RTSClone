@@ -57,9 +57,9 @@ int main()
 		return -1;
 	}
 
-	std::unique_ptr<Model> spacecraftModel = Model::create("spaceCraft1.obj", false, glm::vec3(5.0f, 0.25f, 5.0f));
-	assert(spacecraftModel);
-	if (!spacecraftModel)
+	std::unique_ptr<Model> unitModel = Model::create("spaceCraft1.obj", false, glm::vec3(5.0f, 0.25f, 5.0f));
+	assert(unitModel);
+	if (!unitModel)
 	{
 		std::cout << "Failed to load SpaceCraft model\n";
 		return -1;
@@ -93,14 +93,11 @@ int main()
 	Ground ground;
 #endif // RENDER_GROUND
 	Map map;
-	Faction faction;
+	Faction faction(*headquartersModel, *unitModel, map);
 	sf::Clock gameClock;
 	Camera camera;
 	Entity mineral({ 10.0, Globals::GROUND_HEIGHT, 10.0f }, *rocksOreModel);
-	Unit spacecraft({ 20.0f, Globals::GROUND_HEIGHT, 20.0f }, *spacecraftModel);
-	Headquarters headquarters({ 37.5f, Globals::GROUND_HEIGHT, 37.5f }, *headquartersModel);
 
-	map.addEntityAABB(headquarters.getAABB());
 	map.addEntityAABB(mineral.getAABB());
 
 	shaderHandler->switchToShader(eShaderType::SelectionBox);
@@ -129,12 +126,11 @@ int main()
 				}
 			}
 
-			faction.update(camera, window, spacecraft, headquarters);
-			faction.handleInput(currentSFMLEvent, window, camera, spacecraft, map);
-			headquarters.handleInput(currentSFMLEvent, camera, window);
+			faction.update(camera, window);
+			faction.handleInput(currentSFMLEvent, window, camera, map);
 		}
-		
-		spacecraft.update(deltaTime);
+
+		faction.update(deltaTime);
 		camera.update(window, deltaTime);
 
 		glm::mat4 view = camera.getView(); 
@@ -145,8 +141,7 @@ int main()
 		shaderHandler->setUniformMat4f(eShaderType::Default, "uView", view);
 		shaderHandler->setUniformMat4f(eShaderType::Default, "uProjection", projection);
 	
-		spacecraft.render(*shaderHandler, *spacecraftModel);
-		headquarters.render(*shaderHandler, *headquartersModel, *waypointModel);
+		faction.render(*shaderHandler, *headquartersModel, *unitModel, *waypointModel);
 		mineral.render(*shaderHandler, *rocksOreModel);
 
 		shaderHandler->switchToShader(eShaderType::Debug);
@@ -161,17 +156,16 @@ int main()
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 #ifdef RENDER_AABB
-		headquarters.renderAABB(*shaderHandler);
-		spacecraft.renderAABB(*shaderHandler);
+		faction.renderAABB(*shaderHandler);
 		mineral.renderAABB(*shaderHandler);
 #endif // RENDER_AABB
 
 #ifdef RENDER_PATHING
-		spacecraft.renderPathMesh(*shaderHandler);
+		faction.renderPathing(*shaderHandler);
 #endif // RENDER_PATHING
 		
 		shaderHandler->switchToShader(eShaderType::SelectionBox);
-		faction.render(window);
+		faction.renderSelectionBox(window);
 		glDisable(GL_BLEND);
 
 		window.display();
