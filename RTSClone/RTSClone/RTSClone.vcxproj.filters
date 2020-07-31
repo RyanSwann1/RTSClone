@@ -251,6 +251,9 @@
     <ClInclude Include="ModelManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="ModelName.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="assimp\include\color4.inl">

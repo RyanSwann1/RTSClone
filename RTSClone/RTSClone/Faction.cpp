@@ -124,7 +124,6 @@ void Faction::handleInput(const sf::Event& currentSFMLEvent, const sf::Window& w
         switch (currentSFMLEvent.key.code)
         {
         case sf::Keyboard::Num1:
-            std::cout << "Spawn Unit\n";
             spawnUnit(m_HQ.getUnitSpawnPosition(), modelManager.getModel(eModelName::Harvester), map);
             break;
         }
@@ -143,11 +142,11 @@ void Faction::update(float deltaTime)
 
 void Faction::render(ShaderHandler& shaderHandler, const ModelManager& modelManager) const
 {
-    m_HQ.render(shaderHandler, modelManager.getModel(eModelName::HQ), modelManager.getModel(eModelName::Waypoint));
-    m_unit.render(shaderHandler, modelManager.getModel(eModelName::Unit));
+    m_HQ.render(shaderHandler, modelManager.getModel(m_HQ.getModelName()), modelManager.getModel(eModelName::Waypoint));
+    m_unit.render(shaderHandler, modelManager.getModel(m_unit.getModelName()));
     for (auto& harvester : m_harvesters)
     {
-        harvester.render(shaderHandler, modelManager.getModel(eModelName::Harvester));
+        harvester.render(shaderHandler, modelManager.getModel(harvester.getModelName()));
     }
 }
 

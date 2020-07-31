@@ -4,7 +4,8 @@
 #include "Map.h"
 
 Entity::Entity(const glm::vec3& startingPosition, const Model& model, eEntityType entityType, Map& map)
-	: m_position(startingPosition),
+	: m_modelName(model.modelName),
+	m_position(startingPosition),
 	m_AABB(startingPosition, model),
 	m_type(entityType),
 	m_selected(false)
@@ -13,6 +14,11 @@ Entity::Entity(const glm::vec3& startingPosition, const Model& model, eEntityTyp
 	{
 		map.addEntityAABB(m_AABB);
 	}
+}
+
+eModelName Entity::getModelName() const
+{
+	return m_modelName;
 }
 
 const glm::vec3& Entity::getPosition() const

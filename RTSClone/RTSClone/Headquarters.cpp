@@ -39,7 +39,6 @@ glm::vec3 Headquarters::getUnitSpawnPosition() const
 			m_position);
 	}
 
-	Globals::printImmediately(unitSpawnPosition);
 	return unitSpawnPosition;
 }
 

@@ -3,18 +3,9 @@
 #include "NonCopyable.h"
 #include "NonMovable.h"
 #include "Mesh.h"
+#include "ModelName.h"
 #include <string>
 #include <memory>
-
-enum class eModelName
-{
-	Unit = 0,
-	HQ,
-	Mineral,
-	Waypoint,
-	Harvester,
-	Max = Harvester
-};
 
 class Entity;
 class ShaderHandler;

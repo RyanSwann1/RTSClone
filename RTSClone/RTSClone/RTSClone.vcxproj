@@ -219,6 +219,7 @@
     <ClInclude Include="Model.h" />
     <ClInclude Include="ModelLoader.h" />
     <ClInclude Include="ModelManager.h" />
+    <ClInclude Include="ModelName.h" />
     <ClInclude Include="NonCopyable.h" />
     <ClInclude Include="NonMovable.h" />
     <ClInclude Include="PathFinding.h" />
