@@ -162,6 +162,7 @@
     <ClCompile Include="PathFinding.cpp" />
     <ClCompile Include="ShaderHandler.cpp" />
     <ClCompile Include="Texture.cpp" />
+    <ClCompile Include="Timer.cpp" />
     <ClCompile Include="Unit.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -227,6 +228,7 @@
     <ClInclude Include="PathFinding.h" />
     <ClInclude Include="ShaderHandler.h" />
     <ClInclude Include="Texture.h" />
+    <ClInclude Include="Timer.h" />
     <ClInclude Include="Unit.h" />
   </ItemGroup>
   <ItemGroup>
