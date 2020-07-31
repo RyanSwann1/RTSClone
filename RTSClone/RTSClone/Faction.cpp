@@ -124,7 +124,10 @@ void Faction::handleInput(const sf::Event& currentSFMLEvent, const sf::Window& w
         switch (currentSFMLEvent.key.code)
         {
         case sf::Keyboard::Num1:
-            spawnUnit(m_HQ.getUnitSpawnPosition(), modelManager.getModel(eModelName::Harvester), map);
+            if (m_HQ.isSelected())
+            {
+                spawnUnit(m_HQ.getUnitSpawnPosition(), modelManager.getModel(eModelName::Harvester), map);
+            }
             break;
         }
         break;

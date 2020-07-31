@@ -26,6 +26,7 @@ Headquarters::Headquarters(const glm::vec3& startingPosition, const Model& model
 
 const glm::vec3& Headquarters::getWaypointPosition() const
 {
+	assert(m_selected);
 	return m_waypointPosition;
 }
 
