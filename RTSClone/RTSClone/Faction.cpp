@@ -111,7 +111,6 @@ void Faction::handleInput(const sf::Event& currentSFMLEvent, const sf::Window& w
             m_selectionBox.AABB.reset(m_selectionBox.startingPositionWorldPosition,
                 m_selectionBox.mouseToGroundPosition - m_selectionBox.startingPositionWorldPosition);
 
-            m_HQ.setSelected(m_selectionBox.AABB.contains(m_HQ.getAABB()));
             m_unit.setSelected(m_selectionBox.AABB.contains(m_unit.getAABB()));
 
             for (auto& harvester : m_harvesters)
