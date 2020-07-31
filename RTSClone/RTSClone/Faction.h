@@ -2,8 +2,8 @@
 
 #include "NonCopyable.h"
 #include "NonMovable.h"
-#include "Unit.h"
 #include "Headquarters.h"
+#include "Harvester.h"
 #include <SFML/Graphics.hpp>
 
 struct SelectionBox : private NonMovable, private NonCopyable
@@ -47,7 +47,7 @@ private:
 	SelectionBox m_selectionBox;
 	Headquarters m_HQ;
 	Unit m_unit;
-	std::vector<Unit> m_harvesters;
+	std::vector<Harvester> m_harvesters;
 
 	void spawnUnit(const glm::vec3& spawnPosition, const Model& unitModel, Map& map);
 };

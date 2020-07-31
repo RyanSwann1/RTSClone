@@ -66,6 +66,9 @@
     <ClCompile Include="ModelManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Harvester.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="assimp\include\Compiler\poppack1.h">
@@ -252,6 +255,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="ModelName.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Harvester.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
