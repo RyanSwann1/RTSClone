@@ -31,7 +31,7 @@ public:
 
 	void handleInput(const sf::Event& currentSFMLEvent, const sf::Window& window, const Camera& camera, Map& map, 
 		const ModelManager& modelManager);
-	void update(float deltaTime);
+	void update(float deltaTime, const ModelManager& modelManager);
 	void render(ShaderHandler& shaderHandler, const ModelManager& modelManager) const;
 	void renderSelectionBox(const sf::Window& window) const;
 

@@ -131,12 +131,12 @@ void Faction::handleInput(const sf::Event& currentSFMLEvent, const sf::Window& w
     }
 }
 
-void Faction::update(float deltaTime)
+void Faction::update(float deltaTime, const ModelManager& modelManager)
 {
-    m_unit.update(deltaTime);
+    m_unit.update(deltaTime, modelManager);
     for (auto& harvester : m_harvesters)
     {
-        harvester.update(deltaTime);
+        harvester.update(deltaTime, modelManager);
     }
 }
 

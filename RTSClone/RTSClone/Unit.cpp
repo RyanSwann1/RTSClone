@@ -2,6 +2,7 @@
 #include "ShaderHandler.h"
 #include "Model.h"
 #include "PathFinding.h"
+#include "ModelManager.h"
 
 namespace
 {
@@ -69,7 +70,7 @@ void Unit::moveTo(const glm::vec3& destinationPosition, const Map& map)
 	PathFinding::getInstance().getPathToPosition(m_position, destinationPosition, m_pathToPosition, map);
 }
 
-void Unit::update(float deltaTime)
+void Unit::update(float deltaTime, const ModelManager& modelManager)
 {
 	if (!m_pathToPosition.empty())
 	{
@@ -80,7 +81,7 @@ void Unit::update(float deltaTime)
 		glm::vec3 newPosition = moveTowards(m_position, m_pathToPosition.back(), MOVEMENT_SPEED * deltaTime);
 		m_front = glm::normalize(glm::vec3(newPosition - m_position));
 		m_position = newPosition;
-		m_AABB.reset(m_position, 5.0f);
+		m_AABB.resetFromCentre(m_position, modelManager.getModel(m_modelName).sizeFromCentre);
 		if (m_position == m_pathToPosition.back())
 		{
 			m_pathToPosition.pop_back();

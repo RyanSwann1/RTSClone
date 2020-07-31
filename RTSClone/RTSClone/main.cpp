@@ -103,7 +103,7 @@ int main()
 			faction.handleInput(currentSFMLEvent, window, camera, map, *modelManager);
 		}
 
-		faction.update(deltaTime);
+		faction.update(deltaTime, *modelManager);
 		camera.update(window, deltaTime);
 
 		glm::mat4 view = camera.getView(); 

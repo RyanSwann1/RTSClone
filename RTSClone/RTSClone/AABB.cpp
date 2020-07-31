@@ -95,6 +95,16 @@ bool AABB::contains(const AABB& other) const
 		m_back <= other.m_forward;
 }
 
+void AABB::resetFromCentre(const glm::vec3& position, const glm::vec3& size)
+{
+	m_left = position.x - size.x;
+	m_right = position.x + size.x;
+	m_top = position.y + size.y;
+	m_bottom = position.y - size.y;
+	m_forward = position.z + size.z;
+	m_back = position.z - size.z;
+}
+
 void AABB::reset(const glm::vec3& position, const glm::vec3& size)
 {
 	m_left = glm::min(position.x, position.x + size.x);

@@ -8,13 +8,14 @@
 
 class Map;
 class ShaderHandler;
+class ModelManager;
 class Unit : public Entity
 {
 public:
 	Unit(const glm::vec3& startingPosition, const Model& model, Map& map);
 
 	void moveTo(const glm::vec3& destinationPosition, const Map& map);
-	void update(float deltaTime);
+	void update(float deltaTime, const ModelManager& modelManager);
 
 #ifdef RENDER_PATHING
 	void renderPathMesh(ShaderHandler& shaderHandler);
