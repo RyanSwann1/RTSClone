@@ -30,8 +30,8 @@ public:
 	Faction(const ModelManager& modelManager, Map& map);
 
 	void handleInput(const sf::Event& currentSFMLEvent, const sf::Window& window, const Camera& camera, Map& map, 
-		const ModelManager& modelManager, const Entity& mineral);
-	void update(float deltaTime, const ModelManager& modelManager, const Map& map, const Entity& mineral);
+		const ModelManager& modelManager, const std::vector<Entity>& minerals);
+	void update(float deltaTime, const ModelManager& modelManager, const Map& map);
 	void render(ShaderHandler& shaderHandler, const ModelManager& modelManager) const;
 	void renderSelectionBox(const sf::Window& window) const;
 

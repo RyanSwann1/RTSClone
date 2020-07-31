@@ -57,7 +57,7 @@ Faction::Faction(const ModelManager& modelManager, Map& map)
 {}
 
 void Faction::handleInput(const sf::Event& currentSFMLEvent, const sf::Window& window, const Camera& camera, Map& map, 
-    const ModelManager& modelManager, const Entity& mineral)
+    const ModelManager& modelManager, const std::vector<Entity>& minerals)
 {
     switch (currentSFMLEvent.type)
     {
@@ -92,7 +92,7 @@ void Faction::handleInput(const sf::Event& currentSFMLEvent, const sf::Window& w
             {
                 if (harvester.isSelected())
                 {
-                    harvester.moveTo(mouseToGroundPosition, map, mineral);
+                    harvester.moveTo(mouseToGroundPosition, map, minerals);
                 }
             }
         }
@@ -133,12 +133,12 @@ void Faction::handleInput(const sf::Event& currentSFMLEvent, const sf::Window& w
     }
 }
 
-void Faction::update(float deltaTime, const ModelManager& modelManager, const Map& map, const Entity& mineral)
+void Faction::update(float deltaTime, const ModelManager& modelManager, const Map& map)
 {
     m_unit.update(deltaTime, modelManager);
     for (auto& harvester : m_harvesters)
     {
-        harvester.update(deltaTime, modelManager, m_HQ, map, mineral);
+        harvester.update(deltaTime, modelManager, m_HQ, map);
     }
 }
 

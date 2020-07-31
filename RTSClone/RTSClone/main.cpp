@@ -72,7 +72,10 @@ int main()
 	Faction faction(*modelManager, map);
 	sf::Clock gameClock;
 	Camera camera;
-	Entity mineral({ 10.0, Globals::GROUND_HEIGHT, 10.0f }, modelManager->getModel(eModelName::Mineral), eEntityType::Mineral, map);
+	std::vector<Entity> minerals;
+	minerals.emplace_back(glm::vec3(10.0, Globals::GROUND_HEIGHT, 10.0f), modelManager->getModel(eModelName::Mineral), eEntityType::Mineral, map);
+	minerals.emplace_back(glm::vec3(10.0, Globals::GROUND_HEIGHT, 25.0f), modelManager->getModel(eModelName::Mineral), eEntityType::Mineral, map);
+	minerals.emplace_back(glm::vec3(10.0, Globals::GROUND_HEIGHT, 40.0f), modelManager->getModel(eModelName::Mineral), eEntityType::Mineral, map);
 
 	shaderHandler->switchToShader(eShaderType::SelectionBox);
 	shaderHandler->setUniformMat4f(eShaderType::SelectionBox, "uOrthographic", glm::ortho(0.0f, static_cast<float>(windowSize.x),
@@ -100,10 +103,10 @@ int main()
 				}
 			}
 
-			faction.handleInput(currentSFMLEvent, window, camera, map, *modelManager, mineral);
+			faction.handleInput(currentSFMLEvent, window, camera, map, *modelManager, minerals);
 		}
 
-		faction.update(deltaTime, *modelManager, map, mineral);
+		faction.update(deltaTime, *modelManager, map);
 		camera.update(window, deltaTime);
 
 		glm::mat4 view = camera.getView(); 
@@ -115,7 +118,10 @@ int main()
 		shaderHandler->setUniformMat4f(eShaderType::Default, "uProjection", projection);
 	
 		faction.render(*shaderHandler, *modelManager);
-		mineral.render(*shaderHandler, modelManager->getModel(eModelName::Mineral));
+		for(const auto& mineral : minerals)
+		{
+			mineral.render(*shaderHandler, modelManager->getModel(eModelName::Mineral));
+		}
 
 		shaderHandler->switchToShader(eShaderType::Debug);
 		shaderHandler->setUniformMat4f(eShaderType::Debug, "uView", view);
@@ -130,7 +136,10 @@ int main()
 
 #ifdef RENDER_AABB
 		faction.renderAABB(*shaderHandler);
-		mineral.renderAABB(*shaderHandler);
+		for (auto& mineral : minerals)
+		{
+			mineral.renderAABB(*shaderHandler);
+		}
 #endif // RENDER_AABB
 
 #ifdef RENDER_PATHING
