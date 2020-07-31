@@ -14,7 +14,7 @@ namespace
 			distance++;
 		}
 
-		return position + glm::normalize(harvesterPosition - centrePositionAABB) * 2.0f;
+		return position + glm::normalize(harvesterPosition - centrePositionAABB);
 	}
 
 	glm::vec3 getClosestPositionFromMineral(const glm::vec3& harvesterPosition, const Entity& mineral, const Map& map)
@@ -43,7 +43,8 @@ Harvester::Harvester(const glm::vec3 & startingPosition, const glm::vec3 & desti
 	Unit::moveTo(destinationPosition, map);
 }
 
-void Harvester::update(float deltaTime, const ModelManager& modelManager, const Headquarters& HQ, const Map& map)
+void Harvester::update(float deltaTime, const ModelManager& modelManager, const Headquarters& HQ, const Map& map,
+	const Entity& mineral)
 {
 	Unit::update(deltaTime, modelManager);
 
@@ -60,8 +61,8 @@ void Harvester::update(float deltaTime, const ModelManager& modelManager, const 
 	case eHarvesterState::ReturningMineralsToHQ:
 		if (m_pathToPosition.empty())
 		{
-			m_currentHarvesterState = eHarvesterState::InUseByBaseState;
-			m_currentState = eUnitState::Idle;
+			m_currentHarvesterState = eHarvesterState::MovingToMinerals;
+			Unit::moveTo(getClosestPositionFromAABB(m_position, mineral.getPosition(), mineral.getAABB(), map), map);
 		}
 		break;
 	}
