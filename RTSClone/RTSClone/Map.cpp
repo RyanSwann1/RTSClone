@@ -11,6 +11,11 @@ Map::Map()
 	}
 }
 
+bool Map::isPositionOccupied(const glm::vec3& position) const
+{
+	return m_map[Globals::convertTo1D({ position.x, position.z })];
+}
+
 bool Map::isPositionOccupied(const glm::ivec2& position) const
 {
 	return m_map[Globals::convertTo1D(position)];

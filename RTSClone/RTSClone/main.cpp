@@ -100,7 +100,7 @@ int main()
 				}
 			}
 
-			faction.handleInput(currentSFMLEvent, window, camera, map, *modelManager);
+			faction.handleInput(currentSFMLEvent, window, camera, map, *modelManager, mineral);
 		}
 
 		faction.update(deltaTime, *modelManager);

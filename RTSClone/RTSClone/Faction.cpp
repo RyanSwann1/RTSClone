@@ -57,7 +57,7 @@ Faction::Faction(const ModelManager& modelManager, Map& map)
 {}
 
 void Faction::handleInput(const sf::Event& currentSFMLEvent, const sf::Window& window, const Camera& camera, Map& map, 
-    const ModelManager& modelManager)
+    const ModelManager& modelManager, const Entity& mineral)
 {
     switch (currentSFMLEvent.type)
     {
@@ -92,7 +92,7 @@ void Faction::handleInput(const sf::Event& currentSFMLEvent, const sf::Window& w
             {
                 if (harvester.isSelected())
                 {
-                    harvester.moveTo(mouseToGroundPosition, map);
+                    harvester.moveTo(mouseToGroundPosition, map, mineral);
                 }
             }
         }

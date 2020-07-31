@@ -4,15 +4,16 @@
 
 enum class eHarvesterState
 {
-	BaseStateInUse
+	BaseStateInUse = 0 
 };
 
 class Harvester : public Unit
 {
 public:
-	//Entity(const glm::vec3& startingPosition, const Model& model, eEntityType entityType, Map& map);
 	Harvester(const glm::vec3& startingPosition, const Model& model, Map& map);
 	
+	void moveTo(const glm::vec3& destinationPosition, const Map& map, const Entity& mineral);
+
 private:
 	eHarvesterState m_currentHarvesterState;
 };
