@@ -28,10 +28,10 @@ public:
 	void renderPathMesh(ShaderHandler& shaderHandler);
 #endif // RENDER_PATHING
 
-private:
+protected:
+	eUnitState m_currentState;
 	glm::vec3 m_front;
 	std::vector<glm::vec3> m_pathToPosition;
-	eUnitState m_currentState;
 
 #ifdef RENDER_PATHING
 	Mesh m_renderPathMesh;

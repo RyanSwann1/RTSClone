@@ -60,9 +60,9 @@ namespace
 
 Unit::Unit(const glm::vec3& startingPosition, const Model& model, Map& map)
 	: Entity(startingPosition, model, eEntityType::Unit, map),
+	m_currentState(eUnitState::Idle),
 	m_front(),
-	m_pathToPosition(),
-	m_currentState(eUnitState::Idle)
+	m_pathToPosition()
 {}
 
 void Unit::moveTo(const glm::vec3& destinationPosition, const Map& map)
