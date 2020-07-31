@@ -6,6 +6,13 @@
 #include "Mesh.h"
 #endif // RENDER_PATHING
 
+enum class eUnitState
+{
+	Idle = 0,
+	Moving,
+	InUseByDerivedState
+};
+
 class Map;
 class ShaderHandler;
 class ModelManager;
@@ -24,6 +31,7 @@ public:
 private:
 	glm::vec3 m_front;
 	std::vector<glm::vec3> m_pathToPosition;
+	eUnitState m_currentState;
 
 #ifdef RENDER_PATHING
 	Mesh m_renderPathMesh;

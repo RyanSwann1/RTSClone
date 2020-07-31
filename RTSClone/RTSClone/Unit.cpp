@@ -61,7 +61,8 @@ namespace
 Unit::Unit(const glm::vec3& startingPosition, const Model& model, Map& map)
 	: Entity(startingPosition, model, eEntityType::Unit, map),
 	m_front(),
-	m_pathToPosition()
+	m_pathToPosition(),
+	m_currentState(eUnitState::Idle)
 {}
 
 void Unit::moveTo(const glm::vec3& destinationPosition, const Map& map)
@@ -74,6 +75,7 @@ void Unit::update(float deltaTime, const ModelManager& modelManager)
 {
 	if (!m_pathToPosition.empty())
 	{
+		m_currentState = eUnitState::Moving;
 #ifdef RENDER_PATHING
 		generateRenderPath(m_pathToPosition, m_renderPathMesh);
 #endif // RENDER_PATHING
@@ -85,6 +87,12 @@ void Unit::update(float deltaTime, const ModelManager& modelManager)
 		if (m_position == m_pathToPosition.back())
 		{
 			m_pathToPosition.pop_back();
+			
+			if (m_pathToPosition.empty())
+			{
+				m_currentState = eUnitState::Idle;
+				std::cout << "Idle\n";
+			}
 		}
 	}
 }
