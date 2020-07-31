@@ -24,6 +24,11 @@ Headquarters::Headquarters(const glm::vec3& startingPosition, const Model& model
 	m_waypointPosition(startingPosition)
 {}
 
+const glm::vec3& Headquarters::getWaypointPosition() const
+{
+	return m_waypointPosition;
+}
+
 glm::vec3 Headquarters::getUnitSpawnPosition() const
 {
 	assert(m_selected);

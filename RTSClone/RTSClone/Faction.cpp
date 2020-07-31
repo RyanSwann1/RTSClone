@@ -194,5 +194,12 @@ void Faction::renderAABB(ShaderHandler& shaderHandler)
 
 void Faction::spawnUnit(const glm::vec3& spawnPosition, const Model& unitModel, Map& map)
 {
-    m_harvesters.emplace_back(spawnPosition, unitModel, map);
+    if (m_HQ.getWaypointPosition() != m_HQ.getPosition())
+    {
+        m_harvesters.emplace_back(spawnPosition, m_HQ.getWaypointPosition(), unitModel, map);
+    }
+    else
+    {
+        m_harvesters.emplace_back(spawnPosition, unitModel, map);
+    }
 }

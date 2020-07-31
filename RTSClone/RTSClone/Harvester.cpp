@@ -22,6 +22,13 @@ Harvester::Harvester(const glm::vec3& startingPosition, const Model& model, Map&
 	m_currentHarvesterState(eHarvesterState::BaseStateInUse)
 {}
 
+Harvester::Harvester(const glm::vec3 & startingPosition, const glm::vec3 & destinationPosition, const Model & model, Map & map)
+	: Unit(startingPosition, model, map),
+	m_currentHarvesterState(eHarvesterState::BaseStateInUse)
+{
+	Unit::moveTo(destinationPosition, map);
+}
+
 void Harvester::moveTo(const glm::vec3 & destinationPosition, const Map & map, const Entity & mineral)
 {
 	if (mineral.getAABB().contains(destinationPosition))
