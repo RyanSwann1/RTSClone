@@ -40,16 +40,18 @@ Harvester::Harvester(const glm::vec3& startingPosition, const Model& model, Map&
 	m_mineralToHarvest(nullptr)
 {}
 
-Harvester::Harvester(const glm::vec3 & startingPosition, const glm::vec3 & destinationPosition, const Model & model, Map & map)
+Harvester::Harvester(const glm::vec3 & startingPosition, const glm::vec3 & destinationPosition, const Model & model, 
+	Map & map, const std::vector<Unit>& units)
 	: Unit(startingPosition, model, map),
 	m_currentHarvesterState(eHarvesterState::InUseByBaseState),
 	m_harvestTimer(HARVEST_TIME),
 	m_mineralToHarvest(nullptr)
 {
-	Unit::moveTo(destinationPosition, map);
+	Unit::moveTo(destinationPosition, map, units);
 }
 
-void Harvester::update(float deltaTime, const ModelManager& modelManager, const Headquarters& HQ, const Map& map)
+void Harvester::update(float deltaTime, const ModelManager& modelManager, const Headquarters& HQ, const Map& map, 
+	const std::vector<Unit>& units)
 {
 	Unit::update(deltaTime, modelManager);
 
@@ -66,7 +68,7 @@ void Harvester::update(float deltaTime, const ModelManager& modelManager, const 
 		{
 			m_currentHarvesterState = eHarvesterState::MovingToMinerals;
 			assert(m_mineralToHarvest);
-			Unit::moveTo(getClosestPositionFromAABB(m_position, m_mineralToHarvest->getPosition(), m_mineralToHarvest->getAABB(), map), map);
+			Unit::moveTo(getClosestPositionFromAABB(m_position, m_mineralToHarvest->getPosition(), m_mineralToHarvest->getAABB(), map), map, units);
 		}
 		break;
 	case eHarvesterState::Harvesting:
@@ -75,7 +77,7 @@ void Harvester::update(float deltaTime, const ModelManager& modelManager, const 
 		if (m_harvestTimer.isExpired())
 		{
 			m_currentHarvesterState = eHarvesterState::ReturningMineralsToHQ;
-			Unit::moveTo(getClosestPositionFromAABB(m_position, HQ.getPosition(), HQ.getAABB(), map), map);
+			Unit::moveTo(getClosestPositionFromAABB(m_position, HQ.getPosition(), HQ.getAABB(), map), map, units);
 
 			m_harvestTimer.setActive(false);
 			m_harvestTimer.resetElaspedTime();
@@ -84,7 +86,8 @@ void Harvester::update(float deltaTime, const ModelManager& modelManager, const 
 	}
 }
 
-void Harvester::moveTo(const glm::vec3 & destinationPosition, const Map & map, const std::vector<Entity>& minerals)
+void Harvester::moveTo(const glm::vec3 & destinationPosition, const Map & map, const std::vector<Entity>& minerals,
+	const std::vector<Unit>& units)
 {
 	for (const auto& mineral : minerals)
 	{
@@ -92,7 +95,7 @@ void Harvester::moveTo(const glm::vec3 & destinationPosition, const Map & map, c
 		{
 			m_mineralToHarvest = &mineral;
 			glm::vec3 position = getClosestPositionFromMineral(m_position, mineral, map);
-			Unit::moveTo(position, map);
+			Unit::moveTo(position, map, units);
 			m_currentHarvesterState = eHarvesterState::MovingToMinerals;
 			m_currentState = eUnitState::InUseByDerivedState;
 			break;
@@ -107,6 +110,6 @@ void Harvester::moveTo(const glm::vec3 & destinationPosition, const Map & map, c
 	{
 		m_currentHarvesterState = eHarvesterState::InUseByBaseState;
 		m_currentState = eUnitState::Moving;
-		Unit::moveTo(destinationPosition, map);
+		Unit::moveTo(destinationPosition, map, units);
 	}
 }

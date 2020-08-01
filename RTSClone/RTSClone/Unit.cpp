@@ -65,19 +65,20 @@ Unit::Unit(const glm::vec3& startingPosition, const Model& model, Map& map)
 	m_pathToPosition()
 {}
 
-Unit::Unit(const glm::vec3 & startingPosition, const glm::vec3 & destinationPosition, const Model & model, Map & map)
+Unit::Unit(const glm::vec3 & startingPosition, const glm::vec3 & destinationPosition, const Model & model, Map & map,
+	const std::vector<Unit>& units)
 	: Entity(startingPosition, model, eEntityType::Unit, map),
 	m_currentState(eUnitState::Idle),
 	m_front(),
 	m_pathToPosition()
 {
-	moveTo(destinationPosition, map);
+	moveTo(destinationPosition, map, units);
 }
 
-void Unit::moveTo(const glm::vec3& destinationPosition, const Map& map)
+void Unit::moveTo(const glm::vec3& destinationPosition, const Map& map, const std::vector<Unit>& units)
 {
 	m_pathToPosition.clear();
-	PathFinding::getInstance().getPathToPosition(m_position, destinationPosition, m_pathToPosition, map);
+	PathFinding::getInstance().getPathToPosition(m_position, destinationPosition, m_pathToPosition, map, units);
 }
 
 void Unit::update(float deltaTime, const ModelManager& modelManager)

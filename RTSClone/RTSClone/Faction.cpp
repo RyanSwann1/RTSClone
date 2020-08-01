@@ -188,7 +188,7 @@ void Faction::update(float deltaTime, const ModelManager& modelManager, const Ma
 
     for (auto& harvester : m_harvesters)
     {
-        harvester.update(deltaTime, modelManager, m_HQ, map);
+        harvester.update(deltaTime, modelManager, m_HQ, map, m_units);
     }
 }
 
@@ -248,7 +248,7 @@ void Faction::spawnUnit(const glm::vec3& spawnPosition, const Model& unitModel, 
 {
     if (m_HQ.getWaypointPosition() != m_HQ.getPosition())
     {
-        m_units.emplace_back(spawnPosition, m_HQ.getWaypointPosition(), unitModel, map);
+        m_units.emplace_back(spawnPosition, m_HQ.getWaypointPosition(), unitModel, map, m_units);
     }
     else
     {
@@ -260,7 +260,7 @@ void Faction::spawnHarvester(const glm::vec3& spawnPosition, const Model& unitMo
 {
     if (m_HQ.getWaypointPosition() != m_HQ.getPosition())
     {
-        m_harvesters.emplace_back(spawnPosition, m_HQ.getWaypointPosition(), unitModel, map);
+        m_harvesters.emplace_back(spawnPosition, m_HQ.getWaypointPosition(), unitModel, map, m_units);
     }
     else
     {
@@ -300,7 +300,7 @@ void Faction::moveSingularSelectedUnit(const glm::vec3& destinationPosition, con
     });
     if (selectedUnit != m_units.end())
     {
-        selectedUnit->moveTo(destinationPosition, map);
+        selectedUnit->moveTo(destinationPosition, map, m_units);
     }
     else
     {
@@ -309,7 +309,7 @@ void Faction::moveSingularSelectedUnit(const glm::vec3& destinationPosition, con
         });
         assert(selectedHarvester != m_harvesters.end());
 
-        selectedHarvester->moveTo(destinationPosition, map, minerals);
+        selectedHarvester->moveTo(destinationPosition, map, minerals, m_units);
     }
 }
 
@@ -350,7 +350,7 @@ void Faction::moveMultipleSelectedUnits(const glm::vec3& destinationPosition, co
 
         for (auto& selectedUnit : selectedUnits)
         {
-            selectedUnit->moveTo(destinationPosition - (averagePosition - selectedUnit->getPosition()), map);
+            selectedUnit->moveTo(destinationPosition - (averagePosition - selectedUnit->getPosition()), map, m_units);
         }
     }
 }

@@ -20,9 +20,10 @@ class Unit : public Entity
 {
 public:
 	Unit(const glm::vec3& startingPosition, const Model& model, Map& map);
-	Unit(const glm::vec3& startingPosition, const glm::vec3& destinationPosition, const Model& model, Map& map);
+	Unit(const glm::vec3& startingPosition, const glm::vec3& destinationPosition, const Model& model, Map& map,
+		const std::vector<Unit>& units);
 
-	void moveTo(const glm::vec3& destinationPosition, const Map& map);
+	void moveTo(const glm::vec3& destinationPosition, const Map& map, const std::vector<Unit>& units);
 	void update(float deltaTime, const ModelManager& modelManager);
 
 #ifdef RENDER_PATHING
