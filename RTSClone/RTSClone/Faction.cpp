@@ -143,7 +143,7 @@ void Faction::handleInput(const sf::Event& currentSFMLEvent, const sf::Window& w
         case sf::Keyboard::Num2:
             if (m_HQ.isSelected())
             {
-                spawnHarvester(m_HQ.getUnitSpawnPosition(), modelManager.getModel(eModelName::Unit), map);
+                spawnUnit(m_HQ.getUnitSpawnPosition(), modelManager.getModel(eModelName::Unit), map);
             }
             break;
         }
@@ -216,11 +216,16 @@ void Faction::renderPathing(ShaderHandler& shaderHandler)
 #ifdef RENDER_AABB
 void Faction::renderAABB(ShaderHandler& shaderHandler)
 {
-    m_unit.renderAABB(shaderHandler);
+    for (auto& unit : m_units)
+    {
+        unit.renderAABB(shaderHandler);
+    }
+
     for (auto& harvester : m_harvesters)
     {
         harvester.renderAABB(shaderHandler);
     }
+
     m_HQ.renderAABB(shaderHandler);
 }
 #endif // RENDER_AABB
