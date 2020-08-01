@@ -29,7 +29,7 @@ namespace
 			distance++;
 		}
 
-		return position + glm::normalize(harvesterPosition - mineral.getPosition()) * 2.0f;
+		return position + glm::normalize(harvesterPosition - mineral.getPosition()) * 0.25f;
 	}
 }
 
@@ -95,6 +95,11 @@ void Harvester::moveTo(const glm::vec3 & destinationPosition, const Map & map, c
 			Unit::moveTo(position, map);
 			m_currentHarvesterState = eHarvesterState::MovingToMinerals;
 			m_currentState = eUnitState::InUseByDerivedState;
+			break;
+		}
+		else
+		{
+			m_mineralToHarvest = nullptr;
 		}
 	}
 
