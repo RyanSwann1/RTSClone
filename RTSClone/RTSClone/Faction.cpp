@@ -48,6 +48,44 @@ SelectionBox::~SelectionBox()
     glDeleteBuffers(1, &vboID);
 }
 
+void SelectionBox::setStartingPosition(const sf::Window& window, const glm::vec3& position)
+{
+    startingPositionWorldPosition = position;
+    startingPositionScreenPosition = { sf::Mouse::getPosition(window).x, sf::Mouse::getPosition(window).y };
+    active = true;
+}
+
+void SelectionBox::setSize(const glm::vec3& position)
+{
+    mouseToGroundPosition = position;
+    AABB.reset(startingPositionWorldPosition, mouseToGroundPosition - startingPositionWorldPosition);
+}
+
+void SelectionBox::reset()
+{
+    active = false;
+    AABB.reset();
+}
+
+void SelectionBox::render(const sf::Window& window) const
+{
+    if (active)
+    {
+        glm::vec2 endingPosition = { sf::Mouse::getPosition(window).x, sf::Mouse::getPosition(window).y };
+        std::array<glm::ivec2, 6> quadCoords = getQuadCoords(startingPositionScreenPosition,
+            endingPosition - startingPositionScreenPosition);
+
+        glBindVertexArray(vaoID);
+        glBindBuffer(GL_ARRAY_BUFFER, vboID);
+        glBufferData(GL_ARRAY_BUFFER, quadCoords.size() * sizeof(glm::ivec2), quadCoords.data(), GL_STATIC_DRAW);
+
+        glEnableVertexAttribArray(0);
+        glVertexAttribPointer(0, 2, GL_INT, GL_FALSE, sizeof(glm::ivec2), (const void*)0);
+
+        glDrawArrays(GL_TRIANGLES, 0, 6);
+    }
+}
+
 //Faction
 Faction::Faction(const ModelManager& modelManager, Map& map)
     : m_selectionBox(),
@@ -65,10 +103,7 @@ void Faction::handleInput(const sf::Event& currentSFMLEvent, const sf::Window& w
         if (currentSFMLEvent.mouseButton.button == sf::Mouse::Left)
         {
             glm::vec3 mouseToGroundPosition = camera.getMouseToGroundPosition(window);
-            m_selectionBox.startingPositionWorldPosition = mouseToGroundPosition;
-            m_selectionBox.startingPositionScreenPosition = { sf::Mouse::getPosition(window).x, sf::Mouse::getPosition(window).y };
-            m_selectionBox.active = true;
-
+            m_selectionBox.setStartingPosition(window, mouseToGroundPosition);
             m_HQ.setSelected(m_HQ.getAABB().contains(mouseToGroundPosition));
             
             for (auto& unit : m_units)
@@ -109,16 +144,13 @@ void Faction::handleInput(const sf::Event& currentSFMLEvent, const sf::Window& w
     case sf::Event::MouseButtonReleased:
         if (currentSFMLEvent.mouseButton.button == sf::Mouse::Left)
         {
-            m_selectionBox.active = false;
-            m_selectionBox.AABB.reset();
+            m_selectionBox.reset();
         }
         break;
     case sf::Event::MouseMoved:
         if (m_selectionBox.active)
         {
-            m_selectionBox.mouseToGroundPosition = camera.getMouseToGroundPosition(window);
-            m_selectionBox.AABB.reset(m_selectionBox.startingPositionWorldPosition,
-                m_selectionBox.mouseToGroundPosition - m_selectionBox.startingPositionWorldPosition);
+            m_selectionBox.setSize(camera.getMouseToGroundPosition(window));
 
             for (auto& unit : m_units)
             {
@@ -181,21 +213,7 @@ void Faction::render(ShaderHandler& shaderHandler, const ModelManager& modelMana
 
 void Faction::renderSelectionBox(const sf::Window& window) const
 {
-    if (m_selectionBox.active)
-    {
-        glm::vec2 endingPosition = { sf::Mouse::getPosition(window).x, sf::Mouse::getPosition(window).y };
-        std::array<glm::ivec2, 6> quadCoords = getQuadCoords(m_selectionBox.startingPositionScreenPosition, 
-            endingPosition - m_selectionBox.startingPositionScreenPosition);
-        
-        glBindVertexArray(m_selectionBox.vaoID);
-        glBindBuffer(GL_ARRAY_BUFFER, m_selectionBox.vboID);
-        glBufferData(GL_ARRAY_BUFFER, quadCoords.size() * sizeof(glm::ivec2), quadCoords.data(), GL_STATIC_DRAW);
-
-        glEnableVertexAttribArray(0);
-        glVertexAttribPointer(0, 2, GL_INT, GL_FALSE, sizeof(glm::ivec2), (const void*)0);
-
-        glDrawArrays(GL_TRIANGLES, 0, 6);
-    }
+    m_selectionBox.render(window);
 }
 
 #ifdef RENDER_PATHING

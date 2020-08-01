@@ -11,6 +11,11 @@ struct SelectionBox : private NonMovable, private NonCopyable
 	SelectionBox();
 	~SelectionBox();
 
+	void setStartingPosition(const sf::Window& window, const glm::vec3& position);
+	void setSize(const glm::vec3& position);
+	void reset();
+	void render(const sf::Window& window) const;
+
 	AABB AABB;
 	bool active;
 	glm::vec3 mouseToGroundPosition;
