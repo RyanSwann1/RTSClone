@@ -52,7 +52,7 @@ SelectionBox::~SelectionBox()
 Faction::Faction(const ModelManager& modelManager, Map& map)
     : m_selectionBox(),
     m_HQ({ 37.5f, Globals::GROUND_HEIGHT, 37.5f }, modelManager.getModel(eModelName::HQ), map),
-    m_unit({ 20.0f, Globals::GROUND_HEIGHT, 20.0f }, modelManager.getModel(eModelName::Unit), map),
+    m_units(),
     m_harvesters()
 {}
 
@@ -70,7 +70,12 @@ void Faction::handleInput(const sf::Event& currentSFMLEvent, const sf::Window& w
             m_selectionBox.active = true;
 
             m_HQ.setSelected(m_HQ.getAABB().contains(mouseToGroundPosition));
-            m_unit.setSelected(m_unit.getAABB().contains(mouseToGroundPosition));
+            
+            for (auto& unit : m_units)
+            {
+                unit.setSelected(unit.getAABB().contains(mouseToGroundPosition));
+            }
+
             for (auto& harvester : m_harvesters)
             {
                 harvester.setSelected(harvester.getAABB().contains(mouseToGroundPosition));
@@ -79,11 +84,15 @@ void Faction::handleInput(const sf::Event& currentSFMLEvent, const sf::Window& w
         else if (currentSFMLEvent.mouseButton.button == sf::Mouse::Right)
         {
             glm::vec3 mouseToGroundPosition = camera.getMouseToGroundPosition(window);
-            if (m_unit.isSelected())
+            for (auto& unit : m_units)
             {
-                m_unit.moveTo(mouseToGroundPosition, map);
+                if (unit.isSelected())
+                {
+                    unit.moveTo(mouseToGroundPosition, map);
+                }
             }
-            else if (m_HQ.isSelected())
+            
+            if (m_HQ.isSelected())
             {
                 m_HQ.setWaypointPosition(mouseToGroundPosition);
             }
@@ -111,7 +120,10 @@ void Faction::handleInput(const sf::Event& currentSFMLEvent, const sf::Window& w
             m_selectionBox.AABB.reset(m_selectionBox.startingPositionWorldPosition,
                 m_selectionBox.mouseToGroundPosition - m_selectionBox.startingPositionWorldPosition);
 
-            m_unit.setSelected(m_selectionBox.AABB.contains(m_unit.getAABB()));
+            for (auto& unit : m_units)
+            {
+                unit.setSelected(m_selectionBox.AABB.contains(unit.getAABB()));
+            }
 
             for (auto& harvester : m_harvesters)
             {
@@ -125,7 +137,13 @@ void Faction::handleInput(const sf::Event& currentSFMLEvent, const sf::Window& w
         case sf::Keyboard::Num1:
             if (m_HQ.isSelected())
             {
-                spawnUnit(m_HQ.getUnitSpawnPosition(), modelManager.getModel(eModelName::Harvester), map);
+                spawnHarvester(m_HQ.getUnitSpawnPosition(), modelManager.getModel(eModelName::Harvester), map);
+            }
+            break;
+        case sf::Keyboard::Num2:
+            if (m_HQ.isSelected())
+            {
+                spawnHarvester(m_HQ.getUnitSpawnPosition(), modelManager.getModel(eModelName::Unit), map);
             }
             break;
         }
@@ -135,7 +153,11 @@ void Faction::handleInput(const sf::Event& currentSFMLEvent, const sf::Window& w
 
 void Faction::update(float deltaTime, const ModelManager& modelManager, const Map& map)
 {
-    m_unit.update(deltaTime, modelManager);
+    for (auto& unit : m_units)
+    {
+        unit.update(deltaTime, modelManager);
+    }
+
     for (auto& harvester : m_harvesters)
     {
         harvester.update(deltaTime, modelManager, m_HQ, map);
@@ -145,7 +167,12 @@ void Faction::update(float deltaTime, const ModelManager& modelManager, const Ma
 void Faction::render(ShaderHandler& shaderHandler, const ModelManager& modelManager) const
 {
     m_HQ.render(shaderHandler, modelManager.getModel(m_HQ.getModelName()), modelManager.getModel(eModelName::Waypoint));
-    m_unit.render(shaderHandler, modelManager.getModel(m_unit.getModelName()));
+
+    for (auto& unit : m_units)
+    {
+        unit.render(shaderHandler, modelManager.getModel(unit.getModelName()));
+    }
+
     for (auto& harvester : m_harvesters)
     {
         harvester.render(shaderHandler, modelManager.getModel(harvester.getModelName()));
@@ -174,7 +201,11 @@ void Faction::renderSelectionBox(const sf::Window& window) const
 #ifdef RENDER_PATHING
 void Faction::renderPathing(ShaderHandler& shaderHandler)
 {
-    m_unit.renderPathMesh(shaderHandler);
+    for (auto& unit : m_units)
+    {
+        unit.renderPathMesh(shaderHandler);
+    }
+
     for (auto& harvester : m_harvesters)
     {
         harvester.renderPathMesh(shaderHandler);
@@ -195,6 +226,18 @@ void Faction::renderAABB(ShaderHandler& shaderHandler)
 #endif // RENDER_AABB
 
 void Faction::spawnUnit(const glm::vec3& spawnPosition, const Model& unitModel, Map& map)
+{
+    if (m_HQ.getWaypointPosition() != m_HQ.getPosition())
+    {
+        m_units.emplace_back(spawnPosition, m_HQ.getWaypointPosition(), unitModel, map);
+    }
+    else
+    {
+        m_units.emplace_back(spawnPosition, unitModel, map);
+    }
+}
+
+void Faction::spawnHarvester(const glm::vec3& spawnPosition, const Model& unitModel, Map& map)
 {
     if (m_HQ.getWaypointPosition() != m_HQ.getPosition())
     {

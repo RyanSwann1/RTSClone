@@ -46,8 +46,9 @@ public:
 private:
 	SelectionBox m_selectionBox;
 	Headquarters m_HQ;
-	Unit m_unit;
+	std::vector<Unit> m_units;
 	std::vector<Harvester> m_harvesters;
 
 	void spawnUnit(const glm::vec3& spawnPosition, const Model& unitModel, Map& map);
+	void spawnHarvester(const glm::vec3& spawnPosition, const Model& unitModel, Map& map);
 };
