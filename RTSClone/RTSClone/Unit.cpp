@@ -100,7 +100,6 @@ void Unit::update(float deltaTime, const ModelManager& modelManager)
 			if (m_pathToPosition.empty())
 			{
 				m_currentState = eUnitState::Idle;
-				std::cout << "Idle\n";
 			}
 		}
 	}

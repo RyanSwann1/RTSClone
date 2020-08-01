@@ -8,6 +8,7 @@
 #include "ModelManager.h"
 #include <assert.h>
 #include <array>
+#include <algorithm>
 
 namespace
 {
@@ -89,7 +90,7 @@ void SelectionBox::render(const sf::Window& window) const
 //Faction
 Faction::Faction(const ModelManager& modelManager, Map& map)
     : m_selectionBox(),
-    m_HQ({ 37.5f, Globals::GROUND_HEIGHT, 37.5f }, modelManager.getModel(eModelName::HQ), map),
+    m_HQ({ 35.0f, Globals::GROUND_HEIGHT, 10.f }, modelManager.getModel(eModelName::HQ), map),
     m_units(),
     m_harvesters()
 {}
@@ -119,24 +120,19 @@ void Faction::handleInput(const sf::Event& currentSFMLEvent, const sf::Window& w
         else if (currentSFMLEvent.mouseButton.button == sf::Mouse::Right)
         {
             glm::vec3 mouseToGroundPosition = camera.getMouseToGroundPosition(window);
-            for (auto& unit : m_units)
-            {
-                if (unit.isSelected())
-                {
-                    unit.moveTo(mouseToGroundPosition, map);
-                }
-            }
-            
             if (m_HQ.isSelected())
             {
                 m_HQ.setWaypointPosition(mouseToGroundPosition);
             }
-
-            for (auto& harvester : m_harvesters)
+            else
             {
-                if (harvester.isSelected())
+                if (isOneUnitSelected())
                 {
-                    harvester.moveTo(mouseToGroundPosition, map, minerals);
+                    moveSingularSelectedUnit(mouseToGroundPosition, map, minerals);
+                }
+                else
+                {
+                    moveMultipleSelectedUnits(mouseToGroundPosition, map, minerals);
                 }
             }
         }
@@ -269,5 +265,92 @@ void Faction::spawnHarvester(const glm::vec3& spawnPosition, const Model& unitMo
     else
     {
         m_harvesters.emplace_back(spawnPosition, unitModel, map);
+    }
+}
+
+bool Faction::isOneUnitSelected() const
+{
+    int unitSelectedCount = 0;
+
+    for (const auto& unit : m_units)
+    {
+        if (unit.isSelected())
+        {
+            ++unitSelectedCount;
+        }
+    }
+
+    for (const auto& harvester : m_harvesters)
+    {
+        if (harvester.isSelected())
+        {
+            ++unitSelectedCount;
+        }
+    }
+
+    return unitSelectedCount == 1;
+}
+
+void Faction::moveSingularSelectedUnit(const glm::vec3& destinationPosition, const Map& map, const std::vector<Entity>& minerals)
+{
+    assert(isOneUnitSelected());
+
+    auto selectedUnit = std::find_if(m_units.begin(), m_units.end(), [](const auto& unit) {
+        return unit.isSelected() == true;
+    });
+    if (selectedUnit != m_units.end())
+    {
+        selectedUnit->moveTo(destinationPosition, map);
+    }
+    else
+    {
+        auto selectedHarvester = std::find_if(m_harvesters.begin(), m_harvesters.end(), [](const auto& harvester) {
+            return harvester.isSelected() == true;
+        });
+        assert(selectedHarvester != m_harvesters.end());
+
+        selectedHarvester->moveTo(destinationPosition, map, minerals);
+    }
+}
+
+void Faction::moveMultipleSelectedUnits(const glm::vec3& destinationPosition, const Map& map, const std::vector<Entity>& minerals)
+{
+    std::vector<Unit*> selectedUnits;
+
+    for (auto& unit : m_units)
+    {
+        if (unit.isSelected())
+        {
+            selectedUnits.push_back(&unit);
+        }
+    }
+
+    for (auto& harvester : m_harvesters)
+    {
+        if (harvester.isSelected())
+        {
+            selectedUnits.push_back(&harvester);
+        }
+    }
+    
+    if (!selectedUnits.empty())
+    {
+        std::sort(selectedUnits.begin(), selectedUnits.end(), [](const auto& unitA, const auto& unitB)
+        {
+            return glm::all(glm::lessThan(unitA->getPosition(), unitB->getPosition()));
+        });
+
+        glm::vec3 total(0.0f, 0.0f, 0.0f);
+        for (const auto& selectedUnit : selectedUnits)
+        {
+            total += selectedUnit->getPosition();
+        }
+
+        glm::vec3 averagePosition = { total.x / selectedUnits.size(), total.y / selectedUnits.size(), total.z / selectedUnits.size() };
+
+        for (auto& selectedUnit : selectedUnits)
+        {
+            selectedUnit->moveTo(destinationPosition - (averagePosition - selectedUnit->getPosition()), map);
+        }
     }
 }
