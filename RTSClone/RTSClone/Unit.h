@@ -20,6 +20,7 @@ class Unit : public Entity
 {
 public:
 	Unit(const glm::vec3& startingPosition, const Model& model, Map& map);
+	Unit(const glm::vec3& startingPosition, const glm::vec3& destinationPosition, const Model& model, Map& map);
 
 	void moveTo(const glm::vec3& destinationPosition, const Map& map);
 	void update(float deltaTime, const ModelManager& modelManager);

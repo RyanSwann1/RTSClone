@@ -65,6 +65,15 @@ Unit::Unit(const glm::vec3& startingPosition, const Model& model, Map& map)
 	m_pathToPosition()
 {}
 
+Unit::Unit(const glm::vec3 & startingPosition, const glm::vec3 & destinationPosition, const Model & model, Map & map)
+	: Entity(startingPosition, model, eEntityType::Unit, map),
+	m_currentState(eUnitState::Idle),
+	m_front(),
+	m_pathToPosition()
+{
+	moveTo(destinationPosition, map);
+}
+
 void Unit::moveTo(const glm::vec3& destinationPosition, const Map& map)
 {
 	m_pathToPosition.clear();
