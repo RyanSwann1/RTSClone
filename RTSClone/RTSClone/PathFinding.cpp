@@ -1,7 +1,7 @@
 #include "PathFinding.h"
 #include "Globals.h"
 #include "Map.h"
-#include <array>
+#include "Unit.h"
 
 namespace
 {
@@ -62,15 +62,29 @@ namespace
 		glm::ivec2(-1, 1)
 	};
 
-	std::array<AdjacentPosition, ALL_DIRECTIONS.size()> getAllAdjacentPositions(const glm::ivec2& position, const Map& map)
+	std::array<AdjacentPosition, ALL_DIRECTIONS.size()> getAllAdjacentPositions(const glm::ivec2& position, const Map& map, 
+		const std::vector<Unit>& units, const glm::vec3& startingPosition)
 	{
 		std::array<AdjacentPosition, ALL_DIRECTIONS.size()> adjacentPositions;
 		for (int i = 0; i < adjacentPositions.size(); ++i)
 		{
-			glm::ivec2 newPosition = position + ALL_DIRECTIONS[i];
-			if (isPositionInMapBounds(newPosition) && !map.isPositionOccupied(newPosition))
+			glm::ivec2 adjacentPosition = position + ALL_DIRECTIONS[i];
+			if (isPositionInMapBounds(adjacentPosition) && !map.isPositionOccupied(adjacentPosition))
 			{
-				adjacentPositions[i] = AdjacentPosition(newPosition);
+				bool unitCollision = false;
+				for (const auto& unit : units)
+				{
+					if (unit.getPosition() != startingPosition && unit.getAABB().contains(convertToWorldPosition(adjacentPosition)))
+					{
+						unitCollision = true;
+						break;
+					}
+				}
+
+				if (!unitCollision)
+				{
+					adjacentPositions[i] = AdjacentPosition(adjacentPosition);
+				}
 			}
 			else
 			{
@@ -170,7 +184,7 @@ PathFinding::PathFinding()
 {}
 
 void PathFinding::getPathToPosition(const glm::vec3& startingPosition, const glm::vec3& destinationPosition, std::vector<glm::vec3>& pathToPosition,
-	const Map& map)
+	const Map& map, const std::vector<Unit>& units)
 {
 	m_graph.resetGraph();
 	std::queue<glm::ivec2> empty;
@@ -186,7 +200,7 @@ void PathFinding::getPathToPosition(const glm::vec3& startingPosition, const glm
 		glm::ivec2 position = m_frontier.front();
 		m_frontier.pop();
 
-		std::array<AdjacentPosition, ALL_DIRECTIONS.size()> adjacentPositions = getAllAdjacentPositions(position, map);
+		std::array<AdjacentPosition, ALL_DIRECTIONS.size()> adjacentPositions = getAllAdjacentPositions(position, map, units, startingPosition);
 		float distance = glm::distance(glm::vec2(destinationPositionOnGrid), glm::vec2(startingPositionOnGrid));
 		glm::ivec2 shortestDistancePosition = position;
 		for (const auto& adjacentPosition : adjacentPositions)

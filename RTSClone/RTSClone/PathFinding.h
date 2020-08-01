@@ -38,6 +38,7 @@ private:
 	std::array<GraphNode, static_cast<size_t>(Globals::MAP_SIZE * Globals::MAP_SIZE)> m_graph;
 };
 
+class Unit;
 class Map;
 class PathFinding
 {
@@ -49,7 +50,7 @@ public:
 	}
 
 	void getPathToPosition(const glm::vec3& startingPosition, const glm::vec3& destination, std::vector<glm::vec3>& pathToPosition,
-		const Map& map);
+		const Map& map, const std::vector<Unit>& units);
 
 private:
 	PathFinding();
