@@ -68,14 +68,14 @@ int main()
 #ifdef RENDER_GROUND
 	Ground ground;
 #endif // RENDER_GROUND
-	Map map;
-	Faction faction(*modelManager, map);
+	std::unique_ptr<Map> map = std::make_unique<Map>();
+	Faction faction(*modelManager, *map);
 	sf::Clock gameClock;
 	Camera camera;
 	std::vector<Entity> minerals;
-	minerals.emplace_back(glm::vec3(10.0, Globals::GROUND_HEIGHT, 10.0f), modelManager->getModel(eModelName::Mineral), eEntityType::Mineral, map);
-	minerals.emplace_back(glm::vec3(10.0, Globals::GROUND_HEIGHT, 25.0f), modelManager->getModel(eModelName::Mineral), eEntityType::Mineral, map);
-	minerals.emplace_back(glm::vec3(10.0, Globals::GROUND_HEIGHT, 40.0f), modelManager->getModel(eModelName::Mineral), eEntityType::Mineral, map);
+	minerals.emplace_back(glm::vec3(10.0, Globals::GROUND_HEIGHT, 10.0f), modelManager->getModel(eModelName::Mineral), eEntityType::Mineral, *map);
+	minerals.emplace_back(glm::vec3(10.0, Globals::GROUND_HEIGHT, 25.0f), modelManager->getModel(eModelName::Mineral), eEntityType::Mineral, *map);
+	minerals.emplace_back(glm::vec3(10.0, Globals::GROUND_HEIGHT, 40.0f), modelManager->getModel(eModelName::Mineral), eEntityType::Mineral, *map);
 
 	shaderHandler->switchToShader(eShaderType::SelectionBox);
 	shaderHandler->setUniformMat4f(eShaderType::SelectionBox, "uOrthographic", glm::ortho(0.0f, static_cast<float>(windowSize.x),
@@ -103,10 +103,10 @@ int main()
 				}
 			}
 
-			faction.handleInput(currentSFMLEvent, window, camera, map, *modelManager, minerals);
+			faction.handleInput(currentSFMLEvent, window, camera, *map, *modelManager, minerals);
 		}
 
-		faction.update(deltaTime, *modelManager, map);
+		faction.update(deltaTime, *modelManager, *map);
 		camera.update(window, deltaTime);
 
 		glm::mat4 view = camera.getView(); 
