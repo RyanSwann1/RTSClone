@@ -11,10 +11,6 @@ namespace
 			: valid(false),
 			position()
 		{}
-		AdjacentPosition(bool valid)
-			: valid(valid),
-			position()
-		{}
 		AdjacentPosition(const glm::ivec2& position)
 			: valid(true),
 			position(position)
@@ -63,7 +59,7 @@ namespace
 	};
 
 	std::array<AdjacentPosition, ALL_DIRECTIONS.size()> getAllAdjacentPositions(const glm::ivec2& position, const Map& map, 
-		const std::vector<Unit>& units, const glm::vec3& startingPosition)
+		const std::vector<Unit>& units, const Unit& unit)
 	{
 		std::array<AdjacentPosition, ALL_DIRECTIONS.size()> adjacentPositions;
 		for (int i = 0; i < adjacentPositions.size(); ++i)
@@ -72,20 +68,22 @@ namespace
 			if (isPositionInMapBounds(adjacentPosition) && !map.isPositionOccupied(adjacentPosition))
 			{
 				bool unitCollision = false;
-				for (const auto& unit : units)
+				for (const auto& otherUnit : units)
 				{
-					glm::vec2 direction = glm::normalize(glm::vec2(convertToGridPosition(unit.getPosition()) - position));
-					if (unit.getPosition() != startingPosition &&
-						unit.getAABB().contains(convertToWorldPosition(glm::vec2(adjacentPosition.x, adjacentPosition.y) + direction * 2.0f)))
+					if (&otherUnit != &unit)
 					{
-						unitCollision = true;
-						break;
-					}
+						glm::vec2 direction = glm::normalize(glm::vec2(convertToGridPosition(otherUnit.getPosition()) - position));
+						if (otherUnit.getAABB().contains(convertToWorldPosition(glm::vec2(adjacentPosition.x, adjacentPosition.y) + direction * 3.0f)))
+						{
+							unitCollision = true;
+							break;
+						}
 
-					if (unit.getPosition() != startingPosition && unit.getAABB().contains(convertToWorldPosition(adjacentPosition)))
-					{
-						unitCollision = true;
-						break;
+						if (otherUnit.getAABB().contains(convertToWorldPosition(adjacentPosition)))
+						{
+							unitCollision = true;
+							break;
+						}
 					}
 				}
 
@@ -187,7 +185,7 @@ PathFinding::PathFinding()
 	m_frontier()
 {}
 
-void PathFinding::getPathToPosition(const glm::vec3& startingPosition, const glm::vec3& destinationPosition, std::vector<glm::vec3>& pathToPosition,
+void PathFinding::getPathToPosition(const Unit& unit, const glm::vec3& destinationPosition, std::vector<glm::vec3>& pathToPosition,
 	const Map& map, const std::vector<Unit>& units)
 {
 	assert(pathToPosition.empty());
@@ -196,7 +194,7 @@ void PathFinding::getPathToPosition(const glm::vec3& startingPosition, const glm
 	m_frontier.swap(empty);
 	
 	glm::ivec2 destinationPositionOnGrid = convertToGridPosition(destinationPosition);
-	glm::ivec2 startingPositionOnGrid = convertToGridPosition(startingPosition);
+	glm::ivec2 startingPositionOnGrid = convertToGridPosition(unit.getPosition());
 	m_frontier.push(startingPositionOnGrid);
 	bool destinationReached = false;
 
@@ -205,7 +203,7 @@ void PathFinding::getPathToPosition(const glm::vec3& startingPosition, const glm
 		glm::ivec2 position = m_frontier.front();
 		m_frontier.pop();
 
-		std::array<AdjacentPosition, ALL_DIRECTIONS.size()> adjacentPositions = getAllAdjacentPositions(position, map, units, startingPosition);
+		std::array<AdjacentPosition, ALL_DIRECTIONS.size()> adjacentPositions = getAllAdjacentPositions(position, map, units, unit);
 		float distance = glm::distance(glm::vec2(destinationPositionOnGrid), glm::vec2(startingPositionOnGrid));
 		glm::ivec2 shortestDistancePosition = position;
 		for (const auto& adjacentPosition : adjacentPositions)

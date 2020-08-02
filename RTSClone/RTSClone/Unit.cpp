@@ -83,7 +83,7 @@ eUnitState Unit::getCurrentState() const
 void Unit::moveTo(const glm::vec3& destinationPosition, const Map& map, const std::vector<Unit>& units)
 {
 	m_pathToPosition.clear();
-	PathFinding::getInstance().getPathToPosition(m_position, destinationPosition, m_pathToPosition, map, units);
+	PathFinding::getInstance().getPathToPosition(*this, destinationPosition, m_pathToPosition, map, units);
 }
 
 void Unit::update(float deltaTime, const ModelManager& modelManager)

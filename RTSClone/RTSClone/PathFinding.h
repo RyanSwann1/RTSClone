@@ -49,7 +49,7 @@ public:
 		return instance;
 	}
 
-	void getPathToPosition(const glm::vec3& startingPosition, const glm::vec3& destination, std::vector<glm::vec3>& pathToPosition,
+	void getPathToPosition(const Unit& unit, const glm::vec3& destination, std::vector<glm::vec3>& pathToPosition,
 		const Map& map, const std::vector<Unit>& units);
 
 private:
