@@ -25,7 +25,7 @@ namespace
         };
     };
 
-    glm::vec3 getClosestPositionFromAABB(const glm::vec3& currentPosition, const Harvester& otherHarvester, const Map& map)
+    glm::vec3 getClosestPositionFromAABB(const glm::vec3& currentPosition, const Unit& otherHarvester, const Map& map)
     {
         glm::vec3 position = currentPosition;
         while (otherHarvester.getAABB().contains(position) || map.isPositionOccupied(position))
@@ -204,6 +204,7 @@ void Faction::update(float deltaTime, const ModelManager& modelManager, const Ma
     }
 
     handleHarvesterCollisions(map);
+    handleUnitCollisions(map);
 }
 
 void Faction::render(ShaderHandler& shaderHandler, const ModelManager& modelManager) const
@@ -391,5 +392,30 @@ void Faction::handleHarvesterCollisions(const Map& map)
         }
 
         handledHarvesters.push_back(&harvester);
+    }
+}
+
+void Faction::handleUnitCollisions(const Map& map)
+{
+    std::vector<const Unit*> handledUnits;
+    handledUnits.reserve(m_units.size());
+    for (auto& unit : m_units)
+    {
+        if (unit.getCurrentState() == eUnitState::Idle)
+        {
+            for (auto& otherUnit : m_units)
+            {
+                if (&unit != &otherUnit &&
+                    std::find(handledUnits.cbegin(), handledUnits.cend(), &otherUnit) == handledUnits.cend() &&
+                    otherUnit.getCurrentState() == eUnitState::Idle &&
+                    unit.getAABB().contains(otherUnit.getAABB()))
+                {
+                    unit.moveTo(getClosestPositionFromAABB(unit.getPosition(), otherUnit, map), map, m_units);
+                    break;
+                }
+            }
+        }
+
+        handledUnits.push_back(&unit);
     }
 }
