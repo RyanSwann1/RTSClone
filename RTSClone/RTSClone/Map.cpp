@@ -13,6 +13,7 @@ Map::Map()
 
 bool Map::isPositionOccupied(const glm::vec3& position) const
 {
+	assert(Globals::isPositionInMapBounds(position));
 	return m_map[Globals::convertTo1D({ position.x, position.z })];
 }
 
@@ -31,6 +32,7 @@ void Map::addEntityAABB(const AABB& AABB)
 	{
 		for (int y = position.y; y <= position.y + size.y; ++y)
 		{
+			assert(Globals::isPositionInMapBounds({ x, y }));
 			m_map[Globals::convertTo1D({ x, y })] = true;
 		}
 	}
