@@ -20,9 +20,11 @@ public:
 		Map& map, const std::vector<Unit>& units);
 	
 	void update(float deltaTime, const ModelManager& modelManager, const Headquarters& HQ, const Map& map, 
-		const std::vector<Unit>& units);
+		const std::vector<Unit>& units, const std::vector<Harvester>& harvesters);
+
 	void moveTo(const glm::vec3& destinationPosition, const Map& map, 
 		const std::vector<Entity>& minerals, const std::vector<Unit>& units);
+	void moveTo(const glm::vec3& destinationPosition, const Map& map, const std::vector<Unit>& units);
 
 private:
 	eHarvesterState m_currentHarvesterState;

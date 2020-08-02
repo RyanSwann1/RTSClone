@@ -86,10 +86,6 @@ namespace
 					adjacentPositions[i] = AdjacentPosition(adjacentPosition);
 				}
 			}
-			else
-			{
-				adjacentPositions[i] = AdjacentPosition(false);
-			}
 		}
 
 		return adjacentPositions;
@@ -186,6 +182,7 @@ PathFinding::PathFinding()
 void PathFinding::getPathToPosition(const glm::vec3& startingPosition, const glm::vec3& destinationPosition, std::vector<glm::vec3>& pathToPosition,
 	const Map& map, const std::vector<Unit>& units)
 {
+	assert(pathToPosition.empty());
 	m_graph.resetGraph();
 	std::queue<glm::ivec2> empty;
 	m_frontier.swap(empty);

@@ -24,6 +24,18 @@ namespace
             glm::ivec2(glm::min(startingPosition.x, startingPosition.x + size.x), glm::max(startingPosition.y, startingPosition.y + size.y))
         };
     };
+
+    glm::vec3 getClosestPositionFromAABB(const glm::vec3& currentPosition, const Harvester& otherHarvester, const Map& map)
+    {
+        glm::vec3 position = currentPosition;
+        while (otherHarvester.getAABB().contains(position) || map.isPositionOccupied(position))
+        {
+            position = { Globals::getRandomNumber(-1.0f, 1.0f), 1.0f, Globals::getRandomNumber(-1.0f, 1.0f) };
+            position = currentPosition + glm::normalize(position) * 10.0f;
+        }
+
+        return { position.x, Globals::GROUND_HEIGHT, position.z };
+    }
 };
 
 //SelectionBox
@@ -188,8 +200,10 @@ void Faction::update(float deltaTime, const ModelManager& modelManager, const Ma
 
     for (auto& harvester : m_harvesters)
     {
-        harvester.update(deltaTime, modelManager, m_HQ, map, m_units);
+        harvester.update(deltaTime, modelManager, m_HQ, map, m_units, m_harvesters);
     }
+
+    handleHarvesterCollisions(map);
 }
 
 void Faction::render(ShaderHandler& shaderHandler, const ModelManager& modelManager) const
@@ -352,5 +366,30 @@ void Faction::moveMultipleSelectedUnits(const glm::vec3& destinationPosition, co
         {
             selectedUnit->moveTo(destinationPosition - (averagePosition - selectedUnit->getPosition()), map, m_units);
         }
+    }
+}
+
+void Faction::handleHarvesterCollisions(const Map& map)
+{
+    std::vector<const Harvester*> handledHarvesters;
+    handledHarvesters.reserve(m_harvesters.size());
+    for (auto& harvester : m_harvesters)
+    {
+        if (harvester.getCurrentState() == eUnitState::Idle)
+        {
+            for (auto& otherHarvester : m_harvesters)
+            {
+                if (&harvester != &otherHarvester &&
+                    std::find(handledHarvesters.cbegin(), handledHarvesters.cend(), &otherHarvester) == handledHarvesters.cend() &&
+                    otherHarvester.getCurrentState() == eUnitState::Idle &&
+                    harvester.getAABB().contains(otherHarvester.getAABB()))
+                {
+                    harvester.moveTo(getClosestPositionFromAABB(harvester.getPosition(), otherHarvester, map), map, m_units);
+                    break;
+                }
+            }
+        }
+
+        handledHarvesters.push_back(&harvester);
     }
 }

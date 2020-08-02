@@ -23,6 +23,8 @@ public:
 	Unit(const glm::vec3& startingPosition, const glm::vec3& destinationPosition, const Model& model, Map& map,
 		const std::vector<Unit>& units);
 
+	eUnitState getCurrentState() const;
+
 	void moveTo(const glm::vec3& destinationPosition, const Map& map, const std::vector<Unit>& units);
 	void update(float deltaTime, const ModelManager& modelManager);
 

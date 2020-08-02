@@ -20,6 +20,14 @@ namespace Globals
 		2, 3, 0
 	};
 
+	inline bool isPositionInMapBounds(const glm::ivec2& position)
+	{
+		return position.x >= 0 &&
+			position.x < Globals::MAP_SIZE &&
+			position.y >= 0 &&
+			position.y < Globals::MAP_SIZE;
+	}
+
 	inline bool isPositionInMapBounds(const glm::vec3& position)
 	{
 		return position.x >= 0 &&
@@ -71,7 +79,7 @@ namespace Globals
 	{
 		static std::random_device rd;  //Will be used to obtain a seed for the random number engine
 		static std::mt19937 gen(rd()); //Standard mersenne_twister_engine seeded with rd()
-		std::uniform_int_distribution<> distrib(min, max);
+		std::uniform_real_distribution<float> distrib(min, max);
 
 		return distrib(gen);
 	}

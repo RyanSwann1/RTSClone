@@ -18,6 +18,7 @@ bool Map::isPositionOccupied(const glm::vec3& position) const
 
 bool Map::isPositionOccupied(const glm::ivec2& position) const
 {
+	assert(Globals::isPositionInMapBounds(position));
 	return m_map[Globals::convertTo1D(position)];
 }
 

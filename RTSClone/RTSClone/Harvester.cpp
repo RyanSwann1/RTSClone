@@ -51,7 +51,7 @@ Harvester::Harvester(const glm::vec3 & startingPosition, const glm::vec3 & desti
 }
 
 void Harvester::update(float deltaTime, const ModelManager& modelManager, const Headquarters& HQ, const Map& map, 
-	const std::vector<Unit>& units)
+	const std::vector<Unit>& units, const std::vector<Harvester>& harvesters)
 {
 	Unit::update(deltaTime, modelManager);
 
@@ -112,4 +112,11 @@ void Harvester::moveTo(const glm::vec3 & destinationPosition, const Map & map, c
 		m_currentState = eUnitState::Moving;
 		Unit::moveTo(destinationPosition, map, units);
 	}
+}
+
+void Harvester::moveTo(const glm::vec3& destinationPosition, const Map& map, const std::vector<Unit>& units)
+{
+	m_currentHarvesterState = eHarvesterState::InUseByBaseState;
+	m_currentState = eUnitState::Moving;
+	Unit::moveTo(destinationPosition, map, units);
 }

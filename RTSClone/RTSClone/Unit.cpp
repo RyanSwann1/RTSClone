@@ -75,6 +75,11 @@ Unit::Unit(const glm::vec3 & startingPosition, const glm::vec3 & destinationPosi
 	moveTo(destinationPosition, map, units);
 }
 
+eUnitState Unit::getCurrentState() const
+{
+	return m_currentState;
+}
+
 void Unit::moveTo(const glm::vec3& destinationPosition, const Map& map, const std::vector<Unit>& units)
 {
 	m_pathToPosition.clear();
@@ -83,6 +88,7 @@ void Unit::moveTo(const glm::vec3& destinationPosition, const Map& map, const st
 
 void Unit::update(float deltaTime, const ModelManager& modelManager)
 {
+
 	if (!m_pathToPosition.empty())
 	{
 		m_currentState = eUnitState::Moving;
