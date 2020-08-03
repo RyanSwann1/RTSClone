@@ -88,14 +88,9 @@ void Unit::moveTo(const glm::vec3& destinationPosition, const Map& map, const st
 
 void Unit::update(float deltaTime, const ModelManager& modelManager)
 {
-
 	if (!m_pathToPosition.empty())
 	{
 		m_currentState = eUnitState::Moving;
-#ifdef RENDER_PATHING
-		generateRenderPath(m_pathToPosition, m_renderPathMesh);
-#endif // RENDER_PATHING
-
 		glm::vec3 newPosition = moveTowards(m_position, m_pathToPosition.back(), MOVEMENT_SPEED * deltaTime);
 		m_front = glm::normalize(glm::vec3(newPosition - m_position));
 		m_position = newPosition;
@@ -116,9 +111,10 @@ void Unit::update(float deltaTime, const ModelManager& modelManager)
 void Unit::renderPathMesh(ShaderHandler& shaderHandler)
 {
 	if (!m_pathToPosition.empty())
-	{
+	{	
 		shaderHandler.setUniformVec3(eShaderType::Debug, "uColor", PATH_COLOUR);
 		shaderHandler.setUniform1f(eShaderType::Debug, "uOpacity", PATH_OPACITY);
+		generateRenderPath(m_pathToPosition, m_renderPathMesh);
 		m_renderPathMesh.render(shaderHandler, m_selected);
 	}
 }
