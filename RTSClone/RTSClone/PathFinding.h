@@ -49,6 +49,7 @@ public:
 		return instance;
 	}
 
+	glm::vec3 getClosestAvailablePosition(const glm::vec3& position, const std::vector<Unit>& units, const Map& map);
 	void getPathToPosition(const Unit& unit, const glm::vec3& destination, std::vector<glm::vec3>& pathToPosition,
 		const Map& map, const std::vector<Unit>& units);
 
@@ -57,4 +58,6 @@ private:
 
 	Graph m_graph;
 	std::queue<glm::ivec2> m_frontier;
+
+	void reset();
 };
