@@ -103,7 +103,7 @@ void SelectionBox::render(const sf::Window& window) const
 //Faction
 Faction::Faction(const ModelManager& modelManager, Map& map)
     : m_selectionBox(),
-    m_HQ({ 35.0f, Globals::GROUND_HEIGHT, 10.f }, modelManager.getModel(eModelName::HQ), map),
+    m_HQ({ 35.0f, Globals::GROUND_HEIGHT, 15.f }, modelManager.getModel(eModelName::HQ), map),
     m_units(),
     m_harvesters()
 {}
@@ -269,7 +269,7 @@ void Faction::spawnUnit(const glm::vec3& spawnPosition, const Model& unitModel, 
     }
     else
     {
-        m_units.emplace_back(spawnPosition, unitModel, map);
+        m_units.emplace_back(PathFinding::getInstance().getClosestAvailablePosition(spawnPosition, m_units, map), unitModel, map);
     }
 }
 
