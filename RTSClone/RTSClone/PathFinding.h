@@ -22,7 +22,7 @@ private:
 	bool visited;
 };
 
-class Graph
+class Graph : private NonMovable, private NonCopyable
 {
 public:
 	Graph();
@@ -40,7 +40,7 @@ private:
 
 class Unit;
 class Map;
-class PathFinding
+class PathFinding : private NonMovable, private NonCopyable
 {
 public:
 	static PathFinding& getInstance()

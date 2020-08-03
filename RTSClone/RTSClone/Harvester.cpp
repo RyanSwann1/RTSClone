@@ -41,13 +41,13 @@ Harvester::Harvester(const glm::vec3& startingPosition, const Model& model, Map&
 {}
 
 Harvester::Harvester(const glm::vec3 & startingPosition, const glm::vec3 & destinationPosition, const Model & model, 
-	Map & map, const std::vector<Unit>& units)
+	Map & map)
 	: Unit(startingPosition, model, map),
 	m_currentHarvesterState(eHarvesterState::InUseByBaseState),
 	m_harvestTimer(HARVEST_TIME),
 	m_mineralToHarvest(nullptr)
 {
-	Unit::moveTo(destinationPosition, map, units);
+	Unit::moveTo(destinationPosition, map);
 }
 
 void Harvester::update(float deltaTime, const ModelManager& modelManager, const Headquarters& HQ, const Map& map, 

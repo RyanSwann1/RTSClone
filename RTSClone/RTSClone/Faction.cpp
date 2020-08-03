@@ -277,7 +277,7 @@ void Faction::spawnHarvester(const glm::vec3& spawnPosition, const Model& unitMo
 {
     if (m_HQ.getWaypointPosition() != m_HQ.getPosition())
     {
-        m_harvesters.emplace_back(spawnPosition, m_HQ.getWaypointPosition(), unitModel, map, m_units);
+        m_harvesters.emplace_back(spawnPosition, m_HQ.getWaypointPosition(), unitModel, map);
     }
     else
     {

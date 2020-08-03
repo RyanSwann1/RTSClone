@@ -11,7 +11,7 @@ namespace
 			: valid(false),
 			unitCollision(false),
 			position()
-		{}
+		{}	
 		AdjacentPosition(const glm::ivec2& position)
 			: valid(true),
 			unitCollision(false),
