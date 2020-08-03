@@ -86,6 +86,12 @@ void Unit::moveTo(const glm::vec3& destinationPosition, const Map& map, const st
 	PathFinding::getInstance().getPathToPosition(*this, destinationPosition, m_pathToPosition, map, units);
 }
 
+void Unit::moveTo(const glm::vec3& destinationPosition, const Map& map)
+{
+	m_pathToPosition.clear();
+	PathFinding::getInstance().getPathToPosition(*this, destinationPosition, m_pathToPosition, map);
+}
+
 void Unit::update(float deltaTime, const ModelManager& modelManager)
 {
 	if (!m_pathToPosition.empty())
