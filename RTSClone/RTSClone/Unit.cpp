@@ -78,6 +78,12 @@ eUnitState Unit::getCurrentState() const
 	return m_currentState;
 }
 
+void Unit::moveToAmongstGroup(const glm::vec3& destinationPosition, const Map& map, const std::vector<Unit>& units)
+{
+	m_pathToPosition.clear();
+	PathFinding::getInstance().getPathToPositionAmongstGroup(*this, destinationPosition, m_pathToPosition, map, units);
+}
+
 void Unit::moveTo(const glm::vec3& destinationPosition, const Map& map, const std::vector<Unit>& units)
 {
 	m_pathToPosition.clear();
