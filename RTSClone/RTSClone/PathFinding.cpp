@@ -9,18 +9,27 @@ namespace
 	{
 		AdjacentPosition()
 			: valid(false),
+			unitCollision(false),
 			position()
 		{}
 		AdjacentPosition(const glm::ivec2& position, bool valid)
 			: valid(valid),
+			unitCollision(false),
 			position(position)
 		{}
 		AdjacentPosition(const glm::ivec2& position)
 			: valid(true),
+			unitCollision(false),
+			position(position)
+		{}
+		AdjacentPosition(const glm::ivec2& position, bool valid, bool unitCollision)
+			: valid(valid),
+			unitCollision(unitCollision),
 			position(position)
 		{}
 
 		bool valid;
+		bool unitCollision;
 		glm::ivec2 position;
 	};
 
@@ -90,11 +99,11 @@ namespace
 
 				if (!unitCollision)
 				{
-					adjacentPositions[i] = AdjacentPosition(adjacentPosition, true);
+					adjacentPositions[i] = AdjacentPosition(adjacentPosition, true, unitCollision);
 				}
 				else
 				{
-					adjacentPositions[i] = AdjacentPosition(adjacentPosition, false);
+					adjacentPositions[i] = AdjacentPosition(adjacentPosition, true, unitCollision);
 				}
 			}
 		}
@@ -114,7 +123,7 @@ namespace
 				bool unitCollision = false;
 				for (const auto& otherUnit : units)
 				{
-					if (&otherUnit != &unit)
+					if (&otherUnit != &unit && otherUnit.getCurrentState() == eUnitState::Idle)
 					{
 						glm::vec2 direction = glm::normalize(glm::vec2(convertToGridPosition(otherUnit.getPosition()) - position));
 						if (otherUnit.getAABB().contains(convertToWorldPosition(glm::vec2(adjacentPosition.x, adjacentPosition.y) + direction * 3.0f)))
@@ -236,10 +245,10 @@ void PathFinding::reset()
 	m_frontier.swap(empty);
 }
 
-glm::vec3 PathFinding::getClosestAvailablePosition(const glm::vec3& position, const std::vector<Unit>& units, const Map& map)
+glm::vec3 PathFinding::getClosestAvailablePosition(const glm::vec3& startingPosition, const std::vector<Unit>& units, const Map& map)
 {
 	reset();
-	m_frontier.push(convertToGridPosition(position));
+	m_frontier.push(convertToGridPosition(startingPosition));
 	glm::ivec2 availablePositionOnGrid = {0, 0};
 	bool availablePositionFound = false;
 
@@ -253,15 +262,18 @@ glm::vec3 PathFinding::getClosestAvailablePosition(const glm::vec3& position, co
 		{
 			if (adjacentPosition.valid)
 			{
-				availablePositionOnGrid = adjacentPosition.position;
-				availablePositionFound = true;
-				std::cout << "Found spawn point\n";
-				break;
-			}
-			if (!m_graph.isPositionVisited(adjacentPosition.position))
-			{
-				m_graph.addToGraph(adjacentPosition.position, position);
-				m_frontier.push(adjacentPosition.position);
+				if (!adjacentPosition.unitCollision)
+				{
+					availablePositionOnGrid = adjacentPosition.position;
+					availablePositionFound = true;
+					break;
+				}
+				else if (!m_graph.isPositionVisited(adjacentPosition.position))
+				{
+					m_graph.addToGraph(adjacentPosition.position, position);
+					assert(adjacentPosition.position != glm::ivec2(0, 0));
+					m_frontier.push(adjacentPosition.position);
+				}
 			}
 		}
 
