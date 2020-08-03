@@ -6,13 +6,14 @@
 #include "Camera.h"
 #include "Map.h"
 #include "ModelManager.h"
+#include "PathFinding.h"
 #include <assert.h>
 #include <array>
 #include <algorithm>
 
 namespace
 {
-    std::array<glm::ivec2, 6> getQuadCoords(const glm::ivec2& startingPosition, const glm::ivec2& size)
+    std::array<glm::ivec2, 6> getSelectionBoxQuadCoords(const glm::ivec2& startingPosition, const glm::ivec2& size)
     {
         return
         {
@@ -85,7 +86,7 @@ void SelectionBox::render(const sf::Window& window) const
     if (active)
     {
         glm::vec2 endingPosition = { sf::Mouse::getPosition(window).x, sf::Mouse::getPosition(window).y };
-        std::array<glm::ivec2, 6> quadCoords = getQuadCoords(startingPositionScreenPosition,
+        std::array<glm::ivec2, 6> quadCoords = getSelectionBoxQuadCoords(startingPositionScreenPosition,
             endingPosition - startingPositionScreenPosition);
 
         glBindVertexArray(vaoID);
@@ -263,7 +264,8 @@ void Faction::spawnUnit(const glm::vec3& spawnPosition, const Model& unitModel, 
 {
     if (m_HQ.getWaypointPosition() != m_HQ.getPosition())
     {
-        m_units.emplace_back(spawnPosition, m_HQ.getWaypointPosition(), unitModel, map, m_units);
+        m_units.emplace_back(spawnPosition, PathFinding::getInstance().getClosestAvailablePosition(m_HQ.getWaypointPosition(), m_units, map), 
+            unitModel, map, m_units);
     }
     else
     {
