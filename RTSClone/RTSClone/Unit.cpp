@@ -54,7 +54,6 @@ namespace
 
 		mesh.attachToVAO();
 	};
-
 #endif // RENDER_PATHING
 }
 
@@ -65,14 +64,13 @@ Unit::Unit(const glm::vec3& startingPosition, const Model& model, Map& map)
 	m_pathToPosition()
 {}
 
-Unit::Unit(const glm::vec3 & startingPosition, const glm::vec3 & destinationPosition, const Model & model, Map & map,
-	const std::vector<Unit>& units)
+Unit::Unit(const glm::vec3 & startingPosition, const glm::vec3 & destinationPosition, const Model & model, Map & map)
 	: Entity(startingPosition, model, eEntityType::Unit, map),
 	m_currentState(eUnitState::Idle),
 	m_front(),
 	m_pathToPosition()
 {
-	moveTo(destinationPosition, map, units);
+	moveTo(destinationPosition, map);
 }
 
 eUnitState Unit::getCurrentState() const

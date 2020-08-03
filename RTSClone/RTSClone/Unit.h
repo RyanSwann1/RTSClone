@@ -20,8 +20,7 @@ class Unit : public Entity
 {
 public:
 	Unit(const glm::vec3& startingPosition, const Model& model, Map& map);
-	Unit(const glm::vec3& startingPosition, const glm::vec3& destinationPosition, const Model& model, Map& map,
-		const std::vector<Unit>& units);
+	Unit(const glm::vec3& startingPosition, const glm::vec3& destinationPosition, const Model& model, Map& map);
 
 	eUnitState getCurrentState() const;
 

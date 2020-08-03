@@ -32,7 +32,7 @@ namespace
         while (otherHarvester.getAABB().contains(position) || map.isPositionOccupied(position))
         {
             position = { Globals::getRandomNumber(-1.0f, 1.0f), 1.0f, Globals::getRandomNumber(-1.0f, 1.0f) };
-            position = currentPosition + glm::normalize(position) * 35.0f;
+            position = currentPosition + glm::normalize(position) * 45.0f;
         }
 
         return { position.x, Globals::GROUND_HEIGHT, position.z };
@@ -265,7 +265,7 @@ void Faction::spawnUnit(const glm::vec3& spawnPosition, const Model& unitModel, 
     if (m_HQ.getWaypointPosition() != m_HQ.getPosition())
     {
         m_units.emplace_back(spawnPosition, PathFinding::getInstance().getClosestAvailablePosition(m_HQ.getWaypointPosition(), m_units, map), 
-            unitModel, map, m_units);
+            unitModel, map);
     }
     else
     {
