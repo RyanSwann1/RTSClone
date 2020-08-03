@@ -32,7 +32,7 @@ namespace
         while (otherHarvester.getAABB().contains(position) || map.isPositionOccupied(position))
         {
             position = { Globals::getRandomNumber(-1.0f, 1.0f), 1.0f, Globals::getRandomNumber(-1.0f, 1.0f) };
-            position = currentPosition + glm::normalize(position) * 10.0f;
+            position = currentPosition + glm::normalize(position) * 35.0f;
         }
 
         return { position.x, Globals::GROUND_HEIGHT, position.z };
@@ -412,7 +412,7 @@ void Faction::handleUnitCollisions(const Map& map)
                     otherUnit.getCurrentState() == eUnitState::Idle &&
                     unit.getAABB().contains(otherUnit.getAABB()))
                 {
-                    unit.moveTo(getClosestPositionFromAABB(unit.getPosition(), otherUnit, map), map, m_units);
+                    unit.moveTo(getClosestPositionFromAABB(unit.getPosition(), otherUnit, map), map);
                     break;
                 }
             }
