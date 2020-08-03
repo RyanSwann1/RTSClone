@@ -150,6 +150,21 @@ namespace
 		return adjacentPositions;
 	}
 
+	std::array<AdjacentPosition, ALL_DIRECTIONS.size()> getAllAdjacentPositions(const glm::ivec2& position, const Map& map)
+	{
+		std::array<AdjacentPosition, ALL_DIRECTIONS.size()> adjacentPositions;
+		for (int i = 0; i < adjacentPositions.size(); ++i)
+		{
+			glm::ivec2 adjacentPosition = position + ALL_DIRECTIONS[i];
+			if (isPositionInMapBounds(adjacentPosition) && !map.isPositionOccupied(adjacentPosition))
+			{
+				adjacentPositions[i] = AdjacentPosition(adjacentPosition);
+			}
+		}
+
+		return adjacentPositions;
+	}
+
 	void getPathFromVisitedNodes(const glm::ivec2& startingPosition, const glm::ivec2& destinationPositionOnGrid, const glm::vec3& destinationPosition, 
 		std::vector<glm::vec3>& pathToPosition, Graph& graph)
 	{
@@ -271,7 +286,6 @@ glm::vec3 PathFinding::getClosestAvailablePosition(const glm::vec3& startingPosi
 				else if (!m_graph.isPositionVisited(adjacentPosition.position))
 				{
 					m_graph.addToGraph(adjacentPosition.position, position);
-					assert(adjacentPosition.position != glm::ivec2(0, 0));
 					m_frontier.push(adjacentPosition.position);
 				}
 			}
@@ -288,7 +302,6 @@ void PathFinding::getPathToPosition(const Unit& unit, const glm::vec3& destinati
 {
 	assert(pathToPosition.empty());
 	reset();
-	
 	glm::ivec2 destinationPositionOnGrid = convertToGridPosition(destinationPosition);
 	glm::ivec2 startingPositionOnGrid = convertToGridPosition(unit.getPosition());
 	m_frontier.push(startingPositionOnGrid);
@@ -350,4 +363,44 @@ void PathFinding::getPathToPosition(const Unit& unit, const glm::vec3& destinati
 	{
 		std::cout << "Path is empty\n";
 	}
+}
+
+void PathFinding::getPathToPosition(const Unit& unit, const glm::vec3& destination, std::vector<glm::vec3>& pathToPosition, const Map& map)
+{
+	assert(pathToPosition.empty());
+	reset();
+	glm::ivec2 destinationPositionOnGrid = convertToGridPosition(destination);
+	glm::ivec2 startingPositionOnGrid = convertToGridPosition(unit.getPosition());
+	m_frontier.push(startingPositionOnGrid);
+	bool destinationReached = false;
+
+	while (!m_frontier.empty() && !destinationReached)
+	{
+		glm::ivec2 position = m_frontier.front();
+		m_frontier.pop();
+
+		std::array<AdjacentPosition, ALL_DIRECTIONS.size()> adjacentPositions = getAllAdjacentPositions(position, map);
+		for (const auto& adjacentPosition : adjacentPositions)
+		{
+			if (adjacentPosition.valid)
+			{
+				if (!m_graph.isPositionVisited(adjacentPosition.position))
+				{
+					m_graph.addToGraph(adjacentPosition.position, position);
+					m_frontier.push(adjacentPosition.position);
+				}
+
+				if (adjacentPosition.position == destinationPositionOnGrid)
+				{
+					getPathFromVisitedNodes(startingPositionOnGrid, destinationPositionOnGrid, destination, pathToPosition, m_graph);
+					destinationReached = true;
+					break;
+				}
+			}
+		}
+
+		assert(m_frontier.size() < Globals::MAP_SIZE * Globals::MAP_SIZE);
+	}
+
+	assert(!pathToPosition.empty());
 }
