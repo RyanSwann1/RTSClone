@@ -1,5 +1,7 @@
 #include "AABB.h"
 #include "Model.h"
+#include "Unit.h"
+#include <limits>
 
 #ifdef RENDER_AABB
 #include "ShaderHandler.h"
@@ -7,7 +9,6 @@
 #include <array>
 namespace
 {
-	//void generateLeftFace()
 	constexpr glm::vec3 COLOR = { 1.0f, 0.0f, 0.0f };
 	constexpr float OPACITY = 0.4f;
 
@@ -74,6 +75,47 @@ AABB::AABB(const glm::vec3& position, float distance)
 	m_forward(position.z + distance),
 	m_back(position.z - distance)
 { }
+
+AABB::AABB(const std::vector<const Unit*>& selectedUnits)
+	: m_left(std::numeric_limits<float>::max()),
+	m_right(0.0f),
+	m_top(1.0f),
+	m_bottom(-1.0f),
+	m_forward(0.0f),
+	m_back(std::numeric_limits<float>::max())
+{
+	for (const auto& selectedUnit : selectedUnits)
+	{
+		if (selectedUnit->getPosition().x < m_left)
+		{
+			m_left = selectedUnit->getPosition().x;
+		}
+	}
+
+	for (const auto& selectedUnit : selectedUnits)
+	{
+		if (selectedUnit->getPosition().x > m_right)
+		{
+			m_right = selectedUnit->getPosition().x;
+		}
+	}
+
+	for (const auto& selectedUnit : selectedUnits)
+	{
+		if (selectedUnit->getPosition().z > m_forward)
+		{
+			m_forward = selectedUnit->getPosition().z;
+		}
+	}
+
+	for (const auto& selectedUnit : selectedUnits)
+	{
+		if (selectedUnit->getPosition().z < m_back)
+		{
+			m_back = selectedUnit->getPosition().z;
+		}
+	}
+}
 
 bool AABB::contains(const glm::vec3& position) const
 {
