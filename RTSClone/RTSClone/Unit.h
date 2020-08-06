@@ -19,12 +19,13 @@ class ModelManager;
 class Unit : public Entity
 {
 public:
-	Unit(const glm::vec3& startingPosition, const Model& model, Map& map);
-	Unit(const glm::vec3& startingPosition, const glm::vec3& destinationPosition, const Model& model, Map& map);
+	Unit(const glm::vec3& startingPosition, const Model& model, Map& map, eEntityType entityType = eEntityType::Unit);
+	Unit(const glm::vec3& startingPosition, const glm::vec3& destinationPosition, const Model& model, Map& map, eEntityType entityType = eEntityType::Unit);
 
 	eUnitState getCurrentState() const;
 
 	void moveToAmongstGroup(const glm::vec3& destinationPosition, const Map& map, const std::vector<Unit>& units);
+	void moveToAmongstGroup(const glm::vec3& destinationPosition, const Map& map);
 	void moveTo(const glm::vec3& destinationPosition, const Map& map, const std::vector<Unit>& units);
 	void moveTo(const glm::vec3& destinationPosition, const Map& map);
 	void update(float deltaTime, const ModelManager& modelManager);

@@ -545,6 +545,59 @@ void PathFinding::getPathToPositionAmongstGroup(const Unit& unit, const glm::vec
 	}
 }
 
+void PathFinding::getPathToPositionAmongstGroup(const Unit& unit, const glm::vec3& destinationPosition, std::vector<glm::vec3>& pathToPosition, const Map& map)
+{
+	assert(pathToPosition.empty());
+	reset();
+	glm::ivec2 destinationPositionOnGrid = convertToGridPosition(destinationPosition);
+	glm::ivec2 startingPositionOnGrid = convertToGridPosition(unit.getPosition());
+	m_frontier.push(startingPositionOnGrid);
+	bool destinationReached = false;
+	glm::ivec2 position = { 0, 0 };
+	while (!m_frontier.empty() && !destinationReached)
+	{
+		position = m_frontier.front();
+		m_frontier.pop();
+
+		std::array<AdjacentPosition, ALL_DIRECTIONS.size()> adjacentPositions = getAllAdjacentPositions(position, map);
+		float distance = glm::distance(glm::vec2(destinationPositionOnGrid), glm::vec2(startingPositionOnGrid));
+		glm::ivec2 shortestDistancePosition = position;
+		for (const auto& adjacentPosition : adjacentPositions)
+		{
+			if (adjacentPosition.valid && glm::distance(glm::vec2(destinationPositionOnGrid), glm::vec2(adjacentPosition.position)) < distance)
+			{
+				distance = glm::distance(glm::vec2(destinationPositionOnGrid), glm::vec2(adjacentPosition.position));
+				shortestDistancePosition = adjacentPosition.position;
+			}
+		}
+
+		//If Shortest Position found
+		if (!m_graph.isPositionVisited(shortestDistancePosition))
+		{
+			m_graph.addToGraph(shortestDistancePosition, position);
+			m_frontier.push(shortestDistancePosition);
+
+			if (shortestDistancePosition == destinationPositionOnGrid)
+			{
+				destinationReached = true;
+				getPathFromVisitedNodes(startingPositionOnGrid, shortestDistancePosition, destinationPosition, pathToPosition, m_graph);
+			}
+		}
+		else
+		{
+			getPathFromVisitedNodes(startingPositionOnGrid, shortestDistancePosition, pathToPosition, m_graph);
+			destinationReached = true;
+		}
+
+		assert(m_frontier.size() <= Globals::MAP_SIZE * Globals::MAP_SIZE);
+	}
+
+	if (pathToPosition.empty())
+	{
+		std::cout << "Path is empty\n";
+	}
+}
+
 UnitFormationPosition::UnitFormationPosition(const glm::vec3& position)
 	: newPosition(position)
 {}

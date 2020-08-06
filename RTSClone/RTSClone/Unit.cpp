@@ -60,15 +60,15 @@ namespace
 #endif // RENDER_PATHING
 }
 
-Unit::Unit(const glm::vec3& startingPosition, const Model& model, Map& map)
-	: Entity(startingPosition, model, eEntityType::Unit),
+Unit::Unit(const glm::vec3& startingPosition, const Model& model, Map& map, eEntityType entityType)
+	: Entity(startingPosition, model, entityType),
 	m_currentState(eUnitState::Idle),
 	m_front(),
 	m_pathToPosition()
 {}
 
-Unit::Unit(const glm::vec3 & startingPosition, const glm::vec3 & destinationPosition, const Model & model, Map & map)
-	: Entity(startingPosition, model, eEntityType::Unit),
+Unit::Unit(const glm::vec3 & startingPosition, const glm::vec3 & destinationPosition, const Model & model, Map & map, eEntityType entityType)
+	: Entity(startingPosition, model, entityType),
 	m_currentState(eUnitState::Idle),
 	m_front(),
 	m_pathToPosition()
@@ -85,6 +85,12 @@ void Unit::moveToAmongstGroup(const glm::vec3& destinationPosition, const Map& m
 {
 	m_pathToPosition.clear();
 	PathFinding::getInstance().getPathToPositionAmongstGroup(*this, destinationPosition, m_pathToPosition, map, units);
+}
+
+void Unit::moveToAmongstGroup(const glm::vec3& destinationPosition, const Map& map)
+{
+	m_pathToPosition.clear();
+	PathFinding::getInstance().getPathToPositionAmongstGroup(*this, destinationPosition, m_pathToPosition, map);
 }
 
 void Unit::moveTo(const glm::vec3& destinationPosition, const Map& map, const std::vector<Unit>& units)

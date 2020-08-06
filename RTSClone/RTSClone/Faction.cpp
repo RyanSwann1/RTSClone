@@ -331,7 +331,7 @@ void Faction::moveSingularSelectedUnit(const glm::vec3& destinationPosition, con
         });
         assert(selectedHarvester != m_harvesters.end());
 
-        selectedHarvester->moveTo(destinationPosition, map, minerals, m_units);
+        selectedHarvester->moveTo(destinationPosition, map, minerals);
     }
 }
 
@@ -389,15 +389,16 @@ void Faction::moveMultipleSelectedUnits(const glm::vec3& destinationPosition, co
 
             for (auto& selectedUnit : selectedUnits)
             {
-                if (selectedUnit->getType() == eEntityType::Unit)
+                switch (selectedUnit->getType())
                 {
+                case eEntityType::Unit:
                     selectedUnit->moveToAmongstGroup(Globals::convertToNodePosition(destinationPosition - (averagePosition - selectedUnit->getPosition())),
                         map, m_units);
-                }
-                else
-                {
+                    break;
+                case eEntityType::Harvester:
                     selectedUnit->moveToAmongstGroup(destinationPosition - (averagePosition - selectedUnit->getPosition()),
-                        map, m_units);
+                        map);
+                    break;
                 }
             }
         }
@@ -419,7 +420,7 @@ void Faction::handleHarvesterCollisions(const Map& map)
                     otherHarvester.getCurrentState() == eUnitState::Idle &&
                     harvester.getAABB().contains(otherHarvester.getAABB()))
                 {
-                    harvester.moveTo(getClosestPositionFromAABB(harvester.getPosition(), otherHarvester, map), map, m_units);
+                    harvester.moveTo(getClosestPositionFromAABB(harvester.getPosition(), otherHarvester, map), map);
                     break;
                 }
             }

@@ -35,15 +35,14 @@ namespace
 }
 
 Harvester::Harvester(const glm::vec3& startingPosition, const Model& model, Map& map)
-	: Unit(startingPosition, model, map),
+	: Unit(startingPosition, model, map, eEntityType::Harvester),
 	m_currentHarvesterState(eHarvesterState::InUseByBaseState),
 	m_harvestTimer(HARVEST_TIME),
 	m_mineralToHarvest(nullptr)
 {}
 
-Harvester::Harvester(const glm::vec3 & startingPosition, const glm::vec3 & destinationPosition, const Model & model, 
-	Map & map)
-	: Unit(startingPosition, model, map),
+Harvester::Harvester(const glm::vec3 & startingPosition, const glm::vec3 & destinationPosition, const Model & model, Map & map)
+	: Unit(startingPosition, model, map, eEntityType::Harvester),
 	m_currentHarvesterState(eHarvesterState::InUseByBaseState),
 	m_harvestTimer(HARVEST_TIME),
 	m_mineralToHarvest(nullptr)
@@ -87,8 +86,7 @@ void Harvester::update(float deltaTime, const ModelManager& modelManager, const 
 	}
 }
 
-void Harvester::moveTo(const glm::vec3 & destinationPosition, const Map & map, const std::vector<Mineral>& minerals,
-	const std::vector<Unit>& units)
+void Harvester::moveTo(const glm::vec3 & destinationPosition, const Map & map, const std::vector<Mineral>& minerals)
 {
 	for (const auto& mineral : minerals)
 	{
@@ -96,7 +94,7 @@ void Harvester::moveTo(const glm::vec3 & destinationPosition, const Map & map, c
 		{
 			m_mineralToHarvest = &mineral;
 			glm::vec3 position = getClosestPositionFromMineral(m_position, mineral, map);
-			Unit::moveTo(position, map, units);
+			Unit::moveTo(position, map);
 			m_currentHarvesterState = eHarvesterState::MovingToMinerals;
 			m_currentState = eUnitState::InUseByDerivedState;
 			break;
@@ -111,13 +109,13 @@ void Harvester::moveTo(const glm::vec3 & destinationPosition, const Map & map, c
 	{
 		m_currentHarvesterState = eHarvesterState::InUseByBaseState;
 		m_currentState = eUnitState::Moving;
-		Unit::moveTo(destinationPosition, map, units);
+		Unit::moveTo(destinationPosition, map);
 	}
 }
 
-void Harvester::moveTo(const glm::vec3& destinationPosition, const Map& map, const std::vector<Unit>& units)
+void Harvester::moveTo(const glm::vec3& destinationPosition, const Map& map)
 {
 	m_currentHarvesterState = eHarvesterState::InUseByBaseState;
 	m_currentState = eUnitState::Moving;
-	Unit::moveTo(destinationPosition, map, units);
+	Unit::moveTo(destinationPosition, map);
 }

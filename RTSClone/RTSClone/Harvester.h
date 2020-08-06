@@ -25,8 +25,8 @@ public:
 		const std::vector<Unit>& units, const std::vector<Harvester>& harvesters);
 
 	void moveTo(const glm::vec3& destinationPosition, const Map& map, 
-		const std::vector<Mineral>& minerals, const std::vector<Unit>& units);
-	void moveTo(const glm::vec3& destinationPosition, const Map& map, const std::vector<Unit>& units);
+		const std::vector<Mineral>& minerals);
+	void moveTo(const glm::vec3& destinationPosition, const Map& map);
 
 private:
 	eHarvesterState m_currentHarvesterState;

@@ -45,7 +45,7 @@ std::unique_ptr<ModelManager> ModelManager::create()
 	models[static_cast<int>(waypointModel->modelName)] = std::move(waypointModel);
 
 	std::unique_ptr<Model> harvesterModel = Model::create("robot.obj", false, 
-		{ 2.0f, 1.0f, 2.0 }, eModelName::Harvester, { 0.8f, 0.8f, 0.8f });
+		{ 1.5f, 1.0f, 1.5f }, eModelName::Harvester, { 0.8f, 0.8f, 0.8f });
 	assert(harvesterModel);
 	if (!harvesterModel)
 	{
