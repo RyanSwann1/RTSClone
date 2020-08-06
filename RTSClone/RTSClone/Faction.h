@@ -4,6 +4,7 @@
 #include "NonMovable.h"
 #include "Headquarters.h"
 #include "Harvester.h"
+#include "PathFinding.h"
 #include <SFML/Graphics.hpp>
 
 struct SelectionBox : private NonMovable, private NonCopyable
@@ -60,6 +61,30 @@ private:
 	bool isOneUnitSelected() const;
 	void moveSingularSelectedUnit(const glm::vec3& destinationPosition, const Map& map, const std::vector<Mineral>& minerals);
 	void moveMultipleSelectedUnits(const glm::vec3& destinationPosition, const Map& map, const std::vector<Mineral>& minerals);
-	void handleHarvesterCollisions(const Map& map);
-	void handleUnitCollisions(const Map& map);
+
+	template <class Entity>
+	void handleCollisions(std::vector<Entity>& entities, const Map& map)
+	{
+		std::vector<const Entity*> handledUnits;
+		handledUnits.reserve(m_harvesters.size());
+		for (auto& entity : entities)
+		{
+			if (entity.getCurrentState() == eUnitState::Idle)
+			{
+				for (const auto& otherEntity : entities)
+				{
+					if (&entity != &otherEntity &&
+						std::find(handledUnits.cbegin(), handledUnits.cend(), &otherEntity) == handledUnits.cend() &&
+						otherEntity.getCurrentState() == eUnitState::Idle &&
+						entity.getAABB().contains(otherEntity.getAABB()))
+					{
+						entity.moveTo(PathFinding::getInstance().getClosestPositionOutsideAABB<Entity>(entity, entities, map), map);
+						break;
+					}
+				}
+			}
+
+			handledUnits.push_back(&entity);
+		}
+	}
 };

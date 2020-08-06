@@ -4,6 +4,8 @@
 #include "NonMovable.h"
 #include "glm/glm.hpp"
 #include "Globals.h"
+#include "Unit.h"
+#include "Map.h"
 #include <vector>
 #include <queue>
 #include <array>
@@ -38,6 +40,7 @@ private:
 	std::array<GraphNode, static_cast<size_t>(Globals::MAP_SIZE * Globals::MAP_SIZE)> m_graph;
 };
 
+class Harvester;
 class Unit;
 class Map;
 class PathFinding : private NonMovable, private NonCopyable
@@ -49,7 +52,55 @@ public:
 		return instance;
 	}
 
-	glm::vec3 getClosestPositionOutsideAABB(const Unit& currentUnit, const std::vector<Unit>& units, const Map& map);
+	template <class Entity>
+	glm::vec3 getClosestPositionOutsideAABB(const Entity& currentEntity, const std::vector<Entity>& entities, const Map& map)
+	{
+		constexpr float MAX_RAY_DISTANCE = static_cast<float>(Globals::NODE_SIZE) * 10.0f;
+		constexpr std::array<glm::ivec2, 4> DIRECTIONS =
+		{
+			glm::ivec2(0, 1),
+			glm::ivec2(1, 0),
+			glm::ivec2(0, -1),
+			glm::ivec2(-1, 0),
+		};
+
+		assert(currentEntity.getCurrentState() == eUnitState::Idle);
+		float distance = std::numeric_limits<float>::max();
+		glm::vec3 shortestDistancePosition = currentEntity.getPosition();
+
+		for (const auto& direction : DIRECTIONS)
+		{
+			glm::vec3 position = currentEntity.getPosition();
+			for (float ray = static_cast<float>(Globals::NODE_SIZE); ray <= MAX_RAY_DISTANCE; ray += static_cast<float>(Globals::NODE_SIZE))
+			{
+				position = position + glm::normalize(glm::vec3(direction.x, Globals::GROUND_HEIGHT, direction.y)) * ray;
+
+				bool collision = false;
+				for (const auto& otherEntities : entities)
+				{
+					if (&currentEntity == &otherEntities || otherEntities.getCurrentState() != eUnitState::Idle)
+					{
+						continue;
+					}
+					else if (otherEntities.getAABB().contains(position) || map.isPositionOccupied(position))
+					{
+						collision = true;
+						break;
+					}
+				}
+
+				if (!collision && glm::distance(currentEntity.getPosition(), position) < distance)
+				{
+					distance = glm::distance(currentEntity.getPosition(), position);
+					shortestDistancePosition = position;
+				}
+			}
+		}
+
+		assert(distance < std::numeric_limits<float>::max() && shortestDistancePosition != currentEntity.getPosition());
+		return shortestDistancePosition;
+	}
+
 	std::vector<glm::vec3> getFormationPositions(const glm::vec3& startingPosition, const std::vector<const Unit*> selectedUnits,
 		const Map& map);
 	glm::vec3 getClosestAvailablePosition(const glm::vec3& startingPosition, const std::vector<Unit>& units, const Map& map);

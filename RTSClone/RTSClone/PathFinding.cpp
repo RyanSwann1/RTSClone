@@ -2,6 +2,7 @@
 #include "Globals.h"
 #include "Map.h"
 #include "Unit.h"
+#include "Harvester.h"
 #include "ModelManager.h"
 #include <limits>
 
@@ -55,14 +56,6 @@ namespace
 	{
 		return { position.x / Globals::NODE_SIZE, position.z / Globals::NODE_SIZE };
 	}
-
-	constexpr std::array<glm::ivec2, 4> DIRECTIONS =
-	{
-		glm::ivec2(0, 1),
-		glm::ivec2(1, 0),
-		glm::ivec2(0, -1),
-		glm::ivec2(-1, 0),
-	};
 
 	constexpr std::array<glm::ivec2, 8> ALL_DIRECTIONS =
 	{
@@ -315,46 +308,6 @@ void PathFinding::reset()
 	m_graph.resetGraph();
 	std::queue<glm::ivec2> empty;
 	m_frontier.swap(empty);
-}
-
-glm::vec3 PathFinding::getClosestPositionOutsideAABB(const Unit& currentUnit, const std::vector<Unit>& units, const Map& map)
-{	
-	assert(currentUnit.getCurrentState() == eUnitState::Idle);
-	constexpr float MAX_RAY_DISTANCE = static_cast<float>(Globals::NODE_SIZE) * 10.0f;
-	float distance = std::numeric_limits<float>::max();
-	glm::vec3 shortestDistancePosition = currentUnit.getPosition();
-
-	for (const auto& direction : DIRECTIONS)
-	{
-		glm::vec3 position = currentUnit.getPosition();
-		for (float ray = static_cast<float>(Globals::NODE_SIZE); ray <= MAX_RAY_DISTANCE; ray += static_cast<float>(Globals::NODE_SIZE))
-		{
-			position = position + glm::normalize(glm::vec3(direction.x, Globals::GROUND_HEIGHT, direction.y)) * ray;
-
-			bool collision = false;
-			for (const auto& otherUnit : units)
-			{
-				if (&currentUnit == &otherUnit || otherUnit.getCurrentState() != eUnitState::Idle)
-				{
-					continue;
-				}
-				else if (otherUnit.getAABB().contains(position) || map.isPositionOccupied(position))
-				{
-					collision = true;
-					break;
-				}
-			}
-
-			if (!collision && glm::distance(currentUnit.getPosition(), position) < distance)
-			{
-				distance = glm::distance(currentUnit.getPosition(), position);
-				shortestDistancePosition = position;
-			}
-		}
-	}
-
-	assert(distance < std::numeric_limits<float>::max() && shortestDistancePosition != currentUnit.getPosition());
-	return shortestDistancePosition;
 }
 
 std::vector<glm::vec3> PathFinding::getFormationPositions(const glm::vec3& startingPosition,
