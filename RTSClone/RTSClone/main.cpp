@@ -31,6 +31,8 @@
 //Design Patterns
 //https://www.youtube.com/watch?v=hQE8lQk9ikE
 
+
+
 int main()
 {
 	sf::ContextSettings settings;
@@ -73,9 +75,12 @@ int main()
 	sf::Clock gameClock;
 	Camera camera;
 	std::vector<Entity> minerals;
-	minerals.emplace_back(glm::vec3(10.0, Globals::GROUND_HEIGHT, 10.0f), modelManager->getModel(eModelName::Mineral), eEntityType::Mineral, *map);
-	minerals.emplace_back(glm::vec3(10.0, Globals::GROUND_HEIGHT, 25.0f), modelManager->getModel(eModelName::Mineral), eEntityType::Mineral, *map);
-	minerals.emplace_back(glm::vec3(10.0, Globals::GROUND_HEIGHT, 40.0f), modelManager->getModel(eModelName::Mineral), eEntityType::Mineral, *map);
+
+	for (float z = Globals::NODE_SIZE; z <= Globals::NODE_SIZE * 5; z += Globals::NODE_SIZE)
+	{
+		minerals.emplace_back(Globals::convertToNodePosition({ 10.0, Globals::GROUND_HEIGHT, z }),
+			modelManager->getModel(eModelName::Mineral), eEntityType::Mineral, *map);
+	}
 
 	shaderHandler->switchToShader(eShaderType::SelectionBox);
 	shaderHandler->setUniformMat4f(eShaderType::SelectionBox, "uOrthographic", glm::ortho(0.0f, static_cast<float>(windowSize.x),

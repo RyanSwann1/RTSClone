@@ -103,7 +103,7 @@ void SelectionBox::render(const sf::Window& window) const
 //Faction
 Faction::Faction(const ModelManager& modelManager, Map& map)
     : m_selectionBox(),
-    m_HQ({ 50.0f, Globals::GROUND_HEIGHT, 50.f }, modelManager.getModel(eModelName::HQ), map),
+    m_HQ(Globals::convertToNodePosition({ 35.0f, Globals::GROUND_HEIGHT, 15.f }), modelManager.getModel(eModelName::HQ), map),
     m_units(),
     m_harvesters()
 {}

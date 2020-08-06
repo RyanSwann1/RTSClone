@@ -6,7 +6,8 @@ std::unique_ptr<ModelManager> ModelManager::create()
 {
 	std::array<std::unique_ptr<Model>, static_cast<size_t>(eModelName::Max) + 1> models;
 
-	std::unique_ptr<Model> unitModel = Model::create("spaceCraft1.obj", false, { Globals::NODE_SIZE / 2, 0.25f, Globals::NODE_SIZE / 2 }, eModelName::Unit, { 0.75f, 0.75f, 0.75f });
+	std::unique_ptr<Model> unitModel = Model::create("spaceCraft1.obj", false, 
+		{ Globals::NODE_SIZE / 2, 0.25f, Globals::NODE_SIZE / 2 }, eModelName::Unit, { 0.35f, 0.35f, 0.35f });
 	assert(unitModel);
 	if (!unitModel)
 	{
@@ -15,7 +16,8 @@ std::unique_ptr<ModelManager> ModelManager::create()
 	}
 	models[static_cast<int>(unitModel->modelName)] = std::move(unitModel);
 
-	std::unique_ptr<Model> headquartersModel = Model::create("portal.obj", true, glm::vec3(5.0f, 0.25f, 3.0f), eModelName::HQ, { 1.0f, 1.0f, 1.0f });
+	std::unique_ptr<Model> headquartersModel = Model::create("portal.obj", true, 
+		glm::vec3(5.0f, 0.25f, 3.0f), eModelName::HQ, { 1.0f, 1.0f, 1.0f });
 	assert(headquartersModel);
 	if (!headquartersModel)
 	{
@@ -24,7 +26,7 @@ std::unique_ptr<ModelManager> ModelManager::create()
 	}
 	models[static_cast<int>(headquartersModel->modelName)] = std::move(headquartersModel);
 
-	std::unique_ptr<Model> mineralModel = Model::create("rocksOre.obj", true, glm::vec3(5.0f, 0.25f, 5.0f), eModelName::Mineral, { 1.0f, 1.0f, 1.0f });
+	std::unique_ptr<Model> mineralModel = Model::create("rocksOre.obj", true, glm::vec3(3.0f, 0.25f, 3.0f), eModelName::Mineral, { 0.6f, 0.6f, 0.6f });
 	assert(mineralModel);
 	if (!mineralModel)
 	{
@@ -42,7 +44,8 @@ std::unique_ptr<ModelManager> ModelManager::create()
 	}
 	models[static_cast<int>(waypointModel->modelName)] = std::move(waypointModel);
 
-	std::unique_ptr<Model> harvesterModel = Model::create("robot.obj", false, { 2.0f, 1.0f, 2.0 }, eModelName::Harvester, { 1.0f, 1.0f, 1.0f });
+	std::unique_ptr<Model> harvesterModel = Model::create("robot.obj", false, 
+		{ 2.0f, 1.0f, 2.0 }, eModelName::Harvester, { 0.8f, 0.8f, 0.8f });
 	assert(harvesterModel);
 	if (!harvesterModel)
 	{

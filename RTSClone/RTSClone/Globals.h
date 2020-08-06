@@ -70,6 +70,24 @@ namespace Globals
 		}
 	}
 
+	inline glm::vec3 convertToNodePosition(const glm::vec3& position)
+	{
+		glm::vec3 newPosition = position;
+		int xDifference = static_cast<int>(position.x) % Globals::NODE_SIZE;
+		if (xDifference > 0)
+		{
+			newPosition.x -= xDifference;
+		}
+
+		int zDifference = static_cast<int>(position.z) % Globals::NODE_SIZE;
+		if (zDifference > 0)
+		{
+			newPosition.z -= zDifference;
+		}
+
+		return newPosition;
+	}
+
 	inline glm::ivec2 convertToGridPosition(const glm::vec3& position)
 	{
 		return { position.x / Globals::NODE_SIZE, position.z / Globals::NODE_SIZE };

@@ -62,8 +62,8 @@ void Model::render(ShaderHandler & shaderHandler, const Entity& entity) const
 		entityPosition.z -= (entity.getAABB().m_forward - entity.getAABB().m_back) / 2.0f;
 	}
 
-	glm::mat4 model = glm::scale(glm::mat4(1.0), glm::vec3(1.0f, 1.0f, 1.0f));
-	model = glm::translate(model, entityPosition);
+	glm::mat4 model = glm::translate(glm::mat4(1.0f), entityPosition);
+	model = glm::scale(model, scale);
 	shaderHandler.setUniformMat4f(eShaderType::Default, "uModel", model);
 
 	for (const auto& mesh : meshes)
