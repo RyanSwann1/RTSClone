@@ -11,7 +11,7 @@ namespace Globals
 	constexpr unsigned int INVALID_OPENGL_ID = 0;
 	constexpr float GROUND_HEIGHT = 0.0f;
 	constexpr int MAP_SIZE = 150;
-	constexpr int NODE_SIZE = 1;
+	constexpr int NODE_SIZE = 7;
 
 	constexpr int CUBE_FACE_INDICIE_COUNT = 4;
 	constexpr std::array<unsigned int, 6> CUBE_FACE_INDICIES =
@@ -68,6 +68,11 @@ namespace Globals
 			std::cout << position.z << "\n\n";
 			clock.restart();
 		}
+	}
+
+	inline glm::ivec2 convertToGridPosition(const glm::vec3& position)
+	{
+		return { position.x / Globals::NODE_SIZE, position.z / Globals::NODE_SIZE };
 	}
 
 	inline int convertTo1D(const glm::ivec2& position)
