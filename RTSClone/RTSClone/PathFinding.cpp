@@ -56,6 +56,14 @@ namespace
 		return { position.x / Globals::NODE_SIZE, position.z / Globals::NODE_SIZE };
 	}
 
+	constexpr std::array<glm::ivec2, 4> DIRECTIONS =
+	{
+		glm::ivec2(0, 1),
+		glm::ivec2(1, 0),
+		glm::ivec2(0, -1),
+		glm::ivec2(-1, 0),
+	};
+
 	constexpr std::array<glm::ivec2, 8> ALL_DIRECTIONS =
 	{
 		glm::ivec2(0, 1),
@@ -271,39 +279,40 @@ void PathFinding::reset()
 glm::vec3 PathFinding::getClosestPositionOutsideAABB(const Unit& currentUnit, const std::vector<Unit>& units, const Map& map)
 {	
 	assert(currentUnit.getCurrentState() == eUnitState::Idle);
-	constexpr float MAX_RAY_DISTANCE = static_cast<float>(Globals::NODE_SIZE) * 5.0f;
+	constexpr float MAX_RAY_DISTANCE = static_cast<float>(Globals::NODE_SIZE) * 7.0f;
 	float distance = std::numeric_limits<float>::max();
-	glm::vec3 shortestDistancePosition = { 0.0f, 0.0f, 0.0f };
+	glm::vec3 shortestDistancePosition = currentUnit.getPosition();
 
-	for (const auto& direction : ALL_DIRECTIONS)
+	for (const auto& direction : DIRECTIONS)
 	{
-		for (const auto& otherUnit : units)
+		glm::vec3 position = currentUnit.getPosition();
+		for (float ray = static_cast<float>(Globals::NODE_SIZE); ray <= MAX_RAY_DISTANCE; ray += static_cast<float>(Globals::NODE_SIZE))
 		{
-			if (&currentUnit == &otherUnit || otherUnit.getCurrentState() != eUnitState::Idle)
-			{
-				continue;
-			}
+			position = position + glm::normalize(glm::vec3(direction.x, Globals::GROUND_HEIGHT, direction.y)) * ray;
 
-			glm::vec3 position = currentUnit.getPosition();
-			for (float ray = static_cast<float>(Globals::NODE_SIZE); ray <= MAX_RAY_DISTANCE; ray += static_cast<float>(Globals::NODE_SIZE))
+			bool collision = false;
+			for (const auto& otherUnit : units)
 			{
-				position = position + glm::normalize(glm::vec3(direction.x, Globals::GROUND_HEIGHT, direction.y)) * ray;
-
-				if (!otherUnit.getAABB().contains(position) && !map.isPositionOccupied(position))
+				if (&currentUnit == &otherUnit || otherUnit.getCurrentState() != eUnitState::Idle)
 				{
-					if (glm::distance(currentUnit.getPosition(), position) < distance)
-					{
-						distance = glm::distance(currentUnit.getPosition(), position);
-						shortestDistancePosition = position;
-					}
-
+					continue;
+				}
+				else if (otherUnit.getAABB().contains(position) || map.isPositionOccupied(position))
+				{
+					collision = true;
 					break;
 				}
+			}
+
+			if (!collision && glm::distance(currentUnit.getPosition(), position) < distance)
+			{
+				distance = glm::distance(currentUnit.getPosition(), position);
+				shortestDistancePosition = position;
 			}
 		}
 	}
 
-	assert(distance < std::numeric_limits<float>::max());
+	assert(distance < std::numeric_limits<float>::max() && shortestDistancePosition != currentUnit.getPosition());
 	return shortestDistancePosition;
 }
 
