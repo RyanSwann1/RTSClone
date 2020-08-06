@@ -313,21 +313,6 @@ void PathFinding::reset()
 std::vector<glm::vec3> PathFinding::getFormationPositions(const glm::vec3& startingPosition,
 	const std::vector<const Unit*> selectedUnits, const Map& map)
 {
-	//Consider actual units
-	//Ignore selected units - because they are going to move
-	//Move half to centre
-
-	////std::sort(selectedUnits.begin(), selectedUnits.end(), [](const auto& unitA, const auto& unitB)
-	////{
-	////	return glm::all(glm::lessThan(unitA->getPosition(), unitB->getPosition()));
-	////});
-	//assert(!selectedUnits.empty());
-	//std::vector<const Unit*> orderedUnits = selectedUnits;
-	//std::sort(orderedUnits.begin(), orderedUnits.end(), [&startingPosition](const auto& a, const auto& b) 
-	//{
-	//	return glm::distance(a->getPosition(), startingPosition) < glm::distance(b->getPosition(), startingPosition);
-	//});
-
 	assert(!selectedUnits.empty());
 	reset();
 
