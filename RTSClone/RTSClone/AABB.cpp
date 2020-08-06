@@ -131,12 +131,12 @@ bool AABB::contains(const glm::vec3& position) const
 
 bool AABB::contains(const AABB& other) const
 {
-	return m_left <= other.m_right &&
-		m_right >= other.m_left &&
-		m_top >= other.m_bottom &&
-		m_bottom <= other.m_top &&
-		m_forward >= other.m_back &&
-		m_back <= other.m_forward;
+	return m_left < other.m_right &&
+		m_right > other.m_left &&
+		m_top > other.m_bottom &&
+		m_bottom < other.m_top &&
+		m_forward > other.m_back &&
+		m_back < other.m_forward;
 }
 
 void AABB::resetFromCentre(const glm::vec3& position, const glm::vec3& size)
