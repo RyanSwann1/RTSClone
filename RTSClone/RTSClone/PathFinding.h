@@ -8,14 +8,6 @@
 #include <queue>
 #include <array>
 
-class Unit;
-struct UnitFormationPosition
-{
-	UnitFormationPosition(const glm::vec3& position);
-
-	const glm::vec3 newPosition;
-};
-
 class GraphNode
 {
 public:
@@ -57,7 +49,7 @@ public:
 		return instance;
 	}
 
-	std::vector<UnitFormationPosition> getFormationPositions(const glm::vec3& startingPosition, const std::vector<const Unit*> selectedUnits,
+	std::vector<glm::vec3> getFormationPositions(const glm::vec3& startingPosition, const std::vector<const Unit*> selectedUnits,
 		const Map& map);
 	glm::vec3 getClosestAvailablePosition(const glm::vec3& startingPosition, const std::vector<Unit>& units, const Map& map);
 	void getPathToPosition(const Unit& unit, const glm::vec3& destination, std::vector<glm::vec3>& pathToPosition,

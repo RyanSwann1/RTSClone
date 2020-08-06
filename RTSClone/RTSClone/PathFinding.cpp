@@ -267,7 +267,7 @@ void PathFinding::reset()
 	m_frontier.swap(empty);
 }
 
-std::vector<UnitFormationPosition> PathFinding::getFormationPositions(const glm::vec3& startingPosition, 
+std::vector<glm::vec3> PathFinding::getFormationPositions(const glm::vec3& startingPosition, 
 	const std::vector<const Unit*> selectedUnits, const Map& map)
 {
 	//Consider actual units
@@ -288,7 +288,7 @@ std::vector<UnitFormationPosition> PathFinding::getFormationPositions(const glm:
 	assert(!selectedUnits.empty());
 	reset();
 
-	std::vector<UnitFormationPosition> unitFormationPositions;
+	std::vector<glm::vec3> unitFormationPositions;
 	unitFormationPositions.reserve(selectedUnits.size());
 	int selectedUnitIndex = 0;
 	m_frontier.push(convertToGridPosition(startingPosition));
@@ -597,7 +597,3 @@ void PathFinding::getPathToPositionAmongstGroup(const Unit& unit, const glm::vec
 		std::cout << "Path is empty\n";
 	}
 }
-
-UnitFormationPosition::UnitFormationPosition(const glm::vec3& position)
-	: newPosition(position)
-{}

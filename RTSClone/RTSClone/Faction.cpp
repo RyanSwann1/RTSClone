@@ -361,14 +361,14 @@ void Faction::moveMultipleSelectedUnits(const glm::vec3& destinationPosition, co
         AABB selectionBoxAABB({ selectedUnits.begin(), selectedUnits.end() });
         if (selectionBoxAABB.contains(destinationPosition))
         {
-            std::vector<UnitFormationPosition> unitFormationPositions = PathFinding::getInstance().getFormationPositions(destinationPosition, 
+            std::vector<glm::vec3> unitFormationPositions = PathFinding::getInstance().getFormationPositions(destinationPosition, 
                 { selectedUnits.begin(), selectedUnits.end() }, map);
 
             if (unitFormationPositions.size() == selectedUnits.size())
             {
                 for (int i = 0; i < unitFormationPositions.size(); ++i)
                 {
-                    selectedUnits[i]->moveTo(unitFormationPositions[i].newPosition, map);
+                    selectedUnits[i]->moveTo(unitFormationPositions[i], map);
                 }
             }
         }
