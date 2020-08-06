@@ -12,7 +12,7 @@ class ShaderHandler;
 struct Model : private NonMovable, private NonCopyable
 {
 	static std::unique_ptr<Model> create(const std::string& filePath, bool renderFromCentrePosition, 
-		const glm::vec3& sizeFromCentre, eModelName modelName);
+		const glm::vec3& sizeFromCentre, eModelName modelName, const glm::vec3& scale);
 
 	void attachMeshesToVAO() const;
 	void render(ShaderHandler& shaderHandler, const glm::vec3& position) const;
@@ -21,9 +21,10 @@ struct Model : private NonMovable, private NonCopyable
 	const eModelName modelName;
 	const bool renderFromCentrePosition;
 	const glm::vec3 sizeFromCentre;
+	const glm::vec3 scale;
 	std::vector<Mesh> meshes;
     std::vector<MeshTextureDetails> textures;
 	
 private:
-	Model(bool renderFromCentrePosition, const glm::vec3& sizeFromCentre, eModelName modelName);
+	Model(bool renderFromCentrePosition, const glm::vec3& sizeFromCentre, eModelName modelName, const glm::vec3& scale);
 };
