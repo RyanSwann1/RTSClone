@@ -58,7 +58,8 @@ private:
 	void spawnHarvester(const glm::vec3& spawnPosition, const Model& unitModel, Map& map);
 	bool isOneUnitSelected() const;
 	void moveSingularSelectedUnit(const glm::vec3& destinationPosition, const Map& map, const std::vector<Entity>& minerals);
-	void moveMultipleSelectedUnits(const glm::vec3& destinationPosition, const Map& map, const std::vector<Entity>& minerals);
+	void moveMultipleSelectedUnits(const glm::vec3& destinationPosition, const Map& map, const std::vector<Entity>& minerals,
+		const ModelManager& modelManager);
 	void handleHarvesterCollisions(const Map& map);
 	void handleUnitCollisions(const Map& map);
 };

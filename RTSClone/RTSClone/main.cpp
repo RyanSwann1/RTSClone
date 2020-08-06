@@ -133,6 +133,7 @@ int main()
 
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		glDisable(GL_DEPTH_TEST);
 
 #ifdef RENDER_AABB
 		faction.renderAABB(*shaderHandler);
@@ -149,6 +150,7 @@ int main()
 		shaderHandler->switchToShader(eShaderType::SelectionBox);
 		faction.renderSelectionBox(window);
 		glDisable(GL_BLEND);
+		glEnable(GL_DEPTH_TEST);
 
 		window.display();
 	}

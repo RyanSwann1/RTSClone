@@ -1,11 +1,12 @@
 #include "ModelManager.h"
+#include "Globals.h"
 #include <iostream>
 
 std::unique_ptr<ModelManager> ModelManager::create()
 {
 	std::array<std::unique_ptr<Model>, static_cast<size_t>(eModelName::Max) + 1> models;
 
-	std::unique_ptr<Model> unitModel = Model::create("spaceCraft1.obj", false, { 5.0f, 0.25f, 5.0f }, eModelName::Unit, { 0.75f, 0.75f, 0.75f });
+	std::unique_ptr<Model> unitModel = Model::create("spaceCraft1.obj", false, { Globals::NODE_SIZE / 2, 0.25f, Globals::NODE_SIZE / 2 }, eModelName::Unit, { 0.75f, 0.75f, 0.75f });
 	assert(unitModel);
 	if (!unitModel)
 	{

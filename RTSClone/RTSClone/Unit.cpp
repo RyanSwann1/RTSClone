@@ -27,10 +27,10 @@ namespace
 	{
 		constexpr std::array<glm::vec3, 4> CUBE_FACE_TOP =
 		{
-			glm::vec3(0, Globals::NODE_SIZE, Globals::NODE_SIZE),
-			glm::vec3(Globals::NODE_SIZE, Globals::NODE_SIZE, Globals::NODE_SIZE),
-			glm::vec3(Globals::NODE_SIZE, Globals::NODE_SIZE, 0),
-			glm::vec3(0, Globals::NODE_SIZE, 0)
+			glm::vec3(0.0f, 0.0f, Globals::NODE_SIZE),
+			glm::vec3(Globals::NODE_SIZE, 0.0f, Globals::NODE_SIZE),
+			glm::vec3(Globals::NODE_SIZE, 0.0f, 0.0f),
+			glm::vec3(0.0f, 0.0f, 0.0f)
 		};
 
 		mesh.m_indices.clear();
@@ -41,7 +41,10 @@ namespace
 		{
 			for (const auto& i : CUBE_FACE_TOP)
 			{
-				mesh.m_vertices.emplace_back(pathNode + i);
+				glm::vec3 position = { pathNode + i };
+				position.x -= static_cast<float>(Globals::NODE_SIZE) / 2.0f;
+				position.z -= static_cast<float>(Globals::NODE_SIZE) / 2.0f;
+				mesh.m_vertices.emplace_back(position);
 			}
 
 			for (unsigned int i : Globals::CUBE_FACE_INDICIES)

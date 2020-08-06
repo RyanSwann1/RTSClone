@@ -103,7 +103,7 @@ void SelectionBox::render(const sf::Window& window) const
 //Faction
 Faction::Faction(const ModelManager& modelManager, Map& map)
     : m_selectionBox(),
-    m_HQ({ 35.0f, Globals::GROUND_HEIGHT, 15.f }, modelManager.getModel(eModelName::HQ), map),
+    m_HQ({ 50.0f, Globals::GROUND_HEIGHT, 50.f }, modelManager.getModel(eModelName::HQ), map),
     m_units(),
     m_harvesters()
 {}
@@ -145,7 +145,7 @@ void Faction::handleInput(const sf::Event& currentSFMLEvent, const sf::Window& w
                 }
                 else
                 {
-                    moveMultipleSelectedUnits(mouseToGroundPosition, map, minerals);
+                    moveMultipleSelectedUnits(mouseToGroundPosition, map, minerals, modelManager);
                 }
             }
         }
@@ -330,10 +330,11 @@ void Faction::moveSingularSelectedUnit(const glm::vec3& destinationPosition, con
     }
 }
 
-void Faction::moveMultipleSelectedUnits(const glm::vec3& destinationPosition, const Map& map, const std::vector<Entity>& minerals)
+void Faction::moveMultipleSelectedUnits(const glm::vec3& destinationPosition, const Map& map, const std::vector<Entity>& minerals,
+    const ModelManager& modelManager)
 {
     std::vector<Unit*> selectedUnits;
-
+ 
     for (auto& unit : m_units)
     {
         if (unit.isSelected())
@@ -352,22 +353,32 @@ void Faction::moveMultipleSelectedUnits(const glm::vec3& destinationPosition, co
     
     if (!selectedUnits.empty())
     {
-        std::sort(selectedUnits.begin(), selectedUnits.end(), [](const auto& unitA, const auto& unitB)
+        assert(!isOneUnitSelected());
+        AABB selectionBoxAABB({ selectedUnits.begin(), selectedUnits.end() });
+        if (selectionBoxAABB.contains(destinationPosition))
         {
-            return glm::all(glm::lessThan(unitA->getPosition(), unitB->getPosition()));
-        });
-
-        glm::vec3 total(0.0f, 0.0f, 0.0f);
-        for (const auto& selectedUnit : selectedUnits)
-        {
-            total += selectedUnit->getPosition();
+            //PathFinding::getInstance().getFormationPositions(destinationPosition, 
+            //    { selectedUnits.begin(), selectedUnits.end() }, map, m_units, modelManager);
         }
-
-        glm::vec3 averagePosition = { total.x / selectedUnits.size(), total.y / selectedUnits.size(), total.z / selectedUnits.size() };
-
-        for (auto& selectedUnit : selectedUnits)
+        else
         {
-            selectedUnit->moveToAmongstGroup(destinationPosition - (averagePosition - selectedUnit->getPosition()), map, m_units);
+            std::sort(selectedUnits.begin(), selectedUnits.end(), [](const auto& unitA, const auto& unitB)
+            {
+                return glm::all(glm::lessThan(unitA->getPosition(), unitB->getPosition()));
+            });
+
+            glm::vec3 total(0.0f, 0.0f, 0.0f);
+            for (const auto& selectedUnit : selectedUnits)
+            {
+                total += selectedUnit->getPosition();
+            }
+
+            glm::vec3 averagePosition = { total.x / selectedUnits.size(), total.y / selectedUnits.size(), total.z / selectedUnits.size() };
+
+            for (auto& selectedUnit : selectedUnits)
+            {
+                selectedUnit->moveToAmongstGroup(destinationPosition - (averagePosition - selectedUnit->getPosition()), map, m_units);
+            }
         }
     }
 }

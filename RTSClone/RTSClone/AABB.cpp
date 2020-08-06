@@ -11,7 +11,7 @@ namespace
 {
 	constexpr glm::vec3 COLOR = { 1.0f, 0.0f, 0.0f };
 	constexpr float OPACITY = 0.4f;
-
+	constexpr float HEIGHT = 0.0f;
 	void generateMesh(const glm::vec3& position, const glm::vec3& size, Mesh& mesh)
 	{
 		mesh.m_vertices.clear();
@@ -19,10 +19,10 @@ namespace
 
 		const std::array<glm::vec3, 4> CUBE_FACE_TOP =
 		{
-			glm::vec3(position.x - size.x, 1.0f, position.z + size.z),
-			glm::vec3(position.x + size.x, 1.0f, position.z + size.z),
-			glm::vec3(position.x + size.x, 1.0f, position.z - size.z),
-			glm::vec3(position.x - size.x, 1.0f, position.z - size.z)
+			glm::vec3(position.x - size.x, HEIGHT, position.z + size.z),
+			glm::vec3(position.x + size.x, HEIGHT, position.z + size.z),
+			glm::vec3(position.x + size.x, HEIGHT, position.z - size.z),
+			glm::vec3(position.x - size.x, HEIGHT, position.z - size.z)
 		};
 
 		for (const auto& i : CUBE_FACE_TOP)
@@ -84,6 +84,8 @@ AABB::AABB(const std::vector<const Unit*>& selectedUnits)
 	m_forward(0.0f),
 	m_back(std::numeric_limits<float>::max())
 {
+	assert(std::find(selectedUnits.cbegin(), selectedUnits.cend(), nullptr) == selectedUnits.cend());
+
 	for (const auto& selectedUnit : selectedUnits)
 	{
 		if (selectedUnit->getPosition().x < m_left)
@@ -182,6 +184,7 @@ void AABB::render(ShaderHandler& shaderHandler)
 {
 	glm::vec3 centrePosition((m_right - (m_right - m_left) / 2.0f), (m_top - (m_top - m_bottom) / 2.0f), (m_forward - (m_forward - m_back) / 2.0f));
 	glm::vec3 distanceFromCentre(m_right - centrePosition.x, m_top - centrePosition.y, m_forward - centrePosition.z);
+
 	generateMesh(centrePosition, distanceFromCentre, m_mesh);
 
 	shaderHandler.setUniformVec3(eShaderType::Debug, "uColor", COLOR);
