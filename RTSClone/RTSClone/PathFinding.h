@@ -58,7 +58,7 @@ public:
 	void getPathToPosition(const Unit& unit, const glm::vec3& destination, std::vector<glm::vec3>& pathToPosition,
 		const Map& map);
 	void getPathToPositionAmongstGroup(const Unit& unit, const glm::vec3& destinationPosition, std::vector<glm::vec3>& pathToPosition,
-		const Map& map, const std::vector<Unit>& units);
+		const Map& map, const std::vector<Unit>& units, const std::vector<const Unit*>& selectedUnits);
 	void getPathToPositionAmongstGroup(const Unit& unit, const glm::vec3& destinationPosition, std::vector<glm::vec3>& pathToPosition,
 		const Map& map);
 

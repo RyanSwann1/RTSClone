@@ -109,6 +109,47 @@ namespace
 		return adjacentPositions;
 	}
 
+	std::array<AdjacentPosition, ALL_DIRECTIONS.size()> getAllAdjacentPositions(const glm::ivec2& position, const Map& map,
+		const std::vector<Unit>& units, const Unit& unit, const std::vector<const Unit*>& selectedUnits)
+	{
+		std::array<AdjacentPosition, ALL_DIRECTIONS.size()> adjacentPositions;
+		for (int i = 0; i < adjacentPositions.size(); ++i)
+		{
+			glm::ivec2 adjacentPosition = position + ALL_DIRECTIONS[i];
+			if (isPositionInMapBounds(adjacentPosition) && !map.isPositionOccupied(adjacentPosition))
+			{
+				bool unitCollision = false;
+				for (const auto& otherUnit : units)
+				{
+					if (&otherUnit != &unit && 
+						std::find(selectedUnits.cbegin(), selectedUnits.cend(), &otherUnit) == selectedUnits.cend() &&
+						otherUnit.getCurrentState() == eUnitState::Idle)
+					{
+						glm::vec2 direction = glm::normalize(glm::vec2(convertToGridPosition(otherUnit.getPosition()) - position));
+						if (otherUnit.getAABB().contains(convertToWorldPosition(glm::vec2(adjacentPosition.x, adjacentPosition.y) + direction * 3.0f)))
+						{
+							unitCollision = true;
+							break;
+						}
+
+						if (otherUnit.getAABB().contains(convertToWorldPosition(adjacentPosition)))
+						{
+							unitCollision = true;
+							break;
+						}
+					}
+				}
+
+				if (!unitCollision)
+				{
+					adjacentPositions[i] = AdjacentPosition(adjacentPosition);
+				}
+			}
+		}
+
+		return adjacentPositions;
+	}
+
 	std::array<AdjacentPosition, ALL_DIRECTIONS.size()> getAllAdjacentPositions(const glm::ivec2& position, const Map& map, 
 		const std::vector<Unit>& units, const Unit& unit)
 	{
@@ -279,7 +320,7 @@ void PathFinding::reset()
 glm::vec3 PathFinding::getClosestPositionOutsideAABB(const Unit& currentUnit, const std::vector<Unit>& units, const Map& map)
 {	
 	assert(currentUnit.getCurrentState() == eUnitState::Idle);
-	constexpr float MAX_RAY_DISTANCE = static_cast<float>(Globals::NODE_SIZE) * 7.0f;
+	constexpr float MAX_RAY_DISTANCE = static_cast<float>(Globals::NODE_SIZE) * 10.0f;
 	float distance = std::numeric_limits<float>::max();
 	glm::vec3 shortestDistancePosition = currentUnit.getPosition();
 
@@ -537,11 +578,10 @@ void PathFinding::getPathToPosition(const Unit& unit, const glm::vec3& destinati
 	{
 		std::cout << "Empty Path\n";
 	}
-	//assert(!pathToPosition.empty());
 }
 
 void PathFinding::getPathToPositionAmongstGroup(const Unit& unit, const glm::vec3& destinationPosition, std::vector<glm::vec3>& pathToPosition, 
-	const Map& map, const std::vector<Unit>& units)
+	const Map& map, const std::vector<Unit>& units, const std::vector<const Unit*>& selectedUnits)
 {
 	assert(pathToPosition.empty());
 	reset();
@@ -555,7 +595,7 @@ void PathFinding::getPathToPositionAmongstGroup(const Unit& unit, const glm::vec
 		position = m_frontier.front();
 		m_frontier.pop();
 
-		std::array<AdjacentPosition, ALL_DIRECTIONS.size()> adjacentPositions = getAllAdjacentPositions(position, map, units, unit);
+		std::array<AdjacentPosition, ALL_DIRECTIONS.size()> adjacentPositions = getAllAdjacentPositions(position, map, units, unit, selectedUnits);
 		float distance = glm::distance(glm::vec2(destinationPositionOnGrid), glm::vec2(startingPositionOnGrid));
 		glm::ivec2 shortestDistancePosition = position;
 		for (const auto& adjacentPosition : adjacentPositions)

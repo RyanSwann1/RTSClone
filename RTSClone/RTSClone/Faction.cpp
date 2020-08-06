@@ -417,11 +417,10 @@ void Faction::moveMultipleSelectedUnits(const glm::vec3& destinationPosition, co
                 {
                 case eEntityType::Unit:
                     selectedUnit->moveToAmongstGroup(Globals::convertToNodePosition(destinationPosition - (averagePosition - selectedUnit->getPosition())),
-                        map, m_units);
+                        map, m_units, { selectedUnits.cbegin(), selectedUnits.cend() });
                     break;
                 case eEntityType::Harvester:
-                    selectedUnit->moveToAmongstGroup(destinationPosition - (averagePosition - selectedUnit->getPosition()),
-                        map);
+                    selectedUnit->moveToAmongstGroup(destinationPosition - (averagePosition - selectedUnit->getPosition()), map);
                     break;
                 default:
                     assert(false);
