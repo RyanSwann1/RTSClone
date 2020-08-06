@@ -3,6 +3,7 @@
 #include "Unit.h"
 #include "Timer.h"
 
+//https://stackoverflow.com/questions/50182913/what-are-the-principles-involved-for-an-hierarchical-state-machine-and-how-to-i - HSM
 enum class eHarvesterState
 {
 	InUseByBaseState = 0,
@@ -11,6 +12,7 @@ enum class eHarvesterState
 	Harvesting
 };
 
+class Mineral;
 class Headquarters;
 class Harvester : public Unit
 {
@@ -23,7 +25,7 @@ public:
 		const std::vector<Unit>& units, const std::vector<Harvester>& harvesters);
 
 	void moveTo(const glm::vec3& destinationPosition, const Map& map, 
-		const std::vector<Entity>& minerals, const std::vector<Unit>& units);
+		const std::vector<Mineral>& minerals, const std::vector<Unit>& units);
 	void moveTo(const glm::vec3& destinationPosition, const Map& map, const std::vector<Unit>& units);
 
 private:

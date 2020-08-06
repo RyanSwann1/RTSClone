@@ -2,6 +2,7 @@
 #include "Globals.h"
 #include "Map.h"
 #include "Unit.h"
+#include "ModelManager.h"
 
 namespace
 {
@@ -179,12 +180,15 @@ namespace
 		std::vector<glm::vec3>& pathToPosition, Graph& graph)
 	{
 		pathToPosition.push_back(destinationPosition);
-		glm::ivec2 position = graph.getPreviousPosition(destinationPositionOnGrid);
+		glm::ivec2 positionOnGrid = graph.getPreviousPosition(destinationPositionOnGrid);
 
-		while (position != startingPosition)
+		while (positionOnGrid != startingPosition)
 		{
-			pathToPosition.push_back(convertToWorldPosition(position));
-			position = graph.getPreviousPosition(position);
+			glm::vec3 position = convertToWorldPosition(positionOnGrid);
+			position.x += static_cast<float>(Globals::NODE_SIZE) / 2.0f;
+			position.z -= static_cast<float>(Globals::NODE_SIZE) / 2.0f;
+			pathToPosition.push_back(convertToWorldPosition(positionOnGrid));
+			positionOnGrid = graph.getPreviousPosition(positionOnGrid);
 
 			assert(pathToPosition.size() <= Globals::MAP_SIZE * Globals::MAP_SIZE);
 		}
@@ -270,6 +274,63 @@ void PathFinding::reset()
 	m_frontier.swap(empty);
 }
 
+std::vector<UnitFormationPosition> PathFinding::getFormationPositions(const glm::vec3& startingPosition, 
+	const std::vector<const Unit*> selectedUnits, const Map& map)
+{
+	//Consider actual units
+	//Ignore selected units - because they are going to move
+	//Move half to centre
+
+	////std::sort(selectedUnits.begin(), selectedUnits.end(), [](const auto& unitA, const auto& unitB)
+	////{
+	////	return glm::all(glm::lessThan(unitA->getPosition(), unitB->getPosition()));
+	////});
+	//assert(!selectedUnits.empty());
+	//std::vector<const Unit*> orderedUnits = selectedUnits;
+	//std::sort(orderedUnits.begin(), orderedUnits.end(), [&startingPosition](const auto& a, const auto& b) 
+	//{
+	//	return glm::distance(a->getPosition(), startingPosition) < glm::distance(b->getPosition(), startingPosition);
+	//});
+
+	assert(!selectedUnits.empty());
+	reset();
+
+	std::vector<UnitFormationPosition> unitFormationPositions;
+	unitFormationPositions.reserve(selectedUnits.size());
+	int selectedUnitIndex = 0;
+	m_frontier.push(convertToGridPosition(startingPosition));
+
+	while (!m_frontier.empty() && unitFormationPositions.size() < selectedUnits.size())
+	{
+		glm::ivec2 position = m_frontier.front();
+		m_frontier.pop();
+
+		std::array<AdjacentPosition, ALL_DIRECTIONS.size()> adjacentPositions = getAllAdjacentPositions(position, map);
+		for (const auto& adjacentPosition : adjacentPositions)
+		{
+			if (adjacentPosition.valid)
+			{
+				if (!m_graph.isPositionVisited(adjacentPosition.position))
+				{
+					m_graph.addToGraph(adjacentPosition.position, position);
+					m_frontier.push(adjacentPosition.position);
+
+					assert(selectedUnitIndex < selectedUnits.size());
+					unitFormationPositions.emplace_back(convertToWorldPosition(adjacentPosition.position));
+					++selectedUnitIndex;
+					
+					if (unitFormationPositions.size() == selectedUnits.size())
+					{
+						break;
+					}
+				}
+			}
+		}
+	}
+
+	return unitFormationPositions;
+}
+
 glm::vec3 PathFinding::getClosestAvailablePosition(const glm::vec3& startingPosition, const std::vector<Unit>& units, const Map& map)
 {
 	reset();
@@ -317,6 +378,7 @@ void PathFinding::getPathToPosition(const Unit& unit, const glm::vec3& destinati
 	m_frontier.push(startingPositionOnGrid);
 	bool destinationReached = false;
 	glm::ivec2 position = { 0, 0 };
+	glm::ivec2 shortestDistancePosition = { 0, 0 };
 	while (!m_frontier.empty() && !destinationReached)
 	{
 		position = m_frontier.front();
@@ -324,7 +386,7 @@ void PathFinding::getPathToPosition(const Unit& unit, const glm::vec3& destinati
 
 		std::array<AdjacentPosition, ALL_DIRECTIONS.size()> adjacentPositions = getAllAdjacentPositions(position, map, units, unit);
 		float distance = glm::distance(glm::vec2(destinationPositionOnGrid), glm::vec2(startingPositionOnGrid));
-		glm::ivec2 shortestDistancePosition = position;
+		shortestDistancePosition = position;
 		for (const auto& adjacentPosition : adjacentPositions)
 		{
 			if (adjacentPosition.valid && glm::distance(glm::vec2(destinationPositionOnGrid), glm::vec2(adjacentPosition.position)) < distance)
@@ -415,7 +477,11 @@ void PathFinding::getPathToPosition(const Unit& unit, const glm::vec3& destinati
 		assert(m_frontier.size() < Globals::MAP_SIZE * Globals::MAP_SIZE);
 	}
 
-	assert(!pathToPosition.empty());
+	if (pathToPosition.empty())
+	{
+		std::cout << "Empty Path\n";
+	}
+	//assert(!pathToPosition.empty());
 }
 
 void PathFinding::getPathToPositionAmongstGroup(const Unit& unit, const glm::vec3& destinationPosition, std::vector<glm::vec3>& pathToPosition, 
@@ -471,3 +537,7 @@ void PathFinding::getPathToPositionAmongstGroup(const Unit& unit, const glm::vec
 		std::cout << "Path is empty\n";
 	}
 }
+
+UnitFormationPosition::UnitFormationPosition(const glm::vec3& position)
+	: newPosition(position)
+{}

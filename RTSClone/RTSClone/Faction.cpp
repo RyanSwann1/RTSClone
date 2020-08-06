@@ -150,7 +150,7 @@ void Faction::handleInput(const sf::Event& currentSFMLEvent, const sf::Window& w
                 }
                 else
                 {
-                    moveMultipleSelectedUnits(mouseToGroundPosition, map, minerals, modelManager);
+                    moveMultipleSelectedUnits(mouseToGroundPosition, map, minerals);
                 }
             }
         }
@@ -335,8 +335,7 @@ void Faction::moveSingularSelectedUnit(const glm::vec3& destinationPosition, con
     }
 }
 
-void Faction::moveMultipleSelectedUnits(const glm::vec3& destinationPosition, const Map& map, const std::vector<Mineral>& minerals,
-    const ModelManager& modelManager)
+void Faction::moveMultipleSelectedUnits(const glm::vec3& destinationPosition, const Map& map, const std::vector<Mineral>& minerals)
 {
     std::vector<Unit*> selectedUnits;
  
@@ -362,8 +361,16 @@ void Faction::moveMultipleSelectedUnits(const glm::vec3& destinationPosition, co
         AABB selectionBoxAABB({ selectedUnits.begin(), selectedUnits.end() });
         if (selectionBoxAABB.contains(destinationPosition))
         {
-            //PathFinding::getInstance().getFormationPositions(destinationPosition, 
-            //    { selectedUnits.begin(), selectedUnits.end() }, map, m_units, modelManager);
+            std::vector<UnitFormationPosition> unitFormationPositions = PathFinding::getInstance().getFormationPositions(destinationPosition, 
+                { selectedUnits.begin(), selectedUnits.end() }, map);
+
+            if (unitFormationPositions.size() == selectedUnits.size())
+            {
+                for (int i = 0; i < unitFormationPositions.size(); ++i)
+                {
+                    selectedUnits[i]->moveTo(unitFormationPositions[i].newPosition, map);
+                }
+            }
         }
         else
         {
@@ -382,11 +389,7 @@ void Faction::moveMultipleSelectedUnits(const glm::vec3& destinationPosition, co
 
             for (auto& selectedUnit : selectedUnits)
             {
-                switch (selectedUnit->getType())
-                {
-
-                }
-                selectedUnit->moveToAmongstGroup(Globals::convertToNodePosition(destinationPosition - (averagePosition - selectedUnit->getPosition())),
+                selectedUnit->moveToAmongstGroup(destinationPosition - (averagePosition - selectedUnit->getPosition()),
                     map, m_units);
             }
         }
