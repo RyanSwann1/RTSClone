@@ -32,7 +32,7 @@ namespace
         while (otherHarvester.getAABB().contains(position) || map.isPositionOccupied(position))
         {
             position = { Globals::getRandomNumber(-1.0f, 1.0f), 1.0f, Globals::getRandomNumber(-1.0f, 1.0f) };
-            position = currentPosition + glm::normalize(position) * 45.0f;
+            position = currentPosition + glm::normalize(position) * static_cast<float>(Globals::NODE_SIZE) * 2.0f;
         }
 
         return { position.x, Globals::GROUND_HEIGHT, position.z };
@@ -210,7 +210,7 @@ void Faction::update(float deltaTime, const ModelManager& modelManager, const Ma
     }
 
     handleHarvesterCollisions(map);
-   // handleUnitCollisions(map);
+    handleUnitCollisions(map);
 }
 
 void Faction::render(ShaderHandler& shaderHandler, const ModelManager& modelManager) const

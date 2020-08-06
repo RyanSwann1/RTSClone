@@ -79,13 +79,6 @@ namespace
 				bool unitCollision = false;
 				for (const auto& otherUnit : units)
 				{
-					glm::vec2 direction = glm::normalize(glm::vec2(convertToGridPosition(otherUnit.getPosition()) - position));
-					if (otherUnit.getAABB().contains(convertToWorldPosition(glm::vec2(adjacentPosition.x, adjacentPosition.y) + direction * 8.0f)))
-					{
-						unitCollision = true;
-						break;
-					}
-
 					if (otherUnit.getAABB().contains(convertToWorldPosition(adjacentPosition)))
 					{
 						unitCollision = true;
