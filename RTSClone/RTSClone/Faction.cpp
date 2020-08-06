@@ -26,12 +26,36 @@ namespace
         };
     };
 
-    glm::vec3 getClosestPositionFromAABB(const glm::vec3& currentPosition, const Unit& otherHarvester, const Map& map)
+    glm::vec3 getClosestPositionFromAABB(const Unit& currentUnit, const std::vector<Unit>& units, const Map& map)
+    {
+ 
+        bool positionFound = false;
+        while (!positionFound)
+        {
+
+        }
+
+        return glm::vec3();
+    }
+
+    constexpr float MAX_RAY = 20.0f;
+    glm::vec3 getClosestPositionFromAABB(const glm::vec3& currentPosition, const Unit& otherUnit, const Map& map)
     {
         glm::vec3 position = currentPosition;
-        while (otherHarvester.getAABB().contains(position) || map.isPositionOccupied(position))
+        bool positionFound = false;
+        while (!positionFound)
         {
             position = { Globals::getRandomNumber(-1.0f, 1.0f), 1.0f, Globals::getRandomNumber(-1.0f, 1.0f) };
+            for (float ray = 0.0f; ray < MAX_RAY; ++ray)
+            {
+                position = currentPosition + glm::normalize(position) * ray;
+
+                if (!otherUnit.getAABB().contains(position) || map.isPositionOccupied(position))
+                {
+                    positionFound = true;
+                }
+            }
+            
             position = currentPosition + glm::normalize(position) * static_cast<float>(Globals::NODE_SIZE) * 2.0f;
         }
 
@@ -210,7 +234,7 @@ void Faction::update(float deltaTime, const ModelManager& modelManager, const Ma
     }
 
     handleHarvesterCollisions(map);
-    //handleUnitCollisions(map);
+    handleUnitCollisions(map);
 }
 
 void Faction::render(ShaderHandler& shaderHandler, const ModelManager& modelManager) const
@@ -447,7 +471,7 @@ void Faction::handleUnitCollisions(const Map& map)
                     otherUnit.getCurrentState() == eUnitState::Idle &&
                     unit.getAABB().contains(otherUnit.getAABB()))
                 {
-                    unit.moveTo(getClosestPositionFromAABB(unit.getPosition(), otherUnit, map), map);
+                    unit.moveTo(PathFinding::getInstance().getClosestPositionOutsideAABB(unit, m_units, map), map);
                     break;
                 }
             }

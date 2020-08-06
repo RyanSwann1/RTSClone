@@ -87,6 +87,24 @@ namespace Globals
 		return newPosition;
 	}
 
+	inline glm::ivec2 convertToNodePosition(const glm::ivec2& position)
+	{
+		glm::ivec2 newPosition = { std::floor(position.x), std::floor(position.y) };
+		int xDifference = static_cast<int>(position.x) % Globals::NODE_SIZE;
+		if (xDifference > 0)
+		{
+			newPosition.x -= xDifference;
+		}
+
+		int zDifference = static_cast<int>(position.y) % Globals::NODE_SIZE;
+		if (zDifference > 0)
+		{
+			newPosition.y -= zDifference;
+		}
+
+		return newPosition;
+	}
+
 	inline glm::ivec2 convertToGridPosition(const glm::vec3& position)
 	{
 		return { position.x / Globals::NODE_SIZE, position.z / Globals::NODE_SIZE };

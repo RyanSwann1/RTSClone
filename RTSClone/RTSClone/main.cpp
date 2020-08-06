@@ -31,6 +31,8 @@
 //https://gamedev.stackexchange.com/questions/42106/2d-pathfinding-finding-smooth-paths
 //Design Patterns
 //https://www.youtube.com/watch?v=hQE8lQk9ikE
+//Game engine from scratch
+//https://www.gamasutra.com/blogs/MichaelKissner/20151027/257369/Writing_a_Game_Engine_from_Scratch__Part_1_Messaging.php
 
 int main()
 {

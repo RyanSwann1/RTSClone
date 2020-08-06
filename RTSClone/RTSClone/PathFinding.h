@@ -49,6 +49,7 @@ public:
 		return instance;
 	}
 
+	glm::vec3 getClosestPositionOutsideAABB(const Unit& currentUnit, const std::vector<Unit>& units, const Map& map);
 	std::vector<glm::vec3> getFormationPositions(const glm::vec3& startingPosition, const std::vector<const Unit*> selectedUnits,
 		const Map& map);
 	glm::vec3 getClosestAvailablePosition(const glm::vec3& startingPosition, const std::vector<Unit>& units, const Map& map);

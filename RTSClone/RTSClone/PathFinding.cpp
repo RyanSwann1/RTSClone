@@ -3,6 +3,7 @@
 #include "Map.h"
 #include "Unit.h"
 #include "ModelManager.h"
+#include <limits>
 
 namespace
 {
@@ -267,7 +268,46 @@ void PathFinding::reset()
 	m_frontier.swap(empty);
 }
 
-std::vector<glm::vec3> PathFinding::getFormationPositions(const glm::vec3& startingPosition, 
+glm::vec3 PathFinding::getClosestPositionOutsideAABB(const Unit& currentUnit, const std::vector<Unit>& units, const Map& map)
+{	
+	assert(currentUnit.getCurrentState() == eUnitState::Idle);
+	constexpr float MAX_RAY_DISTANCE = static_cast<float>(Globals::NODE_SIZE) * 5.0f;
+	float distance = std::numeric_limits<float>::max();
+	glm::vec3 shortestDistancePosition = { 0.0f, 0.0f, 0.0f };
+
+	for (const auto& direction : ALL_DIRECTIONS)
+	{
+		for (const auto& otherUnit : units)
+		{
+			if (&currentUnit == &otherUnit || otherUnit.getCurrentState() != eUnitState::Idle)
+			{
+				continue;
+			}
+
+			glm::vec3 position = currentUnit.getPosition();
+			for (float ray = static_cast<float>(Globals::NODE_SIZE); ray <= MAX_RAY_DISTANCE; ray += static_cast<float>(Globals::NODE_SIZE))
+			{
+				position = position + glm::normalize(glm::vec3(direction.x, Globals::GROUND_HEIGHT, direction.y)) * ray;
+
+				if (!otherUnit.getAABB().contains(position) && !map.isPositionOccupied(position))
+				{
+					if (glm::distance(currentUnit.getPosition(), position) < distance)
+					{
+						distance = glm::distance(currentUnit.getPosition(), position);
+						shortestDistancePosition = position;
+					}
+
+					break;
+				}
+			}
+		}
+	}
+
+	assert(distance < std::numeric_limits<float>::max());
+	return shortestDistancePosition;
+}
+
+std::vector<glm::vec3> PathFinding::getFormationPositions(const glm::vec3& startingPosition,
 	const std::vector<const Unit*> selectedUnits, const Map& map)
 {
 	//Consider actual units
