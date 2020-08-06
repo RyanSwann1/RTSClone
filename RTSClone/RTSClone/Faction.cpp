@@ -399,6 +399,8 @@ void Faction::moveMultipleSelectedUnits(const glm::vec3& destinationPosition, co
                     selectedUnit->moveToAmongstGroup(destinationPosition - (averagePosition - selectedUnit->getPosition()),
                         map);
                     break;
+                default:
+                    assert(false);
                 }
             }
         }

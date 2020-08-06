@@ -10,7 +10,7 @@ namespace Globals
 { 
 	constexpr unsigned int INVALID_OPENGL_ID = 0;
 	constexpr float GROUND_HEIGHT = 0.0f;
-	constexpr int MAP_SIZE = 150;
+	constexpr int MAP_SIZE = 30;
 	constexpr int NODE_SIZE = 6;
 
 	constexpr int CUBE_FACE_INDICIE_COUNT = 4;
@@ -31,12 +31,11 @@ namespace Globals
 	inline bool isPositionInMapBounds(const glm::vec3& position)
 	{
 		return position.x >= 0 &&
-			position.x < Globals::MAP_SIZE &&
+			position.x < Globals::MAP_SIZE * Globals::NODE_SIZE &&
 			position.y >= 0 &&
-			position.y < Globals::MAP_SIZE &&
+			position.y < Globals::MAP_SIZE * Globals::NODE_SIZE &&
 			position.z >= 0 &&
-			position.z < Globals::MAP_SIZE;
-		
+			position.z < Globals::MAP_SIZE * Globals::NODE_SIZE;
 	}
 
 	inline void print(const std::string& text)
