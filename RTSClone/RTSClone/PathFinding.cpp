@@ -326,8 +326,22 @@ std::vector<UnitFormationPosition> PathFinding::getFormationPositions(const glm:
 
 glm::vec3 PathFinding::getClosestAvailablePosition(const glm::vec3& startingPosition, const std::vector<Unit>& units, const Map& map)
 {
+	glm::ivec2 startingPositionOnGrid = Globals::convertToGridPosition(startingPosition);
+	if (isPositionInMapBounds(startingPositionOnGrid) && !map.isPositionOccupied(startingPositionOnGrid))
+	{
+		auto cIter = std::find_if(units.cbegin(), units.cend(), [&startingPosition](const auto& unit)
+		{
+			return unit.getPosition() == startingPosition;
+		});
+
+		if (cIter == units.cend())
+		{
+			return startingPosition;
+		}
+	}
+
 	reset();
-	m_frontier.push(convertToGridPosition(startingPosition));
+	m_frontier.push(startingPositionOnGrid);
 	glm::ivec2 availablePositionOnGrid = {0, 0};
 	bool availablePositionFound = false;
 

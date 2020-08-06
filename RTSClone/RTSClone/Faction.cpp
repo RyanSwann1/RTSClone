@@ -135,7 +135,7 @@ void Faction::handleInput(const sf::Event& currentSFMLEvent, const sf::Window& w
             glm::vec3 mouseToGroundPosition = camera.getMouseToGroundPosition(window);
             if (m_HQ.isSelected())
             {
-                m_HQ.setWaypointPosition(mouseToGroundPosition);
+                m_HQ.setWaypointPosition(Globals::convertToNodePosition(mouseToGroundPosition));
             }
             else
             {
@@ -210,7 +210,7 @@ void Faction::update(float deltaTime, const ModelManager& modelManager, const Ma
     }
 
     handleHarvesterCollisions(map);
-    handleUnitCollisions(map);
+    //handleUnitCollisions(map);
 }
 
 void Faction::render(ShaderHandler& shaderHandler, const ModelManager& modelManager) const
@@ -322,7 +322,7 @@ void Faction::moveSingularSelectedUnit(const glm::vec3& destinationPosition, con
     });
     if (selectedUnit != m_units.end())
     {
-        selectedUnit->moveTo(destinationPosition, map, m_units);
+        selectedUnit->moveTo(Globals::convertToNodePosition(destinationPosition), map, m_units);
     }
     else
     {
@@ -389,8 +389,16 @@ void Faction::moveMultipleSelectedUnits(const glm::vec3& destinationPosition, co
 
             for (auto& selectedUnit : selectedUnits)
             {
-                selectedUnit->moveToAmongstGroup(destinationPosition - (averagePosition - selectedUnit->getPosition()),
-                    map, m_units);
+                if (selectedUnit->getType() == eEntityType::Unit)
+                {
+                    selectedUnit->moveToAmongstGroup(Globals::convertToNodePosition(destinationPosition - (averagePosition - selectedUnit->getPosition())),
+                        map, m_units);
+                }
+                else
+                {
+                    selectedUnit->moveToAmongstGroup(destinationPosition - (averagePosition - selectedUnit->getPosition()),
+                        map, m_units);
+                }
             }
         }
     }
