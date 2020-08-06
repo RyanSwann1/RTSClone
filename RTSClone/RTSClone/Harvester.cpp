@@ -1,6 +1,7 @@
 #include "Harvester.h"
 #include "Map.h"
 #include "Headquarters.h"
+#include "Mineral.h"
 
 namespace
 {
@@ -86,7 +87,7 @@ void Harvester::update(float deltaTime, const ModelManager& modelManager, const 
 	}
 }
 
-void Harvester::moveTo(const glm::vec3 & destinationPosition, const Map & map, const std::vector<Entity>& minerals,
+void Harvester::moveTo(const glm::vec3 & destinationPosition, const Map & map, const std::vector<Mineral>& minerals,
 	const std::vector<Unit>& units)
 {
 	for (const auto& mineral : minerals)

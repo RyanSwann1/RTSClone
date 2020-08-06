@@ -7,6 +7,7 @@
 enum class eEntityType
 {
 	Unit = 0,
+	Harvester,
 	Building,
 	Mineral
 };
@@ -17,8 +18,7 @@ class Map;
 class Entity
 {
 public:
-	Entity(const glm::vec3& startingPosition, const Model& model, eEntityType entityType, Map& map);
-	
+	eEntityType getType() const;
 	eModelName getModelName() const;
 	const glm::vec3& getPosition() const;
 	const AABB& getAABB() const;
@@ -31,7 +31,9 @@ public:
 	void renderAABB(ShaderHandler& shaderHandler);
 #endif // RENDER_AABB
 
-protected:
+protected:	
+	Entity(const glm::vec3& startingPosition, const Model& model, eEntityType entityType);
+
 	eModelName m_modelName;
 	glm::vec3 m_position;
 	AABB m_AABB;

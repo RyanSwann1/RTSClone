@@ -12,6 +12,7 @@
 #include "glm/gtc/matrix_transform.hpp"
 #include "Faction.h"
 #include "ModelManager.h"
+#include "Mineral.h"
 
 #define RENDER_GROUND
 #ifdef RENDER_GROUND
@@ -30,8 +31,6 @@
 //https://gamedev.stackexchange.com/questions/42106/2d-pathfinding-finding-smooth-paths
 //Design Patterns
 //https://www.youtube.com/watch?v=hQE8lQk9ikE
-
-
 
 int main()
 {
@@ -74,12 +73,12 @@ int main()
 	Faction faction(*modelManager, *map);
 	sf::Clock gameClock;
 	Camera camera;
-	std::vector<Entity> minerals;
+	std::vector<Mineral> minerals;
 
 	for (float z = Globals::NODE_SIZE; z <= Globals::NODE_SIZE * 5; z += Globals::NODE_SIZE)
 	{
 		minerals.emplace_back(Globals::convertToNodePosition({ 10.0, Globals::GROUND_HEIGHT, z }),
-			modelManager->getModel(eModelName::Mineral), eEntityType::Mineral, *map);
+			modelManager->getModel(eModelName::Mineral), *map);
 	}
 
 	shaderHandler->switchToShader(eShaderType::SelectionBox);

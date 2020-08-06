@@ -61,14 +61,14 @@ namespace
 }
 
 Unit::Unit(const glm::vec3& startingPosition, const Model& model, Map& map)
-	: Entity(startingPosition, model, eEntityType::Unit, map),
+	: Entity(startingPosition, model, eEntityType::Unit),
 	m_currentState(eUnitState::Idle),
 	m_front(),
 	m_pathToPosition()
 {}
 
 Unit::Unit(const glm::vec3 & startingPosition, const glm::vec3 & destinationPosition, const Model & model, Map & map)
-	: Entity(startingPosition, model, eEntityType::Unit, map),
+	: Entity(startingPosition, model, eEntityType::Unit),
 	m_currentState(eUnitState::Idle),
 	m_front(),
 	m_pathToPosition()

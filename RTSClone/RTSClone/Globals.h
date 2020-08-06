@@ -72,7 +72,7 @@ namespace Globals
 
 	inline glm::vec3 convertToNodePosition(const glm::vec3& position)
 	{
-		glm::vec3 newPosition = position;
+		glm::vec3 newPosition = { std::floor(position.x), std::floor(position.y), std::floor(position.z) };
 		int xDifference = static_cast<int>(position.x) % Globals::NODE_SIZE;
 		if (xDifference > 0)
 		{

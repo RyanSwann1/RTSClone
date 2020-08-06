@@ -2,6 +2,7 @@
 #include "Camera.h"
 #include "Model.h"
 #include "Globals.h"
+#include "Map.h"
 
 namespace
 {
@@ -20,9 +21,11 @@ namespace
 }
 
 Headquarters::Headquarters(const glm::vec3& startingPosition, const Model& model, Map& map)
-	: Entity(startingPosition, model, eEntityType::Building, map),
+	: Entity(startingPosition, model, eEntityType::Building),
 	m_waypointPosition(startingPosition)
-{}
+{
+	map.addEntityAABB(m_AABB);
+}
 
 const glm::vec3& Headquarters::getWaypointPosition() const
 {

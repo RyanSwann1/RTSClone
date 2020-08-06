@@ -109,7 +109,7 @@ Faction::Faction(const ModelManager& modelManager, Map& map)
 {}
 
 void Faction::handleInput(const sf::Event& currentSFMLEvent, const sf::Window& window, const Camera& camera, Map& map, 
-    const ModelManager& modelManager, const std::vector<Entity>& minerals)
+    const ModelManager& modelManager, const std::vector<Mineral>& minerals)
 {
     switch (currentSFMLEvent.type)
     {
@@ -139,6 +139,11 @@ void Faction::handleInput(const sf::Event& currentSFMLEvent, const sf::Window& w
             }
             else
             {
+                if (sf::Keyboard::isKeyPressed(sf::Keyboard::LShift))
+                {
+                    mouseToGroundPosition = Globals::convertToNodePosition(mouseToGroundPosition);
+                    Globals::printImmediately(mouseToGroundPosition);
+                }
                 if (isOneUnitSelected())
                 {
                     moveSingularSelectedUnit(mouseToGroundPosition, map, minerals);
@@ -205,7 +210,7 @@ void Faction::update(float deltaTime, const ModelManager& modelManager, const Ma
     }
 
     handleHarvesterCollisions(map);
-    handleUnitCollisions(map);
+   // handleUnitCollisions(map);
 }
 
 void Faction::render(ShaderHandler& shaderHandler, const ModelManager& modelManager) const
@@ -308,7 +313,7 @@ bool Faction::isOneUnitSelected() const
     return unitSelectedCount == 1;
 }
 
-void Faction::moveSingularSelectedUnit(const glm::vec3& destinationPosition, const Map& map, const std::vector<Entity>& minerals)
+void Faction::moveSingularSelectedUnit(const glm::vec3& destinationPosition, const Map& map, const std::vector<Mineral>& minerals)
 {
     assert(isOneUnitSelected());
 
@@ -330,7 +335,7 @@ void Faction::moveSingularSelectedUnit(const glm::vec3& destinationPosition, con
     }
 }
 
-void Faction::moveMultipleSelectedUnits(const glm::vec3& destinationPosition, const Map& map, const std::vector<Entity>& minerals,
+void Faction::moveMultipleSelectedUnits(const glm::vec3& destinationPosition, const Map& map, const std::vector<Mineral>& minerals,
     const ModelManager& modelManager)
 {
     std::vector<Unit*> selectedUnits;
@@ -377,7 +382,12 @@ void Faction::moveMultipleSelectedUnits(const glm::vec3& destinationPosition, co
 
             for (auto& selectedUnit : selectedUnits)
             {
-                selectedUnit->moveToAmongstGroup(destinationPosition - (averagePosition - selectedUnit->getPosition()), map, m_units);
+                switch (selectedUnit->getType())
+                {
+
+                }
+                selectedUnit->moveToAmongstGroup(Globals::convertToNodePosition(destinationPosition - (averagePosition - selectedUnit->getPosition())),
+                    map, m_units);
             }
         }
     }

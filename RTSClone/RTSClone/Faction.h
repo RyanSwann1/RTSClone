@@ -25,6 +25,7 @@ struct SelectionBox : private NonMovable, private NonCopyable
 	unsigned int vboID;
 };
 
+class Mineral;
 class ShaderHandler;
 class ModelManager;
 struct Camera;
@@ -35,7 +36,7 @@ public:
 	Faction(const ModelManager& modelManager, Map& map);
 
 	void handleInput(const sf::Event& currentSFMLEvent, const sf::Window& window, const Camera& camera, Map& map, 
-		const ModelManager& modelManager, const std::vector<Entity>& minerals);
+		const ModelManager& modelManager, const std::vector<Mineral>& minerals);
 	void update(float deltaTime, const ModelManager& modelManager, const Map& map);
 	void render(ShaderHandler& shaderHandler, const ModelManager& modelManager) const;
 	void renderSelectionBox(const sf::Window& window) const;
@@ -57,8 +58,8 @@ private:
 	void spawnUnit(const glm::vec3& spawnPosition, const Model& unitModel, Map& map);
 	void spawnHarvester(const glm::vec3& spawnPosition, const Model& unitModel, Map& map);
 	bool isOneUnitSelected() const;
-	void moveSingularSelectedUnit(const glm::vec3& destinationPosition, const Map& map, const std::vector<Entity>& minerals);
-	void moveMultipleSelectedUnits(const glm::vec3& destinationPosition, const Map& map, const std::vector<Entity>& minerals,
+	void moveSingularSelectedUnit(const glm::vec3& destinationPosition, const Map& map, const std::vector<Mineral>& minerals);
+	void moveMultipleSelectedUnits(const glm::vec3& destinationPosition, const Map& map, const std::vector<Mineral>& minerals,
 		const ModelManager& modelManager);
 	void handleHarvesterCollisions(const Map& map);
 	void handleUnitCollisions(const Map& map);
