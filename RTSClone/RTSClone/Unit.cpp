@@ -8,17 +8,6 @@ namespace
 {
 	constexpr float MOVEMENT_SPEED = 7.5f;
 
-	glm::vec3 moveTowards(const glm::vec3& currentPosition, const glm::vec3& targetPosition, float maxDistanceDelta)
-	{
-		float magnitude = glm::distance(targetPosition, currentPosition);
-		if (magnitude <= maxDistanceDelta || magnitude == 0.0f)
-		{
-			return targetPosition;
-		}
-
-		return currentPosition + glm::vec3(targetPosition - currentPosition) / magnitude * maxDistanceDelta;
-	}
-
 #ifdef RENDER_PATHING
 	constexpr glm::vec3 PATH_COLOUR = { 1.0f, 0.27f, 0.0f };
 	constexpr float PATH_OPACITY = 0.25f;
@@ -86,44 +75,52 @@ void Unit::moveToAmongstGroup(const glm::vec3& destinationPosition, const Map& m
 {
 	m_pathToPosition.clear();
 	PathFinding::getInstance().getPathToPositionAmongstGroup(*this, destinationPosition, m_pathToPosition, map, units, selectedUnits);
+	m_currentState = eUnitState::Moving;
 }
 
 void Unit::moveToAmongstGroup(const glm::vec3& destinationPosition, const Map& map)
 {
 	m_pathToPosition.clear();
 	PathFinding::getInstance().getPathToPositionAmongstGroup(*this, destinationPosition, m_pathToPosition, map);
+	m_currentState = eUnitState::Moving;
 }
 
 void Unit::moveTo(const glm::vec3& destinationPosition, const Map& map, const std::vector<Unit>& units)
 {
 	m_pathToPosition.clear();
 	PathFinding::getInstance().getPathToPosition(*this, destinationPosition, m_pathToPosition, map, units);
+	m_currentState = eUnitState::Moving;
 }
 
 void Unit::moveTo(const glm::vec3& destinationPosition, const Map& map)
 {
 	m_pathToPosition.clear();
 	PathFinding::getInstance().getPathToPosition(*this, destinationPosition, m_pathToPosition, map);
+	m_currentState = eUnitState::Moving;
 }
 
 void Unit::update(float deltaTime, const ModelManager& modelManager)
 {
-	if (!m_pathToPosition.empty())
+	switch (m_currentState)
 	{
-		m_currentState = eUnitState::Moving;
-		glm::vec3 newPosition = moveTowards(m_position, m_pathToPosition.back(), MOVEMENT_SPEED * deltaTime);
-		m_front = glm::normalize(glm::vec3(newPosition - m_position));
-		m_position = newPosition;
-		m_AABB.resetFromCentre(m_position, modelManager.getModel(m_modelName).sizeFromCentre);
-		if (m_position == m_pathToPosition.back())
+	case eUnitState::Moving:
+		if (!m_pathToPosition.empty())
 		{
-			m_pathToPosition.pop_back();
-			
-			if (m_pathToPosition.empty())
+			glm::vec3 newPosition = Globals::moveTowards(m_position, m_pathToPosition.back(), MOVEMENT_SPEED * deltaTime);
+			m_front = glm::normalize(glm::vec3(newPosition - m_position));
+			m_position = newPosition;
+			m_AABB.resetFromCentre(m_position, modelManager.getModel(m_modelName).sizeFromCentre);
+			if (m_position == m_pathToPosition.back())
 			{
-				m_currentState = eUnitState::Idle;
+				m_pathToPosition.pop_back();
+
+				if (m_pathToPosition.empty())
+				{
+					m_currentState = eUnitState::Idle;
+				}
 			}
 		}
+		break;
 	}
 }
 

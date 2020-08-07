@@ -194,7 +194,7 @@ void Faction::update(float deltaTime, const ModelManager& modelManager, const Ma
 
     for (auto& harvester : m_harvesters)
     {
-        harvester.update(deltaTime, modelManager, m_HQ, map, m_units, m_harvesters);
+        harvester.update(deltaTime, modelManager, m_HQ, map, m_harvesters);
     }
 
     handleCollisions<Unit>(m_units, map);

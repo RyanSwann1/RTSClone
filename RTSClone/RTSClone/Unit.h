@@ -6,11 +6,19 @@
 #include "Mesh.h"
 #endif // RENDER_PATHING
 
+//Unit States
+//Moving
+//Attacking
+//Harvesting 
+//Idling
+
 enum class eUnitState
 {
 	Idle = 0,
 	Moving,
-	InUseByDerivedState
+	MovingToMinerals,
+	ReturningMineralsToHQ,
+	Harvesting
 };
 
 class Map;

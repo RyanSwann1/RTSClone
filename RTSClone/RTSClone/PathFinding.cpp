@@ -313,6 +313,7 @@ void PathFinding::reset()
 std::vector<glm::vec3> PathFinding::getFormationPositions(const glm::vec3& startingPosition,
 	const std::vector<const Unit*> selectedUnits, const Map& map)
 {
+	//TODO: Sort by closest
 	assert(!selectedUnits.empty());
 	reset();
 

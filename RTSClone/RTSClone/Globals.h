@@ -115,6 +115,17 @@ namespace Globals
 		return position.x * Globals::MAP_SIZE + position.y;
 	}
 
+	inline glm::vec3 moveTowards(const glm::vec3& currentPosition, const glm::vec3& targetPosition, float maxDistanceDelta)
+	{
+		float magnitude = glm::distance(targetPosition, currentPosition);
+		if (magnitude <= maxDistanceDelta || magnitude == 0.0f)
+		{
+			return targetPosition;
+		}
+
+		return currentPosition + glm::vec3(targetPosition - currentPosition) / magnitude * maxDistanceDelta;
+	}
+
 	inline float getRandomNumber(float min, float max)
 	{
 		static std::random_device rd;  //Will be used to obtain a seed for the random number engine
