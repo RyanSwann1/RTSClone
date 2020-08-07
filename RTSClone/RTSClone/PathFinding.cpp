@@ -314,7 +314,7 @@ std::vector<glm::vec3> PathFinding::getFormationPositions(const glm::vec3& start
 	const std::vector<const Unit*> selectedUnits, const Map& map)
 {
 	//TODO: Sort by closest
-	assert(!selectedUnits.empty());
+	assert(!selectedUnits.empty() && std::find(selectedUnits.cbegin(), selectedUnits.cend(), nullptr) == selectedUnits.cend());
 	reset();
 
 	std::vector<glm::vec3> unitFormationPositions;
@@ -476,12 +476,12 @@ void PathFinding::getPathToPosition(const Unit& unit, const glm::vec3& destinati
 	}
 }
 
-void PathFinding::getPathToPosition(const Unit& unit, const glm::vec3& destination, std::vector<glm::vec3>& pathToPosition, const Map& map)
+void PathFinding::getPathToPosition(const glm::vec3& startingPosition, const glm::vec3& destination, std::vector<glm::vec3>& pathToPosition, const Map& map)
 {
 	assert(pathToPosition.empty());
 	reset();
 	glm::ivec2 destinationPositionOnGrid = convertToGridPosition(destination);
-	glm::ivec2 startingPositionOnGrid = convertToGridPosition(unit.getPosition());
+	glm::ivec2 startingPositionOnGrid = convertToGridPosition(startingPosition);
 	m_frontier.push(startingPositionOnGrid);
 	bool destinationReached = false;
 
@@ -624,4 +624,26 @@ void PathFinding::getPathToPositionAmongstGroup(const Unit& unit, const glm::vec
 	{
 		std::cout << "Path is empty\n";
 	}
+}
+
+void PathFinding::getPathToClosestPositionOutsideAABB(const glm::vec3& entityPosition, const AABB& AABB, const glm::vec3& centrePositionAABB, 
+	const Map& map, std::vector<glm::vec3>& pathToPosition)
+{
+	glm::vec3 position = centrePositionAABB;
+	glm::vec3 direction = glm::normalize(entityPosition - centrePositionAABB);
+	for (float ray = 1.0f; ray <= Globals::NODE_SIZE * 5.0f; ++ray)
+	{
+		position = position + direction * ray;
+		if (!AABB.contains(position) && !map.isPositionOccupied(position) && Globals::isPositionInMapBounds(position))
+		{
+			getPathToPosition(centrePositionAABB, position, pathToPosition, map);
+			if (!pathToPosition.empty())
+			{
+				std::cout << ray << "\n";
+				return;
+			}
+		}
+	}
+	
+	assert(false);
 }

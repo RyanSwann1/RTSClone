@@ -9,32 +9,6 @@ namespace
 {
 	constexpr float HARVEST_TIME = 2.0f;
 	constexpr float MOVEMENT_SPEED = 7.5f;
-
-	glm::vec3 getClosestPositionFromAABB(const glm::vec3& harvesterPosition, const glm::vec3& centrePositionAABB, const AABB& AABB, const Map& map)
-	{
-		glm::vec3 position = centrePositionAABB;
-		float distance = 1.0f;
-		while (AABB.contains(position) && map.isPositionOccupied(position))
-		{
-			position = position + glm::normalize(harvesterPosition - centrePositionAABB) * distance;
-			distance++;
-		}
-
-		return position + glm::normalize(harvesterPosition - centrePositionAABB);
-	}
-
-	glm::vec3 getClosestPositionFromMineral(const glm::vec3& harvesterPosition, const Entity& mineral, const Map& map)
-	{
-		glm::vec3 position = mineral.getPosition();
-		float distance = 1.0f;
-		while (mineral.getAABB().contains(position) && map.isPositionOccupied(position))
-		{
-			position = position + glm::normalize(harvesterPosition - mineral.getPosition()) * distance;
-			distance++;
-		}
-
-		return position + glm::normalize(harvesterPosition - mineral.getPosition()) * 0.25f;
-	}
 }
 
 Harvester::Harvester(const glm::vec3& startingPosition, const Model& model, Map& map)
@@ -91,7 +65,9 @@ void Harvester::update(float deltaTime, const ModelManager& modelManager, const 
 				{
 					m_currentState = eUnitState::MovingToMinerals;
 					assert(m_mineralToHarvest);
-					moveTo(getClosestPositionFromAABB(m_position, m_mineralToHarvest->getPosition(), m_mineralToHarvest->getAABB(), map), map);
+					m_pathToPosition.clear();
+					PathFinding::getInstance().getPathToClosestPositionOutsideAABB(m_position, m_mineralToHarvest->getAABB(), 
+						m_mineralToHarvest->getPosition(), map, m_pathToPosition);
 				}
 			}
 		}
@@ -105,7 +81,8 @@ void Harvester::update(float deltaTime, const ModelManager& modelManager, const 
 			m_harvestTimer.resetElaspedTime();
 
 			m_currentState = eUnitState::ReturningMineralsToHQ;
-			moveTo(getClosestPositionFromAABB(m_position, HQ.getPosition(), HQ.getAABB(), map), map);
+			m_pathToPosition.clear();
+			PathFinding::getInstance().getPathToClosestPositionOutsideAABB(m_position, HQ.getAABB(), HQ.getPosition(), map, m_pathToPosition);
 		}
 		break;
 	}
@@ -118,9 +95,11 @@ void Harvester::moveTo(const glm::vec3 & destinationPosition, const Map & map, c
 		if (mineral.getAABB().contains(destinationPosition))
 		{
 			m_mineralToHarvest = &mineral;
-			glm::vec3 position = getClosestPositionFromMineral(m_position, mineral, map);
+			m_pathToPosition.clear();
+			PathFinding::getInstance().getPathToClosestPositionOutsideAABB(m_position, m_mineralToHarvest->getAABB(), 
+				m_mineralToHarvest->getPosition(), map, m_pathToPosition);
 			m_currentState = eUnitState::MovingToMinerals;
-			moveTo(position, map);
+
 			break;
 		}
 		else
@@ -138,5 +117,5 @@ void Harvester::moveTo(const glm::vec3 & destinationPosition, const Map & map, c
 void Harvester::moveTo(const glm::vec3& destinationPosition, const Map& map)
 {
 	m_pathToPosition.clear();
-	PathFinding::getInstance().getPathToPosition(*this, destinationPosition, m_pathToPosition, map);
+	PathFinding::getInstance().getPathToPosition(m_position, destinationPosition, m_pathToPosition, map);
 }

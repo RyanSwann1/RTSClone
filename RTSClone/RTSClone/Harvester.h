@@ -21,5 +21,5 @@ public:
 
 private:
 	Timer m_harvestTimer;
-	const Entity* m_mineralToHarvest;
+	const Mineral* m_mineralToHarvest;
 };

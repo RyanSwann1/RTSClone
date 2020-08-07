@@ -95,7 +95,7 @@ void Unit::moveTo(const glm::vec3& destinationPosition, const Map& map, const st
 void Unit::moveTo(const glm::vec3& destinationPosition, const Map& map)
 {
 	m_pathToPosition.clear();
-	PathFinding::getInstance().getPathToPosition(*this, destinationPosition, m_pathToPosition, map);
+	PathFinding::getInstance().getPathToPosition(m_position, destinationPosition, m_pathToPosition, map);
 	m_currentState = eUnitState::Moving;
 }
 
