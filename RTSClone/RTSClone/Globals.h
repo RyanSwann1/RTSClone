@@ -69,6 +69,38 @@ namespace Globals
 		}
 	}
 
+	inline glm::vec3 convertToNearestNodePosition(const glm::vec3& position) 
+	{
+		glm::vec3 newPosition = { std::floor(position.x), std::floor(position.y), std::floor(position.z) };
+		int xDifference = static_cast<int>(position.x) % Globals::NODE_SIZE;
+		if (xDifference > 0)
+		{
+			if (static_cast<float>(xDifference) >= static_cast<float>(NODE_SIZE) / 2.0f)
+			{
+				newPosition.x += NODE_SIZE - xDifference;
+			}
+			else
+			{
+				newPosition.x -= xDifference;
+			}
+		}
+
+		int zDifference = static_cast<int>(position.z) % Globals::NODE_SIZE;
+		if (zDifference > 0)
+		{
+			if (static_cast<float>(zDifference) >= static_cast<float>(NODE_SIZE) / 2.0f)
+			{
+				newPosition.z += NODE_SIZE - zDifference;
+			}
+			else
+			{
+				newPosition.z -= zDifference;
+			}
+		}
+
+		return newPosition;
+	}
+
 	inline glm::vec3 convertToNodePosition(const glm::vec3& position)
 	{
 		glm::vec3 newPosition = { std::floor(position.x), std::floor(position.y), std::floor(position.z) };
@@ -82,24 +114,6 @@ namespace Globals
 		if (zDifference > 0)
 		{
 			newPosition.z -= zDifference;
-		}
-
-		return newPosition;
-	}
-
-	inline glm::ivec2 convertToNodePosition(const glm::ivec2& position)
-	{
-		glm::ivec2 newPosition = { std::floor(position.x), std::floor(position.y) };
-		int xDifference = static_cast<int>(position.x) % Globals::NODE_SIZE;
-		if (xDifference > 0)
-		{
-			newPosition.x -= xDifference;
-		}
-
-		int zDifference = static_cast<int>(position.y) % Globals::NODE_SIZE;
-		if (zDifference > 0)
-		{
-			newPosition.y -= zDifference;
 		}
 
 		return newPosition;

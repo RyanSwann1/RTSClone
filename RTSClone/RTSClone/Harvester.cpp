@@ -65,6 +65,7 @@ void Harvester::update(float deltaTime, const ModelManager& modelManager, const 
 				{
 					m_currentState = eUnitState::MovingToMinerals;
 					assert(m_mineralToHarvest);
+
 					m_pathToPosition.clear();
 					PathFinding::getInstance().getPathToClosestPositionOutsideAABB(m_position, m_mineralToHarvest->getAABB(), 
 						m_mineralToHarvest->getPosition(), map, m_pathToPosition);
