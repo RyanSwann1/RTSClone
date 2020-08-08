@@ -37,7 +37,7 @@ public:
 	Faction(const ModelManager& modelManager, Map& map);
 
 	void handleInput(const sf::Event& currentSFMLEvent, const sf::Window& window, const Camera& camera, Map& map, 
-		const ModelManager& modelManager, const std::vector<Mineral>& minerals);
+		const ModelManager& modelManager, const std::vector<Mineral>& minerals, float deltaTime);
 	void update(float deltaTime, const ModelManager& modelManager, const Map& map);
 	void render(ShaderHandler& shaderHandler, const ModelManager& modelManager) const;
 	void renderSelectionBox(const sf::Window& window) const;
@@ -55,6 +55,7 @@ private:
 	Headquarters m_HQ;
 	std::vector<Unit> m_units;
 	std::vector<Harvester> m_harvesters;
+	glm::vec3 m_previousMouseToGroundPosition;
 
 	void spawnUnit(const glm::vec3& spawnPosition, const Model& unitModel, Map& map);
 	void spawnHarvester(const glm::vec3& spawnPosition, const Model& unitModel, Map& map);
@@ -85,6 +86,40 @@ private:
 			}
 
 			handledUnits.push_back(&entity);
+		}
+	}
+
+	template <class Entity>
+	void selectUnit(std::vector<Entity>& entities, const glm::vec3& mouseToGroundPosition, bool selectAllUnits)
+	{
+		auto selectedEntity = std::find_if(entities.begin(), entities.end(), [&mouseToGroundPosition](const auto& entity)
+		{
+			return entity.getAABB().contains(mouseToGroundPosition);
+		});
+		if (selectedEntity != entities.cend())
+		{
+			if (selectAllUnits)
+			{
+				for (auto& entity : entities)
+				{
+					entity.setSelected(true);
+				}
+			}
+			else
+			{
+				for (auto& entity : entities)
+				{
+					entity.setSelected(entity.getAABB().contains(mouseToGroundPosition));
+				}
+			}
+		}
+		else
+		{
+			for (auto& entity : entities)
+			{
+				entity.setSelected(false);
+			}
+
 		}
 	}
 };

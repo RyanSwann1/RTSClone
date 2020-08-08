@@ -93,30 +93,35 @@ Faction::Faction(const ModelManager& modelManager, Map& map)
     : m_selectionBox(),
     m_HQ(Globals::convertToNodePosition({ 35.0f, Globals::GROUND_HEIGHT, 15.f }), modelManager.getModel(eModelName::HQ), map),
     m_units(),
-    m_harvesters()
+    m_harvesters(),
+    m_previousMouseToGroundPosition()
 {}
 
 void Faction::handleInput(const sf::Event& currentSFMLEvent, const sf::Window& window, const Camera& camera, Map& map, 
-    const ModelManager& modelManager, const std::vector<Mineral>& minerals)
+    const ModelManager& modelManager, const std::vector<Mineral>& minerals, float deltaTime)
 {
     switch (currentSFMLEvent.type)
     {
     case sf::Event::MouseButtonPressed:
         if (currentSFMLEvent.mouseButton.button == sf::Mouse::Left)
         {
+            bool selectAllUnits = false;
             glm::vec3 mouseToGroundPosition = camera.getMouseToGroundPosition(window);
-            m_selectionBox.setStartingPosition(window, mouseToGroundPosition);
-            m_HQ.setSelected(m_HQ.getAABB().contains(mouseToGroundPosition));
-            
-            for (auto& unit : m_units)
+            if (mouseToGroundPosition != m_previousMouseToGroundPosition)
             {
-                unit.setSelected(unit.getAABB().contains(mouseToGroundPosition));
+                m_previousMouseToGroundPosition = mouseToGroundPosition;
+                selectAllUnits = false;
+            }
+            else
+            {
+                selectAllUnits = true;
             }
 
-            for (auto& harvester : m_harvesters)
-            {
-                harvester.setSelected(harvester.getAABB().contains(mouseToGroundPosition));
-            }
+            selectUnit<Unit>(m_units, mouseToGroundPosition, selectAllUnits);
+            selectUnit<Harvester>(m_harvesters, mouseToGroundPosition, selectAllUnits);
+
+            m_selectionBox.setStartingPosition(window, mouseToGroundPosition);
+            m_HQ.setSelected(m_HQ.getAABB().contains(mouseToGroundPosition));
         }
         else if (currentSFMLEvent.mouseButton.button == sf::Mouse::Right)
         {
