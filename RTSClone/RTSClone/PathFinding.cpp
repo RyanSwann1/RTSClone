@@ -102,6 +102,40 @@ namespace
 
 		return adjacentPositions;
 	}
+	
+	std::array<AdjacentPosition, ALL_DIRECTIONS.size()> getAllAdjacentPositionsAStar(const glm::ivec2& position, const Map& map,
+		const std::vector<Unit>& units, const Unit& unit)
+	{
+		std::array<AdjacentPosition, ALL_DIRECTIONS.size()> adjacentPositions;
+		for (int i = 0; i < adjacentPositions.size(); ++i)
+		{
+			glm::ivec2 adjacentPosition = position + ALL_DIRECTIONS[i];
+			if (isPositionInMapBounds(adjacentPosition) && !map.isPositionOccupied(adjacentPosition))
+			{
+				bool unitCollision = false;
+				for (const auto& otherUnit : units)
+				{
+					if (&otherUnit != &unit && otherUnit.getCurrentState() == eUnitState::Idle)
+					{
+						//glm::vec2 direction = glm::normalize(glm::vec2(convertToGridPosition(otherUnit.getPosition()) - position));
+
+						if (otherUnit.getAABB().contains(convertToWorldPosition(adjacentPosition)))
+						{
+							unitCollision = true;
+							break;
+						}
+					}
+				}
+
+				if (!unitCollision)
+				{
+					adjacentPositions[i] = AdjacentPosition(adjacentPosition);
+				}
+			}
+		}
+
+		return adjacentPositions;
+	}
 
 	std::array<AdjacentPosition, ALL_DIRECTIONS.size()> getAllAdjacentPositions(const glm::ivec2& position, const Map& map,
 		const std::vector<Unit>& units, const Unit& unit, const std::vector<const Unit*>& selectedUnits)
@@ -718,6 +752,7 @@ void PathFinding::getPathToPositionAStar(const Unit& unit, const glm::vec3& dest
 	while (!openQueue.empty() && !destinationReached)
 	{
 		GraphNodeAStar currentNode = openQueue.top();
+		openQueue.pop();
 
 		if (currentNode.position == destinationOnGrid)
 		{
@@ -730,8 +765,6 @@ void PathFinding::getPathToPositionAStar(const Unit& unit, const glm::vec3& dest
 				parentPosition = parentNode.parentPosition;
 
 				glm::vec3 position = convertToWorldPosition(parentNode.position);
-				//position.x += static_cast<float>(Globals::NODE_SIZE) / 2.0f;
-				//position.z -= static_cast<float>(Globals::NODE_SIZE) / 2.0f;
 				pathToPosition.emplace_back(position);
 			}
 			
@@ -739,14 +772,14 @@ void PathFinding::getPathToPositionAStar(const Unit& unit, const glm::vec3& dest
 		}
 		else
 		{ 
-			std::array<AdjacentPosition, ALL_DIRECTIONS.size()> adjacentPositions = getAllAdjacentPositions(currentNode.position, map, units);
+			std::array<AdjacentPosition, ALL_DIRECTIONS.size()> adjacentPositions = getAllAdjacentPositionsAStar(currentNode.position, map, units, unit);
 			for (const auto& adjacentPosition : adjacentPositions)
 			{
 				if (!adjacentPosition.valid || closedQueue.contains(adjacentPosition.position))
 				{
 					continue;
 				}
-				else
+				else if(adjacentPosition.valid)
 				{
 					GraphNodeAStar adjacentNode(adjacentPosition.position, currentNode.position,
 						currentNode.g + glm::distance(glm::vec2(adjacentPosition.position), glm::vec2(currentNode.position)),
@@ -765,15 +798,14 @@ void PathFinding::getPathToPositionAStar(const Unit& unit, const glm::vec3& dest
 		}
 		
 		closedQueue.push(currentNode);
-		openQueue.pop();
-	
 		assert(openQueue.size() < Globals::MAP_SIZE * Globals::MAP_SIZE && closedQueue.size() < Globals::MAP_SIZE * Globals::MAP_SIZE);
 	}
 }
 
 //GraphNodeAStar
 GraphNodeAStar::GraphNodeAStar(const glm::ivec2& position, const glm::ivec2& parentPosition, float g, float h)
-	: position(position),
+	: traversable(true),
+	position(position),
 	parentPosition(parentPosition),
 	g(g),
 	h(h)

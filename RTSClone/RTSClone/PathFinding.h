@@ -19,6 +19,7 @@ struct GraphNodeAStar
 
 	float getF() const;
 
+	bool traversable;
 	glm::ivec2 position;
 	glm::ivec2 parentPosition;
 	float g; //Distance between successor and previous
