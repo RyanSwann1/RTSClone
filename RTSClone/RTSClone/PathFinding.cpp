@@ -696,12 +696,12 @@ void PathFinding::getPathToPositionAStar(const Unit& unit, const glm::vec3& dest
 	glm::ivec2 startingPositionOnGrid = convertToGridPosition(unit.getPosition());
 	glm::ivec2 destinationOnGrid = convertToGridPosition(destination);
 
-	m_openQueue.emplace(startingPositionOnGrid, startingPositionOnGrid, 0.0f, glm::distance(glm::vec2(destinationOnGrid), glm::vec2(startingPositionOnGrid)));
+	m_openQueue.add({ startingPositionOnGrid, startingPositionOnGrid, 0.0f, glm::distance(glm::vec2(destinationOnGrid), glm::vec2(startingPositionOnGrid)) });
 
-	while (!m_openQueue.empty() && !destinationReached)
+	while (!m_openQueue.isEmpty() && !destinationReached)
 	{
-		PriorityQueueNode currentNode = m_openQueue.top();
-		m_openQueue.pop();
+		PriorityQueueNode currentNode = m_openQueue.getTop();
+		m_openQueue.popTop();
 
 		if (currentNode.position == destinationOnGrid)
 		{
@@ -740,14 +740,16 @@ void PathFinding::getPathToPositionAStar(const Unit& unit, const glm::vec3& dest
 					}
 					else if (!m_openQueue.contains(adjacentPosition.position))
 					{
-						m_openQueue.push(adjacentNode);
+						m_openQueue.add(adjacentNode);
 					}
 				}
 			}
 		}
 		
-		m_closedQueue.push(currentNode);
-		assert(m_openQueue.size() <= Globals::MAP_SIZE * Globals::MAP_SIZE && m_closedQueue.size() <= Globals::MAP_SIZE * Globals::MAP_SIZE);
+		m_closedQueue.add(currentNode);
+
+		assert(m_openQueue.getSize() <= static_cast<size_t>(Globals::MAP_SIZE * Globals::MAP_SIZE) && 
+			m_closedQueue.getSize() <= static_cast<size_t>(Globals::MAP_SIZE * Globals::MAP_SIZE));
 	}
 }
 
@@ -766,24 +768,56 @@ float PriorityQueueNode::getF() const
 }
 
 PriorityQueue::PriorityQueue(size_t size)
-	: priority_queue(nodeCompare)
+	: priority_queue(nodeCompare),
+	m_addedNodePositions()
 {
 	c.reserve(size);
+}
+
+size_t PriorityQueue::getSize() const
+{
+	return c.size();
 }
 
 void PriorityQueue::clear()
 {
 	c.clear();
+	m_addedNodePositions.clear();
+}
+
+bool PriorityQueue::isEmpty() const
+{
+	return c.empty();
+}
+
+void PriorityQueue::add(const PriorityQueueNode& node)
+{
+	assert(!contains(node.position));
+
+	push(node);
+	m_addedNodePositions.insert(node.position);
+}
+
+void PriorityQueue::popTop()
+{
+	assert(!isEmpty());
+
+	auto iter = m_addedNodePositions.find(top().position);
+	assert(iter != m_addedNodePositions.end());
+	m_addedNodePositions.erase(iter);
+
+	pop();
 }
 
 bool PriorityQueue::contains(const glm::ivec2& position) const
 {
-	auto cIter = std::find_if(c.cbegin(), c.cend(), [&position](const auto& node) -> bool
-	{
-		return position == node.position;
-	});
+	return m_addedNodePositions.find(position) != m_addedNodePositions.cend();
+}
 
-	return cIter != c.cend();
+const PriorityQueueNode& PriorityQueue::getTop() const
+{
+	assert(!isEmpty());
+	return top();
 }
 
 PriorityQueueNode& PriorityQueue::getNode(const glm::ivec2& position)
