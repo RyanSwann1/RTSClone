@@ -161,6 +161,7 @@
     <ClCompile Include="ModelLoader.cpp" />
     <ClCompile Include="ModelManager.cpp" />
     <ClCompile Include="PathFinding.cpp" />
+    <ClCompile Include="PriorityQueue.cpp" />
     <ClCompile Include="ShaderHandler.cpp" />
     <ClCompile Include="Texture.cpp" />
     <ClCompile Include="Timer.cpp" />
@@ -228,6 +229,7 @@
     <ClInclude Include="NonCopyable.h" />
     <ClInclude Include="NonMovable.h" />
     <ClInclude Include="PathFinding.h" />
+    <ClInclude Include="PriorityQueue.h" />
     <ClInclude Include="ShaderHandler.h" />
     <ClInclude Include="Texture.h" />
     <ClInclude Include="Timer.h" />
