@@ -5,6 +5,7 @@
 #include "Harvester.h"
 #include "ModelManager.h"
 #include <limits>
+#include <queue>
 
 namespace
 {
@@ -229,6 +230,59 @@ namespace
 			assert(pathToPosition.size() <= Globals::MAP_SIZE * Globals::MAP_SIZE);
 		}
 	}
+
+	const auto nodeCompare = [](const auto& a, const auto& b) -> bool { return b.getF() < a.getF(); };
+	struct NodePriorityQueue : public std::priority_queue<GraphNodeAStar, std::vector<GraphNodeAStar>, decltype(nodeCompare)>
+	{
+		NodePriorityQueue()
+			: priority_queue(nodeCompare)
+		{}
+		NodePriorityQueue(size_t size)
+			: priority_queue(nodeCompare)
+		{
+			c.reserve(size);
+		}
+
+		void clear()
+		{
+			c.clear();
+		}
+
+		bool contains(const glm::ivec2& position) const
+		{
+			auto cIter = std::find_if(c.cbegin(), c.cend(), [&position](const auto& node) -> bool
+			{
+				return position == node.position;
+			});
+
+			return cIter != c.cend();
+		}
+
+		GraphNodeAStar& getNode(const glm::ivec2& position)
+		{
+			auto iter = std::find_if(c.begin(), c.end(), [&position](const auto& node) -> bool
+			{
+				return node.position == position;
+			});
+
+			assert(iter != c.end());
+			return (*iter);
+		}
+
+		bool isSuccessorNodeValid(const GraphNodeAStar& successorNode) const
+		{
+			auto matchingNode = std::find_if(c.cbegin(), c.cend(), [&successorNode](const auto& node) -> bool
+			{
+				return successorNode.position == node.position;
+			});
+			if (matchingNode != c.cend() && successorNode.getF() < matchingNode->getF())
+			{
+				return true;
+			}
+
+			return false;
+		}
+	};
 }
 
 //Graph Node
@@ -639,11 +693,93 @@ void PathFinding::getPathToClosestPositionOutsideAABB(const glm::vec3& entityPos
 			getPathToPosition(centrePositionAABB, position, pathToPosition, map);
 			if (!pathToPosition.empty())
 			{
-				std::cout << ray << "\n";
 				return;
 			}
 		}
 	}
 	
 	assert(false);
+}
+
+void PathFinding::getPathToPositionAStar(const Unit& unit, const glm::vec3& destination, std::vector<glm::vec3>& pathToPosition, const Map& map,
+	const std::vector<Unit>& units)
+{
+	assert(!units.empty());
+
+	bool destinationReached = false;
+	glm::ivec2 startingPositionOnGrid = convertToGridPosition(unit.getPosition());
+	glm::ivec2 destinationOnGrid = convertToGridPosition(destination);
+
+	NodePriorityQueue openQueue;
+	NodePriorityQueue closedQueue;
+
+	openQueue.emplace(startingPositionOnGrid, startingPositionOnGrid, 0.0f, glm::distance(glm::vec2(destinationOnGrid), glm::vec2(startingPositionOnGrid)));
+
+	while (!openQueue.empty() && !destinationReached)
+	{
+		GraphNodeAStar currentNode = openQueue.top();
+
+		if (currentNode.position == destinationOnGrid)
+		{
+			pathToPosition.emplace_back(convertToWorldPosition(currentNode.position));
+
+			glm::ivec2 parentPosition = currentNode.parentPosition;
+			while (parentPosition != startingPositionOnGrid)
+			{
+				const GraphNodeAStar& parentNode = closedQueue.getNode(parentPosition);
+				parentPosition = parentNode.parentPosition;
+
+				glm::vec3 position = convertToWorldPosition(parentNode.position);
+				//position.x += static_cast<float>(Globals::NODE_SIZE) / 2.0f;
+				//position.z -= static_cast<float>(Globals::NODE_SIZE) / 2.0f;
+				pathToPosition.emplace_back(position);
+			}
+			
+			destinationReached = true;
+		}
+		else
+		{ 
+			std::array<AdjacentPosition, ALL_DIRECTIONS.size()> adjacentPositions = getAllAdjacentPositions(currentNode.position, map, units);
+			for (const auto& adjacentPosition : adjacentPositions)
+			{
+				if (!adjacentPosition.valid || closedQueue.contains(adjacentPosition.position))
+				{
+					continue;
+				}
+				else
+				{
+					GraphNodeAStar adjacentNode(adjacentPosition.position, currentNode.position,
+						currentNode.g + glm::distance(glm::vec2(adjacentPosition.position), glm::vec2(currentNode.position)),
+						glm::distance(glm::vec2(destinationOnGrid), glm::vec2(adjacentPosition.position)));
+
+					if (openQueue.isSuccessorNodeValid(adjacentNode))
+					{
+						openQueue.getNode(adjacentPosition.position) = adjacentNode;
+					}
+					else if (!openQueue.contains(adjacentPosition.position))
+					{
+						openQueue.push(adjacentNode);
+					}
+				}
+			}
+		}
+		
+		closedQueue.push(currentNode);
+		openQueue.pop();
+	
+		assert(openQueue.size() < Globals::MAP_SIZE * Globals::MAP_SIZE && closedQueue.size() < Globals::MAP_SIZE * Globals::MAP_SIZE);
+	}
+}
+
+//GraphNodeAStar
+GraphNodeAStar::GraphNodeAStar(const glm::ivec2& position, const glm::ivec2& parentPosition, float g, float h)
+	: position(position),
+	parentPosition(parentPosition),
+	g(g),
+	h(h)
+{}
+
+float GraphNodeAStar::getF() const
+{
+	return h + g;
 }

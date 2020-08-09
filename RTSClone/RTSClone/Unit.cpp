@@ -99,6 +99,13 @@ void Unit::moveTo(const glm::vec3& destinationPosition, const Map& map)
 	m_currentState = eUnitState::Moving;
 }
 
+void Unit::moveToAStar(const glm::vec3& destinationPosition, const Map& map, const std::vector<Unit>& units)
+{
+	m_pathToPosition.clear();
+	PathFinding::getInstance().getPathToPositionAStar(*this, destinationPosition, m_pathToPosition, map, units);
+	m_currentState = eUnitState::Moving;
+}
+
 void Unit::update(float deltaTime, const ModelManager& modelManager)
 {
 	switch (m_currentState)

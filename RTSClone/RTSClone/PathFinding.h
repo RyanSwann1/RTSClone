@@ -10,6 +10,21 @@
 #include <queue>
 #include <array>
 
+//Pathfinding Optimisations
+//https://www.reddit.com/r/gamedev/comments/dk19g6/new_pathfinding_algorithm_factorio/
+
+struct GraphNodeAStar
+{
+	GraphNodeAStar(const glm::ivec2& position, const glm::ivec2& parentPosition, float g, float h);
+
+	float getF() const;
+
+	glm::ivec2 position;
+	glm::ivec2 parentPosition;
+	float g; //Distance between successor and previous
+	float h; //previous.g + Distance to destination
+};
+
 class GraphNode
 {
 public:
@@ -102,6 +117,7 @@ public:
 	}
 
 	
+
 	std::vector<glm::vec3> getFormationPositions(const glm::vec3& startingPosition, const std::vector<const Unit*> selectedUnits,
 		const Map& map);
 	glm::vec3 getClosestAvailablePosition(const glm::vec3& startingPosition, const std::vector<Unit>& units, const Map& map);
@@ -115,6 +131,9 @@ public:
 	const Map& map);
 	void getPathToClosestPositionOutsideAABB(const glm::vec3& entityPosition, const AABB& AABB, const glm::vec3& centrePositionAABB, 
 		const Map& map, std::vector<glm::vec3>& pathToPosition);
+
+	void getPathToPositionAStar(const Unit& unit, const glm::vec3& destination, std::vector<glm::vec3>& pathToPosition, const Map& map,
+		const std::vector<Unit>& units);
 
 private:
 	PathFinding();

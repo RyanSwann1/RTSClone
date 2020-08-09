@@ -119,7 +119,6 @@ private:
 			{
 				entity.setSelected(false);
 			}
-
 		}
 	}
 };
