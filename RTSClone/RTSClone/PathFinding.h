@@ -13,9 +13,9 @@
 //Pathfinding Optimisations
 //https://www.reddit.com/r/gamedev/comments/dk19g6/new_pathfinding_algorithm_factorio/
 
-struct GraphNodeAStar
+struct PriorityQueueNode
 {
-	GraphNodeAStar(const glm::ivec2& position, const glm::ivec2& parentPosition, float g, float h);
+	PriorityQueueNode(const glm::ivec2& position, const glm::ivec2& parentPosition, float g, float h);
 
 	float getF() const;
 
@@ -24,6 +24,18 @@ struct GraphNodeAStar
 	glm::ivec2 parentPosition;
 	float g; //Distance between successor and previous
 	float h; //previous.g + Distance to destination
+};
+
+const auto nodeCompare = [](const auto& a, const auto& b) -> bool { return b.getF() < a.getF(); };
+struct PriorityQueue : public std::priority_queue<PriorityQueueNode, std::vector<PriorityQueueNode>, decltype(nodeCompare)>
+{
+	PriorityQueue(size_t size);
+
+	bool contains(const glm::ivec2& position) const;
+	PriorityQueueNode& getNode(const glm::ivec2& position);
+	bool isSuccessorNodeValid(const PriorityQueueNode& successorNode) const;
+
+	void clear();
 };
 
 class GraphNode
@@ -118,7 +130,6 @@ public:
 	}
 
 	
-
 	std::vector<glm::vec3> getFormationPositions(const glm::vec3& startingPosition, const std::vector<const Unit*> selectedUnits,
 		const Map& map);
 	glm::vec3 getClosestAvailablePosition(const glm::vec3& startingPosition, const std::vector<Unit>& units, const Map& map);
@@ -141,6 +152,8 @@ private:
 
 	Graph m_graph;
 	std::queue<glm::ivec2> m_frontier;
+	PriorityQueue m_openQueue;
+	PriorityQueue m_closedQueue;
 
 	void reset();
 };

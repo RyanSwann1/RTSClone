@@ -264,59 +264,6 @@ namespace
 			assert(pathToPosition.size() <= Globals::MAP_SIZE * Globals::MAP_SIZE);
 		}
 	}
-
-	const auto nodeCompare = [](const auto& a, const auto& b) -> bool { return b.getF() < a.getF(); };
-	struct NodePriorityQueue : public std::priority_queue<GraphNodeAStar, std::vector<GraphNodeAStar>, decltype(nodeCompare)>
-	{
-		NodePriorityQueue()
-			: priority_queue(nodeCompare)
-		{}
-		NodePriorityQueue(size_t size)
-			: priority_queue(nodeCompare)
-		{
-			c.reserve(size);
-		}
-
-		void clear()
-		{
-			c.clear();
-		}
-
-		bool contains(const glm::ivec2& position) const
-		{
-			auto cIter = std::find_if(c.cbegin(), c.cend(), [&position](const auto& node) -> bool
-			{
-				return position == node.position;
-			});
-
-			return cIter != c.cend();
-		}
-
-		GraphNodeAStar& getNode(const glm::ivec2& position)
-		{
-			auto iter = std::find_if(c.begin(), c.end(), [&position](const auto& node) -> bool
-			{
-				return node.position == position;
-			});
-
-			assert(iter != c.end());
-			return (*iter);
-		}
-
-		bool isSuccessorNodeValid(const GraphNodeAStar& successorNode) const
-		{
-			auto matchingNode = std::find_if(c.cbegin(), c.cend(), [&successorNode](const auto& node) -> bool
-			{
-				return successorNode.position == node.position;
-			});
-			if (matchingNode != c.cend() && successorNode.getF() < matchingNode->getF())
-			{
-				return true;
-			}
-
-			return false;
-		}
-	};
 }
 
 //Graph Node
@@ -388,7 +335,9 @@ void Graph::resetGraph()
 //PathFinding
 PathFinding::PathFinding()
 	: m_graph(),
-	m_frontier()
+	m_frontier(),
+	m_openQueue(static_cast<size_t>(Globals::MAP_SIZE * Globals::MAP_SIZE)),
+	m_closedQueue(static_cast<size_t>(Globals::MAP_SIZE * Globals::MAP_SIZE))
 {}
 
 void PathFinding::reset()
@@ -740,19 +689,19 @@ void PathFinding::getPathToPositionAStar(const Unit& unit, const glm::vec3& dest
 {
 	assert(!units.empty());
 
+	m_openQueue.clear();
+	m_closedQueue.clear();
+
 	bool destinationReached = false;
 	glm::ivec2 startingPositionOnGrid = convertToGridPosition(unit.getPosition());
 	glm::ivec2 destinationOnGrid = convertToGridPosition(destination);
 
-	NodePriorityQueue openQueue;
-	NodePriorityQueue closedQueue;
+	m_openQueue.emplace(startingPositionOnGrid, startingPositionOnGrid, 0.0f, glm::distance(glm::vec2(destinationOnGrid), glm::vec2(startingPositionOnGrid)));
 
-	openQueue.emplace(startingPositionOnGrid, startingPositionOnGrid, 0.0f, glm::distance(glm::vec2(destinationOnGrid), glm::vec2(startingPositionOnGrid)));
-
-	while (!openQueue.empty() && !destinationReached)
+	while (!m_openQueue.empty() && !destinationReached)
 	{
-		GraphNodeAStar currentNode = openQueue.top();
-		openQueue.pop();
+		PriorityQueueNode currentNode = m_openQueue.top();
+		m_openQueue.pop();
 
 		if (currentNode.position == destinationOnGrid)
 		{
@@ -761,7 +710,7 @@ void PathFinding::getPathToPositionAStar(const Unit& unit, const glm::vec3& dest
 			glm::ivec2 parentPosition = currentNode.parentPosition;
 			while (parentPosition != startingPositionOnGrid)
 			{
-				const GraphNodeAStar& parentNode = closedQueue.getNode(parentPosition);
+				const PriorityQueueNode& parentNode = m_closedQueue.getNode(parentPosition);
 				parentPosition = parentNode.parentPosition;
 
 				glm::vec3 position = convertToWorldPosition(parentNode.position);
@@ -775,35 +724,35 @@ void PathFinding::getPathToPositionAStar(const Unit& unit, const glm::vec3& dest
 			std::array<AdjacentPosition, ALL_DIRECTIONS.size()> adjacentPositions = getAllAdjacentPositionsAStar(currentNode.position, map, units, unit);
 			for (const auto& adjacentPosition : adjacentPositions)
 			{
-				if (!adjacentPosition.valid || closedQueue.contains(adjacentPosition.position))
+				if (!adjacentPosition.valid || m_closedQueue.contains(adjacentPosition.position))
 				{
 					continue;
 				}
-				else if(adjacentPosition.valid)
+				else
 				{
-					GraphNodeAStar adjacentNode(adjacentPosition.position, currentNode.position,
+					PriorityQueueNode adjacentNode(adjacentPosition.position, currentNode.position,
 						currentNode.g + glm::distance(glm::vec2(adjacentPosition.position), glm::vec2(currentNode.position)),
 						glm::distance(glm::vec2(destinationOnGrid), glm::vec2(adjacentPosition.position)));
 
-					if (openQueue.isSuccessorNodeValid(adjacentNode))
+					if (m_openQueue.isSuccessorNodeValid(adjacentNode))
 					{
-						openQueue.getNode(adjacentPosition.position) = adjacentNode;
+						m_openQueue.getNode(adjacentPosition.position) = adjacentNode;
 					}
-					else if (!openQueue.contains(adjacentPosition.position))
+					else if (!m_openQueue.contains(adjacentPosition.position))
 					{
-						openQueue.push(adjacentNode);
+						m_openQueue.push(adjacentNode);
 					}
 				}
 			}
 		}
 		
-		closedQueue.push(currentNode);
-		assert(openQueue.size() < Globals::MAP_SIZE * Globals::MAP_SIZE && closedQueue.size() < Globals::MAP_SIZE * Globals::MAP_SIZE);
+		m_closedQueue.push(currentNode);
+		assert(m_openQueue.size() <= Globals::MAP_SIZE * Globals::MAP_SIZE && m_closedQueue.size() <= Globals::MAP_SIZE * Globals::MAP_SIZE);
 	}
 }
 
-//GraphNodeAStar
-GraphNodeAStar::GraphNodeAStar(const glm::ivec2& position, const glm::ivec2& parentPosition, float g, float h)
+//PriorityQueueNode
+PriorityQueueNode::PriorityQueueNode(const glm::ivec2& position, const glm::ivec2& parentPosition, float g, float h)
 	: traversable(true),
 	position(position),
 	parentPosition(parentPosition),
@@ -811,7 +760,53 @@ GraphNodeAStar::GraphNodeAStar(const glm::ivec2& position, const glm::ivec2& par
 	h(h)
 {}
 
-float GraphNodeAStar::getF() const
+float PriorityQueueNode::getF() const
 {
 	return h + g;
+}
+
+PriorityQueue::PriorityQueue(size_t size)
+	: priority_queue(nodeCompare)
+{
+	c.reserve(size);
+}
+
+void PriorityQueue::clear()
+{
+	c.clear();
+}
+
+bool PriorityQueue::contains(const glm::ivec2& position) const
+{
+	auto cIter = std::find_if(c.cbegin(), c.cend(), [&position](const auto& node) -> bool
+	{
+		return position == node.position;
+	});
+
+	return cIter != c.cend();
+}
+
+PriorityQueueNode& PriorityQueue::getNode(const glm::ivec2& position)
+{
+	auto iter = std::find_if(c.begin(), c.end(), [&position](const auto& node) -> bool
+	{
+		return node.position == position;
+	});
+
+	assert(iter != c.end());
+	return (*iter);
+}
+
+bool PriorityQueue::isSuccessorNodeValid(const PriorityQueueNode& successorNode) const
+{
+	auto matchingNode = std::find_if(c.cbegin(), c.cend(), [&successorNode](const auto& node) -> bool
+	{
+		return successorNode.position == node.position;
+	});
+	if (matchingNode != c.cend() && successorNode.getF() < matchingNode->getF())
+	{
+		return true;
+	}
+
+	return false;
 }
