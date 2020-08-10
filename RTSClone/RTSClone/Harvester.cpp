@@ -118,7 +118,7 @@ void Harvester::moveTo(const glm::vec3 & destinationPosition, const Map & map, c
 void Harvester::moveTo(const glm::vec3& destinationPosition, const Map& map)
 {
 	m_pathToPosition.clear();
-	PathFinding::getInstance().getPathToPosition(m_position, destinationPosition, m_pathToPosition, map);
+	PathFinding::getInstance().getPathToPositionAStar(m_position, destinationPosition, m_pathToPosition, map);
 
 	if (m_currentState == eUnitState::Idle)
 	{

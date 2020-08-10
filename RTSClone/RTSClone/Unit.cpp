@@ -70,39 +70,24 @@ eUnitState Unit::getCurrentState() const
 	return m_currentState;
 }
 
-void Unit::moveToAmongstGroup(const glm::vec3& destinationPosition, const Map& map, const std::vector<Unit>& units,
-	const std::vector<const Unit*>& selectedUnits)
-{
-	m_pathToPosition.clear();
-	PathFinding::getInstance().getPathToPositionAmongstGroup(*this, destinationPosition, m_pathToPosition, map, units, selectedUnits);
-	m_currentState = eUnitState::Moving;
-}
-
-void Unit::moveToAmongstGroup(const glm::vec3& destinationPosition, const Map& map)
-{
-	m_pathToPosition.clear();
-	PathFinding::getInstance().getPathToPositionAmongstGroup(*this, destinationPosition, m_pathToPosition, map);
-	m_currentState = eUnitState::Moving;
-}
-
 void Unit::moveTo(const glm::vec3& destinationPosition, const Map& map, const std::vector<Unit>& units)
 {
 	m_pathToPosition.clear();
-	PathFinding::getInstance().getPathToPosition(*this, destinationPosition, m_pathToPosition, map, units);
+	PathFinding::getInstance().getPathToPositionAStar(*this, destinationPosition, m_pathToPosition, map, units);
 	m_currentState = eUnitState::Moving;
 }
 
 void Unit::moveTo(const glm::vec3& destinationPosition, const Map& map)
 {
 	m_pathToPosition.clear();
-	PathFinding::getInstance().getPathToPosition(m_position, destinationPosition, m_pathToPosition, map);
+	PathFinding::getInstance().getPathToPositionAStar(m_position, destinationPosition, m_pathToPosition, map);
 	m_currentState = eUnitState::Moving;
 }
 
-void Unit::moveToAStar(const glm::vec3& destinationPosition, const Map& map, const std::vector<Unit>& units)
+void Unit::moveTo(const glm::vec3& destinationPosition, const Map& map, const std::vector<Unit>& units, const std::vector<const Unit*>& selectedUnits)
 {
 	m_pathToPosition.clear();
-	PathFinding::getInstance().getPathToPositionAStar(*this, destinationPosition, m_pathToPosition, map, units);
+	PathFinding::getInstance().getPathToPositionAStar(*this, destinationPosition, m_pathToPosition, map, units, selectedUnits);
 	m_currentState = eUnitState::Moving;
 }
 

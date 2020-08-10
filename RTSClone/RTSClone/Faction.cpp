@@ -315,7 +315,7 @@ void Faction::moveSingularSelectedUnit(const glm::vec3& destinationPosition, con
     });
     if (selectedUnit != m_units.end())
     {
-        selectedUnit->moveToAStar(Globals::convertToNearestNodePosition(destinationPosition), map, m_units);
+        selectedUnit->moveTo(Globals::convertToNearestNodePosition(destinationPosition), map, m_units);
         //selectedUnit->moveTo(Globals::convertToNearestNodePosition(destinationPosition), map, m_units);
     }
     else
@@ -386,11 +386,11 @@ void Faction::moveMultipleSelectedUnits(const glm::vec3& destinationPosition, co
                 switch (selectedUnit->getType())
                 {
                 case eEntityType::Unit:
-                    selectedUnit->moveToAmongstGroup(Globals::convertToNearestNodePosition(destinationPosition - (averagePosition - selectedUnit->getPosition())),
+                    selectedUnit->moveTo(Globals::convertToNearestNodePosition(destinationPosition - (averagePosition - selectedUnit->getPosition())),
                         map, m_units, { selectedUnits.cbegin(), selectedUnits.cend() });
                     break;
                 case eEntityType::Harvester:
-                    selectedUnit->moveToAmongstGroup(destinationPosition - (averagePosition - selectedUnit->getPosition()), map);
+                    selectedUnit->moveTo(destinationPosition - (averagePosition - selectedUnit->getPosition()), map);
                     break;
                 default:
                     assert(false);

@@ -32,12 +32,11 @@ public:
 
 	eUnitState getCurrentState() const;
 
-	void moveToAmongstGroup(const glm::vec3& destinationPosition, const Map& map, 
-		const std::vector<Unit>& units, const std::vector<const Unit*>& selectedUnits);
-	void moveToAmongstGroup(const glm::vec3& destinationPosition, const Map& map);
 	void moveTo(const glm::vec3& destinationPosition, const Map& map, const std::vector<Unit>& units);
 	void moveTo(const glm::vec3& destinationPosition, const Map& map);
-	void moveToAStar(const glm::vec3& destinationPosition, const Map& map, const std::vector<Unit>& units);
+	void moveTo(const glm::vec3& destinationPosition, const Map& map,
+		const std::vector<Unit>& units, const std::vector<const Unit*>& selectedUnits);
+
 	void update(float deltaTime, const ModelManager& modelManager);
 
 #ifdef RENDER_PATHING
