@@ -7,9 +7,11 @@
 #include "Unit.h"
 #include "Map.h"
 #include "PriorityQueue.h"
+#include "AdjacentPositions.h"
 #include <vector>
 #include <queue>
 #include <array>
+#include <functional>
 
 class GraphNode
 {
@@ -108,12 +110,8 @@ public:
 	void getPathToClosestPositionOutsideAABB(const glm::vec3& entityPosition, const AABB& AABB, const glm::vec3& centrePositionAABB, 
 		const Map& map, std::vector<glm::vec3>& pathToPosition);
 
-	void getPathToPositionAStar(const Unit& unit, const glm::vec3& destination, std::vector<glm::vec3>& pathToPosition, const Map& map,
-		const std::vector<Unit>& units);
-	void getPathToPositionAStar(const glm::vec3& startingPosition, const glm::vec3& destination, std::vector<glm::vec3>& pathToPosition,
-		const Map& map);
-	void getPathToPositionAStar(const Unit& unit, const glm::vec3& destination, std::vector<glm::vec3>& pathToPosition, const Map& map,
-		const std::vector<Unit>& units, const std::vector<const Unit*>& selectedUnits);
+	void getPathToPosition(const Unit& unit, const glm::vec3& destination, std::vector<glm::vec3>& pathToPosition, 
+		const std::function<std::array<AdjacentPosition, ALL_DIRECTIONS_ON_GRID.size()>(const glm::ivec2&)>& getAdjacentPositions);
 
 private:
 	PathFinding();

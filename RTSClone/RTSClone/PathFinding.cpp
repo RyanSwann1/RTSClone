@@ -237,7 +237,7 @@ void PathFinding::getPathToClosestPositionOutsideAABB(const glm::vec3& entityPos
 		position = position + direction * ray;
 		if (!AABB.contains(position) && !map.isPositionOccupied(position) && Globals::isPositionInMapBounds(position))
 		{
-			getPathToPositionAStar(centrePositionAABB, position, pathToPosition, map);
+			//getPathToPosition(centrePositionAABB, position, pathToPosition, map);
 			if (!pathToPosition.empty())
 			{
 				return;
@@ -248,145 +248,10 @@ void PathFinding::getPathToClosestPositionOutsideAABB(const glm::vec3& entityPos
 	assert(false);
 }
 
-void PathFinding::getPathToPositionAStar(const Unit& unit, const glm::vec3& destination, std::vector<glm::vec3>& pathToPosition, const Map& map,
-	const std::vector<Unit>& units)
+void PathFinding::getPathToPosition(const Unit& unit, const glm::vec3& destination, std::vector<glm::vec3>& pathToPosition, 
+	const std::function<std::array<AdjacentPosition, ALL_DIRECTIONS_ON_GRID.size()>(const glm::ivec2&)>& getAdjacentPositions)
 {
-	assert(!units.empty());
-
-	m_openQueue.clear();
-	m_closedQueue.clear();
-
-	bool destinationReached = false;
-	glm::ivec2 startingPositionOnGrid = Globals::convertToGridPosition(unit.getPosition());
-	glm::ivec2 destinationOnGrid = Globals::convertToGridPosition(destination);
-
-	m_openQueue.add({ startingPositionOnGrid, startingPositionOnGrid, 0.0f, glm::distance(glm::vec2(destinationOnGrid), glm::vec2(startingPositionOnGrid)) });
-
-	while (!m_openQueue.isEmpty() && !destinationReached)
-	{
-		PriorityQueueNode currentNode = m_openQueue.getTop();
-		m_openQueue.popTop();
-
-		if (currentNode.position == destinationOnGrid)
-		{
-			pathToPosition.emplace_back(Globals::convertToWorldPosition(currentNode.position));
-
-			glm::ivec2 parentPosition = currentNode.parentPosition;
-			while (parentPosition != startingPositionOnGrid)
-			{
-				const PriorityQueueNode& parentNode = m_closedQueue.getNode(parentPosition);
-				parentPosition = parentNode.parentPosition;
-
-				glm::vec3 position = Globals::convertToWorldPosition(parentNode.position);
-				pathToPosition.emplace_back(position);
-			}
-			
-			destinationReached = true;
-		}
-		else
-		{ 
-			std::array<AdjacentPosition, ALL_DIRECTIONS_ON_GRID.size()> adjacentPositions = getAllAdjacentPositions(currentNode.position, map, units, unit);
-			for (const auto& adjacentPosition : adjacentPositions)
-			{
-				if (!adjacentPosition.valid || m_closedQueue.contains(adjacentPosition.position))
-				{
-					continue;
-				}
-				else
-				{
-					PriorityQueueNode adjacentNode(adjacentPosition.position, currentNode.position,
-						currentNode.g + glm::distance(glm::vec2(adjacentPosition.position), glm::vec2(currentNode.position)),
-						glm::distance(glm::vec2(destinationOnGrid), glm::vec2(adjacentPosition.position)));
-
-					if (m_openQueue.isSuccessorNodeValid(adjacentNode))
-					{
-						m_openQueue.getNode(adjacentPosition.position) = adjacentNode;
-					}
-					else if (!m_openQueue.contains(adjacentPosition.position))
-					{
-						m_openQueue.add(adjacentNode);
-					}
-				}
-			}
-		}
-		
-		m_closedQueue.add(currentNode);
-
-		assert(m_openQueue.getSize() <= static_cast<size_t>(Globals::MAP_SIZE * Globals::MAP_SIZE) && 
-			m_closedQueue.getSize() <= static_cast<size_t>(Globals::MAP_SIZE * Globals::MAP_SIZE));
-	}
-}
-
-void PathFinding::getPathToPositionAStar(const glm::vec3& startingPosition, const glm::vec3& destination, std::vector<glm::vec3>& pathToPosition, const Map& map)
-{
-	m_openQueue.clear();
-	m_closedQueue.clear();
-
-	bool destinationReached = false;
-	glm::ivec2 startingPositionOnGrid = Globals::convertToGridPosition(startingPosition);
-	glm::ivec2 destinationOnGrid = Globals::convertToGridPosition(destination);
-
-	m_openQueue.add({ startingPositionOnGrid, startingPositionOnGrid, 0.0f, glm::distance(glm::vec2(destinationOnGrid), glm::vec2(startingPositionOnGrid)) });
-
-	while (!m_openQueue.isEmpty() && !destinationReached)
-	{
-		PriorityQueueNode currentNode = m_openQueue.getTop();
-		m_openQueue.popTop();
-
-		if (currentNode.position == destinationOnGrid)
-		{
-			pathToPosition.emplace_back(Globals::convertToWorldPosition(currentNode.position));
-
-			glm::ivec2 parentPosition = currentNode.parentPosition;
-			while (parentPosition != startingPositionOnGrid)
-			{
-				const PriorityQueueNode& parentNode = m_closedQueue.getNode(parentPosition);
-				parentPosition = parentNode.parentPosition;
-
-				glm::vec3 position = Globals::convertToWorldPosition(parentNode.position);
-				pathToPosition.emplace_back(position);
-			}
-
-			destinationReached = true;
-		}
-		else
-		{
-			std::array<AdjacentPosition, ALL_DIRECTIONS_ON_GRID.size()> adjacentPositions = getAllAdjacentPositions(currentNode.position, map);
-			for (const auto& adjacentPosition : adjacentPositions)
-			{
-				if (!adjacentPosition.valid || m_closedQueue.contains(adjacentPosition.position))
-				{
-					continue;
-				}
-				else
-				{
-					PriorityQueueNode adjacentNode(adjacentPosition.position, currentNode.position,
-						currentNode.g + glm::distance(glm::vec2(adjacentPosition.position), glm::vec2(currentNode.position)),
-						glm::distance(glm::vec2(destinationOnGrid), glm::vec2(adjacentPosition.position)));
-
-					if (m_openQueue.isSuccessorNodeValid(adjacentNode))
-					{
-						m_openQueue.getNode(adjacentPosition.position) = adjacentNode;
-					}
-					else if (!m_openQueue.contains(adjacentPosition.position))
-					{
-						m_openQueue.add(adjacentNode);
-					}
-				}
-			}
-		}
-
-		m_closedQueue.add(currentNode);
-
-		assert(m_openQueue.getSize() <= static_cast<size_t>(Globals::MAP_SIZE * Globals::MAP_SIZE) &&
-			m_closedQueue.getSize() <= static_cast<size_t>(Globals::MAP_SIZE * Globals::MAP_SIZE));
-	}
-}
-
-void PathFinding::getPathToPositionAStar(const Unit& unit, const glm::vec3& destination, std::vector<glm::vec3>& pathToPosition, 
-	const Map& map, const std::vector<Unit>& units, const std::vector<const Unit*>& selectedUnits)
-{
-	assert(!units.empty() && !selectedUnits.empty());
+	assert(getAdjacentPositions);
 
 	m_openQueue.clear();
 	m_closedQueue.clear();
@@ -420,7 +285,7 @@ void PathFinding::getPathToPositionAStar(const Unit& unit, const glm::vec3& dest
 		}
 		else
 		{
-			std::array<AdjacentPosition, ALL_DIRECTIONS_ON_GRID.size()> adjacentPositions = getAllAdjacentPositions(currentNode.position, map, units, unit, selectedUnits);
+			std::array<AdjacentPosition, ALL_DIRECTIONS_ON_GRID.size()> adjacentPositions = getAdjacentPositions(currentNode.position);
 			for (const auto& adjacentPosition : adjacentPositions)
 			{
 				if (!adjacentPosition.valid || m_closedQueue.contains(adjacentPosition.position))

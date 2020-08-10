@@ -73,21 +73,24 @@ eUnitState Unit::getCurrentState() const
 void Unit::moveTo(const glm::vec3& destinationPosition, const Map& map, const std::vector<Unit>& units)
 {
 	m_pathToPosition.clear();
-	PathFinding::getInstance().getPathToPositionAStar(*this, destinationPosition, m_pathToPosition, map, units);
+	PathFinding::getInstance().getPathToPosition(*this, destinationPosition, m_pathToPosition,
+		[&](const glm::ivec2& position) { return getAllAdjacentPositions(position, map, units, *this); });
 	m_currentState = eUnitState::Moving;
 }
 
 void Unit::moveTo(const glm::vec3& destinationPosition, const Map& map)
 {
 	m_pathToPosition.clear();
-	PathFinding::getInstance().getPathToPositionAStar(m_position, destinationPosition, m_pathToPosition, map);
+	PathFinding::getInstance().getPathToPosition(*this, destinationPosition, m_pathToPosition,
+		[&](const glm::ivec2& position) { return getAllAdjacentPositions(position, map); });
 	m_currentState = eUnitState::Moving;
 }
 
 void Unit::moveTo(const glm::vec3& destinationPosition, const Map& map, const std::vector<Unit>& units, const std::vector<const Unit*>& selectedUnits)
 {
 	m_pathToPosition.clear();
-	PathFinding::getInstance().getPathToPositionAStar(*this, destinationPosition, m_pathToPosition, map, units, selectedUnits);
+	PathFinding::getInstance().getPathToPosition(*this, destinationPosition, m_pathToPosition, 
+		[&](const glm::ivec2& position) { return getAllAdjacentPositions(position, map, units, *this, selectedUnits); });
 	m_currentState = eUnitState::Moving;
 }
 
