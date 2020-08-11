@@ -152,9 +152,10 @@ glm::vec3 PathFinding::getClosestAvailablePosition(const glm::vec3& startingPosi
 	return Globals::convertToWorldPosition(availablePositionOnGrid);
 }
 
-void PathFinding::getPathToClosestPositionOutsideAABB(const glm::vec3& entityPosition, const AABB& AABB, const glm::vec3& centrePositionAABB, 
-	const Map& map, std::vector<glm::vec3>& pathToPosition)
+glm::vec3 PathFinding::getClosestPositionOutsideAABB(const glm::vec3& entityPosition, const AABB& AABB, const glm::vec3& centrePositionAABB, 
+	const Map& map)
 {
+	glm::vec3 closestPosition = centrePositionAABB;
 	glm::vec3 position = centrePositionAABB;
 	glm::vec3 direction = glm::normalize(entityPosition - centrePositionAABB);
 	for (float ray = 1.0f; ray <= Globals::NODE_SIZE * 5.0f; ++ray)
@@ -162,19 +163,16 @@ void PathFinding::getPathToClosestPositionOutsideAABB(const glm::vec3& entityPos
 		position = position + direction * ray;
 		if (!AABB.contains(position) && !map.isPositionOccupied(position) && Globals::isPositionInMapBounds(position))
 		{
-			//getPathToPosition(centrePositionAABB, position, pathToPosition, map);
-			if (!pathToPosition.empty())
-			{
-				return;
-			}
+			closestPosition = position;
+			break;
 		}
 	}
-	
-	assert(false);
+
+	return closestPosition;
 }
 
 void PathFinding::getPathToPosition(const Unit& unit, const glm::vec3& destination, std::vector<glm::vec3>& pathToPosition, 
-	const GetAllAdjacentPositions& getAdjacentPositions)
+	const GetAllAdjacentPositions& getAdjacentPositions, bool includeWorldDestinationPosition)
 {
 	assert(getAdjacentPositions);
 
@@ -194,6 +192,12 @@ void PathFinding::getPathToPosition(const Unit& unit, const glm::vec3& destinati
 
 		if (currentNode.position == destinationOnGrid)
 		{
+			assert(pathToPosition.empty());
+			if (includeWorldDestinationPosition)
+			{
+				pathToPosition.push_back(destination);
+			}
+
 			pathToPosition.emplace_back(Globals::convertToWorldPosition(currentNode.position));
 
 			glm::ivec2 parentPosition = currentNode.parentPosition;

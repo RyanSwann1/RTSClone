@@ -63,12 +63,22 @@ void Harvester::update(float deltaTime, const ModelManager& modelManager, const 
 
 				if (m_pathToPosition.empty())
 				{
-					m_currentState = eUnitState::MovingToMinerals;
-					assert(m_mineralToHarvest);
-
 					m_pathToPosition.clear();
-					PathFinding::getInstance().getPathToClosestPositionOutsideAABB(m_position, m_mineralToHarvest->getAABB(), 
-						m_mineralToHarvest->getPosition(), map, m_pathToPosition);
+
+					assert(m_mineralToHarvest);
+					glm::vec3 destination = PathFinding::getInstance().getClosestPositionOutsideAABB(m_position,		
+						m_mineralToHarvest->getAABB(), m_mineralToHarvest->getPosition(), map);
+					PathFinding::getInstance().getPathToPosition(*this, destination, m_pathToPosition,
+						[&](const glm::ivec2& position) { return getAllAdjacentPositions(position, map); }, true);
+
+					if (!m_pathToPosition.empty())
+					{
+						m_currentState = eUnitState::MovingToMinerals;
+					}
+					else
+					{
+						m_currentState = eUnitState::Idle;
+					}
 				}
 			}
 		}
@@ -83,7 +93,20 @@ void Harvester::update(float deltaTime, const ModelManager& modelManager, const 
 
 			m_currentState = eUnitState::ReturningMineralsToHQ;
 			m_pathToPosition.clear();
-			PathFinding::getInstance().getPathToClosestPositionOutsideAABB(m_position, HQ.getAABB(), HQ.getPosition(), map, m_pathToPosition);
+			
+			glm::vec3 destination = PathFinding::getInstance().getClosestPositionOutsideAABB(m_position,
+				HQ.getAABB(), HQ.getPosition(), map);
+			PathFinding::getInstance().getPathToPosition(*this, destination, m_pathToPosition,
+				[&](const glm::ivec2& position) { return getAllAdjacentPositions(position, map); }, true);
+
+			if (!m_pathToPosition.empty())
+			{
+				m_currentState = eUnitState::ReturningMineralsToHQ;
+			}
+			else
+			{
+				m_currentState = eUnitState::Idle;
+			}
 		}
 		break;
 	}
@@ -97,9 +120,20 @@ void Harvester::moveTo(const glm::vec3 & destinationPosition, const Map & map, c
 		{
 			m_mineralToHarvest = &mineral;
 			m_pathToPosition.clear();
-			PathFinding::getInstance().getPathToClosestPositionOutsideAABB(m_position, m_mineralToHarvest->getAABB(), 
-				m_mineralToHarvest->getPosition(), map, m_pathToPosition);
-			m_currentState = eUnitState::MovingToMinerals;
+			
+			glm::vec3 destination = PathFinding::getInstance().getClosestPositionOutsideAABB(m_position,
+				m_mineralToHarvest->getAABB(), m_mineralToHarvest->getPosition(), map);
+			PathFinding::getInstance().getPathToPosition(*this, destination, m_pathToPosition,
+				[&](const glm::ivec2& position) { return getAllAdjacentPositions(position, map); }, true);
+
+			if (!m_pathToPosition.empty())
+			{
+				m_currentState = eUnitState::MovingToMinerals;
+			}
+			else
+			{
+				m_currentState = eUnitState::Idle;
+			}
 
 			break;
 		}

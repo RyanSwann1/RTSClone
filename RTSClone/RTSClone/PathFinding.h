@@ -75,13 +75,14 @@ public:
 
 	std::vector<glm::vec3> getFormationPositions(const glm::vec3& startingPosition, const std::vector<const Unit*> selectedUnits,
 		const Map& map);
+
 	glm::vec3 getClosestAvailablePosition(const glm::vec3& startingPosition, const std::vector<Unit>& units, const Map& map);
 
-	void getPathToClosestPositionOutsideAABB(const glm::vec3& entityPosition, const AABB& AABB, const glm::vec3& centrePositionAABB, 
-		const Map& map, std::vector<glm::vec3>& pathToPosition);
+	glm::vec3 getClosestPositionOutsideAABB(const glm::vec3& entityPosition, const AABB& AABB, const glm::vec3& centrePositionAABB,
+		const Map& map);
 
 	void getPathToPosition(const Unit& unit, const glm::vec3& destination, std::vector<glm::vec3>& pathToPosition, 
-		const GetAllAdjacentPositions& getAdjacentPositions);
+		const GetAllAdjacentPositions& getAdjacentPositions, bool includeWorldDestinationPosition = false);
 
 private:
 	PathFinding();
