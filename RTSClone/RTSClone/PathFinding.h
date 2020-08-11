@@ -7,40 +7,11 @@
 #include "Unit.h"
 #include "Map.h"
 #include "PriorityQueue.h"
+#include "Graph.h"
 #include <vector>
 #include <queue>
 #include <array>
 #include <functional>
-
-class GraphNode
-{
-public:
-	GraphNode();
-	GraphNode(const glm::ivec2& cameFrom);
-
-	const glm::ivec2& getCameFrom() const;
-	bool isVisited() const;
-
-private:
-	glm::ivec2 cameFrom;
-	bool visited;
-};
-
-class Graph : private NonMovable, private NonCopyable
-{
-public:
-	Graph();
-
-	bool isEmpty() const;
-	const glm::ivec2& getPreviousPosition(const glm::ivec2& position) const;
-	bool isPositionVisited(const glm::ivec2& position) const;
-
-	void resetGraph();
-	void addToGraph(const glm::ivec2& position, const glm::ivec2& cameFromPosition);
-
-private:
-	std::array<GraphNode, static_cast<size_t>(Globals::MAP_SIZE * Globals::MAP_SIZE)> m_graph;
-};
 
 class Unit;
 class Map;
@@ -57,7 +28,7 @@ public:
 	glm::vec3 getClosestPositionOutsideAABB(const Entity& currentEntity, const std::vector<Entity>& entities, const Map& map)
 	{
 		constexpr float MAX_RAY_DISTANCE = static_cast<float>(Globals::NODE_SIZE) * 10.0f;
-		constexpr std::array<glm::ivec2, 4> DIRECTIONS =
+		constexpr std::array<glm::ivec2, 4> DIRECTIONS_ON_GRID =
 		{
 			glm::ivec2(0, 1),
 			glm::ivec2(1, 0),
@@ -69,7 +40,7 @@ public:
 		float distance = std::numeric_limits<float>::max();
 		glm::vec3 shortestDistancePosition = currentEntity.getPosition();
 
-		for (const auto& direction : DIRECTIONS)
+		for (const auto& direction : DIRECTIONS_ON_GRID)
 		{
 			glm::vec3 position = currentEntity.getPosition();
 			for (float ray = static_cast<float>(Globals::NODE_SIZE); ray <= MAX_RAY_DISTANCE; ray += static_cast<float>(Globals::NODE_SIZE))
@@ -115,8 +86,10 @@ public:
 private:
 	PathFinding();
 
+	//Greedy BFS
 	Graph m_graph;
 	std::queue<glm::ivec2> m_frontier;
+	//A*
 	PriorityQueue m_openQueue;
 	PriorityQueue m_closedQueue;
 
