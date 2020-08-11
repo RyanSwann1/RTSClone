@@ -68,8 +68,3 @@ bool Graph::isPositionVisited(const glm::ivec2& position) const
 		return m_graph[Globals::convertTo1D(position)].isVisited();
 	}
 }
-
-void Graph::resetGraph()
-{
-
-}
