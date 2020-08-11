@@ -5,6 +5,7 @@
 #include "Globals.h"
 #include "glm/glm.hpp"
 #include <array>
+#include <queue>
 
 class GraphNode
 {
@@ -29,7 +30,7 @@ public:
 	const glm::ivec2& getPreviousPosition(const glm::ivec2& position) const;
 	bool isPositionVisited(const glm::ivec2& position) const;
 
-	void resetGraph();
+	void reset(std::queue<glm::ivec2>& frontier);
 	void addToGraph(const glm::ivec2& position, const glm::ivec2& cameFromPosition);
 
 private:

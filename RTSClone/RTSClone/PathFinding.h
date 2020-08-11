@@ -93,6 +93,4 @@ private:
 	//A*
 	PriorityQueue m_openQueue;
 	PriorityQueue m_closedQueue;
-
-	void reset();
 };

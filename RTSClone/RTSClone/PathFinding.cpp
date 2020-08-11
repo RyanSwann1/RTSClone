@@ -51,19 +51,14 @@ PathFinding::PathFinding()
 	m_closedQueue(static_cast<size_t>(Globals::MAP_SIZE * Globals::MAP_SIZE))
 {}
 
-void PathFinding::reset()
-{
-	m_graph.resetGraph();
-	std::queue<glm::ivec2> empty;
-	m_frontier.swap(empty);
-}
+
 
 std::vector<glm::vec3> PathFinding::getFormationPositions(const glm::vec3& startingPosition,
 	const std::vector<const Unit*> selectedUnits, const Map& map)
 {
 	//TODO: Sort by closest
 	assert(!selectedUnits.empty() && std::find(selectedUnits.cbegin(), selectedUnits.cend(), nullptr) == selectedUnits.cend());
-	reset();
+	m_graph.reset(m_frontier);
 
 	std::vector<glm::vec3> unitFormationPositions;
 	unitFormationPositions.reserve(selectedUnits.size());
@@ -117,7 +112,7 @@ glm::vec3 PathFinding::getClosestAvailablePosition(const glm::vec3& startingPosi
 		}
 	}
 
-	reset();
+	m_graph.reset(m_frontier);
 	m_frontier.push(startingPositionOnGrid);
 	glm::ivec2 availablePositionOnGrid = {0, 0};
 	bool availablePositionFound = false;

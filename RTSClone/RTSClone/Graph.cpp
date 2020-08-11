@@ -26,6 +26,17 @@ Graph::Graph()
 	: m_graph()
 {}
 
+void Graph::reset(std::queue<glm::ivec2>& frontier)
+{
+	for (auto& i : m_graph)
+	{
+		i = GraphNode();
+	}
+
+	std::queue<glm::ivec2> empty;
+	frontier.swap(empty);
+}
+
 void Graph::addToGraph(const glm::ivec2& position, const glm::ivec2& cameFromPosition)
 {
 	assert(Globals::isPositionInMapBounds(position) && !m_graph[Globals::convertTo1D(position)].isVisited());
@@ -60,8 +71,5 @@ bool Graph::isPositionVisited(const glm::ivec2& position) const
 
 void Graph::resetGraph()
 {
-	for (auto& i : m_graph)
-	{
-		i = GraphNode();
-	}
+
 }
