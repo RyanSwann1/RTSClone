@@ -81,6 +81,7 @@ private:
 					{
 						entity.moveTo(PathFinding::getInstance().getClosestPositionOutsideAABB<Entity>(entity, entities, map), 
 							[&](const glm::ivec2& position) { return getAllAdjacentPositions(position, map); });
+
 						break;
 					}
 				}

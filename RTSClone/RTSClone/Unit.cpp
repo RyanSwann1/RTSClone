@@ -72,9 +72,31 @@ eUnitState Unit::getCurrentState() const
 
 void Unit::moveTo(const glm::vec3& destinationPosition, const GetAllAdjacentPositions& getAdjacentPositions)
 {
+	glm::vec3 closestDestination = m_position;
+	if (!m_pathToPosition.empty())
+	{
+		closestDestination = m_pathToPosition.back();
+	}
+
 	m_pathToPosition.clear();
 	PathFinding::getInstance().getPathToPosition(*this, destinationPosition, m_pathToPosition, getAdjacentPositions);
-	m_currentState = eUnitState::Moving;
+	
+	if (!m_pathToPosition.empty())
+	{
+		m_currentState = eUnitState::Moving;
+	}
+	else
+	{
+		if (closestDestination != m_position)
+		{
+			m_pathToPosition.push_back(closestDestination);
+			m_currentState = eUnitState::Moving;
+		}
+		else
+		{
+			m_currentState = eUnitState::Idle;
+		}
+	}
 }
 
 void Unit::update(float deltaTime, const ModelManager& modelManager)

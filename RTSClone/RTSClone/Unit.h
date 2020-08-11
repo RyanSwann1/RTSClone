@@ -40,6 +40,7 @@ protected:
 	glm::vec3 m_front;
 	std::vector<glm::vec3> m_pathToPosition;
 
+private:
 #ifdef RENDER_PATHING
 	Mesh m_renderPathMesh;
 #endif // RENDER_PATHING

@@ -317,7 +317,6 @@ void Faction::moveSingularSelectedUnit(const glm::vec3& destinationPosition, con
     {
         selectedUnit->moveTo(Globals::convertToNearestNodePosition(destinationPosition),
             [&](const glm::ivec2& position) { return getAllAdjacentPositions(position, map, m_units, *selectedUnit); });
-        //selectedUnit->moveTo(Globals::convertToNearestNodePosition(destinationPosition), map, m_units);
     }
     else
     {
