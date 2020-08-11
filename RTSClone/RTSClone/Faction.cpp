@@ -315,7 +315,8 @@ void Faction::moveSingularSelectedUnit(const glm::vec3& destinationPosition, con
     });
     if (selectedUnit != m_units.end())
     {
-        selectedUnit->moveTo(Globals::convertToNearestNodePosition(destinationPosition), map, m_units);
+        selectedUnit->moveTo(Globals::convertToNearestNodePosition(destinationPosition),
+            [&](const glm::ivec2& position) { return getAllAdjacentPositions(position, map, m_units, *selectedUnit); });
         //selectedUnit->moveTo(Globals::convertToNearestNodePosition(destinationPosition), map, m_units);
     }
     else
@@ -362,7 +363,8 @@ void Faction::moveMultipleSelectedUnits(const glm::vec3& destinationPosition, co
             {
                 for (int i = 0; i < unitFormationPositions.size(); ++i)
                 {
-                    selectedUnits[i]->moveTo(unitFormationPositions[i], map);
+                    selectedUnits[i]->moveTo(unitFormationPositions[i], 
+                        [&](const glm::ivec2& position) { return getAllAdjacentPositions(position, map); });
                 }
             }
         }
@@ -387,10 +389,12 @@ void Faction::moveMultipleSelectedUnits(const glm::vec3& destinationPosition, co
                 {
                 case eEntityType::Unit:
                     selectedUnit->moveTo(Globals::convertToNearestNodePosition(destinationPosition - (averagePosition - selectedUnit->getPosition())),
-                        map, m_units, { selectedUnits.cbegin(), selectedUnits.cend() });
+                        [&](const glm::ivec2& position)
+                    { return getAllAdjacentPositions(position, map, m_units, *selectedUnit, { selectedUnits.cbegin(), selectedUnits.cend() }); });
                     break;
                 case eEntityType::Harvester:
-                    selectedUnit->moveTo(destinationPosition - (averagePosition - selectedUnit->getPosition()), map);
+                    selectedUnit->moveTo(destinationPosition - (averagePosition - selectedUnit->getPosition()), 
+                        [&](const glm::ivec2& position) { return getAllAdjacentPositions(position, map); });
                     break;
                 default:
                     assert(false);

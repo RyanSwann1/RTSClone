@@ -3,6 +3,7 @@
 #include "glm/glm.hpp"
 #include <array>
 #include <vector>
+#include <functional>
 
 constexpr std::array<glm::ivec2, 8> ALL_DIRECTIONS_ON_GRID =
 {
@@ -26,6 +27,8 @@ struct AdjacentPosition
 	bool unitCollision;
 	glm::ivec2 position;
 };
+
+using GetAllAdjacentPositions = const std::function<std::array<AdjacentPosition, ALL_DIRECTIONS_ON_GRID.size()>(const glm::ivec2&)>&;
 
 class Map;
 class Unit;

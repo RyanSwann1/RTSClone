@@ -7,7 +7,6 @@
 #include "Unit.h"
 #include "Map.h"
 #include "PriorityQueue.h"
-#include "AdjacentPositions.h"
 #include <vector>
 #include <queue>
 #include <array>
@@ -111,7 +110,7 @@ public:
 		const Map& map, std::vector<glm::vec3>& pathToPosition);
 
 	void getPathToPosition(const Unit& unit, const glm::vec3& destination, std::vector<glm::vec3>& pathToPosition, 
-		const std::function<std::array<AdjacentPosition, ALL_DIRECTIONS_ON_GRID.size()>(const glm::ivec2&)>& getAdjacentPositions);
+		const GetAllAdjacentPositions& getAdjacentPositions);
 
 private:
 	PathFinding();

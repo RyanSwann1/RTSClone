@@ -1,16 +1,12 @@
 #pragma once
 
 #include "Entity.h"
+#include "AdjacentPositions.h"
+#include <functional>
 #include <vector>
 #ifdef RENDER_PATHING
 #include "Mesh.h"
 #endif // RENDER_PATHING
-
-//Unit States
-//Moving
-//Attacking
-//Harvesting 
-//Idling
 
 enum class eUnitState
 {
@@ -31,12 +27,8 @@ public:
 	Unit(const glm::vec3& startingPosition, const glm::vec3& destinationPosition, const Model& model, Map& map, eEntityType entityType = eEntityType::Unit);
 
 	eUnitState getCurrentState() const;
-
-	void moveTo(const glm::vec3& destinationPosition, const Map& map, const std::vector<Unit>& units);
-	void moveTo(const glm::vec3& destinationPosition, const Map& map);
-	void moveTo(const glm::vec3& destinationPosition, const Map& map,
-		const std::vector<Unit>& units, const std::vector<const Unit*>& selectedUnits);
-
+	
+	void moveTo(const glm::vec3& destinationPosition, const GetAllAdjacentPositions& getAdjacentPositions);
 	void update(float deltaTime, const ModelManager& modelManager);
 
 #ifdef RENDER_PATHING

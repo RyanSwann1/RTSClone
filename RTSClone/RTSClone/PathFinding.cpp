@@ -249,7 +249,7 @@ void PathFinding::getPathToClosestPositionOutsideAABB(const glm::vec3& entityPos
 }
 
 void PathFinding::getPathToPosition(const Unit& unit, const glm::vec3& destination, std::vector<glm::vec3>& pathToPosition, 
-	const std::function<std::array<AdjacentPosition, ALL_DIRECTIONS_ON_GRID.size()>(const glm::ivec2&)>& getAdjacentPositions)
+	const GetAllAdjacentPositions& getAdjacentPositions)
 {
 	assert(getAdjacentPositions);
 

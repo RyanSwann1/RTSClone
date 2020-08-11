@@ -22,7 +22,7 @@ Harvester::Harvester(const glm::vec3 & startingPosition, const glm::vec3 & desti
 	m_harvestTimer(HARVEST_TIME),
 	m_mineralToHarvest(nullptr)
 {
-	Unit::moveTo(destinationPosition, map);
+	Unit::moveTo(destinationPosition, [&](const glm::ivec2& position) { return getAllAdjacentPositions(position, map); });
 }
 
 void Harvester::update(float deltaTime, const ModelManager& modelManager, const Headquarters& HQ, const Map& map, 
@@ -111,15 +111,14 @@ void Harvester::moveTo(const glm::vec3 & destinationPosition, const Map & map, c
 
 	if (!m_mineralToHarvest)
 	{
-		Unit::moveTo(destinationPosition, map);
+		Unit::moveTo(destinationPosition, [&](const glm::ivec2& position) { return getAllAdjacentPositions(position, map); });
 	}
 }
 
-void Harvester::moveTo(const glm::vec3& destinationPosition, const Map& map)
+void Harvester::moveTo(const glm::vec3& destinationPosition, const GetAllAdjacentPositions& getAdjacentPositions)
 {
 	m_pathToPosition.clear();
-	PathFinding::getInstance().getPathToPosition(*this, destinationPosition, m_pathToPosition, 
-		[&](const glm::ivec2& position) { return getAllAdjacentPositions(position, map); });
+	PathFinding::getInstance().getPathToPosition(*this, destinationPosition, m_pathToPosition, getAdjacentPositions);
 
 	if (m_currentState == eUnitState::Idle)
 	{

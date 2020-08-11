@@ -17,7 +17,7 @@ public:
 	void update(float deltaTime, const ModelManager& modelManager, const Headquarters& HQ, const Map& map, 
 		const std::vector<Harvester>& harvesters);
 	void moveTo(const glm::vec3& destinationPosition, const Map& map, const std::vector<Mineral>& minerals);
-	void moveTo(const glm::vec3& destinationPosition, const Map& map);
+	void moveTo(const glm::vec3& destinationPosition, const GetAllAdjacentPositions& getAdjacentPositions);
 
 private:
 	Timer m_harvestTimer;
