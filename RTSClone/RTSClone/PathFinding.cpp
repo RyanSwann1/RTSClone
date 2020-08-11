@@ -240,3 +240,43 @@ void PathFinding::getPathToPosition(const Unit& unit, const glm::vec3& destinati
 			m_closedQueue.getSize() <= static_cast<size_t>(Globals::MAP_SIZE * Globals::MAP_SIZE));
 	}
 }
+
+void PathFinding::convertPathToWaypoints(std::vector<glm::vec3>& pathToPosition, const Unit& unit, const std::vector<Unit>& units,
+	const Map& map)
+{
+	assert(!units.empty());
+	if (pathToPosition.size() <= size_t(1))
+	{
+		return;
+	}
+
+	int MAX_RAY = (glm::distance(pathToPosition.front(), pathToPosition.back()));
+	std::cout << MAX_RAY << "\n";
+
+	glm::vec3 position = unit.getPosition();
+	glm::vec3 direction = glm::normalize(pathToPosition.front() - position);
+	bool collision = false;
+	for (float ray = 1.0f; ray <= MAX_RAY; ++ray)
+	{
+		position += direction * 1.0f;
+		Globals::printImmediately(position);
+
+		auto cIter = std::find_if(units.cbegin(), units.cend(), [&position, &unit](const auto& otherUnit)
+		{
+			return &unit != &otherUnit && otherUnit.getAABB().contains(position);
+		});
+		if (cIter != units.cend() || map.isPositionOccupied(position))
+		{
+			collision = true;
+			break;
+		}
+	}
+
+	if (!collision)
+	{
+		while (pathToPosition[0] != pathToPosition.back())
+		{
+			pathToPosition.erase(pathToPosition.begin() + 1);
+		}
+	}
+}

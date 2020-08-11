@@ -22,7 +22,7 @@ Harvester::Harvester(const glm::vec3 & startingPosition, const glm::vec3 & desti
 	m_harvestTimer(HARVEST_TIME),
 	m_mineralToHarvest(nullptr)
 {
-	Unit::moveTo(destinationPosition, [&](const glm::ivec2& position) { return getAllAdjacentPositions(position, map); });
+	moveTo(destinationPosition, map);
 }
 
 void Harvester::update(float deltaTime, const ModelManager& modelManager, const Headquarters& HQ, const Map& map, 
@@ -145,6 +145,6 @@ void Harvester::moveTo(const glm::vec3 & destinationPosition, const Map & map, c
 
 	if (!m_mineralToHarvest)
 	{
-		Unit::moveTo(destinationPosition, [&](const glm::ivec2& position) { return getAllAdjacentPositions(position, map); });
+		moveTo(destinationPosition, map);
 	}
 }

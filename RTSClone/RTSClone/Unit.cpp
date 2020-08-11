@@ -62,7 +62,7 @@ Unit::Unit(const glm::vec3 & startingPosition, const glm::vec3 & destinationPosi
 	m_front(),
 	m_pathToPosition()
 {
-	moveTo(destinationPosition, [&](const glm::ivec2& position) { return getAllAdjacentPositions(position, map); });
+	moveTo(destinationPosition, map);
 }
 
 eUnitState Unit::getCurrentState() const
@@ -70,7 +70,8 @@ eUnitState Unit::getCurrentState() const
 	return m_currentState;
 }
 
-void Unit::moveTo(const glm::vec3& destinationPosition, const GetAllAdjacentPositions& getAdjacentPositions)
+void Unit::moveTo(const glm::vec3& destinationPosition, const Map& map, const std::vector<Unit>& units,
+	const GetAllAdjacentPositions& getAdjacentPositions)
 {
 	glm::vec3 closestDestination = m_position;
 	if (!m_pathToPosition.empty())
@@ -80,7 +81,7 @@ void Unit::moveTo(const glm::vec3& destinationPosition, const GetAllAdjacentPosi
 
 	m_pathToPosition.clear();
 	PathFinding::getInstance().getPathToPosition(*this, destinationPosition, m_pathToPosition, getAdjacentPositions);
-	
+	PathFinding::getInstance().convertPathToWaypoints(m_pathToPosition, *this, units, map);
 	if (!m_pathToPosition.empty())
 	{
 		m_currentState = eUnitState::Moving;
@@ -90,6 +91,35 @@ void Unit::moveTo(const glm::vec3& destinationPosition, const GetAllAdjacentPosi
 		if (closestDestination != m_position)
 		{
 			m_pathToPosition.push_back(closestDestination);
+			m_currentState = eUnitState::Moving;
+		}
+		else
+		{
+			m_currentState = eUnitState::Idle;
+		}
+	}
+}
+
+void Unit::moveTo(const glm::vec3& destinationPosition, const Map& map)
+{
+	glm::vec3 previousClosestDestination = m_position;
+	if (!m_pathToPosition.empty())
+	{
+		previousClosestDestination = m_pathToPosition.back();
+	}
+
+	m_pathToPosition.clear();
+	PathFinding::getInstance().getPathToPosition(*this, destinationPosition, m_pathToPosition, 
+		[&](const glm::ivec2& position) { return getAllAdjacentPositions(position, map); });
+	if (!m_pathToPosition.empty())
+	{
+		m_currentState = eUnitState::Moving;
+	}
+	else
+	{
+		if (previousClosestDestination != m_position)
+		{
+			m_pathToPosition.push_back(previousClosestDestination);
 			m_currentState = eUnitState::Moving;
 		}
 		else
@@ -119,6 +149,10 @@ void Unit::update(float deltaTime, const ModelManager& modelManager)
 					m_currentState = eUnitState::Idle;
 				}
 			}
+		}
+		else
+		{
+			m_currentState = eUnitState::Idle;
 		}
 		break;
 	}

@@ -28,7 +28,10 @@ public:
 
 	eUnitState getCurrentState() const;
 	
-	void moveTo(const glm::vec3& destinationPosition, const GetAllAdjacentPositions& getAdjacentPositions);
+	void moveTo(const glm::vec3& destinationPosition, const Map& map, const std::vector<Unit>& units,
+		const GetAllAdjacentPositions& getAdjacentPositions);
+	void moveTo(const glm::vec3& destinationPosition, const Map& map);
+
 	void update(float deltaTime, const ModelManager& modelManager);
 
 #ifdef RENDER_PATHING
