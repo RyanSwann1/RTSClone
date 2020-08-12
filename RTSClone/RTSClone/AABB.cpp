@@ -67,13 +67,13 @@ AABB::AABB(const glm::vec3& position, const glm::vec3& size)
 	m_back(glm::min(position.z, position.z + size.z))
 {}
 
-AABB::AABB(const glm::vec3& position, float distance)
-	: m_left(position.x - distance),
-	m_right(position.x + distance),
-	m_top(position.y + distance),
-	m_bottom(position.y - distance),
-	m_forward(position.z + distance),
-	m_back(position.z - distance)
+AABB::AABB(const glm::vec3& position, float distanceFromCenter)
+	: m_left(position.x - distanceFromCenter),
+	m_right(position.x + distanceFromCenter),
+	m_top(position.y + distanceFromCenter),
+	m_bottom(position.y - distanceFromCenter),
+	m_forward(position.z + distanceFromCenter),
+	m_back(position.z - distanceFromCenter)
 { }
 
 AABB::AABB(const std::vector<const Unit*>& selectedUnits)
@@ -139,14 +139,14 @@ bool AABB::contains(const AABB& other) const
 		m_back < other.m_forward;
 }
 
-void AABB::resetFromCentre(const glm::vec3& position, const glm::vec3& size)
+void AABB::reset(const glm::vec3& position, const Model& model)
 {
-	m_left = position.x - size.x;
-	m_right = position.x + size.x;
-	m_top = position.y + size.y;
-	m_bottom = position.y - size.y;
-	m_forward = position.z + size.z;
-	m_back = position.z - size.z;
+	m_left = position.x - model.sizeFromCentre.x;
+	m_right = position.x + model.sizeFromCentre.x;
+	m_top = position.y + model.sizeFromCentre.y;
+	m_bottom = position.y - model.sizeFromCentre.y;
+	m_forward = position.z + model.sizeFromCentre.z;
+	m_back = position.z - model.sizeFromCentre.z;
 }
 
 void AABB::reset(const glm::vec3& position, const glm::vec3& size)
@@ -159,14 +159,14 @@ void AABB::reset(const glm::vec3& position, const glm::vec3& size)
 	m_back = glm::min(position.z, position.z + size.z);
 }
 
-void AABB::reset(const glm::vec3& position, float distance)
+void AABB::reset(const glm::vec3& position, float distanceFromCenter)
 {
-	m_left = position.x - distance;
-	m_right = position.x + distance;
-	m_top = position.y + distance;
-	m_bottom = position.y - distance;
-	m_forward = position.z + distance;
-	m_back = position.z - distance;
+	m_left = position.x - distanceFromCenter;
+	m_right = position.x + distanceFromCenter;
+	m_top = position.y + distanceFromCenter;
+	m_bottom = position.y - distanceFromCenter;
+	m_forward = position.z + distanceFromCenter;
+	m_back = position.z - distanceFromCenter;
 }
 
 void AABB::reset()

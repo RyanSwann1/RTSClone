@@ -17,7 +17,7 @@ std::unique_ptr<ModelManager> ModelManager::create()
 	models[static_cast<int>(unitModel->modelName)] = std::move(unitModel);
 
 	std::unique_ptr<Model> headquartersModel = Model::create("portal.obj", true, 
-		glm::vec3(5.0f, 0.25f, 3.0f), eModelName::HQ, { 1.0f, 1.0f, 1.0f });
+		glm::vec3(6.0f, 0.25f, 3.0f), eModelName::HQ, { 1.2f, 1.0f, 0.9f });
 	assert(headquartersModel);
 	if (!headquartersModel)
 	{

@@ -81,7 +81,7 @@ void Unit::moveTo(const glm::vec3& destinationPosition, const Map& map, const st
 
 	m_pathToPosition.clear();
 	PathFinding::getInstance().getPathToPosition(*this, destinationPosition, m_pathToPosition, getAdjacentPositions);
-	PathFinding::getInstance().convertPathToWaypoints(m_pathToPosition, *this, units, map);
+	//PathFinding::getInstance().convertPathToWaypoints(m_pathToPosition, *this, units, map);
 	if (!m_pathToPosition.empty())
 	{
 		m_currentState = eUnitState::Moving;
@@ -139,7 +139,7 @@ void Unit::update(float deltaTime, const ModelManager& modelManager)
 			glm::vec3 newPosition = Globals::moveTowards(m_position, m_pathToPosition.back(), MOVEMENT_SPEED * deltaTime);
 			m_front = glm::normalize(glm::vec3(newPosition - m_position));
 			m_position = newPosition;
-			m_AABB.resetFromCentre(m_position, modelManager.getModel(m_modelName).sizeFromCentre);
+			m_AABB.reset(m_position, modelManager.getModel(m_modelName));
 			if (m_position == m_pathToPosition.back())
 			{
 				m_pathToPosition.pop_back();
