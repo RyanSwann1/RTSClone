@@ -38,21 +38,9 @@ void Map::addEntityAABB(const AABB& AABB)
 	{
 		for (int y = AABB.m_back; y < AABB.m_forward; ++y)
 		{
-			//glm::ivec2 positionOnGrid = Globals::convertToGridPosition({ x, 0.0f, y });
-			//assert(Globals::isPositionInMapBounds(positionOnGrid));
-			//m_map[Globals::convertTo1D(positionOnGrid)] = true;
+			glm::ivec2 positionOnGrid = Globals::convertToGridPosition({ x, 0.0f, y });
+			assert(Globals::isPositionInMapBounds(positionOnGrid));
+			m_map[Globals::convertTo1D(positionOnGrid)] = true;
 		}
 	}
-
-	//glm::ivec2 position(std::floor(AABB.m_left) / Globals::NODE_SIZE, std::floor(AABB.m_back) / Globals::NODE_SIZE);
-	//glm::ivec2 size(std::floor(AABB.m_right - AABB.m_left) / Globals::NODE_SIZE, std::floor(AABB.m_forward - AABB.m_back) / Globals::NODE_SIZE);
-
-	//for (int x = position.x; x <= position.x + size.x; ++x)
-	//{
-	//	for (int y = position.y; y <= position.y + size.y; ++y)
-	//	{
-	//		assert(Globals::isPositionInMapBounds({ x, y }));
-	//		m_map[Globals::convertTo1D({ x, y })] = true;
-	//	}
-	//}
 }

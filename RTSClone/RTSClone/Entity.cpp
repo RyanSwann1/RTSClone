@@ -5,11 +5,14 @@
 
 Entity::Entity(const glm::vec3& startingPosition, const Model& model, eEntityType entityType)
 	: m_modelName(model.modelName),
-	m_position(startingPosition),
-	m_AABB(startingPosition, model),
+	m_position(),
+	m_AABB(),
 	m_type(entityType),
 	m_selected(false)
-{}
+{
+	m_position = Globals::convertToMiddlePosition(startingPosition);
+	m_AABB.reset(m_position, model);
+}
 
 eEntityType Entity::getType() const
 {

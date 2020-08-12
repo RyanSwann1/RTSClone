@@ -128,13 +128,15 @@ void Faction::handleInput(const sf::Event& currentSFMLEvent, const sf::Window& w
             glm::vec3 mouseToGroundPosition = camera.getMouseToGroundPosition(window);
             if (m_HQ.isSelected())
             {
-                m_HQ.setWaypointPosition(Globals::convertToNearestNodePosition(mouseToGroundPosition));
+                glm::vec3 position = Globals::convertToNodePosition(mouseToGroundPosition);
+                position = Globals::convertToMiddlePosition(position);
+                m_HQ.setWaypointPosition(position);
             }
             else
             {
                 if (sf::Keyboard::isKeyPressed(sf::Keyboard::LShift))
                 {
-                    mouseToGroundPosition = Globals::convertToNearestNodePosition(mouseToGroundPosition);
+                    mouseToGroundPosition = Globals::convertToNodePosition(mouseToGroundPosition);
                     Globals::printImmediately(mouseToGroundPosition);
                 }   
                 if (isOneUnitSelected())
@@ -315,7 +317,7 @@ void Faction::moveSingularSelectedUnit(const glm::vec3& destinationPosition, con
     });
     if (selectedUnit != m_units.end())
     {
-        selectedUnit->moveTo(Globals::convertToNearestNodePosition(destinationPosition), map, m_units,
+        selectedUnit->moveTo(Globals::convertToNodePosition(destinationPosition), map, m_units,
             [&](const glm::ivec2& position) { return getAllAdjacentPositions(position, map, m_units, *selectedUnit); });
     }
     else
@@ -387,7 +389,7 @@ void Faction::moveMultipleSelectedUnits(const glm::vec3& destinationPosition, co
                 switch (selectedUnit->getType())
                 {
                 case eEntityType::Unit:
-                    selectedUnit->moveTo(Globals::convertToNearestNodePosition(destinationPosition - (averagePosition - selectedUnit->getPosition())), map, m_units,
+                    selectedUnit->moveTo(Globals::convertToNodePosition(destinationPosition - (averagePosition - selectedUnit->getPosition())), map, m_units,
                         [&](const glm::ivec2& position)
                     { return getAllAdjacentPositions(position, map, m_units, *selectedUnit, { selectedUnits.cbegin(), selectedUnits.cend() }); });
                     break;

@@ -193,16 +193,17 @@ void PathFinding::getPathToPosition(const Unit& unit, const glm::vec3& destinati
 				pathToPosition.push_back(destination);
 			}
 
-			pathToPosition.emplace_back(Globals::convertToWorldPosition(currentNode.position));
-
+			glm::vec3 position = Globals::convertToWorldPosition(currentNode.position);
+			pathToPosition.emplace_back(Globals::convertToMiddlePosition(position));
 			glm::ivec2 parentPosition = currentNode.parentPosition;
+
 			while (parentPosition != startingPositionOnGrid)
 			{
 				const PriorityQueueNode& parentNode = m_closedQueue.getNode(parentPosition);
 				parentPosition = parentNode.parentPosition;
 
-				glm::vec3 position = Globals::convertToWorldPosition(parentNode.position);
-				pathToPosition.emplace_back(position);
+				position = Globals::convertToWorldPosition(parentNode.position);
+				pathToPosition.emplace_back(Globals::convertToMiddlePosition(position));
 			}
 
 			destinationReached = true;
