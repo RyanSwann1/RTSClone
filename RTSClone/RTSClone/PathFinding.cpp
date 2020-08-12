@@ -250,33 +250,65 @@ void PathFinding::convertPathToWaypoints(std::vector<glm::vec3>& pathToPosition,
 		return;
 	}
 
-	int MAX_RAY = (glm::distance(pathToPosition.front(), pathToPosition.back()));
-	std::cout << MAX_RAY << "\n";
-
-	glm::vec3 position = unit.getPosition();
-	glm::vec3 direction = glm::normalize(pathToPosition.front() - position);
-	bool collision = false;
-	for (float ray = 1.0f; ray <= MAX_RAY; ++ray)
+	std::queue<glm::vec3> positionsToDelete;
+	int startingIndex = static_cast<int>(pathToPosition.size()) - 1;
+	int i = startingIndex - 1;
+	bool destinationReached = false;
+	while (startingIndex > 0 && !destinationReached)
 	{
-		position += direction * 1.0f;
-		Globals::printImmediately(position);
+		glm::vec3 startingPosition = pathToPosition[startingIndex];
+		glm::vec3 targetPosition = pathToPosition[i];
+		glm::vec3 position = startingPosition;
+		float MAX_RAY = glm::distance(targetPosition, startingPosition);
+		bool collision = false;
 
-		auto cIter = std::find_if(units.cbegin(), units.cend(), [&position, &unit](const auto& otherUnit)
+		for (float ray = 0.1f; ray <= MAX_RAY; ray += 0.1f)
 		{
-			return &unit != &otherUnit && otherUnit.getAABB().contains(position);
-		});
-		if (cIter != units.cend() || map.isPositionOccupied(position))
+			position = position + glm::normalize(targetPosition - startingPosition) * 0.1f;
+
+			auto cIter = std::find_if(units.cbegin(), units.cend(), [&position, &unit](const auto& otherUnit)
+			{
+				return &unit != &otherUnit && otherUnit.getAABB().contains(position);
+			});
+
+			if (cIter != units.cend() || map.isPositionOccupied(position))
+			{
+				collision = true;
+				break;
+			}
+		}
+
+		if (!collision)
 		{
-			collision = true;
-			break;
+			positionsToDelete.push(pathToPosition[i]);
+				
+			if (i - 1 > 0)
+			{
+				--i;
+			}
+			else
+			{
+				destinationReached = true;
+			}
+		}
+		else
+		{
+			startingIndex = i;
+			i = startingIndex - 1;
 		}
 	}
 
-	if (!collision)
+	assert(positionsToDelete.size() < pathToPosition.size());
+	while (!positionsToDelete.empty())
 	{
-		while (pathToPosition[0] != pathToPosition.back())
+		const glm::vec3& positionToDelete = positionsToDelete.front();
+		auto iter = std::find_if(pathToPosition.begin(), pathToPosition.end(), [&positionToDelete](const auto& position)
 		{
-			pathToPosition.erase(pathToPosition.begin() + 1);
-		}
+			return position == positionToDelete;
+		});
+		assert(iter != pathToPosition.end());
+			
+		pathToPosition.erase(iter);
+		positionsToDelete.pop();
 	}
 }

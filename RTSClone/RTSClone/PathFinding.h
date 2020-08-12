@@ -36,7 +36,7 @@ public:
 			glm::ivec2(-1, 0),
 		};
 
-		assert(currentEntity.getCurrentState() == eUnitState::Idle);
+		assert(currentEntity.getCurrentState() == eUnitState::Idle);	
 		float distance = std::numeric_limits<float>::max();
 		glm::vec3 shortestDistancePosition = currentEntity.getPosition();
 
