@@ -11,7 +11,6 @@ namespace
 {
 	constexpr glm::vec3 COLOR = { 1.0f, 0.0f, 0.0f };
 	constexpr float OPACITY = 0.4f;
-	constexpr float HEIGHT = 0.0f;
 	void generateMesh(float left, float right, float back, float forward, Mesh& mesh)
 	{
 		mesh.m_vertices.clear();
@@ -19,10 +18,10 @@ namespace
 
 		const std::array<glm::vec3, 4> CUBE_FACE_TOP =
 		{
-			glm::vec3(left, HEIGHT, back),
-			glm::vec3(right, HEIGHT, back),
-			glm::vec3(right, HEIGHT, forward),
-			glm::vec3(left, HEIGHT, forward)
+			glm::vec3(left, Globals::GROUND_HEIGHT, back),
+			glm::vec3(right, Globals::GROUND_HEIGHT, back),
+			glm::vec3(right, Globals::GROUND_HEIGHT, forward),
+			glm::vec3(left, Globals::GROUND_HEIGHT, forward)
 		};
 
 		for (const auto& i : CUBE_FACE_TOP)
@@ -98,26 +97,17 @@ AABB::AABB(const std::vector<const Unit*>& selectedUnits)
 		{
 			m_left = selectedUnit->getPosition().x;
 		}
-	}
 
-	for (const auto& selectedUnit : selectedUnits)
-	{
 		if (selectedUnit->getPosition().x > m_right)
 		{
 			m_right = selectedUnit->getPosition().x;
 		}
-	}
 
-	for (const auto& selectedUnit : selectedUnits)
-	{
 		if (selectedUnit->getPosition().z > m_forward)
 		{
 			m_forward = selectedUnit->getPosition().z;
 		}
-	}
 
-	for (const auto& selectedUnit : selectedUnits)
-	{
 		if (selectedUnit->getPosition().z < m_back)
 		{
 			m_back = selectedUnit->getPosition().z;
