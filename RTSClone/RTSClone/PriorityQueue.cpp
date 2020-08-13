@@ -54,7 +54,7 @@ bool PriorityQueue::isEmpty() const
 
 void PriorityQueue::changeNode(const PriorityQueueNode& newNode)
 {
-	assert(isSuccessorNodeValid(newNode) && contains(newNode.position));
+	assert(contains(newNode.position) && isSuccessorNodeValid(newNode));
 
 	eraseNode(newNode.position);
 	add(newNode);

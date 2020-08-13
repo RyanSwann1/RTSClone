@@ -81,7 +81,7 @@ int main()
 
 	for (float z = Globals::NODE_SIZE; z <= Globals::NODE_SIZE * 5; z += Globals::NODE_SIZE)
 	{
-		minerals.emplace_back(Globals::convertToNodePosition({ 10.0, Globals::GROUND_HEIGHT, z }),
+		minerals.emplace_back(Globals::convertToNodePosition({ 55.0, Globals::GROUND_HEIGHT, z }),
 			modelManager->getModel(eModelName::Mineral), *map);
 	}
 

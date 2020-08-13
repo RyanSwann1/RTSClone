@@ -119,14 +119,15 @@ namespace Globals
 		return newPosition;
 	}
 
-	inline glm::vec3 convertToWorldPosition(const glm::ivec2& position)
-	{
-		return { position.x * Globals::NODE_SIZE, Globals::GROUND_HEIGHT, position.y * Globals::NODE_SIZE };
-	}
-
 	inline glm::vec3 convertToMiddlePosition(const glm::vec3& position)
 	{
 		return { position.x + Globals::NODE_SIZE / 2.0f, position.y, position.z + Globals::NODE_SIZE / 2.0f };
+	}
+
+	inline glm::vec3 convertToWorldPosition(const glm::ivec2& position)
+	{
+		return Globals::convertToMiddlePosition(
+			{ position.x * Globals::NODE_SIZE, Globals::GROUND_HEIGHT, position.y * Globals::NODE_SIZE });
 	}
 
 	inline glm::ivec2 convertToGridPosition(const glm::vec3& position)

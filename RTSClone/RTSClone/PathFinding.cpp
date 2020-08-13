@@ -194,8 +194,8 @@ void PathFinding::getPathToPosition(const Unit& unit, const glm::vec3& destinati
 			}
 
 			glm::vec3 position = Globals::convertToWorldPosition(currentNode.position);
-			//pathToPosition.push_back(position);
-			pathToPosition.emplace_back(Globals::convertToMiddlePosition(position));
+			pathToPosition.push_back(position);
+			//pathToPosition.emplace_back(Globals::convertToMiddlePosition(position));
 			glm::ivec2 parentPosition = currentNode.parentPosition;
 
 			while (parentPosition != startingPositionOnGrid)
@@ -204,8 +204,8 @@ void PathFinding::getPathToPosition(const Unit& unit, const glm::vec3& destinati
 				parentPosition = parentNode.parentPosition;
 
 				position = Globals::convertToWorldPosition(parentNode.position);
-				//pathToPosition.push_back(position);
-				pathToPosition.emplace_back(Globals::convertToMiddlePosition(position));
+				pathToPosition.push_back(position);
+				//pathToPosition.emplace_back(Globals::convertToMiddlePosition(position));
 
 				assert(pathToPosition.size() <= Globals::MAP_SIZE * Globals::MAP_SIZE);
 			}

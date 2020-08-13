@@ -18,8 +18,8 @@ struct PriorityQueueNode
 
 	glm::ivec2 position;
 	glm::ivec2 parentPosition;
-	float g; //Distance between successor and previous
-	float h; //previous.g + Distance to destination
+	float g; 
+	float h; 
 };
 
 const auto nodeCompare = [](const auto& a, const auto& b) -> bool { return b.getF() < a.getF(); };
