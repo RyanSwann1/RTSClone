@@ -26,7 +26,8 @@ std::unique_ptr<ModelManager> ModelManager::create()
 	}
 	models[static_cast<int>(headquartersModel->modelName)] = std::move(headquartersModel);
 
-	std::unique_ptr<Model> mineralModel = Model::create("rocksOre.obj", true, glm::vec3(3.0f, 0.25f, 3.0f), eModelName::Mineral, { 0.6f, 0.6f, 0.6f });
+	std::unique_ptr<Model> mineralModel = Model::create("rocksOre.obj", true, 
+		glm::vec3(3.0f, 0.25f, 3.0f), eModelName::Mineral, { 0.6f, 0.6f, 0.6f });
 	assert(mineralModel);
 	if (!mineralModel)
 	{
@@ -35,7 +36,8 @@ std::unique_ptr<ModelManager> ModelManager::create()
 	}
 	models[static_cast<int>(mineralModel->modelName)] = std::move(mineralModel);
 
-	std::unique_ptr<Model> waypointModel = Model::create("laserSabel.obj", true, glm::vec3(2.0f, 1.0f, 2.0f), eModelName::Waypoint, { 1.0f, 1.0f, 1.0f });
+	std::unique_ptr<Model> waypointModel = Model::create("laserSabel.obj", true, 
+		glm::vec3(2.0f, 1.0f, 2.0f), eModelName::Waypoint, { 1.0f, 1.0f, 1.0f });
 	assert(waypointModel);
 	if (!waypointModel)
 	{
@@ -53,6 +55,16 @@ std::unique_ptr<ModelManager> ModelManager::create()
 		return std::unique_ptr<ModelManager>();
 	}
 	models[static_cast<int>(harvesterModel->modelName)] = std::move(harvesterModel);
+
+	std::unique_ptr<Model> satelliteDishModel = Model::create("satelliteDish.obj", false,
+		glm::vec3(3.0f, 1.0f, 3.0f), eModelName::SatelliteDish, glm::vec3(1.0f, 1.0f, 1.0f));
+	assert(satelliteDishModel);
+	if (!satelliteDishModel)
+	{
+		std::cout << "failed to load satelliteDishModel\n";
+		return std::unique_ptr<ModelManager>();
+	}
+	models[static_cast<int>(satelliteDishModel->modelName)] = std::move(satelliteDishModel);
 	
 
 	return std::unique_ptr<ModelManager>(new ModelManager(std::move(models)));

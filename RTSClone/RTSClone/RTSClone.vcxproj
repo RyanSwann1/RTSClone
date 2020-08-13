@@ -165,6 +165,7 @@
     <ClCompile Include="PathFinding.cpp" />
     <ClCompile Include="PriorityQueue.cpp" />
     <ClCompile Include="ShaderHandler.cpp" />
+    <ClCompile Include="SupplyDepot.cpp" />
     <ClCompile Include="Texture.cpp" />
     <ClCompile Include="Timer.cpp" />
     <ClCompile Include="Unit.cpp" />
@@ -235,6 +236,7 @@
     <ClInclude Include="PathFinding.h" />
     <ClInclude Include="PriorityQueue.h" />
     <ClInclude Include="ShaderHandler.h" />
+    <ClInclude Include="SupplyDepot.h" />
     <ClInclude Include="Texture.h" />
     <ClInclude Include="Timer.h" />
     <ClInclude Include="Unit.h" />

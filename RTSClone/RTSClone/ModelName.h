@@ -7,5 +7,6 @@ enum class eModelName
 	Mineral,
 	Waypoint,
 	Harvester,
-	Max = Harvester
+	SatelliteDish,
+	Max = SatelliteDish
 };
