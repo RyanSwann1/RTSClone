@@ -16,6 +16,7 @@ float PriorityQueueNode::getF() const
 //PriorityQueue
 PriorityQueue::PriorityQueue(size_t maxSize)
 	: priority_queue(nodeCompare),
+	m_maxSize(maxSize),
 	m_addedNodePositions()
 {
 	c.reserve(maxSize);
@@ -59,7 +60,7 @@ void PriorityQueue::changeNode(const PriorityQueueNode& newNode)
 
 void PriorityQueue::add(const PriorityQueueNode& node)
 {
-	assert(!contains(node.position));
+	assert(!contains(node.position) && c.size() + 1 <= m_maxSize);
 
 	push(node);
 	m_addedNodePositions.insert(node.position);

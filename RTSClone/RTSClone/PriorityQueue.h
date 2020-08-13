@@ -41,6 +41,7 @@ public:
 	void clear();
 
 private:
+	const size_t m_maxSize;
 	std::unordered_set<glm::ivec2> m_addedNodePositions;
 
 	void eraseNode(const glm::ivec2& position);
