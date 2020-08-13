@@ -7,7 +7,7 @@ std::unique_ptr<ModelManager> ModelManager::create()
 	std::array<std::unique_ptr<Model>, static_cast<size_t>(eModelName::Max) + 1> models;
 
 	std::unique_ptr<Model> unitModel = Model::create("spaceCraft1.obj", false, 
-		{ Globals::NODE_SIZE / 2, 0.25f, Globals::NODE_SIZE / 2 }, eModelName::Unit, { 0.35f, 0.35f, 0.35f });
+		{ 3, 0.25f, 3 }, eModelName::Unit, { 0.35f, 0.35f, 0.35f });
 	assert(unitModel);
 	if (!unitModel)
 	{
@@ -17,7 +17,7 @@ std::unique_ptr<ModelManager> ModelManager::create()
 	models[static_cast<int>(unitModel->modelName)] = std::move(unitModel);
 
 	std::unique_ptr<Model> headquartersModel = Model::create("portal.obj", true, 
-		glm::vec3(6.0f, 0.25f, 3.0f), eModelName::HQ, { 1.2f, 1.0f, 0.9f });
+		glm::vec3(9.0f, 0.25f, 3.0f), eModelName::HQ, { 1.2f, 1.0f, 0.9f });
 	assert(headquartersModel);
 	if (!headquartersModel)
 	{
@@ -54,6 +54,7 @@ std::unique_ptr<ModelManager> ModelManager::create()
 	}
 	models[static_cast<int>(harvesterModel->modelName)] = std::move(harvesterModel);
 	
+
 	return std::unique_ptr<ModelManager>(new ModelManager(std::move(models)));
 }
 

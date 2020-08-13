@@ -128,17 +128,10 @@ void Faction::handleInput(const sf::Event& currentSFMLEvent, const sf::Window& w
             glm::vec3 mouseToGroundPosition = camera.getMouseToGroundPosition(window);
             if (m_HQ.isSelected())
             {
-                glm::vec3 position = Globals::convertToNodePosition(mouseToGroundPosition);
-                position = Globals::convertToMiddlePosition(position);
-                m_HQ.setWaypointPosition(position);
+                m_HQ.setWaypointPosition(mouseToGroundPosition);
             }
             else
             {
-                if (sf::Keyboard::isKeyPressed(sf::Keyboard::LShift))
-                {
-                    mouseToGroundPosition = Globals::convertToNodePosition(mouseToGroundPosition);
-                    Globals::printImmediately(mouseToGroundPosition);
-                }   
                 if (isOneUnitSelected())
                 {
                     moveSingularSelectedUnit(mouseToGroundPosition, map, minerals);

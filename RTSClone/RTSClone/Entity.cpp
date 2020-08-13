@@ -10,7 +10,7 @@ Entity::Entity(const glm::vec3& startingPosition, const Model& model, eEntityTyp
 	m_type(entityType),
 	m_selected(false)
 {
-	m_position = Globals::convertToMiddlePosition(startingPosition);
+	m_position = Globals::convertToMiddleGridPosition(startingPosition);
 	m_AABB.reset(m_position, model);
 }
 
