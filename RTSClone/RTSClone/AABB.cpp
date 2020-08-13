@@ -12,17 +12,17 @@ namespace
 	constexpr glm::vec3 COLOR = { 1.0f, 0.0f, 0.0f };
 	constexpr float OPACITY = 0.4f;
 	constexpr float HEIGHT = 0.0f;
-	void generateMesh(const glm::vec3& position, const glm::vec3& size, Mesh& mesh)
+	void generateMesh(float left, float right, float back, float forward, Mesh& mesh)
 	{
 		mesh.m_vertices.clear();
 		mesh.m_indices.clear();
 
 		const std::array<glm::vec3, 4> CUBE_FACE_TOP =
 		{
-			glm::vec3(position.x - size.x, HEIGHT, position.z + size.z),
-			glm::vec3(position.x + size.x, HEIGHT, position.z + size.z),
-			glm::vec3(position.x + size.x, HEIGHT, position.z - size.z),
-			glm::vec3(position.x - size.x, HEIGHT, position.z - size.z)
+			glm::vec3(left, HEIGHT, back),
+			glm::vec3(right, HEIGHT, back),
+			glm::vec3(right, HEIGHT, forward),
+			glm::vec3(left, HEIGHT, forward)
 		};
 
 		for (const auto& i : CUBE_FACE_TOP)
@@ -50,31 +50,37 @@ AABB::AABB()
 {}
 
 AABB::AABB(const glm::vec3 & position, const Model & model)
-	: m_left(position.x - model.sizeFromCentre.x),
-	m_right(position.x + model.sizeFromCentre.x),
-	m_top(position.y + model.sizeFromCentre.y),
-	m_bottom(position.y - model.sizeFromCentre.y),
-	m_forward(position.z + model.sizeFromCentre.z),
-	m_back(position.z - model.sizeFromCentre.z)
-{}
+	: m_left(0.0f),
+	m_right(0.0f),
+	m_top(0.0f),
+	m_bottom(0.0f),
+	m_forward(0.0f),
+	m_back(0.0f)
+{
+	reset(position, model);
+}
 
 AABB::AABB(const glm::vec3& position, const glm::vec3& size)
-	: m_left(glm::min(position.x, position.x + size.x)),
-	m_right(glm::max(position.x, position.x + size.x)),
-	m_top(glm::max(position.y, position.y + size.y)),
-	m_bottom(glm::min(position.y, position.y + size.y)),
-	m_forward(glm::max(position.z, position.z + size.z)),
-	m_back(glm::min(position.z, position.z + size.z))
-{}
+	: m_left(0.0f),
+	m_right(0.0f),
+	m_top(0.0f),
+	m_bottom(0.0f),
+	m_forward(0.0f),
+	m_back(0.0f)
+{
+	reset(position, size);
+}
 
 AABB::AABB(const glm::vec3& position, float distanceFromCenter)
-	: m_left(position.x - distanceFromCenter),
-	m_right(position.x + distanceFromCenter),
-	m_top(position.y + distanceFromCenter),
-	m_bottom(position.y - distanceFromCenter),
-	m_forward(position.z + distanceFromCenter),
-	m_back(position.z - distanceFromCenter)
-{ }
+	: m_left(0.0f),
+	m_right(0.0f),
+	m_top(0.0f),
+	m_bottom(0.0f),
+	m_forward(0.0f),
+	m_back(0.0f)
+{ 
+	reset(position, distanceFromCenter);
+}
 
 AABB::AABB(const std::vector<const Unit*>& selectedUnits)
 	: m_left(std::numeric_limits<float>::max()),
@@ -182,10 +188,7 @@ void AABB::reset()
 #ifdef RENDER_AABB
 void AABB::render(ShaderHandler& shaderHandler)
 {
-	glm::vec3 centrePosition((m_right - (m_right - m_left) / 2.0f), (m_top - (m_top - m_bottom) / 2.0f), (m_forward - (m_forward - m_back) / 2.0f));
-	glm::vec3 distanceFromCentre(m_right - centrePosition.x, m_top - centrePosition.y, m_forward - centrePosition.z);
-
-	generateMesh(centrePosition, distanceFromCentre, m_mesh);
+	generateMesh(m_left, m_right, m_back, m_forward, m_mesh);
 
 	shaderHandler.setUniformVec3(eShaderType::Debug, "uColor", COLOR);
 	shaderHandler.setUniform1f(eShaderType::Debug, "uOpacity", OPACITY);

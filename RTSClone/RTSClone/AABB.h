@@ -27,6 +27,7 @@ struct AABB
 
 #ifdef RENDER_AABB
 	void render(ShaderHandler& shaderHandler);
+	Mesh m_mesh;
 #endif // RENDER_AABB
 
 	float m_left;
@@ -35,8 +36,4 @@ struct AABB
 	float m_bottom;
 	float m_forward;
 	float m_back;
-
-#ifdef RENDER_AABB
-	Mesh m_mesh;
-#endif // RENDER_AABB
 };
