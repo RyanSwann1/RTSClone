@@ -73,7 +73,7 @@ public:
 		return shortestDistancePosition;
 	}
 
-	std::vector<glm::vec3> getFormationPositions(const glm::vec3& startingPosition, const std::vector<const Unit*> selectedUnits,
+	std::vector<glm::vec3> getFormationPositions(const glm::vec3& startingPosition, const std::vector<Unit*>& selectedUnits,
 		const Map& map);
 
 	glm::vec3 getClosestAvailablePosition(const glm::vec3& startingPosition, const std::vector<Unit>& units, const Map& map);

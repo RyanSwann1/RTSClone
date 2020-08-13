@@ -51,10 +51,8 @@ PathFinding::PathFinding()
 	m_closedQueue(static_cast<size_t>(Globals::MAP_SIZE * Globals::MAP_SIZE))
 {}
 
-
-
 std::vector<glm::vec3> PathFinding::getFormationPositions(const glm::vec3& startingPosition,
-	const std::vector<const Unit*> selectedUnits, const Map& map)
+	const std::vector<Unit*>& selectedUnits, const Map& map)
 {
 	//TODO: Sort by closest
 	assert(!selectedUnits.empty() && std::find(selectedUnits.cbegin(), selectedUnits.cend(), nullptr) == selectedUnits.cend());

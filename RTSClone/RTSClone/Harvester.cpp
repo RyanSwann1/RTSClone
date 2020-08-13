@@ -25,8 +25,7 @@ Harvester::Harvester(const glm::vec3 & startingPosition, const glm::vec3 & desti
 	moveTo(destinationPosition, map);
 }
 
-void Harvester::update(float deltaTime, const ModelManager& modelManager, const Headquarters& HQ, const Map& map, 
-	const std::vector<Harvester>& harvesters)
+void Harvester::update(float deltaTime, const ModelManager& modelManager, const Headquarters& HQ, const Map& map)
 {
 	Unit::update(deltaTime, modelManager);
 

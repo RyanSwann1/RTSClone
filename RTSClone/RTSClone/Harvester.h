@@ -14,8 +14,7 @@ public:
 	Harvester(const glm::vec3& startingPosition, const Model& model, Map& map);
 	Harvester(const glm::vec3& startingPosition, const glm::vec3& destinationPosition, const Model& model, Map& map);
 	
-	void update(float deltaTime, const ModelManager& modelManager, const Headquarters& HQ, const Map& map, 
-		const std::vector<Harvester>& harvesters);
+	void update(float deltaTime, const ModelManager& modelManager, const Headquarters& HQ, const Map& map);
 
 	using Unit::moveTo;
 	void moveTo(const glm::vec3& destinationPosition, const Map& map, const std::vector<Mineral>& minerals);

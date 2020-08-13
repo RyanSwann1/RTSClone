@@ -1,4 +1,5 @@
 #include "PriorityQueue.h"
+#include <iostream>
 
 //PriorityQueueNode
 PriorityQueueNode::PriorityQueueNode(const glm::ivec2& position, const glm::ivec2& parentPosition, float g, float h)

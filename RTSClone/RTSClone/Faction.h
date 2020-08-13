@@ -66,8 +66,7 @@ private:
 	template <class Entity>
 	void handleCollisions(std::vector<Entity>& entities, const Map& map)
 	{
-		std::vector<const Entity*> handledUnits;
-		handledUnits.reserve(m_harvesters.size());
+		static std::vector<const Entity*> handledUnits;
 		for (auto& entity : entities)
 		{
 			if (entity.getCurrentState() == eUnitState::Idle)
@@ -88,6 +87,8 @@ private:
 
 			handledUnits.push_back(&entity);
 		}
+
+		handledUnits.clear();
 	}
 
 	template <class Entity>

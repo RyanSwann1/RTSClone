@@ -194,7 +194,7 @@ void Faction::update(float deltaTime, const ModelManager& modelManager, const Ma
 
     for (auto& harvester : m_harvesters)
     {
-        harvester.update(deltaTime, modelManager, m_HQ, map, m_harvesters);
+        harvester.update(deltaTime, modelManager, m_HQ, map);
     }
 
     handleCollisions<Unit>(m_units, map);
@@ -326,7 +326,7 @@ void Faction::moveSingularSelectedUnit(const glm::vec3& destinationPosition, con
 
 void Faction::moveMultipleSelectedUnits(const glm::vec3& destinationPosition, const Map& map, const std::vector<Mineral>& minerals)
 {
-    std::vector<Unit*> selectedUnits;
+    static std::vector<Unit*> selectedUnits;
  
     for (auto& unit : m_units)
     {
@@ -351,7 +351,7 @@ void Faction::moveMultipleSelectedUnits(const glm::vec3& destinationPosition, co
         if (selectionBoxAABB.contains(destinationPosition))
         {
             std::vector<glm::vec3> unitFormationPositions = PathFinding::getInstance().getFormationPositions(destinationPosition, 
-                { selectedUnits.begin(), selectedUnits.end() }, map);
+                selectedUnits, map);
 
             if (unitFormationPositions.size() == selectedUnits.size())
             {
@@ -384,7 +384,7 @@ void Faction::moveMultipleSelectedUnits(const glm::vec3& destinationPosition, co
                 case eEntityType::Unit:
                     selectedUnit->moveTo(Globals::convertToNodePosition(destinationPosition - (averagePosition - selectedUnit->getPosition())), map, m_units,
                         [&](const glm::ivec2& position)
-                    { return getAllAdjacentPositions(position, map, m_units, *selectedUnit, { selectedUnits.cbegin(), selectedUnits.cend() }); });
+                    { return getAllAdjacentPositions(position, map, m_units, *selectedUnit, selectedUnits); });
                     break;
                 case eEntityType::Harvester:
                     selectedUnit->moveTo(destinationPosition - (averagePosition - selectedUnit->getPosition()), map, m_units, 
@@ -396,4 +396,6 @@ void Faction::moveMultipleSelectedUnits(const glm::vec3& destinationPosition, co
             }
         }
     }
+
+    selectedUnits.clear();
 }

@@ -84,7 +84,8 @@ std::array<AdjacentPosition, ALL_DIRECTIONS_ON_GRID.size()> getAllAdjacentPositi
 	return adjacentPositions;
 }
 
-std::array<AdjacentPosition, ALL_DIRECTIONS_ON_GRID.size()> getAllAdjacentPositions(const glm::ivec2& position, const Map& map, const std::vector<Unit>& units, const Unit& unit, const std::vector<const Unit*>& selectedUnits)
+std::array<AdjacentPosition, ALL_DIRECTIONS_ON_GRID.size()> getAllAdjacentPositions(const glm::ivec2& position, const Map& map, 
+	const std::vector<Unit>& units, const Unit& unit, const std::vector<Unit*>& selectedUnits)
 {
 	std::array<AdjacentPosition, ALL_DIRECTIONS_ON_GRID.size()> adjacentPositions;
 	for (int i = 0; i < adjacentPositions.size(); ++i)
