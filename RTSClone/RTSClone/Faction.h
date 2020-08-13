@@ -5,6 +5,7 @@
 #include "Headquarters.h"
 #include "Harvester.h"
 #include "PathFinding.h"
+#include "SupplyDepot.h"
 #include <SFML/Graphics.hpp>
 
 struct SelectionBox : private NonMovable, private NonCopyable
@@ -55,8 +56,10 @@ private:
 	Headquarters m_HQ;
 	std::vector<Unit> m_units;
 	std::vector<Harvester> m_harvesters;
+	std::vector<SupplyDepot> m_supplyDepots;
 	glm::vec3 m_previousMouseToGroundPosition;
 
+	void addBuilding(eEntityType entityType, const glm::vec3& spawnPosition, const ModelManager& modelManager, Map& map);
 	void spawnUnit(const glm::vec3& spawnPosition, const Model& unitModel, Map& map);
 	void spawnHarvester(const glm::vec3& spawnPosition, const Model& unitModel, Map& map);
 	bool isOneUnitSelected() const;
@@ -79,7 +82,6 @@ private:
 						entity.getAABB().contains(otherEntity.getAABB()))
 					{
 						entity.moveTo(PathFinding::getInstance().getClosestPositionOutsideAABB<Entity>(entity, entities, map), map);
-
 						break;
 					}
 				}

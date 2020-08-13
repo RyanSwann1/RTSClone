@@ -21,7 +21,7 @@ namespace
 }
 
 Headquarters::Headquarters(const glm::vec3& startingPosition, const Model& model, Map& map)
-	: Entity(startingPosition, model, eEntityType::Building),
+	: Entity(startingPosition, model, eEntityType::HQ),
 	m_waypointPosition(startingPosition)
 {
 	map.addEntityAABB(m_AABB);

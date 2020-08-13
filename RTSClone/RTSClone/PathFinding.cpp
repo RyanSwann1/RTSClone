@@ -167,7 +167,7 @@ glm::vec3 PathFinding::getClosestPositionOutsideAABB(const glm::vec3& entityPosi
 void PathFinding::getPathToPosition(const Unit& unit, const glm::vec3& destination, std::vector<glm::vec3>& pathToPosition, 
 	const GetAllAdjacentPositions& getAdjacentPositions, bool includeWorldDestinationPosition)
 {
-	assert(getAdjacentPositions);
+	assert(getAdjacentPositions && pathToPosition.empty());
 
 	m_openQueue.clear();
 	m_closedQueue.clear();
@@ -175,7 +175,6 @@ void PathFinding::getPathToPosition(const Unit& unit, const glm::vec3& destinati
 	bool destinationReached = false;
 	glm::ivec2 startingPositionOnGrid = Globals::convertToGridPosition(unit.getPosition());
 	glm::ivec2 destinationOnGrid = Globals::convertToGridPosition(destination);
-
 	m_openQueue.add({ startingPositionOnGrid, startingPositionOnGrid, 0.0f, glm::distance(glm::vec2(destinationOnGrid), glm::vec2(startingPositionOnGrid)) });
 
 	while (!m_openQueue.isEmpty() && !destinationReached)
@@ -185,7 +184,6 @@ void PathFinding::getPathToPosition(const Unit& unit, const glm::vec3& destinati
 
 		if (currentNode.position == destinationOnGrid)
 		{
-			assert(pathToPosition.empty());
 			if (includeWorldDestinationPosition)
 			{
 				pathToPosition.push_back(destination);
@@ -200,9 +198,7 @@ void PathFinding::getPathToPosition(const Unit& unit, const glm::vec3& destinati
 				const PriorityQueueNode& parentNode = m_closedQueue.getNode(parentPosition);
 				parentPosition = parentNode.parentPosition;
 
-				position = Globals::convertToWorldPosition(parentNode.position);
-				pathToPosition.push_back(position);
-
+				pathToPosition.push_back(Globals::convertToWorldPosition(parentNode.position));
 				assert(pathToPosition.size() <= Globals::MAP_SIZE * Globals::MAP_SIZE);
 			}
 

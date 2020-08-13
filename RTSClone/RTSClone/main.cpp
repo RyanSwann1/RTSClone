@@ -43,7 +43,7 @@ int main()
 	settings.majorVersion = 3;
 	settings.minorVersion = 3;
 	settings.attributeFlags = sf::ContextSettings::Core;
-	 glm::uvec2 windowSize(1280, 800);
+	glm::uvec2 windowSize(1280, 800);
 	//glm::uvec2 windowSize(1980, 1080);
 	sf::Window window(sf::VideoMode(windowSize.x, windowSize.y), "RTS Clone", sf::Style::Default, settings);
 	//sf::Window window(sf::VideoMode(windowSize.x, windowSize.y), "RTS Clone", sf::Style::Fullscreen, settings);
@@ -79,11 +79,15 @@ int main()
 	Camera camera;
 	std::vector<Mineral> minerals;
 
+
 	for (float z = Globals::NODE_SIZE; z <= Globals::NODE_SIZE * 5; z += Globals::NODE_SIZE)
 	{
 		minerals.emplace_back(Globals::convertToNodePosition({ 55.0, Globals::GROUND_HEIGHT, z }),
 			modelManager->getModel(eModelName::Mineral), *map);
 	}
+
+	minerals.emplace_back(Globals::convertToNodePosition({ 55.0, Globals::GROUND_HEIGHT, 50.0f }),
+		modelManager->getModel(eModelName::SatelliteDish), *map);
 
 	shaderHandler->switchToShader(eShaderType::SelectionBox);
 	shaderHandler->setUniformMat4f(eShaderType::SelectionBox, "uOrthographic", glm::ortho(0.0f, static_cast<float>(windowSize.x),
@@ -128,7 +132,7 @@ int main()
 		faction.render(*shaderHandler, *modelManager);
 		for(const auto& mineral : minerals)
 		{
-			mineral.render(*shaderHandler, modelManager->getModel(eModelName::Mineral));
+			mineral.render(*shaderHandler, modelManager->getModel(mineral.getModelName()));
 		}
 
 		shaderHandler->switchToShader(eShaderType::Debug);

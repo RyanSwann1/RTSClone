@@ -8,7 +8,8 @@ enum class eEntityType
 {
 	Unit = 0,
 	Harvester,
-	Building,
+	HQ,
+	SupplyDepot,
 	Mineral
 };
 

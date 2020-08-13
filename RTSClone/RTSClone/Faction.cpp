@@ -94,6 +94,7 @@ Faction::Faction(const ModelManager& modelManager, Map& map)
     m_HQ(Globals::convertToNodePosition({ 35.0f, Globals::GROUND_HEIGHT, 15.f }), modelManager.getModel(eModelName::HQ), map),
     m_units(),
     m_harvesters(),
+    m_supplyDepots(),
     m_previousMouseToGroundPosition()
 {}
 
@@ -180,6 +181,9 @@ void Faction::handleInput(const sf::Event& currentSFMLEvent, const sf::Window& w
                 spawnUnit(m_HQ.getUnitSpawnPosition(), modelManager.getModel(eModelName::Unit), map);
             }
             break;
+        case sf::Keyboard::B:
+            addBuilding(eEntityType::SupplyDepot, Globals::convertToNodePosition(camera.getMouseToGroundPosition(window)), modelManager, map);
+            break;
         }
         break;
     }
@@ -213,6 +217,11 @@ void Faction::render(ShaderHandler& shaderHandler, const ModelManager& modelMana
     for (auto& harvester : m_harvesters)
     {
         harvester.render(shaderHandler, modelManager.getModel(harvester.getModelName()));
+    }
+
+    for (auto& supplyDepot : m_supplyDepots)
+    {
+        supplyDepot.render(shaderHandler, modelManager.getModel(supplyDepot.getModelName()));
     }
 }
 
@@ -249,9 +258,26 @@ void Faction::renderAABB(ShaderHandler& shaderHandler)
         harvester.renderAABB(shaderHandler);
     }
 
+    for (auto& supplyDepot : m_supplyDepots)
+    {
+        supplyDepot.renderAABB(shaderHandler);
+    }
+
     m_HQ.renderAABB(shaderHandler);
 }
 #endif // RENDER_AABB
+
+void Faction::addBuilding(eEntityType entityType, const glm::vec3& spawnPosition, const ModelManager& modelManager, Map& map)
+{
+    switch (entityType)
+    {
+    case eEntityType::SupplyDepot:
+        m_supplyDepots.emplace_back(spawnPosition, modelManager.getModel(eModelName::SatelliteDish), map);
+        break;
+    default:
+        assert(false);
+    }
+}
 
 void Faction::spawnUnit(const glm::vec3& spawnPosition, const Model& unitModel, Map& map)
 {
@@ -306,7 +332,7 @@ bool Faction::isOneUnitSelected() const
         }
     }
 
-    return true;
+    return unitSelectedCount == 1;
 }
 
 void Faction::moveSingularSelectedUnit(const glm::vec3& destinationPosition, const Map& map, const std::vector<Mineral>& minerals)
