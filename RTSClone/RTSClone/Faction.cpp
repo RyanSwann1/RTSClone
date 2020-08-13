@@ -287,6 +287,10 @@ bool Faction::isOneUnitSelected() const
         if (unit.isSelected())
         {
             ++unitSelectedCount;
+            if (unitSelectedCount > 1)
+            {
+                return false;
+            }
         }
     }
 
@@ -295,10 +299,14 @@ bool Faction::isOneUnitSelected() const
         if (harvester.isSelected())
         {
             ++unitSelectedCount;
+            if (unitSelectedCount > 1)
+            {
+                return false;
+            }
         }
     }
 
-    return unitSelectedCount == 1;
+    return true;
 }
 
 void Faction::moveSingularSelectedUnit(const glm::vec3& destinationPosition, const Map& map, const std::vector<Mineral>& minerals)
