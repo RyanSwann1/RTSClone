@@ -206,6 +206,8 @@ void PathFinding::getPathToPosition(const Unit& unit, const glm::vec3& destinati
 				position = Globals::convertToWorldPosition(parentNode.position);
 				//pathToPosition.push_back(position);
 				pathToPosition.emplace_back(Globals::convertToMiddlePosition(position));
+
+				assert(pathToPosition.size() <= Globals::MAP_SIZE * Globals::MAP_SIZE);
 			}
 
 			destinationReached = true;

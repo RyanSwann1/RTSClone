@@ -24,6 +24,7 @@ PriorityQueue::PriorityQueue(size_t maxSize)
 
 size_t PriorityQueue::getSize() const
 {
+	assert(c.size() == m_addedNodePositions.size());
 	return c.size();
 }
 
@@ -47,6 +48,7 @@ void PriorityQueue::eraseNode(const glm::ivec2& position)
 
 bool PriorityQueue::isEmpty() const
 {
+	assert(c.empty() && m_addedNodePositions.empty() || !c.empty() && !m_addedNodePositions.empty());
 	return c.empty();
 }
 
@@ -105,10 +107,6 @@ bool PriorityQueue::isSuccessorNodeValid(const PriorityQueueNode& successorNode)
 	{
 		return successorNode.position == node.position;
 	});
-	if (matchingNode != c.cend() && successorNode.getF() < matchingNode->getF())
-	{
-		return true;
-	}
-
-	return false;
+	
+	return matchingNode != c.cend() && successorNode.getF() < matchingNode->getF();
 }
