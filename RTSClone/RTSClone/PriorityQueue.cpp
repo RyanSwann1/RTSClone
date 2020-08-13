@@ -14,11 +14,11 @@ float PriorityQueueNode::getF() const
 }
 
 //PriorityQueue
-PriorityQueue::PriorityQueue(size_t size)
+PriorityQueue::PriorityQueue(size_t maxSize)
 	: priority_queue(nodeCompare),
 	m_addedNodePositions()
 {
-	c.reserve(size);
+	c.reserve(maxSize);
 }
 
 size_t PriorityQueue::getSize() const
@@ -32,9 +32,29 @@ void PriorityQueue::clear()
 	m_addedNodePositions.clear();
 }
 
+void PriorityQueue::eraseNode(const glm::ivec2& position)
+{
+	auto node = std::find_if(c.begin(), c.end(), [&position](const auto& node)
+	{
+		return node.position == position;
+	});
+	assert(node != c.cend());
+
+	m_addedNodePositions.erase(position);
+	c.erase(node);
+}
+
 bool PriorityQueue::isEmpty() const
 {
 	return c.empty();
+}
+
+void PriorityQueue::changeNode(const PriorityQueueNode& newNode)
+{
+	assert(isSuccessorNodeValid(newNode) && contains(newNode.position));
+
+	eraseNode(newNode.position);
+	add(newNode);
 }
 
 void PriorityQueue::add(const PriorityQueueNode& node)
@@ -67,15 +87,15 @@ const PriorityQueueNode& PriorityQueue::getTop() const
 	return top();
 }
 
-PriorityQueueNode& PriorityQueue::getNode(const glm::ivec2& position)
+const PriorityQueueNode& PriorityQueue::getNode(const glm::ivec2& position) const
 {
-	auto iter = std::find_if(c.begin(), c.end(), [&position](const auto& node) -> bool
+	auto node = std::find_if(c.cbegin(), c.cend(), [&position](const auto& node) -> bool
 	{
 		return node.position == position;
 	});
 
-	assert(iter != c.end());
-	return (*iter);
+	assert(node != c.end());
+	return (*node);
 }
 
 bool PriorityQueue::isSuccessorNodeValid(const PriorityQueueNode& successorNode) const

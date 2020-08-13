@@ -27,6 +27,7 @@ public:
 	template <class Entity>
 	glm::vec3 getClosestPositionOutsideAABB(const Entity& currentEntity, const std::vector<Entity>& entities, const Map& map)
 	{
+		assert(currentEntity.getCurrentState() == eUnitState::Idle);
 		constexpr float MAX_RAY_DISTANCE = static_cast<float>(Globals::NODE_SIZE) * 10.0f;
 		constexpr std::array<glm::ivec2, 4> DIRECTIONS_ON_GRID =
 		{
@@ -36,7 +37,6 @@ public:
 			glm::ivec2(-1, 0),
 		};
 
-		assert(currentEntity.getCurrentState() == eUnitState::Idle);	
 		float distance = std::numeric_limits<float>::max();
 		glm::vec3 shortestDistancePosition = currentEntity.getPosition();
 
