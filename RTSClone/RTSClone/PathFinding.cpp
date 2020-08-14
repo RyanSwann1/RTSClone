@@ -94,24 +94,42 @@ std::vector<glm::vec3> PathFinding::getFormationPositions(const glm::vec3& start
 	return unitFormationPositions;
 }
 
-glm::vec3 PathFinding::getClosestAvailablePosition(const glm::vec3& startingPosition, const std::vector<Unit>& units, const Map& map)
+glm::vec3 PathFinding::getClosestAvailablePosition(const glm::vec3& startingPosition, const std::vector<Unit>& units, 
+	const std::vector<Harvester>& harvesters, const Map& map)
 {
-	glm::ivec2 startingPositionOnGrid = Globals::convertToGridPosition(startingPosition);
-	if (Globals::isPositionInMapBounds(startingPositionOnGrid) && !map.isPositionOccupied(startingPositionOnGrid))
+	if (Globals::isPositionInMapBounds(startingPosition) && !map.isPositionOccupied(startingPosition))
 	{
-		auto cIter = std::find_if(units.cbegin(), units.cend(), [&startingPosition](const auto& unit)
+		glm::vec3 nodePosition = Globals::convertToNodePosition(startingPosition);
+		bool collisionFound = false;
+		for (const auto& unit : units)
 		{
-			return unit.getPosition() == startingPosition;
-		});
+			if (Globals::convertToNodePosition(unit.getPosition()) == nodePosition)
+			{
+				collisionFound = true;
+				break;
+			}
+		}
 
-		if (cIter == units.cend())
+		if (!collisionFound)
+		{
+			for (const auto& harvester : harvesters)
+			{
+				if (Globals::convertToNodePosition(harvester.getPosition()) == nodePosition)
+				{
+					collisionFound = true;
+					break;
+				}
+			}
+		}
+
+		if (!collisionFound)
 		{
 			return startingPosition;
 		}
 	}
 
 	m_graph.reset(m_frontier);
-	m_frontier.push(startingPositionOnGrid);
+	m_frontier.push(Globals::convertToGridPosition(startingPosition));
 	glm::ivec2 availablePositionOnGrid = {0, 0};
 	bool availablePositionFound = false;
 
@@ -120,7 +138,7 @@ glm::vec3 PathFinding::getClosestAvailablePosition(const glm::vec3& startingPosi
 		glm::ivec2 position = m_frontier.front();
 		m_frontier.pop();
 
-		std::array<AdjacentPosition, ALL_DIRECTIONS_ON_GRID.size()> adjacentPositions = getAllAdjacentPositions(position, map, units);
+		std::array<AdjacentPosition, ALL_DIRECTIONS_ON_GRID.size()> adjacentPositions = getAllAdjacentPositions(position, map, units, harvesters);
 		for (const auto& adjacentPosition : adjacentPositions)
 		{
 			if (adjacentPosition.valid)

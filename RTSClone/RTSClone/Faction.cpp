@@ -272,7 +272,7 @@ void Faction::addBuilding(eEntityType entityType, const glm::vec3& spawnPosition
     switch (entityType)
     {
     case eEntityType::SupplyDepot:
-        m_supplyDepots.emplace_back(spawnPosition, modelManager.getModel(eModelName::SatelliteDish), map);
+        m_supplyDepots.emplace_back(spawnPosition, modelManager.getModel(eModelName::SupplyDepot), map);
         break;
     default:
         assert(false);
@@ -283,12 +283,12 @@ void Faction::spawnUnit(const glm::vec3& spawnPosition, const Model& unitModel, 
 {
     if (m_HQ.getWaypointPosition() != m_HQ.getPosition())
     {
-        m_units.emplace_back(spawnPosition, PathFinding::getInstance().getClosestAvailablePosition(m_HQ.getWaypointPosition(), m_units, map), 
-            unitModel, map);
+        m_units.emplace_back(spawnPosition, 
+            PathFinding::getInstance().getClosestAvailablePosition(m_HQ.getWaypointPosition(), m_units, m_harvesters, map), unitModel, map);
     }
     else
     {
-        m_units.emplace_back(PathFinding::getInstance().getClosestAvailablePosition(spawnPosition, m_units, map), unitModel, map);
+        m_units.emplace_back(PathFinding::getInstance().getClosestAvailablePosition(spawnPosition, m_units, m_harvesters, map), unitModel, map);
     }
 }
 
@@ -296,7 +296,8 @@ void Faction::spawnHarvester(const glm::vec3& spawnPosition, const Model& unitMo
 {
     if (m_HQ.getWaypointPosition() != m_HQ.getPosition())
     {
-        m_harvesters.emplace_back(spawnPosition, m_HQ.getWaypointPosition(), unitModel, map);
+        m_harvesters.emplace_back(spawnPosition, 
+            PathFinding::getInstance().getClosestAvailablePosition(m_HQ.getWaypointPosition(), m_units, m_harvesters, map), unitModel, map);
     }
     else
     {
@@ -376,7 +377,7 @@ void Faction::moveMultipleSelectedUnits(const glm::vec3& destinationPosition, co
         {
             selectedUnits.push_back(&harvester);
         }
-    }
+    }   
     
     if (!selectedUnits.empty())
     {

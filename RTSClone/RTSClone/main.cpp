@@ -87,7 +87,7 @@ int main()
 	}
 
 	minerals.emplace_back(Globals::convertToNodePosition({ 55.0, Globals::GROUND_HEIGHT, 50.0f }),
-		modelManager->getModel(eModelName::SatelliteDish), *map);
+		modelManager->getModel(eModelName::SupplyDepot), *map);
 
 	shaderHandler->switchToShader(eShaderType::SelectionBox);
 	shaderHandler->setUniformMat4f(eShaderType::SelectionBox, "uOrthographic", glm::ortho(0.0f, static_cast<float>(windowSize.x),

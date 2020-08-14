@@ -30,10 +30,11 @@ struct AdjacentPosition
 
 using GetAllAdjacentPositions = const std::function<std::array<AdjacentPosition, ALL_DIRECTIONS_ON_GRID.size()>(const glm::ivec2&)>&;
 
+class Harvester;
 class Map;
 class Unit;
 std::array<AdjacentPosition, ALL_DIRECTIONS_ON_GRID.size()> getAllAdjacentPositions(const glm::ivec2& position, const Map& map,
-	const std::vector<Unit>& units);
+	const std::vector<Unit>& units, const std::vector<Harvester>& harvesters);
 
 std::array<AdjacentPosition, ALL_DIRECTIONS_ON_GRID.size()> getAllAdjacentPositions(const glm::ivec2& position, const Map& map,
 	const std::vector<Unit>& units, const Unit& unit);

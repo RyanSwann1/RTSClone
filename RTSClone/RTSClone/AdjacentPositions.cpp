@@ -2,6 +2,7 @@
 #include "Map.h"
 #include "Globals.h"
 #include "Unit.h"
+#include "Harvester.h"
 
 AdjacentPosition::AdjacentPosition()
 	: valid(false),
@@ -21,7 +22,8 @@ AdjacentPosition::AdjacentPosition(const glm::ivec2 & position, bool valid, bool
 	position(position)
 {}
 
-std::array<AdjacentPosition, ALL_DIRECTIONS_ON_GRID.size()> getAllAdjacentPositions(const glm::ivec2 & position, const Map & map, const std::vector<Unit> & units)
+std::array<AdjacentPosition, ALL_DIRECTIONS_ON_GRID.size()> getAllAdjacentPositions(const glm::ivec2 & position, const Map & map, const std::vector<Unit> & units,
+	const std::vector<Harvester>& harvesters)
 {
 	std::array<AdjacentPosition, ALL_DIRECTIONS_ON_GRID.size()> adjacentPositions;
 	for (int i = 0; i < adjacentPositions.size(); ++i)
@@ -30,12 +32,24 @@ std::array<AdjacentPosition, ALL_DIRECTIONS_ON_GRID.size()> getAllAdjacentPositi
 		if (Globals::isPositionInMapBounds(adjacentPosition) && !map.isPositionOccupied(adjacentPosition))
 		{
 			bool unitCollision = false;
-			for (const auto& otherUnit : units)
+			for (const auto& unit : units)
 			{
-				if (otherUnit.getAABB().contains(Globals::convertToWorldPosition(adjacentPosition)))
+				if (unit.getAABB().contains(Globals::convertToWorldPosition(adjacentPosition)))
 				{
 					unitCollision = true;
 					break;
+				}
+			}
+
+			if (!unitCollision)
+			{
+				for (const auto& harvester : harvesters)
+				{
+					if (harvester.getAABB().contains(Globals::convertToWorldPosition(adjacentPosition)))
+					{
+						unitCollision = true;
+						break;
+					}
 				}
 			}
 

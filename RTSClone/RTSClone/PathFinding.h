@@ -13,6 +13,7 @@
 #include <array>
 #include <functional>
 
+class Harvester;
 class Unit;
 class Map;
 class PathFinding : private NonMovable, private NonCopyable
@@ -76,7 +77,8 @@ public:
 	std::vector<glm::vec3> getFormationPositions(const glm::vec3& startingPosition, const std::vector<Unit*>& selectedUnits,
 		const Map& map);
 
-	glm::vec3 getClosestAvailablePosition(const glm::vec3& startingPosition, const std::vector<Unit>& units, const Map& map);
+	glm::vec3 getClosestAvailablePosition(const glm::vec3& startingPosition, const std::vector<Unit>& units, 
+		const std::vector<Harvester>& harvesters, const Map& map);
 
 	glm::vec3 getClosestPositionOutsideAABB(const glm::vec3& entityPosition, const AABB& AABB, const glm::vec3& centrePositionAABB,
 		const Map& map);
