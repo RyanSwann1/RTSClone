@@ -74,6 +74,8 @@ public:
 		return shortestDistancePosition;
 	}
 
+	bool isPositionAvailable(const glm::vec3& nodePosition, const Map& map, const std::vector<Unit>& units, const std::vector<Harvester>& harvesters) const;
+
 	std::vector<glm::vec3> getFormationPositions(const glm::vec3& startingPosition, const std::vector<Unit*>& selectedUnits,
 		const Map& map);
 

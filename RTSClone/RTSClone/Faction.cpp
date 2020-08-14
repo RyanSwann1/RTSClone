@@ -25,41 +25,6 @@ namespace
             glm::ivec2(glm::min(startingPosition.x, startingPosition.x + size.x), glm::max(startingPosition.y, startingPosition.y + size.y))
         };
     };
-
-    bool isPositionAvailable(const glm::vec3& nodePosition, const Map& map, const std::vector<Unit>& units, const std::vector<Harvester>& harvesters)
-    {
-        assert(nodePosition == Globals::convertToNodePosition(nodePosition));
-
-        if (!map.isPositionOccupied(nodePosition))
-        {
-            auto unit = std::find_if(units.cbegin(), units.cend(), [&nodePosition](const auto& unit) -> bool
-            {
-                return Globals::convertToNodePosition(unit.getPosition()) == nodePosition;
-            });
-            
-            if (unit == units.cend())
-            {
-                auto harvester = std::find_if(harvesters.cbegin(), harvesters.cend(), [&nodePosition](const auto& harvester) -> bool
-                {
-                    return Globals::convertToNodePosition(harvester.getPosition()) == nodePosition;
-                });
-                if (harvester != harvesters.cend())
-                {
-                    return false;
-                }
-                else
-                {
-                    return true;
-                }
-            }
-            else
-            {
-                return false;
-            }
-        }
-
-        return false;
-    }
 };
 
 //SelectionBox
@@ -220,7 +185,7 @@ void Faction::handleInput(const sf::Event& currentSFMLEvent, const sf::Window& w
         case sf::Keyboard::B:
         {
             glm::vec3 position = Globals::convertToNodePosition(camera.getMouseToGroundPosition(window));
-            if (isPositionAvailable(position, map, m_units, m_harvesters))
+            if (PathFinding::getInstance().isPositionAvailable(position, map, m_units, m_harvesters))
             {
                 m_supplyDepots.emplace_back(position, modelManager.getModel(eModelName::SupplyDepot), map);
             }  

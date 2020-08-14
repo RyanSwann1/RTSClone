@@ -51,6 +51,40 @@ PathFinding::PathFinding()
 	m_closedQueue(static_cast<size_t>(Globals::MAP_SIZE * Globals::MAP_SIZE))
 {}
 
+bool PathFinding::isPositionAvailable(const glm::vec3& nodePosition, const Map& map, const std::vector<Unit>& units, const std::vector<Harvester>& harvesters) const
+{
+	assert(nodePosition == Globals::convertToNodePosition(nodePosition));
+
+	if (!map.isPositionOccupied(nodePosition))
+	{
+		auto unit = std::find_if(units.cbegin(), units.cend(), [&nodePosition](const auto& unit) -> bool
+		{
+			return Globals::convertToNodePosition(unit.getPosition()) == nodePosition;
+		});
+
+		if (unit == units.cend())
+		{
+			auto harvester = std::find_if(harvesters.cbegin(), harvesters.cend(), [&nodePosition](const auto& harvester) -> bool
+			{
+				return Globals::convertToNodePosition(harvester.getPosition()) == nodePosition;
+			});
+			if (harvester != harvesters.cend())
+			{
+				return false;
+			}
+			else
+			{
+				return true;
+			}
+		}
+		else
+		{
+			return false;
+		}
+	}
+
+	return false;
+}
 std::vector<glm::vec3> PathFinding::getFormationPositions(const glm::vec3& startingPosition,
 	const std::vector<Unit*>& selectedUnits, const Map& map)
 {
@@ -97,35 +131,9 @@ std::vector<glm::vec3> PathFinding::getFormationPositions(const glm::vec3& start
 glm::vec3 PathFinding::getClosestAvailablePosition(const glm::vec3& startingPosition, const std::vector<Unit>& units, 
 	const std::vector<Harvester>& harvesters, const Map& map)
 {
-	if (Globals::isPositionInMapBounds(startingPosition) && !map.isPositionOccupied(startingPosition))
+	if (isPositionAvailable(Globals::convertToNodePosition(startingPosition), map, units, harvesters))
 	{
-		glm::vec3 nodePosition = Globals::convertToNodePosition(startingPosition);
-		bool collisionFound = false;
-		for (const auto& unit : units)
-		{
-			if (Globals::convertToNodePosition(unit.getPosition()) == nodePosition)
-			{
-				collisionFound = true;
-				break;
-			}
-		}
-
-		if (!collisionFound)
-		{
-			for (const auto& harvester : harvesters)
-			{
-				if (Globals::convertToNodePosition(harvester.getPosition()) == nodePosition)
-				{
-					collisionFound = true;
-					break;
-				}
-			}
-		}
-
-		if (!collisionFound)
-		{
-			return startingPosition;
-		}
+		return startingPosition;
 	}
 
 	m_graph.reset(m_frontier);
