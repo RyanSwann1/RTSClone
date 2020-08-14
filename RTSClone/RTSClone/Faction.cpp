@@ -172,17 +172,19 @@ void Faction::handleInput(const sf::Event& currentSFMLEvent, const sf::Window& w
         case sf::Keyboard::Num1:
             if (m_HQ.isSelected())
             {
-                spawnEntity<Unit>(m_HQ.getUnitSpawnPosition(), modelManager.getModel(eModelName::Harvester), map, m_units);
+                spawnUnit<Harvester>(m_HQ.getUnitSpawnPosition(), modelManager.getModel(eModelName::Harvester), map, m_harvesters, 
+                    eEntityType::Harvester);
             }
             break;
         case sf::Keyboard::Num2:
             if (m_HQ.isSelected())
             {
-                spawnEntity<Harvester>(m_HQ.getUnitSpawnPosition(), modelManager.getModel(eModelName::Unit), map, m_harvesters);
+                spawnUnit<Unit>(m_HQ.getUnitSpawnPosition(), modelManager.getModel(eModelName::Unit), map, m_units, eEntityType::Unit);
             }
             break;
         case sf::Keyboard::B:
-            addBuilding(eEntityType::SupplyDepot, Globals::convertToNodePosition(camera.getMouseToGroundPosition(window)), modelManager, map);
+            m_supplyDepots.emplace_back(Globals::convertToNodePosition(camera.getMouseToGroundPosition(window)), 
+                modelManager.getModel(eModelName::SupplyDepot), map);
             break;
         }
         break;
@@ -266,18 +268,6 @@ void Faction::renderAABB(ShaderHandler& shaderHandler)
     m_HQ.renderAABB(shaderHandler);
 }
 #endif // RENDER_AABB
-
-void Faction::addBuilding(eEntityType entityType, const glm::vec3& spawnPosition, const ModelManager& modelManager, Map& map)
-{
-    switch (entityType)
-    {
-    case eEntityType::SupplyDepot:
-        m_supplyDepots.emplace_back(spawnPosition, modelManager.getModel(eModelName::SupplyDepot), map);
-        break;
-    default:
-        assert(false);
-    }
-}
 
 bool Faction::isOneUnitSelected() const
 {

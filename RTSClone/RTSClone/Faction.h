@@ -59,22 +59,29 @@ private:
 	std::vector<SupplyDepot> m_supplyDepots;
 	glm::vec3 m_previousMouseToGroundPosition;
 
-	void addBuilding(eEntityType entityType, const glm::vec3& spawnPosition, const ModelManager& modelManager, Map& map);
 	bool isOneUnitSelected() const;
 	void moveSingularSelectedUnit(const glm::vec3& destinationPosition, const Map& map, const std::vector<Mineral>& minerals);
 	void moveMultipleSelectedUnits(const glm::vec3& destinationPosition, const Map& map, const std::vector<Mineral>& minerals);
 
-	template <class Entity>
-	void spawnEntity(const glm::vec3& spawnPosition, const Model& unitModel, Map& map, std::vector<Entity>& entities)
+	template <class Unit>
+	void spawnUnit(const glm::vec3& spawnPosition, const Model& unitModel, Map& map, std::vector<Unit>& units, eEntityType entityType)
 	{
+		switch (entityType)
+		{
+		case eEntityType::Unit:
+		case eEntityType::Harvester:
 		if (m_HQ.getWaypointPosition() != m_HQ.getPosition())
 		{
-			entities.emplace_back(spawnPosition, PathFinding::getInstance().getClosestAvailablePosition(m_HQ.getWaypointPosition(), m_units, m_harvesters, map),
+			units.emplace_back(spawnPosition, PathFinding::getInstance().getClosestAvailablePosition(m_HQ.getWaypointPosition(), m_units, m_harvesters, map),
 				unitModel, map);
 		}
 		else
 		{
-			entities.emplace_back(PathFinding::getInstance().getClosestAvailablePosition(spawnPosition, m_units, m_harvesters, map), unitModel, map);
+			units.emplace_back(PathFinding::getInstance().getClosestAvailablePosition(spawnPosition, m_units, m_harvesters, map), unitModel, map);
+		}
+			break;
+		default:
+			assert(false);
 		}
 	}
 
