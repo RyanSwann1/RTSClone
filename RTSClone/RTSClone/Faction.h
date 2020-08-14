@@ -60,11 +60,23 @@ private:
 	glm::vec3 m_previousMouseToGroundPosition;
 
 	void addBuilding(eEntityType entityType, const glm::vec3& spawnPosition, const ModelManager& modelManager, Map& map);
-	void spawnUnit(const glm::vec3& spawnPosition, const Model& unitModel, Map& map);
-	void spawnHarvester(const glm::vec3& spawnPosition, const Model& unitModel, Map& map);
 	bool isOneUnitSelected() const;
 	void moveSingularSelectedUnit(const glm::vec3& destinationPosition, const Map& map, const std::vector<Mineral>& minerals);
 	void moveMultipleSelectedUnits(const glm::vec3& destinationPosition, const Map& map, const std::vector<Mineral>& minerals);
+
+	template <class Entity>
+	void spawnEntity(const glm::vec3& spawnPosition, const Model& unitModel, Map& map, std::vector<Entity>& entities)
+	{
+		if (m_HQ.getWaypointPosition() != m_HQ.getPosition())
+		{
+			entities.emplace_back(spawnPosition, PathFinding::getInstance().getClosestAvailablePosition(m_HQ.getWaypointPosition(), m_units, m_harvesters, map),
+				unitModel, map);
+		}
+		else
+		{
+			entities.emplace_back(PathFinding::getInstance().getClosestAvailablePosition(spawnPosition, m_units, m_harvesters, map), unitModel, map);
+		}
+	}
 
 	template <class Entity>
 	void handleCollisions(std::vector<Entity>& entities, const Map& map)

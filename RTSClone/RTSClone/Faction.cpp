@@ -172,13 +172,13 @@ void Faction::handleInput(const sf::Event& currentSFMLEvent, const sf::Window& w
         case sf::Keyboard::Num1:
             if (m_HQ.isSelected())
             {
-                spawnHarvester(m_HQ.getUnitSpawnPosition(), modelManager.getModel(eModelName::Harvester), map);
+                spawnEntity<Unit>(m_HQ.getUnitSpawnPosition(), modelManager.getModel(eModelName::Harvester), map, m_units);
             }
             break;
         case sf::Keyboard::Num2:
             if (m_HQ.isSelected())
             {
-                spawnUnit(m_HQ.getUnitSpawnPosition(), modelManager.getModel(eModelName::Unit), map);
+                spawnEntity<Harvester>(m_HQ.getUnitSpawnPosition(), modelManager.getModel(eModelName::Unit), map, m_harvesters);
             }
             break;
         case sf::Keyboard::B:
@@ -276,32 +276,6 @@ void Faction::addBuilding(eEntityType entityType, const glm::vec3& spawnPosition
         break;
     default:
         assert(false);
-    }
-}
-
-void Faction::spawnUnit(const glm::vec3& spawnPosition, const Model& unitModel, Map& map)
-{
-    if (m_HQ.getWaypointPosition() != m_HQ.getPosition())
-    {
-        m_units.emplace_back(spawnPosition, 
-            PathFinding::getInstance().getClosestAvailablePosition(m_HQ.getWaypointPosition(), m_units, m_harvesters, map), unitModel, map);
-    }
-    else
-    {
-        m_units.emplace_back(PathFinding::getInstance().getClosestAvailablePosition(spawnPosition, m_units, m_harvesters, map), unitModel, map);
-    }
-}
-
-void Faction::spawnHarvester(const glm::vec3& spawnPosition, const Model& unitModel, Map& map)
-{
-    if (m_HQ.getWaypointPosition() != m_HQ.getPosition())
-    {
-        m_harvesters.emplace_back(spawnPosition, 
-            PathFinding::getInstance().getClosestAvailablePosition(m_HQ.getWaypointPosition(), m_units, m_harvesters, map), unitModel, map);
-    }
-    else
-    {
-        m_harvesters.emplace_back(spawnPosition, unitModel, map);
     }
 }
 
