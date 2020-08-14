@@ -62,6 +62,7 @@ private:
 	bool isOneUnitSelected() const;
 	void moveSingularSelectedUnit(const glm::vec3& destinationPosition, const Map& map, const std::vector<Mineral>& minerals);
 	void moveMultipleSelectedUnits(const glm::vec3& destinationPosition, const Map& map, const std::vector<Mineral>& minerals);
+	void revalidateExistingUnitPaths(const Map& map);
 
 	template <class Unit>
 	void spawnUnit(const glm::vec3& spawnPosition, const Model& unitModel, Map& map, std::vector<Unit>& units, eEntityType entityType)

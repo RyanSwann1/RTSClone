@@ -189,6 +189,8 @@ void Faction::handleInput(const sf::Event& currentSFMLEvent, const sf::Window& w
             {
                 m_supplyDepots.emplace_back(position, modelManager.getModel(eModelName::SupplyDepot), map);
             }  
+
+            revalidateExistingUnitPaths(map);
         }
             break;
         }
@@ -402,4 +404,17 @@ void Faction::moveMultipleSelectedUnits(const glm::vec3& destinationPosition, co
     }
 
     selectedUnits.clear();
+}
+
+void Faction::revalidateExistingUnitPaths(const Map& map)
+{
+    for (auto& unit : m_units)
+    {
+        if (!unit.isPathEmpty())
+        {
+            glm::vec3 destination = unit.getDestination();
+            unit.moveTo(destination, map, m_units, [&](const glm::ivec2& position) 
+                { return getAllAdjacentPositions(position, map, m_units, unit); });
+        }
+    }
 }

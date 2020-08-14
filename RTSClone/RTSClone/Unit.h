@@ -26,6 +26,8 @@ public:
 	Unit(const glm::vec3& startingPosition, const Model& model, Map& map, eEntityType entityType = eEntityType::Unit);
 	Unit(const glm::vec3& startingPosition, const glm::vec3& destinationPosition, const Model& model, Map& map, eEntityType entityType = eEntityType::Unit);
 
+	bool isPathEmpty() const;
+	const glm::vec3& getDestination() const;
 	eUnitState getCurrentState() const;
 	
 	void moveTo(const glm::vec3& destinationPosition, const Map& map, const std::vector<Unit>& units,

@@ -65,6 +65,17 @@ Unit::Unit(const glm::vec3 & startingPosition, const glm::vec3 & destinationPosi
 	moveTo(destinationPosition, map);
 }
 
+bool Unit::isPathEmpty() const
+{
+	return m_pathToPosition.empty();
+}
+
+const glm::vec3& Unit::getDestination() const
+{
+	assert(!isPathEmpty());
+	return m_pathToPosition.front();
+}
+
 eUnitState Unit::getCurrentState() const
 {
 	return m_currentState;
