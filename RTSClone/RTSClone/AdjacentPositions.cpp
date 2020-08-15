@@ -23,7 +23,7 @@ AdjacentPosition::AdjacentPosition(const glm::ivec2 & position, bool valid, bool
 {}
 
 std::array<AdjacentPosition, ALL_DIRECTIONS_ON_GRID.size()> getAllAdjacentPositions(const glm::ivec2 & position, const Map & map, const std::vector<Unit> & units,
-	const std::vector<Worker>& harvesters)
+	const std::vector<Worker>& workers)
 {
 	std::array<AdjacentPosition, ALL_DIRECTIONS_ON_GRID.size()> adjacentPositions;
 	for (int i = 0; i < adjacentPositions.size(); ++i)
@@ -43,7 +43,7 @@ std::array<AdjacentPosition, ALL_DIRECTIONS_ON_GRID.size()> getAllAdjacentPositi
 
 			if (!unitCollision)
 			{
-				for (const auto& harvester : harvesters)
+				for (const auto& harvester : workers)
 				{
 					if (harvester.getAABB().contains(Globals::convertToWorldPosition(adjacentPosition)))
 					{

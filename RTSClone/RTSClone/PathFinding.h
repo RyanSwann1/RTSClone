@@ -74,13 +74,13 @@ public:
 		return shortestDistancePosition;
 	}
 
-	bool isPositionAvailable(const glm::vec3& nodePosition, const Map& map, const std::vector<Unit>& units, const std::vector<Worker>& harvesters) const;
+	bool isPositionAvailable(const glm::vec3& nodePosition, const Map& map, const std::vector<Unit>& units, const std::vector<Worker>& workers) const;
 
 	std::vector<glm::vec3> getFormationPositions(const glm::vec3& startingPosition, const std::vector<Unit*>& selectedUnits,
 		const Map& map);
 
 	glm::vec3 getClosestAvailablePosition(const glm::vec3& startingPosition, const std::vector<Unit>& units, 
-		const std::vector<Worker>& harvesters, const Map& map);
+		const std::vector<Worker>& workers, const Map& map);
 
 	glm::vec3 getClosestPositionOutsideAABB(const glm::vec3& entityPosition, const AABB& AABB, const glm::vec3& centrePositionAABB,
 		const Map& map);

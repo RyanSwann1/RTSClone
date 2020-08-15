@@ -51,7 +51,7 @@ PathFinding::PathFinding()
 	m_closedQueue(static_cast<size_t>(Globals::MAP_SIZE * Globals::MAP_SIZE))
 {}
 
-bool PathFinding::isPositionAvailable(const glm::vec3& nodePosition, const Map& map, const std::vector<Unit>& units, const std::vector<Worker>& harvesters) const
+bool PathFinding::isPositionAvailable(const glm::vec3& nodePosition, const Map& map, const std::vector<Unit>& units, const std::vector<Worker>& workers) const
 {
 	assert(nodePosition == Globals::convertToNodePosition(nodePosition));
 
@@ -64,11 +64,11 @@ bool PathFinding::isPositionAvailable(const glm::vec3& nodePosition, const Map& 
 
 		if (unit == units.cend())
 		{
-			auto harvester = std::find_if(harvesters.cbegin(), harvesters.cend(), [&nodePosition](const auto& harvester) -> bool
+			auto worker = std::find_if(workers.cbegin(), workers.cend(), [&nodePosition](const auto& harvester) -> bool
 			{
 				return Globals::convertToNodePosition(harvester.getPosition()) == nodePosition;
 			});
-			if (harvester != harvesters.cend())
+			if (worker != workers.cend())
 			{
 				return false;
 			}
@@ -129,9 +129,9 @@ std::vector<glm::vec3> PathFinding::getFormationPositions(const glm::vec3& start
 }
 
 glm::vec3 PathFinding::getClosestAvailablePosition(const glm::vec3& startingPosition, const std::vector<Unit>& units, 
-	const std::vector<Worker>& harvesters, const Map& map)
+	const std::vector<Worker>& workers, const Map& map)
 {
-	if (isPositionAvailable(Globals::convertToNodePosition(startingPosition), map, units, harvesters))
+	if (isPositionAvailable(Globals::convertToNodePosition(startingPosition), map, units, workers))
 	{
 		return startingPosition;
 	}	
@@ -146,7 +146,7 @@ glm::vec3 PathFinding::getClosestAvailablePosition(const glm::vec3& startingPosi
 		glm::ivec2 position = m_frontier.front();
 		m_frontier.pop();
 
-		std::array<AdjacentPosition, ALL_DIRECTIONS_ON_GRID.size()> adjacentPositions = getAllAdjacentPositions(position, map, units, harvesters);
+		std::array<AdjacentPosition, ALL_DIRECTIONS_ON_GRID.size()> adjacentPositions = getAllAdjacentPositions(position, map, units, workers);
 		for (const auto& adjacentPosition : adjacentPositions)
 		{
 			if (adjacentPosition.valid)
