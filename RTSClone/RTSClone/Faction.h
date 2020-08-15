@@ -65,13 +65,13 @@ private:
 	glm::vec3 m_previousMouseToGroundPosition;
 
 	bool isExceedPopulationLimit(eEntityType entityType) const;
-	bool isEntityAffordable(int resourceAmount) const;
+	bool isEntityAffordable(eEntityType entityType) const;
 	bool isOneUnitSelected() const;
 	
 	void moveSingularSelectedUnit(const glm::vec3& destinationPosition, const Map& map, const std::vector<Mineral>& minerals);
 	void moveMultipleSelectedUnits(const glm::vec3& destinationPosition, const Map& map, const std::vector<Mineral>& minerals);
 	void revalidateExistingUnitPaths(const Map& map);
-	void reduceResources(int amount);
+	void reduceResources(eEntityType addedEntityType);
 	void increaseCurrentPopulationAmount(int amount, eEntityType entityType);
 
 	template <class Unit>

@@ -15,11 +15,13 @@ namespace
 {
     constexpr int STARTING_RESOURCES = 50;
     constexpr int HARVESTER_RESOURCE_COST = 50;
+    constexpr int SUPPLY_DEPOT_COST = 50;
     constexpr int UNIT_RESOURCE_COST = 100;
     constexpr int STARTING_POPULATION = 5;
     constexpr int MAX_POPULATION = 20;
     constexpr int HARVESTER_POPULATION_COST = 1;
     constexpr int UNIT_POPULATION_COST = 2;
+    constexpr int POPULATION_INCREMENT = 5;
 
     std::array<glm::ivec2, 6> getSelectionBoxQuadCoords(const glm::ivec2& startingPosition, const glm::ivec2& size)
     {
@@ -190,32 +192,35 @@ void Faction::handleInput(const sf::Event& currentSFMLEvent, const sf::Window& w
         switch (currentSFMLEvent.key.code)
         {
         case sf::Keyboard::Num1:
-            if (m_HQ.isSelected() && isEntityAffordable(HARVESTER_RESOURCE_COST) && 
+            if (m_HQ.isSelected() && isEntityAffordable(eEntityType::Harvester) && 
                 !isExceedPopulationLimit(eEntityType::Harvester))
             {
                 spawnUnit<Harvester>(m_HQ.getUnitSpawnPosition(), modelManager.getModel(eModelName::Harvester), map, m_harvesters, 
                     eEntityType::Harvester);
                 
-                reduceResources(HARVESTER_RESOURCE_COST);
+                reduceResources(eEntityType::Harvester);
                 increaseCurrentPopulationAmount(HARVESTER_POPULATION_COST, eEntityType::Harvester);
             }
             break;
         case sf::Keyboard::Num2:
-            if (m_HQ.isSelected() && isEntityAffordable(UNIT_RESOURCE_COST) &&
+            if (m_HQ.isSelected() && isEntityAffordable(eEntityType::Harvester) &&
                 !isExceedPopulationLimit(eEntityType::Unit))
             {
                 spawnUnit<Unit>(m_HQ.getUnitSpawnPosition(), modelManager.getModel(eModelName::Unit), map, m_units, eEntityType::Unit);
                 
-                reduceResources(UNIT_RESOURCE_COST);
+                reduceResources(eEntityType::Harvester);
                 increaseCurrentPopulationAmount(UNIT_POPULATION_COST, eEntityType::Unit);
             }
             break;
         case sf::Keyboard::B:
         {
             glm::vec3 position = Globals::convertToNodePosition(camera.getMouseToGroundPosition(window));
-            if (PathFinding::getInstance().isPositionAvailable(position, map, m_units, m_harvesters))
+            if (m_currentPopulationLimit + POPULATION_INCREMENT < MAX_POPULATION &&
+
+                PathFinding::getInstance().isPositionAvailable(position, map, m_units, m_harvesters))
             {
-                m_supplyDepots.emplace_back(position, modelManager.getModel(eModelName::SupplyDepot), map);
+                m_currentPopulationLimit += POPULATION_INCREMENT;
+                m_supplyDepots.emplace_back(position, modelManager.getModel(eModelName::SupplyDepot), map);   
             }  
 
             revalidateExistingUnitPaths(map);
@@ -317,9 +322,22 @@ bool Faction::isExceedPopulationLimit(eEntityType entityType) const
     }
 }
 
-bool Faction::isEntityAffordable(int resourceAmount) const
+bool Faction::isEntityAffordable(eEntityType entityType) const
 {
-    return m_currentResourceAmount - resourceAmount >= 0;
+    switch (entityType)
+    {
+    case eEntityType::Harvester:
+        m_currentResourceAmount - HARVESTER_RESOURCE_COST >= 0;
+        break;
+    case eEntityType::Unit:
+        m_currentResourceAmount - UNIT_RESOURCE_COST >= 0;
+        break;
+    case eEntityType::SupplyDepot:
+        m_currentResourceAmount - SUPPLY_DEPOT_COST >= 0;
+        break;
+    default:
+        assert(false);
+    }
 }
 
 bool Faction::isOneUnitSelected() const
@@ -473,10 +491,21 @@ void Faction::revalidateExistingUnitPaths(const Map& map)
     }
 }
 
-void Faction::reduceResources(int amount)
+void Faction::reduceResources(eEntityType addedEntityType)
 {
-    assert(isEntityAffordable(amount));
-    m_currentResourceAmount -= amount;
+    assert(isEntityAffordable(addedEntityType));
+    switch (addedEntityType)
+    {
+    case eEntityType::Unit:
+        m_currentResourceAmount -= UNIT_RESOURCE_COST;
+        break;
+    case eEntityType::Harvester:
+        m_currentResourceAmount -= HARVESTER_RESOURCE_COST;
+        break;
+    case eEntityType::SupplyDepot:
+        m_currentResourceAmount -= SUPPLY_DEPOT_COST;
+        break;
+    }
 
     std::cout << "Resources: " <<  m_currentResourceAmount << "\n";
 }
