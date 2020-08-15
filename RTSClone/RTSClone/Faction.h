@@ -55,6 +55,8 @@ public:
 
 private:
 	int m_currentResourceAmount;
+	int m_currentPopulationAmount;
+	int m_currentPopulationLimit;
 	SelectionBox m_selectionBox;
 	Headquarters m_HQ;
 	std::vector<Unit> m_units;
@@ -62,6 +64,7 @@ private:
 	std::vector<SupplyDepot> m_supplyDepots;
 	glm::vec3 m_previousMouseToGroundPosition;
 
+	bool isExceedPopulationLimit(eEntityType entityType) const;
 	bool isEntityAffordable(int resourceAmount) const;
 	bool isOneUnitSelected() const;
 	
@@ -69,6 +72,7 @@ private:
 	void moveMultipleSelectedUnits(const glm::vec3& destinationPosition, const Map& map, const std::vector<Mineral>& minerals);
 	void revalidateExistingUnitPaths(const Map& map);
 	void reduceResources(int amount);
+	void increaseCurrentPopulationAmount(int amount, eEntityType entityType);
 
 	template <class Unit>
 	void spawnUnit(const glm::vec3& spawnPosition, const Model& unitModel, Map& map, std::vector<Unit>& units, eEntityType entityType)

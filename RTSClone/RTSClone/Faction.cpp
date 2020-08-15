@@ -16,6 +16,10 @@ namespace
     constexpr int STARTING_RESOURCES = 50;
     constexpr int HARVESTER_RESOURCE_COST = 50;
     constexpr int UNIT_RESOURCE_COST = 100;
+    constexpr int STARTING_POPULATION = 5;
+    constexpr int MAX_POPULATION = 20;
+    constexpr int HARVESTER_POPULATION_COST = 1;
+    constexpr int UNIT_POPULATION_COST = 2;
 
     std::array<glm::ivec2, 6> getSelectionBoxQuadCoords(const glm::ivec2& startingPosition, const glm::ivec2& size)
     {
@@ -95,6 +99,8 @@ void SelectionBox::render(const sf::Window& window) const
 //Faction
 Faction::Faction(const ModelManager& modelManager, Map& map)
     : m_currentResourceAmount(STARTING_RESOURCES),
+    m_currentPopulationAmount(0),
+    m_currentPopulationLimit(STARTING_POPULATION),
     m_selectionBox(),
     m_HQ(Globals::convertToNodePosition({ 35.0f, Globals::GROUND_HEIGHT, 15.f }), modelManager.getModel(eModelName::HQ), map),
     m_units(),
@@ -103,6 +109,7 @@ Faction::Faction(const ModelManager& modelManager, Map& map)
     m_previousMouseToGroundPosition()
 {
     std::cout << "Resources: " <<  m_currentResourceAmount << "\n";
+    std::cout << "Current Population: " << m_currentPopulationAmount << "\n";
 }
 
 void Faction::addResources(Harvester & harvester)
@@ -183,20 +190,24 @@ void Faction::handleInput(const sf::Event& currentSFMLEvent, const sf::Window& w
         switch (currentSFMLEvent.key.code)
         {
         case sf::Keyboard::Num1:
-            if (m_HQ.isSelected() && isEntityAffordable(HARVESTER_RESOURCE_COST))
+            if (m_HQ.isSelected() && isEntityAffordable(HARVESTER_RESOURCE_COST) && 
+                !isExceedPopulationLimit(eEntityType::Harvester))
             {
                 spawnUnit<Harvester>(m_HQ.getUnitSpawnPosition(), modelManager.getModel(eModelName::Harvester), map, m_harvesters, 
                     eEntityType::Harvester);
                 
                 reduceResources(HARVESTER_RESOURCE_COST);
+                increaseCurrentPopulationAmount(HARVESTER_POPULATION_COST, eEntityType::Harvester);
             }
             break;
         case sf::Keyboard::Num2:
-            if (m_HQ.isSelected() && isEntityAffordable(UNIT_RESOURCE_COST))
+            if (m_HQ.isSelected() && isEntityAffordable(UNIT_RESOURCE_COST) &&
+                !isExceedPopulationLimit(eEntityType::Unit))
             {
                 spawnUnit<Unit>(m_HQ.getUnitSpawnPosition(), modelManager.getModel(eModelName::Unit), map, m_units, eEntityType::Unit);
                 
                 reduceResources(UNIT_RESOURCE_COST);
+                increaseCurrentPopulationAmount(UNIT_POPULATION_COST, eEntityType::Unit);
             }
             break;
         case sf::Keyboard::B:
@@ -292,6 +303,19 @@ void Faction::renderAABB(ShaderHandler& shaderHandler)
     m_HQ.renderAABB(shaderHandler);
 }
 #endif // RENDER_AABB
+
+bool Faction::isExceedPopulationLimit(eEntityType entityType) const
+{
+    switch (entityType)
+    {
+    case eEntityType::Unit:
+        return m_currentPopulationAmount + UNIT_POPULATION_COST > m_currentPopulationLimit;
+    case eEntityType::Harvester:
+        return m_currentPopulationAmount + HARVESTER_POPULATION_COST > m_currentPopulationLimit;
+    default:
+        assert(false);
+    }
+}
 
 bool Faction::isEntityAffordable(int resourceAmount) const
 {
@@ -455,4 +479,12 @@ void Faction::reduceResources(int amount)
     m_currentResourceAmount -= amount;
 
     std::cout << "Resources: " <<  m_currentResourceAmount << "\n";
+}
+
+void Faction::increaseCurrentPopulationAmount(int amount, eEntityType entityType)
+{
+    assert(!isExceedPopulationLimit(entityType));
+    m_currentPopulationAmount += amount;
+
+    std::cout << "Population: " << m_currentPopulationAmount << "\n";
 }
