@@ -27,22 +27,23 @@ struct SelectionBox : private NonMovable, private NonCopyable
 	unsigned int vboID;
 };
 
+struct BuildingCommand;
 class Mineral;
 class ShaderHandler;
-class ModelManager;
 struct Camera;
 class Map;
 class Faction : private NonMovable, private NonCopyable
 {
 public:
-	Faction(const ModelManager& modelManager, Map& map);
+	Faction(Map& map);
 
+	void addBuilding(Worker& worker);
 	void addResources(Worker& worker);
 
 	void handleInput(const sf::Event& currentSFMLEvent, const sf::Window& window, const Camera& camera, Map& map, 
-		const ModelManager& modelManager, const std::vector<Mineral>& minerals, float deltaTime);
-	void update(float deltaTime, const ModelManager& modelManager, const Map& map);
-	void render(ShaderHandler& shaderHandler, const ModelManager& modelManager) const;
+		const std::vector<Mineral>& minerals, float deltaTime);
+	void update(float deltaTime, const Map& map);
+	void render(ShaderHandler& shaderHandler) const;
 	void renderSelectionBox(const sf::Window& window) const;
 
 #ifdef RENDER_PATHING

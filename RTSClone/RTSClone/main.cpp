@@ -59,6 +59,12 @@ int main()
 	glEnable(GL_DEPTH_TEST);
 	ImGui_SFML_OpenGL3::init(window);
 	
+	if (!ModelManager::getInstance().isAllModelsLoaded())
+	{
+		std::cout << "Failed to load all models\n";
+		return -1;
+	}
+
 	std::unique_ptr<ShaderHandler> shaderHandler = ShaderHandler::create();
 	assert(shaderHandler);
 	if (!shaderHandler)
@@ -67,19 +73,11 @@ int main()
 		return -1;
 	}
 
-	std::unique_ptr<ModelManager> modelManager = ModelManager::create();
-	assert(modelManager);
-	if (!modelManager)
-	{
-		std::cout << "Failed to load all models\n";
-		return -1;
-	}
-
 #ifdef RENDER_GROUND
 	Ground ground;
 #endif // RENDER_GROUND
 	std::unique_ptr<Map> map = std::make_unique<Map>();
-	Faction faction(*modelManager, *map);
+	Faction faction(*map);
 	sf::Clock gameClock;
 	Camera camera;
 	std::vector<Mineral> minerals;
@@ -87,7 +85,7 @@ int main()
 	for (float z = Globals::NODE_SIZE; z <= Globals::NODE_SIZE * 5; z += Globals::NODE_SIZE)
 	{
 		minerals.emplace_back(Globals::convertToNodePosition({ 70.0f, Globals::GROUND_HEIGHT, z }),
-			modelManager->getModel(eModelName::Mineral), *map);
+			ModelManager::getInstance().getModel(eModelName::Mineral), *map);
 	}
 
 	shaderHandler->switchToShader(eShaderType::SelectionBox);
@@ -116,14 +114,14 @@ int main()
 				}
 			}
 
-			faction.handleInput(currentSFMLEvent, window, camera, *map, *modelManager, minerals, deltaTime);
+			faction.handleInput(currentSFMLEvent, window, camera, *map, minerals, deltaTime);
 		}
 
 		ImGui_SFML_OpenGL3::startFrame();
 
 		ImGui::ShowDemoWindow();
 
-		faction.update(deltaTime, *modelManager, *map);
+		faction.update(deltaTime, *map);
 		camera.update(window, deltaTime);
 
 		glm::mat4 view = camera.getView(); 
@@ -135,10 +133,10 @@ int main()
 		shaderHandler->setUniformMat4f(eShaderType::Default, "uView", view);
 		shaderHandler->setUniformMat4f(eShaderType::Default, "uProjection", projection);
 	
-		faction.render(*shaderHandler, *modelManager);
+		faction.render(*shaderHandler);
 		for(const auto& mineral : minerals)
 		{
-			mineral.render(*shaderHandler, modelManager->getModel(mineral.getModelName()));
+			mineral.render(*shaderHandler, ModelManager::getInstance().getModel(mineral.getModelName()));
 		}
 
 		shaderHandler->switchToShader(eShaderType::Debug);

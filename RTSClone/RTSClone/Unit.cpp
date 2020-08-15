@@ -140,7 +140,7 @@ void Unit::moveTo(const glm::vec3& destinationPosition, const Map& map)
 	}
 }
 
-void Unit::update(float deltaTime, const ModelManager& modelManager)
+void Unit::update(float deltaTime)
 {
 	switch (m_currentState)
 	{
@@ -150,7 +150,7 @@ void Unit::update(float deltaTime, const ModelManager& modelManager)
 			glm::vec3 newPosition = Globals::moveTowards(m_position, m_pathToPosition.back(), MOVEMENT_SPEED * deltaTime);
 			m_front = glm::normalize(glm::vec3(newPosition - m_position));
 			m_position = newPosition;
-			m_AABB.reset(m_position, modelManager.getModel(m_modelName));
+			m_AABB.reset(m_position, ModelManager::getInstance().getModel(m_modelName));
 			if (m_position == m_pathToPosition.back())
 			{
 				m_pathToPosition.pop_back();

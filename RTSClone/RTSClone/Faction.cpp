@@ -99,12 +99,12 @@ void SelectionBox::render(const sf::Window& window) const
 }
 
 //Faction
-Faction::Faction(const ModelManager& modelManager, Map& map)
+Faction::Faction(Map& map)
     : m_currentResourceAmount(STARTING_RESOURCES),
     m_currentPopulationAmount(0),
     m_currentPopulationLimit(STARTING_POPULATION),
     m_selectionBox(),
-    m_HQ(Globals::convertToNodePosition({ 35.0f, Globals::GROUND_HEIGHT, 15.f }), modelManager.getModel(eModelName::HQ), map),
+    m_HQ(Globals::convertToNodePosition({ 35.0f, Globals::GROUND_HEIGHT, 15.f }), ModelManager::getInstance().getModel(eModelName::HQ), map),
     m_units(),
     m_workers(),
     m_supplyDepots(),
@@ -114,6 +114,10 @@ Faction::Faction(const ModelManager& modelManager, Map& map)
     std::cout << "Current Population: " << m_currentPopulationAmount << "\n";
 }
 
+void Faction::addBuilding(Worker& worker)
+{
+}
+
 void Faction::addResources(Worker & worker)
 {
     m_currentResourceAmount += worker.extractResources();
@@ -121,7 +125,7 @@ void Faction::addResources(Worker & worker)
 }
 
 void Faction::handleInput(const sf::Event& currentSFMLEvent, const sf::Window& window, const Camera& camera, Map& map, 
-    const ModelManager& modelManager, const std::vector<Mineral>& minerals, float deltaTime)
+    const std::vector<Mineral>& minerals, float deltaTime)
 {
     switch (currentSFMLEvent.type)
     {
@@ -192,10 +196,10 @@ void Faction::handleInput(const sf::Event& currentSFMLEvent, const sf::Window& w
         switch (currentSFMLEvent.key.code)
         {
         case sf::Keyboard::Num1:
-            spawnUnit<Worker>(m_HQ.getUnitSpawnPosition(), modelManager.getModel(eModelName::Worker), map, m_workers, eEntityType::Worker);
+            spawnUnit<Worker>(m_HQ.getUnitSpawnPosition(), ModelManager::getInstance().getModel(eModelName::Worker), map, m_workers, eEntityType::Worker);
             break;
         case sf::Keyboard::Num2:
-            spawnUnit<Unit>(m_HQ.getUnitSpawnPosition(), modelManager.getModel(eModelName::Unit), map, m_units, eEntityType::Unit);
+            spawnUnit<Unit>(m_HQ.getUnitSpawnPosition(), ModelManager::getInstance().getModel(eModelName::Unit), map, m_units, eEntityType::Unit);
             break;
         case sf::Keyboard::B:
         {
@@ -205,12 +209,13 @@ void Faction::handleInput(const sf::Event& currentSFMLEvent, const sf::Window& w
             });
             if (selectedWorker != m_workers.end())
             {
+
                 glm::vec3 position = Globals::convertToNodePosition(camera.getMouseToGroundPosition(window));
                 if (m_currentPopulationLimit + POPULATION_INCREMENT < MAX_POPULATION &&
                     isEntityAffordable(eEntityType::SupplyDepot) &&
                     PathFinding::getInstance().isPositionAvailable(position, map, m_units, m_workers))
                 {
-                    m_supplyDepots.emplace_back(position, modelManager.getModel(eModelName::SupplyDepot), map);
+                    m_supplyDepots.emplace_back(position, ModelManager::getInstance().getModel(eModelName::SupplyDepot), map);
 
                     glm::vec3 destination = PathFinding::getInstance().getClosestPositionOutsideAABB(selectedWorker->getPosition(),
                         m_supplyDepots.back().getAABB(), m_supplyDepots.back().getPosition(), map);
@@ -218,9 +223,9 @@ void Faction::handleInput(const sf::Event& currentSFMLEvent, const sf::Window& w
 
                     reduceResources(eEntityType::SupplyDepot);
                     increasePopulationLimit();
-                }
 
-                revalidateExistingUnitPaths(map);
+                    revalidateExistingUnitPaths(map);
+                }
             }
         }
             break;
@@ -229,39 +234,40 @@ void Faction::handleInput(const sf::Event& currentSFMLEvent, const sf::Window& w
     }
 }
 
-void Faction::update(float deltaTime, const ModelManager& modelManager, const Map& map)
+void Faction::update(float deltaTime, const Map& map)
 {
     for (auto& unit : m_units)
     {
-        unit.update(deltaTime, modelManager);
+        unit.update(deltaTime);
     }
 
     for (auto& worker : m_workers)
     {
-        worker.update(deltaTime, modelManager, m_HQ, map, *this);
+        worker.update(deltaTime, m_HQ, map, *this);
     }
 
     handleCollisions<Unit>(m_units, map);
     handleCollisions<Worker>(m_workers, map);
 }
 
-void Faction::render(ShaderHandler& shaderHandler, const ModelManager& modelManager) const
+void Faction::render(ShaderHandler& shaderHandler) const
 {
-    m_HQ.render(shaderHandler, modelManager.getModel(m_HQ.getModelName()), modelManager.getModel(eModelName::Waypoint));
+    m_HQ.render(shaderHandler, ModelManager::getInstance().getModel(m_HQ.getModelName()), 
+        ModelManager::getInstance().getModel(eModelName::Waypoint));
 
     for (auto& unit : m_units)
     {
-        unit.render(shaderHandler, modelManager.getModel(unit.getModelName()));
+        unit.render(shaderHandler, ModelManager::getInstance().getModel(unit.getModelName()));
     }
 
     for (auto& worker : m_workers)
     {
-        worker.render(shaderHandler, modelManager.getModel(worker.getModelName()));
+        worker.render(shaderHandler, ModelManager::getInstance().getModel(worker.getModelName()));
     }
 
     for (auto& supplyDepot : m_supplyDepots)
     {
-        supplyDepot.render(shaderHandler, modelManager.getModel(supplyDepot.getModelName()));
+        supplyDepot.render(shaderHandler, ModelManager::getInstance().getModel(supplyDepot.getModelName()));
     }
 }
 

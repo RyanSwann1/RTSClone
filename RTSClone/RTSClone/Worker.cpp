@@ -38,9 +38,9 @@ int Worker::extractResources()
 	return resources;
 }
 
-void Worker::update(float deltaTime, const ModelManager& modelManager, const Headquarters& HQ, const Map& map, Faction& owningFaction)
+void Worker::update(float deltaTime, const Headquarters& HQ, const Map& map, Faction& owningFaction)
 {
-	Unit::update(deltaTime, modelManager);
+	Unit::update(deltaTime);
 
 	switch (m_currentState)
 	{
@@ -50,7 +50,7 @@ void Worker::update(float deltaTime, const ModelManager& modelManager, const Hea
 			glm::vec3 newPosition = Globals::moveTowards(m_position, m_pathToPosition.back(), MOVEMENT_SPEED * deltaTime);
 			m_front = glm::normalize(glm::vec3(newPosition - m_position));
 			m_position = newPosition;
-			m_AABB.reset(m_position, modelManager.getModel(m_modelName));
+			m_AABB.reset(m_position, ModelManager::getInstance().getModel(m_modelName));
 			if (m_position == m_pathToPosition.back())
 			{
 				m_pathToPosition.pop_back();
@@ -73,7 +73,7 @@ void Worker::update(float deltaTime, const ModelManager& modelManager, const Hea
 			glm::vec3 newPosition = Globals::moveTowards(m_position, m_pathToPosition.back(), MOVEMENT_SPEED * deltaTime);
 			m_front = glm::normalize(glm::vec3(newPosition - m_position));
 			m_position = newPosition;
-			m_AABB.reset(m_position, modelManager.getModel(m_modelName));
+			m_AABB.reset(m_position, ModelManager::getInstance().getModel(m_modelName));
 			if (m_position == m_pathToPosition.back())
 			{
 				m_pathToPosition.pop_back();

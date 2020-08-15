@@ -14,12 +14,12 @@ enum class eUnitState
 	Moving,
 	MovingToMinerals,
 	ReturningMineralsToHQ,
-	Harvesting
+	Harvesting,
+	Building
 };
 
 class Map;
 class ShaderHandler;
-class ModelManager;
 class Unit : public Entity
 {
 public:
@@ -34,7 +34,7 @@ public:
 		const GetAllAdjacentPositions& getAdjacentPositions);
 	void moveTo(const glm::vec3& destinationPosition, const Map& map);
 
-	void update(float deltaTime, const ModelManager& modelManager);
+	void update(float deltaTime);
 
 #ifdef RENDER_PATHING
 	void renderPathMesh(ShaderHandler& shaderHandler);
