@@ -9,11 +9,11 @@
 class Faction;
 class Mineral;
 class Headquarters;
-class Harvester : public Unit
+class Worker : public Unit
 {
 public:
-	Harvester(const glm::vec3& startingPosition, const Model& model, Map& map);
-	Harvester(const glm::vec3& startingPosition, const glm::vec3& destinationPosition, const Model& model, Map& map);
+	Worker(const glm::vec3& startingPosition, const Model& model, Map& map);
+	Worker(const glm::vec3& startingPosition, const glm::vec3& destinationPosition, const Model& model, Map& map);
 	
 	int extractResources();
 

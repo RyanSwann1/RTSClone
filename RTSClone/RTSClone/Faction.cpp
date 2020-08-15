@@ -14,12 +14,12 @@
 namespace
 {
     constexpr int STARTING_RESOURCES = 50;
-    constexpr int HARVESTER_RESOURCE_COST = 50;
+    constexpr int WORKER_RESOURCE_COST = 50;
     constexpr int SUPPLY_DEPOT_COST = 50;
     constexpr int UNIT_RESOURCE_COST = 100;
     constexpr int STARTING_POPULATION = 5;
     constexpr int MAX_POPULATION = 20;
-    constexpr int HARVESTER_POPULATION_COST = 1;
+    constexpr int WORKER_POPULATION_COST = 1;
     constexpr int UNIT_POPULATION_COST = 2;
     constexpr int POPULATION_INCREMENT = 5;
 
@@ -106,7 +106,7 @@ Faction::Faction(const ModelManager& modelManager, Map& map)
     m_selectionBox(),
     m_HQ(Globals::convertToNodePosition({ 35.0f, Globals::GROUND_HEIGHT, 15.f }), modelManager.getModel(eModelName::HQ), map),
     m_units(),
-    m_harvesters(),
+    m_workers(),
     m_supplyDepots(),
     m_previousMouseToGroundPosition()
 {
@@ -114,9 +114,9 @@ Faction::Faction(const ModelManager& modelManager, Map& map)
     std::cout << "Current Population: " << m_currentPopulationAmount << "\n";
 }
 
-void Faction::addResources(Harvester & harvester)
+void Faction::addResources(Worker & worker)
 {
-    m_currentResourceAmount += harvester.extractResources();
+    m_currentResourceAmount += worker.extractResources();
     std::cout << "Resources: " << m_currentResourceAmount << "\n";
 }
 
@@ -141,7 +141,7 @@ void Faction::handleInput(const sf::Event& currentSFMLEvent, const sf::Window& w
             }
 
             selectUnit<Unit>(m_units, mouseToGroundPosition, selectAllUnits);
-            selectUnit<Harvester>(m_harvesters, mouseToGroundPosition, selectAllUnits);
+            selectUnit<Worker>(m_workers, mouseToGroundPosition, selectAllUnits);
 
             m_selectionBox.setStartingPosition(window, mouseToGroundPosition);
             m_HQ.setSelected(m_HQ.getAABB().contains(mouseToGroundPosition));
@@ -182,9 +182,9 @@ void Faction::handleInput(const sf::Event& currentSFMLEvent, const sf::Window& w
                 unit.setSelected(m_selectionBox.AABB.contains(unit.getAABB()));
             }
 
-            for (auto& harvester : m_harvesters)
+            for (auto& worker : m_workers)
             {
-                harvester.setSelected(m_selectionBox.AABB.contains(harvester.getAABB()));
+                worker.setSelected(m_selectionBox.AABB.contains(worker.getAABB()));
             }
         }
         break;
@@ -192,23 +192,23 @@ void Faction::handleInput(const sf::Event& currentSFMLEvent, const sf::Window& w
         switch (currentSFMLEvent.key.code)
         {
         case sf::Keyboard::Num1:
-            if (m_HQ.isSelected() && isEntityAffordable(eEntityType::Harvester) && 
-                !isExceedPopulationLimit(eEntityType::Harvester))
+            if (m_HQ.isSelected() && isEntityAffordable(eEntityType::Worker) && 
+                !isExceedPopulationLimit(eEntityType::Worker))
             {
-                spawnUnit<Harvester>(m_HQ.getUnitSpawnPosition(), modelManager.getModel(eModelName::Harvester), map, m_harvesters, 
-                    eEntityType::Harvester);
+                spawnUnit<Worker>(m_HQ.getUnitSpawnPosition(), modelManager.getModel(eModelName::Worker), map, m_workers, 
+                    eEntityType::Worker);
                 
-                reduceResources(eEntityType::Harvester);
-                increaseCurrentPopulationAmount(HARVESTER_POPULATION_COST, eEntityType::Harvester);
+                reduceResources(eEntityType::Worker);
+                increaseCurrentPopulationAmount(WORKER_POPULATION_COST, eEntityType::Worker);
             }
             break;
         case sf::Keyboard::Num2:
-            if (m_HQ.isSelected() && isEntityAffordable(eEntityType::Harvester) &&
+            if (m_HQ.isSelected() && isEntityAffordable(eEntityType::Worker) &&
                 !isExceedPopulationLimit(eEntityType::Unit))
             {
                 spawnUnit<Unit>(m_HQ.getUnitSpawnPosition(), modelManager.getModel(eModelName::Unit), map, m_units, eEntityType::Unit);
                 
-                reduceResources(eEntityType::Harvester);
+                reduceResources(eEntityType::Worker);
                 increaseCurrentPopulationAmount(UNIT_POPULATION_COST, eEntityType::Unit);
             }
             break;
@@ -217,7 +217,7 @@ void Faction::handleInput(const sf::Event& currentSFMLEvent, const sf::Window& w
             glm::vec3 position = Globals::convertToNodePosition(camera.getMouseToGroundPosition(window));
             if (m_currentPopulationLimit + POPULATION_INCREMENT < MAX_POPULATION &&
                 isEntityAffordable(eEntityType::SupplyDepot) &&
-                PathFinding::getInstance().isPositionAvailable(position, map, m_units, m_harvesters))
+                PathFinding::getInstance().isPositionAvailable(position, map, m_units, m_workers))
             {
                 m_supplyDepots.emplace_back(position, modelManager.getModel(eModelName::SupplyDepot), map);   
                 
@@ -240,13 +240,13 @@ void Faction::update(float deltaTime, const ModelManager& modelManager, const Ma
         unit.update(deltaTime, modelManager);
     }
 
-    for (auto& harvester : m_harvesters)
+    for (auto& worker : m_workers)
     {
-        harvester.update(deltaTime, modelManager, m_HQ, map, *this);
+        worker.update(deltaTime, modelManager, m_HQ, map, *this);
     }
 
     handleCollisions<Unit>(m_units, map);
-    handleCollisions<Harvester>(m_harvesters, map);
+    handleCollisions<Worker>(m_workers, map);
 }
 
 void Faction::render(ShaderHandler& shaderHandler, const ModelManager& modelManager) const
@@ -258,9 +258,9 @@ void Faction::render(ShaderHandler& shaderHandler, const ModelManager& modelMana
         unit.render(shaderHandler, modelManager.getModel(unit.getModelName()));
     }
 
-    for (auto& harvester : m_harvesters)
+    for (auto& worker : m_workers)
     {
-        harvester.render(shaderHandler, modelManager.getModel(harvester.getModelName()));
+        worker.render(shaderHandler, modelManager.getModel(worker.getModelName()));
     }
 
     for (auto& supplyDepot : m_supplyDepots)
@@ -282,9 +282,9 @@ void Faction::renderPathing(ShaderHandler& shaderHandler)
         unit.renderPathMesh(shaderHandler);
     }
 
-    for (auto& harvester : m_harvesters)
+    for (auto& worker : m_workers)
     {
-        harvester.renderPathMesh(shaderHandler);
+        worker.renderPathMesh(shaderHandler);
     }
 }
 #endif // RENDER_PATHING
@@ -297,9 +297,9 @@ void Faction::renderAABB(ShaderHandler& shaderHandler)
         unit.renderAABB(shaderHandler);
     }
 
-    for (auto& harvester : m_harvesters)
+    for (auto& worker : m_workers)
     {
-        harvester.renderAABB(shaderHandler);
+        worker.renderAABB(shaderHandler);
     }
 
     for (auto& supplyDepot : m_supplyDepots)
@@ -317,8 +317,8 @@ bool Faction::isExceedPopulationLimit(eEntityType entityType) const
     {
     case eEntityType::Unit:
         return m_currentPopulationAmount + UNIT_POPULATION_COST > m_currentPopulationLimit;
-    case eEntityType::Harvester:
-        return m_currentPopulationAmount + HARVESTER_POPULATION_COST > m_currentPopulationLimit;
+    case eEntityType::Worker:
+        return m_currentPopulationAmount + WORKER_POPULATION_COST > m_currentPopulationLimit;
     default:
         assert(false);
         return true;
@@ -329,8 +329,8 @@ bool Faction::isEntityAffordable(eEntityType entityType) const
 {
     switch (entityType)
     {
-    case eEntityType::Harvester:
-        return m_currentResourceAmount - HARVESTER_RESOURCE_COST >= 0;
+    case eEntityType::Worker:
+        return m_currentResourceAmount - WORKER_RESOURCE_COST >= 0;
     case eEntityType::Unit:
         return  m_currentResourceAmount - UNIT_RESOURCE_COST >= 0;
     case eEntityType::SupplyDepot:
@@ -357,9 +357,9 @@ bool Faction::isOneUnitSelected() const
         }
     }
 
-    for (const auto& harvester : m_harvesters)
+    for (const auto& worker : m_workers)
     {
-        if (harvester.isSelected())
+        if (worker.isSelected())
         {
             ++unitSelectedCount;
             if (unitSelectedCount > 1)
@@ -386,12 +386,12 @@ void Faction::moveSingularSelectedUnit(const glm::vec3& destinationPosition, con
     }
     else
     {
-        auto selectedHarvester = std::find_if(m_harvesters.begin(), m_harvesters.end(), [](const auto& harvester) {
-            return harvester.isSelected() == true;
+        auto selectedWorker = std::find_if(m_workers.begin(), m_workers.end(), [](const auto& worker) {
+            return worker.isSelected() == true;
         });
-        assert(selectedHarvester != m_harvesters.end());
+        assert(selectedWorker != m_workers.end());
 
-        selectedHarvester->moveTo(destinationPosition, map, minerals);
+        selectedWorker->moveTo(destinationPosition, map, minerals);
     }
 }
 
@@ -407,11 +407,11 @@ void Faction::moveMultipleSelectedUnits(const glm::vec3& destinationPosition, co
         }
     }
 
-    for (auto& harvester : m_harvesters)
+    for (auto& worker : m_workers)
     {
-        if (harvester.isSelected())
+        if (worker.isSelected())
         {
-            selectedUnits.push_back(&harvester);
+            selectedUnits.push_back(&worker);
         }
     }   
     
@@ -457,8 +457,8 @@ void Faction::moveMultipleSelectedUnits(const glm::vec3& destinationPosition, co
                         [&](const glm::ivec2& position)
                     { return getAllAdjacentPositions(position, map, m_units, *selectedUnit, selectedUnits); });
                     break;
-                case eEntityType::Harvester:
-                    static_cast<Harvester*>(selectedUnit)->moveTo(destinationPosition - (averagePosition - selectedUnit->getPosition()), map);
+                case eEntityType::Worker:
+                    static_cast<Worker*>(selectedUnit)->moveTo(destinationPosition - (averagePosition - selectedUnit->getPosition()), map);
                     break;
                 default:
                     assert(false);
@@ -482,12 +482,12 @@ void Faction::revalidateExistingUnitPaths(const Map& map)
         }
     }
 
-    for (auto& harvester : m_harvesters)
+    for (auto& worker : m_workers)
     {
-        if (!harvester.isPathEmpty())
+        if (!worker.isPathEmpty())
         {
-            glm::vec3 destination = harvester.getDestination();
-            harvester.moveTo(destination, map, harvester.getCurrentState());
+            glm::vec3 destination = worker.getDestination();
+            worker.moveTo(destination, map, worker.getCurrentState());
         }
     }
 }
@@ -500,8 +500,8 @@ void Faction::reduceResources(eEntityType addedEntityType)
     case eEntityType::Unit:
         m_currentResourceAmount -= UNIT_RESOURCE_COST;
         break;
-    case eEntityType::Harvester:
-        m_currentResourceAmount -= HARVESTER_RESOURCE_COST;
+    case eEntityType::Worker:
+        m_currentResourceAmount -= WORKER_RESOURCE_COST;
         break;
     case eEntityType::SupplyDepot:
         m_currentResourceAmount -= SUPPLY_DEPOT_COST;

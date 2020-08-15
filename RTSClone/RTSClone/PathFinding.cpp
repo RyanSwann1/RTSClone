@@ -2,7 +2,7 @@
 #include "Globals.h"
 #include "Map.h"
 #include "Unit.h"
-#include "Harvester.h"
+#include "Worker.h"
 #include "ModelManager.h"
 #include "AdjacentPositions.h"
 #include <limits>
@@ -51,7 +51,7 @@ PathFinding::PathFinding()
 	m_closedQueue(static_cast<size_t>(Globals::MAP_SIZE * Globals::MAP_SIZE))
 {}
 
-bool PathFinding::isPositionAvailable(const glm::vec3& nodePosition, const Map& map, const std::vector<Unit>& units, const std::vector<Harvester>& harvesters) const
+bool PathFinding::isPositionAvailable(const glm::vec3& nodePosition, const Map& map, const std::vector<Unit>& units, const std::vector<Worker>& harvesters) const
 {
 	assert(nodePosition == Globals::convertToNodePosition(nodePosition));
 
@@ -129,7 +129,7 @@ std::vector<glm::vec3> PathFinding::getFormationPositions(const glm::vec3& start
 }
 
 glm::vec3 PathFinding::getClosestAvailablePosition(const glm::vec3& startingPosition, const std::vector<Unit>& units, 
-	const std::vector<Harvester>& harvesters, const Map& map)
+	const std::vector<Worker>& harvesters, const Map& map)
 {
 	if (isPositionAvailable(Globals::convertToNodePosition(startingPosition), map, units, harvesters))
 	{

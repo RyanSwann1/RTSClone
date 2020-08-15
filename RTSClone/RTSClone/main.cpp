@@ -90,9 +90,6 @@ int main()
 			modelManager->getModel(eModelName::Mineral), *map);
 	}
 
-	minerals.emplace_back(Globals::convertToNodePosition({ 55.0f, Globals::GROUND_HEIGHT, 50.0f }),
-		modelManager->getModel(eModelName::SupplyDepot), *map);
-
 	shaderHandler->switchToShader(eShaderType::SelectionBox);
 	shaderHandler->setUniformMat4f(eShaderType::SelectionBox, "uOrthographic", glm::ortho(0.0f, static_cast<float>(windowSize.x),
 		static_cast<float>(windowSize.y), 0.0f));

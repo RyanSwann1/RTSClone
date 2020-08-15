@@ -3,7 +3,7 @@
 #include "NonCopyable.h"
 #include "NonMovable.h"
 #include "Headquarters.h"
-#include "Harvester.h"
+#include "Worker.h"
 #include "PathFinding.h"
 #include "SupplyDepot.h"
 #include <SFML/Graphics.hpp>
@@ -37,7 +37,7 @@ class Faction : private NonMovable, private NonCopyable
 public:
 	Faction(const ModelManager& modelManager, Map& map);
 
-	void addResources(Harvester& harvester);
+	void addResources(Worker& worker);
 
 	void handleInput(const sf::Event& currentSFMLEvent, const sf::Window& window, const Camera& camera, Map& map, 
 		const ModelManager& modelManager, const std::vector<Mineral>& minerals, float deltaTime);
@@ -60,7 +60,7 @@ private:
 	SelectionBox m_selectionBox;
 	Headquarters m_HQ;
 	std::vector<Unit> m_units;
-	std::vector<Harvester> m_harvesters;
+	std::vector<Worker> m_workers;
 	std::vector<SupplyDepot> m_supplyDepots;
 	glm::vec3 m_previousMouseToGroundPosition;
 
@@ -81,15 +81,15 @@ private:
 		switch (entityType)
 		{
 		case eEntityType::Unit:
-		case eEntityType::Harvester:
+		case eEntityType::Worker:
 		if (m_HQ.getWaypointPosition() != m_HQ.getPosition())
 		{
-			units.emplace_back(spawnPosition, PathFinding::getInstance().getClosestAvailablePosition(m_HQ.getWaypointPosition(), m_units, m_harvesters, map),
+			units.emplace_back(spawnPosition, PathFinding::getInstance().getClosestAvailablePosition(m_HQ.getWaypointPosition(), m_units, m_workers, map),
 				unitModel, map);
 		}
 		else
 		{
-			units.emplace_back(PathFinding::getInstance().getClosestAvailablePosition(spawnPosition, m_units, m_harvesters, map), unitModel, map);
+			units.emplace_back(PathFinding::getInstance().getClosestAvailablePosition(spawnPosition, m_units, m_workers, map), unitModel, map);
 		}
 			break;
 		default:

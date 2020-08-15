@@ -2,7 +2,7 @@
 #include "Map.h"
 #include "Globals.h"
 #include "Unit.h"
-#include "Harvester.h"
+#include "Worker.h"
 
 AdjacentPosition::AdjacentPosition()
 	: valid(false),
@@ -23,7 +23,7 @@ AdjacentPosition::AdjacentPosition(const glm::ivec2 & position, bool valid, bool
 {}
 
 std::array<AdjacentPosition, ALL_DIRECTIONS_ON_GRID.size()> getAllAdjacentPositions(const glm::ivec2 & position, const Map & map, const std::vector<Unit> & units,
-	const std::vector<Harvester>& harvesters)
+	const std::vector<Worker>& harvesters)
 {
 	std::array<AdjacentPosition, ALL_DIRECTIONS_ON_GRID.size()> adjacentPositions;
 	for (int i = 0; i < adjacentPositions.size(); ++i)

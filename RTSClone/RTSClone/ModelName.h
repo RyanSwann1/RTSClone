@@ -6,7 +6,7 @@ enum class eModelName
 	HQ,
 	Mineral,
 	Waypoint,
-	Harvester,
+	Worker,
 	SupplyDepot,
 	Max = SupplyDepot
 };

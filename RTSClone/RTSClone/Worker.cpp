@@ -1,4 +1,4 @@
-#include "Harvester.h"
+#include "Worker.h"
 #include "Map.h"
 #include "Headquarters.h"
 #include "Mineral.h"
@@ -14,15 +14,15 @@ namespace
 	constexpr int RESOURCE_INCREMENT = 10;
 }
 
-Harvester::Harvester(const glm::vec3& startingPosition, const Model& model, Map& map)
-	: Unit(startingPosition, model, map, eEntityType::Harvester),
+Worker::Worker(const glm::vec3& startingPosition, const Model& model, Map& map)
+	: Unit(startingPosition, model, map, eEntityType::Worker),
 	m_currentResourceAmount(0),
 	m_harvestTimer(HARVEST_TIME),
 	m_mineralToHarvest(nullptr)
 {}
 
-Harvester::Harvester(const glm::vec3 & startingPosition, const glm::vec3 & destinationPosition, const Model & model, Map & map)
-	: Unit(startingPosition, model, map, eEntityType::Harvester),
+Worker::Worker(const glm::vec3 & startingPosition, const glm::vec3 & destinationPosition, const Model & model, Map & map)
+	: Unit(startingPosition, model, map, eEntityType::Worker),
 	m_currentResourceAmount(0),
 	m_harvestTimer(HARVEST_TIME),
 	m_mineralToHarvest(nullptr)
@@ -30,7 +30,7 @@ Harvester::Harvester(const glm::vec3 & startingPosition, const glm::vec3 & desti
 	moveTo(destinationPosition, map);
 }
 
-int Harvester::extractResources()
+int Worker::extractResources()
 {
 	assert(m_currentResourceAmount > 0);
 	int resources = m_currentResourceAmount;
@@ -38,7 +38,7 @@ int Harvester::extractResources()
 	return resources;
 }
 
-void Harvester::update(float deltaTime, const ModelManager& modelManager, const Headquarters& HQ, const Map& map, Faction& owningFaction)
+void Worker::update(float deltaTime, const ModelManager& modelManager, const Headquarters& HQ, const Map& map, Faction& owningFaction)
 {
 	Unit::update(deltaTime, modelManager);
 
@@ -143,7 +143,7 @@ void Harvester::update(float deltaTime, const ModelManager& modelManager, const 
 	}
 }
 
-void Harvester::moveTo(const glm::vec3& destinationPosition, const Map& map, eUnitState state)
+void Worker::moveTo(const glm::vec3& destinationPosition, const Map& map, eUnitState state)
 {
 	glm::vec3 previousClosestDestination = m_position;
 	if (!m_pathToPosition.empty())
@@ -172,7 +172,7 @@ void Harvester::moveTo(const glm::vec3& destinationPosition, const Map& map, eUn
 	}
 }
 
-void Harvester::moveTo(const glm::vec3 & destinationPosition, const Map & map, const std::vector<Mineral>& minerals)
+void Worker::moveTo(const glm::vec3 & destinationPosition, const Map & map, const std::vector<Mineral>& minerals)
 {
 	for (const auto& mineral : minerals)
 	{

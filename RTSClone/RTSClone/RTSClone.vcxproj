@@ -149,7 +149,7 @@
     <ClCompile Include="AdjacentPositions.cpp" />
     <ClCompile Include="Faction.cpp" />
     <ClCompile Include="Graph.cpp" />
-    <ClCompile Include="Harvester.cpp" />
+    <ClCompile Include="Worker.cpp" />
     <ClCompile Include="Headquarters.cpp" />
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="Entity.cpp" />
@@ -222,7 +222,7 @@
     <ClInclude Include="assimp\include\version.h" />
     <ClInclude Include="Faction.h" />
     <ClInclude Include="Graph.h" />
-    <ClInclude Include="Harvester.h" />
+    <ClInclude Include="Worker.h" />
     <ClInclude Include="Headquarters.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="Entity.h" />
