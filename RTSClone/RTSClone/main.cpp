@@ -79,14 +79,13 @@ int main()
 	Camera camera;
 	std::vector<Mineral> minerals;
 
-
 	for (float z = Globals::NODE_SIZE; z <= Globals::NODE_SIZE * 5; z += Globals::NODE_SIZE)
 	{
-		minerals.emplace_back(Globals::convertToNodePosition({ 55.0, Globals::GROUND_HEIGHT, z }),
+		minerals.emplace_back(Globals::convertToNodePosition({ 80.0f, Globals::GROUND_HEIGHT, z }),
 			modelManager->getModel(eModelName::Mineral), *map);
 	}
 
-	minerals.emplace_back(Globals::convertToNodePosition({ 55.0, Globals::GROUND_HEIGHT, 50.0f }),
+	minerals.emplace_back(Globals::convertToNodePosition({ 55.0f, Globals::GROUND_HEIGHT, 50.0f }),
 		modelManager->getModel(eModelName::SupplyDepot), *map);
 
 	shaderHandler->switchToShader(eShaderType::SelectionBox);

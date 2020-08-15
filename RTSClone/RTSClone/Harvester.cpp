@@ -111,6 +111,35 @@ void Harvester::update(float deltaTime, const ModelManager& modelManager, const 
 	}
 }
 
+void Harvester::moveTo(const glm::vec3& destinationPosition, const Map& map, eUnitState state)
+{
+	glm::vec3 previousClosestDestination = m_position;
+	if (!m_pathToPosition.empty())
+	{
+		previousClosestDestination = m_pathToPosition.back();
+	}
+
+	m_pathToPosition.clear();
+	PathFinding::getInstance().getPathToPosition(*this, destinationPosition, m_pathToPosition,
+		[&](const glm::ivec2& position) { return getAllAdjacentPositions(position, map); });
+	if (!m_pathToPosition.empty())
+	{
+		m_currentState = state;
+	}
+	else
+	{
+		if (previousClosestDestination != m_position)
+		{
+			m_pathToPosition.push_back(previousClosestDestination);
+			m_currentState = state;
+		}
+		else
+		{
+			m_currentState = eUnitState::Idle;
+		}
+	}
+}
+
 void Harvester::moveTo(const glm::vec3 & destinationPosition, const Map & map, const std::vector<Mineral>& minerals)
 {
 	for (const auto& mineral : minerals)

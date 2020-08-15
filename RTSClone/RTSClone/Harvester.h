@@ -16,7 +16,8 @@ public:
 	
 	void update(float deltaTime, const ModelManager& modelManager, const Headquarters& HQ, const Map& map);
 
-	using Unit::moveTo;
+	//using Unit::moveTo;
+	void moveTo(const glm::vec3& destinationPosition, const Map& map, eUnitState state = eUnitState::Moving);
 	void moveTo(const glm::vec3& destinationPosition, const Map& map, const std::vector<Mineral>& minerals);
 
 private:

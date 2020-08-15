@@ -417,4 +417,13 @@ void Faction::revalidateExistingUnitPaths(const Map& map)
                 { return getAllAdjacentPositions(position, map, m_units, unit); });
         }
     }
+
+    for (auto& harvester : m_harvesters)
+    {
+        if (!harvester.isPathEmpty())
+        {
+            glm::vec3 destination = harvester.getDestination();
+            harvester.moveTo(destination, map, harvester.getCurrentState());
+        }
+    }
 }
