@@ -3,15 +3,7 @@
 #include "glm/glm.hpp"
 #include "AABB.h"
 #include "ModelName.h"
-
-enum class eEntityType
-{
-	Unit = 0,
-	Worker,
-	HQ,
-	SupplyDepot,
-	Mineral
-};
+#include "EntityType.h"
 
 class ShaderHandler;
 struct Model;
