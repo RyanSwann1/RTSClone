@@ -4,28 +4,41 @@
 #include "Mineral.h"
 #include "ModelManager.h"
 #include "PathFinding.h"
+#include "Faction.h"
 
 namespace
 {
 	constexpr float HARVEST_TIME = 2.0f;
 	constexpr float MOVEMENT_SPEED = 7.5f;
+	constexpr int RESOURCE_CAPACITY = 30;
+	constexpr int RESOURCE_INCREMENT = 10;
 }
 
 Harvester::Harvester(const glm::vec3& startingPosition, const Model& model, Map& map)
 	: Unit(startingPosition, model, map, eEntityType::Harvester),
+	m_currentResourceAmount(0),
 	m_harvestTimer(HARVEST_TIME),
 	m_mineralToHarvest(nullptr)
 {}
 
 Harvester::Harvester(const glm::vec3 & startingPosition, const glm::vec3 & destinationPosition, const Model & model, Map & map)
 	: Unit(startingPosition, model, map, eEntityType::Harvester),
+	m_currentResourceAmount(0),
 	m_harvestTimer(HARVEST_TIME),
 	m_mineralToHarvest(nullptr)
 {
 	moveTo(destinationPosition, map);
 }
 
-void Harvester::update(float deltaTime, const ModelManager& modelManager, const Headquarters& HQ, const Map& map)
+int Harvester::extractResources()
+{
+	assert(m_currentResourceAmount > 0);
+	int resources = m_currentResourceAmount;
+	m_currentResourceAmount = 0;
+	return resources;
+}
+
+void Harvester::update(float deltaTime, const ModelManager& modelManager, const Headquarters& HQ, const Map& map, Faction& owningFaction)
 {
 	Unit::update(deltaTime, modelManager);
 
@@ -67,7 +80,7 @@ void Harvester::update(float deltaTime, const ModelManager& modelManager, const 
 
 				if (m_pathToPosition.empty())
 				{
-					m_pathToPosition.clear();
+					owningFaction.addResources(*this);
 
 					assert(m_mineralToHarvest);
 					glm::vec3 destination = PathFinding::getInstance().getClosestPositionOutsideAABB(m_position,		
@@ -93,21 +106,29 @@ void Harvester::update(float deltaTime, const ModelManager& modelManager, const 
 		}
 		break;
 	case eUnitState::Harvesting:
-		m_harvestTimer.setActive(true);
-		m_harvestTimer.update(deltaTime);
-		if (m_harvestTimer.isExpired())
+		assert(m_currentResourceAmount <= RESOURCE_CAPACITY);
+		if (m_currentResourceAmount < RESOURCE_CAPACITY)
+		{
+			m_harvestTimer.setActive(true);
+			m_harvestTimer.update(deltaTime);
+
+			if (m_harvestTimer.isExpired())
+			{
+				m_harvestTimer.resetElaspedTime();
+				m_currentResourceAmount += RESOURCE_INCREMENT;
+			}
+		}
+
+		if (m_currentResourceAmount == RESOURCE_CAPACITY)
 		{
 			m_harvestTimer.setActive(false);
-			m_harvestTimer.resetElaspedTime();
-
-			m_currentState = eUnitState::ReturningMineralsToHQ;
 			m_pathToPosition.clear();
-			
+
 			glm::vec3 destination = PathFinding::getInstance().getClosestPositionOutsideAABB(m_position,
 				HQ.getAABB(), HQ.getPosition(), map);
 			PathFinding::getInstance().getPathToPosition(*this, destination, m_pathToPosition,
 				[&](const glm::ivec2& position) { return getAllAdjacentPositions(position, map); }, true);
-
+			
 			if (!m_pathToPosition.empty())
 			{
 				m_currentState = eUnitState::ReturningMineralsToHQ;
@@ -117,6 +138,7 @@ void Harvester::update(float deltaTime, const ModelManager& modelManager, const 
 				m_currentState = eUnitState::Idle;
 			}
 		}
+		
 		break;
 	}
 }

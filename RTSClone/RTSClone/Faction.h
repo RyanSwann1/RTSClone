@@ -37,6 +37,8 @@ class Faction : private NonMovable, private NonCopyable
 public:
 	Faction(const ModelManager& modelManager, Map& map);
 
+	void addResources(Harvester& harvester);
+
 	void handleInput(const sf::Event& currentSFMLEvent, const sf::Window& window, const Camera& camera, Map& map, 
 		const ModelManager& modelManager, const std::vector<Mineral>& minerals, float deltaTime);
 	void update(float deltaTime, const ModelManager& modelManager, const Map& map);
@@ -52,6 +54,7 @@ public:
 #endif // RENDER_AABB
 
 private:
+	int m_currentResourceAmount;
 	SelectionBox m_selectionBox;
 	Headquarters m_HQ;
 	std::vector<Unit> m_units;

@@ -13,6 +13,10 @@
 
 namespace
 {
+    constexpr int STARTING_RESOURCES = 50;
+    constexpr int HARVESTER_RESOURCE_COST = 50;
+    constexpr int UNIT_RESOURCE_COST = 100;
+
     std::array<glm::ivec2, 6> getSelectionBoxQuadCoords(const glm::ivec2& startingPosition, const glm::ivec2& size)
     {
         return
@@ -90,13 +94,20 @@ void SelectionBox::render(const sf::Window& window) const
 
 //Faction
 Faction::Faction(const ModelManager& modelManager, Map& map)
-    : m_selectionBox(),
+    : m_currentResourceAmount(STARTING_RESOURCES),
+    m_selectionBox(),
     m_HQ(Globals::convertToNodePosition({ 35.0f, Globals::GROUND_HEIGHT, 15.f }), modelManager.getModel(eModelName::HQ), map),
     m_units(),
     m_harvesters(),
     m_supplyDepots(),
     m_previousMouseToGroundPosition()
 {}
+
+void Faction::addResources(Harvester & harvester)
+{
+    m_currentResourceAmount += harvester.extractResources();
+    std::cout << "Resources: " << m_currentResourceAmount << "\n";
+}
 
 void Faction::handleInput(const sf::Event& currentSFMLEvent, const sf::Window& window, const Camera& camera, Map& map, 
     const ModelManager& modelManager, const std::vector<Mineral>& minerals, float deltaTime)
@@ -207,7 +218,7 @@ void Faction::update(float deltaTime, const ModelManager& modelManager, const Ma
 
     for (auto& harvester : m_harvesters)
     {
-        harvester.update(deltaTime, modelManager, m_HQ, map);
+        harvester.update(deltaTime, modelManager, m_HQ, map, *this);
     }
 
     handleCollisions<Unit>(m_units, map);
