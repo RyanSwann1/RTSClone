@@ -13,12 +13,16 @@
 #include "Faction.h"
 #include "ModelManager.h"
 #include "Mineral.h"
+#include "imgui/imgui.h"
+#include "imgui_impl/imgui_wrapper.h"
 
 #define RENDER_GROUND
 #ifdef RENDER_GROUND
 #include "Ground.h"
 #endif // RENDER_GROUND
 
+//Networking Protocol
+//https://gamedev.stackexchange.com/a/162509/76861
 //OpenGL Debug
 //https://gist.github.com/qookei/76586d33238f0fa918c499dc7fb5ed04
 //A*
@@ -53,7 +57,8 @@ int main()
 
 	glViewport(0, 0, windowSize.x, windowSize.y);
 	glEnable(GL_DEPTH_TEST);
-
+	ImGui_SFML_OpenGL3::init(window);
+	
 	std::unique_ptr<ShaderHandler> shaderHandler = ShaderHandler::create();
 	assert(shaderHandler);
 	if (!shaderHandler)
@@ -81,7 +86,7 @@ int main()
 
 	for (float z = Globals::NODE_SIZE; z <= Globals::NODE_SIZE * 5; z += Globals::NODE_SIZE)
 	{
-		minerals.emplace_back(Globals::convertToNodePosition({ 80.0f, Globals::GROUND_HEIGHT, z }),
+		minerals.emplace_back(Globals::convertToNodePosition({ 70.0f, Globals::GROUND_HEIGHT, z }),
 			modelManager->getModel(eModelName::Mineral), *map);
 	}
 
@@ -117,6 +122,10 @@ int main()
 			faction.handleInput(currentSFMLEvent, window, camera, *map, *modelManager, minerals, deltaTime);
 		}
 
+		ImGui_SFML_OpenGL3::startFrame();
+
+		ImGui::ShowDemoWindow();
+
 		faction.update(deltaTime, *modelManager, *map);
 		camera.update(window, deltaTime);
 
@@ -124,6 +133,7 @@ int main()
 		glm::mat4 projection = camera.getProjection(window);
 
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	
 		shaderHandler->switchToShader(eShaderType::Default);
 		shaderHandler->setUniformMat4f(eShaderType::Default, "uView", view);
 		shaderHandler->setUniformMat4f(eShaderType::Default, "uProjection", projection);
@@ -162,9 +172,10 @@ int main()
 		faction.renderSelectionBox(window);
 		glDisable(GL_BLEND);
 		glEnable(GL_DEPTH_TEST);
-
+		ImGui::EndFrame();
 		window.display();
 	}
 
+	ImGui_SFML_OpenGL3::shutdown();
 	return 0;
 }
