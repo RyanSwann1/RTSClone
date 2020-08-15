@@ -73,6 +73,7 @@ private:
 	void revalidateExistingUnitPaths(const Map& map);
 	void reduceResources(eEntityType addedEntityType);
 	void increaseCurrentPopulationAmount(int amount, eEntityType entityType);
+	void increasePopulationLimit();
 
 	template <class Unit>
 	void spawnUnit(const glm::vec3& spawnPosition, const Model& unitModel, Map& map, std::vector<Unit>& units, eEntityType entityType)

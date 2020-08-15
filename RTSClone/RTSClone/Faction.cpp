@@ -216,11 +216,13 @@ void Faction::handleInput(const sf::Event& currentSFMLEvent, const sf::Window& w
         {
             glm::vec3 position = Globals::convertToNodePosition(camera.getMouseToGroundPosition(window));
             if (m_currentPopulationLimit + POPULATION_INCREMENT < MAX_POPULATION &&
-
+                isEntityAffordable(eEntityType::SupplyDepot) &&
                 PathFinding::getInstance().isPositionAvailable(position, map, m_units, m_harvesters))
             {
-                m_currentPopulationLimit += POPULATION_INCREMENT;
                 m_supplyDepots.emplace_back(position, modelManager.getModel(eModelName::SupplyDepot), map);   
+                
+                reduceResources(eEntityType::SupplyDepot);
+                increasePopulationLimit();
             }  
 
             revalidateExistingUnitPaths(map);
@@ -319,6 +321,7 @@ bool Faction::isExceedPopulationLimit(eEntityType entityType) const
         return m_currentPopulationAmount + HARVESTER_POPULATION_COST > m_currentPopulationLimit;
     default:
         assert(false);
+        return true;
     }
 }
 
@@ -327,16 +330,14 @@ bool Faction::isEntityAffordable(eEntityType entityType) const
     switch (entityType)
     {
     case eEntityType::Harvester:
-        m_currentResourceAmount - HARVESTER_RESOURCE_COST >= 0;
-        break;
+        return m_currentResourceAmount - HARVESTER_RESOURCE_COST >= 0;
     case eEntityType::Unit:
-        m_currentResourceAmount - UNIT_RESOURCE_COST >= 0;
-        break;
+        return  m_currentResourceAmount - UNIT_RESOURCE_COST >= 0;
     case eEntityType::SupplyDepot:
-        m_currentResourceAmount - SUPPLY_DEPOT_COST >= 0;
-        break;
+        return m_currentResourceAmount - SUPPLY_DEPOT_COST >= 0;
     default:
         assert(false);
+        return false;
     }
 }
 
@@ -516,4 +517,12 @@ void Faction::increaseCurrentPopulationAmount(int amount, eEntityType entityType
     m_currentPopulationAmount += amount;
 
     std::cout << "Population: " << m_currentPopulationAmount << "\n";
+}
+
+void Faction::increasePopulationLimit()
+{
+    assert(m_currentPopulationLimit + POPULATION_INCREMENT <= MAX_POPULATION);
+    m_currentPopulationLimit += POPULATION_INCREMENT;
+
+    std::cout << "Population Limit: " << m_currentPopulationLimit << "\n";
 }
