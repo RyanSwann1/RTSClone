@@ -121,7 +121,7 @@ void Harvester::moveTo(const glm::vec3& destinationPosition, const Map& map, eUn
 
 	m_pathToPosition.clear();
 	PathFinding::getInstance().getPathToPosition(*this, destinationPosition, m_pathToPosition,
-		[&](const glm::ivec2& position) { return getAllAdjacentPositions(position, map); });
+		[&](const glm::ivec2& position) { return getAllAdjacentPositions(position, map); }, true);
 	if (!m_pathToPosition.empty())
 	{
 		m_currentState = state;
