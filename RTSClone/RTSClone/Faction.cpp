@@ -393,8 +393,7 @@ void Faction::moveMultipleSelectedUnits(const glm::vec3& destinationPosition, co
                     { return getAllAdjacentPositions(position, map, m_units, *selectedUnit, selectedUnits); });
                     break;
                 case eEntityType::Harvester:
-                    selectedUnit->moveTo(destinationPosition - (averagePosition - selectedUnit->getPosition()), map, m_units, 
-                        [&](const glm::ivec2& position) { return getAllAdjacentPositions(position, map); });
+                    static_cast<Harvester*>(selectedUnit)->moveTo(destinationPosition - (averagePosition - selectedUnit->getPosition()), map);
                     break;
                 default:
                     assert(false);
