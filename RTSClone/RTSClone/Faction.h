@@ -62,10 +62,13 @@ private:
 	std::vector<SupplyDepot> m_supplyDepots;
 	glm::vec3 m_previousMouseToGroundPosition;
 
+	bool isEntityAffordable(int resourceAmount) const;
 	bool isOneUnitSelected() const;
+	
 	void moveSingularSelectedUnit(const glm::vec3& destinationPosition, const Map& map, const std::vector<Mineral>& minerals);
 	void moveMultipleSelectedUnits(const glm::vec3& destinationPosition, const Map& map, const std::vector<Mineral>& minerals);
 	void revalidateExistingUnitPaths(const Map& map);
+	void reduceResources(int amount);
 
 	template <class Unit>
 	void spawnUnit(const glm::vec3& spawnPosition, const Model& unitModel, Map& map, std::vector<Unit>& units, eEntityType entityType)

@@ -101,7 +101,9 @@ Faction::Faction(const ModelManager& modelManager, Map& map)
     m_harvesters(),
     m_supplyDepots(),
     m_previousMouseToGroundPosition()
-{}
+{
+    std::cout << "Resources: " <<  m_currentResourceAmount << "\n";
+}
 
 void Faction::addResources(Harvester & harvester)
 {
@@ -181,16 +183,20 @@ void Faction::handleInput(const sf::Event& currentSFMLEvent, const sf::Window& w
         switch (currentSFMLEvent.key.code)
         {
         case sf::Keyboard::Num1:
-            if (m_HQ.isSelected())
+            if (m_HQ.isSelected() && isEntityAffordable(HARVESTER_RESOURCE_COST))
             {
                 spawnUnit<Harvester>(m_HQ.getUnitSpawnPosition(), modelManager.getModel(eModelName::Harvester), map, m_harvesters, 
                     eEntityType::Harvester);
+                
+                reduceResources(HARVESTER_RESOURCE_COST);
             }
             break;
         case sf::Keyboard::Num2:
-            if (m_HQ.isSelected())
+            if (m_HQ.isSelected() && isEntityAffordable(UNIT_RESOURCE_COST))
             {
                 spawnUnit<Unit>(m_HQ.getUnitSpawnPosition(), modelManager.getModel(eModelName::Unit), map, m_units, eEntityType::Unit);
+                
+                reduceResources(UNIT_RESOURCE_COST);
             }
             break;
         case sf::Keyboard::B:
@@ -286,6 +292,11 @@ void Faction::renderAABB(ShaderHandler& shaderHandler)
     m_HQ.renderAABB(shaderHandler);
 }
 #endif // RENDER_AABB
+
+bool Faction::isEntityAffordable(int resourceAmount) const
+{
+    return m_currentResourceAmount - resourceAmount >= 0;
+}
 
 bool Faction::isOneUnitSelected() const
 {
@@ -436,4 +447,12 @@ void Faction::revalidateExistingUnitPaths(const Map& map)
             harvester.moveTo(destination, map, harvester.getCurrentState());
         }
     }
+}
+
+void Faction::reduceResources(int amount)
+{
+    assert(isEntityAffordable(amount));
+    m_currentResourceAmount -= amount;
+
+    std::cout << "Resources: " <<  m_currentResourceAmount << "\n";
 }
