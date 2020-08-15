@@ -134,7 +134,7 @@ glm::vec3 PathFinding::getClosestAvailablePosition(const glm::vec3& startingPosi
 	if (isPositionAvailable(Globals::convertToNodePosition(startingPosition), map, units, harvesters))
 	{
 		return startingPosition;
-	}
+	}	
 
 	m_graph.reset(m_frontier);
 	m_frontier.push(Globals::convertToGridPosition(startingPosition));

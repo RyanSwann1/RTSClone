@@ -48,6 +48,11 @@ void Harvester::update(float deltaTime, const ModelManager& modelManager, const 
 				}
 			}
 		}
+		else
+		{
+			assert(false);
+			m_currentState = eUnitState::Idle;
+		}
 		break;
 	case eUnitState::ReturningMineralsToHQ:
 		if (!m_pathToPosition.empty())
@@ -80,6 +85,11 @@ void Harvester::update(float deltaTime, const ModelManager& modelManager, const 
 					}
 				}
 			}
+		}
+		else
+		{
+			assert(false);
+			m_currentState = eUnitState::Idle;
 		}
 		break;
 	case eUnitState::Harvesting:
