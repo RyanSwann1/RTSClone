@@ -199,18 +199,29 @@ void Faction::handleInput(const sf::Event& currentSFMLEvent, const sf::Window& w
             break;
         case sf::Keyboard::B:
         {
-            glm::vec3 position = Globals::convertToNodePosition(camera.getMouseToGroundPosition(window));
-            if (m_currentPopulationLimit + POPULATION_INCREMENT < MAX_POPULATION &&
-                isEntityAffordable(eEntityType::SupplyDepot) &&
-                PathFinding::getInstance().isPositionAvailable(position, map, m_units, m_workers))
+            auto selectedWorker = std::find_if(m_workers.begin(), m_workers.end(), [](const auto& worker)
             {
-                m_supplyDepots.emplace_back(position, modelManager.getModel(eModelName::SupplyDepot), map);   
-                
-                reduceResources(eEntityType::SupplyDepot);
-                increasePopulationLimit();
-            }  
+                return worker.isSelected();
+            });
+            if (selectedWorker != m_workers.end())
+            {
+                glm::vec3 position = Globals::convertToNodePosition(camera.getMouseToGroundPosition(window));
+                if (m_currentPopulationLimit + POPULATION_INCREMENT < MAX_POPULATION &&
+                    isEntityAffordable(eEntityType::SupplyDepot) &&
+                    PathFinding::getInstance().isPositionAvailable(position, map, m_units, m_workers))
+                {
+                    m_supplyDepots.emplace_back(position, modelManager.getModel(eModelName::SupplyDepot), map);
 
-            revalidateExistingUnitPaths(map);
+                    glm::vec3 destination = PathFinding::getInstance().getClosestPositionOutsideAABB(selectedWorker->getPosition(),
+                        m_supplyDepots.back().getAABB(), m_supplyDepots.back().getPosition(), map);
+                    selectedWorker->moveTo(destination, map);
+
+                    reduceResources(eEntityType::SupplyDepot);
+                    increasePopulationLimit();
+                }
+
+                revalidateExistingUnitPaths(map);
+            }
         }
             break;
         }
