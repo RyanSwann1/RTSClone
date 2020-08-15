@@ -72,28 +72,34 @@ private:
 	void moveMultipleSelectedUnits(const glm::vec3& destinationPosition, const Map& map, const std::vector<Mineral>& minerals);
 	void revalidateExistingUnitPaths(const Map& map);
 	void reduceResources(eEntityType addedEntityType);
-	void increaseCurrentPopulationAmount(int amount, eEntityType entityType);
+	void increaseCurrentPopulationAmount(eEntityType entityType);
 	void increasePopulationLimit();
 
 	template <class Unit>
 	void spawnUnit(const glm::vec3& spawnPosition, const Model& unitModel, Map& map, std::vector<Unit>& units, eEntityType entityType)
 	{
-		switch (entityType)
+		if (m_HQ.isSelected() && isEntityAffordable(entityType) && !isExceedPopulationLimit(entityType))
 		{
-		case eEntityType::Unit:
-		case eEntityType::Worker:
-		if (m_HQ.getWaypointPosition() != m_HQ.getPosition())
-		{
-			units.emplace_back(spawnPosition, PathFinding::getInstance().getClosestAvailablePosition(m_HQ.getWaypointPosition(), m_units, m_workers, map),
-				unitModel, map);
-		}
-		else
-		{
-			units.emplace_back(PathFinding::getInstance().getClosestAvailablePosition(spawnPosition, m_units, m_workers, map), unitModel, map);
-		}
-			break;
-		default:
-			assert(false);
+			switch (entityType)
+			{
+			case eEntityType::Unit:
+			case eEntityType::Worker:
+				if (m_HQ.getWaypointPosition() != m_HQ.getPosition())
+				{
+					units.emplace_back(spawnPosition, PathFinding::getInstance().getClosestAvailablePosition(m_HQ.getWaypointPosition(), m_units, m_workers, map),
+						unitModel, map);
+				}
+				else
+				{
+					units.emplace_back(PathFinding::getInstance().getClosestAvailablePosition(spawnPosition, m_units, m_workers, map), unitModel, map);
+				}
+				break;
+			default:
+				assert(false);
+			}
+
+			reduceResources(entityType);
+			increaseCurrentPopulationAmount(entityType);
 		}
 	}
 

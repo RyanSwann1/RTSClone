@@ -192,25 +192,10 @@ void Faction::handleInput(const sf::Event& currentSFMLEvent, const sf::Window& w
         switch (currentSFMLEvent.key.code)
         {
         case sf::Keyboard::Num1:
-            if (m_HQ.isSelected() && isEntityAffordable(eEntityType::Worker) && 
-                !isExceedPopulationLimit(eEntityType::Worker))
-            {
-                spawnUnit<Worker>(m_HQ.getUnitSpawnPosition(), modelManager.getModel(eModelName::Worker), map, m_workers, 
-                    eEntityType::Worker);
-                
-                reduceResources(eEntityType::Worker);
-                increaseCurrentPopulationAmount(WORKER_POPULATION_COST, eEntityType::Worker);
-            }
+            spawnUnit<Worker>(m_HQ.getUnitSpawnPosition(), modelManager.getModel(eModelName::Worker), map, m_workers, eEntityType::Worker);
             break;
         case sf::Keyboard::Num2:
-            if (m_HQ.isSelected() && isEntityAffordable(eEntityType::Worker) &&
-                !isExceedPopulationLimit(eEntityType::Unit))
-            {
-                spawnUnit<Unit>(m_HQ.getUnitSpawnPosition(), modelManager.getModel(eModelName::Unit), map, m_units, eEntityType::Unit);
-                
-                reduceResources(eEntityType::Worker);
-                increaseCurrentPopulationAmount(UNIT_POPULATION_COST, eEntityType::Unit);
-            }
+            spawnUnit<Unit>(m_HQ.getUnitSpawnPosition(), modelManager.getModel(eModelName::Unit), map, m_units, eEntityType::Unit);
             break;
         case sf::Keyboard::B:
         {
@@ -511,10 +496,23 @@ void Faction::reduceResources(eEntityType addedEntityType)
     std::cout << "Resources: " <<  m_currentResourceAmount << "\n";
 }
 
-void Faction::increaseCurrentPopulationAmount(int amount, eEntityType entityType)
+void Faction::increaseCurrentPopulationAmount(eEntityType entityType)
 {
     assert(!isExceedPopulationLimit(entityType));
-    m_currentPopulationAmount += amount;
+    switch (entityType)
+    {
+    case eEntityType::Unit:
+        m_currentPopulationAmount += UNIT_POPULATION_COST;
+        break;
+    case eEntityType::Worker:
+        m_currentPopulationAmount += WORKER_POPULATION_COST;
+        break;
+    case eEntityType::SupplyDepot:
+        m_currentPopulationAmount += SUPPLY_DEPOT_COST;
+        break;
+    default:
+        assert(false);
+    }
 
     std::cout << "Population: " << m_currentPopulationAmount << "\n";
 }
