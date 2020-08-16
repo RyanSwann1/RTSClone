@@ -2,7 +2,7 @@
 #include "Globals.h"
 #include "glad.h"
 #include "Unit.h"
-#include "Headquarters.h"
+#include "BuildingSpawner.h"
 #include "Camera.h"
 #include "Map.h"
 #include "ModelManager.h"
@@ -15,7 +15,8 @@ namespace
 {
     constexpr int STARTING_RESOURCES = 100;
     constexpr int WORKER_RESOURCE_COST = 50;
-    constexpr int SUPPLY_DEPOT_COST = 50;
+    constexpr int SUPPLY_DEPOT_RESOURCE_COST = 50;
+    constexpr int BARRACKS_RESOURCE_COST = 50;
     constexpr int UNIT_RESOURCE_COST = 100;
     constexpr int STARTING_POPULATION = 5;
     constexpr int MAX_POPULATION = 20;
@@ -108,24 +109,40 @@ Faction::Faction(Map& map)
     m_units(),
     m_workers(),
     m_supplyDepots(),
+    m_barracks(),
     m_previousMouseToGroundPosition()
 {
     std::cout << "Resources: " <<  m_currentResourceAmount << "\n";
     std::cout << "Current Population: " << m_currentPopulationAmount << "\n";
 }
 
-const SupplyDepot* Faction::addBuilding(Worker& worker, Map& map, glm::vec3 spawnPosition)
+const Entity* Faction::addBuilding(Worker& worker, Map& map, glm::vec3 spawnPosition, eEntityType entityType)
 {
     if (m_currentPopulationLimit + POPULATION_INCREMENT < MAX_POPULATION &&
-        isEntityAffordable(eEntityType::SupplyDepot) &&
+        isEntityAffordable(entityType) &&
         PathFinding::getInstance().isPositionAvailable(spawnPosition, map, m_units, m_workers, worker))
     {
-        m_supplyDepots.emplace_back(spawnPosition, ModelManager::getInstance().getModel(eModelName::SupplyDepot), map);
-        reduceResources(eEntityType::SupplyDepot);
-        increasePopulationLimit();
+        const Entity* addedBuilding = nullptr;
+        switch (entityType)
+        {
+        case eEntityType::SupplyDepot:
+            m_supplyDepots.emplace_back(spawnPosition, ModelManager::getInstance().getModel(eModelName::SupplyDepot), map);
+            addedBuilding = &m_supplyDepots.back();
+            increasePopulationLimit();
+            break;
+        case eEntityType::Barracks:
+            m_barracks.emplace_back(spawnPosition, ModelManager::getInstance().getModel(eModelName::Barracks), map);
+            addedBuilding = &m_barracks.back();
+            break;
+        default:
+            assert(false);
+        }
+        
+        reduceResources(entityType);
         revalidateExistingUnitPaths(map);
 
-        return &m_supplyDepots.back();
+        assert(addedBuilding);
+        return addedBuilding;
     }
 
     return nullptr;
@@ -223,8 +240,24 @@ void Faction::handleInput(const sf::Event& currentSFMLEvent, const sf::Window& w
             if (selectedWorker != m_workers.end())
             {
                 glm::vec3 position = Globals::convertToNodePosition(camera.getMouseToGroundPosition(window));
-                selectedWorker->build([this, &map, position](Worker& worker) 
-                    { return addBuilding(worker, map, position); }, position, map);
+                eEntityType entityType = eEntityType::SupplyDepot;
+                selectedWorker->build([this, &map, position, entityType](Worker& worker)
+                { return addBuilding(worker, map, position, entityType); }, position, map);
+            }
+        }
+            break;
+        case sf::Keyboard::N:
+        {
+            auto selectedWorker = std::find_if(m_workers.begin(), m_workers.end(), [](const auto& worker)
+            {
+                return worker.isSelected();
+            });
+            if (selectedWorker != m_workers.end())
+            {
+                glm::vec3 position = Globals::convertToNodePosition(camera.getMouseToGroundPosition(window));
+                eEntityType entityType = eEntityType::Barracks;
+                selectedWorker->build([this, &map, position, entityType](Worker& worker)
+                { return addBuilding(worker, map, position, entityType); }, position, map);
             }
         }
             break;
@@ -268,6 +301,12 @@ void Faction::render(ShaderHandler& shaderHandler) const
     {
         supplyDepot.render(shaderHandler, ModelManager::getInstance().getModel(supplyDepot.getModelName()));
     }
+
+    for (auto& barracks : m_barracks)
+    {
+        barracks.render(shaderHandler, ModelManager::getInstance().getModel(barracks.getModelName()), 
+            ModelManager::getInstance().getModel(eModelName::Waypoint));
+    }
 }
 
 void Faction::renderSelectionBox(const sf::Window& window) const
@@ -308,6 +347,11 @@ void Faction::renderAABB(ShaderHandler& shaderHandler)
         supplyDepot.renderAABB(shaderHandler);
     }
 
+    for (auto& barracks : m_barracks)
+    {
+        barracks.renderAABB(shaderHandler);
+    }
+
     m_HQ.renderAABB(shaderHandler);
 }
 #endif // RENDER_AABB
@@ -335,7 +379,9 @@ bool Faction::isEntityAffordable(eEntityType entityType) const
     case eEntityType::Unit:
         return  m_currentResourceAmount - UNIT_RESOURCE_COST >= 0;
     case eEntityType::SupplyDepot:
-        return m_currentResourceAmount - SUPPLY_DEPOT_COST >= 0;
+        return m_currentResourceAmount - SUPPLY_DEPOT_RESOURCE_COST >= 0;
+    case eEntityType::Barracks:
+        return m_currentResourceAmount - BARRACKS_RESOURCE_COST >= 0;
     default:
         assert(false);
         return false;
@@ -505,7 +551,10 @@ void Faction::reduceResources(eEntityType addedEntityType)
         m_currentResourceAmount -= WORKER_RESOURCE_COST;
         break;
     case eEntityType::SupplyDepot:
-        m_currentResourceAmount -= SUPPLY_DEPOT_COST;
+        m_currentResourceAmount -= SUPPLY_DEPOT_RESOURCE_COST;
+        break;
+    case eEntityType::Barracks:
+        m_currentResourceAmount -= BARRACKS_RESOURCE_COST;
         break;
     }
 
@@ -522,9 +571,6 @@ void Faction::increaseCurrentPopulationAmount(eEntityType entityType)
         break;
     case eEntityType::Worker:
         m_currentPopulationAmount += WORKER_POPULATION_COST;
-        break;
-    case eEntityType::SupplyDepot:
-        m_currentPopulationAmount += SUPPLY_DEPOT_COST;
         break;
     default:
         assert(false);

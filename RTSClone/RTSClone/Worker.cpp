@@ -1,6 +1,6 @@
 #include "Worker.h"
 #include "Map.h"
-#include "Headquarters.h"
+#include "BuildingSpawner.h"
 #include "Mineral.h"
 #include "ModelManager.h"
 #include "PathFinding.h"
@@ -41,13 +41,13 @@ int Worker::extractResources()
 	return resources;
 }
 
-void Worker::build(const std::function<const SupplyDepot*(Worker&)>& buildingCommand, const glm::vec3& buildPosition, const Map& map)
+void Worker::build(const std::function<const Entity*(Worker&)>& buildingCommand, const glm::vec3& buildPosition, const Map& map)
 {
 	m_buildingCommand = buildingCommand;
 	moveTo(buildPosition, map, eUnitState::MovingToBuildingPosition);
 }
 
-void Worker::update(float deltaTime, const Headquarters& HQ, const Map& map, Faction& owningFaction)
+void Worker::update(float deltaTime, const BuildingSpawner& HQ, const Map& map, Faction& owningFaction)
 {
 	Unit::update(deltaTime);
 
@@ -174,13 +174,16 @@ void Worker::update(float deltaTime, const Headquarters& HQ, const Map& map, Fac
 		break;
 	case eUnitState::Building:
 		assert(m_pathToPosition.empty() && m_buildingCommand);
-		const SupplyDepot* newBuilding = m_buildingCommand(*this);
+		const Entity* newBuilding = m_buildingCommand(*this);
 		m_buildingCommand = nullptr;
 		if (newBuilding)
 		{
-			glm::vec3 destination = PathFinding::getInstance().getClosestPositionOutsideAABB(m_position,
-				newBuilding->getAABB(), newBuilding->getPosition(), map);
-			moveTo(destination, map);
+			moveTo(PathFinding::getInstance().getClosestPositionOutsideAABB(m_position,
+				newBuilding->getAABB(), newBuilding->getPosition(), map), map);
+		}
+		else
+		{
+			m_currentState = eUnitState::Idle;
 		}
 
 		break;

@@ -2,7 +2,7 @@
 
 #include "NonCopyable.h"
 #include "NonMovable.h"
-#include "Headquarters.h"
+#include "BuildingSpawner.h"
 #include "Worker.h"
 #include "PathFinding.h"
 #include "SupplyDepot.h"
@@ -58,17 +58,18 @@ private:
 	int m_currentPopulationAmount;
 	int m_currentPopulationLimit;
 	SelectionBox m_selectionBox;
-	Headquarters m_HQ;
+	BuildingSpawner m_HQ;
 	std::vector<Unit> m_units;
 	std::vector<Worker> m_workers;
 	std::vector<SupplyDepot> m_supplyDepots;
+	std::vector<BuildingSpawner> m_barracks;
 	glm::vec3 m_previousMouseToGroundPosition;
 
 	bool isExceedPopulationLimit(eEntityType entityType) const;
 	bool isEntityAffordable(eEntityType entityType) const;
 	bool isOneUnitSelected() const;
 	
-	const SupplyDepot* addBuilding(Worker& worker, Map& map, glm::vec3 spawnPosition);
+	const Entity* addBuilding(Worker& worker, Map& map, glm::vec3 spawnPosition, eEntityType entityType);
 	void moveSingularSelectedUnit(const glm::vec3& destinationPosition, const Map& map, const std::vector<Mineral>& minerals);
 	void moveMultipleSelectedUnits(const glm::vec3& destinationPosition, const Map& map, const std::vector<Mineral>& minerals);
 	void revalidateExistingUnitPaths(const Map& map);
