@@ -68,7 +68,7 @@ private:
 	bool isEntityAffordable(eEntityType entityType) const;
 	bool isOneUnitSelected() const;
 	
-	void addBuilding(Worker& worker, Map& map, glm::vec3 spawnPosition);
+	const SupplyDepot* addBuilding(Worker& worker, Map& map, glm::vec3 spawnPosition);
 	void moveSingularSelectedUnit(const glm::vec3& destinationPosition, const Map& map, const std::vector<Mineral>& minerals);
 	void moveMultipleSelectedUnits(const glm::vec3& destinationPosition, const Map& map, const std::vector<Mineral>& minerals);
 	void revalidateExistingUnitPaths(const Map& map);

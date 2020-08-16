@@ -114,23 +114,21 @@ Faction::Faction(Map& map)
     std::cout << "Current Population: " << m_currentPopulationAmount << "\n";
 }
 
-void Faction::addBuilding(Worker& worker, Map& map, glm::vec3 spawnPosition)
+const SupplyDepot* Faction::addBuilding(Worker& worker, Map& map, glm::vec3 spawnPosition)
 {
     if (m_currentPopulationLimit + POPULATION_INCREMENT < MAX_POPULATION &&
         isEntityAffordable(eEntityType::SupplyDepot) &&
         PathFinding::getInstance().isPositionAvailable(spawnPosition, map, m_units, m_workers, worker))
     {
         m_supplyDepots.emplace_back(spawnPosition, ModelManager::getInstance().getModel(eModelName::SupplyDepot), map);
-
-        glm::vec3 destination = PathFinding::getInstance().getClosestPositionOutsideAABB(worker.getPosition(),
-            m_supplyDepots.back().getAABB(), m_supplyDepots.back().getPosition(), map);
-        worker.moveTo(destination, map);
-
         reduceResources(eEntityType::SupplyDepot);
         increasePopulationLimit();
-
         revalidateExistingUnitPaths(map);
+
+        return &m_supplyDepots.back();
     }
+
+    return nullptr;
 }
 
 void Faction::addResources(Worker & worker)
