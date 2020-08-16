@@ -77,5 +77,14 @@ ModelManager::ModelManager()
 		std::cout << "failed to load satelliteDishModel\n";
 		m_loadedAllModels = false;
 	}
-	m_models[static_cast<int>(satelliteDishModel->modelName)] = std::move(satelliteDishModel);
+
+	std::unique_ptr<Model> barracksModel = Model::create("buildingOpen.obj", false,
+		glm::vec3(3.0f, 1.0f, 3.0f), eModelName::Barracks, { 1.0f, 1.0f, 1.0f });
+	assert(barracksModel);
+	if (!barracksModel)
+	{
+		std::cout << "Couldn't load buildingOpen.obj\n";
+		m_loadedAllModels = false;
+	}
+	m_models[static_cast<int>(barracksModel->modelName)] = std::move(barracksModel);
 }

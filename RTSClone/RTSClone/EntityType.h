@@ -6,5 +6,6 @@ enum class eEntityType
 	Worker,
 	HQ,
 	SupplyDepot,
+	Barracks,
 	Mineral
 };

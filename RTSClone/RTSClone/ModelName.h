@@ -8,5 +8,6 @@ enum class eModelName
 	Waypoint,
 	Worker,
 	SupplyDepot,
-	Max = SupplyDepot
+	Barracks,
+	Max = Barracks
 };
