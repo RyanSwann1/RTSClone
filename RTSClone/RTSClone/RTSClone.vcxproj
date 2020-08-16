@@ -220,7 +220,6 @@
     <ClInclude Include="assimp\include\vector2.h" />
     <ClInclude Include="assimp\include\vector3.h" />
     <ClInclude Include="assimp\include\version.h" />
-    <ClInclude Include="Commands.h" />
     <ClInclude Include="EntityType.h" />
     <ClInclude Include="Faction.h" />
     <ClInclude Include="Graph.h" />

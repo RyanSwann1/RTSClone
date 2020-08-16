@@ -15,6 +15,7 @@ enum class eUnitState
 	MovingToMinerals,
 	ReturningMineralsToHQ,
 	Harvesting,
+	MovingToBuildingPosition,
 	Building
 };
 

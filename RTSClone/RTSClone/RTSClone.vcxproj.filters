@@ -341,9 +341,6 @@
     <ClInclude Include="Worker.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Commands.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="EntityType.h">
       <Filter>Header Files</Filter>
     </ClInclude>

@@ -16,6 +16,7 @@ namespace
 
 Worker::Worker(const glm::vec3& startingPosition, const Model& model, Map& map)
 	: Unit(startingPosition, model, map, eEntityType::Worker),
+	m_buildingCommand(),
 	m_currentResourceAmount(0),
 	m_harvestTimer(HARVEST_TIME),
 	m_mineralToHarvest(nullptr)
@@ -23,6 +24,7 @@ Worker::Worker(const glm::vec3& startingPosition, const Model& model, Map& map)
 
 Worker::Worker(const glm::vec3 & startingPosition, const glm::vec3 & destinationPosition, const Model & model, Map & map)
 	: Unit(startingPosition, model, map, eEntityType::Worker),
+	m_buildingCommand(),
 	m_currentResourceAmount(0),
 	m_harvestTimer(HARVEST_TIME),
 	m_mineralToHarvest(nullptr)
@@ -36,6 +38,12 @@ int Worker::extractResources()
 	int resources = m_currentResourceAmount;
 	m_currentResourceAmount = 0;
 	return resources;
+}
+
+void Worker::build(const std::function<void(Worker&)>& buildingCommand, const glm::vec3& buildPosition, const Map& map)
+{
+	m_buildingCommand = buildingCommand;
+	moveTo(buildPosition, map, eUnitState::MovingToBuildingPosition);
 }
 
 void Worker::update(float deltaTime, const Headquarters& HQ, const Map& map, Faction& owningFaction)
@@ -139,6 +147,34 @@ void Worker::update(float deltaTime, const Headquarters& HQ, const Map& map, Fac
 			}
 		}
 		
+		break;
+	case eUnitState::MovingToBuildingPosition:
+		assert(m_buildingCommand);
+		if (!m_pathToPosition.empty())
+		{
+			glm::vec3 newPosition = Globals::moveTowards(m_position, m_pathToPosition.back(), MOVEMENT_SPEED * deltaTime);
+			m_front = glm::normalize(glm::vec3(newPosition - m_position));
+			m_position = newPosition;
+			m_AABB.reset(m_position, ModelManager::getInstance().getModel(m_modelName));
+			if (m_position == m_pathToPosition.back())
+			{
+				m_pathToPosition.pop_back();
+
+				if (m_pathToPosition.empty())
+				{
+					m_currentState = eUnitState::Building;
+				}
+			}
+		}
+		else
+		{
+			m_currentState = eUnitState::Idle;
+		}
+		break;
+	case eUnitState::Building:
+		assert(m_buildingCommand);
+		m_buildingCommand(*this);
+		m_buildingCommand = nullptr;
 		break;
 	}
 }

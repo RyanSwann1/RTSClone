@@ -13,7 +13,7 @@
 
 namespace
 {
-    constexpr int STARTING_RESOURCES = 50;
+    constexpr int STARTING_RESOURCES = 100;
     constexpr int WORKER_RESOURCE_COST = 50;
     constexpr int SUPPLY_DEPOT_COST = 50;
     constexpr int UNIT_RESOURCE_COST = 100;
@@ -114,8 +114,23 @@ Faction::Faction(Map& map)
     std::cout << "Current Population: " << m_currentPopulationAmount << "\n";
 }
 
-void Faction::addBuilding(Worker& worker)
+void Faction::addBuilding(Worker& worker, Map& map, glm::vec3 spawnPosition)
 {
+    if (m_currentPopulationLimit + POPULATION_INCREMENT < MAX_POPULATION &&
+        isEntityAffordable(eEntityType::SupplyDepot) &&
+        PathFinding::getInstance().isPositionAvailable(spawnPosition, map, m_units, m_workers, worker))
+    {
+        m_supplyDepots.emplace_back(spawnPosition, ModelManager::getInstance().getModel(eModelName::SupplyDepot), map);
+
+        glm::vec3 destination = PathFinding::getInstance().getClosestPositionOutsideAABB(worker.getPosition(),
+            m_supplyDepots.back().getAABB(), m_supplyDepots.back().getPosition(), map);
+        worker.moveTo(destination, map);
+
+        reduceResources(eEntityType::SupplyDepot);
+        increasePopulationLimit();
+
+        revalidateExistingUnitPaths(map);
+    }
 }
 
 void Faction::addResources(Worker & worker)
@@ -209,23 +224,9 @@ void Faction::handleInput(const sf::Event& currentSFMLEvent, const sf::Window& w
             });
             if (selectedWorker != m_workers.end())
             {
-
                 glm::vec3 position = Globals::convertToNodePosition(camera.getMouseToGroundPosition(window));
-                if (m_currentPopulationLimit + POPULATION_INCREMENT < MAX_POPULATION &&
-                    isEntityAffordable(eEntityType::SupplyDepot) &&
-                    PathFinding::getInstance().isPositionAvailable(position, map, m_units, m_workers))
-                {
-                    m_supplyDepots.emplace_back(position, ModelManager::getInstance().getModel(eModelName::SupplyDepot), map);
-
-                    glm::vec3 destination = PathFinding::getInstance().getClosestPositionOutsideAABB(selectedWorker->getPosition(),
-                        m_supplyDepots.back().getAABB(), m_supplyDepots.back().getPosition(), map);
-                    selectedWorker->moveTo(destination, map);
-
-                    reduceResources(eEntityType::SupplyDepot);
-                    increasePopulationLimit();
-
-                    revalidateExistingUnitPaths(map);
-                }
+                selectedWorker->build([this, &map, position](Worker& worker) 
+                    { return addBuilding(worker, map, position); }, position, map);
             }
         }
             break;
