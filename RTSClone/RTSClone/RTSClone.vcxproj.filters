@@ -57,9 +57,6 @@
     <ClCompile Include="Map.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Headquarters.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Faction.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -103,6 +100,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Worker.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="BuildingSpawner.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -281,9 +281,6 @@
     <ClInclude Include="Map.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Headquarters.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Faction.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -342,6 +339,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="EntityType.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BuildingSpawner.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

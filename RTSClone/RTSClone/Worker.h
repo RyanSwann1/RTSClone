@@ -9,7 +9,7 @@
 class SupplyDepot;
 class Faction;
 class Mineral;
-class Headquarters;
+class BuildingSpawner;
 class Worker : public Unit
 {
 public:
@@ -19,7 +19,7 @@ public:
 	int extractResources();	
 
 	void build(const std::function<const SupplyDepot*(Worker&)>& buildingCommand, const glm::vec3& buildPosition, const Map& map);
-	void update(float deltaTime, const Headquarters& HQ, const Map& map, Faction& owningFaction);
+	void update(float deltaTime, const BuildingSpawner& HQ, const Map& map, Faction& owningFaction);
 	void moveTo(const glm::vec3& destinationPosition, const Map& map, eUnitState state = eUnitState::Moving);
 	void moveTo(const glm::vec3& destinationPosition, const Map& map, const std::vector<Mineral>& minerals);
 

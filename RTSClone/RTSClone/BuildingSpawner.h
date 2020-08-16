@@ -4,10 +4,10 @@
 #include <SFML/Graphics.hpp>
 
 struct Camera;
-class Headquarters : public Entity
+class BuildingSpawner : public Entity
 {
 public:
-	Headquarters(const glm::vec3& startingPosition, const Model& model, Map& map);
+	BuildingSpawner(const glm::vec3& startingPosition, const Model& model, Map& map);
 
 	const glm::vec3& getWaypointPosition() const;
 	glm::vec3 getUnitSpawnPosition() const;

@@ -7,7 +7,6 @@
 #include "Texture.h"
 #include "Camera.h"
 #include "Unit.h"
-#include "Headquarters.h"
 #include "Map.h"
 #include "glm/gtc/matrix_transform.hpp"
 #include "Faction.h"

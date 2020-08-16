@@ -1,4 +1,4 @@
-#include "Headquarters.h"
+#include "BuildingSpawner.h"
 #include "Camera.h"
 #include "Model.h"
 #include "Globals.h"
@@ -20,20 +20,20 @@ namespace
 	}
 }
 
-Headquarters::Headquarters(const glm::vec3& startingPosition, const Model& model, Map& map)
+BuildingSpawner::BuildingSpawner(const glm::vec3& startingPosition, const Model& model, Map& map)
 	: Entity(startingPosition, model, eEntityType::HQ),
 	m_waypointPosition(startingPosition)
 {
 	map.addEntityAABB(m_AABB);
 }
 
-const glm::vec3& Headquarters::getWaypointPosition() const
+const glm::vec3& BuildingSpawner::getWaypointPosition() const
 {
 	assert(m_selected);
 	return m_waypointPosition;
 }
 
-glm::vec3 Headquarters::getUnitSpawnPosition() const
+glm::vec3 BuildingSpawner::getUnitSpawnPosition() const
 {
 	assert(m_selected);
 	glm::vec3 unitSpawnPosition;
@@ -51,7 +51,7 @@ glm::vec3 Headquarters::getUnitSpawnPosition() const
 	return unitSpawnPosition;
 }
 
-void Headquarters::setWaypointPosition(const glm::vec3& position)
+void BuildingSpawner::setWaypointPosition(const glm::vec3& position)
 {
 	assert(m_selected);
 	if (Globals::isPositionInMapBounds(position))
@@ -67,7 +67,7 @@ void Headquarters::setWaypointPosition(const glm::vec3& position)
 	}
 }
 
-void Headquarters::render(ShaderHandler & shaderHandler, const Model & renderModel, const Model & waypointModel) const
+void BuildingSpawner::render(ShaderHandler & shaderHandler, const Model & renderModel, const Model & waypointModel) const
 {
 	if (m_selected && m_waypointPosition != m_position)
 	{

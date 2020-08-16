@@ -150,7 +150,7 @@
     <ClCompile Include="Faction.cpp" />
     <ClCompile Include="Graph.cpp" />
     <ClCompile Include="Worker.cpp" />
-    <ClCompile Include="Headquarters.cpp" />
+    <ClCompile Include="BuildingSpawner.cpp" />
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="Entity.cpp" />
     <ClCompile Include="glad.c" />
@@ -224,7 +224,7 @@
     <ClInclude Include="Faction.h" />
     <ClInclude Include="Graph.h" />
     <ClInclude Include="Worker.h" />
-    <ClInclude Include="Headquarters.h" />
+    <ClInclude Include="BuildingSpawner.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="Entity.h" />
     <ClInclude Include="glad.h" />
