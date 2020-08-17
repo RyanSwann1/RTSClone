@@ -27,28 +27,31 @@ BuildingSpawner::BuildingSpawner(const glm::vec3& startingPosition, const Model&
 	map.addEntityAABB(m_AABB);
 }
 
-const glm::vec3& BuildingSpawner::getWaypointPosition() const
+bool BuildingSpawner::isWaypointActive() const
 {
 	assert(m_selected);
+	return m_waypointPosition != m_position;
+}
+
+const glm::vec3& BuildingSpawner::getWaypointPosition() const
+{
+	assert(m_selected && isWaypointActive());
 	return m_waypointPosition;
 }
 
 glm::vec3 BuildingSpawner::getUnitSpawnPosition() const
 {
 	assert(m_selected);
-	glm::vec3 unitSpawnPosition;
-	if (m_waypointPosition != m_position)
+	if (isWaypointActive())
 	{
-		unitSpawnPosition = getSpawnPosition(m_AABB, glm::normalize(m_waypointPosition - m_position), m_position);
+		return getSpawnPosition(m_AABB, glm::normalize(m_waypointPosition - m_position), m_position);
 	}
 	else
 	{
-		unitSpawnPosition = getSpawnPosition(m_AABB, 
+		return getSpawnPosition(m_AABB, 
 			glm::normalize(glm::vec3(Globals::getRandomNumber(-1.0f, 1.0f), Globals::GROUND_HEIGHT, Globals::getRandomNumber(-1.0f, 1.0f))), 
 			m_position);
 	}
-
-	return unitSpawnPosition;
 }
 
 void BuildingSpawner::setWaypointPosition(const glm::vec3& position)

@@ -93,7 +93,7 @@ private:
 				});
 				if (barracks != m_barracks.end())
 				{
-					if (barracks->getWaypointPosition() != barracks->getPosition())
+					if (barracks->isWaypointActive())
 					{
 						units.emplace_back(barracks->getUnitSpawnPosition(), PathFinding::getInstance().getClosestAvailablePosition(
 							barracks->getWaypointPosition(), m_units, m_workers, map), unitModel, map);
@@ -111,7 +111,7 @@ private:
 			case eEntityType::Worker:
 				if (m_HQ.isSelected())
 				{
-					if (m_HQ.getWaypointPosition() != m_HQ.getPosition())
+					if (m_HQ.isWaypointActive())
 					{
 						units.emplace_back(m_HQ.getUnitSpawnPosition(), PathFinding::getInstance().getClosestAvailablePosition(
 							m_HQ.getWaypointPosition(), m_units, m_workers, map), unitModel, map);
@@ -135,27 +135,6 @@ private:
 				increaseCurrentPopulationAmount(entityType);
 			}
 		}
-		//if (m_HQ.isSelected() && isEntityAffordable(entityType) && !isExceedPopulationLimit(entityType))
-		//{
-		//	switch (entityType)
-		//	{
-		//	case eEntityType::Unit:
-		//	case eEntityType::Worker:
-		//		if (m_HQ.getWaypointPosition() != m_HQ.getPosition())
-		//		{
-		//	
-		//		}
-		//		else
-		//		{
-		//			
-		//		}
-		//		break;
-		//	default:
-		//		assert(false);
-		//	}
-		//	reduceResources(entityType);
-		//	increaseCurrentPopulationAmount(entityType);
-		//}
 	}
 
 	template <class Entity>
