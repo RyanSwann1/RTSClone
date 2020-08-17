@@ -180,6 +180,7 @@ void Worker::update(float deltaTime, const BuildingSpawner& HQ, const Map& map, 
 		{
 			moveTo(PathFinding::getInstance().getClosestPositionOutsideAABB(m_position,
 				newBuilding->getAABB(), newBuilding->getPosition(), map), map);
+			
 			assert(!m_pathToPosition.empty());
 		}
 		else

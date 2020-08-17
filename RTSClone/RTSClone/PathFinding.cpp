@@ -211,8 +211,17 @@ glm::vec3 PathFinding::getClosestPositionOutsideAABB(const glm::vec3& entityPosi
 	const Map& map)
 {
 	glm::vec3 closestPosition = centrePositionAABB;
+	glm::vec3 direction = { 0.0f, 0.0f, 0.0f };
+	if (entityPosition == centrePositionAABB)
+	{
+		direction = glm::normalize(glm::vec3(Globals::getRandomNumber(-1.0f, 1.0f), Globals::GROUND_HEIGHT, Globals::getRandomNumber(-1.0f, 1.0f)));
+	}
+	else
+	{
+		direction = glm::normalize(entityPosition - centrePositionAABB);
+	}
+
 	glm::vec3 position = centrePositionAABB;
-	glm::vec3 direction = glm::normalize(entityPosition - centrePositionAABB);
 	for (float ray = 1.0f; ray <= Globals::NODE_SIZE * 5.0f; ++ray)
 	{
 		position = position + direction * ray;
@@ -223,6 +232,7 @@ glm::vec3 PathFinding::getClosestPositionOutsideAABB(const glm::vec3& entityPosi
 		}
 	}
 
+	assert(closestPosition != centrePositionAABB);
 	return closestPosition;
 }
 
@@ -230,6 +240,11 @@ void PathFinding::getPathToPosition(const Unit& unit, const glm::vec3& destinati
 	const GetAllAdjacentPositions& getAdjacentPositions, bool includeWorldDestinationPosition)
 {
 	assert(getAdjacentPositions && pathToPosition.empty());
+
+	if (unit.getPosition() == destination)
+	{
+		return;
+	}
 
 	m_openQueue.clear();
 	m_closedQueue.clear();
