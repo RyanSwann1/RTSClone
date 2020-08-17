@@ -568,6 +568,11 @@ void Faction::increasePopulationLimit()
 
 void Faction::instructWorkerToBuild(eEntityType entityType, const glm::vec3& mouseToGroundPosition, Map& map)
 {
+    if (!Globals::isPositionInMapBounds(mouseToGroundPosition))
+    {
+        return;
+    }
+
     switch (entityType)
     {
     case eEntityType::Barracks:
