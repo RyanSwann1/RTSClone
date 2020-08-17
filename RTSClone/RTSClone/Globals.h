@@ -121,7 +121,12 @@ namespace Globals
 
 	inline glm::vec3 convertToMiddleGridPosition(const glm::vec3& position)
 	{
-		return { position.x + Globals::NODE_SIZE / 2.0f, position.y, position.z + Globals::NODE_SIZE / 2.0f };
+		assert(static_cast<int>(position.x) % Globals::NODE_SIZE == 0 &&
+			position.y == Globals::GROUND_HEIGHT &&
+			static_cast<int>(position.z) % Globals::NODE_SIZE == 0);
+
+		return { position.x + static_cast<float>(Globals::NODE_SIZE) / 2.0f, position.y, 
+			position.z + static_cast<float>(Globals::NODE_SIZE) / 2.0f };
 	}
 
 	inline glm::vec3 convertToWorldPosition(const glm::ivec2& position)
