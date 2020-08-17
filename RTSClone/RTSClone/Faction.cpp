@@ -178,7 +178,12 @@ void Faction::handleInput(const sf::Event& currentSFMLEvent, const sf::Window& w
             selectUnit<Worker>(m_workers, mouseToGroundPosition, selectAllUnits);
 
             m_selectionBox.setStartingPosition(window, mouseToGroundPosition);
+            
             m_HQ.setSelected(m_HQ.getAABB().contains(mouseToGroundPosition));
+            for (auto& barracks : m_barracks)
+            {
+                barracks.setSelected(barracks.getAABB().contains(mouseToGroundPosition));
+            }
         }
         else if (currentSFMLEvent.mouseButton.button == sf::Mouse::Right)
         {
@@ -225,11 +230,11 @@ void Faction::handleInput(const sf::Event& currentSFMLEvent, const sf::Window& w
     case sf::Event::KeyPressed:
         switch (currentSFMLEvent.key.code)
         {
-        case sf::Keyboard::Num1:
-            spawnUnit<Worker>(m_HQ.getUnitSpawnPosition(), ModelManager::getInstance().getModel(eModelName::Worker), map, m_workers, eEntityType::Worker);
+        case sf::Keyboard::U:
+            spawnUnit<Unit>(ModelManager::getInstance().getModel(eModelName::Unit), map, m_units, eEntityType::Unit);
             break;
-        case sf::Keyboard::Num2:
-            spawnUnit<Unit>(m_HQ.getUnitSpawnPosition(), ModelManager::getInstance().getModel(eModelName::Unit), map, m_units, eEntityType::Unit);
+        case sf::Keyboard::W:
+            spawnUnit<Worker>(ModelManager::getInstance().getModel(eModelName::Worker), map, m_workers, eEntityType::Worker);
             break;
         case sf::Keyboard::B:
         {

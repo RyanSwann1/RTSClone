@@ -78,31 +78,84 @@ private:
 	void increasePopulationLimit();
 
 	template <class Unit>
-	void spawnUnit(const glm::vec3& spawnPosition, const Model& unitModel, Map& map, std::vector<Unit>& units, eEntityType entityType)
+	void spawnUnit(const Model& unitModel, Map& map, std::vector<Unit>& units, eEntityType entityType)
 	{
-		if (m_HQ.isSelected() && isEntityAffordable(entityType) && !isExceedPopulationLimit(entityType))
+		if (isEntityAffordable(entityType) && !isExceedPopulationLimit(entityType))
 		{
+			bool unitSpawned = false;
 			switch (entityType)
 			{
 			case eEntityType::Unit:
-			case eEntityType::Worker:
-				if (m_HQ.getWaypointPosition() != m_HQ.getPosition())
+			{
+				auto barracks = std::find_if(m_barracks.begin(), m_barracks.end(), [](const auto& barracks)
 				{
-					units.emplace_back(spawnPosition, PathFinding::getInstance().getClosestAvailablePosition(m_HQ.getWaypointPosition(), m_units, m_workers, map),
-						unitModel, map);
+					return barracks.isSelected();
+				});
+				if (barracks != m_barracks.end())
+				{
+					if (barracks->getWaypointPosition() != barracks->getPosition())
+					{
+						units.emplace_back(barracks->getUnitSpawnPosition(), PathFinding::getInstance().getClosestAvailablePosition(
+							barracks->getWaypointPosition(), m_units, m_workers, map), unitModel, map);
+					}
+					else
+					{
+						units.emplace_back(PathFinding::getInstance().getClosestAvailablePosition(barracks->getUnitSpawnPosition(),
+							m_units, m_workers, map), unitModel, map);
+					}
+
+					unitSpawned = true;
 				}
-				else
+			}
+				break;
+			case eEntityType::Worker:
+				if (m_HQ.isSelected())
 				{
-					units.emplace_back(PathFinding::getInstance().getClosestAvailablePosition(spawnPosition, m_units, m_workers, map), unitModel, map);
+					if (m_HQ.getWaypointPosition() != m_HQ.getPosition())
+					{
+						units.emplace_back(m_HQ.getUnitSpawnPosition(), PathFinding::getInstance().getClosestAvailablePosition(
+							m_HQ.getWaypointPosition(), m_units, m_workers, map), unitModel, map);
+					}
+					else
+					{
+						units.emplace_back(PathFinding::getInstance().getClosestAvailablePosition(
+							m_HQ.getUnitSpawnPosition(), m_units, m_workers, map), unitModel, map);
+					}
+
+					unitSpawned = true;
 				}
 				break;
 			default:
 				assert(false);
 			}
 
-			reduceResources(entityType);
-			increaseCurrentPopulationAmount(entityType);
+			if (unitSpawned)
+			{
+				reduceResources(entityType);
+				increaseCurrentPopulationAmount(entityType);
+			}
 		}
+		//if (m_HQ.isSelected() && isEntityAffordable(entityType) && !isExceedPopulationLimit(entityType))
+		//{
+		//	switch (entityType)
+		//	{
+		//	case eEntityType::Unit:
+		//	case eEntityType::Worker:
+		//		if (m_HQ.getWaypointPosition() != m_HQ.getPosition())
+		//		{
+		//	
+		//		}
+		//		else
+		//		{
+		//			
+		//		}
+		//		break;
+		//	default:
+		//		assert(false);
+		//	}
+		//	reduceResources(entityType);
+		//	increaseCurrentPopulationAmount(entityType);
+		//}
 	}
 
 	template <class Entity>

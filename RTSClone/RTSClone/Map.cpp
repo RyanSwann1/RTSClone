@@ -1,7 +1,6 @@
 #include "Map.h"
 #include "AABB.h"
 
-//Map
 Map::Map()
 	: m_map()
 {
