@@ -76,6 +76,7 @@ private:
 	void reduceResources(eEntityType addedEntityType);
 	void increaseCurrentPopulationAmount(eEntityType entityType);
 	void increasePopulationLimit();
+	void instructWorkerToBuild(eEntityType entityType, const glm::vec3& position, Map& map);
 
 	template <class Unit>
 	void spawnUnit(const Model& unitModel, Map& map, std::vector<Unit>& units, eEntityType entityType)

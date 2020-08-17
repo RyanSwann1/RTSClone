@@ -237,34 +237,10 @@ void Faction::handleInput(const sf::Event& currentSFMLEvent, const sf::Window& w
             spawnUnit<Worker>(ModelManager::getInstance().getModel(eModelName::Worker), map, m_workers, eEntityType::Worker);
             break;
         case sf::Keyboard::B:
-        {
-            auto selectedWorker = std::find_if(m_workers.begin(), m_workers.end(), [](const auto& worker)
-            {
-                return worker.isSelected();
-            });
-            if (selectedWorker != m_workers.end())
-            {
-                glm::vec3 position = Globals::convertToNodePosition(camera.getMouseToGroundPosition(window));
-                eEntityType entityType = eEntityType::SupplyDepot;
-                selectedWorker->build([this, &map, position, entityType](Worker& worker)
-                { return addBuilding(worker, map, position, entityType); }, position, map);
-            }
-        }
+            instructWorkerToBuild(eEntityType::SupplyDepot, Globals::convertToNodePosition(camera.getMouseToGroundPosition(window)), map);
             break;
         case sf::Keyboard::N:
-        {
-            auto selectedWorker = std::find_if(m_workers.begin(), m_workers.end(), [](const auto& worker)
-            {
-                return worker.isSelected();
-            });
-            if (selectedWorker != m_workers.end())
-            {
-                glm::vec3 position = Globals::convertToNodePosition(camera.getMouseToGroundPosition(window));
-                eEntityType entityType = eEntityType::Barracks;
-                selectedWorker->build([this, &map, position, entityType](Worker& worker)
-                { return addBuilding(worker, map, position, entityType); }, position, map);
-            }
-        }
+            instructWorkerToBuild(eEntityType::Barracks, Globals::convertToNodePosition(camera.getMouseToGroundPosition(window)), map);
             break;
         }
         break;
@@ -590,4 +566,27 @@ void Faction::increasePopulationLimit()
     m_currentPopulationLimit += POPULATION_INCREMENT;
 
     std::cout << "Population Limit: " << m_currentPopulationLimit << "\n";
+}
+
+void Faction::instructWorkerToBuild(eEntityType entityType, const glm::vec3& position, Map& map)
+{
+    switch (entityType)
+    {
+    case eEntityType::Barracks:
+    case eEntityType::SupplyDepot:
+    {
+        auto selectedWorker = std::find_if(m_workers.begin(), m_workers.end(), [](const auto& worker)
+        {
+            return worker.isSelected();
+        });
+        if (selectedWorker != m_workers.end())
+        {
+            selectedWorker->build([this, &map, position, entityType](Worker& worker)
+            { return addBuilding(worker, map, position, entityType); }, position, map);
+        }
+    }
+        break;
+    default:
+        assert(false);
+    }
 }
