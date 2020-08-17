@@ -134,7 +134,7 @@ int main()
 		faction.render(*shaderHandler);
 		for(const auto& mineral : minerals)
 		{
-			mineral.render(*shaderHandler, ModelManager::getInstance().getModel(mineral.getModelName()));
+			mineral.render(*shaderHandler);
 		}
 
 		shaderHandler->switchToShader(eShaderType::Debug);

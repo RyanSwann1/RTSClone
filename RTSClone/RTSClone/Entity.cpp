@@ -45,9 +45,9 @@ void Entity::setSelected(bool selected)
 	m_selected = selected;
 }
 
-void Entity::render(ShaderHandler& shaderHandler, const Model& renderModel) const
+void Entity::render(ShaderHandler& shaderHandler) const
 {
-	renderModel.render(shaderHandler, *this);
+	ModelManager::getInstance().getModel(m_modelName).render(shaderHandler, *this);
 }
 
 #ifdef RENDER_AABB

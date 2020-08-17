@@ -265,28 +265,26 @@ void Faction::update(float deltaTime, const Map& map)
 
 void Faction::render(ShaderHandler& shaderHandler) const
 {
-    m_HQ.render(shaderHandler, ModelManager::getInstance().getModel(m_HQ.getModelName()), 
-        ModelManager::getInstance().getModel(eModelName::Waypoint));
+    m_HQ.render(shaderHandler);
 
     for (auto& unit : m_units)
     {
-        unit.render(shaderHandler, ModelManager::getInstance().getModel(unit.getModelName()));
+        unit.render(shaderHandler);
     }
 
     for (auto& worker : m_workers)
     {
-        worker.render(shaderHandler, ModelManager::getInstance().getModel(worker.getModelName()));
+        worker.render(shaderHandler);
     }
 
     for (auto& supplyDepot : m_supplyDepots)
     {
-        supplyDepot.render(shaderHandler, ModelManager::getInstance().getModel(supplyDepot.getModelName()));
+        supplyDepot.render(shaderHandler);
     }
 
     for (auto& barracks : m_barracks)
     {
-        barracks.render(shaderHandler, ModelManager::getInstance().getModel(barracks.getModelName()), 
-            ModelManager::getInstance().getModel(eModelName::Waypoint));
+        barracks.render(shaderHandler);
     }
 }
 

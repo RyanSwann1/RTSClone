@@ -3,6 +3,7 @@
 #include "Model.h"
 #include "Globals.h"
 #include "Map.h"
+#include "ModelManager.h"
 
 namespace
 {
@@ -70,12 +71,12 @@ void BuildingSpawner::setWaypointPosition(const glm::vec3& position)
 	}
 }
 
-void BuildingSpawner::render(ShaderHandler & shaderHandler, const Model & renderModel, const Model & waypointModel) const
+void BuildingSpawner::render(ShaderHandler & shaderHandler) const
 {
-	if (m_selected && m_waypointPosition != m_position)
+	if (m_selected && isWaypointActive())
 	{
-		waypointModel.render(shaderHandler, m_waypointPosition);
+		ModelManager::getInstance().getModel(eModelName::Waypoint).render(shaderHandler, m_waypointPosition);
 	}
 	
-	renderModel.render(shaderHandler, *this);
+	Entity::render(shaderHandler);
 }

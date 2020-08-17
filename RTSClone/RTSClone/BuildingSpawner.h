@@ -14,7 +14,7 @@ public:
 	glm::vec3 getUnitSpawnPosition() const;
 
 	void setWaypointPosition(const glm::vec3& position);
-	void render(ShaderHandler& shaderHandler, const Model& renderModel, const Model& waypointModel) const;
+	void render(ShaderHandler& shaderHandler) const;
 
 private:
 	glm::vec3 m_waypointPosition;
