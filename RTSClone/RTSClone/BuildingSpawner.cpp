@@ -23,7 +23,7 @@ namespace
 
 BuildingSpawner::BuildingSpawner(const glm::vec3& startingPosition, Map& map, eModelName modelName)
 	: Entity(startingPosition, modelName, eEntityType::HQ),
-	m_waypointPosition(startingPosition)
+	m_waypointPosition(m_position)
 {
 	map.addEntityAABB(m_AABB);
 }
