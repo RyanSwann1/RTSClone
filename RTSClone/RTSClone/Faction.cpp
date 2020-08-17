@@ -105,7 +105,7 @@ Faction::Faction(Map& map)
     m_currentPopulationAmount(0),
     m_currentPopulationLimit(STARTING_POPULATION),
     m_selectionBox(),
-    m_HQ(Globals::convertToNodePosition({ 35.0f, Globals::GROUND_HEIGHT, 15.f }), ModelManager::getInstance().getModel(eModelName::HQ), map),
+    m_HQ(Globals::convertToNodePosition({ 35.0f, Globals::GROUND_HEIGHT, 15.f }), map, eModelName::HQ),
     m_units(),
     m_workers(),
     m_supplyDepots(),
@@ -126,12 +126,12 @@ const Entity* Faction::addBuilding(Worker& worker, Map& map, glm::vec3 spawnPosi
         switch (entityType)
         {
         case eEntityType::SupplyDepot:
-            m_supplyDepots.emplace_back(spawnPosition, ModelManager::getInstance().getModel(eModelName::SupplyDepot), map);
+            m_supplyDepots.emplace_back(spawnPosition, map);
             addedBuilding = &m_supplyDepots.back();
             increasePopulationLimit();
             break;
         case eEntityType::Barracks:
-            m_barracks.emplace_back(spawnPosition, ModelManager::getInstance().getModel(eModelName::Barracks), map);
+            m_barracks.emplace_back(spawnPosition, map, eModelName::Barracks);
             addedBuilding = &m_barracks.back();
             break;
         default:
@@ -231,10 +231,10 @@ void Faction::handleInput(const sf::Event& currentSFMLEvent, const sf::Window& w
         switch (currentSFMLEvent.key.code)
         {
         case sf::Keyboard::U:
-            spawnUnit<Unit>(ModelManager::getInstance().getModel(eModelName::Unit), map, m_units, eEntityType::Unit);
+            spawnUnit<Unit>(map, m_units, eEntityType::Unit);
             break;
         case sf::Keyboard::W:
-            spawnUnit<Worker>(ModelManager::getInstance().getModel(eModelName::Worker), map, m_workers, eEntityType::Worker);
+            spawnUnit<Worker>(map, m_workers, eEntityType::Worker);
             break;
         case sf::Keyboard::B:
             instructWorkerToBuild(eEntityType::SupplyDepot, Globals::convertToNodePosition(camera.getMouseToGroundPosition(window)), map);

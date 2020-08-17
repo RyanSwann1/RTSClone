@@ -7,7 +7,7 @@ struct Camera;
 class BuildingSpawner : public Entity
 {
 public:
-	BuildingSpawner(const glm::vec3& startingPosition, const Model& model, Map& map);
+	BuildingSpawner(const glm::vec3& startingPosition, Map& map, eModelName modelName);
 
 	bool isWaypointActive() const;
 	const glm::vec3& getWaypointPosition() const;

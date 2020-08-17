@@ -2,16 +2,17 @@
 #include "Model.h"
 #include "ShaderHandler.h"
 #include "Map.h"
+#include "ModelManager.h"
 
-Entity::Entity(const glm::vec3& startingPosition, const Model& model, eEntityType entityType)
-	: m_modelName(model.modelName),
+Entity::Entity(const glm::vec3& startingPosition, eModelName modelName, eEntityType entityType)
+	: m_modelName(modelName),
 	m_position(),
 	m_AABB(),
 	m_type(entityType),
 	m_selected(false)
 {
 	m_position = Globals::convertToMiddleGridPosition(startingPosition);
-	m_AABB.reset(m_position, model);
+	m_AABB.reset(m_position, ModelManager::getInstance().getModel(m_modelName));
 }
 
 eEntityType Entity::getType() const

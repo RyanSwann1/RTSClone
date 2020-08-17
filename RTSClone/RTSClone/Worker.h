@@ -12,8 +12,8 @@ class BuildingSpawner;
 class Worker : public Unit
 {
 public:
-	Worker(const glm::vec3& startingPosition, const Model& model, Map& map);
-	Worker(const glm::vec3& startingPosition, const glm::vec3& destinationPosition, const Model& model, Map& map);
+	Worker(const glm::vec3& startingPosition, Map& map);
+	Worker(const glm::vec3& startingPosition, const glm::vec3& destinationPosition, Map& map);
 	
 	int extractResources();	
 

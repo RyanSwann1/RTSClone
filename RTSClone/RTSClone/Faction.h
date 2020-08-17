@@ -79,7 +79,7 @@ private:
 	void instructWorkerToBuild(eEntityType entityType, const glm::vec3& position, Map& map);
 
 	template <class Unit>
-	void spawnUnit(const Model& unitModel, Map& map, std::vector<Unit>& units, eEntityType entityType)
+	void spawnUnit(Map& map, std::vector<Unit>& units, eEntityType entityType)
 	{
 		if (isEntityAffordable(entityType) && !isExceedPopulationLimit(entityType))
 		{
@@ -97,12 +97,12 @@ private:
 					if (barracks->isWaypointActive())
 					{
 						units.emplace_back(barracks->getUnitSpawnPosition(), PathFinding::getInstance().getClosestAvailablePosition(
-							barracks->getWaypointPosition(), m_units, m_workers, map), unitModel, map);
+							barracks->getWaypointPosition(), m_units, m_workers, map), map);
 					}
 					else
 					{
 						units.emplace_back(PathFinding::getInstance().getClosestAvailablePosition(barracks->getUnitSpawnPosition(),
-							m_units, m_workers, map), unitModel, map);
+							m_units, m_workers, map), map);
 					}
 
 					unitSpawned = true;
@@ -115,12 +115,12 @@ private:
 					if (m_HQ.isWaypointActive())
 					{
 						units.emplace_back(m_HQ.getUnitSpawnPosition(), PathFinding::getInstance().getClosestAvailablePosition(
-							m_HQ.getWaypointPosition(), m_units, m_workers, map), unitModel, map);
+							m_HQ.getWaypointPosition(), m_units, m_workers, map), map);
 					}
 					else
 					{
 						units.emplace_back(PathFinding::getInstance().getClosestAvailablePosition(
-							m_HQ.getUnitSpawnPosition(), m_units, m_workers, map), unitModel, map);
+							m_HQ.getUnitSpawnPosition(), m_units, m_workers, map), map);
 					}
 
 					unitSpawned = true;

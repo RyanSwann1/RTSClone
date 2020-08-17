@@ -20,8 +20,8 @@ namespace
 	}
 }
 
-BuildingSpawner::BuildingSpawner(const glm::vec3& startingPosition, const Model& model, Map& map)
-	: Entity(startingPosition, model, eEntityType::HQ),
+BuildingSpawner::BuildingSpawner(const glm::vec3& startingPosition, Map& map, eModelName modelName)
+	: Entity(startingPosition, modelName, eEntityType::HQ),
 	m_waypointPosition(startingPosition)
 {
 	map.addEntityAABB(m_AABB);

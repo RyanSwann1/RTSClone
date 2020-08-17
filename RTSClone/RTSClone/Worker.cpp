@@ -15,16 +15,16 @@ namespace
 	constexpr int RESOURCE_INCREMENT = 10;
 }
 
-Worker::Worker(const glm::vec3& startingPosition, const Model& model, Map& map)
-	: Unit(startingPosition, model, map, eEntityType::Worker),
+Worker::Worker(const glm::vec3& startingPosition, Map& map)
+	: Unit(startingPosition, map, eModelName::Worker, eEntityType::Worker),
 	m_buildingCommand(),
 	m_currentResourceAmount(0),
 	m_harvestTimer(HARVEST_TIME),
 	m_mineralToHarvest(nullptr)
 {}
 
-Worker::Worker(const glm::vec3 & startingPosition, const glm::vec3 & destinationPosition, const Model & model, Map & map)
-	: Unit(startingPosition, model, map, eEntityType::Worker),
+Worker::Worker(const glm::vec3 & startingPosition, const glm::vec3 & destinationPosition, Map & map)
+	: Unit(startingPosition, map, eModelName::Worker, eEntityType::Worker),
 	m_buildingCommand(),
 	m_currentResourceAmount(0),
 	m_harvestTimer(HARVEST_TIME),

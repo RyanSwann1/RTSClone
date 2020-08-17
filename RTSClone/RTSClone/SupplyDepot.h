@@ -6,5 +6,5 @@ class Map;
 class SupplyDepot : public Entity
 {
 public:
-	SupplyDepot(const glm::vec3& startingPosition, const Model& model, Map& map);
+	SupplyDepot(const glm::vec3& startingPosition, Map& map);
 };
