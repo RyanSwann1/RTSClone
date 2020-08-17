@@ -194,6 +194,14 @@ void Faction::handleInput(const sf::Event& currentSFMLEvent, const sf::Window& w
             }
             else
             {
+                for (auto& barracks : m_barracks)
+                {
+                    if (barracks.isSelected())
+                    {
+                        barracks.setWaypointPosition(mouseToGroundPosition);
+                    }
+                }
+
                 if (isOneUnitSelected())
                 {
                     moveSingularSelectedUnit(mouseToGroundPosition, map, minerals);
