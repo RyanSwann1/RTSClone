@@ -80,7 +80,7 @@ ModelManager::ModelManager()
 	m_models[static_cast<int>(satelliteDishModel->modelName)] = std::move(satelliteDishModel);
 
 	std::unique_ptr<Model> barracksModel = Model::create("buildingOpen.obj", true,
-		glm::vec3(3.0f, 1.0f, 3.0f), eModelName::Barracks, { 1.0f, 1.0f, 1.0f });
+		glm::vec3(3.0f, 1.0f, 3.0f), eModelName::Barracks, { 0.5f, 0.5f, 0.5f });
 	assert(barracksModel);
 	if (!barracksModel)
 	{

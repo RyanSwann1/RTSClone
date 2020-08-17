@@ -96,13 +96,13 @@ private:
 				{
 					if (barracks->isWaypointActive())
 					{
-						units.emplace_back(barracks->getUnitSpawnPosition(), PathFinding::getInstance().getClosestAvailablePosition(
+						units.emplace_back(Globals::convertToNodePosition(barracks->getUnitSpawnPosition()), PathFinding::getInstance().getClosestAvailablePosition(
 							barracks->getWaypointPosition(), m_units, m_workers, map), map);
 					}
 					else
 					{
-						units.emplace_back(PathFinding::getInstance().getClosestAvailablePosition(barracks->getUnitSpawnPosition(),
-							m_units, m_workers, map), map);
+						units.emplace_back(Globals::convertToNodePosition(PathFinding::getInstance().getClosestAvailablePosition(barracks->getUnitSpawnPosition(),
+							m_units, m_workers, map)), map);
 					}
 
 					unitSpawned = true;

@@ -178,8 +178,9 @@ void Worker::update(float deltaTime, const BuildingSpawner& HQ, const Map& map, 
 		m_buildingCommand = nullptr;
 		if (newBuilding)
 		{
-			moveTo(PathFinding::getInstance().getClosestPositionOutsideAABB(m_position,
-				newBuilding->getAABB(), newBuilding->getPosition(), map), map);
+			glm::vec3 position = PathFinding::getInstance().getClosestPositionOutsideAABB(m_position,
+				newBuilding->getAABB(), newBuilding->getPosition(), map);
+			moveTo(position, map);
 			
 			assert(!m_pathToPosition.empty());
 		}

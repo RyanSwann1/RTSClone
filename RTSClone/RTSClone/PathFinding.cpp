@@ -222,9 +222,9 @@ glm::vec3 PathFinding::getClosestPositionOutsideAABB(const glm::vec3& entityPosi
 	}
 
 	glm::vec3 position = centrePositionAABB;
-	for (float ray = 1.0f; ray <= Globals::NODE_SIZE * 5.0f; ++ray)
+	for (float ray = 1.0f; ray <= Globals::NODE_SIZE * 7.0f; ++ray)
 	{
-		position = position + direction * ray;
+		position = position + direction * 1.0f;
 		if (!AABB.contains(position) && !map.isPositionOccupied(position) && Globals::isPositionInMapBounds(position))
 		{
 			closestPosition = position;
