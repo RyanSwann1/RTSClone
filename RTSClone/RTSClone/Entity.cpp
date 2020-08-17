@@ -6,12 +6,27 @@
 
 Entity::Entity(const glm::vec3& startingPosition, eModelName modelName, eEntityType entityType)
 	: m_modelName(modelName),
-	m_position(),
+	m_position(0.0f, 0.0f, 0.0f),
 	m_AABB(),
 	m_type(entityType),
 	m_selected(false)
 {
-	m_position = Globals::convertToMiddleGridPosition(startingPosition);
+	switch (m_type)
+	{
+	case eEntityType::Barracks:
+	case eEntityType::HQ:
+	case eEntityType::Mineral:
+	case eEntityType::SupplyDepot:
+	case eEntityType::Unit:
+		m_position = Globals::convertToMiddleGridPosition(startingPosition);
+		break;
+	case eEntityType::Worker:
+		m_position = startingPosition;
+		break;
+	default: 
+		assert(false);
+	}
+	
 	m_AABB.reset(m_position, ModelManager::getInstance().getModel(m_modelName));
 }
 
