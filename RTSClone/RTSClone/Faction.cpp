@@ -13,13 +13,13 @@
 
 namespace
 {
-    constexpr int STARTING_RESOURCES = 100;
+    constexpr int STARTING_RESOURCES = 1000;
     constexpr int WORKER_RESOURCE_COST = 50;
     constexpr int SUPPLY_DEPOT_RESOURCE_COST = 50;
     constexpr int BARRACKS_RESOURCE_COST = 50;
     constexpr int UNIT_RESOURCE_COST = 100;
     constexpr int STARTING_POPULATION = 5;
-    constexpr int MAX_POPULATION = 20;
+    constexpr int MAX_POPULATION = 200;
     constexpr int WORKER_POPULATION_COST = 1;
     constexpr int UNIT_POPULATION_COST = 2;
     constexpr int POPULATION_INCREMENT = 5;
@@ -237,10 +237,10 @@ void Faction::handleInput(const sf::Event& currentSFMLEvent, const sf::Window& w
             spawnUnit<Worker>(map, m_workers, eEntityType::Worker);
             break;
         case sf::Keyboard::B:
-            instructWorkerToBuild(eEntityType::SupplyDepot, Globals::convertToNodePosition(camera.getMouseToGroundPosition(window)), map);
+            instructWorkerToBuild(eEntityType::SupplyDepot, camera.getMouseToGroundPosition(window), map);
             break;
         case sf::Keyboard::N:
-            instructWorkerToBuild(eEntityType::Barracks, Globals::convertToNodePosition(camera.getMouseToGroundPosition(window)), map);
+            instructWorkerToBuild(eEntityType::Barracks, camera.getMouseToGroundPosition(window), map);
             break;
         }
         break;
@@ -566,7 +566,7 @@ void Faction::increasePopulationLimit()
     std::cout << "Population Limit: " << m_currentPopulationLimit << "\n";
 }
 
-void Faction::instructWorkerToBuild(eEntityType entityType, const glm::vec3& position, Map& map)
+void Faction::instructWorkerToBuild(eEntityType entityType, const glm::vec3& mouseToGroundPosition, Map& map)
 {
     switch (entityType)
     {
@@ -579,8 +579,9 @@ void Faction::instructWorkerToBuild(eEntityType entityType, const glm::vec3& pos
         });
         if (selectedWorker != m_workers.end())
         {
-            selectedWorker->build([this, &map, position, entityType](Worker& worker)
-            { return addBuilding(worker, map, position, entityType); }, position, map);
+            glm::vec3 buildPosition = Globals::convertToNodePosition(mouseToGroundPosition);
+            selectedWorker->build([this, &map, buildPosition, entityType](Worker& worker)
+            { return addBuilding(worker, map, buildPosition, entityType); }, buildPosition, map);
         }
     }
         break;

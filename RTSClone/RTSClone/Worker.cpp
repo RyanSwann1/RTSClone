@@ -41,10 +41,10 @@ int Worker::extractResources()
 	return resources;
 }
 
-void Worker::build(const std::function<const Entity*(Worker&)>& buildingCommand, const glm::vec3& buildPosition, const Map& map)
+void Worker::build(const std::function<const Entity*(Worker&)>& buildingCommand, const glm::vec3& destination, const Map& map)
 {
 	m_buildingCommand = buildingCommand;
-	moveTo(buildPosition, map, eUnitState::MovingToBuildingPosition);
+	moveTo(Globals::convertToMiddleGridPosition(destination), map, eUnitState::MovingToBuildingPosition);
 }
 
 void Worker::update(float deltaTime, const BuildingSpawner& HQ, const Map& map, Faction& owningFaction)
@@ -180,12 +180,13 @@ void Worker::update(float deltaTime, const BuildingSpawner& HQ, const Map& map, 
 		{
 			moveTo(PathFinding::getInstance().getClosestPositionOutsideAABB(m_position,
 				newBuilding->getAABB(), newBuilding->getPosition(), map), map);
+			assert(!m_pathToPosition.empty());
 		}
 		else
 		{
 			m_currentState = eUnitState::Idle;
 		}
-
+		
 		break;
 	}
 }
