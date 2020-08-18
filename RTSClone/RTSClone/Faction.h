@@ -70,8 +70,8 @@ private:
 	bool isOneUnitSelected() const;
 	
 	const Entity* addBuilding(Worker& worker, Map& map, glm::vec3 spawnPosition, eEntityType entityType);
-	void moveSingularSelectedUnit(const glm::vec3& destinationPosition, const Map& map, const std::vector<Mineral>& minerals);
-	void moveMultipleSelectedUnits(const glm::vec3& destinationPosition, const Map& map, const std::vector<Mineral>& minerals);
+	void moveSingularSelectedUnit(const glm::vec3& mouseToGroundPosition, const Map& map, const std::vector<Mineral>& minerals);
+	void moveMultipleSelectedUnits(const glm::vec3& mouseToGroundPosition, const Map& map, const std::vector<Mineral>& minerals);
 	void revalidateExistingUnitPaths(const Map& map);
 	void reduceResources(eEntityType addedEntityType);
 	void increaseCurrentPopulationAmount(eEntityType entityType);

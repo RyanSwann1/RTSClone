@@ -7,6 +7,7 @@
 #include "Map.h"
 #include "ModelManager.h"
 #include "PathFinding.h"
+#include "Mineral.h"
 #include <assert.h>
 #include <array>
 #include <algorithm>
@@ -410,7 +411,7 @@ bool Faction::isOneUnitSelected() const
     return unitSelectedCount == 1;
 }
 
-void Faction::moveSingularSelectedUnit(const glm::vec3& destinationPosition, const Map& map, const std::vector<Mineral>& minerals)
+void Faction::moveSingularSelectedUnit(const glm::vec3& mouseToGroundPosition, const Map& map, const std::vector<Mineral>& minerals)
 {
     assert(isOneUnitSelected());
 
@@ -419,7 +420,7 @@ void Faction::moveSingularSelectedUnit(const glm::vec3& destinationPosition, con
     });
     if (selectedUnit != m_units.end())
     {
-        selectedUnit->moveTo(Globals::convertToNodePosition(destinationPosition), map, m_units,
+        selectedUnit->moveTo(Globals::convertToNodePosition(mouseToGroundPosition), map, m_units,
             [&](const glm::ivec2& position) { return getAllAdjacentPositions(position, map, m_units, *selectedUnit); });
     }
     else
@@ -429,11 +430,11 @@ void Faction::moveSingularSelectedUnit(const glm::vec3& destinationPosition, con
         });
         assert(selectedWorker != m_workers.end());
 
-        selectedWorker->moveTo(destinationPosition, map, minerals);
+        selectedWorker->moveTo(mouseToGroundPosition, map, minerals);
     }
 }
 
-void Faction::moveMultipleSelectedUnits(const glm::vec3& destinationPosition, const Map& map, const std::vector<Mineral>& minerals)
+void Faction::moveMultipleSelectedUnits(const glm::vec3& mouseToGroundPosition, const Map& map, const std::vector<Mineral>& minerals)
 {
     static std::vector<Unit*> selectedUnits;
  
@@ -457,9 +458,9 @@ void Faction::moveMultipleSelectedUnits(const glm::vec3& destinationPosition, co
     {
         assert(!isOneUnitSelected());
         AABB selectionBoxAABB({ selectedUnits.begin(), selectedUnits.end() });
-        if (selectionBoxAABB.contains(destinationPosition))
+        if (selectionBoxAABB.contains(mouseToGroundPosition))
         {
-            std::vector<glm::vec3> unitFormationPositions = PathFinding::getInstance().getFormationPositions(destinationPosition, 
+            std::vector<glm::vec3> unitFormationPositions = PathFinding::getInstance().getFormationPositions(mouseToGroundPosition,
                 selectedUnits, map);
 
             if (unitFormationPositions.size() == selectedUnits.size())
@@ -473,33 +474,56 @@ void Faction::moveMultipleSelectedUnits(const glm::vec3& destinationPosition, co
         }
         else
         {
-            std::sort(selectedUnits.begin(), selectedUnits.end(), [](const auto& unitA, const auto& unitB)
+            const Mineral* mineralSelected = nullptr;
+            for (const auto& mineral : minerals)
             {
-                return glm::all(glm::lessThan(unitA->getPosition(), unitB->getPosition()));
-            });
-
-            glm::vec3 total(0.0f, 0.0f, 0.0f);
-            for (const auto& selectedUnit : selectedUnits)
-            {
-                total += selectedUnit->getPosition();
+                if (mineral.getAABB().contains(mouseToGroundPosition))
+                {
+                    mineralSelected = &mineral;
+                    break;
+                }
             }
 
-            glm::vec3 averagePosition = { total.x / selectedUnits.size(), total.y / selectedUnits.size(), total.z / selectedUnits.size() };
-
-            for (auto& selectedUnit : selectedUnits)
+            if (mineralSelected)
             {
-                switch (selectedUnit->getType())
+                for(auto& selectedUnit : selectedUnits)
                 {
-                case eEntityType::Unit:
-                    selectedUnit->moveTo(Globals::convertToNodePosition(destinationPosition - (averagePosition - selectedUnit->getPosition())), map, m_units,
-                        [&](const glm::ivec2& position)
-                    { return getAllAdjacentPositions(position, map, m_units, *selectedUnit, selectedUnits); });
-                    break;
-                case eEntityType::Worker:
-                    static_cast<Worker*>(selectedUnit)->moveTo(destinationPosition - (averagePosition - selectedUnit->getPosition()), map);
-                    break;
-                default:
-                    assert(false);
+                    if (selectedUnit->getType() == eEntityType::Worker)
+                    {
+                        static_cast<Worker*>(selectedUnit)->moveTo(mouseToGroundPosition, map, minerals);
+                    }
+                }
+            }
+            else
+            {
+                std::sort(selectedUnits.begin(), selectedUnits.end(), [](const auto& unitA, const auto& unitB)
+                {
+                    return glm::all(glm::lessThan(unitA->getPosition(), unitB->getPosition()));
+                });
+
+                glm::vec3 total(0.0f, 0.0f, 0.0f);
+                for (const auto& selectedUnit : selectedUnits)
+                {
+                    total += selectedUnit->getPosition();
+                }
+
+                glm::vec3 averagePosition = { total.x / selectedUnits.size(), total.y / selectedUnits.size(), total.z / selectedUnits.size() };
+
+                for (auto& selectedUnit : selectedUnits)
+                {
+                    switch (selectedUnit->getType())
+                    {
+                    case eEntityType::Unit:
+                        selectedUnit->moveTo(Globals::convertToNodePosition(mouseToGroundPosition - (averagePosition - selectedUnit->getPosition())), map, m_units,
+                            [&](const glm::ivec2& position)
+                        { return getAllAdjacentPositions(position, map, m_units, *selectedUnit, selectedUnits); });
+                        break;
+                    case eEntityType::Worker:
+                        static_cast<Worker*>(selectedUnit)->moveTo(mouseToGroundPosition - (averagePosition - selectedUnit->getPosition()), map);
+                        break;
+                    default:
+                        assert(false);
+                    }
                 }
             }
         }
