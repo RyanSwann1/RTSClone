@@ -20,6 +20,8 @@
 #include "Ground.h"
 #endif // RENDER_GROUND
 
+//AI
+//https://www.youtube.com/watch?v=V3qASwCM-PE&list=PLdgLYFdStKu03Dv9GUsXBDQMdyJbkDb8i
 //Networking Protocol
 //https://gamedev.stackexchange.com/a/162509/76861
 //OpenGL Debug

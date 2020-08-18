@@ -21,6 +21,7 @@ public:
 	void update(float deltaTime, const BuildingSpawner& HQ, const Map& map, Faction& owningFaction);
 	void moveTo(const glm::vec3& destinationPosition, const Map& map, eUnitState state = eUnitState::Moving);
 	void moveTo(const glm::vec3& destinationPosition, const Map& map, const std::vector<Mineral>& minerals);
+	void render(ShaderHandler& shaderHandler) const;
 
 private:
 	std::function<const Entity*(Worker&)> m_buildingCommand;

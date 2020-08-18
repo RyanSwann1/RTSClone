@@ -258,3 +258,14 @@ void Worker::moveTo(const glm::vec3 & destinationPosition, const Map & map, cons
 		moveTo(destinationPosition, map);
 	}
 }
+
+void Worker::render(ShaderHandler& shaderHandler) const
+{
+	if (m_currentResourceAmount > 0 && m_currentState != eUnitState::Harvesting)
+	{
+		ModelManager::getInstance().getModel(eModelName::WorkerMineral).render(
+			shaderHandler, { m_position.x - 0.5f, m_position.y, m_position.z - 0.5f });
+	}
+
+	Entity::render(shaderHandler);
+}
