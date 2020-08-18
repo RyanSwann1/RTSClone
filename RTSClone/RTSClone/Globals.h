@@ -13,6 +13,14 @@ namespace Globals
 	constexpr int MAP_SIZE = 30;
 	constexpr int NODE_SIZE = 6;
 
+	constexpr glm::vec3 UNIT_AABB_SIZE { 0.35f, 0.35f, 0.35f };
+	constexpr glm::vec3 HQ_AABB_SIZE { 1.2f, 1.0f, 0.9f };
+	constexpr glm::vec3 MINERAL_AABB_SIZE { 0.6f, 0.6f, 0.6f };
+	constexpr glm::vec3 WAYPOINT_AABB_SIZE { 1.0f, 1.0f, 1.0f };
+	constexpr glm::vec3 WORKER_AABB_SIZE { 0.8f, 0.8f, 0.8f };
+	constexpr glm::vec3 SUPPLY_DEPOT_AABB_SIZE { 1.0f, 1.0f, 1.0f };
+	constexpr glm::vec3 BARRACKS_AABB_SIZE { 0.5f, 0.5f, 0.5f };
+
 	constexpr int CUBE_FACE_INDICIE_COUNT = 4;
 	constexpr std::array<unsigned int, 6> CUBE_FACE_INDICIES =
 	{
