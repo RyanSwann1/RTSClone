@@ -192,6 +192,10 @@ void Faction::handleInput(const sf::Event& currentSFMLEvent, const sf::Window& w
             {
                 m_HQ.setWaypointPosition(mouseToGroundPosition);
             }
+            else if (m_HQ.getAABB().contains(mouseToGroundPosition))
+            {
+                instructWorkerReturnMinerals(map);
+            }
             else
             {
                 for (auto& barracks : m_barracks)
@@ -600,5 +604,17 @@ void Faction::instructWorkerToBuild(eEntityType entityType, const glm::vec3& mou
         break;
     default:
         assert(false);
+    }
+}
+
+void Faction::instructWorkerReturnMinerals(const Map& map)
+{
+    for (auto& worker : m_workers)
+    {
+        if (worker.isSelected() && worker.isHoldingResources())
+        {
+            glm::vec3 destination = PathFinding::getInstance().getClosestPositionOutsideAABB(worker.getPosition(), m_HQ.getAABB(), m_HQ.getPosition(), map);
+            worker.moveTo(destination, map, eUnitState::ReturningMineralsToHQ);
+        }
     }
 }

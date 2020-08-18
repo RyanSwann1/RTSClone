@@ -77,6 +77,7 @@ private:
 	void increaseCurrentPopulationAmount(eEntityType entityType);
 	void increasePopulationLimit();
 	void instructWorkerToBuild(eEntityType entityType, const glm::vec3& mouseToGroundPosition, Map& map);
+	void instructWorkerReturnMinerals(const Map& map);
 
 	template <class Unit>
 	void spawnUnit(Map& map, std::vector<Unit>& units, eEntityType entityType)

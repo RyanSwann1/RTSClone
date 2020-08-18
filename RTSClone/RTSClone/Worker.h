@@ -15,6 +15,7 @@ public:
 	Worker(const glm::vec3& startingPosition, Map& map);
 	Worker(const glm::vec3& startingPosition, const glm::vec3& destinationPosition, Map& map);
 	
+	bool isHoldingResources() const;
 	int extractResources();	
 
 	void build(const std::function<const Entity*(Worker&)>& buildingCommand, const glm::vec3& destination, const Map& map);

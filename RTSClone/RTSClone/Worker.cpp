@@ -33,6 +33,11 @@ Worker::Worker(const glm::vec3 & startingPosition, const glm::vec3 & destination
 	moveTo(destinationPosition, map);
 }
 
+bool Worker::isHoldingResources() const
+{
+	return m_currentResourceAmount > 0;
+}
+
 int Worker::extractResources()
 {
 	assert(m_currentResourceAmount > 0);
@@ -77,6 +82,7 @@ void Worker::update(float deltaTime, const BuildingSpawner& HQ, const Map& map, 
 		}
 		break;
 	case eUnitState::ReturningMineralsToHQ:
+		assert(isHoldingResources());
 		if (!m_pathToPosition.empty())
 		{
 			glm::vec3 newPosition = Globals::moveTowards(m_position, m_pathToPosition.back(), MOVEMENT_SPEED * deltaTime);
@@ -86,16 +92,16 @@ void Worker::update(float deltaTime, const BuildingSpawner& HQ, const Map& map, 
 			if (m_position == m_pathToPosition.back())
 			{
 				m_pathToPosition.pop_back();
-
 				if (m_pathToPosition.empty())
 				{
 					owningFaction.addResources(*this);
-
-					assert(m_mineralToHarvest);
-					glm::vec3 destination = PathFinding::getInstance().getClosestPositionOutsideAABB(m_position,		
-						m_mineralToHarvest->getAABB(), m_mineralToHarvest->getPosition(), map);
-					PathFinding::getInstance().getPathToPosition(*this, destination, m_pathToPosition,
-						[&](const glm::ivec2& position) { return getAllAdjacentPositions(position, map); }, true);
+					if (m_mineralToHarvest)
+					{
+						glm::vec3 destination = PathFinding::getInstance().getClosestPositionOutsideAABB(m_position,
+							m_mineralToHarvest->getAABB(), m_mineralToHarvest->getPosition(), map);
+						PathFinding::getInstance().getPathToPosition(*this, destination, m_pathToPosition,
+							[&](const glm::ivec2& position) { return getAllAdjacentPositions(position, map); }, true);
+					}
 
 					if (!m_pathToPosition.empty())
 					{
