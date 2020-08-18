@@ -12,17 +12,15 @@ class Unit;
 struct AABB
 {
 	AABB();
-	AABB(const glm::vec3& position, const Model& model);
 	AABB(const glm::vec3& position, const glm::vec3& size);
-	AABB(const glm::vec3& position, float distanceFromCenter);
 	AABB(const std::vector<const Unit*>& selectedUnits);
 
 	bool contains(const glm::vec3& position) const;
 	bool contains(const AABB& other) const;
-
+	
+	void update(const glm::vec3& position);
 	void reset(const glm::vec3& position, const Model& model);
 	void reset(const glm::vec3& position, const glm::vec3& size);
-	void reset(const glm::vec3& position, float distanceFromCenter);
 	void reset();
 
 #ifdef RENDER_AABB
