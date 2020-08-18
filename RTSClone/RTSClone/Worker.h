@@ -6,7 +6,7 @@
 //https://stackoverflow.com/questions/50182913/what-are-the-principles-involved-for-an-hierarchical-state-machine-and-how-to-i - HSM
 //https://gameprogrammingpatterns.com/state.html
 
-class Faction;
+class FactionPlayer;
 class Mineral;
 class BuildingSpawner;
 class Worker : public Unit
@@ -19,7 +19,7 @@ public:
 	int extractResources();	
 
 	void build(const std::function<const Entity*(Worker&)>& buildingCommand, const glm::vec3& destination, const Map& map);
-	void update(float deltaTime, const BuildingSpawner& HQ, const Map& map, Faction& owningFaction);
+	void update(float deltaTime, const BuildingSpawner& HQ, const Map& map, FactionPlayer& owningFaction);
 	void moveTo(const glm::vec3& destinationPosition, const Map& map, eUnitState state = eUnitState::Moving);
 	void moveTo(const glm::vec3& destinationPosition, const Map& map, const std::vector<Mineral>& minerals);
 	void render(ShaderHandler& shaderHandler) const;

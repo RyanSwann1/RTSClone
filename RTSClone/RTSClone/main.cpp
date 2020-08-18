@@ -9,7 +9,7 @@
 #include "Unit.h"
 #include "Map.h"
 #include "glm/gtc/matrix_transform.hpp"
-#include "Faction.h"
+#include "FactionPlayer.h"
 #include "ModelManager.h"
 #include "Mineral.h"
 #include "imgui/imgui.h"
@@ -78,7 +78,7 @@ int main()
 	Ground ground;
 #endif // RENDER_GROUND
 	std::unique_ptr<Map> map = std::make_unique<Map>();
-	Faction faction(*map);
+	FactionPlayer faction(*map);
 	sf::Clock gameClock;
 	Camera camera;
 	std::vector<Mineral> minerals;

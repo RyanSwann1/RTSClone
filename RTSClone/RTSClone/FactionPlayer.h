@@ -32,10 +32,10 @@ class Mineral;
 class ShaderHandler;
 struct Camera;
 class Map;
-class Faction : private NonMovable, private NonCopyable
+class FactionPlayer : private NonMovable, private NonCopyable
 {
 public:
-	Faction(Map& map);
+	FactionPlayer(Map& map);
 
 	void addResources(Worker& worker);
 

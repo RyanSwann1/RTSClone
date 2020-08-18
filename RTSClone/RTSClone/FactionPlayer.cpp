@@ -1,4 +1,4 @@
-#include "Faction.h"
+#include "FactionPlayer.h"
 #include "Globals.h"
 #include "glad.h"
 #include "Unit.h"
@@ -101,7 +101,7 @@ void SelectionBox::render(const sf::Window& window) const
 }
 
 //Faction
-Faction::Faction(Map& map)
+FactionPlayer::FactionPlayer(Map& map)
     : m_currentResourceAmount(STARTING_RESOURCES),
     m_currentPopulationAmount(0),
     m_currentPopulationLimit(STARTING_POPULATION),
@@ -117,7 +117,7 @@ Faction::Faction(Map& map)
     std::cout << "Current Population: " << m_currentPopulationAmount << "\n";
 }
 
-const Entity* Faction::addBuilding(Worker& worker, Map& map, glm::vec3 spawnPosition, eEntityType entityType)
+const Entity* FactionPlayer::addBuilding(Worker& worker, Map& map, glm::vec3 spawnPosition, eEntityType entityType)
 {
     if (m_currentPopulationLimit + POPULATION_INCREMENT < MAX_POPULATION &&
         isEntityAffordable(entityType) &&
@@ -149,13 +149,13 @@ const Entity* Faction::addBuilding(Worker& worker, Map& map, glm::vec3 spawnPosi
     return nullptr;
 }
 
-void Faction::addResources(Worker & worker)
+void FactionPlayer::addResources(Worker & worker)
 {
     m_currentResourceAmount += worker.extractResources();
     std::cout << "Resources: " << m_currentResourceAmount << "\n";
 }
 
-void Faction::handleInput(const sf::Event& currentSFMLEvent, const sf::Window& window, const Camera& camera, Map& map, 
+void FactionPlayer::handleInput(const sf::Event& currentSFMLEvent, const sf::Window& window, const Camera& camera, Map& map, 
     const std::vector<Mineral>& minerals, float deltaTime)
 {
     switch (currentSFMLEvent.type)
@@ -260,7 +260,7 @@ void Faction::handleInput(const sf::Event& currentSFMLEvent, const sf::Window& w
     }
 }
 
-void Faction::update(float deltaTime, const Map& map)
+void FactionPlayer::update(float deltaTime, const Map& map)
 {
     for (auto& unit : m_units)
     {
@@ -276,7 +276,7 @@ void Faction::update(float deltaTime, const Map& map)
     handleCollisions<Worker>(m_workers, map);
 }
 
-void Faction::render(ShaderHandler& shaderHandler) const
+void FactionPlayer::render(ShaderHandler& shaderHandler) const
 {
     m_HQ.render(shaderHandler);
 
@@ -301,13 +301,13 @@ void Faction::render(ShaderHandler& shaderHandler) const
     }
 }
 
-void Faction::renderSelectionBox(const sf::Window& window) const
+void FactionPlayer::renderSelectionBox(const sf::Window& window) const
 {
     m_selectionBox.render(window);
 }
 
 #ifdef RENDER_PATHING
-void Faction::renderPathing(ShaderHandler& shaderHandler)
+void FactionPlayer::renderPathing(ShaderHandler& shaderHandler)
 {
     for (auto& unit : m_units)
     {
@@ -322,7 +322,7 @@ void Faction::renderPathing(ShaderHandler& shaderHandler)
 #endif // RENDER_PATHING
 
 #ifdef RENDER_AABB
-void Faction::renderAABB(ShaderHandler& shaderHandler)
+void FactionPlayer::renderAABB(ShaderHandler& shaderHandler)
 {
     for (auto& unit : m_units)
     {
@@ -348,7 +348,7 @@ void Faction::renderAABB(ShaderHandler& shaderHandler)
 }
 #endif // RENDER_AABB
 
-bool Faction::isExceedPopulationLimit(eEntityType entityType) const
+bool FactionPlayer::isExceedPopulationLimit(eEntityType entityType) const
 {
     switch (entityType)
     {
@@ -362,7 +362,7 @@ bool Faction::isExceedPopulationLimit(eEntityType entityType) const
     }
 }
 
-bool Faction::isEntityAffordable(eEntityType entityType) const
+bool FactionPlayer::isEntityAffordable(eEntityType entityType) const
 {
     switch (entityType)
     {
@@ -380,7 +380,7 @@ bool Faction::isEntityAffordable(eEntityType entityType) const
     }
 }
 
-bool Faction::isOneUnitSelected() const
+bool FactionPlayer::isOneUnitSelected() const
 {
     int unitSelectedCount = 0;
 
@@ -411,7 +411,7 @@ bool Faction::isOneUnitSelected() const
     return unitSelectedCount == 1;
 }
 
-void Faction::moveSingularSelectedUnit(const glm::vec3& mouseToGroundPosition, const Map& map, const std::vector<Mineral>& minerals)
+void FactionPlayer::moveSingularSelectedUnit(const glm::vec3& mouseToGroundPosition, const Map& map, const std::vector<Mineral>& minerals)
 {
     assert(isOneUnitSelected());
 
@@ -434,7 +434,7 @@ void Faction::moveSingularSelectedUnit(const glm::vec3& mouseToGroundPosition, c
     }
 }
 
-void Faction::moveMultipleSelectedUnits(const glm::vec3& mouseToGroundPosition, const Map& map, const std::vector<Mineral>& minerals)
+void FactionPlayer::moveMultipleSelectedUnits(const glm::vec3& mouseToGroundPosition, const Map& map, const std::vector<Mineral>& minerals)
 {
     static std::vector<Unit*> selectedUnits;
  
@@ -532,7 +532,7 @@ void Faction::moveMultipleSelectedUnits(const glm::vec3& mouseToGroundPosition, 
     selectedUnits.clear();
 }
 
-void Faction::revalidateExistingUnitPaths(const Map& map)
+void FactionPlayer::revalidateExistingUnitPaths(const Map& map)
 {
     for (auto& unit : m_units)
     {
@@ -554,7 +554,7 @@ void Faction::revalidateExistingUnitPaths(const Map& map)
     }
 }
 
-void Faction::reduceResources(eEntityType addedEntityType)
+void FactionPlayer::reduceResources(eEntityType addedEntityType)
 {
     assert(isEntityAffordable(addedEntityType));
     switch (addedEntityType)
@@ -576,7 +576,7 @@ void Faction::reduceResources(eEntityType addedEntityType)
     std::cout << "Resources: " <<  m_currentResourceAmount << "\n";
 }
 
-void Faction::increaseCurrentPopulationAmount(eEntityType entityType)
+void FactionPlayer::increaseCurrentPopulationAmount(eEntityType entityType)
 {
     assert(!isExceedPopulationLimit(entityType));
     switch (entityType)
@@ -594,7 +594,7 @@ void Faction::increaseCurrentPopulationAmount(eEntityType entityType)
     std::cout << "Population: " << m_currentPopulationAmount << "\n";
 }
 
-void Faction::increasePopulationLimit()
+void FactionPlayer::increasePopulationLimit()
 {
     assert(m_currentPopulationLimit + POPULATION_INCREMENT <= MAX_POPULATION);
     m_currentPopulationLimit += POPULATION_INCREMENT;
@@ -602,7 +602,7 @@ void Faction::increasePopulationLimit()
     std::cout << "Population Limit: " << m_currentPopulationLimit << "\n";
 }
 
-void Faction::instructWorkerToBuild(eEntityType entityType, const glm::vec3& mouseToGroundPosition, Map& map)
+void FactionPlayer::instructWorkerToBuild(eEntityType entityType, const glm::vec3& mouseToGroundPosition, Map& map)
 {
     if (!Globals::isPositionInMapBounds(mouseToGroundPosition))
     {
@@ -631,7 +631,7 @@ void Faction::instructWorkerToBuild(eEntityType entityType, const glm::vec3& mou
     }
 }
 
-void Faction::instructWorkerReturnMinerals(const Map& map)
+void FactionPlayer::instructWorkerReturnMinerals(const Map& map)
 {
     for (auto& worker : m_workers)
     {
