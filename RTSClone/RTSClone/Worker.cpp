@@ -4,7 +4,7 @@
 #include "Mineral.h"
 #include "ModelManager.h"
 #include "PathFinding.h"
-#include "FactionPlayer.h"
+#include "Faction.h"
 #include "SupplyDepot.h"
 
 namespace
@@ -52,7 +52,7 @@ void Worker::build(const std::function<const Entity*(Worker&)>& buildingCommand,
 	moveTo(Globals::convertToMiddleGridPosition(destination), map, eUnitState::MovingToBuildingPosition);
 }
 
-void Worker::update(float deltaTime, const BuildingSpawner& HQ, const Map& map, FactionPlayer& owningFaction)
+void Worker::update(float deltaTime, const BuildingSpawner& HQ, const Map& map, Faction& owningFaction)
 {
 	Unit::update(deltaTime);
 

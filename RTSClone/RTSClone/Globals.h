@@ -13,6 +13,17 @@ namespace Globals
 	constexpr int MAP_SIZE = 30;
 	constexpr int NODE_SIZE = 6;
 
+	constexpr int STARTING_RESOURCES = 1000;
+	constexpr int WORKER_RESOURCE_COST = 50;
+	constexpr int SUPPLY_DEPOT_RESOURCE_COST = 50;
+	constexpr int BARRACKS_RESOURCE_COST = 50;
+	constexpr int UNIT_RESOURCE_COST = 100;
+	constexpr int STARTING_POPULATION = 5;
+	constexpr int MAX_POPULATION = 200;
+	constexpr int WORKER_POPULATION_COST = 1;
+	constexpr int UNIT_POPULATION_COST = 2;
+	constexpr int POPULATION_INCREMENT = 5;
+
 	constexpr glm::vec3 UNIT_AABB_SIZE { 0.35f, 0.35f, 0.35f };
 	constexpr glm::vec3 HQ_AABB_SIZE { 1.2f, 1.0f, 0.9f };
 	constexpr glm::vec3 MINERAL_AABB_SIZE { 0.6f, 0.6f, 0.6f };

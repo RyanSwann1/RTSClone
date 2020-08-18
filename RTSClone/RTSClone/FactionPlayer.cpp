@@ -14,17 +14,6 @@
 
 namespace
 {
-    constexpr int STARTING_RESOURCES = 1000;
-    constexpr int WORKER_RESOURCE_COST = 50;
-    constexpr int SUPPLY_DEPOT_RESOURCE_COST = 50;
-    constexpr int BARRACKS_RESOURCE_COST = 50;
-    constexpr int UNIT_RESOURCE_COST = 100;
-    constexpr int STARTING_POPULATION = 5;
-    constexpr int MAX_POPULATION = 200;
-    constexpr int WORKER_POPULATION_COST = 1;
-    constexpr int UNIT_POPULATION_COST = 2;
-    constexpr int POPULATION_INCREMENT = 5;
-
     std::array<glm::ivec2, 6> getSelectionBoxQuadCoords(const glm::ivec2& startingPosition, const glm::ivec2& size)
     {
         return
@@ -102,57 +91,12 @@ void SelectionBox::render(const sf::Window& window) const
 
 //Faction
 FactionPlayer::FactionPlayer(Map& map)
-    : m_currentResourceAmount(STARTING_RESOURCES),
-    m_currentPopulationAmount(0),
-    m_currentPopulationLimit(STARTING_POPULATION),
+    : Faction(map),
     m_selectionBox(),
-    m_HQ(Globals::convertToNodePosition({ 35.0f, Globals::GROUND_HEIGHT, 15.f }), map, eModelName::HQ),
-    m_units(),
-    m_workers(),
-    m_supplyDepots(),
-    m_barracks(),
     m_previousMouseToGroundPosition()
 {
     std::cout << "Resources: " <<  m_currentResourceAmount << "\n";
     std::cout << "Current Population: " << m_currentPopulationAmount << "\n";
-}
-
-const Entity* FactionPlayer::addBuilding(Worker& worker, Map& map, glm::vec3 spawnPosition, eEntityType entityType)
-{
-    if (m_currentPopulationLimit + POPULATION_INCREMENT < MAX_POPULATION &&
-        isEntityAffordable(entityType) &&
-        PathFinding::getInstance().isPositionAvailable(spawnPosition, map, m_units, m_workers, worker))
-    {
-        const Entity* addedBuilding = nullptr;
-        switch (entityType)
-        {
-        case eEntityType::SupplyDepot:
-            m_supplyDepots.emplace_back(spawnPosition, map);
-            addedBuilding = &m_supplyDepots.back();
-            increasePopulationLimit();
-            break;
-        case eEntityType::Barracks:
-            m_barracks.emplace_back(spawnPosition, map, eModelName::Barracks);
-            addedBuilding = &m_barracks.back();
-            break;
-        default:
-            assert(false);
-        }
-        
-        reduceResources(entityType);
-        revalidateExistingUnitPaths(map);
-
-        assert(addedBuilding);
-        return addedBuilding;
-    }
-
-    return nullptr;
-}
-
-void FactionPlayer::addResources(Worker & worker)
-{
-    m_currentResourceAmount += worker.extractResources();
-    std::cout << "Resources: " << m_currentResourceAmount << "\n";
 }
 
 void FactionPlayer::handleInput(const sf::Event& currentSFMLEvent, const sf::Window& window, const Camera& camera, Map& map, 
@@ -260,124 +204,9 @@ void FactionPlayer::handleInput(const sf::Event& currentSFMLEvent, const sf::Win
     }
 }
 
-void FactionPlayer::update(float deltaTime, const Map& map)
-{
-    for (auto& unit : m_units)
-    {
-        unit.update(deltaTime);
-    }
-
-    for (auto& worker : m_workers)
-    {
-        worker.update(deltaTime, m_HQ, map, *this);
-    }
-
-    handleCollisions<Unit>(m_units, map);
-    handleCollisions<Worker>(m_workers, map);
-}
-
-void FactionPlayer::render(ShaderHandler& shaderHandler) const
-{
-    m_HQ.render(shaderHandler);
-
-    for (auto& unit : m_units)
-    {
-        unit.render(shaderHandler);
-    }
-
-    for (auto& worker : m_workers)
-    {
-        worker.render(shaderHandler);
-    }
-
-    for (auto& supplyDepot : m_supplyDepots)
-    {
-        supplyDepot.render(shaderHandler);
-    }
-
-    for (auto& barracks : m_barracks)
-    {
-        barracks.render(shaderHandler);
-    }
-}
-
 void FactionPlayer::renderSelectionBox(const sf::Window& window) const
 {
     m_selectionBox.render(window);
-}
-
-#ifdef RENDER_PATHING
-void FactionPlayer::renderPathing(ShaderHandler& shaderHandler)
-{
-    for (auto& unit : m_units)
-    {
-        unit.renderPathMesh(shaderHandler);
-    }
-
-    for (auto& worker : m_workers)
-    {
-        worker.renderPathMesh(shaderHandler);
-    }
-}
-#endif // RENDER_PATHING
-
-#ifdef RENDER_AABB
-void FactionPlayer::renderAABB(ShaderHandler& shaderHandler)
-{
-    for (auto& unit : m_units)
-    {
-        unit.renderAABB(shaderHandler);
-    }
-
-    for (auto& worker : m_workers)
-    {
-        worker.renderAABB(shaderHandler);
-    }
-
-    for (auto& supplyDepot : m_supplyDepots)
-    {
-        supplyDepot.renderAABB(shaderHandler);
-    }
-
-    for (auto& barracks : m_barracks)
-    {
-        barracks.renderAABB(shaderHandler);
-    }
-
-    m_HQ.renderAABB(shaderHandler);
-}
-#endif // RENDER_AABB
-
-bool FactionPlayer::isExceedPopulationLimit(eEntityType entityType) const
-{
-    switch (entityType)
-    {
-    case eEntityType::Unit:
-        return m_currentPopulationAmount + UNIT_POPULATION_COST > m_currentPopulationLimit;
-    case eEntityType::Worker:
-        return m_currentPopulationAmount + WORKER_POPULATION_COST > m_currentPopulationLimit;
-    default:
-        assert(false);
-        return true;
-    }
-}
-
-bool FactionPlayer::isEntityAffordable(eEntityType entityType) const
-{
-    switch (entityType)
-    {
-    case eEntityType::Worker:
-        return m_currentResourceAmount - WORKER_RESOURCE_COST >= 0;
-    case eEntityType::Unit:
-        return  m_currentResourceAmount - UNIT_RESOURCE_COST >= 0;
-    case eEntityType::SupplyDepot:
-        return m_currentResourceAmount - SUPPLY_DEPOT_RESOURCE_COST >= 0;
-    case eEntityType::Barracks:
-        return m_currentResourceAmount - BARRACKS_RESOURCE_COST >= 0;
-    default:
-        assert(false);
-        return false;
-    }
 }
 
 bool FactionPlayer::isOneUnitSelected() const
@@ -530,105 +359,6 @@ void FactionPlayer::moveMultipleSelectedUnits(const glm::vec3& mouseToGroundPosi
     }
 
     selectedUnits.clear();
-}
-
-void FactionPlayer::revalidateExistingUnitPaths(const Map& map)
-{
-    for (auto& unit : m_units)
-    {
-        if (!unit.isPathEmpty())
-        {
-            glm::vec3 destination = unit.getDestination();
-            unit.moveTo(destination, map, m_units, [&](const glm::ivec2& position) 
-                { return getAllAdjacentPositions(position, map, m_units, unit); });
-        }
-    }
-
-    for (auto& worker : m_workers)
-    {
-        if (!worker.isPathEmpty())
-        {
-            glm::vec3 destination = worker.getDestination();
-            worker.moveTo(destination, map, worker.getCurrentState());
-        }
-    }
-}
-
-void FactionPlayer::reduceResources(eEntityType addedEntityType)
-{
-    assert(isEntityAffordable(addedEntityType));
-    switch (addedEntityType)
-    {
-    case eEntityType::Unit:
-        m_currentResourceAmount -= UNIT_RESOURCE_COST;
-        break;
-    case eEntityType::Worker:
-        m_currentResourceAmount -= WORKER_RESOURCE_COST;
-        break;
-    case eEntityType::SupplyDepot:
-        m_currentResourceAmount -= SUPPLY_DEPOT_RESOURCE_COST;
-        break;
-    case eEntityType::Barracks:
-        m_currentResourceAmount -= BARRACKS_RESOURCE_COST;
-        break;
-    }
-
-    std::cout << "Resources: " <<  m_currentResourceAmount << "\n";
-}
-
-void FactionPlayer::increaseCurrentPopulationAmount(eEntityType entityType)
-{
-    assert(!isExceedPopulationLimit(entityType));
-    switch (entityType)
-    {
-    case eEntityType::Unit:
-        m_currentPopulationAmount += UNIT_POPULATION_COST;
-        break;
-    case eEntityType::Worker:
-        m_currentPopulationAmount += WORKER_POPULATION_COST;
-        break;
-    default:
-        assert(false);
-    }
-
-    std::cout << "Population: " << m_currentPopulationAmount << "\n";
-}
-
-void FactionPlayer::increasePopulationLimit()
-{
-    assert(m_currentPopulationLimit + POPULATION_INCREMENT <= MAX_POPULATION);
-    m_currentPopulationLimit += POPULATION_INCREMENT;
-
-    std::cout << "Population Limit: " << m_currentPopulationLimit << "\n";
-}
-
-void FactionPlayer::instructWorkerToBuild(eEntityType entityType, const glm::vec3& mouseToGroundPosition, Map& map)
-{
-    if (!Globals::isPositionInMapBounds(mouseToGroundPosition))
-    {
-        return;
-    }
-
-    switch (entityType)
-    {
-    case eEntityType::Barracks:
-    case eEntityType::SupplyDepot:
-    {
-        auto selectedWorker = std::find_if(m_workers.begin(), m_workers.end(), [](const auto& worker)
-        {
-            return worker.isSelected();
-        });
-        if (selectedWorker != m_workers.end())
-        {
-            glm::vec3 buildPosition = Globals::convertToNodePosition(mouseToGroundPosition);
-            selectedWorker->build([this, &map, buildPosition, entityType](Worker& worker)
-            { return addBuilding(worker, map, buildPosition, entityType); }, buildPosition, map);
-        }
-    }
-        break;
-    default:
-        assert(false);
-    }
 }
 
 void FactionPlayer::instructWorkerReturnMinerals(const Map& map)
