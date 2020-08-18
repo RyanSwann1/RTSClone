@@ -147,6 +147,7 @@
   <ItemGroup>
     <ClCompile Include="AABB.cpp" />
     <ClCompile Include="AdjacentPositions.cpp" />
+    <ClCompile Include="Faction.cpp" />
     <ClCompile Include="FactionPlayer.cpp" />
     <ClCompile Include="Graph.cpp" />
     <ClCompile Include="Worker.cpp" />
@@ -221,6 +222,7 @@
     <ClInclude Include="assimp\include\vector3.h" />
     <ClInclude Include="assimp\include\version.h" />
     <ClInclude Include="EntityType.h" />
+    <ClInclude Include="Faction.h" />
     <ClInclude Include="FactionPlayer.h" />
     <ClInclude Include="Graph.h" />
     <ClInclude Include="Worker.h" />
