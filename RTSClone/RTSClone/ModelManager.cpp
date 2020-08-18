@@ -49,6 +49,16 @@ ModelManager::ModelManager()
 	}
 	m_models[static_cast<int>(mineralModel->modelName)] = std::move(mineralModel);
 
+	std::unique_ptr<Model> workerMineralModel = Model::create("rocksOre.obj", true,
+		glm::vec3(0.0f, 0.0f, 0.0f), eModelName::WorkerMineral , { 0.2f, 0.2f, 0.2f });
+	assert(workerMineralModel);
+	if (!workerMineralModel)
+	{
+		std::cout << "Rocks Ore Model not found\n";
+		m_loadedAllModels = false;
+	}
+	m_models[static_cast<int>(workerMineralModel->modelName)] = std::move(workerMineralModel);
+
 	std::unique_ptr<Model> waypointModel = Model::create("laserSabel.obj", true,
 		glm::vec3(2.0f, 1.0f, 2.0f), eModelName::Waypoint, Globals::WAYPOINT_AABB_SIZE);
 	assert(waypointModel);
