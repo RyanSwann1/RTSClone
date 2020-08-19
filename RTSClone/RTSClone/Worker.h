@@ -12,8 +12,8 @@ class BuildingSpawner;
 class Worker : public Unit
 {
 public:
-	Worker(int ID, const glm::vec3& startingPosition, Map& map);
-	Worker(int ID, const glm::vec3& startingPosition, const glm::vec3& destinationPosition, Map& map);
+	Worker(int ID, const glm::vec3& startingPosition);
+	Worker(int ID, const glm::vec3& startingPosition, const glm::vec3& destinationPosition, const Map& map);
 	
 	bool isHoldingResources() const;
 	int extractResources();	

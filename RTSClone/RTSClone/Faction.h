@@ -6,6 +6,19 @@
 #include "PathFinding.h"
 #include "SupplyDepot.h"
 
+struct BuildingToSpawn
+{
+	BuildingToSpawn(int workerID, const glm::vec3& spawnPosition, eModelName modelName)
+		: workerID(workerID),
+		spawnPosition(spawnPosition),
+		modelName(modelName)
+	{}
+
+	int workerID;
+	glm::vec3 spawnPosition;
+	eModelName modelName;
+};
+
 class ShaderHandler;
 class Map;
 class Faction : private NonMovable, private NonCopyable
@@ -71,7 +84,7 @@ protected:
 					{
 						units.emplace_back(UniqueEntityIDDistributer::getInstance().getUniqueEntityID(),
 							Globals::convertToNodePosition(PathFinding::getInstance().getClosestAvailablePosition(barracks->getUnitSpawnPosition(),
-							m_units, m_workers, map)), map);
+							m_units, m_workers, map)));
 					}
 
 					unitSpawned = true;
@@ -91,7 +104,7 @@ protected:
 					{
 						units.emplace_back(UniqueEntityIDDistributer::getInstance().getUniqueEntityID(),
 							PathFinding::getInstance().getClosestAvailablePosition(
-							m_HQ.getUnitSpawnPosition(), m_units, m_workers, map), map);
+							m_HQ.getUnitSpawnPosition(), m_units, m_workers, map));
 					}
 
 					unitSpawned = true;

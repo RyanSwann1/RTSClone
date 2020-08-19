@@ -49,14 +49,14 @@ namespace
 #endif // RENDER_PATHING
 }
 
-Unit::Unit(int ID, const glm::vec3& startingPosition, Map& map, eModelName modelName, eEntityType entityType)
+Unit::Unit(int ID, const glm::vec3& startingPosition, eModelName modelName, eEntityType entityType)
 	: Entity(ID, startingPosition, modelName, entityType),
 	m_currentState(eUnitState::Idle),
 	m_front(),
 	m_pathToPosition()
 {}
 
-Unit::Unit(int ID, const glm::vec3 & startingPosition, const glm::vec3 & destinationPosition, Map & map, eModelName modelName, eEntityType entityType)
+Unit::Unit(int ID, const glm::vec3 & startingPosition, const glm::vec3 & destinationPosition, const Map & map, eModelName modelName, eEntityType entityType)
 	: Entity(ID, startingPosition, modelName, entityType),
 	m_currentState(eUnitState::Idle),
 	m_front(),
