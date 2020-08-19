@@ -22,8 +22,8 @@ namespace
 	}
 }
 
-BuildingSpawner::BuildingSpawner(const glm::vec3& startingPosition, eModelName modelName, eEntityType entityType)
-	: Entity(startingPosition, modelName, entityType),
+BuildingSpawner::BuildingSpawner(int ID, const glm::vec3& startingPosition, eModelName modelName, eEntityType entityType)
+	: Entity(ID, startingPosition, modelName, entityType),
 	m_waypointPosition(m_position)
 {
 	GameEventMessenger::getInstance().broadcast<GameEvents::MapModification<eGameEventType::AddEntityToMap>>({ m_AABB });	

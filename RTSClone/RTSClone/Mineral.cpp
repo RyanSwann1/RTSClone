@@ -2,8 +2,8 @@
 #include "GameEventMessenger.h"
 #include "GameEvents.h"
 
-Mineral::Mineral(const glm::vec3& startingPosition)
-	: Entity(startingPosition, eModelName::Mineral, eEntityType::Mineral)
+Mineral::Mineral(int ID, const glm::vec3& startingPosition)
+	: Entity(ID, startingPosition, eModelName::Mineral, eEntityType::Mineral)
 {
 	GameEventMessenger::getInstance().broadcast<GameEvents::MapModification<eGameEventType::AddEntityToMap>>({ m_AABB });
 }

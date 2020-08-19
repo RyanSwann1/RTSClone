@@ -12,6 +12,7 @@ namespace Globals
 	constexpr float GROUND_HEIGHT = 0.0f;
 	constexpr int MAP_SIZE = 30;
 	constexpr int NODE_SIZE = 6;
+	constexpr int INVALID_ENTITY_ID = -1;
 
 	constexpr int STARTING_RESOURCES = 1000;
 	constexpr int WORKER_RESOURCE_COST = 50;

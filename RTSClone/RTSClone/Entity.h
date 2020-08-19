@@ -8,7 +8,7 @@
 class ShaderHandler;
 struct Model;
 class Map;
-class Entity
+class Entity : private NonCopyable
 {
 public:
 	Entity(Entity&&) noexcept;
@@ -28,8 +28,9 @@ public:
 #endif // RENDER_AABB
 
 protected:	
-	Entity(const glm::vec3& startingPosition, eModelName modelName, eEntityType entityType);
+	Entity(int ID, const glm::vec3& startingPosition, eModelName modelName, eEntityType entityType);
 
+	int m_ID;
 	eModelName m_modelName;
 	glm::vec3 m_position;
 	AABB m_AABB;

@@ -6,7 +6,7 @@
 class BuildingSpawner : public Entity
 {
 public:
-	BuildingSpawner(const glm::vec3& startingPosition, eModelName modelName, eEntityType entityType);
+	BuildingSpawner(int ID, const glm::vec3& startingPosition, eModelName modelName, eEntityType entityType);
 	BuildingSpawner(BuildingSpawner&&) noexcept;
 	BuildingSpawner& operator=(BuildingSpawner&&) noexcept;
 	~BuildingSpawner();

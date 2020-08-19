@@ -1,7 +1,6 @@
 #pragma once
 
-#include "NonCopyable.h"
-#include "NonMovable.h"
+#include "UniqueEntityIDDistributer.h"
 #include "BuildingSpawner.h"
 #include "Worker.h"
 #include "PathFinding.h"
@@ -64,12 +63,14 @@ protected:
 				{
 					if (barracks->isWaypointActive())
 					{
-						units.emplace_back(Globals::convertToNodePosition(barracks->getUnitSpawnPosition()), PathFinding::getInstance().getClosestAvailablePosition(
+						units.emplace_back(UniqueEntityIDDistributer::getInstance().getUniqueEntityID(),
+							Globals::convertToNodePosition(barracks->getUnitSpawnPosition()), PathFinding::getInstance().getClosestAvailablePosition(
 							barracks->getWaypointPosition(), m_units, m_workers, map), map);
 					}
 					else
 					{
-						units.emplace_back(Globals::convertToNodePosition(PathFinding::getInstance().getClosestAvailablePosition(barracks->getUnitSpawnPosition(),
+						units.emplace_back(UniqueEntityIDDistributer::getInstance().getUniqueEntityID(),
+							Globals::convertToNodePosition(PathFinding::getInstance().getClosestAvailablePosition(barracks->getUnitSpawnPosition(),
 							m_units, m_workers, map)), map);
 					}
 
@@ -82,12 +83,14 @@ protected:
 				{
 					if (m_HQ.isWaypointActive())
 					{
-						units.emplace_back(m_HQ.getUnitSpawnPosition(), PathFinding::getInstance().getClosestAvailablePosition(
+						units.emplace_back(UniqueEntityIDDistributer::getInstance().getUniqueEntityID(),
+							m_HQ.getUnitSpawnPosition(), PathFinding::getInstance().getClosestAvailablePosition(
 							m_HQ.getWaypointPosition(), m_units, m_workers, map), map);
 					}
 					else
 					{
-						units.emplace_back(PathFinding::getInstance().getClosestAvailablePosition(
+						units.emplace_back(UniqueEntityIDDistributer::getInstance().getUniqueEntityID(),
+							PathFinding::getInstance().getClosestAvailablePosition(
 							m_HQ.getUnitSpawnPosition(), m_units, m_workers, map), map);
 					}
 

@@ -2,8 +2,8 @@
 #include "GameEventMessenger.h"
 #include "GameEvents.h"
 
-SupplyDepot::SupplyDepot(const glm::vec3& startingPosition)
-	: Entity(startingPosition, eModelName::SupplyDepot, eEntityType::SupplyDepot)
+SupplyDepot::SupplyDepot(int ID, const glm::vec3& startingPosition)
+	: Entity(ID, startingPosition, eModelName::SupplyDepot, eEntityType::SupplyDepot)
 {
 	GameEventMessenger::getInstance().broadcast<GameEvents::MapModification<eGameEventType::AddEntityToMap>>({ m_AABB });
 }

@@ -24,8 +24,8 @@ class ShaderHandler;
 class Unit : public Entity
 {
 public:
-	Unit(const glm::vec3& startingPosition, Map& map, eModelName modelName = eModelName::Unit, eEntityType entityType = eEntityType::Unit);
-	Unit(const glm::vec3& startingPosition, const glm::vec3& destinationPosition, Map& map, eModelName modelName = eModelName::Unit, 
+	Unit(int ID, const glm::vec3& startingPosition, Map& map, eModelName modelName = eModelName::Unit, eEntityType entityType = eEntityType::Unit);
+	Unit(int ID, const glm::vec3& startingPosition, const glm::vec3& destinationPosition, Map& map, eModelName modelName = eModelName::Unit, 
 		eEntityType entityType = eEntityType::Unit);
 
 	bool isPathEmpty() const;
