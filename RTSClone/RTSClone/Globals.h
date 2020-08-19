@@ -13,6 +13,7 @@ namespace Globals
 	constexpr int MAP_SIZE = 30;
 	constexpr int NODE_SIZE = 6;
 	constexpr int INVALID_ENTITY_ID = -1;
+	constexpr size_t MAX_MINERALS_PER_FACTION = 5;
 
 	constexpr int STARTING_RESOURCES = 1000;
 	constexpr int WORKER_RESOURCE_COST = 50;

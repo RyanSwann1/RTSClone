@@ -1,6 +1,6 @@
 #include "Worker.h"
 #include "Map.h"
-#include "BuildingSpawner.h"
+#include "UnitSpawnerBuilding.h"
 #include "Mineral.h"
 #include "ModelManager.h"
 #include "PathFinding.h"
@@ -52,7 +52,7 @@ void Worker::build(const std::function<const Entity*(Worker&)>& buildingCommand,
 	moveTo(Globals::convertToMiddleGridPosition(destination), map, eUnitState::MovingToBuildingPosition);
 }
 
-void Worker::update(float deltaTime, const BuildingSpawner& HQ, const Map& map, Faction& owningFaction)
+void Worker::update(float deltaTime, const UnitSpawnerBuilding& HQ, const Map& map, Faction& owningFaction)
 {
 	Unit::update(deltaTime);
 

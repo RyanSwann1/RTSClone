@@ -1,4 +1,4 @@
-#include "BuildingSpawner.h"
+#include "UnitSpawnerBuilding.h"
 #include "Camera.h"
 #include "Model.h"
 #include "Globals.h"
@@ -22,26 +22,26 @@ namespace
 	}
 }
 
-BuildingSpawner::BuildingSpawner(int ID, const glm::vec3& startingPosition, eModelName modelName, eEntityType entityType)
+UnitSpawnerBuilding::UnitSpawnerBuilding(int ID, const glm::vec3& startingPosition, eModelName modelName, eEntityType entityType)
 	: Entity(ID, startingPosition, modelName, entityType),
 	m_waypointPosition(m_position)
 {
 	GameEventMessenger::getInstance().broadcast<GameEvents::MapModification<eGameEventType::AddEntityToMap>>({ m_AABB });	
 }
 
-BuildingSpawner::BuildingSpawner(BuildingSpawner&& orig) noexcept
+UnitSpawnerBuilding::UnitSpawnerBuilding(UnitSpawnerBuilding&& orig) noexcept
 	: Entity(std::move(orig)),
 	m_waypointPosition(orig.m_waypointPosition)
 {}
 
-BuildingSpawner& BuildingSpawner::operator=(BuildingSpawner&& orig) noexcept
+UnitSpawnerBuilding& UnitSpawnerBuilding::operator=(UnitSpawnerBuilding&& orig) noexcept
 {
 	Entity::operator=(std::move(orig));
 	m_waypointPosition = orig.m_waypointPosition;
 	return *this;
 }
 
-BuildingSpawner::~BuildingSpawner()
+UnitSpawnerBuilding::~UnitSpawnerBuilding()
 {
 	if (m_ID != Globals::INVALID_ENTITY_ID)
 	{
@@ -49,19 +49,19 @@ BuildingSpawner::~BuildingSpawner()
 	}
 }
 
-bool BuildingSpawner::isWaypointActive() const
+bool UnitSpawnerBuilding::isWaypointActive() const
 {
 	assert(m_selected);
 	return m_waypointPosition != m_position;
 }
 
-const glm::vec3& BuildingSpawner::getWaypointPosition() const
+const glm::vec3& UnitSpawnerBuilding::getWaypointPosition() const
 {
 	assert(m_selected && isWaypointActive());
 	return m_waypointPosition;
 }
 
-glm::vec3 BuildingSpawner::getUnitSpawnPosition() const
+glm::vec3 UnitSpawnerBuilding::getUnitSpawnPosition() const
 {
 	assert(m_selected);
 	if (isWaypointActive())
@@ -76,7 +76,7 @@ glm::vec3 BuildingSpawner::getUnitSpawnPosition() const
 	}
 }
 
-void BuildingSpawner::setWaypointPosition(const glm::vec3& position)
+void UnitSpawnerBuilding::setWaypointPosition(const glm::vec3& position)
 {
 	assert(m_selected);
 	if (Globals::isPositionInMapBounds(position))
@@ -92,7 +92,7 @@ void BuildingSpawner::setWaypointPosition(const glm::vec3& position)
 	}
 }
 
-void BuildingSpawner::render(ShaderHandler & shaderHandler) const
+void UnitSpawnerBuilding::render(ShaderHandler & shaderHandler) const
 {
 	if (m_selected && isWaypointActive())
 	{

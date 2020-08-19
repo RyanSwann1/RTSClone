@@ -152,7 +152,7 @@
     <ClCompile Include="GameEventMessenger.cpp" />
     <ClCompile Include="Graph.cpp" />
     <ClCompile Include="Worker.cpp" />
-    <ClCompile Include="BuildingSpawner.cpp" />
+    <ClCompile Include="UnitSpawnerBuilding.cpp" />
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="Entity.cpp" />
     <ClCompile Include="glad.c" />
@@ -231,7 +231,7 @@
     <ClInclude Include="Graph.h" />
     <ClInclude Include="UniqueEntityIDDistributer.h" />
     <ClInclude Include="Worker.h" />
-    <ClInclude Include="BuildingSpawner.h" />
+    <ClInclude Include="UnitSpawnerBuilding.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="Entity.h" />
     <ClInclude Include="glad.h" />

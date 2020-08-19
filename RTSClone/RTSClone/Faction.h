@@ -1,7 +1,7 @@
 #pragma once
 
 #include "UniqueEntityIDDistributer.h"
-#include "BuildingSpawner.h"
+#include "UnitSpawnerBuilding.h"
 #include "Worker.h"
 #include "PathFinding.h"
 #include "SupplyDepot.h"
@@ -42,11 +42,11 @@ protected:
 	int m_currentResourceAmount;
 	int m_currentPopulationAmount;
 	int m_currentPopulationLimit;
-	BuildingSpawner m_HQ;
+	UnitSpawnerBuilding m_HQ;
 	std::vector<Unit> m_units;
 	std::vector<Worker> m_workers;
 	std::vector<SupplyDepot> m_supplyDepots;
-	std::vector<BuildingSpawner> m_barracks;
+	std::vector<UnitSpawnerBuilding> m_barracks;
 
 	bool isExceedPopulationLimit(eEntityType entityType) const;
 	bool isEntityAffordable(eEntityType entityType) const;
