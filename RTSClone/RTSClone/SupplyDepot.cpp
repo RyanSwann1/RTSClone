@@ -1,6 +1,7 @@
 #include "SupplyDepot.h"
 #include "GameEventMessenger.h"
 #include "GameEvents.h"
+#include "Globals.h"
 
 SupplyDepot::SupplyDepot(int ID, const glm::vec3& startingPosition)
 	: Entity(ID, startingPosition, eModelName::SupplyDepot, eEntityType::SupplyDepot)
@@ -20,5 +21,8 @@ SupplyDepot& SupplyDepot::operator=(SupplyDepot&& orig) noexcept
 
 SupplyDepot::~SupplyDepot()
 {
-	GameEventMessenger::getInstance().broadcast<GameEvents::MapModification<eGameEventType::RemoveEntityFromMap>>({ m_AABB });
+	if (m_ID != Globals::INVALID_ENTITY_ID)
+	{
+		GameEventMessenger::getInstance().broadcast<GameEvents::MapModification<eGameEventType::RemoveEntityFromMap>>({ m_AABB });
+	}
 }

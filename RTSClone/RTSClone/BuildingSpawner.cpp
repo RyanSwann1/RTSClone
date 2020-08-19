@@ -43,7 +43,10 @@ BuildingSpawner& BuildingSpawner::operator=(BuildingSpawner&& orig) noexcept
 
 BuildingSpawner::~BuildingSpawner()
 {
-	GameEventMessenger::getInstance().broadcast<GameEvents::MapModification<eGameEventType::RemoveEntityFromMap>>({ m_AABB });
+	if (m_ID != Globals::INVALID_ENTITY_ID)
+	{
+		GameEventMessenger::getInstance().broadcast<GameEvents::MapModification<eGameEventType::RemoveEntityFromMap>>({ m_AABB });
+	}
 }
 
 bool BuildingSpawner::isWaypointActive() const
