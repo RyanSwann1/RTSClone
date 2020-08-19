@@ -40,7 +40,6 @@ public:
 
 protected:
 	Faction(const glm::vec3& hqStartingPosition, const glm::vec3& mineralsStartingPosition);
-
 	std::vector<Mineral> m_minerals;
 	UnitSpawnerBuilding m_HQ;
 	std::vector<Unit> m_units;
@@ -59,67 +58,53 @@ protected:
 	void instructWorkerToBuild(eEntityType entityType, const glm::vec3& mouseToGroundPosition, Map& map);
 
 	template <class Unit>
-	void spawnUnit(Map& map, std::vector<Unit>& units, eEntityType entityType)
+	bool spawnUnit(const Map& map, std::vector<Unit>& units, eEntityType entityType, UnitSpawnerBuilding& building)
 	{
 		if (isEntityAffordable(entityType) && !isExceedPopulationLimit(entityType))
 		{
-			bool unitSpawned = false;
 			switch (entityType)
 			{
 			case eEntityType::Unit:
 			{
-				auto barracks = std::find_if(m_barracks.begin(), m_barracks.end(), [](const auto& barracks)
+				if (building.isWaypointActive())
 				{
-					return barracks.isSelected();
-				});
-				if (barracks != m_barracks.end())
+					units.emplace_back(UniqueEntityIDDistributer::getInstance().getUniqueEntityID(),
+						Globals::convertToNodePosition(building.getUnitSpawnPosition()), PathFinding::getInstance().getClosestAvailablePosition(
+							building.getWaypointPosition(), m_units, m_workers, map), map);
+				}
+				else
 				{
-					if (barracks->isWaypointActive())
-					{
-						units.emplace_back(UniqueEntityIDDistributer::getInstance().getUniqueEntityID(),
-							Globals::convertToNodePosition(barracks->getUnitSpawnPosition()), PathFinding::getInstance().getClosestAvailablePosition(
-							barracks->getWaypointPosition(), m_units, m_workers, map), map);
-					}
-					else
-					{
-						units.emplace_back(UniqueEntityIDDistributer::getInstance().getUniqueEntityID(),
-							Globals::convertToNodePosition(PathFinding::getInstance().getClosestAvailablePosition(barracks->getUnitSpawnPosition(),
+					units.emplace_back(UniqueEntityIDDistributer::getInstance().getUniqueEntityID(),
+						Globals::convertToNodePosition(PathFinding::getInstance().getClosestAvailablePosition(building.getUnitSpawnPosition(),
 							m_units, m_workers, map)));
-					}
-
-					unitSpawned = true;
 				}
 			}
 			break;
 			case eEntityType::Worker:
-				if (m_HQ.isSelected())
+				if (building.isWaypointActive())
 				{
-					if (m_HQ.isWaypointActive())
-					{
-						units.emplace_back(UniqueEntityIDDistributer::getInstance().getUniqueEntityID(),
-							m_HQ.getUnitSpawnPosition(), PathFinding::getInstance().getClosestAvailablePosition(
-							m_HQ.getWaypointPosition(), m_units, m_workers, map), map);
-					}
-					else
-					{
-						units.emplace_back(UniqueEntityIDDistributer::getInstance().getUniqueEntityID(),
-							PathFinding::getInstance().getClosestAvailablePosition(
-							m_HQ.getUnitSpawnPosition(), m_units, m_workers, map));
-					}
-
-					unitSpawned = true;
+					units.emplace_back(UniqueEntityIDDistributer::getInstance().getUniqueEntityID(),
+						building.getUnitSpawnPosition(), PathFinding::getInstance().getClosestAvailablePosition(
+						building.getWaypointPosition(), m_units, m_workers, map), map);
+				}
+				else
+				{
+					units.emplace_back(UniqueEntityIDDistributer::getInstance().getUniqueEntityID(),
+						PathFinding::getInstance().getClosestAvailablePosition(
+						building.getUnitSpawnPosition(), m_units, m_workers, map));
 				}
 				break;
 			default:
 				assert(false);
 			}
 
-			if (unitSpawned)
-			{
-				reduceResources(entityType);
-				increaseCurrentPopulationAmount(entityType);
-			}
+			reduceResources(entityType);
+			increaseCurrentPopulationAmount(entityType);
+			
+			return true;
 		}
+
+		return false;
 	}
 
 private:

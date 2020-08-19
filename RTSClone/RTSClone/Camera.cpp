@@ -5,7 +5,7 @@
 namespace
 {
 	constexpr float MAX_RAY_TO_GROUND_DISTANCE = 500.0f;
-	constexpr float MOVEMENT_SPEED = 25.0f;
+	constexpr float MOVEMENT_SPEED = 110.0f;
 	constexpr float SENSITIVITY = 0.1f;
 	constexpr float NEAR_PLANE_DISTANCE = 0.1f;
 	constexpr float FAR_PLANE_DISTANCE = 1750.0f;

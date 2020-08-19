@@ -92,10 +92,7 @@ FactionPlayer::FactionPlayer(const glm::vec3& hqStartingPosition, const glm::vec
     : Faction(hqStartingPosition, mineralsStartingPosition),
     m_selectionBox(),
     m_previousMouseToGroundPosition()
-{
-    std::cout << "Resources: " <<  m_currentResourceAmount << "\n";
-    std::cout << "Current Population: " << m_currentPopulationAmount << "\n";
-}
+{}
 
 void FactionPlayer::handleInput(const sf::Event& currentSFMLEvent, const sf::Window& window, const Camera& camera, Map& map, float deltaTime)
 {
@@ -185,10 +182,22 @@ void FactionPlayer::handleInput(const sf::Event& currentSFMLEvent, const sf::Win
         switch (currentSFMLEvent.key.code)
         {
         case sf::Keyboard::U:
-            spawnUnit<Unit>(map, m_units, eEntityType::Unit);
+        {
+            auto barracks = std::find_if(m_barracks.begin(), m_barracks.end(), [](const auto& barracks)
+            {
+                return barracks.isSelected();
+            });
+            if (barracks != m_barracks.end())
+            {
+                spawnUnit<Unit>(map, m_units, eEntityType::Unit, *barracks);
+            }
+        }
             break;
         case sf::Keyboard::W:
-            spawnUnit<Worker>(map, m_workers, eEntityType::Worker);
+            if (m_HQ.isSelected())
+            {
+                spawnUnit<Worker>(map, m_workers, eEntityType::Worker, m_HQ);
+            }
             break;
         case sf::Keyboard::B:
             instructWorkerToBuild(eEntityType::SupplyDepot, camera.getMouseToGroundPosition(window), map);
