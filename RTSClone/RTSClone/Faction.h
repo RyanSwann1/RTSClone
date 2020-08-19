@@ -7,8 +7,6 @@
 #include "PathFinding.h"
 #include "SupplyDepot.h"
 
-struct BuildingCommand;
-class Mineral;
 class ShaderHandler;
 class Map;
 class Faction : private NonMovable, private NonCopyable

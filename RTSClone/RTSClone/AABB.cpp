@@ -59,7 +59,7 @@ AABB::AABB(const glm::vec3& position, const glm::vec3& size)
 	reset(position, size);
 }
 
-AABB::AABB(const std::vector<const Unit*>& selectedUnits)
+AABB::AABB(const std::vector<Unit*>& selectedUnits)
 	: m_left(std::numeric_limits<float>::max()),
 	m_right(0.0f),
 	m_top(1.0f),

@@ -286,7 +286,7 @@ void FactionPlayer::moveMultipleSelectedUnits(const glm::vec3& mouseToGroundPosi
     if (!selectedUnits.empty())
     {
         assert(!isOneUnitSelected());
-        AABB selectionBoxAABB({ selectedUnits.begin(), selectedUnits.end() });
+        AABB selectionBoxAABB(selectedUnits);
         if (selectionBoxAABB.contains(mouseToGroundPosition))
         {
             std::vector<glm::vec3> unitFormationPositions = PathFinding::getInstance().getFormationPositions(mouseToGroundPosition,

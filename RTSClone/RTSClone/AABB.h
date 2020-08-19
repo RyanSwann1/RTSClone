@@ -13,7 +13,7 @@ struct AABB
 {
 	AABB();
 	AABB(const glm::vec3& position, const glm::vec3& size);
-	AABB(const std::vector<const Unit*>& selectedUnits);
+	AABB(const std::vector<Unit*>& selectedUnits);
 
 	bool contains(const glm::vec3& position) const;
 	bool contains(const AABB& other) const;
