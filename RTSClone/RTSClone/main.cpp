@@ -85,7 +85,7 @@ int main()
 
 	for (float z = Globals::NODE_SIZE; z <= Globals::NODE_SIZE * 5; z += Globals::NODE_SIZE)
 	{
-		minerals.emplace_back(Globals::convertToNodePosition({ 70.0f, Globals::GROUND_HEIGHT, z }), *map);
+		minerals.emplace_back(Globals::convertToNodePosition({ 70.0f, Globals::GROUND_HEIGHT, z }));
 	}
 
 	shaderHandler->switchToShader(eShaderType::SelectionBox);

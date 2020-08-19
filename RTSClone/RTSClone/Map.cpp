@@ -1,5 +1,7 @@
 #include "Map.h"
 #include "AABB.h"
+#include "GameEventMessenger.h"
+#include "GameEvents.h"
 
 Map::Map()
 	: m_map()
@@ -8,6 +10,18 @@ Map::Map()
 	{
 		i = false;
 	}
+
+	GameEventMessenger::getInstance().subscribe<GameEvents::MapModification<eGameEventType::AddEntityToMap>>(
+		[&](const GameEvents::MapModification<eGameEventType::AddEntityToMap>& gameEvent) { return addEntityToMap(gameEvent); }, this);
+
+	GameEventMessenger::getInstance().subscribe<GameEvents::MapModification<eGameEventType::RemoveEntityFromMap>>(
+		[&](const GameEvents::MapModification<eGameEventType::RemoveEntityFromMap>& gameEvent) { return removeEntityFromMap(gameEvent); }, this);
+}
+
+Map::~Map()
+{
+	GameEventMessenger::getInstance().unsubscribe<GameEvents::MapModification<eGameEventType::AddEntityToMap>>(this);
+	GameEventMessenger::getInstance().unsubscribe<GameEvents::MapModification<eGameEventType::RemoveEntityFromMap>>(this);
 }
 
 bool Map::isPositionOccupied(const glm::vec3& position) const
@@ -31,15 +45,28 @@ bool Map::isPositionOccupied(const glm::ivec2& position) const
 	return true;
 }
 
-void Map::addEntityAABB(const AABB& AABB)
+void Map::addEntityToMap(const GameEvents::MapModification<eGameEventType::AddEntityToMap>& gameEvent)
 {
-	for (int x = AABB.m_left; x < AABB.m_right; ++x)
+	for (int x = gameEvent.entityAABB.m_left; x < gameEvent.entityAABB.m_right; ++x)
 	{
-		for (int y = AABB.m_back; y < AABB.m_forward; ++y)
+		for (int y = gameEvent.entityAABB.m_back; y < gameEvent.entityAABB.m_forward; ++y)
 		{
 			glm::ivec2 positionOnGrid = Globals::convertToGridPosition({ x, 0.0f, y });
 			assert(Globals::isPositionInMapBounds(positionOnGrid));
 			m_map[Globals::convertTo1D(positionOnGrid)] = true;
+		}
+	}
+}
+
+void Map::removeEntityFromMap(const GameEvents::MapModification<eGameEventType::RemoveEntityFromMap>& gameEvent)
+{
+	for (int x = gameEvent.entityAABB.m_left; x < gameEvent.entityAABB.m_right; ++x)
+	{
+		for (int y = gameEvent.entityAABB.m_back; y < gameEvent.entityAABB.m_forward; ++y)
+		{
+			glm::ivec2 positionOnGrid = Globals::convertToGridPosition({ x, 0.0f, y });
+			assert(Globals::isPositionInMapBounds(positionOnGrid));
+			m_map[Globals::convertTo1D(positionOnGrid)] = false;
 		}
 	}
 }
