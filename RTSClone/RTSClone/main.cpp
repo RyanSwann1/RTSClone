@@ -80,7 +80,7 @@ int main()
 	std::unique_ptr<Map> map = std::make_unique<Map>();
 	glm::vec3 playerHQPosition = { 35.0f, Globals::GROUND_HEIGHT, 15.f };
 	glm::vec3 playerMineralsStartingPosition = { 70.0f, Globals::GROUND_HEIGHT, Globals::NODE_SIZE };
-	FactionPlayer faction(*map, playerHQPosition, playerMineralsStartingPosition);
+	FactionPlayer faction(playerHQPosition, playerMineralsStartingPosition);
 	sf::Clock gameClock;
 	Camera camera;
 

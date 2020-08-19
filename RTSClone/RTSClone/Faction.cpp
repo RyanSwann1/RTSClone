@@ -1,6 +1,6 @@
 #include "Faction.h"
 
-Faction::Faction(Map& map, const glm::vec3& hqStartingPosition, const glm::vec3& mineralsStartingPosition)
+Faction::Faction(const glm::vec3& hqStartingPosition, const glm::vec3& mineralsStartingPosition)
     : m_currentResourceAmount(Globals::STARTING_RESOURCES),
     m_currentPopulationAmount(0),
     m_currentPopulationLimit(Globals::STARTING_POPULATION),
@@ -14,7 +14,7 @@ Faction::Faction(Map& map, const glm::vec3& hqStartingPosition, const glm::vec3&
 {
     m_minerals.reserve(Globals::MAX_MINERALS_PER_FACTION);
     glm::vec3 startingPosition = mineralsStartingPosition;
-    for (int i = 1; i <= Globals::MAX_MINERALS_PER_FACTION; ++i)
+    for (int i = 0; i < Globals::MAX_MINERALS_PER_FACTION; ++i)
     {
         glm::vec3 position = mineralsStartingPosition;
         position.z += Globals::NODE_SIZE * i;

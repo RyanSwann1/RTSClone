@@ -39,10 +39,8 @@ public:
 #endif // RENDER_AABB
 
 protected:
-	Faction(Map& map, const glm::vec3& hqStartingPosition, const glm::vec3& mineralsStartingPosition);
-	int m_currentResourceAmount;
-	int m_currentPopulationAmount;
-	int m_currentPopulationLimit;
+	Faction(const glm::vec3& hqStartingPosition, const glm::vec3& mineralsStartingPosition);
+
 	std::vector<Mineral> m_minerals;
 	UnitSpawnerBuilding m_HQ;
 	std::vector<Unit> m_units;
@@ -123,6 +121,11 @@ protected:
 			}
 		}
 	}
+
+private:
+	int m_currentResourceAmount;
+	int m_currentPopulationAmount;
+	int m_currentPopulationLimit;
 
 	template <class Entity>
 	void handleCollisions(std::vector<Entity>& entities, const Map& map)

@@ -88,8 +88,8 @@ void SelectionBox::render(const sf::Window& window) const
 }
 
 //Faction
-FactionPlayer::FactionPlayer(Map& map, const glm::vec3& hqStartingPosition, const glm::vec3& mineralsStartingPosition)
-    : Faction(map, hqStartingPosition, mineralsStartingPosition),
+FactionPlayer::FactionPlayer(const glm::vec3& hqStartingPosition, const glm::vec3& mineralsStartingPosition)
+    : Faction(hqStartingPosition, mineralsStartingPosition),
     m_selectionBox(),
     m_previousMouseToGroundPosition()
 {
