@@ -4,7 +4,7 @@ Faction::Faction(Map& map)
     : m_currentResourceAmount(Globals::STARTING_RESOURCES),
     m_currentPopulationAmount(0),
     m_currentPopulationLimit(Globals::STARTING_POPULATION),
-    m_HQ(Globals::convertToNodePosition({ 35.0f, Globals::GROUND_HEIGHT, 15.f }), map, eModelName::HQ),
+    m_HQ(Globals::convertToNodePosition({ 35.0f, Globals::GROUND_HEIGHT, 15.f }), eModelName::HQ),
     m_units(),
     m_workers(),
     m_supplyDepots(),
@@ -142,12 +142,12 @@ const Entity* Faction::addBuilding(Worker& worker, Map& map, glm::vec3 spawnPosi
         switch (entityType)
         {
         case eEntityType::SupplyDepot:
-            m_supplyDepots.emplace_back(spawnPosition, map);
+            m_supplyDepots.emplace_back(spawnPosition);
             addedBuilding = &m_supplyDepots.back();
             increasePopulationLimit();
             break;
         case eEntityType::Barracks:
-            m_barracks.emplace_back(spawnPosition, map, eModelName::Barracks);
+            m_barracks.emplace_back(spawnPosition, eModelName::Barracks);
             addedBuilding = &m_barracks.back();
             break;
         default:

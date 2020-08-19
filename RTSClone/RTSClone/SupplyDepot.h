@@ -2,9 +2,11 @@
 
 #include "Entity.h"
 
-class Map;
 class SupplyDepot : public Entity
 {
 public:
-	SupplyDepot(const glm::vec3& startingPosition, Map& map);
+	SupplyDepot(const glm::vec3& startingPosition);
+	SupplyDepot(SupplyDepot&&) noexcept;
+	SupplyDepot& operator=(SupplyDepot&&) noexcept;
+	~SupplyDepot();
 };

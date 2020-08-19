@@ -2,8 +2,9 @@
 #include "Camera.h"
 #include "Model.h"
 #include "Globals.h"
-#include "Map.h"
 #include "ModelManager.h"
+#include "GameEventMessenger.h"
+#include "GameEvents.h"
 
 namespace
 {
@@ -21,11 +22,28 @@ namespace
 	}
 }
 
-BuildingSpawner::BuildingSpawner(const glm::vec3& startingPosition, Map& map, eModelName modelName)
+BuildingSpawner::BuildingSpawner(const glm::vec3& startingPosition, eModelName modelName)
 	: Entity(startingPosition, modelName, eEntityType::HQ),
 	m_waypointPosition(m_position)
 {
-	map.addEntityAABB(m_AABB);
+	GameEventMessenger::getInstance().broadcast<GameEvents::MapModification<eGameEventType::AddEntityToMap>>({ m_AABB });	
+}
+
+BuildingSpawner::BuildingSpawner(BuildingSpawner&& orig) noexcept
+	: Entity(std::move(orig)),
+	m_waypointPosition(orig.m_waypointPosition)
+{}
+
+BuildingSpawner& BuildingSpawner::operator=(BuildingSpawner&& orig) noexcept
+{
+	Entity::operator=(std::move(orig));
+	m_waypointPosition = orig.m_waypointPosition;
+	return *this;
+}
+
+BuildingSpawner::~BuildingSpawner()
+{
+	GameEventMessenger::getInstance().broadcast<GameEvents::MapModification<eGameEventType::RemoveEntityFromMap>>({ m_AABB });
 }
 
 bool BuildingSpawner::isWaypointActive() const

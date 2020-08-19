@@ -134,5 +134,4 @@ protected:
 
 		handledUnits.clear();
 	}
-
 };

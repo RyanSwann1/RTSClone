@@ -30,6 +30,25 @@ Entity::Entity(const glm::vec3& startingPosition, eModelName modelName, eEntityT
 	m_AABB.reset(m_position, ModelManager::getInstance().getModel(m_modelName));
 }
 
+Entity::Entity(Entity&& orig) noexcept
+	: m_modelName(orig.m_modelName),
+	m_position(orig.m_position),
+	m_AABB(std::move(orig.m_AABB)),
+	m_type(orig.m_type),
+	m_selected(orig.m_selected)
+{}
+
+Entity& Entity::operator=(Entity&& orig) noexcept
+{
+	m_modelName = orig.m_modelName;
+	m_position = orig.m_position;
+	m_AABB = std::move(orig.m_AABB);
+	m_type = orig.m_type;
+	m_selected = orig.m_selected;
+
+	return *this;
+}
+
 eEntityType Entity::getType() const
 {
 	return m_type;
