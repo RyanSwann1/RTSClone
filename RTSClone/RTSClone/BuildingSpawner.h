@@ -3,11 +3,10 @@
 #include "Entity.h"
 #include <SFML/Graphics.hpp>
 
-struct Camera;
 class BuildingSpawner : public Entity
 {
 public:
-	BuildingSpawner(const glm::vec3& startingPosition, eModelName modelName);
+	BuildingSpawner(const glm::vec3& startingPosition, eModelName modelName, eEntityType entityType);
 	BuildingSpawner(BuildingSpawner&&) noexcept;
 	BuildingSpawner& operator=(BuildingSpawner&&) noexcept;
 	~BuildingSpawner();
