@@ -148,6 +148,7 @@
     <ClCompile Include="AABB.cpp" />
     <ClCompile Include="AdjacentPositions.cpp" />
     <ClCompile Include="Faction.cpp" />
+    <ClCompile Include="FactionAI.cpp" />
     <ClCompile Include="FactionPlayer.cpp" />
     <ClCompile Include="GameEventMessenger.cpp" />
     <ClCompile Include="Graph.cpp" />
@@ -224,6 +225,7 @@
     <ClInclude Include="assimp\include\version.h" />
     <ClInclude Include="EntityType.h" />
     <ClInclude Include="Faction.h" />
+    <ClInclude Include="FactionAI.h" />
     <ClInclude Include="FactionPlayer.h" />
     <ClInclude Include="GameEventMessenger.h" />
     <ClInclude Include="GameEvents.h" />
