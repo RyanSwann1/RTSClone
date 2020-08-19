@@ -362,6 +362,9 @@
     <ClInclude Include="GameEventType.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="UniqueEntityIDDistributer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="assimp\include\color4.inl">
