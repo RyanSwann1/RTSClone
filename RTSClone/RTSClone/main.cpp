@@ -10,6 +10,7 @@
 #include "Map.h"
 #include "glm/gtc/matrix_transform.hpp"
 #include "FactionPlayer.h"
+#include "FactionAI.h"
 #include "ModelManager.h"
 #include "Mineral.h"
 #include "imgui/imgui.h"
@@ -78,9 +79,8 @@ int main()
 	Ground ground;
 #endif // RENDER_GROUND
 	std::unique_ptr<Map> map = std::make_unique<Map>();
-	glm::vec3 playerHQPosition = { 35.0f, Globals::GROUND_HEIGHT, 15.f };
-	glm::vec3 playerMineralsStartingPosition = { 70.0f, Globals::GROUND_HEIGHT, Globals::NODE_SIZE };
-	FactionPlayer faction(playerHQPosition, playerMineralsStartingPosition);
+	FactionAI playerAI({ 35.0f, Globals::GROUND_HEIGHT, 100.0f }, { 70.0f, Globals::GROUND_HEIGHT, 100.0f});
+	FactionPlayer player({ 35.0f, Globals::GROUND_HEIGHT, 15.f }, { 70.0f, Globals::GROUND_HEIGHT, Globals::NODE_SIZE });
 	sf::Clock gameClock;
 	Camera camera;
 
@@ -110,14 +110,15 @@ int main()
 				}
 			}
 
-			faction.handleInput(currentSFMLEvent, window, camera, *map, deltaTime);
+			player.handleInput(currentSFMLEvent, window, camera, *map, deltaTime);
 		}
 
 		ImGui_SFML_OpenGL3::startFrame();
 
 		ImGui::ShowDemoWindow();
 
-		faction.update(deltaTime, *map);
+		player.update(deltaTime, *map);
+		playerAI.update(deltaTime, *map);
 		camera.update(window, deltaTime);
 
 		glm::mat4 view = camera.getView(); 
@@ -129,7 +130,8 @@ int main()
 		shaderHandler->setUniformMat4f(eShaderType::Default, "uView", view);
 		shaderHandler->setUniformMat4f(eShaderType::Default, "uProjection", projection);
 	
-		faction.render(*shaderHandler);
+		player.render(*shaderHandler);
+		playerAI.render(*shaderHandler);
 
 		shaderHandler->switchToShader(eShaderType::Debug);
 		shaderHandler->setUniformMat4f(eShaderType::Debug, "uView", view);
@@ -144,15 +146,17 @@ int main()
 		glDisable(GL_DEPTH_TEST);
 
 #ifdef RENDER_AABB
-		faction.renderAABB(*shaderHandler);
+		player.renderAABB(*shaderHandler);
+		playerAI.renderAABB(*shaderHandler);
 #endif // RENDER_AABB
 
 #ifdef RENDER_PATHING
-		faction.renderPathing(*shaderHandler);
+		player.renderPathing(*shaderHandler);
+		playerAI.renderPathing(*shaderHandler);
 #endif // RENDER_PATHING
 		
 		shaderHandler->switchToShader(eShaderType::SelectionBox);
-		faction.renderSelectionBox(window);
+		player.renderSelectionBox(window);
 		glDisable(GL_BLEND);
 		glEnable(GL_DEPTH_TEST);
 		ImGui::EndFrame();

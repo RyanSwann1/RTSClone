@@ -5,7 +5,6 @@ namespace
 	constexpr int STARTING_WORKER_COUNT = 5;
 }
 
-//FactionAI
 FactionAI::FactionAI(const glm::vec3& hqStartingPosition, const glm::vec3& mineralsStartingPosition)
 	: Faction(hqStartingPosition, mineralsStartingPosition),
 	m_unitSpawnQueue()
