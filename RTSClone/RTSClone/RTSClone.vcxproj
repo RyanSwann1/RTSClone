@@ -149,6 +149,7 @@
     <ClCompile Include="AdjacentPositions.cpp" />
     <ClCompile Include="Faction.cpp" />
     <ClCompile Include="FactionPlayer.cpp" />
+    <ClCompile Include="GameEventMessenger.cpp" />
     <ClCompile Include="Graph.cpp" />
     <ClCompile Include="Worker.cpp" />
     <ClCompile Include="BuildingSpawner.cpp" />
@@ -224,6 +225,9 @@
     <ClInclude Include="EntityType.h" />
     <ClInclude Include="Faction.h" />
     <ClInclude Include="FactionPlayer.h" />
+    <ClInclude Include="GameEventMessenger.h" />
+    <ClInclude Include="GameEvents.h" />
+    <ClInclude Include="GameEventType.h" />
     <ClInclude Include="Graph.h" />
     <ClInclude Include="Worker.h" />
     <ClInclude Include="BuildingSpawner.h" />
