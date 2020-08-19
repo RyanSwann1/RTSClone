@@ -78,16 +78,11 @@ int main()
 	Ground ground;
 #endif // RENDER_GROUND
 	std::unique_ptr<Map> map = std::make_unique<Map>();
-	FactionPlayer faction(*map);
+	glm::vec3 playerHQPosition = { 35.0f, Globals::GROUND_HEIGHT, 15.f };
+	glm::vec3 playerMineralsStartingPosition = { 70.0f, Globals::GROUND_HEIGHT, Globals::NODE_SIZE };
+	FactionPlayer faction(*map, playerHQPosition, playerMineralsStartingPosition);
 	sf::Clock gameClock;
 	Camera camera;
-	std::vector<Mineral> minerals;
-
-	for (float z = Globals::NODE_SIZE; z <= Globals::NODE_SIZE * 5; z += Globals::NODE_SIZE)
-	{
-		minerals.emplace_back(UniqueEntityIDDistributer::getInstance().getUniqueEntityID(),
-			Globals::convertToNodePosition({ 70.0f, Globals::GROUND_HEIGHT, z }));
-	}
 
 	shaderHandler->switchToShader(eShaderType::SelectionBox);
 	shaderHandler->setUniformMat4f(eShaderType::SelectionBox, "uOrthographic", glm::ortho(0.0f, static_cast<float>(windowSize.x),
@@ -115,7 +110,7 @@ int main()
 				}
 			}
 
-			faction.handleInput(currentSFMLEvent, window, camera, *map, minerals, deltaTime);
+			faction.handleInput(currentSFMLEvent, window, camera, *map, deltaTime);
 		}
 
 		ImGui_SFML_OpenGL3::startFrame();
@@ -135,10 +130,6 @@ int main()
 		shaderHandler->setUniformMat4f(eShaderType::Default, "uProjection", projection);
 	
 		faction.render(*shaderHandler);
-		for(const auto& mineral : minerals)
-		{
-			mineral.render(*shaderHandler);
-		}
 
 		shaderHandler->switchToShader(eShaderType::Debug);
 		shaderHandler->setUniformMat4f(eShaderType::Debug, "uView", view);
@@ -154,10 +145,6 @@ int main()
 
 #ifdef RENDER_AABB
 		faction.renderAABB(*shaderHandler);
-		for (auto& mineral : minerals)
-		{
-			mineral.renderAABB(*shaderHandler);
-		}
 #endif // RENDER_AABB
 
 #ifdef RENDER_PATHING

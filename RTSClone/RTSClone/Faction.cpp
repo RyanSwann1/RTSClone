@@ -1,16 +1,26 @@
 #include "Faction.h"
 
-Faction::Faction(Map& map)
+Faction::Faction(Map& map, const glm::vec3& hqStartingPosition, const glm::vec3& mineralsStartingPosition)
     : m_currentResourceAmount(Globals::STARTING_RESOURCES),
     m_currentPopulationAmount(0),
     m_currentPopulationLimit(Globals::STARTING_POPULATION),
+    m_minerals(),
     m_HQ(UniqueEntityIDDistributer::getInstance().getUniqueEntityID(),
-        Globals::convertToNodePosition({ 35.0f, Globals::GROUND_HEIGHT, 15.f }), eModelName::HQ, eEntityType::HQ),
+        Globals::convertToNodePosition(hqStartingPosition), eModelName::HQ, eEntityType::HQ),
     m_units(),
     m_workers(),
     m_supplyDepots(),
     m_barracks()
-{}
+{
+    m_minerals.reserve(Globals::MAX_MINERALS_PER_FACTION);
+    glm::vec3 startingPosition = mineralsStartingPosition;
+    for (int i = 1; i <= Globals::MAX_MINERALS_PER_FACTION; ++i)
+    {
+        glm::vec3 position = mineralsStartingPosition;
+        position.z += Globals::NODE_SIZE * i;
+        m_minerals.emplace_back(UniqueEntityIDDistributer::getInstance().getUniqueEntityID(), Globals::convertToNodePosition(position));
+    }
+}
 
 void Faction::addResources(Worker& worker)
 {
@@ -38,24 +48,29 @@ void Faction::render(ShaderHandler& shaderHandler) const
 {
     m_HQ.render(shaderHandler);
 
-    for (auto& unit : m_units)
+    for (const auto& unit : m_units)
     {
         unit.render(shaderHandler);
     }
 
-    for (auto& worker : m_workers)
+    for (const auto& worker : m_workers)
     {
         worker.render(shaderHandler);
     }
 
-    for (auto& supplyDepot : m_supplyDepots)
+    for (const auto& supplyDepot : m_supplyDepots)
     {
         supplyDepot.render(shaderHandler);
     }
 
-    for (auto& barracks : m_barracks)
+    for (const auto& barracks : m_barracks)
     {
         barracks.render(shaderHandler);
+    }
+
+    for (const auto& minerals : m_minerals)
+    {
+        minerals.render(shaderHandler);
     }
 }
 
@@ -95,6 +110,11 @@ void Faction::renderAABB(ShaderHandler& shaderHandler)
     for (auto& barracks : m_barracks)
     {
         barracks.renderAABB(shaderHandler);
+    }
+
+    for (auto& minerals : m_minerals)
+    {
+        minerals.renderAABB(shaderHandler);
     }
 
     m_HQ.renderAABB(shaderHandler);

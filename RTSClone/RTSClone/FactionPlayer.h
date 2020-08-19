@@ -26,10 +26,9 @@ struct Camera;
 class FactionPlayer : public Faction
 {
 public:
-	FactionPlayer(Map& map);
+	FactionPlayer(Map& map, const glm::vec3& hqStartingPosition, const glm::vec3& mineralsStartingPosition);
 
-	void handleInput(const sf::Event& currentSFMLEvent, const sf::Window& window, const Camera& camera, Map& map, 
-		const std::vector<Mineral>& minerals, float deltaTime);
+	void handleInput(const sf::Event& currentSFMLEvent, const sf::Window& window, const Camera& camera, Map& map, float deltaTime);
 	void renderSelectionBox(const sf::Window& window) const;
 
 private:
@@ -38,8 +37,8 @@ private:
 
 	bool isOneUnitSelected() const;
 	
-	void moveSingularSelectedUnit(const glm::vec3& mouseToGroundPosition, const Map& map, const std::vector<Mineral>& minerals);
-	void moveMultipleSelectedUnits(const glm::vec3& mouseToGroundPosition, const Map& map, const std::vector<Mineral>& minerals);
+	void moveSingularSelectedUnit(const glm::vec3& mouseToGroundPosition, const Map& map);
+	void moveMultipleSelectedUnits(const glm::vec3& mouseToGroundPosition, const Map& map);
 	void instructWorkerReturnMinerals(const Map& map);
 
 	template <class Entity>

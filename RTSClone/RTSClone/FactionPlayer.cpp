@@ -88,8 +88,8 @@ void SelectionBox::render(const sf::Window& window) const
 }
 
 //Faction
-FactionPlayer::FactionPlayer(Map& map)
-    : Faction(map),
+FactionPlayer::FactionPlayer(Map& map, const glm::vec3& hqStartingPosition, const glm::vec3& mineralsStartingPosition)
+    : Faction(map, hqStartingPosition, mineralsStartingPosition),
     m_selectionBox(),
     m_previousMouseToGroundPosition()
 {
@@ -97,8 +97,7 @@ FactionPlayer::FactionPlayer(Map& map)
     std::cout << "Current Population: " << m_currentPopulationAmount << "\n";
 }
 
-void FactionPlayer::handleInput(const sf::Event& currentSFMLEvent, const sf::Window& window, const Camera& camera, Map& map, 
-    const std::vector<Mineral>& minerals, float deltaTime)
+void FactionPlayer::handleInput(const sf::Event& currentSFMLEvent, const sf::Window& window, const Camera& camera, Map& map, float deltaTime)
 {
     switch (currentSFMLEvent.type)
     {
@@ -151,11 +150,11 @@ void FactionPlayer::handleInput(const sf::Event& currentSFMLEvent, const sf::Win
 
                 if (isOneUnitSelected())
                 {
-                    moveSingularSelectedUnit(mouseToGroundPosition, map, minerals);
+                    moveSingularSelectedUnit(mouseToGroundPosition, map);
                 }
                 else
                 {
-                    moveMultipleSelectedUnits(mouseToGroundPosition, map, minerals);
+                    moveMultipleSelectedUnits(mouseToGroundPosition, map);
                 }
             }
         }
@@ -238,7 +237,7 @@ bool FactionPlayer::isOneUnitSelected() const
     return unitSelectedCount == 1;
 }
 
-void FactionPlayer::moveSingularSelectedUnit(const glm::vec3& mouseToGroundPosition, const Map& map, const std::vector<Mineral>& minerals)
+void FactionPlayer::moveSingularSelectedUnit(const glm::vec3& mouseToGroundPosition, const Map& map)
 {
     assert(isOneUnitSelected());
 
@@ -257,11 +256,11 @@ void FactionPlayer::moveSingularSelectedUnit(const glm::vec3& mouseToGroundPosit
         });
         assert(selectedWorker != m_workers.end());
 
-        selectedWorker->moveTo(mouseToGroundPosition, map, minerals);
+        selectedWorker->moveTo(mouseToGroundPosition, map, m_minerals);
     }
 }
 
-void FactionPlayer::moveMultipleSelectedUnits(const glm::vec3& mouseToGroundPosition, const Map& map, const std::vector<Mineral>& minerals)
+void FactionPlayer::moveMultipleSelectedUnits(const glm::vec3& mouseToGroundPosition, const Map& map)
 {
     static std::vector<Unit*> selectedUnits;
  
@@ -302,7 +301,7 @@ void FactionPlayer::moveMultipleSelectedUnits(const glm::vec3& mouseToGroundPosi
         else
         {
             const Mineral* mineralSelected = nullptr;
-            for (const auto& mineral : minerals)
+            for (const auto& mineral : m_minerals)
             {
                 if (mineral.getAABB().contains(mouseToGroundPosition))
                 {
@@ -317,7 +316,7 @@ void FactionPlayer::moveMultipleSelectedUnits(const glm::vec3& mouseToGroundPosi
                 {
                     if (selectedUnit->getType() == eEntityType::Worker)
                     {
-                        static_cast<Worker*>(selectedUnit)->moveTo(mouseToGroundPosition, map, minerals);
+                        static_cast<Worker*>(selectedUnit)->moveTo(mouseToGroundPosition, map, m_minerals);
                     }
                 }
             }
