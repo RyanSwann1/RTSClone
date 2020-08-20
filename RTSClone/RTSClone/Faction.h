@@ -58,7 +58,7 @@ protected:
 	void instructWorkerToBuild(eEntityType entityType, const glm::vec3& mouseToGroundPosition, Map& map);
 
 	template <class Unit>
-	bool spawnUnit(const Map& map, std::vector<Unit>& units, eEntityType entityType, UnitSpawnerBuilding& building)
+	bool spawnUnit(const Map& map, std::vector<Unit>& units, eEntityType entityType, UnitSpawnerBuilding& building, Unit** addedUnit = nullptr)
 	{
 		if (isEntityAffordable(entityType) && !isExceedPopulationLimit(entityType))
 		{
@@ -100,7 +100,8 @@ protected:
 
 			reduceResources(entityType);
 			increaseCurrentPopulationAmount(entityType);
-			
+			*addedUnit = &units.back();
+
 			return true;
 		}
 

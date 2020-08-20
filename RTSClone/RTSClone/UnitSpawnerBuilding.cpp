@@ -51,19 +51,16 @@ UnitSpawnerBuilding::~UnitSpawnerBuilding()
 
 bool UnitSpawnerBuilding::isWaypointActive() const
 {
-	//assert(m_selected);
 	return m_waypointPosition != m_position;
 }
 
 const glm::vec3& UnitSpawnerBuilding::getWaypointPosition() const
 {
-	//assert(m_selected && isWaypointActive());
 	return m_waypointPosition;
 }
 
 glm::vec3 UnitSpawnerBuilding::getUnitSpawnPosition() const
 {
-	//assert(m_selected);
 	if (isWaypointActive())
 	{
 		return getSpawnPosition(m_AABB, glm::normalize(m_waypointPosition - m_position), m_position);
@@ -78,7 +75,6 @@ glm::vec3 UnitSpawnerBuilding::getUnitSpawnPosition() const
 
 void UnitSpawnerBuilding::setWaypointPosition(const glm::vec3& position)
 {
-	//assert(m_selected);
 	if (Globals::isPositionInMapBounds(position))
 	{
 		if (m_AABB.contains(position))

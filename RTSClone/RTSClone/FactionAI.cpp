@@ -29,7 +29,18 @@ void FactionAI::update(float deltaTime, const Map & map)
 			unitSpawned = spawnUnit<Unit>(map, m_units, m_unitSpawnQueue.front(), m_barracks.back());
 			break;
 		case eEntityType::Worker:
-			unitSpawned = spawnUnit<Worker>(map, m_workers, m_unitSpawnQueue.front(), m_HQ);
+		{
+			Worker* addedWorker = nullptr;
+			unitSpawned = spawnUnit<Worker>(map, m_workers, m_unitSpawnQueue.front(), m_HQ, &addedWorker);
+			if (unitSpawned)
+			{
+				assert(addedWorker);
+
+				int mineralIndex = Globals::getRandomNumber(0, m_minerals.size() - 1);
+				glm::vec3 destination = m_minerals[mineralIndex].getPosition();
+				addedWorker->moveTo(destination, map, m_minerals);
+			}
+		}
 			break;
 		default:
 			assert(false);
