@@ -9,16 +9,6 @@ SupplyDepot::SupplyDepot(int ID, const glm::vec3& startingPosition)
 	GameMessenger::getInstance().broadcast<GameMessages::MapModification<eGameMessageType::AddEntityToMap>>({ m_AABB });
 }
 
-SupplyDepot::SupplyDepot(SupplyDepot&& orig) noexcept
-	: Entity(std::move(orig))
-{}
-
-SupplyDepot& SupplyDepot::operator=(SupplyDepot&& orig) noexcept
-{
-	Entity::operator=(std::move(orig));
-	return *this;
-}
-
 SupplyDepot::~SupplyDepot()
 {
 	if (m_ID != Globals::INVALID_ENTITY_ID)

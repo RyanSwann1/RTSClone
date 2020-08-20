@@ -22,7 +22,7 @@ enum class eUnitState
 
 class Map;
 class ShaderHandler;
-class Unit : public Entity
+class Unit : public Entity, protected NonMovable
 {
 public:
 	Unit(int ID, const glm::vec3& startingPosition, eModelName modelName = eModelName::Unit, eEntityType entityType = eEntityType::Unit);

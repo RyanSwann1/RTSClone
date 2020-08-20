@@ -8,7 +8,7 @@
 class ShaderHandler;
 struct Model;
 class Map;
-class Entity : private NonCopyable
+class Entity : protected NonCopyable
 {
 public:
 	Entity(Entity&&) noexcept;

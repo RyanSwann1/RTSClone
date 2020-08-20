@@ -2,11 +2,9 @@
 
 #include "Entity.h"
 
-class SupplyDepot : public Entity
+class SupplyDepot : public Entity, private NonMovable
 {
 public:
 	SupplyDepot(int ID, const glm::vec3& startingPosition);
-	SupplyDepot(SupplyDepot&&) noexcept;
-	SupplyDepot& operator=(SupplyDepot&&) noexcept;
 	~SupplyDepot();
 };

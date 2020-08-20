@@ -29,18 +29,6 @@ UnitSpawnerBuilding::UnitSpawnerBuilding(int ID, const glm::vec3& startingPositi
 	GameMessenger::getInstance().broadcast<GameMessages::MapModification<eGameMessageType::AddEntityToMap>>({ m_AABB });	
 }
 
-UnitSpawnerBuilding::UnitSpawnerBuilding(UnitSpawnerBuilding&& orig) noexcept
-	: Entity(std::move(orig)),
-	m_waypointPosition(orig.m_waypointPosition)
-{}
-
-UnitSpawnerBuilding& UnitSpawnerBuilding::operator=(UnitSpawnerBuilding&& orig) noexcept
-{
-	Entity::operator=(std::move(orig));
-	m_waypointPosition = orig.m_waypointPosition;
-	return *this;
-}
-
 UnitSpawnerBuilding::~UnitSpawnerBuilding()
 {
 	if (m_ID != Globals::INVALID_ENTITY_ID)

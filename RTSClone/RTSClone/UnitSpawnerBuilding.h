@@ -3,12 +3,10 @@
 #include "Entity.h"
 #include <SFML/Graphics.hpp>
 
-class UnitSpawnerBuilding : public Entity
+class UnitSpawnerBuilding : public Entity, private NonMovable
 {
 public:
 	UnitSpawnerBuilding(int ID, const glm::vec3& startingPosition, eModelName modelName, eEntityType entityType);
-	UnitSpawnerBuilding(UnitSpawnerBuilding&&) noexcept;
-	UnitSpawnerBuilding& operator=(UnitSpawnerBuilding&&) noexcept;
 	~UnitSpawnerBuilding();
 
 	bool isWaypointActive() const;
