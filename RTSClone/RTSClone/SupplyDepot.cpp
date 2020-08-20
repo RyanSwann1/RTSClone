@@ -1,12 +1,12 @@
 #include "SupplyDepot.h"
-#include "GameEventMessenger.h"
+#include "GameMessenger.h"
 #include "GameEvents.h"
 #include "Globals.h"
 
 SupplyDepot::SupplyDepot(int ID, const glm::vec3& startingPosition)
 	: Entity(ID, startingPosition, eModelName::SupplyDepot, eEntityType::SupplyDepot)
 {
-	GameEventMessenger::getInstance().broadcast<GameEvents::MapModification<eGameEventType::AddEntityToMap>>({ m_AABB });
+	GameMessenger::getInstance().broadcast<GameEvents::MapModification<eGameEventType::AddEntityToMap>>({ m_AABB });
 }
 
 SupplyDepot::SupplyDepot(SupplyDepot&& orig) noexcept
@@ -23,6 +23,6 @@ SupplyDepot::~SupplyDepot()
 {
 	if (m_ID != Globals::INVALID_ENTITY_ID)
 	{
-		GameEventMessenger::getInstance().broadcast<GameEvents::MapModification<eGameEventType::RemoveEntityFromMap>>({ m_AABB });
+		GameMessenger::getInstance().broadcast<GameEvents::MapModification<eGameEventType::RemoveEntityFromMap>>({ m_AABB });
 	}
 }

@@ -1,6 +1,6 @@
 #include "Map.h"
 #include "AABB.h"
-#include "GameEventMessenger.h"
+#include "GameMessenger.h"
 #include "GameEvents.h"
 
 Map::Map()
@@ -11,17 +11,17 @@ Map::Map()
 		i = false;
 	}
 
-	GameEventMessenger::getInstance().subscribe<GameEvents::MapModification<eGameEventType::AddEntityToMap>>(
+	GameMessenger::getInstance().subscribe<GameEvents::MapModification<eGameEventType::AddEntityToMap>>(
 		[&](const GameEvents::MapModification<eGameEventType::AddEntityToMap>& gameEvent) { return addEntityToMap(gameEvent); }, this);
 
-	GameEventMessenger::getInstance().subscribe<GameEvents::MapModification<eGameEventType::RemoveEntityFromMap>>(
+	GameMessenger::getInstance().subscribe<GameEvents::MapModification<eGameEventType::RemoveEntityFromMap>>(
 		[&](const GameEvents::MapModification<eGameEventType::RemoveEntityFromMap>& gameEvent) { return removeEntityFromMap(gameEvent); }, this);
 }
 
 Map::~Map()
 {
-	GameEventMessenger::getInstance().unsubscribe<GameEvents::MapModification<eGameEventType::AddEntityToMap>>(this);
-	GameEventMessenger::getInstance().unsubscribe<GameEvents::MapModification<eGameEventType::RemoveEntityFromMap>>(this);
+	GameMessenger::getInstance().unsubscribe<GameEvents::MapModification<eGameEventType::AddEntityToMap>>(this);
+	GameMessenger::getInstance().unsubscribe<GameEvents::MapModification<eGameEventType::RemoveEntityFromMap>>(this);
 }
 
 bool Map::isPositionOccupied(const glm::vec3& position) const

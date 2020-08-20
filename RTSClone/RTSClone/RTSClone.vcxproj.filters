@@ -105,13 +105,13 @@
     <ClCompile Include="Faction.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="GameEventMessenger.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="UnitSpawnerBuilding.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="FactionAI.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GameMessenger.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -353,9 +353,6 @@
     <ClInclude Include="Faction.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="GameEventMessenger.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="GameEvents.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -369,6 +366,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="FactionAI.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GameMessenger.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

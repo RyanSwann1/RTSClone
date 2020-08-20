@@ -1,12 +1,12 @@
 #include "Mineral.h"
-#include "GameEventMessenger.h"
+#include "GameMessenger.h"
 #include "GameEvents.h"
 #include "Globals.h"
 
 Mineral::Mineral(int ID, const glm::vec3& startingPosition)
 	: Entity(ID, startingPosition, eModelName::Mineral, eEntityType::Mineral)
 {
-	GameEventMessenger::getInstance().broadcast<GameEvents::MapModification<eGameEventType::AddEntityToMap>>({ m_AABB });
+	GameMessenger::getInstance().broadcast<GameEvents::MapModification<eGameEventType::AddEntityToMap>>({ m_AABB });
 }
 
 Mineral::Mineral(Mineral&& orig) noexcept
@@ -23,6 +23,6 @@ Mineral::~Mineral()
 {
 	if (m_ID != Globals::INVALID_ENTITY_ID)
 	{
-		GameEventMessenger::getInstance().broadcast<GameEvents::MapModification<eGameEventType::RemoveEntityFromMap>>({ m_AABB });
+		GameMessenger::getInstance().broadcast<GameEvents::MapModification<eGameEventType::RemoveEntityFromMap>>({ m_AABB });
 	}
 }

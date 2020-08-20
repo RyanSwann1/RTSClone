@@ -18,12 +18,12 @@ struct Listener : private NonCopyable
 	const void* m_ownerAddress;
 };
 
-class GameEventMessenger : private NonCopyable, private NonMovable
+class GameMessenger : private NonCopyable, private NonMovable
 {
 public:
-	static GameEventMessenger& getInstance()
+	static GameMessenger& getInstance()
 	{
-		static GameEventMessenger instance;
+		static GameMessenger instance;
 		return instance;
 	}
 
@@ -62,7 +62,7 @@ public:
 	}
 
 private:
-	GameEventMessenger() {}
+	GameMessenger() {}
 	std::array<std::vector<Listener>, static_cast<size_t>(eGameEventType::Max) + 1> m_listeners;
 
 	bool isOwnerAlreadyRegistered(const std::vector<Listener>& listeners, eGameEventType gameEventType, const void* ownerAddress) const;

@@ -1,4 +1,4 @@
-#include "GameEventMessenger.h"
+#include "GameMessenger.h"
 
 Listener::Listener(const std::function<void(const void*)>& fp, const void* ownerAddress)
 	: m_listener(fp),
@@ -26,7 +26,7 @@ Listener& Listener::operator=(Listener&& orig) noexcept
 	return *this;
 }
 
-bool GameEventMessenger::isOwnerAlreadyRegistered(const std::vector<Listener>& listeners, eGameEventType gameEventType, const void* ownerAddress) const
+bool GameMessenger::isOwnerAlreadyRegistered(const std::vector<Listener>& listeners, eGameEventType gameEventType, const void* ownerAddress) const
 {
 	assert(ownerAddress != nullptr);
 

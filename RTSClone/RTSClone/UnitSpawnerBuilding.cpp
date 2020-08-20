@@ -3,7 +3,7 @@
 #include "Model.h"
 #include "Globals.h"
 #include "ModelManager.h"
-#include "GameEventMessenger.h"
+#include "GameMessenger.h"
 #include "GameEvents.h"
 
 namespace
@@ -26,7 +26,7 @@ UnitSpawnerBuilding::UnitSpawnerBuilding(int ID, const glm::vec3& startingPositi
 	: Entity(ID, startingPosition, modelName, entityType),
 	m_waypointPosition(m_position)
 {
-	GameEventMessenger::getInstance().broadcast<GameEvents::MapModification<eGameEventType::AddEntityToMap>>({ m_AABB });	
+	GameMessenger::getInstance().broadcast<GameEvents::MapModification<eGameEventType::AddEntityToMap>>({ m_AABB });	
 }
 
 UnitSpawnerBuilding::UnitSpawnerBuilding(UnitSpawnerBuilding&& orig) noexcept
@@ -45,7 +45,7 @@ UnitSpawnerBuilding::~UnitSpawnerBuilding()
 {
 	if (m_ID != Globals::INVALID_ENTITY_ID)
 	{
-		GameEventMessenger::getInstance().broadcast<GameEvents::MapModification<eGameEventType::RemoveEntityFromMap>>({ m_AABB });
+		GameMessenger::getInstance().broadcast<GameEvents::MapModification<eGameEventType::RemoveEntityFromMap>>({ m_AABB });
 	}
 }
 
