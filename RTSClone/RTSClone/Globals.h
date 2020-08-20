@@ -15,13 +15,13 @@ namespace Globals
 	constexpr int INVALID_ENTITY_ID = -1;
 	constexpr size_t MAX_MINERALS_PER_FACTION = 5;
 
-	constexpr int STARTING_RESOURCES = 1000;
+	constexpr int STARTING_RESOURCES = 50;
 	constexpr int WORKER_RESOURCE_COST = 50;
 	constexpr int SUPPLY_DEPOT_RESOURCE_COST = 50;
 	constexpr int BARRACKS_RESOURCE_COST = 50;
 	constexpr int UNIT_RESOURCE_COST = 100;
 	constexpr int STARTING_POPULATION = 5;
-	constexpr int MAX_POPULATION = 200;
+	constexpr int MAX_POPULATION = 20;
 	constexpr int WORKER_POPULATION_COST = 1;
 	constexpr int UNIT_POPULATION_COST = 2;
 	constexpr int POPULATION_INCREMENT = 5;

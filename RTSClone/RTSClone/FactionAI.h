@@ -12,4 +12,5 @@ public:
 
 private:
 	std::queue<eEntityType> m_unitSpawnQueue;
+	Timer m_delayTimer;
 };

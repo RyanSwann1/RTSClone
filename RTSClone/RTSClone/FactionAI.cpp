@@ -3,12 +3,16 @@
 namespace
 {
 	constexpr int STARTING_WORKER_COUNT = 5;
+	constexpr float DELAY_TIME = 3.0f;
 }
 
 FactionAI::FactionAI(const glm::vec3& hqStartingPosition, const glm::vec3& mineralsStartingPosition)
 	: Faction(hqStartingPosition, mineralsStartingPosition),
-	m_unitSpawnQueue()
+	m_unitSpawnQueue(),
+	m_delayTimer(DELAY_TIME)
 {
+	m_delayTimer.setActive(true);
+
 	for (int i = 0; i < STARTING_WORKER_COUNT; ++i)
 	{
 		m_unitSpawnQueue.push(eEntityType::Worker);
@@ -19,13 +23,16 @@ void FactionAI::update(float deltaTime, const Map & map)
 {
 	Faction::update(deltaTime, map);
 
-	if (!m_unitSpawnQueue.empty())
+	m_delayTimer.update(deltaTime);
+
+	if (!m_unitSpawnQueue.empty() && m_delayTimer.isExpired())
 	{
+		m_delayTimer.resetElaspedTime();
+
 		switch (m_unitSpawnQueue.front())
 		{
 		case eEntityType::Unit:
-			assert(m_barracks.size() == 1);
-			if (spawnUnit<Unit>(map, m_units, m_unitSpawnQueue.front(), m_barracks.back()))
+			if (!m_barracks.empty() && spawnUnit<Unit>(map, m_units, m_unitSpawnQueue.front(), m_barracks.back()))
 			{
 				m_unitSpawnQueue.pop();
 			}
