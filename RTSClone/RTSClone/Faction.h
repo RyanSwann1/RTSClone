@@ -42,6 +42,7 @@ public:
 protected:
 	Faction(const glm::vec3& hqStartingPosition, const glm::vec3& mineralsStartingPosition);
 	std::vector<Mineral> m_minerals;
+	std::vector<Entity*> m_allEntities;
 	std::list<Unit> m_units;
 	std::list<Worker> m_workers;
 	std::list<SupplyDepot> m_supplyDepots;
@@ -101,6 +102,7 @@ protected:
 
 			reduceResources(entityType);
 			increaseCurrentPopulationAmount(entityType);
+			m_allEntities.push_back(&units.back());
 			return &units.back();
 		}
 

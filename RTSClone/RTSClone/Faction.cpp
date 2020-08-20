@@ -5,6 +5,7 @@ Faction::Faction(const glm::vec3& hqStartingPosition, const glm::vec3& mineralsS
     m_currentPopulationAmount(0),
     m_currentPopulationLimit(Globals::STARTING_POPULATION),
     m_minerals(),
+    m_allEntities(),
     m_units(),
     m_workers(),
     m_supplyDepots(),
@@ -12,6 +13,8 @@ Faction::Faction(const glm::vec3& hqStartingPosition, const glm::vec3& mineralsS
     m_HQ(UniqueEntityIDDistributer::getInstance().getUniqueEntityID(),
         Globals::convertToNodePosition(hqStartingPosition), eModelName::HQ, eEntityType::HQ)
 {
+    m_allEntities.push_back(&m_HQ);
+
     m_minerals.reserve(Globals::MAX_MINERALS_PER_FACTION);
     glm::vec3 startingPosition = mineralsStartingPosition;
     for (int i = 0; i < Globals::MAX_MINERALS_PER_FACTION; ++i)
@@ -92,6 +95,7 @@ void Faction::renderPathing(ShaderHandler& shaderHandler)
 #ifdef RENDER_AABB
 void Faction::renderAABB(ShaderHandler& shaderHandler)
 {
+
     for (auto& unit : m_units)
     {
         unit.renderAABB(shaderHandler);
@@ -159,7 +163,7 @@ const Entity* Faction::addBuilding(Worker& worker, Map& map, glm::vec3 spawnPosi
         isEntityAffordable(entityType) &&
         PathFinding::getInstance().isPositionAvailable(spawnPosition, map, m_units, m_workers, worker))
     {
-        const Entity* addedBuilding = nullptr;
+        Entity* addedBuilding = nullptr;
         switch (entityType)
         {
         case eEntityType::SupplyDepot:
@@ -180,6 +184,7 @@ const Entity* Faction::addBuilding(Worker& worker, Map& map, glm::vec3 spawnPosi
         revalidateExistingUnitPaths(map);
 
         assert(addedBuilding);
+        m_allEntities.push_back(addedBuilding);
         return addedBuilding;
     }
 
