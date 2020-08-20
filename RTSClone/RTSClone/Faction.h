@@ -6,6 +6,7 @@
 #include "PathFinding.h"
 #include "SupplyDepot.h"
 #include "Mineral.h"
+#include <list>
 
 struct BuildingToSpawn
 {
@@ -41,11 +42,11 @@ public:
 protected:
 	Faction(const glm::vec3& hqStartingPosition, const glm::vec3& mineralsStartingPosition);
 	std::vector<Mineral> m_minerals;
+	std::list<Unit> m_units;
+	std::list<Worker> m_workers;
+	std::list<SupplyDepot> m_supplyDepots;
+	std::list<UnitSpawnerBuilding> m_barracks;
 	UnitSpawnerBuilding m_HQ;
-	std::vector<Unit> m_units;
-	std::vector<Worker> m_workers;
-	std::vector<SupplyDepot> m_supplyDepots;
-	std::vector<UnitSpawnerBuilding> m_barracks;
 
 	bool isExceedPopulationLimit(eEntityType entityType) const;
 	bool isEntityAffordable(eEntityType entityType) const;
@@ -58,7 +59,7 @@ protected:
 	void instructWorkerToBuild(eEntityType entityType, const glm::vec3& mouseToGroundPosition, Map& map);
 
 	template <class Unit>
-	Unit* spawnUnit(const Map& map, std::vector<Unit>& units, eEntityType entityType, UnitSpawnerBuilding& building)
+	Unit* spawnUnit(const Map& map, std::list<Unit>& units, eEntityType entityType, UnitSpawnerBuilding& building)
 	{
 		if (isEntityAffordable(entityType) && !isExceedPopulationLimit(entityType))
 		{
@@ -112,7 +113,7 @@ private:
 	int m_currentPopulationLimit;
 
 	template <class Entity>
-	void handleCollisions(std::vector<Entity>& entities, const Map& map)
+	void handleCollisions(std::list<Entity>& entities, const Map& map)
 	{
 		static std::vector<const Entity*> handledUnits;
 		for (auto& entity : entities)

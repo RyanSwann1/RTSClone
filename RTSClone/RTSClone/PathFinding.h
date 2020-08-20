@@ -12,6 +12,7 @@
 #include <queue>
 #include <array>
 #include <functional>
+#include <list>
 
 class Worker;
 class Unit;
@@ -26,7 +27,7 @@ public:
 	}
 
 	template <class Entity>
-	glm::vec3 getClosestPositionOutsideAABB(const Entity& currentEntity, const std::vector<Entity>& entities, const Map& map)
+	glm::vec3 getClosestPositionOutsideAABB(const Entity& currentEntity, const std::list<Entity>& entities, const Map& map)
 	{
 		assert(currentEntity.getCurrentState() == eUnitState::Idle);
 		constexpr float MAX_RAY_DISTANCE = static_cast<float>(Globals::NODE_SIZE) * 10.0f;
@@ -74,15 +75,15 @@ public:
 		return shortestDistancePosition;
 	}
 
-	bool isPositionAvailable(const glm::vec3& nodePosition, const Map& map, const std::vector<Unit>& units, const std::vector<Worker>& workers, 
+	bool isPositionAvailable(const glm::vec3& nodePosition, const Map& map, const std::list<Unit>& units, const std::list<Worker>& workers, 
 		const Worker& workerSender) const;
-	bool isPositionAvailable(const glm::vec3& nodePosition, const Map& map, const std::vector<Unit>& units, const std::vector<Worker>& workers) const;
+	bool isPositionAvailable(const glm::vec3& nodePosition, const Map& map, const std::list<Unit>& units, const std::list<Worker>& workers) const;
 
 	std::vector<glm::vec3> getFormationPositions(const glm::vec3& startingPosition, const std::vector<Unit*>& selectedUnits,
 		const Map& map);
 
-	glm::vec3 getClosestAvailablePosition(const glm::vec3& startingPosition, const std::vector<Unit>& units, 
-		const std::vector<Worker>& workers, const Map& map);
+	glm::vec3 getClosestAvailablePosition(const glm::vec3& startingPosition, const std::list<Unit>& units, 
+		const std::list<Worker>& workers, const Map& map);
 
 	glm::vec3 getClosestPositionOutsideAABB(const glm::vec3& entityPosition, const AABB& AABB, const glm::vec3& centrePositionAABB,
 		const Map& map);
@@ -90,7 +91,7 @@ public:
 	void getPathToPosition(const Unit& unit, const glm::vec3& destination, std::vector<glm::vec3>& pathToPosition, 
 		const GetAllAdjacentPositions& getAdjacentPositions, bool includeWorldDestinationPosition = false);
 
-	void convertPathToWaypoints(std::vector<glm::vec3>& pathToPosition, const Unit& unit, const std::vector<Unit>& units, 
+	void convertPathToWaypoints(std::vector<glm::vec3>& pathToPosition, const Unit& unit, const std::list<Unit>& units, 
 		const Map& map);
 
 private:

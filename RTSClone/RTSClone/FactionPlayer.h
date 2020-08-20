@@ -42,7 +42,7 @@ private:
 	void instructWorkerReturnMinerals(const Map& map);
 
 	template <class Entity>
-	void selectUnit(std::vector<Entity>& entities, const glm::vec3& mouseToGroundPosition, bool selectAllUnits)
+	void selectUnit(std::list<Entity>& entities, const glm::vec3& mouseToGroundPosition, bool selectAllUnits)
 	{
 		auto selectedEntity = std::find_if(entities.begin(), entities.end(), [&mouseToGroundPosition](const auto& entity)
 		{

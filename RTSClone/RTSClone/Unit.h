@@ -4,6 +4,7 @@
 #include "AdjacentPositions.h"
 #include <functional>
 #include <vector>
+#include <list>
 #ifdef RENDER_PATHING
 #include "Mesh.h"
 #endif // RENDER_PATHING
@@ -32,7 +33,7 @@ public:
 	const glm::vec3& getDestination() const;
 	eUnitState getCurrentState() const;
 	
-	void moveTo(const glm::vec3& destinationPosition, const Map& map, const std::vector<Unit>& units,
+	void moveTo(const glm::vec3& destinationPosition, const Map& map, const std::list<Unit>& units,
 		const GetAllAdjacentPositions& getAdjacentPositions);
 	void moveTo(const glm::vec3& destinationPosition, const Map& map);
 

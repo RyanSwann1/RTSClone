@@ -51,7 +51,7 @@ PathFinding::PathFinding()
 	m_closedQueue(static_cast<size_t>(Globals::MAP_SIZE * Globals::MAP_SIZE))
 {}
 
-bool PathFinding::isPositionAvailable(const glm::vec3& nodePosition, const Map& map, const std::vector<Unit>& units, const std::vector<Worker>& workers, 
+bool PathFinding::isPositionAvailable(const glm::vec3& nodePosition, const Map& map, const std::list<Unit>& units, const std::list<Worker>& workers, 
 	const Worker& workerSender) const
 {
 	assert(nodePosition == Globals::convertToNodePosition(nodePosition));
@@ -87,7 +87,7 @@ bool PathFinding::isPositionAvailable(const glm::vec3& nodePosition, const Map& 
 	return false;
 }
 
-bool PathFinding::isPositionAvailable(const glm::vec3& nodePosition, const Map& map, const std::vector<Unit>& units, const std::vector<Worker>& workers) const
+bool PathFinding::isPositionAvailable(const glm::vec3& nodePosition, const Map& map, const std::list<Unit>& units, const std::list<Worker>& workers) const
 {
 	assert(nodePosition == Globals::convertToNodePosition(nodePosition));
 
@@ -164,8 +164,8 @@ std::vector<glm::vec3> PathFinding::getFormationPositions(const glm::vec3& start
 	return unitFormationPositions;
 }
 
-glm::vec3 PathFinding::getClosestAvailablePosition(const glm::vec3& startingPosition, const std::vector<Unit>& units, 
-	const std::vector<Worker>& workers, const Map& map)
+glm::vec3 PathFinding::getClosestAvailablePosition(const glm::vec3& startingPosition, const std::list<Unit>& units, 
+	const std::list<Worker>& workers, const Map& map)
 {
 	if (isPositionAvailable(Globals::convertToNodePosition(startingPosition), map, units, workers))
 	{
@@ -315,7 +315,7 @@ void PathFinding::getPathToPosition(const Unit& unit, const glm::vec3& destinati
 	}
 }
 
-void PathFinding::convertPathToWaypoints(std::vector<glm::vec3>& pathToPosition, const Unit& unit, const std::vector<Unit>& units,
+void PathFinding::convertPathToWaypoints(std::vector<glm::vec3>& pathToPosition, const Unit& unit, const std::list<Unit>& units,
 	const Map& map)
 {
 	assert(!units.empty());

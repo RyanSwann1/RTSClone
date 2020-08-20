@@ -4,6 +4,7 @@
 #include <array>
 #include <vector>
 #include <functional>
+#include <list>
 
 constexpr std::array<glm::ivec2, 8> ALL_DIRECTIONS_ON_GRID =
 {
@@ -34,12 +35,12 @@ class Worker;
 class Map;
 class Unit;
 std::array<AdjacentPosition, ALL_DIRECTIONS_ON_GRID.size()> getAllAdjacentPositions(const glm::ivec2& position, const Map& map,
-	const std::vector<Unit>& units, const std::vector<Worker>& workers);
+	const std::list<Unit>& units, const std::list<Worker>& workers);
 
 std::array<AdjacentPosition, ALL_DIRECTIONS_ON_GRID.size()> getAllAdjacentPositions(const glm::ivec2& position, const Map& map,
-	const std::vector<Unit>& units, const Unit& unit);
+	const std::list<Unit>& units, const Unit& unit);
 
 std::array<AdjacentPosition, ALL_DIRECTIONS_ON_GRID.size()> getAllAdjacentPositions(const glm::ivec2& position, const Map& map,
-	const std::vector<Unit>& units, const Unit& unit, const std::vector<Unit*>& selectedUnits);
+	const std::list<Unit>& units, const Unit& unit, const std::vector<Unit*>& selectedUnits);
 
 std::array<AdjacentPosition, ALL_DIRECTIONS_ON_GRID.size()> getAllAdjacentPositions(const glm::ivec2& position, const Map& map);

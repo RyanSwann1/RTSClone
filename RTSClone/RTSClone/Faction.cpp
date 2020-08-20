@@ -5,12 +5,12 @@ Faction::Faction(const glm::vec3& hqStartingPosition, const glm::vec3& mineralsS
     m_currentPopulationAmount(0),
     m_currentPopulationLimit(Globals::STARTING_POPULATION),
     m_minerals(),
-    m_HQ(UniqueEntityIDDistributer::getInstance().getUniqueEntityID(),
-        Globals::convertToNodePosition(hqStartingPosition), eModelName::HQ, eEntityType::HQ),
     m_units(),
     m_workers(),
     m_supplyDepots(),
-    m_barracks()
+    m_barracks(),
+    m_HQ(UniqueEntityIDDistributer::getInstance().getUniqueEntityID(),
+        Globals::convertToNodePosition(hqStartingPosition), eModelName::HQ, eEntityType::HQ)
 {
     m_minerals.reserve(Globals::MAX_MINERALS_PER_FACTION);
     glm::vec3 startingPosition = mineralsStartingPosition;

@@ -81,7 +81,7 @@ eUnitState Unit::getCurrentState() const
 	return m_currentState;
 }
 
-void Unit::moveTo(const glm::vec3& destinationPosition, const Map& map, const std::vector<Unit>& units,
+void Unit::moveTo(const glm::vec3& destinationPosition, const Map& map, const std::list<Unit>& units,
 	const GetAllAdjacentPositions& getAdjacentPositions)
 {
 	glm::vec3 closestDestination = m_position;

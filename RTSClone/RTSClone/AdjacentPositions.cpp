@@ -22,8 +22,8 @@ AdjacentPosition::AdjacentPosition(const glm::ivec2 & position, bool valid, bool
 	position(position)
 {}
 
-std::array<AdjacentPosition, ALL_DIRECTIONS_ON_GRID.size()> getAllAdjacentPositions(const glm::ivec2 & position, const Map & map, const std::vector<Unit> & units,
-	const std::vector<Worker>& workers)
+std::array<AdjacentPosition, ALL_DIRECTIONS_ON_GRID.size()> getAllAdjacentPositions(const glm::ivec2 & position, const Map & map, const std::list<Unit> & units,
+	const std::list<Worker>& workers)
 {
 	std::array<AdjacentPosition, ALL_DIRECTIONS_ON_GRID.size()> adjacentPositions;
 	for (int i = 0; i < adjacentPositions.size(); ++i)
@@ -67,7 +67,7 @@ std::array<AdjacentPosition, ALL_DIRECTIONS_ON_GRID.size()> getAllAdjacentPositi
 	return adjacentPositions;
 }
 
-std::array<AdjacentPosition, ALL_DIRECTIONS_ON_GRID.size()> getAllAdjacentPositions(const glm::ivec2& position, const Map& map, const std::vector<Unit>& units, const Unit& unit)
+std::array<AdjacentPosition, ALL_DIRECTIONS_ON_GRID.size()> getAllAdjacentPositions(const glm::ivec2& position, const Map& map, const std::list<Unit>& units, const Unit& unit)
 {
 	std::array<AdjacentPosition, ALL_DIRECTIONS_ON_GRID.size()> adjacentPositions;
 	for (int i = 0; i < adjacentPositions.size(); ++i)
@@ -99,7 +99,7 @@ std::array<AdjacentPosition, ALL_DIRECTIONS_ON_GRID.size()> getAllAdjacentPositi
 }
 
 std::array<AdjacentPosition, ALL_DIRECTIONS_ON_GRID.size()> getAllAdjacentPositions(const glm::ivec2& position, const Map& map, 
-	const std::vector<Unit>& units, const Unit& unit, const std::vector<Unit*>& selectedUnits)
+	const std::list<Unit>& units, const Unit& unit, const std::vector<Unit*>& selectedUnits)
 {
 	std::array<AdjacentPosition, ALL_DIRECTIONS_ON_GRID.size()> adjacentPositions;
 	for (int i = 0; i < adjacentPositions.size(); ++i)
