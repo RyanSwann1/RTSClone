@@ -228,7 +228,7 @@
     <ClInclude Include="FactionAI.h" />
     <ClInclude Include="FactionPlayer.h" />
     <ClInclude Include="GameMessenger.h" />
-    <ClInclude Include="GameEvents.h" />
+    <ClInclude Include="GameMessages.h" />
     <ClInclude Include="GameMessageType.h" />
     <ClInclude Include="Graph.h" />
     <ClInclude Include="UniqueEntityIDDistributer.h" />

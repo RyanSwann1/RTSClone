@@ -1,7 +1,7 @@
 #include "Map.h"
 #include "AABB.h"
 #include "GameMessenger.h"
-#include "GameEvents.h"
+#include "GameMessages.h"
 
 Map::Map()
 	: m_map()
@@ -11,17 +11,17 @@ Map::Map()
 		i = false;
 	}
 
-	GameMessenger::getInstance().subscribe<GameEvents::MapModification<eGameMessageType::AddEntityToMap>>(
-		[&](const GameEvents::MapModification<eGameMessageType::AddEntityToMap>& gameEvent) { return addEntityToMap(gameEvent); }, this);
+	GameMessenger::getInstance().subscribe<GameMessages::MapModification<eGameMessageType::AddEntityToMap>>(
+		[&](const GameMessages::MapModification<eGameMessageType::AddEntityToMap>& gameEvent) { return addEntityToMap(gameEvent); }, this);
 
-	GameMessenger::getInstance().subscribe<GameEvents::MapModification<eGameMessageType::RemoveEntityFromMap>>(
-		[&](const GameEvents::MapModification<eGameMessageType::RemoveEntityFromMap>& gameEvent) { return removeEntityFromMap(gameEvent); }, this);
+	GameMessenger::getInstance().subscribe<GameMessages::MapModification<eGameMessageType::RemoveEntityFromMap>>(
+		[&](const GameMessages::MapModification<eGameMessageType::RemoveEntityFromMap>& gameEvent) { return removeEntityFromMap(gameEvent); }, this);
 }
 
 Map::~Map()
 {
-	GameMessenger::getInstance().unsubscribe<GameEvents::MapModification<eGameMessageType::AddEntityToMap>>(this);
-	GameMessenger::getInstance().unsubscribe<GameEvents::MapModification<eGameMessageType::RemoveEntityFromMap>>(this);
+	GameMessenger::getInstance().unsubscribe<GameMessages::MapModification<eGameMessageType::AddEntityToMap>>(this);
+	GameMessenger::getInstance().unsubscribe<GameMessages::MapModification<eGameMessageType::RemoveEntityFromMap>>(this);
 }
 
 bool Map::isPositionOccupied(const glm::vec3& position) const
@@ -45,7 +45,7 @@ bool Map::isPositionOccupied(const glm::ivec2& position) const
 	return true;
 }
 
-void Map::addEntityToMap(const GameEvents::MapModification<eGameMessageType::AddEntityToMap>& gameEvent)
+void Map::addEntityToMap(const GameMessages::MapModification<eGameMessageType::AddEntityToMap>& gameEvent)
 {
 	for (int x = gameEvent.entityAABB.m_left; x < gameEvent.entityAABB.m_right; ++x)
 	{
@@ -58,7 +58,7 @@ void Map::addEntityToMap(const GameEvents::MapModification<eGameMessageType::Add
 	}
 }
 
-void Map::removeEntityFromMap(const GameEvents::MapModification<eGameMessageType::RemoveEntityFromMap>& gameEvent)
+void Map::removeEntityFromMap(const GameMessages::MapModification<eGameMessageType::RemoveEntityFromMap>& gameEvent)
 {
 	for (int x = gameEvent.entityAABB.m_left; x < gameEvent.entityAABB.m_right; ++x)
 	{

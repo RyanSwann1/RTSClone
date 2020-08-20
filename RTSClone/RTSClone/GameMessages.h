@@ -3,17 +3,17 @@
 #include "GameMessageType.h"
 #include "AABB.h"
 
-namespace GameEvents
+namespace GameMessages
 {
 	//CRTP - C++
 	template <eGameMessageType T>
-	struct BaseEvent
+	struct BaseMessage
 	{
 		static eGameMessageType getType() { return T; };
 	};
 
 	template <eGameMessageType eventType>
-	struct MapModification : public BaseEvent<eventType>
+	struct MapModification : public BaseMessage<eventType>
 	{
 		MapModification(const AABB& entityAABB)
 			: entityAABB(entityAABB)

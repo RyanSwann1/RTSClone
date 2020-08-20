@@ -6,7 +6,7 @@
 #include "GameMessageType.h"
 #include <array>
 
-namespace GameEvents
+namespace GameMessages
 {
 	template <eGameMessageType type>
 	struct MapModification;
@@ -24,6 +24,6 @@ public:
 private:
 	std::array<bool, static_cast<size_t>(Globals::MAP_SIZE * Globals::MAP_SIZE)> m_map;
 	
-	void addEntityToMap(const GameEvents::MapModification<eGameMessageType::AddEntityToMap>& gameEvent);
-	void removeEntityFromMap(const GameEvents::MapModification<eGameMessageType::RemoveEntityFromMap>& gameEvent);
+	void addEntityToMap(const GameMessages::MapModification<eGameMessageType::AddEntityToMap>& gameEvent);
+	void removeEntityFromMap(const GameMessages::MapModification<eGameMessageType::RemoveEntityFromMap>& gameEvent);
 };
