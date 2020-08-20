@@ -26,7 +26,7 @@ Listener& Listener::operator=(Listener&& orig) noexcept
 	return *this;
 }
 
-bool GameMessenger::isOwnerAlreadyRegistered(const std::vector<Listener>& listeners, eGameEventType gameEventType, const void* ownerAddress) const
+bool GameMessenger::isOwnerAlreadyRegistered(const std::vector<Listener>& listeners, eGameMessageType gameEventType, const void* ownerAddress) const
 {
 	assert(ownerAddress != nullptr);
 

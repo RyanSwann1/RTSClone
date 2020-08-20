@@ -1,6 +1,6 @@
 #pragma once
 
-enum class eGameEventType
+enum class eGameMessageType
 {
 	AddEntityToMap = 0,
 	RemoveEntityFromMap,

@@ -1,18 +1,18 @@
 #pragma once
 
-#include "GameEventType.h"
+#include "GameMessageType.h"
 #include "AABB.h"
 
 namespace GameEvents
 {
 	//CRTP - C++
-	template <eGameEventType T>
+	template <eGameMessageType T>
 	struct BaseEvent
 	{
-		static eGameEventType getType() { return T; };
+		static eGameMessageType getType() { return T; };
 	};
 
-	template <eGameEventType eventType>
+	template <eGameMessageType eventType>
 	struct MapModification : public BaseEvent<eventType>
 	{
 		MapModification(const AABB& entityAABB)

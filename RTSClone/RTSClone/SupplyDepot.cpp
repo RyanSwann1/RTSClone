@@ -6,7 +6,7 @@
 SupplyDepot::SupplyDepot(int ID, const glm::vec3& startingPosition)
 	: Entity(ID, startingPosition, eModelName::SupplyDepot, eEntityType::SupplyDepot)
 {
-	GameMessenger::getInstance().broadcast<GameEvents::MapModification<eGameEventType::AddEntityToMap>>({ m_AABB });
+	GameMessenger::getInstance().broadcast<GameEvents::MapModification<eGameMessageType::AddEntityToMap>>({ m_AABB });
 }
 
 SupplyDepot::SupplyDepot(SupplyDepot&& orig) noexcept
@@ -23,6 +23,6 @@ SupplyDepot::~SupplyDepot()
 {
 	if (m_ID != Globals::INVALID_ENTITY_ID)
 	{
-		GameMessenger::getInstance().broadcast<GameEvents::MapModification<eGameEventType::RemoveEntityFromMap>>({ m_AABB });
+		GameMessenger::getInstance().broadcast<GameEvents::MapModification<eGameMessageType::RemoveEntityFromMap>>({ m_AABB });
 	}
 }

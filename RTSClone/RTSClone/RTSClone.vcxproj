@@ -229,7 +229,7 @@
     <ClInclude Include="FactionPlayer.h" />
     <ClInclude Include="GameMessenger.h" />
     <ClInclude Include="GameEvents.h" />
-    <ClInclude Include="GameEventType.h" />
+    <ClInclude Include="GameMessageType.h" />
     <ClInclude Include="Graph.h" />
     <ClInclude Include="UniqueEntityIDDistributer.h" />
     <ClInclude Include="Worker.h" />

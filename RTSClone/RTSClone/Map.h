@@ -3,12 +3,12 @@
 #include "NonCopyable.h"
 #include "NonMovable.h"
 #include "Globals.h"
-#include "GameEventType.h"
+#include "GameMessageType.h"
 #include <array>
 
 namespace GameEvents
 {
-	template <eGameEventType type>
+	template <eGameMessageType type>
 	struct MapModification;
 }
 struct AABB;
@@ -24,6 +24,6 @@ public:
 private:
 	std::array<bool, static_cast<size_t>(Globals::MAP_SIZE * Globals::MAP_SIZE)> m_map;
 	
-	void addEntityToMap(const GameEvents::MapModification<eGameEventType::AddEntityToMap>& gameEvent);
-	void removeEntityFromMap(const GameEvents::MapModification<eGameEventType::RemoveEntityFromMap>& gameEvent);
+	void addEntityToMap(const GameEvents::MapModification<eGameMessageType::AddEntityToMap>& gameEvent);
+	void removeEntityFromMap(const GameEvents::MapModification<eGameMessageType::RemoveEntityFromMap>& gameEvent);
 };

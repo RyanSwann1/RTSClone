@@ -2,7 +2,7 @@
 
 #include "NonCopyable.h"
 #include "NonMovable.h"
-#include "GameEventType.h"
+#include "GameMessageType.h"
 #include <functional>
 #include <vector>
 #include <assert.h>
@@ -63,7 +63,7 @@ public:
 
 private:
 	GameMessenger() {}
-	std::array<std::vector<Listener>, static_cast<size_t>(eGameEventType::Max) + 1> m_listeners;
+	std::array<std::vector<Listener>, static_cast<size_t>(eGameMessageType::Max) + 1> m_listeners;
 
-	bool isOwnerAlreadyRegistered(const std::vector<Listener>& listeners, eGameEventType gameEventType, const void* ownerAddress) const;
+	bool isOwnerAlreadyRegistered(const std::vector<Listener>& listeners, eGameMessageType gameEventType, const void* ownerAddress) const;
 };

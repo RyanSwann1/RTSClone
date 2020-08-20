@@ -356,9 +356,6 @@
     <ClInclude Include="GameEvents.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="GameEventType.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="UniqueEntityIDDistributer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -369,6 +366,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="GameMessenger.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GameMessageType.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
