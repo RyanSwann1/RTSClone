@@ -10,8 +10,7 @@ Faction::Faction(const glm::vec3& hqStartingPosition, const glm::vec3& mineralsS
     m_workers(),
     m_supplyDepots(),
     m_barracks(),
-    m_HQ(UniqueEntityIDDistributer::getInstance().getUniqueEntityID(),
-        Globals::convertToNodePosition(hqStartingPosition), eModelName::HQ, eEntityType::HQ)
+    m_HQ(Globals::convertToNodePosition(hqStartingPosition), eModelName::HQ, eEntityType::HQ)
 {
     m_allEntities.push_back(&m_HQ);
 
@@ -21,7 +20,7 @@ Faction::Faction(const glm::vec3& hqStartingPosition, const glm::vec3& mineralsS
     {
         glm::vec3 position = mineralsStartingPosition;
         position.z += Globals::NODE_SIZE * i;
-        m_minerals.emplace_back(UniqueEntityIDDistributer::getInstance().getUniqueEntityID(), Globals::convertToNodePosition(position));
+        m_minerals.emplace_back(Globals::convertToNodePosition(position));
     }
 }
 
@@ -184,13 +183,12 @@ const Entity* Faction::addBuilding(Worker& worker, Map& map, glm::vec3 spawnPosi
         switch (entityType)
         {
         case eEntityType::SupplyDepot:
-            m_supplyDepots.emplace_back(UniqueEntityIDDistributer::getInstance().getUniqueEntityID(), spawnPosition);
+            m_supplyDepots.emplace_back(spawnPosition);
             addedBuilding = &m_supplyDepots.back();
             increasePopulationLimit();
             break;
         case eEntityType::Barracks:
-            m_barracks.emplace_back(UniqueEntityIDDistributer::getInstance().getUniqueEntityID(),
-                spawnPosition, eModelName::Barracks, eEntityType::Barracks);
+            m_barracks.emplace_back(spawnPosition, eModelName::Barracks, eEntityType::Barracks);
             addedBuilding = &m_barracks.back();
             break;
         default:

@@ -5,6 +5,7 @@
 #include "ModelManager.h"
 #include "GameMessenger.h"
 #include "GameMessages.h"
+#include "UniqueEntityIDDistributer.h"
 
 namespace
 {
@@ -22,8 +23,8 @@ namespace
 	}
 }
 
-UnitSpawnerBuilding::UnitSpawnerBuilding(int ID, const glm::vec3& startingPosition, eModelName modelName, eEntityType entityType)
-	: Entity(ID, startingPosition, modelName, entityType),
+UnitSpawnerBuilding::UnitSpawnerBuilding(const glm::vec3& startingPosition, eModelName modelName, eEntityType entityType)
+	: Entity(UniqueEntityIDDistributer::getInstance().getUniqueEntityID(), startingPosition, modelName, entityType),
 	m_waypointPosition(m_position)
 {
 	GameMessenger::getInstance().broadcast<GameMessages::MapModification<eGameMessageType::AddEntityToMap>>({ m_AABB });	

@@ -25,8 +25,8 @@ class ShaderHandler;
 class Unit : public Entity, protected NonMovable
 {
 public:
-	Unit(int ID, const glm::vec3& startingPosition, eModelName modelName = eModelName::Unit, eEntityType entityType = eEntityType::Unit);
-	Unit(int ID, const glm::vec3& startingPosition, const glm::vec3& destinationPosition, const Map& map, eModelName modelName = eModelName::Unit, 
+	Unit(const glm::vec3& startingPosition, eModelName modelName = eModelName::Unit, eEntityType entityType = eEntityType::Unit);
+	Unit(const glm::vec3& startingPosition, const glm::vec3& destinationPosition, const Map& map, eModelName modelName = eModelName::Unit, 
 		eEntityType entityType = eEntityType::Unit);
 
 	bool isPathEmpty() const;

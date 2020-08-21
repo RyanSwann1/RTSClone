@@ -71,14 +71,12 @@ protected:
 			{
 				if (building.isWaypointActive())
 				{
-					units.emplace_back(UniqueEntityIDDistributer::getInstance().getUniqueEntityID(),
-						Globals::convertToNodePosition(building.getUnitSpawnPosition()), PathFinding::getInstance().getClosestAvailablePosition(
+					units.emplace_back(Globals::convertToNodePosition(building.getUnitSpawnPosition()), PathFinding::getInstance().getClosestAvailablePosition(
 							building.getWaypointPosition(), m_units, m_workers, map), map);
 				}
 				else
 				{
-					units.emplace_back(UniqueEntityIDDistributer::getInstance().getUniqueEntityID(),
-						Globals::convertToNodePosition(PathFinding::getInstance().getClosestAvailablePosition(building.getUnitSpawnPosition(),
+					units.emplace_back(Globals::convertToNodePosition(PathFinding::getInstance().getClosestAvailablePosition(building.getUnitSpawnPosition(),
 							m_units, m_workers, map)));
 				}
 			}
@@ -86,14 +84,12 @@ protected:
 			case eEntityType::Worker:
 				if (building.isWaypointActive())
 				{
-					units.emplace_back(UniqueEntityIDDistributer::getInstance().getUniqueEntityID(),
-						building.getUnitSpawnPosition(), PathFinding::getInstance().getClosestAvailablePosition(
+					units.emplace_back(building.getUnitSpawnPosition(), PathFinding::getInstance().getClosestAvailablePosition(
 						building.getWaypointPosition(), m_units, m_workers, map), map);
 				}
 				else
 				{
-					units.emplace_back(UniqueEntityIDDistributer::getInstance().getUniqueEntityID(),
-						PathFinding::getInstance().getClosestAvailablePosition(
+					units.emplace_back(PathFinding::getInstance().getClosestAvailablePosition(
 						building.getUnitSpawnPosition(), m_units, m_workers, map));
 				}
 				break;

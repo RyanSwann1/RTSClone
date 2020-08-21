@@ -2,9 +2,10 @@
 #include "GameMessenger.h"
 #include "GameMessages.h"
 #include "Globals.h"
+#include "UniqueEntityIDDistributer.h"
 
-Mineral::Mineral(int ID, const glm::vec3& startingPosition)
-	: Entity(ID, startingPosition, eModelName::Mineral, eEntityType::Mineral)
+Mineral::Mineral(const glm::vec3& startingPosition)
+	: Entity(UniqueEntityIDDistributer::getInstance().getUniqueEntityID(), startingPosition, eModelName::Mineral, eEntityType::Mineral)
 {
 	GameMessenger::getInstance().broadcast<GameMessages::MapModification<eGameMessageType::AddEntityToMap>>({ m_AABB });
 }
