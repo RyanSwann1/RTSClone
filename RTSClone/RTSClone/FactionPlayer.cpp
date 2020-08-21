@@ -329,7 +329,7 @@ void FactionPlayer::moveMultipleSelectedUnits(const glm::vec3& mouseToGroundPosi
             {
                 for(auto& selectedUnit : selectedUnits)
                 {
-                    if (selectedUnit->getType() == eEntityType::Worker)
+                    if (selectedUnit->getEntityType() == eEntityType::Worker)
                     {
                         static_cast<Worker*>(selectedUnit)->moveTo(mouseToGroundPosition, map, m_minerals);
                     }
@@ -352,7 +352,7 @@ void FactionPlayer::moveMultipleSelectedUnits(const glm::vec3& mouseToGroundPosi
 
                 for (auto& selectedUnit : selectedUnits)
                 {
-                    switch (selectedUnit->getType())
+                    switch (selectedUnit->getEntityType())
                     {
                     case eEntityType::Unit:
                         selectedUnit->moveTo(Globals::convertToNodePosition(mouseToGroundPosition - (averagePosition - selectedUnit->getPosition())), map, m_units,

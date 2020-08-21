@@ -60,7 +60,7 @@ int Entity::getID() const
 	return m_ID;
 }
 
-eEntityType Entity::getType() const
+eEntityType Entity::getEntityType() const
 {
 	return m_type;
 }

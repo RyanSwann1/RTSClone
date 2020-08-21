@@ -15,7 +15,7 @@ public:
 	Entity& operator=(Entity&&) noexcept;
 
 	int getID() const;
-	eEntityType getType() const;
+	eEntityType getEntityType() const;
 	eModelName getModelName() const;
 	const glm::vec3& getPosition() const;
 	const AABB& getAABB() const;
