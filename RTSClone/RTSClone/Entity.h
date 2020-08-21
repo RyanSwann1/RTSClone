@@ -30,11 +30,12 @@ public:
 
 protected:	
 	Entity(int ID, const glm::vec3& startingPosition, eModelName modelName, eEntityType entityType);
-
-	int m_ID;
-	eModelName m_modelName;
 	glm::vec3 m_position;
 	AABB m_AABB;
+	
+private:
+	int m_ID;
+	eModelName m_modelName;
 	eEntityType m_type;
 	bool m_selected;
 };

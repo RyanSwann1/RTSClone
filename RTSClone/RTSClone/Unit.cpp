@@ -178,7 +178,7 @@ void Unit::renderPathMesh(ShaderHandler& shaderHandler)
 		shaderHandler.setUniformVec3(eShaderType::Debug, "uColor", PATH_COLOUR);
 		shaderHandler.setUniform1f(eShaderType::Debug, "uOpacity", PATH_OPACITY);
 		generateRenderPath(m_pathToPosition, m_renderPathMesh);
-		m_renderPathMesh.render(shaderHandler, m_selected);
+		m_renderPathMesh.render(shaderHandler, isSelected());
 	}
 }
 #endif // RENDER_PATHING

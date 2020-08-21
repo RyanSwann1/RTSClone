@@ -22,7 +22,7 @@ Mineral& Mineral::operator=(Mineral&& orig) noexcept
 
 Mineral::~Mineral()
 {
-	if (m_ID != Globals::INVALID_ENTITY_ID)
+	if (getID() != Globals::INVALID_ENTITY_ID)
 	{
 		GameMessenger::getInstance().broadcast<GameMessages::MapModification<eGameMessageType::RemoveEntityFromMap>>({ m_AABB });
 	}

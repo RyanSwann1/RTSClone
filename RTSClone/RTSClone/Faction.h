@@ -100,6 +100,7 @@ protected:
 			reduceResources(entityType);
 			increaseCurrentPopulationAmount(entityType);
 			m_allEntities.push_back(&units.back());
+
 			return &units.back();
 		}
 

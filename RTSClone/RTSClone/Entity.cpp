@@ -5,10 +5,10 @@
 #include "ModelManager.h"
 
 Entity::Entity(int ID, const glm::vec3& startingPosition, eModelName modelName, eEntityType entityType)
-	: m_ID(ID),
-	m_modelName(modelName),
-	m_position(0.0f, 0.0f, 0.0f),
+	: m_position(0.0f, 0.0f, 0.0f),
 	m_AABB(),
+	m_ID(ID),
+	m_modelName(modelName),
 	m_type(entityType),
 	m_selected(false)
 {
@@ -32,10 +32,10 @@ Entity::Entity(int ID, const glm::vec3& startingPosition, eModelName modelName, 
 }
 
 Entity::Entity(Entity&& orig) noexcept
-	: m_ID(orig.m_ID),
-	m_modelName(orig.m_modelName),
-	m_position(orig.m_position),
+	: m_position(orig.m_position),
 	m_AABB(std::move(orig.m_AABB)),
+	m_ID(orig.m_ID),
+	m_modelName(orig.m_modelName),
 	m_type(orig.m_type),
 	m_selected(orig.m_selected)
 {
@@ -44,10 +44,10 @@ Entity::Entity(Entity&& orig) noexcept
 
 Entity& Entity::operator=(Entity&& orig) noexcept
 {
-	m_ID = orig.m_ID;
-	m_modelName = orig.m_modelName;
 	m_position = orig.m_position;
 	m_AABB = std::move(orig.m_AABB);
+	m_ID = orig.m_ID;
+	m_modelName = orig.m_modelName;
 	m_type = orig.m_type;
 	m_selected = orig.m_selected;
 
