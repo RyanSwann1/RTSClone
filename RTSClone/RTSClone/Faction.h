@@ -26,8 +26,9 @@ class Map;
 class Faction : private NonMovable, private NonCopyable
 {
 public:
-	void addResources(Worker& worker);
-	
+	int getEntityIDAtPosition(const glm::vec3& position) const;
+
+	void addResources(Worker& worker);	
 	void update(float deltaTime, const Map& map);
 	void render(ShaderHandler& shaderHandler) const;
 

@@ -25,6 +25,23 @@ Faction::Faction(const glm::vec3& hqStartingPosition, const glm::vec3& mineralsS
     }
 }
 
+int Faction::getEntityIDAtPosition(const glm::vec3& position) const
+{
+    auto cIter = std::find_if(m_allEntities.cbegin(), m_allEntities.cend(), [&position](const auto& entity)
+    {
+        return entity->getAABB().contains(position);
+    });
+
+    if (cIter != m_allEntities.cend())
+    {
+        return (*cIter)->getID();
+    }
+    else
+    {
+        return Globals::INVALID_ENTITY_ID;
+    }
+}
+
 void Faction::addResources(Worker& worker)
 {
     m_currentResourceAmount += worker.extractResources();

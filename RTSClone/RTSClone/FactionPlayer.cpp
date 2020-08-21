@@ -94,7 +94,8 @@ FactionPlayer::FactionPlayer(const glm::vec3& hqStartingPosition, const glm::vec
     m_previousMouseToGroundPosition()
 {}
 
-void FactionPlayer::handleInput(const sf::Event& currentSFMLEvent, const sf::Window& window, const Camera& camera, Map& map, float deltaTime)
+void FactionPlayer::handleInput(const sf::Event& currentSFMLEvent, const sf::Window& window, const Camera& camera, Map& map, 
+    float deltaTime, const Faction& opposingFaction)
 {
     switch (currentSFMLEvent.type)
     {
@@ -127,7 +128,12 @@ void FactionPlayer::handleInput(const sf::Event& currentSFMLEvent, const sf::Win
         else if (currentSFMLEvent.mouseButton.button == sf::Mouse::Right)
         {
             glm::vec3 mouseToGroundPosition = camera.getMouseToGroundPosition(window);
-            if (m_HQ.isSelected())
+            int opposingEntityID = opposingFaction.getEntityIDAtPosition(mouseToGroundPosition);
+            if (opposingEntityID != Globals::INVALID_ENTITY_ID)
+            {
+                std::cout << "Clicked on enemy Entity " << opposingEntityID << "\n";
+            }
+            else if (m_HQ.isSelected())
             {
                 m_HQ.setWaypointPosition(mouseToGroundPosition);
             }

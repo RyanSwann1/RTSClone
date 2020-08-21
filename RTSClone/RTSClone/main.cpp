@@ -110,7 +110,7 @@ int main()
 				}
 			}
 
-			player.handleInput(currentSFMLEvent, window, camera, *map, deltaTime);
+			player.handleInput(currentSFMLEvent, window, camera, *map, deltaTime, playerAI);
 		}
 
 		ImGui_SFML_OpenGL3::startFrame();

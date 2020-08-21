@@ -55,6 +55,11 @@ Entity& Entity::operator=(Entity&& orig) noexcept
 	return *this;
 }
 
+int Entity::getID() const
+{
+	return m_ID;
+}
+
 eEntityType Entity::getType() const
 {
 	return m_type;
