@@ -42,6 +42,38 @@ namespace
 			assert(pathToPosition.size() <= Globals::MAP_SIZE * Globals::MAP_SIZE);
 		}
 	}
+
+	void getPathFromClosedQueue(std::vector<glm::vec3>& pathToPosition, const glm::ivec2& startingPositionOnGrid,
+		const PriorityQueueNode& initialNode, const PriorityQueue& closedQueue)
+	{
+		pathToPosition.push_back(Globals::convertToWorldPosition(initialNode.position));
+		glm::ivec2 parentPosition = initialNode.parentPosition;
+
+		while (parentPosition != startingPositionOnGrid)
+		{
+			const PriorityQueueNode& parentNode = closedQueue.getNode(parentPosition);
+			parentPosition = parentNode.parentPosition;
+
+			pathToPosition.push_back(Globals::convertToWorldPosition(parentNode.position));
+			assert(pathToPosition.size() <= Globals::MAP_SIZE * Globals::MAP_SIZE);
+		}
+	}
+
+	void getPathFromClosedQueue(std::vector<glm::vec3>& pathToPosition, const glm::ivec2& startingPositionOnGrid,
+		const glm::ivec2& initialPathPosition, const PriorityQueue& closedQueue)
+	{
+		pathToPosition.push_back(Globals::convertToWorldPosition(initialPathPosition));
+		glm::ivec2 parentPosition = closedQueue.getNode(initialPathPosition).parentPosition;
+
+		while (parentPosition != startingPositionOnGrid)
+		{
+			const PriorityQueueNode& parentNode = closedQueue.getNode(parentPosition);
+			parentPosition = parentNode.parentPosition;
+
+			pathToPosition.push_back(Globals::convertToWorldPosition(parentNode.position));
+			assert(pathToPosition.size() <= Globals::MAP_SIZE * Globals::MAP_SIZE);
+		}
+	}
 }
 
 PathFinding::PathFinding()
@@ -268,20 +300,8 @@ void PathFinding::getPathToPosition(const Unit& unit, const glm::vec3& destinati
 				assert(!Globals::isEntityIDValid(unit.getTargetID()));
 				pathToPosition.push_back(destination);
 			}
-			
-			glm::vec3 position = Globals::convertToWorldPosition(currentNode.position);
-			pathToPosition.push_back(position);
-			glm::ivec2 parentPosition = currentNode.parentPosition;
 
-			while (parentPosition != startingPositionOnGrid)
-			{
-				const PriorityQueueNode& parentNode = m_closedQueue.getNode(parentPosition);
-				parentPosition = parentNode.parentPosition;
-
-				pathToPosition.push_back(Globals::convertToWorldPosition(parentNode.position));
-				assert(pathToPosition.size() <= Globals::MAP_SIZE * Globals::MAP_SIZE);
-			}
-
+			getPathFromClosedQueue(pathToPosition, startingPositionOnGrid, currentNode, m_closedQueue);
 			destinationReached = true;
 		}
 		else
@@ -325,17 +345,7 @@ void PathFinding::getPathToPosition(const Unit& unit, const glm::vec3& destinati
 
 	if (pathToPosition.empty())
 	{	
-		pathToPosition.push_back(Globals::convertToWorldPosition(closestAvailablePosition));
-		glm::ivec2 parentPosition = m_closedQueue.getNode(closestAvailablePosition).parentPosition;
-
-		while (parentPosition != startingPositionOnGrid)
-		{
-			const PriorityQueueNode& parentNode = m_closedQueue.getNode(parentPosition);
-			parentPosition = parentNode.parentPosition;
-
-			pathToPosition.push_back(Globals::convertToWorldPosition(parentNode.position));
-			assert(pathToPosition.size() <= Globals::MAP_SIZE * Globals::MAP_SIZE);
-		}
+		getPathFromClosedQueue(pathToPosition, startingPositionOnGrid, closestAvailablePosition, m_closedQueue);
 	}
 }
 
