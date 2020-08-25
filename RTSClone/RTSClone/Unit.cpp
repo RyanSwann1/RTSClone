@@ -96,10 +96,10 @@ void Unit::setTargetID(int entityTargetID, const glm::vec3& targetPosition)
 	assert(entityTargetID != Globals::INVALID_ENTITY_ID);
 	m_targetEntityID = entityTargetID;
 
-	if (glm::distance(targetPosition, m_position) <= UNIT_ATTACK_RANGE)
-	{
-		m_currentState = eUnitState::Attacking;
-	}
+	//if (glm::distance(targetPosition, m_position) <= UNIT_ATTACK_RANGE)
+	//{
+	//	m_currentState = eUnitState::Attacking;
+	//}
 }
 
 void Unit::moveTo(const glm::vec3& destinationPosition, const Map& map, const std::list<Unit>& units,
@@ -162,51 +162,43 @@ void Unit::moveTo(const glm::vec3& destinationPosition, const Map& map)
 
 void Unit::update(float deltaTime, const Faction& opposingFaction, const Map& map, const std::list<Unit>& units)
 {
+	if (!m_pathToPosition.empty())
+	{
+		glm::vec3 newPosition = Globals::moveTowards(m_position, m_pathToPosition.back(), MOVEMENT_SPEED * deltaTime);
+		m_front = glm::normalize(glm::vec3(newPosition - m_position));
+		m_position = newPosition;
+		m_AABB.update(m_position);
+
+		if (m_position == m_pathToPosition.back())
+		{
+			m_pathToPosition.pop_back();
+		}
+	}
+
 	switch (m_currentState)
 	{
 	case eUnitState::Moving:
-		if (!m_pathToPosition.empty())
+		if (Globals::isEntityIDValid(m_targetEntityID))
 		{
-			glm::vec3 newPosition = Globals::moveTowards(m_position, m_pathToPosition.back(), MOVEMENT_SPEED * deltaTime);
-			m_front = glm::normalize(glm::vec3(newPosition - m_position));
-			m_position = newPosition;
-			m_AABB.update(m_position);
-			if (m_position == m_pathToPosition.back())
+			const Entity* targetEntity = opposingFaction.getEntity(m_targetEntityID);
+			if (targetEntity)
 			{
-				m_pathToPosition.pop_back();
-				
-				if (Globals::isEntityIDValid(m_targetEntityID))
+				if (glm::distance(targetEntity->getPosition(), m_position) <= UNIT_ATTACK_RANGE)
 				{
-					const Entity* targetEntity = opposingFaction.getEntity(m_targetEntityID);
-					if (targetEntity)
-					{
-						if (glm::distance(targetEntity->getPosition(), m_position) <= UNIT_ATTACK_RANGE)
-						{
-							m_currentState = eUnitState::Attacking;
-						}
-						else
-						{
-							moveTo(targetEntity->getPosition(), map, units,
-								[&](const glm::ivec2& position) {return getAllAdjacentPositions(position, map, units, *this); });
-						}
-					}
-					else
-					{
-						m_targetEntityID = Globals::INVALID_ENTITY_ID;
-					}
-				}
-				else if (m_pathToPosition.empty())
-				{
-					m_currentState = eUnitState::Idle;
-					m_targetEntityID = Globals::INVALID_ENTITY_ID;
+					m_currentState = eUnitState::Attacking;
 				}
 			}
+			else
+			{
+				m_targetEntityID = Globals::INVALID_ENTITY_ID;
+			}
 		}
-		else
+		else if (m_pathToPosition.empty())
 		{
 			m_currentState = eUnitState::Idle;
 			m_targetEntityID = Globals::INVALID_ENTITY_ID;
 		}
+	
 		break;
 	case eUnitState::Attacking:
 	{
@@ -224,11 +216,6 @@ void Unit::update(float deltaTime, const Faction& opposingFaction, const Map& ma
 			if (glm::distance(targetEntity->getPosition(), m_position) <= UNIT_ATTACK_RANGE)
 			{
 				Globals::print("Attack");
-			}
-			else
-			{
-				moveTo(targetEntity->getPosition(), map, units,
-					[&](const glm::ivec2& position) {return getAllAdjacentPositions(position, map, units, *this); });
 			}
 		}
 	}

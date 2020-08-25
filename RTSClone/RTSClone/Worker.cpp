@@ -60,65 +60,32 @@ void Worker::update(float deltaTime, const UnitSpawnerBuilding& HQ, const Map& m
 	switch (m_currentState)
 	{
 	case eUnitState::MovingToMinerals:
-		if (!m_pathToPosition.empty())
+		if (m_pathToPosition.empty())
 		{
-			glm::vec3 newPosition = Globals::moveTowards(m_position, m_pathToPosition.back(), MOVEMENT_SPEED * deltaTime);
-			m_front = glm::normalize(glm::vec3(newPosition - m_position));
-			m_position = newPosition;
-			m_AABB.update(m_position);
-			if (m_position == m_pathToPosition.back())
-			{
-				m_pathToPosition.pop_back();
-
-				if (m_pathToPosition.empty())
-				{
-					m_currentState = eUnitState::Harvesting;
-				}
-			}
-		}
-		else
-		{
-			assert(false);
-			m_currentState = eUnitState::Idle;
+			m_currentState = eUnitState::Harvesting;
 		}
 		break;
 	case eUnitState::ReturningMineralsToHQ:
 		assert(isHoldingResources());
-		if (!m_pathToPosition.empty())
+		if (m_pathToPosition.empty())
 		{
-			glm::vec3 newPosition = Globals::moveTowards(m_position, m_pathToPosition.back(), MOVEMENT_SPEED * deltaTime);
-			m_front = glm::normalize(glm::vec3(newPosition - m_position));
-			m_position = newPosition;
-			m_AABB.update(m_position);
-			if (m_position == m_pathToPosition.back())
+			owningFaction.addResources(*this);
+			if (m_mineralToHarvest)
 			{
-				m_pathToPosition.pop_back();
-				if (m_pathToPosition.empty())
-				{
-					owningFaction.addResources(*this);
-					if (m_mineralToHarvest)
-					{
-						glm::vec3 destination = PathFinding::getInstance().getClosestPositionOutsideAABB(m_position,
-							m_mineralToHarvest->getAABB(), m_mineralToHarvest->getPosition(), map);
-						PathFinding::getInstance().getPathToPosition(*this, destination, m_pathToPosition,
-							[&](const glm::ivec2& position) { return getAllAdjacentPositions(position, map); }, true);
-					}
-
-					if (!m_pathToPosition.empty())
-					{
-						m_currentState = eUnitState::MovingToMinerals;
-					}
-					else
-					{
-						m_currentState = eUnitState::Idle;
-					}
-				}
+				glm::vec3 destination = PathFinding::getInstance().getClosestPositionOutsideAABB(m_position,
+					m_mineralToHarvest->getAABB(), m_mineralToHarvest->getPosition(), map);
+				PathFinding::getInstance().getPathToPosition(*this, destination, m_pathToPosition,
+					[&](const glm::ivec2& position) { return getAllAdjacentPositions(position, map); }, true);
 			}
-		}
-		else
-		{
-			assert(false);
-			m_currentState = eUnitState::Idle;
+
+			if (!m_pathToPosition.empty())
+			{
+				m_currentState = eUnitState::MovingToMinerals;
+			}
+			else
+			{
+				m_currentState = eUnitState::Idle;
+			}
 		}
 		break;
 	case eUnitState::Harvesting:
@@ -154,29 +121,12 @@ void Worker::update(float deltaTime, const UnitSpawnerBuilding& HQ, const Map& m
 				m_currentState = eUnitState::Idle;
 			}
 		}
-		
 		break;
 	case eUnitState::MovingToBuildingPosition:
 		assert(m_buildingCommand);
-		if (!m_pathToPosition.empty())
+		if (m_pathToPosition.empty())
 		{
-			glm::vec3 newPosition = Globals::moveTowards(m_position, m_pathToPosition.back(), MOVEMENT_SPEED * deltaTime);
-			m_front = glm::normalize(glm::vec3(newPosition - m_position));
-			m_position = newPosition;
-			m_AABB.update(m_position);
-			if (m_position == m_pathToPosition.back())
-			{
-				m_pathToPosition.pop_back();
-
-				if (m_pathToPosition.empty())
-				{
-					m_currentState = eUnitState::Building;
-				}
-			}
-		}
-		else
-		{
-			m_currentState = eUnitState::Idle;
+			m_currentState = eUnitState::Building;
 		}
 		break;
 	case eUnitState::Building:
