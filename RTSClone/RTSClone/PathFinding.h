@@ -27,7 +27,7 @@ public:
 	}
 
 	template <class Entity>
-	glm::vec3 getClosestPositionOutsideAABB(const Entity& currentEntity, const std::list<Entity>& entities, const Map& map) const
+	glm::vec3 getClosestAvailablePosition(const Entity& currentEntity, const std::list<Entity>& entities, const Map& map) const
 	{
 		assert(currentEntity.getCurrentState() == eUnitState::Idle);
 		constexpr float MAX_RAY_DISTANCE = static_cast<float>(Globals::NODE_SIZE) * 10.0f;

@@ -128,7 +128,7 @@ private:
 						otherEntity.getCurrentState() == eUnitState::Idle &&
 						entity.getAABB().contains(otherEntity.getAABB()))
 					{
-						entity.moveTo(PathFinding::getInstance().getClosestPositionOutsideAABB<Entity>(entity, entities, map), map);
+						entity.moveTo(PathFinding::getInstance().getClosestAvailablePosition<Entity>(entity, entities, map), map);
 						break;
 					}
 				}

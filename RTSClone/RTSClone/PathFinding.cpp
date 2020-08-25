@@ -297,7 +297,6 @@ void PathFinding::getPathToPosition(const Unit& unit, const glm::vec3& destinati
 		{
 			if (includeWorldDestinationPosition)
 			{
-				assert(!Globals::isEntityIDValid(unit.getTargetID()));
 				pathToPosition.push_back(destination);
 			}
 
