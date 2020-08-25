@@ -128,10 +128,16 @@ void FactionPlayer::handleInput(const sf::Event& currentSFMLEvent, const sf::Win
         else if (currentSFMLEvent.mouseButton.button == sf::Mouse::Right)
         {
             glm::vec3 mouseToGroundPosition = camera.getMouseToGroundPosition(window);
-            int opposingEntityID = opposingFaction.getEntityIDAtPosition(mouseToGroundPosition);
-            if (opposingEntityID != Globals::INVALID_ENTITY_ID)
+            int targetEntityID = opposingFaction.getEntityIDAtPosition(mouseToGroundPosition);
+            if (Globals::isEntityIDValid(targetEntityID))
             {
-                std::cout << "Clicked on enemy Entity " << opposingEntityID << "\n";
+                for (auto& unit : m_units)
+                {
+                    if (unit.isSelected())
+                    {
+                        instructUnitToAttack(unit, targetEntityID, opposingFaction, map);
+                    }
+                }
             }
             else if (m_HQ.isSelected())
             {
@@ -383,4 +389,16 @@ void FactionPlayer::instructWorkerReturnMinerals(const Map& map)
             worker.moveTo(destination, map, eUnitState::ReturningMineralsToHQ);
         }
     }
+}
+
+void FactionPlayer::instructUnitToAttack(Unit& unit, int targetEntityID, const Faction& opposingFaction, const Map& map)
+{
+    assert(Globals::isEntityIDValid(targetEntityID));
+
+    unit.setTargetID(targetEntityID);
+    const Entity* targetEntity = opposingFaction.getEntity(targetEntityID);
+    assert(targetEntity);
+
+    unit.moveTo(targetEntity->getPosition(), map, m_units,
+        [&](const glm::ivec2& position) { return getAllAdjacentPositions(position, map, m_units, unit); });
 }
