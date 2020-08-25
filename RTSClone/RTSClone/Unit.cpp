@@ -91,15 +91,27 @@ eUnitState Unit::getCurrentState() const
 	return m_currentState;
 }
 
+void Unit::resetTargetID()
+{
+	m_targetEntityID = Globals::INVALID_ENTITY_ID;
+}
+
 void Unit::setTargetID(int entityTargetID, const glm::vec3& targetPosition)
 {
 	assert(entityTargetID != Globals::INVALID_ENTITY_ID);
 	m_targetEntityID = entityTargetID;
 
-	//if (glm::distance(targetPosition, m_position) <= UNIT_ATTACK_RANGE)
-	//{
-	//	m_currentState = eUnitState::Attacking;
-	//}
+	if (glm::distance(targetPosition, m_position) <= UNIT_ATTACK_RANGE)
+	{
+		if (!m_pathToPosition.empty() && m_position != m_pathToPosition.back())
+		{
+			glm::vec3 closestDestination = m_pathToPosition.back();
+			m_pathToPosition.clear();
+			m_pathToPosition.push_back(closestDestination);
+		}
+
+		m_currentState = eUnitState::Attacking;
+	}
 }
 
 void Unit::moveTo(const glm::vec3& destinationPosition, const Map& map, const std::list<Unit>& units,
@@ -203,7 +215,12 @@ void Unit::update(float deltaTime, const Faction& opposingFaction, const Map& ma
 	case eUnitState::Attacking:
 	{
 		assert(m_targetEntityID != Globals::INVALID_ENTITY_ID);
-		m_pathToPosition.clear();
+		if (!m_pathToPosition.empty() && m_position != m_pathToPosition.back())
+		{
+			glm::vec3 closestDestination = m_pathToPosition.back();
+			m_pathToPosition.clear();
+			m_pathToPosition.push_back(closestDestination);
+		}
 
 		const Entity* targetEntity = opposingFaction.getEntity(m_targetEntityID);
 		if (!targetEntity)
