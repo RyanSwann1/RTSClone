@@ -15,7 +15,7 @@ namespace Globals
 	constexpr int INVALID_ENTITY_ID = -1;
 	constexpr size_t MAX_MINERALS_PER_FACTION = 5;
 
-	constexpr int STARTING_RESOURCES = 50;
+	constexpr int STARTING_RESOURCES = 500;
 	constexpr int WORKER_RESOURCE_COST = 50;
 	constexpr int SUPPLY_DEPOT_RESOURCE_COST = 50;
 	constexpr int BARRACKS_RESOURCE_COST = 50;
@@ -69,6 +69,8 @@ namespace Globals
 			clock.restart();
 		}
 	}
+
+
 
 	inline void printImmediately(const glm::vec3& position)
 	{
@@ -175,6 +177,11 @@ namespace Globals
 		}
 
 		return currentPosition + glm::vec3(targetPosition - currentPosition) / magnitude * maxDistanceDelta;
+	}
+
+	inline bool isEntityIDValid(int entityID)
+	{
+		return entityID != Globals::INVALID_ENTITY_ID;
 	}
 
 	inline int getRandomNumber(int min, int max)

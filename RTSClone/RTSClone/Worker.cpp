@@ -52,9 +52,10 @@ void Worker::build(const std::function<const Entity*(Worker&)>& buildingCommand,
 	moveTo(Globals::convertToMiddleGridPosition(destination), map, eUnitState::MovingToBuildingPosition);
 }
 
-void Worker::update(float deltaTime, const UnitSpawnerBuilding& HQ, const Map& map, Faction& owningFaction)
+void Worker::update(float deltaTime, const UnitSpawnerBuilding& HQ, const Map& map, Faction& owningFaction, const Faction& opposingFaction,
+	const std::list<Unit>& units)
 {
-	Unit::update(deltaTime);
+	Unit::update(deltaTime, opposingFaction, map, units);
 
 	switch (m_currentState)
 	{

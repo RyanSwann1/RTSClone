@@ -24,6 +24,21 @@ Faction::Faction(const glm::vec3& hqStartingPosition, const glm::vec3& mineralsS
     }
 }
 
+const Entity* Faction::getEntity(int entityID) const
+{
+    auto entity = std::find_if(m_allEntities.cbegin(), m_allEntities.cend(), [entityID](const auto& entity)
+    {
+        return entity->getID() == entityID;
+    });
+    
+    if (entity != m_allEntities.cend())
+    {
+        return (*entity);
+    }
+
+    return nullptr;
+}
+
 int Faction::getEntityIDAtPosition(const glm::vec3& position) const
 {
     auto cIter = std::find_if(m_allEntities.cbegin(), m_allEntities.cend(), [&position](const auto& entity)
@@ -47,16 +62,16 @@ void Faction::addResources(Worker& worker)
     std::cout << "Resources: " << m_currentResourceAmount << "\n";
 }
 
-void Faction::update(float deltaTime, const Map& map)
+void Faction::update(float deltaTime, const Map& map, const Faction& opposingFaction)
 {
     for (auto& unit : m_units)
     {
-        unit.update(deltaTime);
+        unit.update(deltaTime, opposingFaction, map, m_units);
     }
 
     for (auto& worker : m_workers)
     {
-        worker.update(deltaTime, m_HQ, map, *this);
+        worker.update(deltaTime, m_HQ, map, *this, opposingFaction, m_units);
     }
 
     handleCollisions<Unit>(m_units, map);
@@ -111,7 +126,6 @@ void Faction::renderPathing(ShaderHandler& shaderHandler)
 #ifdef RENDER_AABB
 void Faction::renderAABB(ShaderHandler& shaderHandler)
 {
-
     for (auto& unit : m_units)
     {
         unit.renderAABB(shaderHandler);

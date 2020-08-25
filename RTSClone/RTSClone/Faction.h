@@ -26,10 +26,11 @@ class Map;
 class Faction : private NonMovable, private NonCopyable
 {
 public:
+	const Entity* getEntity(int entityID) const;
 	int getEntityIDAtPosition(const glm::vec3& position) const;
 
 	void addResources(Worker& worker);	
-	void update(float deltaTime, const Map& map);
+	void update(float deltaTime, const Map& map, const Faction& opposingFaction);
 	void render(ShaderHandler& shaderHandler) const;
 
 #ifdef RENDER_PATHING

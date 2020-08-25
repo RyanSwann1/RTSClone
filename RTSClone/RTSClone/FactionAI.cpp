@@ -19,9 +19,9 @@ FactionAI::FactionAI(const glm::vec3& hqStartingPosition, const glm::vec3& miner
 	}
 }
 
-void FactionAI::update(float deltaTime, const Map & map)
+void FactionAI::update(float deltaTime, const Map & map, const Faction& opposingFaction)
 {
-	Faction::update(deltaTime, map);
+	Faction::update(deltaTime, map, opposingFaction);
 
 	m_delayTimer.update(deltaTime);
 

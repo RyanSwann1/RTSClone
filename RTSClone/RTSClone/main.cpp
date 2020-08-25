@@ -117,8 +117,8 @@ int main()
 
 		ImGui::ShowDemoWindow();
 
-		player.update(deltaTime, *map);
-		playerAI.update(deltaTime, *map);
+		player.update(deltaTime, *map, playerAI);
+		playerAI.update(deltaTime, *map, player);
 		camera.update(window, deltaTime);
 
 		glm::mat4 view = camera.getView(); 
