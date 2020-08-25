@@ -2,6 +2,7 @@
 
 #include "Entity.h"
 #include "AdjacentPositions.h"
+#include "Timer.h"
 #include <functional>
 #include <vector>
 #include <list>
@@ -39,7 +40,7 @@ public:
 	void resetTargetID();
 	void setTargetID(int entityTargetID, const glm::vec3& targetPosition);
 	void moveTo(const glm::vec3& destinationPosition, const Map& map, const std::list<Unit>& units,
-		const GetAllAdjacentPositions& getAdjacentPositions);
+		const GetAllAdjacentPositions& getAdjacentPositions, eUnitState state = eUnitState::Moving);
 	void moveTo(const glm::vec3& destinationPosition, const Map& map);
 
 	void update(float deltaTime, const Faction& opposingFaction, const Map& map, const std::list<Unit>& units);
@@ -54,6 +55,7 @@ protected:
 	std::vector<glm::vec3> m_pathToPosition;
 
 private:
+	Timer m_attackTimer;
 	int m_targetEntityID;
 #ifdef RENDER_PATHING
 	Mesh m_renderPathMesh;

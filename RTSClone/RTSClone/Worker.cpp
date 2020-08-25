@@ -19,7 +19,7 @@ Worker::Worker(const glm::vec3& startingPosition)
 	: Unit(startingPosition, eModelName::Worker, eEntityType::Worker),
 	m_buildingCommand(),
 	m_currentResourceAmount(0),
-	m_harvestTimer(HARVEST_TIME),
+	m_harvestTimer(HARVEST_TIME, false),
 	m_mineralToHarvest(nullptr)
 {}
 
@@ -27,7 +27,7 @@ Worker::Worker(const glm::vec3 & startingPosition, const glm::vec3 & destination
 	: Unit(startingPosition, eModelName::Worker, eEntityType::Worker),
 	m_buildingCommand(),
 	m_currentResourceAmount(0),
-	m_harvestTimer(HARVEST_TIME),
+	m_harvestTimer(HARVEST_TIME, false),
 	m_mineralToHarvest(nullptr)
 {
 	moveTo(destinationPosition, map);

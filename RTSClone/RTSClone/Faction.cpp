@@ -59,7 +59,6 @@ int Faction::getEntityIDAtPosition(const glm::vec3& position) const
 void Faction::addResources(Worker& worker)
 {
     m_currentResourceAmount += worker.extractResources();
-    std::cout << "Resources: " << m_currentResourceAmount << "\n";
 }
 
 void Faction::update(float deltaTime, const Map& map, const Faction& opposingFaction)
@@ -239,7 +238,6 @@ void Faction::reduceResources(eEntityType addedEntityType)
         break;
     }
 
-    std::cout << "Resources: " << m_currentResourceAmount << "\n";
 }
 
 void Faction::increaseCurrentPopulationAmount(eEntityType entityType)
@@ -257,7 +255,6 @@ void Faction::increaseCurrentPopulationAmount(eEntityType entityType)
         assert(false);
     }
 
-    std::cout << "Population: " << m_currentPopulationAmount << "\n";
 }
 
 void Faction::increasePopulationLimit()
@@ -265,7 +262,6 @@ void Faction::increasePopulationLimit()
     assert(m_currentPopulationLimit + Globals::POPULATION_INCREMENT <= Globals::MAX_POPULATION);
     m_currentPopulationLimit += Globals::POPULATION_INCREMENT;
 
-    std::cout << "Population Limit: " << m_currentPopulationLimit << "\n";
 }
 
 void Faction::revalidateExistingUnitPaths(const Map& map)

@@ -9,10 +9,8 @@ namespace
 FactionAI::FactionAI(const glm::vec3& hqStartingPosition, const glm::vec3& mineralsStartingPosition)
 	: Faction(hqStartingPosition, mineralsStartingPosition),
 	m_unitSpawnQueue(),
-	m_delayTimer(DELAY_TIME)
+	m_delayTimer(DELAY_TIME, true)
 {
-	m_delayTimer.setActive(true);
-
 	for (int i = 0; i < STARTING_WORKER_COUNT; ++i)
 	{
 		m_unitSpawnQueue.push(eEntityType::Worker);
