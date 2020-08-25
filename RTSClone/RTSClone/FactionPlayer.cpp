@@ -267,6 +267,7 @@ void FactionPlayer::moveSingularSelectedUnit(const glm::vec3& mouseToGroundPosit
     });
     if (selectedUnit != m_units.end())
     {
+        selectedUnit->resetTargetID();
         selectedUnit->moveTo(Globals::convertToNodePosition(mouseToGroundPosition), map, m_units,
             [&](const glm::ivec2& position) { return getAllAdjacentPositions(position, map, m_units, *selectedUnit); });
     }
@@ -276,7 +277,7 @@ void FactionPlayer::moveSingularSelectedUnit(const glm::vec3& mouseToGroundPosit
             return worker.isSelected() == true;
         });
         assert(selectedWorker != m_workers.end());
-
+        selectedWorker->resetTargetID();
         selectedWorker->moveTo(mouseToGroundPosition, map, m_minerals);
     }
 }
@@ -361,11 +362,13 @@ void FactionPlayer::moveMultipleSelectedUnits(const glm::vec3& mouseToGroundPosi
                     switch (selectedUnit->getEntityType())
                     {
                     case eEntityType::Unit:
+                        selectedUnit->resetTargetID();
                         selectedUnit->moveTo(Globals::convertToNodePosition(mouseToGroundPosition - (averagePosition - selectedUnit->getPosition())), map, m_units,
                             [&](const glm::ivec2& position)
                         { return getAllAdjacentPositions(position, map, m_units, *selectedUnit, selectedUnits); });
                         break;
                     case eEntityType::Worker:
+                        selectedUnit->resetTargetID();
                         static_cast<Worker*>(selectedUnit)->moveTo(mouseToGroundPosition - (averagePosition - selectedUnit->getPosition()), map);
                         break;
                     default:
