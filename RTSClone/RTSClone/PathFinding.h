@@ -27,7 +27,7 @@ public:
 	}
 
 	template <class Entity>
-	glm::vec3 getClosestPositionOutsideAABB(const Entity& currentEntity, const std::list<Entity>& entities, const Map& map)
+	glm::vec3 getClosestPositionOutsideAABB(const Entity& currentEntity, const std::list<Entity>& entities, const Map& map) const
 	{
 		assert(currentEntity.getCurrentState() == eUnitState::Idle);
 		constexpr float MAX_RAY_DISTANCE = static_cast<float>(Globals::NODE_SIZE) * 10.0f;
@@ -77,6 +77,7 @@ public:
 
 	bool isPositionAvailable(const glm::vec3& nodePosition, const Map& map, const std::list<Unit>& units, const std::list<Worker>& workers, 
 		const Worker& workerSender) const;
+
 	bool isPositionAvailable(const glm::vec3& nodePosition, const Map& map, const std::list<Unit>& units, const std::list<Worker>& workers) const;
 
 	std::vector<glm::vec3> getFormationPositions(const glm::vec3& startingPosition, const std::vector<Unit*>& selectedUnits,
@@ -97,7 +98,7 @@ public:
 private:
 	PathFinding();
 
-	//Greedy BFS
+	//BFS
 	Graph m_graph;
 	std::queue<glm::ivec2> m_frontier;
 	//A*
