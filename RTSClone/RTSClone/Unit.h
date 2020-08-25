@@ -25,7 +25,7 @@ enum class eUnitState
 class Faction;
 class Map;
 class ShaderHandler;
-class Unit : public Entity, protected NonMovable
+class Unit : public Entity, private NonMovable
 {
 public:
 	Unit(const glm::vec3& startingPosition, eModelName modelName = eModelName::Unit, eEntityType entityType = eEntityType::Unit);
