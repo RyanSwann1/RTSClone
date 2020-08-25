@@ -4,10 +4,12 @@
 #include "PathFinding.h"
 #include "ModelManager.h"
 #include "UniqueEntityIDDistributer.h"
+#include "Faction.h"
 
 namespace
 {
 	constexpr float MOVEMENT_SPEED = 7.5f;
+	constexpr float UNIT_ATTACK_RANGE = 2.0f * Globals::NODE_SIZE;
 
 #ifdef RENDER_PATHING
 	constexpr glm::vec3 PATH_COLOUR = { 1.0f, 0.27f, 0.0f };
@@ -54,16 +56,30 @@ Unit::Unit(const glm::vec3& startingPosition, eModelName modelName, eEntityType 
 	: Entity(UniqueEntityIDDistributer::getInstance().getUniqueEntityID(), startingPosition, modelName, entityType),
 	m_currentState(eUnitState::Idle),
 	m_front(),
-	m_pathToPosition()
+	m_pathToPosition(),
+	m_attackRange(UNIT_ATTACK_RANGE),
+	m_targetEntityID(Globals::INVALID_ENTITY_ID)
 {}
 
 Unit::Unit(const glm::vec3 & startingPosition, const glm::vec3 & destinationPosition, const Map & map, eModelName modelName, eEntityType entityType)
 	: Entity(UniqueEntityIDDistributer::getInstance().getUniqueEntityID(), startingPosition, modelName, entityType),
 	m_currentState(eUnitState::Idle),
 	m_front(),
-	m_pathToPosition()
+	m_pathToPosition(),
+	m_attackRange(UNIT_ATTACK_RANGE),
+	m_targetEntityID(Globals::INVALID_ENTITY_ID)
 {
 	moveTo(destinationPosition, map);
+}
+
+int Unit::getTargetID() const
+{
+	return m_targetEntityID;
+}
+
+float Unit::getAttackRange() const
+{
+	return m_attackRange;
 }
 
 bool Unit::isPathEmpty() const
@@ -82,6 +98,12 @@ eUnitState Unit::getCurrentState() const
 	return m_currentState;
 }
 
+void Unit::setTargetID(int entityTargetID)
+{
+	assert(entityTargetID != Globals::INVALID_ENTITY_ID);
+	m_targetEntityID = entityTargetID;
+}
+
 void Unit::moveTo(const glm::vec3& destinationPosition, const Map& map, const std::list<Unit>& units,
 	const GetAllAdjacentPositions& getAdjacentPositions)
 {
@@ -93,7 +115,6 @@ void Unit::moveTo(const glm::vec3& destinationPosition, const Map& map, const st
 
 	m_pathToPosition.clear();
 	PathFinding::getInstance().getPathToPosition(*this, destinationPosition, m_pathToPosition, getAdjacentPositions);
-	//PathFinding::getInstance().convertPathToWaypoints(m_pathToPosition, *this, units, map);
 	if (!m_pathToPosition.empty())
 	{
 		m_currentState = eUnitState::Moving;
@@ -141,7 +162,7 @@ void Unit::moveTo(const glm::vec3& destinationPosition, const Map& map)
 	}
 }
 
-void Unit::update(float deltaTime)
+void Unit::update(float deltaTime, const Faction& opposingFaction, const Map& map, const std::list<Unit>& units)
 {
 	switch (m_currentState)
 	{
@@ -155,17 +176,66 @@ void Unit::update(float deltaTime)
 			if (m_position == m_pathToPosition.back())
 			{
 				m_pathToPosition.pop_back();
+				
+				if (Globals::isEntityIDValid(m_targetEntityID))
+				{
+					const Entity* targetEntity = opposingFaction.getEntity(m_targetEntityID);
+					if (targetEntity)
+					{
+						if (glm::distance(targetEntity->getPosition(), m_position) <= UNIT_ATTACK_RANGE)
+						{
+							m_currentState = eUnitState::Attacking;
+							m_pathToPosition.clear();
+						}
+						else
+						{
+		/*					moveTo(targetEntity->getPosition(), map, units,
+								[&](const glm::ivec2& position) {return getAllAdjacentPositions(position, map, units, *this); });*/
+						}
+					}
+					else
+					{
+						m_targetEntityID = Globals::INVALID_ENTITY_ID;
+					}
+				}
 
 				if (m_pathToPosition.empty())
 				{
 					m_currentState = eUnitState::Idle;
+					m_targetEntityID = Globals::INVALID_ENTITY_ID;
 				}
 			}
 		}
 		else
 		{
 			m_currentState = eUnitState::Idle;
+			m_targetEntityID = Globals::INVALID_ENTITY_ID;
 		}
+		break;
+	case eUnitState::Attacking:
+	{
+		assert(m_targetEntityID != Globals::INVALID_ENTITY_ID &&
+			m_pathToPosition.empty());
+		const Entity* targetEntity = opposingFaction.getEntity(m_targetEntityID);
+		if (!targetEntity)
+		{
+			m_targetEntityID = Globals::INVALID_ENTITY_ID;
+			m_currentState = eUnitState::Idle;
+		}
+		else
+		{
+			if (glm::distance(targetEntity->getPosition(), m_position) <= UNIT_ATTACK_RANGE)
+			{
+				//Attack
+				std::cout << "Attacking\n";
+			}
+			else
+			{
+				moveTo(targetEntity->getPosition(), map, units,
+					[&](const glm::ivec2& position) {return getAllAdjacentPositions(position, map, units, *this); });
+			}
+		}
+	}
 		break;
 	}
 }

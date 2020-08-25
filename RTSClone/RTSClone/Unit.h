@@ -17,9 +17,11 @@ enum class eUnitState
 	ReturningMineralsToHQ,
 	Harvesting,
 	MovingToBuildingPosition,
+	Attacking,
 	Building
 };
 
+class Faction;
 class Map;
 class ShaderHandler;
 class Unit : public Entity, protected NonMovable
@@ -28,16 +30,19 @@ public:
 	Unit(const glm::vec3& startingPosition, eModelName modelName = eModelName::Unit, eEntityType entityType = eEntityType::Unit);
 	Unit(const glm::vec3& startingPosition, const glm::vec3& destinationPosition, const Map& map, eModelName modelName = eModelName::Unit, 
 		eEntityType entityType = eEntityType::Unit);
-
+		
+	int getTargetID() const;
+	float getAttackRange() const;
 	bool isPathEmpty() const;
 	const glm::vec3& getDestination() const;
 	eUnitState getCurrentState() const;
-	
+
+	void setTargetID(int entityTargetID);
 	void moveTo(const glm::vec3& destinationPosition, const Map& map, const std::list<Unit>& units,
 		const GetAllAdjacentPositions& getAdjacentPositions);
 	void moveTo(const glm::vec3& destinationPosition, const Map& map);
 
-	void update(float deltaTime);
+	void update(float deltaTime, const Faction& opposingFaction, const Map& map, const std::list<Unit>& units);
 
 #ifdef RENDER_PATHING
 	void renderPathMesh(ShaderHandler& shaderHandler);
@@ -49,6 +54,8 @@ protected:
 	std::vector<glm::vec3> m_pathToPosition;
 
 private:
+	float m_attackRange;
+	int m_targetEntityID;
 #ifdef RENDER_PATHING
 	Mesh m_renderPathMesh;
 #endif // RENDER_PATHING
