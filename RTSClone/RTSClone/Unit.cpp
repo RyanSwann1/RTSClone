@@ -9,7 +9,7 @@
 namespace
 {
 	constexpr float MOVEMENT_SPEED = 7.5f;
-	constexpr float UNIT_ATTACK_RANGE = 2.0f * Globals::NODE_SIZE;
+	constexpr float UNIT_ATTACK_RANGE = 5.0f * Globals::NODE_SIZE;
 
 #ifdef RENDER_PATHING
 	constexpr glm::vec3 PATH_COLOUR = { 1.0f, 0.27f, 0.0f };
@@ -57,7 +57,6 @@ Unit::Unit(const glm::vec3& startingPosition, eModelName modelName, eEntityType 
 	m_currentState(eUnitState::Idle),
 	m_front(),
 	m_pathToPosition(),
-	m_attackRange(UNIT_ATTACK_RANGE),
 	m_targetEntityID(Globals::INVALID_ENTITY_ID)
 {}
 
@@ -66,7 +65,6 @@ Unit::Unit(const glm::vec3 & startingPosition, const glm::vec3 & destinationPosi
 	m_currentState(eUnitState::Idle),
 	m_front(),
 	m_pathToPosition(),
-	m_attackRange(UNIT_ATTACK_RANGE),
 	m_targetEntityID(Globals::INVALID_ENTITY_ID)
 {
 	moveTo(destinationPosition, map);
@@ -75,11 +73,6 @@ Unit::Unit(const glm::vec3 & startingPosition, const glm::vec3 & destinationPosi
 int Unit::getTargetID() const
 {
 	return m_targetEntityID;
-}
-
-float Unit::getAttackRange() const
-{
-	return m_attackRange;
 }
 
 bool Unit::isPathEmpty() const
@@ -185,12 +178,11 @@ void Unit::update(float deltaTime, const Faction& opposingFaction, const Map& ma
 						if (glm::distance(targetEntity->getPosition(), m_position) <= UNIT_ATTACK_RANGE)
 						{
 							m_currentState = eUnitState::Attacking;
-							m_pathToPosition.clear();
 						}
 						else
 						{
-		/*					moveTo(targetEntity->getPosition(), map, units,
-								[&](const glm::ivec2& position) {return getAllAdjacentPositions(position, map, units, *this); });*/
+							moveTo(targetEntity->getPosition(), map, units,
+								[&](const glm::ivec2& position) {return getAllAdjacentPositions(position, map, units, *this); });
 						}
 					}
 					else
@@ -214,8 +206,9 @@ void Unit::update(float deltaTime, const Faction& opposingFaction, const Map& ma
 		break;
 	case eUnitState::Attacking:
 	{
-		assert(m_targetEntityID != Globals::INVALID_ENTITY_ID &&
-			m_pathToPosition.empty());
+		assert(m_targetEntityID != Globals::INVALID_ENTITY_ID);
+		m_pathToPosition.clear();
+
 		const Entity* targetEntity = opposingFaction.getEntity(m_targetEntityID);
 		if (!targetEntity)
 		{
@@ -226,8 +219,7 @@ void Unit::update(float deltaTime, const Faction& opposingFaction, const Map& ma
 		{
 			if (glm::distance(targetEntity->getPosition(), m_position) <= UNIT_ATTACK_RANGE)
 			{
-				//Attack
-				std::cout << "Attacking\n";
+				Globals::print("Attack");
 			}
 			else
 			{

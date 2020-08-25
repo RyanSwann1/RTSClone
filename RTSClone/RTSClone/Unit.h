@@ -32,7 +32,6 @@ public:
 		eEntityType entityType = eEntityType::Unit);
 		
 	int getTargetID() const;
-	float getAttackRange() const;
 	bool isPathEmpty() const;
 	const glm::vec3& getDestination() const;
 	eUnitState getCurrentState() const;
@@ -54,7 +53,6 @@ protected:
 	std::vector<glm::vec3> m_pathToPosition;
 
 private:
-	float m_attackRange;
 	int m_targetEntityID;
 #ifdef RENDER_PATHING
 	Mesh m_renderPathMesh;
