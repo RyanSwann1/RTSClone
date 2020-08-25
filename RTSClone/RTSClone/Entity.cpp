@@ -3,11 +3,12 @@
 #include "ShaderHandler.h"
 #include "Map.h"
 #include "ModelManager.h"
+#include "UniqueEntityIDDistributer.h"
 
-Entity::Entity(int ID, const glm::vec3& startingPosition, eModelName modelName, eEntityType entityType)
+Entity::Entity(const glm::vec3& startingPosition, eModelName modelName, eEntityType entityType)
 	: m_position(0.0f, 0.0f, 0.0f),
 	m_AABB(),
-	m_ID(ID),
+	m_ID(UniqueEntityIDDistributer::getInstance().getUniqueEntityID()),
 	m_modelName(modelName),
 	m_type(entityType),
 	m_selected(false)

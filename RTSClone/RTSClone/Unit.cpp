@@ -54,7 +54,7 @@ namespace
 }
 
 Unit::Unit(const glm::vec3& startingPosition, eModelName modelName, eEntityType entityType)
-	: Entity(UniqueEntityIDDistributer::getInstance().getUniqueEntityID(), startingPosition, modelName, entityType),
+	: Entity(startingPosition, modelName, entityType),
 	m_currentState(eUnitState::Idle),
 	m_front(),
 	m_pathToPosition(),
@@ -63,7 +63,7 @@ Unit::Unit(const glm::vec3& startingPosition, eModelName modelName, eEntityType 
 {}
 
 Unit::Unit(const glm::vec3 & startingPosition, const glm::vec3 & destinationPosition, const Map & map, eModelName modelName, eEntityType entityType)
-	: Entity(UniqueEntityIDDistributer::getInstance().getUniqueEntityID(), startingPosition, modelName, entityType),
+	: Entity(startingPosition, modelName, entityType),
 	m_currentState(eUnitState::Idle),
 	m_front(),
 	m_pathToPosition(),

@@ -29,7 +29,7 @@ public:
 #endif // RENDER_AABB
 
 protected:	
-	Entity(int ID, const glm::vec3& startingPosition, eModelName modelName, eEntityType entityType);
+	Entity(const glm::vec3& startingPosition, eModelName modelName, eEntityType entityType);
 	glm::vec3 m_position;
 	AABB m_AABB;
 	

@@ -24,7 +24,7 @@ namespace
 }
 
 UnitSpawnerBuilding::UnitSpawnerBuilding(const glm::vec3& startingPosition, eModelName modelName, eEntityType entityType)
-	: Entity(UniqueEntityIDDistributer::getInstance().getUniqueEntityID(), startingPosition, modelName, entityType),
+	: Entity(startingPosition, modelName, entityType),
 	m_waypointPosition(m_position)
 {
 	GameMessenger::getInstance().broadcast<GameMessages::MapModification<eGameMessageType::AddEntityToMap>>({ m_AABB });	
