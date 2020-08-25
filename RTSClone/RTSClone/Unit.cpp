@@ -91,10 +91,15 @@ eUnitState Unit::getCurrentState() const
 	return m_currentState;
 }
 
-void Unit::setTargetID(int entityTargetID)
+void Unit::setTargetID(int entityTargetID, const glm::vec3& targetPosition)
 {
 	assert(entityTargetID != Globals::INVALID_ENTITY_ID);
 	m_targetEntityID = entityTargetID;
+
+	if (glm::distance(targetPosition, m_position) <= UNIT_ATTACK_RANGE)
+	{
+		m_currentState = eUnitState::Attacking;
+	}
 }
 
 void Unit::moveTo(const glm::vec3& destinationPosition, const Map& map, const std::list<Unit>& units,
@@ -190,8 +195,7 @@ void Unit::update(float deltaTime, const Faction& opposingFaction, const Map& ma
 						m_targetEntityID = Globals::INVALID_ENTITY_ID;
 					}
 				}
-
-				if (m_pathToPosition.empty())
+				else if (m_pathToPosition.empty())
 				{
 					m_currentState = eUnitState::Idle;
 					m_targetEntityID = Globals::INVALID_ENTITY_ID;

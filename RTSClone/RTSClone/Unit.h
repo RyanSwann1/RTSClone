@@ -36,7 +36,7 @@ public:
 	const glm::vec3& getDestination() const;
 	eUnitState getCurrentState() const;
 
-	void setTargetID(int entityTargetID);
+	void setTargetID(int entityTargetID, const glm::vec3& targetPosition);
 	void moveTo(const glm::vec3& destinationPosition, const Map& map, const std::list<Unit>& units,
 		const GetAllAdjacentPositions& getAdjacentPositions);
 	void moveTo(const glm::vec3& destinationPosition, const Map& map);
