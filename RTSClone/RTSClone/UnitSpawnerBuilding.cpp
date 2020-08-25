@@ -32,10 +32,8 @@ UnitSpawnerBuilding::UnitSpawnerBuilding(const glm::vec3& startingPosition, eMod
 
 UnitSpawnerBuilding::~UnitSpawnerBuilding()
 {
-	if (getID() != Globals::INVALID_ENTITY_ID)
-	{
-		GameMessenger::getInstance().broadcast<GameMessages::MapModification<eGameMessageType::RemoveEntityFromMap>>({ m_AABB });
-	}
+	assert(getID() != Globals::INVALID_ENTITY_ID);
+	GameMessenger::getInstance().broadcast<GameMessages::MapModification<eGameMessageType::RemoveEntityFromMap>>({ m_AABB });
 }
 
 bool UnitSpawnerBuilding::isWaypointActive() const
