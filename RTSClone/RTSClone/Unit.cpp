@@ -104,7 +104,7 @@ void Unit::setTargetID(int entityTargetID, const glm::vec3& targetPosition)
 	assert(entityTargetID != Globals::INVALID_ENTITY_ID);
 	m_targetEntityID = entityTargetID;
 
-	if (glm::distance(targetPosition, m_position) <= UNIT_ATTACK_RANGE)
+	if (Globals::getSqrDistance(targetPosition, m_position) <= UNIT_ATTACK_RANGE * UNIT_ATTACK_RANGE)
 	{
 		if (!m_pathToPosition.empty() && m_position != m_pathToPosition.back())
 		{
@@ -198,7 +198,7 @@ void Unit::update(float deltaTime, const Faction& opposingFaction, const Map& ma
 			const Entity* targetEntity = opposingFaction.getEntity(m_targetEntityID);
 			if (targetEntity)
 			{
-				if (glm::distance(targetEntity->getPosition(), m_position) <= UNIT_ATTACK_RANGE)
+				if (Globals::getSqrDistance(targetEntity->getPosition(), m_position) <= UNIT_ATTACK_RANGE * UNIT_ATTACK_RANGE)
 				{
 					m_currentState = eUnitState::Attacking;
 				}
@@ -231,7 +231,7 @@ void Unit::update(float deltaTime, const Faction& opposingFaction, const Map& ma
 			}
 			else
 			{
-				if (glm::distance(targetEntity->getPosition(), m_position) <= UNIT_ATTACK_RANGE)
+				if (Globals::getSqrDistance(targetEntity->getPosition(), m_position) <= UNIT_ATTACK_RANGE * UNIT_ATTACK_RANGE)
 				{
 					//Attack
 				}

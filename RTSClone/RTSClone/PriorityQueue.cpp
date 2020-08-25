@@ -11,7 +11,7 @@ PriorityQueueNode::PriorityQueueNode(const glm::ivec2& position, const glm::ivec
 
 float PriorityQueueNode::getF() const
 {
-	return h + g;
+	return (h + g) * 2.0f;
 }
 
 //PriorityQueue

@@ -91,38 +91,23 @@ namespace Globals
 			clock.restart();
 		}
 	}
+	
+	inline float getSqrDistance(const glm::vec2& positionB, const glm::vec2& positionA)
+	{
+		float x = glm::pow(positionB.x - positionA.x, 2);
+		float y = glm::pow(positionB.y - positionA.y, 2);
 
-	//inline glm::vec3 convertToNearestNodePosition(const glm::vec3& position) 
-	//{
-	//	glm::vec3 newPosition = { std::floor(position.x), std::floor(position.y), std::floor(position.z) };
-	//	int xDifference = static_cast<int>(position.x) % Globals::NODE_SIZE;
-	//	if (xDifference > 0)
-	//	{
-	//		if (static_cast<float>(xDifference) >= static_cast<float>(NODE_SIZE) / 2.0f)
-	//		{
-	//			newPosition.x += NODE_SIZE - xDifference;
-	//		}
-	//		else
-	//		{
-	//			newPosition.x -= xDifference;
-	//		}
-	//	}
+		return x + y;
+	}
 
-	//	int zDifference = static_cast<int>(position.z) % Globals::NODE_SIZE;
-	//	if (zDifference > 0)
-	//	{
-	//		if (static_cast<float>(zDifference) >= static_cast<float>(NODE_SIZE) / 2.0f)
-	//		{
-	//			newPosition.z += NODE_SIZE - zDifference;
-	//		}
-	//		else
-	//		{
-	//			newPosition.z -= zDifference;
-	//		}
-	//	}
+	inline float getSqrDistance(const glm::vec3& positionB, const glm::vec3& positionA)
+	{
+		float x = glm::pow(positionB.x - positionA.x, 2);
+		float y = glm::pow(positionB.y - positionA.y, 2);
+		float z = glm::pow(positionB.z - positionA.z, 2);
 
-	//	return newPosition;
-	//}
+		return x + y + z;
+	}
 
 	inline glm::vec3 convertToNodePosition(const glm::vec3& position)
 	{

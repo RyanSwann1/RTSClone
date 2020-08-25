@@ -284,9 +284,10 @@ void PathFinding::getPathToPosition(const Unit& unit, const glm::vec3& destinati
 	bool destinationReached = false;
 	glm::ivec2 startingPositionOnGrid = Globals::convertToGridPosition(unit.getPosition());
 	glm::ivec2 destinationOnGrid = Globals::convertToGridPosition(destination);
-	float shortestDistance = glm::distance(destination, unit.getPosition());
+	float shortestDistance = Globals::getSqrDistance(destination, unit.getPosition());
 	glm::ivec2 closestAvailablePosition = { 0, 0 };
-	m_openQueue.add({ startingPositionOnGrid, startingPositionOnGrid, 0.0f, glm::distance(glm::vec2(destinationOnGrid), glm::vec2(startingPositionOnGrid)) });
+	m_openQueue.add({ startingPositionOnGrid, startingPositionOnGrid, 0.0f, 
+		Globals::getSqrDistance(glm::vec2(destinationOnGrid), glm::vec2(startingPositionOnGrid)) });
 
 	while (!m_openQueue.isEmpty() && !destinationReached)
 	{
@@ -314,15 +315,15 @@ void PathFinding::getPathToPosition(const Unit& unit, const glm::vec3& destinati
 				}
 				else
 				{
-					if (glm::distance(glm::vec2(destinationOnGrid), glm::vec2(adjacentPosition.position)) < shortestDistance)
+					if (Globals::getSqrDistance(glm::vec2(destinationOnGrid), glm::vec2(adjacentPosition.position)) < shortestDistance * shortestDistance)
 					{
 						closestAvailablePosition = adjacentPosition.position;
 						shortestDistance = glm::distance(glm::vec2(destinationOnGrid), glm::vec2(adjacentPosition.position));
 					}
 
 					PriorityQueueNode adjacentNode(adjacentPosition.position, currentNode.position,
-						currentNode.g + glm::distance(glm::vec2(adjacentPosition.position), glm::vec2(currentNode.position)),
-						glm::distance(glm::vec2(destinationOnGrid), glm::vec2(adjacentPosition.position)));
+						currentNode.g + Globals::getSqrDistance(glm::vec2(adjacentPosition.position), glm::vec2(currentNode.position)),
+						Globals::getSqrDistance(glm::vec2(destinationOnGrid), glm::vec2(adjacentPosition.position)));
 
 					if (m_openQueue.isSuccessorNodeValid(adjacentNode))
 					{
