@@ -80,7 +80,7 @@ public:
 
 	bool isPositionAvailable(const glm::vec3& nodePosition, const Map& map, const std::list<Unit>& units, const std::list<Worker>& workers) const;
 
-	std::vector<glm::vec3> getFormationPositions(const glm::vec3& startingPosition, const std::vector<Unit*>& selectedUnits,
+	const std::vector<glm::vec3>& getFormationPositions(const glm::vec3& startingPosition, const std::vector<Unit*>& selectedUnits,
 		const Map& map);
 
 	glm::vec3 getClosestAvailablePosition(const glm::vec3& startingPosition, const std::list<Unit>& units, 

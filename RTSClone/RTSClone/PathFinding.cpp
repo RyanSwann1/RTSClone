@@ -153,15 +153,16 @@ bool PathFinding::isPositionAvailable(const glm::vec3& nodePosition, const Map& 
 
 	return false;
 }
-std::vector<glm::vec3> PathFinding::getFormationPositions(const glm::vec3& startingPosition,
+
+const std::vector<glm::vec3>& PathFinding::getFormationPositions(const glm::vec3& startingPosition,
 	const std::vector<Unit*>& selectedUnits, const Map& map)
 {
 	//TODO: Sort by closest
 	assert(!selectedUnits.empty() && std::find(selectedUnits.cbegin(), selectedUnits.cend(), nullptr) == selectedUnits.cend());
 	m_graph.reset(m_frontier);
 
-	std::vector<glm::vec3> unitFormationPositions;
-	unitFormationPositions.reserve(selectedUnits.size());
+	static std::vector<glm::vec3> unitFormationPositions;
+	unitFormationPositions.clear();
 	int selectedUnitIndex = 0;
 	m_frontier.push(Globals::convertToGridPosition(startingPosition));
 
