@@ -1,16 +1,17 @@
 #include "Faction.h"
 
-Faction::Faction(const glm::vec3& hqStartingPosition, const glm::vec3& mineralsStartingPosition)
-    : m_currentResourceAmount(Globals::STARTING_RESOURCES),
-    m_currentPopulationAmount(0),
-    m_currentPopulationLimit(Globals::STARTING_POPULATION),
-    m_minerals(),
+Faction::Faction(eFactionName factionName, const glm::vec3& hqStartingPosition, const glm::vec3& mineralsStartingPosition)
+    : m_minerals(),
     m_allEntities(),
     m_units(),
     m_workers(),
     m_supplyDepots(),
     m_barracks(),
-    m_HQ(Globals::convertToNodePosition(hqStartingPosition), eModelName::HQ, eEntityType::HQ)
+    m_HQ(Globals::convertToNodePosition(hqStartingPosition), eModelName::HQ, eEntityType::HQ),
+    m_factionName(factionName),
+    m_currentResourceAmount(Globals::STARTING_RESOURCES),
+    m_currentPopulationAmount(0),
+    m_currentPopulationLimit(Globals::STARTING_POPULATION)
 {
     m_allEntities.push_back(&m_HQ);
 

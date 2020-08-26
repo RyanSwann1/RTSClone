@@ -6,8 +6,8 @@ namespace
 	constexpr float DELAY_TIME = 3.0f;
 }
 
-FactionAI::FactionAI(const glm::vec3& hqStartingPosition, const glm::vec3& mineralsStartingPosition)
-	: Faction(hqStartingPosition, mineralsStartingPosition),
+FactionAI::FactionAI(eFactionName factionName, const glm::vec3& hqStartingPosition, const glm::vec3& mineralsStartingPosition)
+	: Faction(factionName, hqStartingPosition, mineralsStartingPosition),
 	m_unitSpawnQueue(),
 	m_delayTimer(DELAY_TIME, true)
 {

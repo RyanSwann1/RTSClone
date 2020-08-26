@@ -8,6 +8,13 @@
 #include "Mineral.h"
 #include <list>
 
+enum class eFactionName
+{
+	Player = 0,
+	AI,
+	Max = AI
+};
+
 struct BuildingToSpawn
 {
 	BuildingToSpawn(int workerID, const glm::vec3& spawnPosition, eModelName modelName)
@@ -19,6 +26,12 @@ struct BuildingToSpawn
 	int workerID;
 	glm::vec3 spawnPosition;
 	eModelName modelName;
+};
+
+template <eFactionName T>
+struct FactionName
+{
+	static eFactionName getName() const { return T; }
 };
 
 class ShaderHandler;
@@ -42,7 +55,7 @@ public:
 #endif // RENDER_AABB
 
 protected:
-	Faction(const glm::vec3& hqStartingPosition, const glm::vec3& mineralsStartingPosition);
+	Faction(eFactionName factionName, const glm::vec3& hqStartingPosition, const glm::vec3& mineralsStartingPosition);
 	std::vector<Mineral> m_minerals;
 	std::vector<Entity*> m_allEntities;
 	std::list<Unit> m_units;
@@ -109,6 +122,7 @@ protected:
 	}
 
 private:
+	const eFactionName m_factionName;
 	int m_currentResourceAmount;
 	int m_currentPopulationAmount;
 	int m_currentPopulationLimit;

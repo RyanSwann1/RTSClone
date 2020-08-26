@@ -6,7 +6,7 @@
 class FactionAI : public Faction
 {
 public:
-	FactionAI(const glm::vec3& hqStartingPosition, const glm::vec3& mineralsStartingPosition);
+	FactionAI(eFactionName factionName, const glm::vec3& hqStartingPosition, const glm::vec3& mineralsStartingPosition);
 
 	void update(float deltaTime, const Map& map, const Faction& opposingFaction);
 
