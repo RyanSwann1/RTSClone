@@ -55,7 +55,7 @@ void Worker::build(const std::function<const Entity*(Worker&)>& buildingCommand,
 void Worker::update(float deltaTime, const UnitSpawnerBuilding& HQ, const Map& map, Faction& owningFaction, const Faction& opposingFaction,
 	const std::list<Unit>& units)
 {
-	Unit::update(deltaTime, opposingFaction, map, units);
+	Unit::update(deltaTime, owningFaction, opposingFaction, map, units);
 
 	switch (m_currentState)
 	{

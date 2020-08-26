@@ -6,14 +6,8 @@
 #include "PathFinding.h"
 #include "SupplyDepot.h"
 #include "Mineral.h"
+#include "FactionName.h"
 #include <list>
-
-enum class eFactionName
-{
-	Player = 0,
-	AI,
-	Max = AI
-};
 
 struct BuildingToSpawn
 {
@@ -28,20 +22,17 @@ struct BuildingToSpawn
 	eModelName modelName;
 };
 
-template <eFactionName T>
-struct FactionName
-{
-	static eFactionName getName() const { return T; }
-};
-
+struct GameEvent;
 class ShaderHandler;
 class Map;
 class Faction : private NonMovable, private NonCopyable
 {
 public:
+	eFactionName getName() const;
 	const Entity* getEntity(int entityID) const;
 	int getEntityIDAtPosition(const glm::vec3& position) const;
 
+	void handleEvent(const GameEvent& gameEvent);
 	void addResources(Worker& worker);	
 	void update(float deltaTime, const Map& map, const Faction& opposingFaction);
 	void render(ShaderHandler& shaderHandler) const;

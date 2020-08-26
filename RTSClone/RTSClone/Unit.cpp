@@ -5,6 +5,7 @@
 #include "ModelManager.h"
 #include "UniqueEntityIDDistributer.h"
 #include "Faction.h"
+#include "GameEventHandler.h"
 
 namespace
 {
@@ -175,7 +176,7 @@ void Unit::moveTo(const glm::vec3& destinationPosition, const Map& map)
 	}
 }
 
-void Unit::update(float deltaTime, const Faction& opposingFaction, const Map& map, const std::list<Unit>& units)
+void Unit::update(float deltaTime, const Faction& owningFaction, const Faction& opposingFaction, const Map& map, const std::list<Unit>& units)
 {
 	if (!m_pathToPosition.empty())
 	{
@@ -233,7 +234,8 @@ void Unit::update(float deltaTime, const Faction& opposingFaction, const Map& ma
 			{
 				if (Globals::getSqrDistance(targetEntity->getPosition(), m_position) <= UNIT_ATTACK_RANGE * UNIT_ATTACK_RANGE)
 				{
-					//Attack
+					GameEventHandler::getInstance().addEvent(
+						{ eGameEventType::Attack, owningFaction.getName(), getID(), m_targetEntityID });
 				}
 				else
 				{

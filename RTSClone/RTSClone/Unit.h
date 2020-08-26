@@ -43,7 +43,7 @@ public:
 		const GetAllAdjacentPositions& getAdjacentPositions, eUnitState state = eUnitState::Moving);
 	void moveTo(const glm::vec3& destinationPosition, const Map& map);
 
-	void update(float deltaTime, const Faction& opposingFaction, const Map& map, const std::list<Unit>& units);
+	void update(float deltaTime, const Faction& owningFaction, const Faction& opposingFaction, const Map& map, const std::list<Unit>& units);
 
 #ifdef RENDER_PATHING
 	void renderPathMesh(ShaderHandler& shaderHandler);

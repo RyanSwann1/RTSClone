@@ -15,6 +15,7 @@
 #include "Mineral.h"
 #include "imgui/imgui.h"
 #include "imgui_impl/imgui_wrapper.h"
+#include "GameEventHandler.h"
 
 #define RENDER_GROUND
 #ifdef RENDER_GROUND
@@ -79,8 +80,8 @@ int main()
 	Ground ground;
 #endif // RENDER_GROUND
 	std::unique_ptr<Map> map = std::make_unique<Map>();
-	FactionAI playerAI({ 35.0f, Globals::GROUND_HEIGHT, 100.0f }, { 70.0f, Globals::GROUND_HEIGHT, 100.0f});
-	FactionPlayer player({ 35.0f, Globals::GROUND_HEIGHT, 15.f }, { 70.0f, Globals::GROUND_HEIGHT, Globals::NODE_SIZE });
+	FactionAI playerAI(eFactionName::AI, { 35.0f, Globals::GROUND_HEIGHT, 100.0f }, { 70.0f, Globals::GROUND_HEIGHT, 100.0f});
+	FactionPlayer player(eFactionName::Player, { 35.0f, Globals::GROUND_HEIGHT, 15.f }, { 70.0f, Globals::GROUND_HEIGHT, Globals::NODE_SIZE });
 	sf::Clock gameClock;
 	Camera camera;
 
@@ -120,6 +121,8 @@ int main()
 		player.update(deltaTime, *map, playerAI);
 		playerAI.update(deltaTime, *map, player);
 		camera.update(window, deltaTime);
+
+		GameEventHandler::getInstance().handleEvents(player, playerAI);
 
 		glm::mat4 view = camera.getView(); 
 		glm::mat4 projection = camera.getProjection(window);

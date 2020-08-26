@@ -1,4 +1,5 @@
 #include "Faction.h"
+#include "GameEventHandler.h"
 
 Faction::Faction(eFactionName factionName, const glm::vec3& hqStartingPosition, const glm::vec3& mineralsStartingPosition)
     : m_minerals(),
@@ -23,6 +24,11 @@ Faction::Faction(eFactionName factionName, const glm::vec3& hqStartingPosition, 
         position.z += Globals::NODE_SIZE * i;
         m_minerals.emplace_back(Globals::convertToNodePosition(position));
     }
+}
+
+eFactionName Faction::getName() const
+{
+    return m_factionName;
 }
 
 const Entity* Faction::getEntity(int entityID) const
@@ -57,6 +63,35 @@ int Faction::getEntityIDAtPosition(const glm::vec3& position) const
     }
 }
 
+void Faction::handleEvent(const GameEvent& gameEvent)
+{
+    assert(gameEvent.senderFaction != m_factionName);
+
+    int targetID = gameEvent.targetID;
+    auto entity = std::find_if(m_allEntities.begin(), m_allEntities.end(), [targetID](const auto& entity)
+    {
+        return entity->getID() == targetID;
+    });
+   
+    assert(entity != m_allEntities.end());
+    switch ((*entity)->getEntityType())
+    {
+    case eEntityType::Worker:
+    {
+        auto worker = std::find_if(m_workers.begin(), m_workers.end(), [targetID](const auto& worker)
+        {
+            return worker.getID() == targetID;
+        });
+        assert(worker != m_workers.end());
+
+        m_workers.erase(worker);
+    }
+        break;
+    }
+
+    m_allEntities.erase(entity);
+}
+
 void Faction::addResources(Worker& worker)
 {
     m_currentResourceAmount += worker.extractResources();
@@ -66,7 +101,7 @@ void Faction::update(float deltaTime, const Map& map, const Faction& opposingFac
 {
     for (auto& unit : m_units)
     {
-        unit.update(deltaTime, opposingFaction, map, m_units);
+        unit.update(deltaTime, *this, opposingFaction, map, m_units);
     }
 
     for (auto& worker : m_workers)
