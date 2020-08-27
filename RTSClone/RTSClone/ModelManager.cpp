@@ -1,5 +1,6 @@
 #include "ModelManager.h"
 #include "Globals.h"
+#include "EntityType.h"
 #include <iostream>
 
 namespace 
