@@ -6,20 +6,8 @@
 PlannedBuilding::PlannedBuilding(int workerID, const glm::vec3& spawnPosition, eEntityType entityType)
     : workerID(workerID),
     spawnPosition(spawnPosition),
-    modelName()
-{
-    switch (entityType)
-    {
-    case eEntityType::Barracks:
-        modelName = eModelName::Barracks;
-        break;
-    case eEntityType::SupplyDepot:
-        modelName = eModelName::SupplyDepot;
-        break;
-    default:
-        assert(false);
-    }
-}
+    entityType(entityType)
+{}
 
 //Faction
 Faction::Faction(eFactionName factionName, const glm::vec3& hqStartingPosition, const glm::vec3& mineralsStartingPosition)
@@ -190,7 +178,7 @@ void Faction::renderPlannedBuildings(ShaderHandler& shaderHandler) const
 {
     for (const auto& plannedBuilding : m_plannedBuildings)
     {
-        ModelManager::getInstance().getModel(plannedBuilding.modelName).render(shaderHandler, plannedBuilding.spawnPosition);
+        ModelManager::getInstance().getModel(plannedBuilding.entityType).render(shaderHandler, plannedBuilding.spawnPosition);
     }
 }
 

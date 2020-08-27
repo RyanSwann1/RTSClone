@@ -16,7 +16,6 @@ public:
 
 	int getID() const;
 	eEntityType getEntityType() const;
-	eModelName getModelName() const;
 	const glm::vec3& getPosition() const;
 	const AABB& getAABB() const;
 	bool isSelected() const;

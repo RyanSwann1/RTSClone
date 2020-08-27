@@ -15,7 +15,7 @@ struct PlannedBuilding
 
 	int workerID;
 	glm::vec3 spawnPosition;
-	eModelName modelName;
+	eEntityType entityType;
 };
 
 struct GameEvent;
