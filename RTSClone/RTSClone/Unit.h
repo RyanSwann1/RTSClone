@@ -42,7 +42,6 @@ public:
 	void setTargetID(int entityTargetID, const glm::vec3& targetPosition);
 	void moveTo(const glm::vec3& destinationPosition, const Map& map, const GetAllAdjacentPositions& getAdjacentPositions, 
 		eUnitState state = eUnitState::Moving);
-	void moveTo(const glm::vec3& destinationPosition, const Map& map);
 
 	void update(float deltaTime, const Faction& opposingFaction, const Map& map, const std::list<Unit>& units);
 

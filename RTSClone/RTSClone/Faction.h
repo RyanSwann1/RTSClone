@@ -131,7 +131,8 @@ private:
 						otherEntity.getCurrentState() == eUnitState::Idle &&
 						entity.getAABB().contains(otherEntity.getAABB()))
 					{
-						entity.moveTo(PathFinding::getInstance().getClosestAvailablePosition<Entity>(entity, entities, map), map);
+						entity.moveTo(PathFinding::getInstance().getClosestAvailablePosition<Entity>(entity, entities, map), map,
+							[&](const glm::ivec2& position) { return getAllAdjacentPositions(position, map); });
 						break;
 					}
 				}

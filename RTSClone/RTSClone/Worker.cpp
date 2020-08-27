@@ -31,7 +31,8 @@ Worker::Worker(const Faction& owningFaction, const glm::vec3 & startingPosition,
 	m_harvestTimer(HARVEST_TIME, false),
 	m_mineralToHarvest(nullptr)
 {
-	moveTo(destinationPosition, map);
+	moveTo(destinationPosition, map,
+		[&](const glm::ivec2& position) { return getAllAdjacentPositions(position, map); });
 }
 
 bool Worker::isHoldingResources() const
@@ -52,7 +53,8 @@ bool Worker::build(const std::function<const Entity*(Worker&)>& buildingCommand,
 	if (!m_buildingCommand)
 	{
 		m_buildingCommand = buildingCommand;
-		moveTo(Globals::convertToMiddleGridPosition(buildPosition), map, eUnitState::MovingToBuildingPosition);
+		moveTo(Globals::convertToMiddleGridPosition(buildPosition), map, 
+			[&](const glm::ivec2& position) { return getAllAdjacentPositions(position, map); }, eUnitState::MovingToBuildingPosition);
 
 		return true;
 	}
@@ -82,7 +84,10 @@ void Worker::update(float deltaTime, const UnitSpawnerBuilding& HQ, const Map& m
 			{
 				glm::vec3 destination = PathFinding::getInstance().getClosestPositionOutsideAABB(m_position,
 					m_mineralToHarvest->getAABB(), m_mineralToHarvest->getPosition(), map);
-				moveTo(destination, map, eUnitState::MovingToMinerals, m_mineralToHarvest);
+				
+				moveTo(destination, map, 
+					[&](const glm::ivec2& position) { return getAllAdjacentPositions(position, map); }, 
+					eUnitState::MovingToMinerals, m_mineralToHarvest);
 			}
 			else
 			{
@@ -111,7 +116,7 @@ void Worker::update(float deltaTime, const UnitSpawnerBuilding& HQ, const Map& m
 
 			glm::vec3 destination = PathFinding::getInstance().getClosestPositionOutsideAABB(m_position,
 				HQ.getAABB(), HQ.getPosition(), map);
-			moveTo(destination, map, eUnitState::ReturningMineralsToHQ);
+			moveTo(destination, map, [&](const glm::ivec2& position) { return getAllAdjacentPositions(position, map); }, eUnitState::ReturningMineralsToHQ);
 		}
 		break;
 	case eUnitState::MovingToBuildingPosition:
@@ -131,7 +136,7 @@ void Worker::update(float deltaTime, const UnitSpawnerBuilding& HQ, const Map& m
 
 			glm::vec3 destination = PathFinding::getInstance().getClosestPositionOutsideAABB(m_position,
 				newBuilding->getAABB(), newBuilding->getPosition(), map);
-			moveTo(destination, map);
+			moveTo(destination, map, [&](const glm::ivec2& position) { return getAllAdjacentPositions(position, map); });
 			assert(!m_pathToPosition.empty());
 		}
 		else
@@ -142,7 +147,8 @@ void Worker::update(float deltaTime, const UnitSpawnerBuilding& HQ, const Map& m
 	}
 }
 
-void Worker::moveTo(const glm::vec3& destinationPosition, const Map& map, eUnitState state, const Mineral* mineralToHarvest)
+void Worker::moveTo(const glm::vec3& destinationPosition, const Map& map, const GetAllAdjacentPositions& getAdjacentPositions,
+	eUnitState state, const Mineral* mineralToHarvest)
 {
 	assert(state == eUnitState::Moving || state == eUnitState::MovingToBuildingPosition || 
 		state == eUnitState::MovingToMinerals || state == eUnitState::ReturningMineralsToHQ);

@@ -73,7 +73,7 @@ Unit::Unit(const Faction& owningFaction, const glm::vec3 & startingPosition, con
 	m_attackTimer(TIME_BETWEEN_ATTACK, true),
 	m_targetEntityID(Globals::INVALID_ENTITY_ID)
 {
-	moveTo(destinationPosition, map);
+	moveTo(destinationPosition, map, [&](const glm::ivec2& position) { return getAllAdjacentPositions(position, map); });
 }
 
 int Unit::getTargetID() const
@@ -141,35 +141,6 @@ void Unit::moveTo(const glm::vec3& destinationPosition, const Map& map, const Ge
 		{
 			m_pathToPosition.push_back(closestDestination);
 			m_currentState = state;
-		}
-		else
-		{
-			m_currentState = eUnitState::Idle;
-		}
-	}
-}
-
-void Unit::moveTo(const glm::vec3& destinationPosition, const Map& map)
-{
-	glm::vec3 previousClosestDestination = m_position;
-	if (!m_pathToPosition.empty())
-	{
-		previousClosestDestination = m_pathToPosition.back();
-	}
-
-	m_pathToPosition.clear();
-	PathFinding::getInstance().getPathToPosition(*this, destinationPosition, m_pathToPosition, 
-		[&](const glm::ivec2& position) { return getAllAdjacentPositions(position, map); });
-	if (!m_pathToPosition.empty())
-	{
-		m_currentState = eUnitState::Moving;
-	}
-	else
-	{
-		if (previousClosestDestination != m_position)
-		{
-			m_pathToPosition.push_back(previousClosestDestination);
-			m_currentState = eUnitState::Moving;
 		}
 		else
 		{

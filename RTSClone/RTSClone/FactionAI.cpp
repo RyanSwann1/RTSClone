@@ -60,7 +60,8 @@ void FactionAI::update(float deltaTime, const Map & map, const Faction& opposing
 
 				glm::vec3 destination = PathFinding::getInstance().getClosestPositionOutsideAABB(addedWorker->getPosition(),
 					mineralToHarvest->getAABB(), mineralToHarvest->getPosition(), map);
-				addedWorker->moveTo(destination, map, eUnitState::MovingToMinerals, mineralToHarvest);
+				addedWorker->moveTo(destination, map, [&](const glm::ivec2& position) { return getAllAdjacentPositions(position, map); },
+					eUnitState::MovingToMinerals, mineralToHarvest);
 			
 				m_unitSpawnQueue.pop();
 			}
