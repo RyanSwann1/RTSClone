@@ -6,6 +6,7 @@
 #include "PathFinding.h"
 #include "Faction.h"
 #include "SupplyDepot.h"
+#include "GameEventHandler.h"
 
 namespace
 {
@@ -46,10 +47,17 @@ int Worker::extractResources()
 	return resources;
 }
 
-void Worker::build(const std::function<const Entity*(Worker&)>& buildingCommand, const glm::vec3& destination, const Map& map)
+bool Worker::build(const std::function<const Entity*(Worker&)>& buildingCommand, const glm::vec3& buildPosition, const Map& map)
 {
-	m_buildingCommand = buildingCommand;
-	moveTo(Globals::convertToMiddleGridPosition(destination), map, eUnitState::MovingToBuildingPosition);
+	if (!m_buildingCommand)
+	{
+		m_buildingCommand = buildingCommand;
+		moveTo(Globals::convertToMiddleGridPosition(buildPosition), map, eUnitState::MovingToBuildingPosition);
+
+		return true;
+	}
+
+	return false;
 }
 
 void Worker::update(float deltaTime, const UnitSpawnerBuilding& HQ, const Map& map, Faction& owningFaction, const Faction& opposingFaction,
@@ -135,10 +143,11 @@ void Worker::update(float deltaTime, const UnitSpawnerBuilding& HQ, const Map& m
 		m_buildingCommand = nullptr;
 		if (newBuilding)
 		{
+			GameEventHandler::getInstance().addEvent({ eGameEventType::RemovePlannedBuilding, m_owningFaction.getName(), getID() });
+
 			glm::vec3 position = PathFinding::getInstance().getClosestPositionOutsideAABB(m_position,
 				newBuilding->getAABB(), newBuilding->getPosition(), map);
 			moveTo(position, map);
-			
 			assert(!m_pathToPosition.empty());
 		}
 		else
@@ -152,6 +161,15 @@ void Worker::update(float deltaTime, const UnitSpawnerBuilding& HQ, const Map& m
 
 void Worker::moveTo(const glm::vec3& destinationPosition, const Map& map, eUnitState state)
 {
+	assert(state == eUnitState::Moving || state == eUnitState::MovingToMinerals || 
+		state == eUnitState::MovingToBuildingPosition);
+
+	if (m_buildingCommand && (state == eUnitState::Moving || state == eUnitState::MovingToMinerals))
+	{
+		GameEventHandler::getInstance().addEvent({ eGameEventType::RemovePlannedBuilding, m_owningFaction.getName(), getID() });
+		m_buildingCommand = nullptr;
+	}
+
 	glm::vec3 previousClosestDestination = m_position;
 	if (!m_pathToPosition.empty())
 	{
@@ -181,6 +199,12 @@ void Worker::moveTo(const glm::vec3& destinationPosition, const Map& map, eUnitS
 
 void Worker::moveTo(const glm::vec3 & destinationPosition, const Map & map, const std::vector<Mineral>& minerals)
 {
+	if (m_buildingCommand)
+	{
+		GameEventHandler::getInstance().addEvent({ eGameEventType::RemovePlannedBuilding, m_owningFaction.getName(), getID() });
+		m_buildingCommand = nullptr;
+	}
+
 	for (const auto& mineral : minerals)
 	{
 		if (mineral.getAABB().contains(destinationPosition))

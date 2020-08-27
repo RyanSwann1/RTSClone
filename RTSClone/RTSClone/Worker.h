@@ -18,7 +18,7 @@ public:
 	bool isHoldingResources() const;
 	int extractResources();	
 
-	void build(const std::function<const Entity*(Worker&)>& buildingCommand, const glm::vec3& destination, const Map& map);
+	bool build(const std::function<const Entity*(Worker&)>& buildingCommand, const glm::vec3& buildPosition, const Map& map);
 	void update(float deltaTime, const UnitSpawnerBuilding& HQ, const Map& map, Faction& owningFaction, const Faction& opposingFaction,
 		const std::list<Unit>& units);
 	void moveTo(const glm::vec3& destinationPosition, const Map& map, eUnitState state = eUnitState::Moving);

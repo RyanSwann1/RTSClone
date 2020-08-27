@@ -9,13 +9,9 @@
 #include "FactionName.h"
 #include <list>
 
-struct BuildingToSpawn
+struct PlannedBuilding
 {
-	BuildingToSpawn(int workerID, const glm::vec3& spawnPosition, eModelName modelName)
-		: workerID(workerID),
-		spawnPosition(spawnPosition),
-		modelName(modelName)
-	{}
+	PlannedBuilding(int workerID, const glm::vec3& spawnPosition, eEntityType entityType);
 
 	int workerID;
 	glm::vec3 spawnPosition;
@@ -47,6 +43,7 @@ public:
 
 protected:
 	Faction(eFactionName factionName, const glm::vec3& hqStartingPosition, const glm::vec3& mineralsStartingPosition);
+	std::vector<PlannedBuilding> m_plannedBuildings;
 	std::vector<Mineral> m_minerals;
 	std::vector<Entity*> m_allEntities;
 	std::list<Unit> m_units;
@@ -76,12 +73,12 @@ protected:
 			{
 				if (building.isWaypointActive())
 				{
-					units.emplace_back(Globals::convertToNodePosition(building.getUnitSpawnPosition()), PathFinding::getInstance().getClosestAvailablePosition(
+					units.emplace_back(*this, Globals::convertToNodePosition(building.getUnitSpawnPosition()), PathFinding::getInstance().getClosestAvailablePosition(
 							building.getWaypointPosition(), m_units, m_workers, map), map);
 				}
 				else
 				{
-					units.emplace_back(Globals::convertToNodePosition(PathFinding::getInstance().getClosestAvailablePosition(building.getUnitSpawnPosition(),
+					units.emplace_back(*this, Globals::convertToNodePosition(PathFinding::getInstance().getClosestAvailablePosition(building.getUnitSpawnPosition(),
 							m_units, m_workers, map)));
 				}
 			}
@@ -89,12 +86,12 @@ protected:
 			case eEntityType::Worker:
 				if (building.isWaypointActive())
 				{
-					units.emplace_back(building.getUnitSpawnPosition(), PathFinding::getInstance().getClosestAvailablePosition(
+					units.emplace_back(*this, building.getUnitSpawnPosition(), PathFinding::getInstance().getClosestAvailablePosition(
 						building.getWaypointPosition(), m_units, m_workers, map), map);
 				}
 				else
 				{
-					units.emplace_back(PathFinding::getInstance().getClosestAvailablePosition(
+					units.emplace_back(*this, PathFinding::getInstance().getClosestAvailablePosition(
 						building.getUnitSpawnPosition(), m_units, m_workers, map));
 				}
 				break;

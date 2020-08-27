@@ -1,5 +1,20 @@
 #include "FactionAI.h"
 
+//Levels
+//Strategyt level - general - thgought about game state as a whole  where units are - lacing resources? Or attack enemy base - all high level
+//Tactics level - Act on tactics from strategy layer - gain resources or attack enemy - 
+//Team Level - made up of units - 
+
+//IF paleyur attacks mid tactic - abondon plan - change tactic
+//Each of tactic - in script
+//Set of steps: move team 1 to front of enemy base - move team 2 back of enemy base
+
+//Threat detection map - base A* off of the threat of the map - move across area of least threat
+
+//Was tactic successful? If so do it more - Feedback on performance
+//Keeping track of wher enemy atacks your base, building turrets in appriopriate places
+//Overview of  how AI will work generally.
+
 namespace
 {
 	constexpr int STARTING_WORKER_COUNT = 5;

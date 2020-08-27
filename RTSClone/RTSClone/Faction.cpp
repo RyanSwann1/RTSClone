@@ -1,8 +1,30 @@
 #include "Faction.h"
 #include "GameEventHandler.h"
+#include "ModelManager.h"
 
+//PlannedBuilding
+PlannedBuilding::PlannedBuilding(int workerID, const glm::vec3& spawnPosition, eEntityType entityType)
+    : workerID(workerID),
+    spawnPosition(spawnPosition),
+    modelName()
+{
+    switch (entityType)
+    {
+    case eEntityType::Barracks:
+        modelName = eModelName::Barracks;
+        break;
+    case eEntityType::SupplyDepot:
+        modelName = eModelName::SupplyDepot;
+        break;
+    default:
+        assert(false);
+    }
+}
+
+//Faction
 Faction::Faction(eFactionName factionName, const glm::vec3& hqStartingPosition, const glm::vec3& mineralsStartingPosition)
-    : m_minerals(),
+    : m_plannedBuildings(),
+    m_minerals(),
     m_allEntities(),
     m_units(),
     m_workers(),
@@ -65,31 +87,52 @@ int Faction::getEntityIDAtPosition(const glm::vec3& position) const
 
 void Faction::handleEvent(const GameEvent& gameEvent)
 {
-    assert(gameEvent.senderFaction != m_factionName);
+    assert(gameEvent.senderFaction == m_factionName);
 
-    int targetID = gameEvent.targetID;
-    auto entity = std::find_if(m_allEntities.begin(), m_allEntities.end(), [targetID](const auto& entity)
+    switch (gameEvent.type)
     {
-        return entity->getID() == targetID;
-    });
-   
-    assert(entity != m_allEntities.end());
-    switch ((*entity)->getEntityType())
+    case eGameEventType::Attack:
     {
-    case eEntityType::Worker:
-    {
-        auto worker = std::find_if(m_workers.begin(), m_workers.end(), [targetID](const auto& worker)
+        int targetID = gameEvent.targetID;
+        auto entity = std::find_if(m_allEntities.begin(), m_allEntities.end(), [targetID](const auto& entity)
         {
-            return worker.getID() == targetID;
+            return entity->getID() == targetID;
         });
-        assert(worker != m_workers.end());
 
-        m_workers.erase(worker);
+        assert(entity != m_allEntities.end());
+        switch ((*entity)->getEntityType())
+        {
+        case eEntityType::Worker:
+        {
+            auto worker = std::find_if(m_workers.begin(), m_workers.end(), [targetID](const auto& worker)
+            {
+                return worker.getID() == targetID;
+            });
+            assert(worker != m_workers.end());
+
+            m_workers.erase(worker);
+        }
+        break;
+        }
+
+        m_allEntities.erase(entity);
     }
         break;
+    case eGameEventType::RemovePlannedBuilding:
+    {
+        int senderID = gameEvent.senderID;
+        auto buildingToSpawn = std::find_if(m_plannedBuildings.begin(), m_plannedBuildings.end(), [senderID](const auto& buildingToSpawn)
+        {
+            return buildingToSpawn.workerID == senderID;
+        });
+        assert(buildingToSpawn != m_plannedBuildings.end());
+        m_plannedBuildings.erase(buildingToSpawn);
     }
+        break;
 
-    m_allEntities.erase(entity);
+    default:
+        assert(false);
+    }
 }
 
 void Faction::addResources(Worker& worker)
@@ -101,7 +144,7 @@ void Faction::update(float deltaTime, const Map& map, const Faction& opposingFac
 {
     for (auto& unit : m_units)
     {
-        unit.update(deltaTime, *this, opposingFaction, map, m_units);
+        unit.update(deltaTime, opposingFaction, map, m_units);
     }
 
     for (auto& worker : m_workers)
@@ -140,6 +183,11 @@ void Faction::render(ShaderHandler& shaderHandler) const
     for (const auto& minerals : m_minerals)
     {
         minerals.render(shaderHandler);
+    }
+
+    for (auto& plannedBuilding : m_plannedBuildings)
+    {
+        ModelManager::getInstance().getModel(plannedBuilding.modelName).render(shaderHandler, plannedBuilding.spawnPosition);
     }
 }
 
@@ -273,7 +321,6 @@ void Faction::reduceResources(eEntityType addedEntityType)
         m_currentResourceAmount -= Globals::BARRACKS_RESOURCE_COST;
         break;
     }
-
 }
 
 void Faction::increaseCurrentPopulationAmount(eEntityType entityType)
@@ -290,14 +337,12 @@ void Faction::increaseCurrentPopulationAmount(eEntityType entityType)
     default:
         assert(false);
     }
-
 }
 
 void Faction::increasePopulationLimit()
 {
     assert(m_currentPopulationLimit + Globals::POPULATION_INCREMENT <= Globals::MAX_POPULATION);
     m_currentPopulationLimit += Globals::POPULATION_INCREMENT;
-
 }
 
 void Faction::revalidateExistingUnitPaths(const Map& map)
@@ -341,8 +386,12 @@ void Faction::instructWorkerToBuild(eEntityType entityType, const glm::vec3& mou
         if (selectedWorker != m_workers.end())
         {
             glm::vec3 buildPosition = Globals::convertToNodePosition(mouseToGroundPosition);
-            selectedWorker->build([this, &map, buildPosition, entityType](Worker& worker)
-            { return addBuilding(worker, map, buildPosition, entityType); }, buildPosition, map);
+            
+            if (selectedWorker->build([this, &map, buildPosition, entityType](Worker& worker)
+                { return addBuilding(worker, map, buildPosition, entityType); }, buildPosition, map))
+            {
+                m_plannedBuildings.emplace_back(selectedWorker->getID(), buildPosition, entityType);
+            }
         }
     }
     break;
