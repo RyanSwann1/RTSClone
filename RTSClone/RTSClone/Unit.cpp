@@ -120,8 +120,8 @@ void Unit::setTargetID(int entityTargetID, const glm::vec3& targetPosition)
 	}
 }
 
-void Unit::moveTo(const glm::vec3& destinationPosition, const Map& map, const std::list<Unit>& units,
-	const GetAllAdjacentPositions& getAdjacentPositions, eUnitState state)
+void Unit::moveTo(const glm::vec3& destinationPosition, const Map& map, const GetAllAdjacentPositions& getAdjacentPositions, 
+	eUnitState state)
 {
 	glm::vec3 closestDestination = m_position;
 	if (!m_pathToPosition.empty())
@@ -241,7 +241,7 @@ void Unit::update(float deltaTime, const Faction& opposingFaction, const Map& ma
 				}
 				else
 				{
-					moveTo(targetEntity->getPosition(), map, units,
+					moveTo(targetEntity->getPosition(), map,
 						[&](const glm::ivec2& position) { return getAllAdjacentPositions(position, map, units, *this); }, eUnitState::Attacking);
 					
 					newPosition = true;

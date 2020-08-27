@@ -268,7 +268,7 @@ void FactionPlayer::moveSingularSelectedUnit(const glm::vec3& mouseToGroundPosit
     if (selectedUnit != m_units.end())
     {
         selectedUnit->resetTargetID();
-        selectedUnit->moveTo(Globals::convertToNodePosition(mouseToGroundPosition), map, m_units,
+        selectedUnit->moveTo(Globals::convertToNodePosition(mouseToGroundPosition), map,
             [&](const glm::ivec2& position) { return getAllAdjacentPositions(position, map, m_units, *selectedUnit); });
     }
     else
@@ -335,7 +335,7 @@ void FactionPlayer::moveMultipleSelectedUnits(const glm::vec3& mouseToGroundPosi
             {
                 for (int i = 0; i < unitFormationPositions.size(); ++i)
                 {
-                    selectedUnits[i]->moveTo(unitFormationPositions[i], map, m_units,
+                    selectedUnits[i]->moveTo(unitFormationPositions[i], map, 
                         [&](const glm::ivec2& position) { return getAllAdjacentPositions(position, map); });
                 }
             }
@@ -385,7 +385,7 @@ void FactionPlayer::moveMultipleSelectedUnits(const glm::vec3& mouseToGroundPosi
                     {
                     case eEntityType::Unit:
                         selectedUnit->resetTargetID();
-                        selectedUnit->moveTo(Globals::convertToNodePosition(mouseToGroundPosition - (averagePosition - selectedUnit->getPosition())), map, m_units,
+                        selectedUnit->moveTo(Globals::convertToNodePosition(mouseToGroundPosition - (averagePosition - selectedUnit->getPosition())), map,
                             [&](const glm::ivec2& position)
                         { return getAllAdjacentPositions(position, map, m_units, *selectedUnit, selectedUnits); });
                         break;
@@ -425,7 +425,7 @@ void FactionPlayer::instructUnitToAttack(Unit& unit, int targetEntityID, const F
     unit.setTargetID(targetEntityID, targetEntity->getPosition());
     if (unit.getCurrentState() != eUnitState::Attacking)
     {
-        unit.moveTo(targetEntity->getPosition(), map, m_units,
+        unit.moveTo(targetEntity->getPosition(), map,
             [&](const glm::ivec2& position) { return getAllAdjacentPositions(position, map, m_units, unit); });
     }
 }

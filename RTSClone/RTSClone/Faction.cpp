@@ -355,7 +355,7 @@ void Faction::revalidateExistingUnitPaths(const Map& map)
         if (!unit.isPathEmpty())
         {
             glm::vec3 destination = unit.getDestination();
-            unit.moveTo(destination, map, m_units, [&](const glm::ivec2& position)
+            unit.moveTo(destination, map, [&](const glm::ivec2& position)
             { return getAllAdjacentPositions(position, map, m_units, unit); });
         }
     }
