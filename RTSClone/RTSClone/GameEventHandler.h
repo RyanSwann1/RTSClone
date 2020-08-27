@@ -8,11 +8,13 @@
 
 enum class eGameEventType
 {
-	Attack = 0
+	Attack = 0,
+	RemovePlannedBuilding
 };
 
 struct GameEvent
 {
+	GameEvent(eGameEventType gameEventType, eFactionName senderFaction, int senderID);
 	GameEvent(eGameEventType gameEventType, eFactionName senderFaction, int senderID, int targetID);
 
 	const eGameEventType type;

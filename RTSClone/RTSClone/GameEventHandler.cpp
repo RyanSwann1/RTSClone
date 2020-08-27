@@ -3,6 +3,13 @@
 #include "FactionPlayer.h"
 #include "FactionAI.h"
 
+GameEvent::GameEvent(eGameEventType gameEventType, eFactionName senderFaction, int senderID)
+	: type(gameEventType),
+	senderFaction(senderFaction),
+	senderID(senderID),
+	targetID(Globals::INVALID_ENTITY_ID)
+{}
+
 //GameEvent
 GameEvent::GameEvent(eGameEventType gameEventType, eFactionName senderFaction, int senderID, int targetID)
 	: type(gameEventType),
@@ -37,9 +44,15 @@ void GameEventHandler::handleEvents(FactionPlayer& player, FactionAI& playerAI)
 			{
 				player.handleEvent(gameEvent);
 			}
-			else
+			break;
+		case eGameEventType::RemovePlannedBuilding:
+			if (gameEvent.senderFaction == eFactionName::Player)
 			{
-				assert(false);
+				player.handleEvent(gameEvent);
+			}
+			else if (gameEvent.senderFaction == eFactionName::AI)
+			{
+				playerAI.handleEvent(gameEvent);
 			}
 			break;
 		default:
