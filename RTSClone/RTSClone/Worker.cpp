@@ -159,16 +159,21 @@ void Worker::update(float deltaTime, const UnitSpawnerBuilding& HQ, const Map& m
 	}
 }
 
-void Worker::moveTo(const glm::vec3& destinationPosition, const Map& map, eUnitState state)
+void Worker::moveTo(const glm::vec3& destinationPosition, const Map& map, eUnitState state, const Mineral* mineralToHarvest)
 {
-	assert(state == eUnitState::Moving || state == eUnitState::MovingToMinerals || 
-		state == eUnitState::MovingToBuildingPosition);
+	assert(state == eUnitState::Moving || state == eUnitState::MovingToBuildingPosition || state == eUnitState::MovingToMinerals);
 
 	if (m_buildingCommand && (state == eUnitState::Moving || state == eUnitState::MovingToMinerals))
 	{
 		GameEventHandler::getInstance().addEvent({ eGameEventType::RemovePlannedBuilding, m_owningFaction.getName(), getID() });
 		m_buildingCommand = nullptr;
 	}
+	else if (state == eUnitState::Moving)
+	{
+		m_mineralToHarvest = nullptr;
+	}
+
+	m_mineralToHarvest = mineralToHarvest;
 
 	glm::vec3 previousClosestDestination = m_position;
 	if (!m_pathToPosition.empty())
@@ -194,49 +199,6 @@ void Worker::moveTo(const glm::vec3& destinationPosition, const Map& map, eUnitS
 		{
 			m_currentState = eUnitState::Idle;
 		}
-	}
-}
-
-void Worker::moveTo(const glm::vec3 & destinationPosition, const Map & map, const std::vector<Mineral>& minerals)
-{
-	if (m_buildingCommand)
-	{
-		GameEventHandler::getInstance().addEvent({ eGameEventType::RemovePlannedBuilding, m_owningFaction.getName(), getID() });
-		m_buildingCommand = nullptr;
-	}
-
-	for (const auto& mineral : minerals)
-	{
-		if (mineral.getAABB().contains(destinationPosition))
-		{
-			m_mineralToHarvest = &mineral;
-			m_pathToPosition.clear();
-			
-			glm::vec3 destination = PathFinding::getInstance().getClosestPositionOutsideAABB(m_position,
-				m_mineralToHarvest->getAABB(), m_mineralToHarvest->getPosition(), map);
-			PathFinding::getInstance().getPathToPosition(*this, destination, m_pathToPosition,
-				[&](const glm::ivec2& position) { return getAllAdjacentPositions(position, map); }, true);
-
-			if (!m_pathToPosition.empty())
-			{
-				m_currentState = eUnitState::MovingToMinerals;
-			}
-			else
-			{
-				m_currentState = eUnitState::Idle;
-			}
-
-			break;
-		}
-		else
-		{
-			m_mineralToHarvest = nullptr;
-		}
-	}
-
-	if (!m_mineralToHarvest)
-	{
-		moveTo(destinationPosition, map);
 	}
 }
 
