@@ -32,6 +32,7 @@ public:
 	void addResources(Worker& worker);	
 	void update(float deltaTime, const Map& map, const Faction& opposingFaction);
 	void render(ShaderHandler& shaderHandler) const;
+	void renderPlannedBuildings(ShaderHandler& shaderHandler) const;
 
 #ifdef RENDER_PATHING
 	void renderPathing(ShaderHandler& shaderHandler);

@@ -132,14 +132,7 @@ int main()
 		glm::mat4 projection = camera.getProjection(window);
 
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	
-		shaderHandler->switchToShader(eShaderType::Default);
-		shaderHandler->setUniformMat4f(eShaderType::Default, "uView", view);
-		shaderHandler->setUniformMat4f(eShaderType::Default, "uProjection", projection);
-	
-		player.render(*shaderHandler);
-		playerAI.render(*shaderHandler);
-
+		
 		shaderHandler->switchToShader(eShaderType::Debug);
 		shaderHandler->setUniformMat4f(eShaderType::Debug, "uView", view);
 		shaderHandler->setUniformMat4f(eShaderType::Debug, "uProjection", projection);
@@ -148,9 +141,25 @@ int main()
 		ground.render(*shaderHandler);
 #endif // RENDER_GROUND
 
+		shaderHandler->switchToShader(eShaderType::Default);
+		shaderHandler->setUniformMat4f(eShaderType::Default, "uView", view);
+		shaderHandler->setUniformMat4f(eShaderType::Default, "uProjection", projection);
+		shaderHandler->setUniform1f(eShaderType::Default, "uOpacity", 1.0f);
+	
+		player.render(*shaderHandler);
+		playerAI.render(*shaderHandler);
+
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		glDisable(GL_DEPTH_TEST);
+
+		shaderHandler->setUniform1f(eShaderType::Default, "uOpacity", 0.5f);
+		player.renderPlannedBuildings(*shaderHandler);
+		playerAI.render(*shaderHandler);
+
+		shaderHandler->switchToShader(eShaderType::Debug);
+		shaderHandler->setUniformMat4f(eShaderType::Debug, "uView", view);
+		shaderHandler->setUniformMat4f(eShaderType::Debug, "uProjection", projection);
 
 #ifdef RENDER_AABB
 		player.renderAABB(*shaderHandler);

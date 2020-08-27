@@ -184,8 +184,11 @@ void Faction::render(ShaderHandler& shaderHandler) const
     {
         minerals.render(shaderHandler);
     }
+}
 
-    for (auto& plannedBuilding : m_plannedBuildings)
+void Faction::renderPlannedBuildings(ShaderHandler& shaderHandler) const
+{
+    for (const auto& plannedBuilding : m_plannedBuildings)
     {
         ModelManager::getInstance().getModel(plannedBuilding.modelName).render(shaderHandler, plannedBuilding.spawnPosition);
     }
