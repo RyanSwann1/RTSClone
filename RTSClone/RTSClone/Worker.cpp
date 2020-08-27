@@ -17,7 +17,7 @@ namespace
 }
 
 Worker::Worker(const Faction& owningFaction, const glm::vec3& startingPosition)
-	: Unit(owningFaction, startingPosition, eModelName::Worker, eEntityType::Worker),
+	: Unit(owningFaction, startingPosition, eEntityType::Worker),
 	m_buildingCommand(),
 	m_currentResourceAmount(0),
 	m_harvestTimer(HARVEST_TIME, false),
@@ -25,7 +25,7 @@ Worker::Worker(const Faction& owningFaction, const glm::vec3& startingPosition)
 {}
 
 Worker::Worker(const Faction& owningFaction, const glm::vec3 & startingPosition, const glm::vec3 & destinationPosition, const Map & map)
-	: Unit(owningFaction, startingPosition, eModelName::Worker, eEntityType::Worker),
+	: Unit(owningFaction, startingPosition, eEntityType::Worker),
 	m_buildingCommand(),
 	m_currentResourceAmount(0),
 	m_harvestTimer(HARVEST_TIME, false),

@@ -5,11 +5,10 @@
 #include "ModelManager.h"
 #include "UniqueEntityIDDistributer.h"
 
-Entity::Entity(const glm::vec3& startingPosition, eModelName modelName, eEntityType entityType)
+Entity::Entity(const glm::vec3& startingPosition, eEntityType entityType)
 	: m_position(0.0f, 0.0f, 0.0f),
 	m_AABB(),
 	m_ID(UniqueEntityIDDistributer::getInstance().getUniqueEntityID()),
-	m_modelName(modelName),
 	m_type(entityType),
 	m_selected(false)
 {
@@ -29,14 +28,13 @@ Entity::Entity(const glm::vec3& startingPosition, eModelName modelName, eEntityT
 		assert(false);
 	}
 	
-	m_AABB.reset(m_position, ModelManager::getInstance().getModel(m_modelName));
+	m_AABB.reset(m_position, ModelManager::getInstance().getModel(m_type));
 }
 
 Entity::Entity(Entity&& orig) noexcept
 	: m_position(orig.m_position),
 	m_AABB(std::move(orig.m_AABB)),
 	m_ID(orig.m_ID),
-	m_modelName(orig.m_modelName),
 	m_type(orig.m_type),
 	m_selected(orig.m_selected)
 {
@@ -48,7 +46,6 @@ Entity& Entity::operator=(Entity&& orig) noexcept
 	m_position = orig.m_position;
 	m_AABB = std::move(orig.m_AABB);
 	m_ID = orig.m_ID;
-	m_modelName = orig.m_modelName;
 	m_type = orig.m_type;
 	m_selected = orig.m_selected;
 
@@ -64,11 +61,6 @@ int Entity::getID() const
 eEntityType Entity::getEntityType() const
 {
 	return m_type;
-}
-
-eModelName Entity::getModelName() const
-{
-	return m_modelName;
 }
 
 const glm::vec3& Entity::getPosition() const
@@ -93,7 +85,7 @@ void Entity::setSelected(bool selected)
 
 void Entity::render(ShaderHandler& shaderHandler) const
 {
-	ModelManager::getInstance().getModel(m_modelName).render(shaderHandler, *this);
+	ModelManager::getInstance().getModel(m_type).render(shaderHandler, *this);
 }
 
 #ifdef RENDER_AABB

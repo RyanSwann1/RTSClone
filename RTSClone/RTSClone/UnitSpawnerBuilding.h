@@ -6,7 +6,7 @@
 class UnitSpawnerBuilding : public Entity, private NonMovable
 {
 public:
-	UnitSpawnerBuilding(const glm::vec3& startingPosition, eModelName modelName, eEntityType entityType);
+	UnitSpawnerBuilding(const glm::vec3& startingPosition, eEntityType entityType);
 	~UnitSpawnerBuilding();
 
 	bool isWaypointActive() const;

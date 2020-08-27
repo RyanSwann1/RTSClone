@@ -5,7 +5,7 @@
 #include "UniqueEntityIDDistributer.h"
 
 Mineral::Mineral(const glm::vec3& startingPosition)
-	: Entity(startingPosition, eModelName::Mineral, eEntityType::Mineral)
+	: Entity(startingPosition, eEntityType::Mineral)
 {
 	GameMessenger::getInstance().broadcast<GameMessages::MapModification<eGameMessageType::AddEntityToMap>>({ m_AABB });
 }

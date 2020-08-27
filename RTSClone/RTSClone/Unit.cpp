@@ -54,8 +54,8 @@ namespace
 #endif // RENDER_PATHING
 }
 
-Unit::Unit(const Faction& owningFaction, const glm::vec3& startingPosition, eModelName modelName, eEntityType entityType)
-	: Entity(startingPosition, modelName, entityType),
+Unit::Unit(const Faction& owningFaction, const glm::vec3& startingPosition, eEntityType entityType)
+	: Entity(startingPosition, entityType),
 	m_owningFaction(owningFaction),
 	m_currentState(eUnitState::Idle),
 	m_front(),
@@ -64,8 +64,8 @@ Unit::Unit(const Faction& owningFaction, const glm::vec3& startingPosition, eMod
 	m_targetEntityID(Globals::INVALID_ENTITY_ID)
 {}
 
-Unit::Unit(const Faction& owningFaction, const glm::vec3 & startingPosition, const glm::vec3 & destinationPosition, const Map & map, eModelName modelName, eEntityType entityType)
-	: Entity(startingPosition, modelName, entityType),
+Unit::Unit(const Faction& owningFaction, const glm::vec3 & startingPosition, const glm::vec3 & destinationPosition, const Map & map, eEntityType entityType)
+	: Entity(startingPosition, entityType),
 	m_owningFaction(owningFaction),
 	m_currentState(eUnitState::Idle),
 	m_front(),

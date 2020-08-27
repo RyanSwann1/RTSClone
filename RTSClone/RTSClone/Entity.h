@@ -29,13 +29,12 @@ public:
 #endif // RENDER_AABB
 
 protected:	
-	Entity(const glm::vec3& startingPosition, eModelName modelName, eEntityType entityType);
+	Entity(const glm::vec3& startingPosition, eEntityType entityType);
 	glm::vec3 m_position;
 	AABB m_AABB;
 	
 private:
 	int m_ID;
-	eModelName m_modelName;
 	eEntityType m_type;
 	bool m_selected;
 };
