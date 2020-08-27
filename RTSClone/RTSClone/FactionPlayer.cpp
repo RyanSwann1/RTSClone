@@ -278,7 +278,27 @@ void FactionPlayer::moveSingularSelectedUnit(const glm::vec3& mouseToGroundPosit
         });
         assert(selectedWorker != m_workers.end());
         selectedWorker->resetTargetID();
-        selectedWorker->moveTo(mouseToGroundPosition, map, m_minerals);
+
+        const Mineral* mineralToHarvest = nullptr;
+        for (const auto& mineral : m_minerals)
+        {
+            if (mineral.getAABB().contains(mouseToGroundPosition))
+            {
+                mineralToHarvest = &mineral;
+                break;
+            }
+        }
+
+        if (mineralToHarvest)
+        {
+            glm::vec3 destination = PathFinding::getInstance().getClosestPositionOutsideAABB(selectedWorker->getPosition(),
+                mineralToHarvest->getAABB(), mineralToHarvest->getPosition(), map);
+            selectedWorker->moveTo(mouseToGroundPosition, map, eUnitState::MovingToMinerals, mineralToHarvest);
+        }
+        else
+        {
+            selectedWorker->moveTo(mouseToGroundPosition, map);
+        }
     }
 }
 
@@ -338,7 +358,9 @@ void FactionPlayer::moveMultipleSelectedUnits(const glm::vec3& mouseToGroundPosi
                 {
                     if (selectedUnit->getEntityType() == eEntityType::Worker)
                     {
-                        static_cast<Worker*>(selectedUnit)->moveTo(mouseToGroundPosition, map, m_minerals);
+                        glm::vec3 destination = PathFinding::getInstance().getClosestPositionOutsideAABB(selectedUnit->getPosition(),
+                            mineralSelected->getAABB(), mineralSelected->getPosition(), map);
+                        static_cast<Worker*>(selectedUnit)->moveTo(mouseToGroundPosition, map, eUnitState::MovingToMinerals, mineralSelected);
                     }
                 }
             }
