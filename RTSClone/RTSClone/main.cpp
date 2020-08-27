@@ -96,6 +96,7 @@ int main()
 	while (window.isOpen())
 	{
 		float deltaTime = gameClock.restart().asSeconds();
+		//Handle Input
 		sf::Event currentSFMLEvent;
 		while (window.pollEvent(currentSFMLEvent))
 		{
@@ -118,12 +119,15 @@ int main()
 
 		ImGui::ShowDemoWindow();
 
+		//Update
 		player.update(deltaTime, *map, playerAI);
 		playerAI.update(deltaTime, *map, player);
 		camera.update(window, deltaTime);
 
+		//Handle Game Events
 		GameEventHandler::getInstance().handleEvents(player, playerAI);
 
+		//Render
 		glm::mat4 view = camera.getView(); 
 		glm::mat4 projection = camera.getProjection(window);
 

@@ -59,7 +59,7 @@ ModelManager::ModelManager()
 	}
 	m_models[static_cast<int>(workerMineralModel->modelName)] = std::move(workerMineralModel);
 
-	std::unique_ptr<Model> waypointModel = Model::create("laserSabel.obj", true,
+	std::unique_ptr<Model> waypointModel = Model::create("laserSabel.obj", false,
 		glm::vec3(2.0f, 1.0f, 2.0f), eModelName::Waypoint, Globals::WAYPOINT_AABB_SIZE);
 	assert(waypointModel);
 	if (!waypointModel)
