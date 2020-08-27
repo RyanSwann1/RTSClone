@@ -85,24 +85,25 @@ void Faction::handleEvent(const GameEvent& gameEvent)
         {
             return entity->getID() == targetID;
         });
-
-        assert(entity != m_allEntities.end());
-        switch ((*entity)->getEntityType())
+        if (entity != m_allEntities.end())
         {
-        case eEntityType::Worker:
-        {
-            auto worker = std::find_if(m_workers.begin(), m_workers.end(), [targetID](const auto& worker)
+            switch ((*entity)->getEntityType())
             {
-                return worker.getID() == targetID;
-            });
-            assert(worker != m_workers.end());
+            case eEntityType::Worker:
+            {
+                auto worker = std::find_if(m_workers.begin(), m_workers.end(), [targetID](const auto& worker)
+                {
+                    return worker.getID() == targetID;
+                });
+                assert(worker != m_workers.end());
 
-            m_workers.erase(worker);
-        }
-        break;
-        }
+                m_workers.erase(worker);
+            }
+            break;
+            }
 
-        m_allEntities.erase(entity);
+            m_allEntities.erase(entity);
+        }
     }
         break;
     case eGameEventType::RemovePlannedBuilding:
