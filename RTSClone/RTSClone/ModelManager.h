@@ -4,6 +4,7 @@
 #include <memory>
 #include <array>
 
+enum class eEntityType;
 class ModelManager : private NonMovable, private NonCopyable
 {
 public:
@@ -15,6 +16,7 @@ public:
 
 	bool isAllModelsLoaded() const;
 	const Model& getModel(eModelName modelName) const;
+	const Model& getModel(eEntityType entityType) const;
 
 private:
 	ModelManager();

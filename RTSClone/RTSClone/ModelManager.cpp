@@ -2,6 +2,30 @@
 #include "Globals.h"
 #include <iostream>
 
+namespace 
+{
+	eModelName getModelName(eEntityType entityType)
+	{
+		switch (entityType)
+		{
+		case eEntityType::Unit:
+			return eModelName::Unit;
+		case eEntityType::Worker:
+			return eModelName::Worker;
+		case eEntityType::HQ:
+			return eModelName::HQ;
+		case eEntityType::SupplyDepot:
+			return eModelName::SupplyDepot;
+		case eEntityType::Barracks:
+			return eModelName::Barracks;
+		case eEntityType::Mineral:
+			return eModelName::Mineral;
+		default:
+			assert(false);
+		}
+	}
+}
+
 bool ModelManager::isAllModelsLoaded() const
 {
 	return m_loadedAllModels;
@@ -9,6 +33,15 @@ bool ModelManager::isAllModelsLoaded() const
 
 const Model& ModelManager::getModel(eModelName modelName) const
 {
+	assert(m_models[static_cast<int>(modelName)] &&
+		m_models[static_cast<int>(modelName)]->modelName == modelName);
+
+	return *m_models[static_cast<int>(modelName)];
+}
+
+const Model& ModelManager::getModel(eEntityType entityType) const
+{
+	eModelName modelName = getModelName(entityType);
 	assert(m_models[static_cast<int>(modelName)] &&
 		m_models[static_cast<int>(modelName)]->modelName == modelName);
 
