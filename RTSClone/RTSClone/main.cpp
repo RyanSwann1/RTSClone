@@ -155,7 +155,6 @@ int main()
 
 		shaderHandler->setUniform1f(eShaderType::Default, "uOpacity", 0.5f);
 		player.renderPlannedBuildings(*shaderHandler);
-		playerAI.render(*shaderHandler);
 
 		shaderHandler->switchToShader(eShaderType::Debug);
 		shaderHandler->setUniformMat4f(eShaderType::Debug, "uView", view);
