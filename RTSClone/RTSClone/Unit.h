@@ -28,9 +28,10 @@ class ShaderHandler;
 class Unit : public Entity, private NonMovable
 {
 public:
-	Unit(const glm::vec3& startingPosition, eModelName modelName = eModelName::Unit, eEntityType entityType = eEntityType::Unit);
-	Unit(const glm::vec3& startingPosition, const glm::vec3& destinationPosition, const Map& map, eModelName modelName = eModelName::Unit, 
-		eEntityType entityType = eEntityType::Unit);
+	Unit(const Faction& owningFaction, const glm::vec3& startingPosition, 
+		eModelName modelName = eModelName::Unit, eEntityType entityType = eEntityType::Unit);
+	Unit(const Faction& owningFaction, const glm::vec3& startingPosition, const glm::vec3& destinationPosition, 
+		const Map& map, eModelName modelName = eModelName::Unit, eEntityType entityType = eEntityType::Unit);
 		 
 	int getTargetID() const;
 	bool isPathEmpty() const;
@@ -43,13 +44,14 @@ public:
 		const GetAllAdjacentPositions& getAdjacentPositions, eUnitState state = eUnitState::Moving);
 	void moveTo(const glm::vec3& destinationPosition, const Map& map);
 
-	void update(float deltaTime, const Faction& owningFaction, const Faction& opposingFaction, const Map& map, const std::list<Unit>& units);
+	void update(float deltaTime, const Faction& opposingFaction, const Map& map, const std::list<Unit>& units);
 
 #ifdef RENDER_PATHING
 	void renderPathMesh(ShaderHandler& shaderHandler);
 #endif // RENDER_PATHING
 
 protected:
+	const Faction& m_owningFaction;
 	eUnitState m_currentState;
 	glm::vec3 m_front;
 	std::vector<glm::vec3> m_pathToPosition;

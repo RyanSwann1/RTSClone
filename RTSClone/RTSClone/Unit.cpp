@@ -54,8 +54,9 @@ namespace
 #endif // RENDER_PATHING
 }
 
-Unit::Unit(const glm::vec3& startingPosition, eModelName modelName, eEntityType entityType)
+Unit::Unit(const Faction& owningFaction, const glm::vec3& startingPosition, eModelName modelName, eEntityType entityType)
 	: Entity(startingPosition, modelName, entityType),
+	m_owningFaction(owningFaction),
 	m_currentState(eUnitState::Idle),
 	m_front(),
 	m_pathToPosition(),
@@ -63,8 +64,9 @@ Unit::Unit(const glm::vec3& startingPosition, eModelName modelName, eEntityType 
 	m_targetEntityID(Globals::INVALID_ENTITY_ID)
 {}
 
-Unit::Unit(const glm::vec3 & startingPosition, const glm::vec3 & destinationPosition, const Map & map, eModelName modelName, eEntityType entityType)
+Unit::Unit(const Faction& owningFaction, const glm::vec3 & startingPosition, const glm::vec3 & destinationPosition, const Map & map, eModelName modelName, eEntityType entityType)
 	: Entity(startingPosition, modelName, entityType),
+	m_owningFaction(owningFaction),
 	m_currentState(eUnitState::Idle),
 	m_front(),
 	m_pathToPosition(),
@@ -176,7 +178,7 @@ void Unit::moveTo(const glm::vec3& destinationPosition, const Map& map)
 	}
 }
 
-void Unit::update(float deltaTime, const Faction& owningFaction, const Faction& opposingFaction, const Map& map, const std::list<Unit>& units)
+void Unit::update(float deltaTime, const Faction& opposingFaction, const Map& map, const std::list<Unit>& units)
 {
 	if (!m_pathToPosition.empty())
 	{
@@ -235,7 +237,7 @@ void Unit::update(float deltaTime, const Faction& owningFaction, const Faction& 
 				if (Globals::getSqrDistance(targetEntity->getPosition(), m_position) <= UNIT_ATTACK_RANGE * UNIT_ATTACK_RANGE)
 				{
 					GameEventHandler::getInstance().addEvent(
-						{ eGameEventType::Attack, owningFaction.getName(), getID(), m_targetEntityID });
+						{ eGameEventType::Attack, m_owningFaction.getName(), getID(), m_targetEntityID });
 				}
 				else
 				{

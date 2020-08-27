@@ -15,16 +15,16 @@ namespace
 	constexpr int RESOURCE_INCREMENT = 10;
 }
 
-Worker::Worker(const glm::vec3& startingPosition)
-	: Unit(startingPosition, eModelName::Worker, eEntityType::Worker),
+Worker::Worker(const Faction& owningFaction, const glm::vec3& startingPosition)
+	: Unit(owningFaction, startingPosition, eModelName::Worker, eEntityType::Worker),
 	m_buildingCommand(),
 	m_currentResourceAmount(0),
 	m_harvestTimer(HARVEST_TIME, false),
 	m_mineralToHarvest(nullptr)
 {}
 
-Worker::Worker(const glm::vec3 & startingPosition, const glm::vec3 & destinationPosition, const Map & map)
-	: Unit(startingPosition, eModelName::Worker, eEntityType::Worker),
+Worker::Worker(const Faction& owningFaction, const glm::vec3 & startingPosition, const glm::vec3 & destinationPosition, const Map & map)
+	: Unit(owningFaction, startingPosition, eModelName::Worker, eEntityType::Worker),
 	m_buildingCommand(),
 	m_currentResourceAmount(0),
 	m_harvestTimer(HARVEST_TIME, false),
@@ -55,7 +55,7 @@ void Worker::build(const std::function<const Entity*(Worker&)>& buildingCommand,
 void Worker::update(float deltaTime, const UnitSpawnerBuilding& HQ, const Map& map, Faction& owningFaction, const Faction& opposingFaction,
 	const std::list<Unit>& units)
 {
-	Unit::update(deltaTime, owningFaction, opposingFaction, map, units);
+	Unit::update(deltaTime, opposingFaction, map, units);
 
 	switch (m_currentState)
 	{
