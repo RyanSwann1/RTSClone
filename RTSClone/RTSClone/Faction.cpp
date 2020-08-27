@@ -75,12 +75,11 @@ int Faction::getEntityIDAtPosition(const glm::vec3& position) const
 
 void Faction::handleEvent(const GameEvent& gameEvent)
 {
-    assert(gameEvent.senderFaction == m_factionName);
-
     switch (gameEvent.type)
     {
     case eGameEventType::Attack:
     {
+        assert(gameEvent.senderFaction != m_factionName);
         int targetID = gameEvent.targetID;
         auto entity = std::find_if(m_allEntities.begin(), m_allEntities.end(), [targetID](const auto& entity)
         {
@@ -108,6 +107,7 @@ void Faction::handleEvent(const GameEvent& gameEvent)
         break;
     case eGameEventType::RemovePlannedBuilding:
     {
+        assert(gameEvent.senderFaction == m_factionName);
         int senderID = gameEvent.senderID;
         auto buildingToSpawn = std::find_if(m_plannedBuildings.begin(), m_plannedBuildings.end(), [senderID](const auto& buildingToSpawn)
         {
