@@ -40,9 +40,23 @@ bool Worker::isHoldingResources() const
 	return m_currentResourceAmount > 0;
 }
 
-int Worker::extractResources()
+int Worker::extractResources(const Map& map)
 {
-	assert(m_currentResourceAmount > 0);
+	assert(isHoldingResources());
+	if (m_mineralToHarvest)
+	{
+		glm::vec3 destination = PathFinding::getInstance().getClosestPositionOutsideAABB(m_position,
+			m_mineralToHarvest->getAABB(), m_mineralToHarvest->getPosition(), map);
+
+		moveTo(destination, map,
+			[&](const glm::ivec2& position) { return getAllAdjacentPositions(position, map); },
+			eUnitState::MovingToMinerals, m_mineralToHarvest);
+	}
+	else
+	{
+		m_currentState = eUnitState::Idle;
+	}
+
 	int resources = m_currentResourceAmount;
 	m_currentResourceAmount = 0;
 	return resources;
@@ -62,7 +76,7 @@ bool Worker::build(const std::function<const Entity*(Worker&)>& buildingCommand,
 	return false;
 }
 
-void Worker::update(float deltaTime, const UnitSpawnerBuilding& HQ, const Map& map, Faction& owningFaction, const Faction& opposingFaction,
+void Worker::update(float deltaTime, const UnitSpawnerBuilding& HQ, const Map& map, const Faction& opposingFaction,
 	const std::list<Unit>& units)
 {
 	Unit::update(deltaTime, opposingFaction, map, units);
@@ -79,20 +93,8 @@ void Worker::update(float deltaTime, const UnitSpawnerBuilding& HQ, const Map& m
 		assert(isHoldingResources());
 		if (m_pathToPosition.empty())
 		{
-			owningFaction.addResources(*this);
-			if (m_mineralToHarvest)
-			{
-				glm::vec3 destination = PathFinding::getInstance().getClosestPositionOutsideAABB(m_position,
-					m_mineralToHarvest->getAABB(), m_mineralToHarvest->getPosition(), map);
-				
-				moveTo(destination, map, 
-					[&](const glm::ivec2& position) { return getAllAdjacentPositions(position, map); }, 
-					eUnitState::MovingToMinerals, m_mineralToHarvest);
-			}
-			else
-			{
-				m_currentState = eUnitState::Idle;
-			}
+			GameEventHandler::getInstance().addEvent({ eGameEventType::AddResources, m_owningFaction.getName(), getID() });
+			m_currentState = eUnitState::Idle;
 		}
 		break;
 	case eUnitState::Harvesting:

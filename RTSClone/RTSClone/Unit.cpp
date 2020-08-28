@@ -151,6 +151,8 @@ void Unit::moveTo(const glm::vec3& destinationPosition, const Map& map, const Ge
 
 void Unit::update(float deltaTime, const Faction& opposingFaction, const Map& map, const std::list<Unit>& units)
 {
+	assert(opposingFaction.getName() != m_owningFaction.getName());
+
 	if (!m_pathToPosition.empty())
 	{
 		glm::vec3 newPosition = Globals::moveTowards(m_position, m_pathToPosition.back(), MOVEMENT_SPEED * deltaTime);

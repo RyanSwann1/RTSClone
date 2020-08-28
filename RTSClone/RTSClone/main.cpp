@@ -125,7 +125,7 @@ int main()
 		camera.update(window, deltaTime);
 
 		//Handle Game Events
-		GameEventHandler::getInstance().handleEvents(player, playerAI);
+		GameEventHandler::getInstance().handleEvents(player, playerAI, *map);
 
 		//Render
 		glm::mat4 view = camera.getView(); 

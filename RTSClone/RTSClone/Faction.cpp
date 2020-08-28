@@ -73,7 +73,7 @@ int Faction::getEntityIDAtPosition(const glm::vec3& position) const
     }
 }
 
-void Faction::handleEvent(const GameEvent& gameEvent)
+void Faction::handleEvent(const GameEvent& gameEvent, const Map& map)
 {
     switch (gameEvent.type)
     {
@@ -118,15 +118,27 @@ void Faction::handleEvent(const GameEvent& gameEvent)
         m_plannedBuildings.erase(buildingToSpawn);
     }
         break;
-
+    case eGameEventType::AddResources:
+    {
+        int workerID = gameEvent.senderID;
+        auto worker = std::find_if(m_workers.begin(), m_workers.end(), [workerID](const auto& worker)
+        {
+            return worker.getID() == workerID;
+        });
+        if (worker != m_workers.end())
+        {
+            addResources(*worker, map);
+        }
+    }
+        break;
     default:
         assert(false);
     }
 }
 
-void Faction::addResources(Worker& worker)
+void Faction::addResources(Worker& worker, const Map& map)
 {
-    m_currentResourceAmount += worker.extractResources();
+    m_currentResourceAmount += worker.extractResources(map);
 }
 
 void Faction::update(float deltaTime, const Map& map, const Faction& opposingFaction)
@@ -138,7 +150,7 @@ void Faction::update(float deltaTime, const Map& map, const Faction& opposingFac
 
     for (auto& worker : m_workers)
     {
-        worker.update(deltaTime, m_HQ, map, *this, opposingFaction, m_units);
+        worker.update(deltaTime, m_HQ, map, opposingFaction, m_units);
     }
 
     handleCollisions<Unit>(m_units, map);
