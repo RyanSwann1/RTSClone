@@ -7,6 +7,7 @@
 #include "Faction.h"
 #include "SupplyDepot.h"
 #include "GameEventHandler.h"
+#include "GameEvent.h"
 
 namespace
 {

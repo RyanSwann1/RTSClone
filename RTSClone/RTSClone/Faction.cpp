@@ -1,6 +1,7 @@
 #include "Faction.h"
 #include "GameEventHandler.h"
 #include "ModelManager.h"
+#include "GameEvent.h"
 
 //PlannedBuilding
 PlannedBuilding::PlannedBuilding(int workerID, const glm::vec3& spawnPosition, eEntityType entityType)

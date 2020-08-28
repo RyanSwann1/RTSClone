@@ -150,6 +150,7 @@
     <ClCompile Include="Faction.cpp" />
     <ClCompile Include="FactionAI.cpp" />
     <ClCompile Include="FactionPlayer.cpp" />
+    <ClCompile Include="GameEvent.cpp" />
     <ClCompile Include="GameEventHandler.cpp" />
     <ClCompile Include="GameMessenger.cpp" />
     <ClCompile Include="Graph.cpp" />
@@ -229,6 +230,7 @@
     <ClInclude Include="FactionAI.h" />
     <ClInclude Include="FactionName.h" />
     <ClInclude Include="FactionPlayer.h" />
+    <ClInclude Include="GameEvent.h" />
     <ClInclude Include="GameEventHandler.h" />
     <ClInclude Include="GameMessenger.h" />
     <ClInclude Include="GameMessages.h" />

@@ -2,23 +2,8 @@
 #include "Globals.h"
 #include "FactionPlayer.h"
 #include "FactionAI.h"
+#include "GameEvent.h"
 
-//GameEvent
-GameEvent::GameEvent(eGameEventType gameEventType, eFactionName senderFaction, int senderID)
-	: type(gameEventType),
-	senderFaction(senderFaction),
-	senderID(senderID),
-	targetID(Globals::INVALID_ENTITY_ID)
-{}
-
-GameEvent::GameEvent(eGameEventType gameEventType, eFactionName senderFaction, int senderID, int targetID)
-	: type(gameEventType),
-	senderFaction(senderFaction),
-	senderID(senderID),
-	targetID(targetID)
-{}
-
-//GameEventHandler
 GameEventHandler::GameEventHandler()
 	: m_gameEvents()
 {}
