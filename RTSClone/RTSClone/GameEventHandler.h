@@ -9,7 +9,8 @@
 enum class eGameEventType
 {
 	Attack = 0,
-	RemovePlannedBuilding
+	RemovePlannedBuilding,
+	AddResources
 };
 
 struct GameEvent
@@ -25,6 +26,7 @@ struct GameEvent
 
 class FactionPlayer;
 class FactionAI;
+class Map;
 class GameEventHandler : private NonCopyable, private NonMovable
 {
 public:
@@ -35,7 +37,7 @@ public:
 	}
 
 	void addEvent(const GameEvent& gameEvent);
-	void handleEvents(FactionPlayer& player, FactionAI& playerAI);
+	void handleEvents(FactionPlayer& player, FactionAI& playerAI, const Map& map);
 	
 private:
 	GameEventHandler();
