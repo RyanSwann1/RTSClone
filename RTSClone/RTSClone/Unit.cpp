@@ -170,6 +170,18 @@ void Unit::update(float deltaTime, const Faction& opposingFaction, const Map& ma
 
 	switch (m_currentState)
 	{
+	case eUnitState::Idle:
+		assert(m_targetEntityID == Globals::INVALID_ENTITY_ID);
+		if (m_attackTimer.isExpired() && getEntityType() == eEntityType::Unit)
+		{
+			const Entity* targetEntity = opposingFaction.getEntity(m_position, UNIT_ATTACK_RANGE);
+			if (targetEntity)
+			{
+				m_targetEntityID = targetEntity->getID();
+				m_currentState = eUnitState::Attacking;
+			}
+		}
+		break;
 	case eUnitState::Moving:
 		if (Globals::isEntityIDValid(m_targetEntityID))
 		{
