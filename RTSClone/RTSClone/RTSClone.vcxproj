@@ -154,6 +154,8 @@
     <ClCompile Include="GameEventHandler.cpp" />
     <ClCompile Include="GameMessenger.cpp" />
     <ClCompile Include="Graph.cpp" />
+    <ClCompile Include="Projectile.cpp" />
+    <ClCompile Include="ProjectileHandler.cpp" />
     <ClCompile Include="Worker.cpp" />
     <ClCompile Include="UnitSpawnerBuilding.cpp" />
     <ClCompile Include="Camera.cpp" />
@@ -236,6 +238,8 @@
     <ClInclude Include="GameMessages.h" />
     <ClInclude Include="GameMessageType.h" />
     <ClInclude Include="Graph.h" />
+    <ClInclude Include="Projectile.h" />
+    <ClInclude Include="ProjectileHandler.h" />
     <ClInclude Include="UniqueEntityIDDistributer.h" />
     <ClInclude Include="Worker.h" />
     <ClInclude Include="UnitSpawnerBuilding.h" />

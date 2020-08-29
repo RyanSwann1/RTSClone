@@ -49,8 +49,7 @@ int Worker::extractResources(const Map& map)
 		glm::vec3 destination = PathFinding::getInstance().getClosestPositionOutsideAABB(m_position,
 			m_mineralToHarvest->getAABB(), m_mineralToHarvest->getPosition(), map);
 
-		moveTo(destination, map,
-			[&](const glm::ivec2& position) { return getAllAdjacentPositions(position, map); },
+		moveTo(destination, map, [&](const glm::ivec2& position) { return getAllAdjacentPositions(position, map); },
 			eUnitState::MovingToMinerals, m_mineralToHarvest);
 	}
 	else

@@ -7,5 +7,6 @@ enum class eEntityType
 	HQ,
 	SupplyDepot,
 	Barracks,
-	Mineral
+	Mineral,
+	Projectile
 };

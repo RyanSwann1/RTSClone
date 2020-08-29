@@ -6,6 +6,7 @@
 #include "UniqueEntityIDDistributer.h"
 #include "Faction.h"
 #include "GameEventHandler.h"
+#include "GameEvent.h"
 
 namespace
 {
@@ -209,8 +210,8 @@ void Unit::update(float deltaTime, const Faction& opposingFaction, const Map& ma
 			{
 				if (Globals::getSqrDistance(targetEntity->getPosition(), m_position) <= UNIT_ATTACK_RANGE * UNIT_ATTACK_RANGE)
 				{
-					GameEventHandler::getInstance().addEvent(
-						{ eGameEventType::Attack, m_owningFaction.getName(), getID(), m_targetEntityID });
+					GameEventHandler::getInstance().addEvent({ eGameEventType::SpawnProjectile, m_owningFaction.getName(), getID(),
+						targetEntity->getID(), m_position, targetEntity->getPosition() });
 				}
 				else
 				{

@@ -16,6 +16,7 @@
 #include "imgui/imgui.h"
 #include "imgui_impl/imgui_wrapper.h"
 #include "GameEventHandler.h"
+#include "ProjectileHandler.h"
 
 #define RENDER_GROUND
 #ifdef RENDER_GROUND
@@ -84,6 +85,7 @@ int main()
 	FactionPlayer player(eFactionName::Player, { 35.0f, Globals::GROUND_HEIGHT, 15.f }, { 70.0f, Globals::GROUND_HEIGHT, Globals::NODE_SIZE });
 	sf::Clock gameClock;
 	Camera camera;
+	ProjectileHandler projectileHandler;
 
 	shaderHandler->switchToShader(eShaderType::SelectionBox);
 	shaderHandler->setUniformMat4f(eShaderType::SelectionBox, "uOrthographic", glm::ortho(0.0f, static_cast<float>(windowSize.x),
@@ -120,12 +122,13 @@ int main()
 		ImGui::ShowDemoWindow();
 
 		//Update
+		projectileHandler.update(deltaTime);
 		player.update(deltaTime, *map, playerAI);
 		playerAI.update(deltaTime, *map, player);
 		camera.update(window, deltaTime);
 
 		//Handle Game Events
-		GameEventHandler::getInstance().handleEvents(player, playerAI, *map);
+		GameEventHandler::getInstance().handleEvents(player, playerAI, *map, projectileHandler);
 
 		//Render
 		glm::mat4 view = camera.getView(); 
@@ -148,6 +151,7 @@ int main()
 	
 		player.render(*shaderHandler);
 		playerAI.render(*shaderHandler);
+		projectileHandler.render(*shaderHandler);
 
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);

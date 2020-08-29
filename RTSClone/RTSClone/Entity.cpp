@@ -22,6 +22,7 @@ Entity::Entity(const glm::vec3& startingPosition, eEntityType entityType)
 		m_position = Globals::convertToMiddleGridPosition(startingPosition);
 		break;
 	case eEntityType::Worker:
+	case eEntityType::Projectile:
 		m_position = startingPosition;
 		break;
 	default: 
