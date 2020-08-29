@@ -344,27 +344,27 @@ void FactionPlayer::moveMultipleSelectedUnits(const glm::vec3& mouseToGroundPosi
         }
         else
         {
-            const Mineral* mineralSelected = nullptr;
+            const Mineral* mineralToHarvest = nullptr;
             for (const auto& mineral : m_minerals)
             {
                 if (mineral.getAABB().contains(mouseToGroundPosition))
                 {
-                    mineralSelected = &mineral;
+                    mineralToHarvest = &mineral;
                     break;
                 }
             }
 
-            if (mineralSelected)
+            if (mineralToHarvest)
             {
                 for(auto& selectedUnit : selectedUnits)
                 {
                     if (selectedUnit->getEntityType() == eEntityType::Worker)
                     {
                         glm::vec3 destination = PathFinding::getInstance().getClosestPositionOutsideAABB(selectedUnit->getPosition(),
-                            mineralSelected->getAABB(), mineralSelected->getPosition(), map);
+                            mineralToHarvest->getAABB(), mineralToHarvest->getPosition(), map);
                         static_cast<Worker*>(selectedUnit)->moveTo(mouseToGroundPosition, map, 
                             [&](const glm::ivec2& position) { return getAllAdjacentPositions(position, map); },
-                            eUnitState::MovingToMinerals, mineralSelected);
+                            eUnitState::MovingToMinerals, mineralToHarvest);
                     }
                 }
             }

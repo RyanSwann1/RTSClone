@@ -5,7 +5,7 @@
 
 namespace
 {
-	constexpr float MOVEMENT_SPEED = 65.0f;
+	constexpr float MOVEMENT_SPEED = 90.0f;
 }
 
 Projectile::Projectile(const GameEvent& gameEvent)

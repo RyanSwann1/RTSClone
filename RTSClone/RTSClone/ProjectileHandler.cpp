@@ -15,7 +15,7 @@ void ProjectileHandler::addProjectile(const GameEvent& gameEvent)
 void ProjectileHandler::update(float deltaTime, const FactionPlayer& player, const FactionAI& playerAI)
 {
 	for (auto projectile = m_projectiles.begin(); projectile != m_projectiles.end();)
-	{
+	{	
 		projectile->update(deltaTime);
 	
 		bool projectileCollision = false;

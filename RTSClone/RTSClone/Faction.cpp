@@ -114,11 +114,10 @@ void Faction::handleEvent(const GameEvent& gameEvent)
                 assert(worker != m_workers.end());
 
                 m_workers.erase(worker);
+                m_allEntities.erase(entity);
             }
             break;
             }
-
-            m_allEntities.erase(entity);
         }
     }
         break;

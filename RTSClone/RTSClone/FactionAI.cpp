@@ -55,13 +55,14 @@ void FactionAI::update(float deltaTime, const Map & map, const Faction& opposing
 			Worker* addedWorker = spawnUnit<Worker>(map, m_workers, m_unitSpawnQueue.front(), m_HQ);
 			if (addedWorker)
 			{
+				assert(!m_minerals.empty());
 				int mineralIndex = Globals::getRandomNumber(0, m_minerals.size() - 1);
-				const Mineral* mineralToHarvest = &m_minerals[mineralIndex];
-
+				const Mineral& mineralToHarvest = m_minerals[mineralIndex];
 				glm::vec3 destination = PathFinding::getInstance().getClosestPositionOutsideAABB(addedWorker->getPosition(),
-					mineralToHarvest->getAABB(), mineralToHarvest->getPosition(), map);
+					mineralToHarvest.getAABB(), mineralToHarvest.getPosition(), map);
+
 				addedWorker->moveTo(destination, map, [&](const glm::ivec2& position) { return getAllAdjacentPositions(position, map); },
-					eUnitState::MovingToMinerals, mineralToHarvest);
+					eUnitState::MovingToMinerals, &mineralToHarvest);
 			
 				m_unitSpawnQueue.pop();
 			}
