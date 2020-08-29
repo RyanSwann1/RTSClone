@@ -42,8 +42,14 @@ void Model::attachMeshesToVAO() const
 }
 
 void Model::render(ShaderHandler& shaderHandler, const glm::vec3& position) const
-{
-	glm::mat4 model = glm::translate(glm::mat4(1.0), position);
+{	
+	glm::vec3 modelPosition = position;
+	if (renderFromCentrePosition)
+	{
+		modelPosition.x += sizeFromCentre.x;
+		modelPosition.z -= sizeFromCentre.z;
+	}
+	glm::mat4 model = glm::translate(glm::mat4(1.0), modelPosition);
 	model = glm::scale(model, scale);
 	shaderHandler.setUniformMat4f(eShaderType::Default, "uModel", model);
 
