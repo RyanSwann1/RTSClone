@@ -18,5 +18,5 @@ public:
 	void update(float deltaTime);
 
 private:
-	GameEvent m_gameEvent;
+	GameEvent m_senderEvent;
 };

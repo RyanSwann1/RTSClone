@@ -10,34 +10,34 @@ namespace
 
 Projectile::Projectile(const GameEvent& gameEvent)
 	: Entity(gameEvent.startingPosition, eEntityType::Projectile),
-	m_gameEvent(gameEvent)
+	m_senderEvent(gameEvent)
 {}
 
 Projectile::Projectile(Projectile&& orig) noexcept
 	: Entity(std::move(orig)),
-	m_gameEvent(orig.m_gameEvent)
+	m_senderEvent(orig.m_senderEvent)
 {}
 
 const GameEvent& Projectile::getSenderEvent() const
 {
-	return m_gameEvent;
+	return m_senderEvent;
 }
 
 bool Projectile::isReachedDestination() const
 {
-	return m_position == m_gameEvent.endingPosition;
+	return m_position == m_senderEvent.endingPosition;
 }
 
 void Projectile::update(float deltaTime)
 {
-	m_position = Globals::moveTowards(m_position, m_gameEvent.endingPosition, MOVEMENT_SPEED * deltaTime);
+	m_position = Globals::moveTowards(m_position, m_senderEvent.endingPosition, MOVEMENT_SPEED * deltaTime);
 	m_AABB.update(m_position);
 }
 
 Projectile& Projectile::operator=(Projectile&& orig) noexcept
 {
 	Entity::operator=(std::move(orig));
-	m_gameEvent = orig.m_gameEvent;
+	m_senderEvent = orig.m_senderEvent;
 
 	return *this;
 }
