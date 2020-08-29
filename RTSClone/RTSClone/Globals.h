@@ -70,8 +70,6 @@ namespace Globals
 		}
 	}
 
-
-
 	inline void printImmediately(const glm::vec3& position)
 	{
 		std::cout << position.x << "\n";

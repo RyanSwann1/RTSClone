@@ -23,6 +23,7 @@ class Worker : public Unit
 public:
 	Worker(const Faction& owningFaction, const glm::vec3& startingPosition);
 	Worker(const Faction& owningFaction, const glm::vec3& startingPosition, const glm::vec3& destinationPosition, const Map& map);
+	~Worker();
 	
 	bool isHoldingResources() const;
 	int extractResources();	

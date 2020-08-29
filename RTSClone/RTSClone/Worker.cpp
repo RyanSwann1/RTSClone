@@ -45,6 +45,11 @@ Worker::Worker(const Faction& owningFaction, const glm::vec3 & startingPosition,
 		[&](const glm::ivec2& position) { return getAllAdjacentPositions(position, map); });
 }
 
+Worker::~Worker()
+{
+	GameEventHandler::getInstance().addEvent({ eGameEventType::RemoveAllWorkerPlannedBuildings, m_owningFaction.getName(), getID() });
+}
+
 bool Worker::isHoldingResources() const
 {
 	return m_currentResourceAmount > 0;

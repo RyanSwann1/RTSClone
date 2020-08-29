@@ -92,7 +92,7 @@ const glm::vec3& Unit::getDestination() const
 	assert(!isPathEmpty());
 	return m_pathToPosition.front();
 }
-
+	
 eUnitState Unit::getCurrentState() const
 {
 	return m_currentState;
