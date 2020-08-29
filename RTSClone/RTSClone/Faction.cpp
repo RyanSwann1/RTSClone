@@ -47,12 +47,12 @@ eFactionName Faction::getName() const
 const Entity* Faction::getEntity(const glm::vec3& position, float maxDistance) const
 {
     const Entity* closestEntity = nullptr;
-    float closestEntityDistance = std::numeric_limits<float>::max();
+    float closestEntityDistance = maxDistance * maxDistance;
     
     for (const auto& entity : m_allEntities)
     {
         float distance = Globals::getSqrDistance(entity->getPosition(), position);
-        if (distance < closestEntityDistance && distance < maxDistance * maxDistance)
+        if (distance < maxDistance * maxDistance)
         {
             closestEntity = entity;
             closestEntityDistance = distance;
