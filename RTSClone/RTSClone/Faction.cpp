@@ -432,18 +432,25 @@ void Faction::instructWorkerToBuild(eEntityType entityType, const glm::vec3& mou
     case eEntityType::Barracks:
     case eEntityType::SupplyDepot:
     {
-        auto selectedWorker = std::find_if(m_workers.begin(), m_workers.end(), [](const auto& worker)
+        glm::vec3 buildPosition = Globals::convertToNodePosition(mouseToGroundPosition);
+        auto plannedBuilding = std::find_if(m_plannedBuildings.cbegin(), m_plannedBuildings.cend(), [&buildPosition](const auto& plannedBuilding)
         {
-            return worker.isSelected();
+            return plannedBuilding.spawnPosition == Globals::convertToMiddleGridPosition(buildPosition);
         });
-        if (selectedWorker != m_workers.end())
+
+        if (plannedBuilding == m_plannedBuildings.cend())
         {
-            glm::vec3 buildPosition = Globals::convertToNodePosition(mouseToGroundPosition);
-            
-            if (selectedWorker->build([this, &map, buildPosition, entityType](Worker& worker)
-                { return addBuilding(worker, map, buildPosition, entityType); }, buildPosition, map))
+            auto selectedWorker = std::find_if(m_workers.begin(), m_workers.end(), [](const auto& worker)
             {
-                m_plannedBuildings.emplace_back(selectedWorker->getID(), buildPosition, entityType);
+                return worker.isSelected();
+            });
+            if (selectedWorker != m_workers.end())
+            {
+                if (selectedWorker->build([this, &map, buildPosition, entityType](Worker& worker)
+                { return addBuilding(worker, map, buildPosition, entityType); }, buildPosition, map))
+                {
+                    m_plannedBuildings.emplace_back(selectedWorker->getID(), buildPosition, entityType);
+                }
             }
         }
     }
