@@ -39,4 +39,6 @@ private:
 	int m_currentResourceAmount;
 	Timer m_harvestTimer;
 	const Mineral* m_mineralToHarvest;
+
+	void clearBuildingCommands();
 };

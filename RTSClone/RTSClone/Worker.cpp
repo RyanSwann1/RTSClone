@@ -143,7 +143,16 @@ void Worker::update(float deltaTime, const UnitSpawnerBuilding& HQ, const Map& m
 		
 		const Entity* newBuilding = m_buildingCommands.front().command(*this);
 		m_buildingCommands.pop();
-		GameEventHandler::getInstance().addEvent({ eGameEventType::RemovePlannedBuilding, m_owningFaction.getName(), newBuilding->getPosition() });
+		if (newBuilding)
+		{
+			GameEventHandler::getInstance().addEvent({ eGameEventType::RemovePlannedBuilding, m_owningFaction.getName(), newBuilding->getPosition() });
+		}
+		else
+		{
+			GameEventHandler::getInstance().addEvent({ eGameEventType::RemoveAllWorkerPlannedBuildings, m_owningFaction.getName(), getID() });
+			clearBuildingCommands();
+		}
+		
 		if (!m_buildingCommands.empty())
 		{
 			moveTo(m_buildingCommands.front().buildPosition, map, 
@@ -177,8 +186,7 @@ void Worker::moveTo(const glm::vec3& destinationPosition, const Map& map, const 
 	if (state != eUnitState::MovingToBuildingPosition && !m_buildingCommands.empty())
 	{
 		GameEventHandler::getInstance().addEvent({ eGameEventType::RemovePlannedBuilding, m_owningFaction.getName(), getID() });
-		std::queue<BuildingCommand> empty;
-		std::swap(m_buildingCommands, empty);
+		clearBuildingCommands();
 	}
 	else if (state == eUnitState::Moving)
 	{
@@ -189,7 +197,7 @@ void Worker::moveTo(const glm::vec3& destinationPosition, const Map& map, const 
 	{
 		m_mineralToHarvest = mineralToHarvest;
 	}
-
+			
 	glm::vec3 previousClosestDestination = m_position;
 	if (!m_pathToPosition.empty())
 	{
@@ -226,4 +234,10 @@ void Worker::render(ShaderHandler& shaderHandler) const
 	}
 
 	Entity::render(shaderHandler);
+}
+
+void Worker::clearBuildingCommands()
+{
+	std::queue<BuildingCommand> empty;
+	std::swap(m_buildingCommands, empty);
 }

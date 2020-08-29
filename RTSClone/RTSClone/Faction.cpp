@@ -136,6 +136,19 @@ void Faction::handleEvent(const GameEvent& gameEvent)
         m_plannedBuildings.erase(buildingToSpawn);
     }
         break;
+    case eGameEventType::RemoveAllWorkerPlannedBuildings:
+        for (auto plannedBuilding = m_plannedBuildings.begin(); plannedBuilding != m_plannedBuildings.end();)
+        {
+            if (plannedBuilding->workerID == gameEvent.senderID)
+            {
+                plannedBuilding = m_plannedBuildings.erase(plannedBuilding);
+            }
+            else
+            {
+                ++plannedBuilding;
+            }
+        }
+        break;
     case eGameEventType::AddResources:
     {
         int workerID = gameEvent.senderID;
