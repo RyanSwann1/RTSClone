@@ -41,22 +41,9 @@ bool Worker::isHoldingResources() const
 	return m_currentResourceAmount > 0;
 }
 
-int Worker::extractResources(const Map& map)
+int Worker::extractResources()
 {
 	assert(isHoldingResources());
-	if (m_mineralToHarvest)
-	{
-		glm::vec3 destination = PathFinding::getInstance().getClosestPositionOutsideAABB(m_position,
-			m_mineralToHarvest->getAABB(), m_mineralToHarvest->getPosition(), map);
-
-		moveTo(destination, map, [&](const glm::ivec2& position) { return getAllAdjacentPositions(position, map); },
-			eUnitState::MovingToMinerals, m_mineralToHarvest);
-	}
-	else
-	{
-		m_currentState = eUnitState::Idle;
-	}
-
 	int resources = m_currentResourceAmount;
 	m_currentResourceAmount = 0;
 	return resources;
@@ -94,7 +81,18 @@ void Worker::update(float deltaTime, const UnitSpawnerBuilding& HQ, const Map& m
 		if (m_pathToPosition.empty())
 		{
 			GameEventHandler::getInstance().addEvent({ eGameEventType::AddResources, m_owningFaction.getName(), getID() });
-			m_currentState = eUnitState::Idle;
+			if (m_mineralToHarvest)
+			{
+				glm::vec3 destination = PathFinding::getInstance().getClosestPositionOutsideAABB(m_position,
+					m_mineralToHarvest->getAABB(), m_mineralToHarvest->getPosition(), map);
+
+				moveTo(destination, map, [&](const glm::ivec2& position) { return getAllAdjacentPositions(position, map); },
+					eUnitState::MovingToMinerals, m_mineralToHarvest);
+			}
+			else
+			{
+				m_currentState = eUnitState::Idle;
+			}
 		}
 		break;
 	case eUnitState::Harvesting:

@@ -16,7 +16,7 @@ public:
 	Worker(const Faction& owningFaction, const glm::vec3& startingPosition, const glm::vec3& destinationPosition, const Map& map);
 	
 	bool isHoldingResources() const;
-	int extractResources(const Map& map);	
+	int extractResources();	
 
 	bool build(const std::function<const Entity*(Worker&)>& buildingCommand, const glm::vec3& buildPosition, const Map& map);
 	void update(float deltaTime, const UnitSpawnerBuilding& HQ, const Map& map, const Faction& opposingFaction,
