@@ -44,6 +44,24 @@ eFactionName Faction::getName() const
     return m_factionName;
 }
 
+const Entity* Faction::getEntity(const glm::vec3& position, float maxDistance) const
+{
+    const Entity* closestEntity = nullptr;
+    float closestEntityDistance = std::numeric_limits<float>::max();
+    
+    for (const auto& entity : m_allEntities)
+    {
+        float distance = Globals::getSqrDistance(entity->getPosition(), position);
+        if (distance < closestEntityDistance && distance < maxDistance * maxDistance)
+        {
+            closestEntity = entity;
+            closestEntityDistance = distance;
+        }
+    }
+
+    return closestEntity;
+}
+
 const Entity* Faction::getEntity(const AABB& AABB, int entityID) const
 {
     auto entity = std::find_if(m_allEntities.cbegin(), m_allEntities.cend(), [&AABB, entityID](const auto& entity)

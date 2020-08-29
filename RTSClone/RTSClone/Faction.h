@@ -25,6 +25,7 @@ class Faction : private NonMovable, private NonCopyable
 {
 public:
 	eFactionName getName() const;
+	const Entity* getEntity(const glm::vec3& position, float maxDistance) const;
 	const Entity* getEntity(const AABB& AABB, int entityID) const;
 	const Entity* getEntity(int entityID) const;
 	int getEntityIDAtPosition(const glm::vec3& position) const;
