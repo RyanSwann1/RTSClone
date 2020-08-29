@@ -21,6 +21,8 @@ namespace
 			return eModelName::Barracks;
 		case eEntityType::Mineral:
 			return eModelName::Mineral;
+		case eEntityType::Projectile:
+			return eModelName::Projectile;
 		default:
 			assert(false);
 		}
@@ -112,6 +114,16 @@ ModelManager::ModelManager()
 		m_loadedAllModels = false;
 	}
 	m_models[static_cast<int>(workerModel->modelName)] = std::move(workerModel);
+
+	std::unique_ptr<Model> projectileModel = Model::create("laserSabel.obj", false,
+		{ 1.0f, 1.0f, 1.0f }, eModelName::Projectile, { 0.75f, 0.75f, 0.75f });
+	assert(projectileModel);
+	if (!projectileModel)
+	{
+		std::cout << "Couldn't load projectile model\n";
+		m_loadedAllModels = false;
+	}
+	m_models[static_cast<int>(eModelName::Projectile)] = std::move(projectileModel);
 
 	std::unique_ptr<Model> supplyDepotModel = Model::create("satelliteDish.obj", false,
 		glm::vec3(3.0f, 1.0f, 3.0f), eModelName::SupplyDepot, Globals::SUPPLY_DEPOT_AABB_SIZE);

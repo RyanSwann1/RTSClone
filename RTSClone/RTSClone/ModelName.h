@@ -8,6 +8,7 @@ enum class eModelName
 	WorkerMineral,
 	Waypoint,
 	Worker,
+	Projectile,
 	SupplyDepot,
 	Barracks,
 	Max = Barracks
