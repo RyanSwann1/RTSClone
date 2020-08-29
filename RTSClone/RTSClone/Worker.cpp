@@ -185,7 +185,7 @@ void Worker::moveTo(const glm::vec3& destinationPosition, const Map& map, const 
 
 	if (state != eUnitState::MovingToBuildingPosition && !m_buildingCommands.empty())
 	{
-		GameEventHandler::getInstance().addEvent({ eGameEventType::RemovePlannedBuilding, m_owningFaction.getName(), getID() });
+		GameEventHandler::getInstance().addEvent({ eGameEventType::RemoveAllWorkerPlannedBuildings, m_owningFaction.getName(), getID() });
 		clearBuildingCommands();
 	}
 	else if (state == eUnitState::Moving)
