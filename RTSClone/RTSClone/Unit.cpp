@@ -153,6 +153,7 @@ void Unit::moveTo(const glm::vec3& destinationPosition, const Map& map, const Ge
 void Unit::update(float deltaTime, const Faction& opposingFaction, const Map& map, const std::list<Unit>& units)
 {
 	assert(opposingFaction.getName() != m_owningFaction.getName());
+	m_attackTimer.update(deltaTime);
 
 	if (!m_pathToPosition.empty())
 	{
@@ -194,7 +195,7 @@ void Unit::update(float deltaTime, const Faction& opposingFaction, const Map& ma
 	case eUnitState::Attacking:
 	{
 		assert(m_targetEntityID != Globals::INVALID_ENTITY_ID);
-		m_attackTimer.update(deltaTime);
+		
 		bool newPosition = false;
 		if (m_attackTimer.isExpired())
 		{
