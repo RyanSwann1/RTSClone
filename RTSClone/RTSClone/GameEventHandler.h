@@ -9,7 +9,6 @@
 class ProjectileHandler;
 class FactionPlayer;
 class FactionAI;
-class Map;
 class GameEventHandler : private NonCopyable, private NonMovable
 {
 public:
@@ -20,7 +19,7 @@ public:
 	}
 
 	void addEvent(const GameEvent& gameEvent);
-	void handleEvents(FactionPlayer& player, FactionAI& playerAI, const Map& map, ProjectileHandler& projectileHandler);
+	void handleEvents(FactionPlayer& player, FactionAI& playerAI, ProjectileHandler& projectileHandler);
 	
 private:
 	GameEventHandler();

@@ -74,7 +74,7 @@ int Faction::getEntityIDAtPosition(const glm::vec3& position) const
     }
 }
 
-void Faction::handleEvent(const GameEvent& gameEvent, const Map& map)
+void Faction::handleEvent(const GameEvent& gameEvent)
 {
     switch (gameEvent.type)
     {
@@ -128,7 +128,7 @@ void Faction::handleEvent(const GameEvent& gameEvent, const Map& map)
         });
         if (worker != m_workers.end())
         {
-            addResources(*worker, map);
+            addResources(*worker);
         }
     }
         break;
@@ -137,9 +137,9 @@ void Faction::handleEvent(const GameEvent& gameEvent, const Map& map)
     }
 }
 
-void Faction::addResources(Worker& worker, const Map& map)
+void Faction::addResources(Worker& worker)
 {
-    m_currentResourceAmount += worker.extractResources(map);
+    m_currentResourceAmount += worker.extractResources();
 }
 
 void Faction::update(float deltaTime, const Map& map, const Faction& opposingFaction)

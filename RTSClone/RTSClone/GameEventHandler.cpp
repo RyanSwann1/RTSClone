@@ -13,7 +13,7 @@ void GameEventHandler::addEvent(const GameEvent& gameEvent)
 	m_gameEvents.push(gameEvent);
 }
 
-void GameEventHandler::handleEvents(FactionPlayer& player, FactionAI& playerAI, const Map& map, ProjectileHandler& projectileHandler)
+void GameEventHandler::handleEvents(FactionPlayer& player, FactionAI& playerAI, ProjectileHandler& projectileHandler)
 {
 	while (!m_gameEvents.empty())
 	{
@@ -23,31 +23,31 @@ void GameEventHandler::handleEvents(FactionPlayer& player, FactionAI& playerAI, 
 		case eGameEventType::Attack:
 			if (gameEvent.senderFaction == eFactionName::Player)
 			{
-				playerAI.handleEvent(gameEvent, map);
+				playerAI.handleEvent(gameEvent);
 			}
 			else if(gameEvent.senderFaction == eFactionName::AI)
 			{
-				player.handleEvent(gameEvent, map);
+				player.handleEvent(gameEvent);
 			}
 			break;
 		case eGameEventType::RemovePlannedBuilding:
 			if (gameEvent.senderFaction == eFactionName::Player)
 			{
-				player.handleEvent(gameEvent, map);
+				player.handleEvent(gameEvent);
 			}
 			else if (gameEvent.senderFaction == eFactionName::AI)
 			{
-				playerAI.handleEvent(gameEvent, map);
+				playerAI.handleEvent(gameEvent);
 			}
 			break;
 		case eGameEventType::AddResources:
 			if (gameEvent.senderFaction == eFactionName::Player)
 			{
-				player.handleEvent(gameEvent, map);
+				player.handleEvent(gameEvent);
 			}
 			else if (gameEvent.senderFaction == eFactionName::AI)
 			{
-				playerAI.handleEvent(gameEvent, map);
+				playerAI.handleEvent(gameEvent);
 			}
 			break;
 		case eGameEventType::SpawnProjectile:

@@ -28,8 +28,7 @@ public:
 	const Entity* getEntity(int entityID) const;
 	int getEntityIDAtPosition(const glm::vec3& position) const;
 
-	void handleEvent(const GameEvent& gameEvent, const Map& map);
-
+	void handleEvent(const GameEvent& gameEvent);
 	void update(float deltaTime, const Map& map, const Faction& opposingFaction);
 	void render(ShaderHandler& shaderHandler) const;
 	void renderPlannedBuildings(ShaderHandler& shaderHandler) const;
@@ -62,7 +61,7 @@ protected:
 	void increasePopulationLimit();
 	void revalidateExistingUnitPaths(const Map& map);
 	void instructWorkerToBuild(eEntityType entityType, const glm::vec3& mouseToGroundPosition, Map& map);
-	void addResources(Worker& worker, const Map& map);
+	void addResources(Worker& worker);
 
 	template <class Unit>
 	Unit* spawnUnit(const Map& map, std::list<Unit>& units, eEntityType entityType, UnitSpawnerBuilding& building)
