@@ -3,8 +3,10 @@
 #include "NonCopyable.h"
 #include "NonMovable.h"
 #include "glm/glm.hpp"
+#include "GameEvent.h"
 #include <queue>
 
+class ProjectileHandler;
 class FactionPlayer;
 class FactionAI;
 class Map;
@@ -18,7 +20,7 @@ public:
 	}
 
 	void addEvent(const GameEvent& gameEvent);
-	void handleEvents(FactionPlayer& player, FactionAI& playerAI, const Map& map);
+	void handleEvents(FactionPlayer& player, FactionAI& playerAI, const Map& map, ProjectileHandler& projectileHandler);
 	
 private:
 	GameEventHandler();

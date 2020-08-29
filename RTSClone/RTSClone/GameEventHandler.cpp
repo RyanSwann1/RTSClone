@@ -2,7 +2,7 @@
 #include "Globals.h"
 #include "FactionPlayer.h"
 #include "FactionAI.h"
-#include "GameEvent.h"
+#include "ProjectileHandler.h"
 
 GameEventHandler::GameEventHandler()
 	: m_gameEvents()
@@ -13,7 +13,7 @@ void GameEventHandler::addEvent(const GameEvent& gameEvent)
 	m_gameEvents.push(gameEvent);
 }
 
-void GameEventHandler::handleEvents(FactionPlayer& player, FactionAI& playerAI, const Map& map)
+void GameEventHandler::handleEvents(FactionPlayer& player, FactionAI& playerAI, const Map& map, ProjectileHandler& projectileHandler)
 {
 	while (!m_gameEvents.empty())
 	{
@@ -49,6 +49,9 @@ void GameEventHandler::handleEvents(FactionPlayer& player, FactionAI& playerAI, 
 			{
 				playerAI.handleEvent(gameEvent, map);
 			}
+			break;
+		case eGameEventType::SpawnProjectile:
+			projectileHandler.addProjectile(gameEvent);
 			break;
 		default:
 			assert(false);
