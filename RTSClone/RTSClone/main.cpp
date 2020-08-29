@@ -122,7 +122,7 @@ int main()
 		ImGui::ShowDemoWindow();
 
 		//Update
-		projectileHandler.update(deltaTime);
+		projectileHandler.update(deltaTime, player, playerAI);
 		player.update(deltaTime, *map, playerAI);
 		playerAI.update(deltaTime, *map, player);
 		camera.update(window, deltaTime);
@@ -167,6 +167,7 @@ int main()
 #ifdef RENDER_AABB
 		player.renderAABB(*shaderHandler);
 		playerAI.renderAABB(*shaderHandler);
+		projectileHandler.renderAABB(*shaderHandler);
 #endif // RENDER_AABB
 
 #ifdef RENDER_PATHING

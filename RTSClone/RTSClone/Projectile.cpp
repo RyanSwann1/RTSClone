@@ -26,6 +26,7 @@ bool Projectile::isReachedDestination() const
 void Projectile::update(float deltaTime)
 {
 	m_position = Globals::moveTowards(m_position, m_gameEvent.endingPosition, MOVEMENT_SPEED * deltaTime);
+	m_AABB.update(m_position);
 }
 
 Projectile& Projectile::operator=(Projectile&& orig) noexcept

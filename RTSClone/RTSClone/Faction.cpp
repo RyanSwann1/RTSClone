@@ -42,6 +42,21 @@ eFactionName Faction::getName() const
     return m_factionName;
 }
 
+const Entity* Faction::getEntity(const AABB& AABB, int entityID) const
+{
+    auto entity = std::find_if(m_allEntities.cbegin(), m_allEntities.cend(), [&AABB, entityID](const auto& entity)
+    {
+        return entity->getAABB().contains(AABB) && entity->getID() == entityID;
+    });
+    
+    if (entity != m_allEntities.cend())
+    {
+        return (*entity);
+    }
+
+    return nullptr;
+}
+
 const Entity* Faction::getEntity(int entityID) const
 {
     auto entity = std::find_if(m_allEntities.cbegin(), m_allEntities.cend(), [entityID](const auto& entity)
