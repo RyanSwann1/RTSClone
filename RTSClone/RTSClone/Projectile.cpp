@@ -18,6 +18,11 @@ Projectile::Projectile(Projectile&& orig) noexcept
 	m_gameEvent(orig.m_gameEvent)
 {}
 
+const GameEvent& Projectile::getSenderEvent() const
+{
+	return m_gameEvent;
+}
+
 bool Projectile::isReachedDestination() const
 {
 	return m_position == m_gameEvent.endingPosition;

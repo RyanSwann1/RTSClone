@@ -19,13 +19,13 @@ void ProjectileHandler::update(float deltaTime, const FactionPlayer& player, con
 		projectile->update(deltaTime);
 	
 		bool projectileCollision = false;
-		switch (projectile->m_gameEvent.senderFaction)
+		switch (projectile->getSenderEvent().senderFaction)
 		{
 		case eFactionName::Player:
-			projectileCollision = playerAI.getEntity(projectile->getAABB(), projectile->m_gameEvent.targetID);
+			projectileCollision = playerAI.getEntity(projectile->getAABB(), projectile->getSenderEvent().targetID);
 			break;
 		case eFactionName::AI:
-			projectileCollision = player.getEntity(projectile->getAABB(), projectile->m_gameEvent.targetID);
+			projectileCollision = player.getEntity(projectile->getAABB(), projectile->getSenderEvent().targetID);
 			break;
 		}
 
@@ -33,8 +33,8 @@ void ProjectileHandler::update(float deltaTime, const FactionPlayer& player, con
 		{
 			if (projectileCollision)
 			{
-				GameEventHandler::getInstance().addEvent({ eGameEventType::Attack, projectile->m_gameEvent.senderFaction,
-					projectile->getID(), projectile->m_gameEvent.targetID });
+				GameEventHandler::getInstance().addEvent({ eGameEventType::Attack, projectile->getSenderEvent().senderFaction,
+					projectile->getID(), projectile->getSenderEvent().targetID });
 			}
 
 			projectile = m_projectiles.erase(projectile);
