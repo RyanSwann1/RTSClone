@@ -91,7 +91,8 @@ void SelectionBox::render(const sf::Window& window) const
 FactionPlayer::FactionPlayer(eFactionName factionName, const glm::vec3& hqStartingPosition, const glm::vec3& mineralsStartingPosition)
     : Faction(factionName, hqStartingPosition, mineralsStartingPosition),
     m_selectionBox(),
-    m_previousMouseToGroundPosition()
+    m_previousMouseToGroundPosition(),
+    m_attackMoveSelected(false)
 {}
 
 void FactionPlayer::handleInput(const sf::Event& currentSFMLEvent, const sf::Window& window, const Camera& camera, const Map& map, 
@@ -169,6 +170,7 @@ void FactionPlayer::handleInput(const sf::Event& currentSFMLEvent, const sf::Win
         }
         break;
     case sf::Event::MouseButtonReleased:
+        m_attackMoveSelected = false;
         if (currentSFMLEvent.mouseButton.button == sf::Mouse::Left)
         {
             m_selectionBox.reset();
@@ -216,6 +218,9 @@ void FactionPlayer::handleInput(const sf::Event& currentSFMLEvent, const sf::Win
             break;
         case sf::Keyboard::N:
             instructWorkerToBuild(eEntityType::Barracks, camera.getMouseToGroundPosition(window), map);
+            break;
+        case sf::Keyboard::A:
+            m_attackMoveSelected = true;
             break;
         }
         break;
@@ -268,8 +273,9 @@ void FactionPlayer::moveSingularSelectedUnit(const glm::vec3& mouseToGroundPosit
     if (selectedUnit != m_units.end())
     {
         selectedUnit->resetTargetID();
+        eUnitState state = (m_attackMoveSelected ? eUnitState::AttackMoving : eUnitState::Moving);
         selectedUnit->moveTo(Globals::convertToNodePosition(mouseToGroundPosition), map,
-            [&](const glm::ivec2& position) { return getAllAdjacentPositions(position, map, m_units, *selectedUnit); });
+            [&](const glm::ivec2& position) { return getAllAdjacentPositions(position, map, m_units, *selectedUnit); }, state);
     }
     else
     {
@@ -294,7 +300,7 @@ void FactionPlayer::moveSingularSelectedUnit(const glm::vec3& mouseToGroundPosit
             glm::vec3 destination = PathFinding::getInstance().getClosestPositionOutsideAABB(selectedWorker->getPosition(),
                 mineralToHarvest->getAABB(), mineralToHarvest->getPosition(), map);
             
-            selectedWorker->moveTo(mouseToGroundPosition, map, [&](const glm::ivec2& position) { return getAllAdjacentPositions(position, map); },
+            selectedWorker->moveTo(destination, map, [&](const glm::ivec2& position) { return getAllAdjacentPositions(position, map); },
                 eUnitState::MovingToMinerals, mineralToHarvest);
         }
         else
@@ -388,10 +394,14 @@ void FactionPlayer::moveMultipleSelectedUnits(const glm::vec3& mouseToGroundPosi
                     switch (selectedUnit->getEntityType())
                     {
                     case eEntityType::Unit:
+                    {
                         selectedUnit->resetTargetID();
+                        eUnitState state = (m_attackMoveSelected ? eUnitState::AttackMoving : eUnitState::Moving);
+
                         selectedUnit->moveTo(Globals::convertToNodePosition(mouseToGroundPosition - (averagePosition - selectedUnit->getPosition())), map,
                             [&](const glm::ivec2& position)
-                        { return getAllAdjacentPositions(position, map, m_units, *selectedUnit, selectedUnits); });
+                        { return getAllAdjacentPositions(position, map, m_units, *selectedUnit, selectedUnits); }, state);
+                    }
                         break;
                     case eEntityType::Worker:
                         selectedUnit->resetTargetID();

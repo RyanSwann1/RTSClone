@@ -171,7 +171,7 @@ void Unit::update(float deltaTime, const Faction& opposingFaction, const Map& ma
 	switch (m_currentState)
 	{
 	case eUnitState::Idle:
-		assert(m_targetEntityID == Globals::INVALID_ENTITY_ID);
+		assert(m_targetEntityID == Globals::INVALID_ENTITY_ID && m_pathToPosition.empty());
 		if (m_attackTimer.isExpired() && getEntityType() == eEntityType::Unit)
 		{
 			const Entity* targetEntity = opposingFaction.getEntity(m_position, UNIT_ATTACK_RANGE);
@@ -196,12 +196,25 @@ void Unit::update(float deltaTime, const Faction& opposingFaction, const Map& ma
 			else
 			{
 				m_targetEntityID = Globals::INVALID_ENTITY_ID;
+				m_currentState = eUnitState::Idle;
+				m_pathToPosition.clear();
 			}
 		}
 		else if (m_pathToPosition.empty())
 		{
 			m_currentState = eUnitState::Idle;
 			m_targetEntityID = Globals::INVALID_ENTITY_ID;
+		}
+		break;
+	case eUnitState::AttackMoving:
+		if (m_attackTimer.isExpired())
+		{
+			const Entity* targetEntity = opposingFaction.getEntity(m_position, UNIT_ATTACK_RANGE);
+			if (targetEntity)
+			{
+				m_targetEntityID = targetEntity->getID();
+				m_currentState = eUnitState::Attacking;
+			}
 		}
 		break;
 	case eUnitState::Attacking:
@@ -211,8 +224,6 @@ void Unit::update(float deltaTime, const Faction& opposingFaction, const Map& ma
 		bool newPosition = false;
 		if (m_attackTimer.isExpired())
 		{
-			m_attackTimer.resetElaspedTime();
-			
 			const Entity* targetEntity = opposingFaction.getEntity(m_targetEntityID);
 			if (!targetEntity)
 			{
@@ -244,6 +255,11 @@ void Unit::update(float deltaTime, const Faction& opposingFaction, const Map& ma
 		}
 	}
 		break;
+	}
+
+	if (m_attackTimer.isExpired())
+	{
+		m_attackTimer.resetElaspedTime();
 	}
 }
 

@@ -37,6 +37,7 @@ public:
 private:
 	SelectionBox m_selectionBox;
 	glm::vec3 m_previousMouseToGroundPosition;
+	bool m_attackMoveSelected;
 
 	bool isOneUnitSelected() const;
 	
