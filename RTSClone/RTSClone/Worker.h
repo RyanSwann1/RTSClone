@@ -2,9 +2,18 @@
 
 #include "Unit.h"
 #include "Timer.h"
+#include <queue>
 
 //https://stackoverflow.com/questions/50182913/what-are-the-principles-involved-for-an-hierarchical-state-machine-and-how-to-i - HSM
 //https://gameprogrammingpatterns.com/state.html
+
+struct BuildingCommand
+{
+	BuildingCommand(const std::function<const Entity* (Worker&)>& command, const glm::vec3& buildPosition);
+
+	std::function<const Entity* (Worker&)> command;
+	glm::vec3 buildPosition;
+};
 
 class Faction;
 class Mineral;
@@ -26,7 +35,7 @@ public:
 	void render(ShaderHandler& shaderHandler) const;
 
 private:
-	std::function<const Entity*(Worker&)> m_buildingCommand;
+	std::queue<BuildingCommand> m_buildingCommands;
 	int m_currentResourceAmount;
 	Timer m_harvestTimer;
 	const Mineral* m_mineralToHarvest;

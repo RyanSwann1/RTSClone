@@ -17,9 +17,18 @@ namespace
 	constexpr int RESOURCE_INCREMENT = 10;
 }
 
+//BuildingCommand
+BuildingCommand::BuildingCommand(const std::function<const Entity* (Worker&)>& command, const glm::vec3& buildPosition)
+	: command(command),
+	buildPosition(buildPosition)
+{
+	assert(command);
+}
+
+//Worker
 Worker::Worker(const Faction& owningFaction, const glm::vec3& startingPosition)
 	: Unit(owningFaction, startingPosition, eEntityType::Worker),
-	m_buildingCommand(),
+	m_buildingCommands(),
 	m_currentResourceAmount(0),
 	m_harvestTimer(HARVEST_TIME, false),
 	m_mineralToHarvest(nullptr)
@@ -27,7 +36,7 @@ Worker::Worker(const Faction& owningFaction, const glm::vec3& startingPosition)
 
 Worker::Worker(const Faction& owningFaction, const glm::vec3 & startingPosition, const glm::vec3 & destinationPosition, const Map & map)
 	: Unit(owningFaction, startingPosition, eEntityType::Worker),
-	m_buildingCommand(),
+	m_buildingCommands(),
 	m_currentResourceAmount(0),
 	m_harvestTimer(HARVEST_TIME, false),
 	m_mineralToHarvest(nullptr)
@@ -51,11 +60,14 @@ int Worker::extractResources()
 
 bool Worker::build(const std::function<const Entity*(Worker&)>& buildingCommand, const glm::vec3& buildPosition, const Map& map)
 {
-	if (!map.isPositionOccupied(buildPosition) && !m_buildingCommand)
+	if (!map.isPositionOccupied(buildPosition))
 	{
-		m_buildingCommand = buildingCommand;
-		moveTo(Globals::convertToMiddleGridPosition(buildPosition), map, 
-			[&](const glm::ivec2& position) { return getAllAdjacentPositions(position, map); }, eUnitState::MovingToBuildingPosition);
+		m_buildingCommands.emplace(buildingCommand, buildPosition);
+		if (m_buildingCommands.size() == size_t(1))
+		{
+			moveTo(Globals::convertToMiddleGridPosition(buildPosition), map,
+				[&](const glm::ivec2& position) { return getAllAdjacentPositions(position, map); }, eUnitState::MovingToBuildingPosition);
+		}
 
 		return true;
 	}
@@ -120,28 +132,38 @@ void Worker::update(float deltaTime, const UnitSpawnerBuilding& HQ, const Map& m
 		}
 		break;
 	case eUnitState::MovingToBuildingPosition:
-		assert(m_buildingCommand);
+		assert(!m_buildingCommands.empty());
 		if (m_pathToPosition.empty())
 		{
 			m_currentState = eUnitState::Building;
 		}
 		break;
 	case eUnitState::Building:
-		assert(m_pathToPosition.empty() && m_buildingCommand);
-		const Entity* newBuilding = m_buildingCommand(*this);
-		m_buildingCommand = nullptr;
+		assert(m_pathToPosition.empty() && !m_buildingCommands.empty());
+		
+		const Entity* newBuilding = m_buildingCommands.front().command(*this);
+		m_buildingCommands.pop();
 		GameEventHandler::getInstance().addEvent({ eGameEventType::RemovePlannedBuilding, m_owningFaction.getName(), getID() });
-		if (newBuilding)
+		if (!m_buildingCommands.empty())
 		{
-			glm::vec3 destination = PathFinding::getInstance().getClosestPositionOutsideAABB(m_position,
-				newBuilding->getAABB(), newBuilding->getPosition(), map);
-			moveTo(destination, map, [&](const glm::ivec2& position) { return getAllAdjacentPositions(position, map); });
-			assert(!m_pathToPosition.empty());
+			moveTo(m_buildingCommands.front().buildPosition, map, 
+				[&](const glm::ivec2& position) { return getAllAdjacentPositions(position, map); }, eUnitState::MovingToBuildingPosition);
 		}
 		else
 		{
-			m_currentState = eUnitState::Idle;
+			if (newBuilding)
+			{
+				glm::vec3 destination = PathFinding::getInstance().getClosestPositionOutsideAABB(m_position,
+					newBuilding->getAABB(), newBuilding->getPosition(), map);
+				moveTo(destination, map, [&](const glm::ivec2& position) { return getAllAdjacentPositions(position, map); });
+				assert(!m_pathToPosition.empty());
+			}
+			else
+			{
+				m_currentState = eUnitState::Idle;
+			}
 		}
+
 		break;
 	}
 }
@@ -152,10 +174,11 @@ void Worker::moveTo(const glm::vec3& destinationPosition, const Map& map, const 
 	assert(state == eUnitState::Moving || state == eUnitState::MovingToBuildingPosition || 
 		state == eUnitState::MovingToMinerals || state == eUnitState::ReturningMineralsToHQ);
 
-	if (m_buildingCommand && state != eUnitState::MovingToBuildingPosition)
+	if (state != eUnitState::MovingToBuildingPosition && !m_buildingCommands.empty())
 	{
 		GameEventHandler::getInstance().addEvent({ eGameEventType::RemovePlannedBuilding, m_owningFaction.getName(), getID() });
-		m_buildingCommand = nullptr;
+		std::queue<BuildingCommand> empty;
+		std::swap(m_buildingCommands, empty);
 	}
 	else if (state == eUnitState::Moving)
 	{
