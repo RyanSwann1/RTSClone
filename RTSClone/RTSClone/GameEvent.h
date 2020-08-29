@@ -7,6 +7,7 @@ enum class eGameEventType
 {
 	Attack = 0,
 	RemovePlannedBuilding,
+	RemoveAllWorkerPlannedBuildings,
 	AddResources,
 	SpawnProjectile
 };

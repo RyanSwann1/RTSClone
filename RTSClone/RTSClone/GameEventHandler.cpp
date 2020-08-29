@@ -31,6 +31,7 @@ void GameEventHandler::handleEvents(FactionPlayer& player, FactionAI& playerAI, 
 			}
 			break;
 		case eGameEventType::RemovePlannedBuilding:
+		case eGameEventType::RemoveAllWorkerPlannedBuildings:
 			if (gameEvent.senderFaction == eFactionName::Player)
 			{
 				player.handleEvent(gameEvent);
