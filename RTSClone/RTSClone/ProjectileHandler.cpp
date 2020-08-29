@@ -1,6 +1,7 @@
 #include "ProjectileHandler.h"
 #include "FactionPlayer.h"
 #include "FactionAI.h"
+#include "GameEventHandler.h"
 
 ProjectileHandler::ProjectileHandler()
 	: m_projectiles()
@@ -21,9 +22,7 @@ void ProjectileHandler::update(float deltaTime, const FactionPlayer& player, con
 		switch (projectile->m_gameEvent.senderFaction)
 		{
 		case eFactionName::Player:
-		{
 			projectileCollision = playerAI.getEntity(projectile->getAABB(), projectile->m_gameEvent.targetID);
-		}
 			break;
 		case eFactionName::AI:
 			projectileCollision = player.getEntity(projectile->getAABB(), projectile->m_gameEvent.targetID);
@@ -32,6 +31,12 @@ void ProjectileHandler::update(float deltaTime, const FactionPlayer& player, con
 
 		if (projectileCollision || projectile->isReachedDestination())
 		{
+			if (projectileCollision)
+			{
+				GameEventHandler::getInstance().addEvent({ eGameEventType::Attack, projectile->m_gameEvent.senderFaction,
+					projectile->getID(), projectile->m_gameEvent.targetID });
+			}
+
 			projectile = m_projectiles.erase(projectile);
 		}
 		else
