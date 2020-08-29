@@ -30,7 +30,7 @@ class FactionPlayer : public Faction
 public:
 	FactionPlayer(eFactionName factionName, const glm::vec3& hqStartingPosition, const glm::vec3& mineralsStartingPosition);
 
-	void handleInput(const sf::Event& currentSFMLEvent, const sf::Window& window, const Camera& camera, Map& map, 
+	void handleInput(const sf::Event& currentSFMLEvent, const sf::Window& window, const Camera& camera, const Map& map, 
 		float deltaTime, const Faction& opposingFaction);
 	void renderSelectionBox(const sf::Window& window) const;
 

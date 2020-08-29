@@ -94,7 +94,7 @@ FactionPlayer::FactionPlayer(eFactionName factionName, const glm::vec3& hqStarti
     m_previousMouseToGroundPosition()
 {}
 
-void FactionPlayer::handleInput(const sf::Event& currentSFMLEvent, const sf::Window& window, const Camera& camera, Map& map, 
+void FactionPlayer::handleInput(const sf::Event& currentSFMLEvent, const sf::Window& window, const Camera& camera, const Map& map, 
     float deltaTime, const Faction& opposingFaction)
 {
     switch (currentSFMLEvent.type)

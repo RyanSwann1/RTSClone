@@ -323,7 +323,7 @@ bool Faction::isEntityAffordable(eEntityType entityType) const
     }
 }
 
-const Entity* Faction::addBuilding(Worker& worker, Map& map, glm::vec3 spawnPosition, eEntityType entityType)
+const Entity* Faction::addBuilding(Worker& worker, const Map& map, glm::vec3 spawnPosition, eEntityType entityType)
 {
     if (m_currentPopulationLimit + Globals::POPULATION_INCREMENT < Globals::MAX_POPULATION &&
         isEntityAffordable(entityType) &&
@@ -420,9 +420,9 @@ void Faction::revalidateExistingUnitPaths(const Map& map)
     }
 }
 
-void Faction::instructWorkerToBuild(eEntityType entityType, const glm::vec3& mouseToGroundPosition, Map& map)
+void Faction::instructWorkerToBuild(eEntityType entityType, const glm::vec3& mouseToGroundPosition, const Map& map)
 {
-    if (!Globals::isPositionInMapBounds(mouseToGroundPosition))
+    if (!Globals::isPositionInMapBounds(mouseToGroundPosition) || map.isPositionOccupied(mouseToGroundPosition))
     {
         return;
     }

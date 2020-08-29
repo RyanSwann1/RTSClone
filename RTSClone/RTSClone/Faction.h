@@ -57,12 +57,12 @@ protected:
 	bool isExceedPopulationLimit(eEntityType entityType) const;
 	bool isEntityAffordable(eEntityType entityType) const;
 
-	const Entity* addBuilding(Worker& worker, Map& map, glm::vec3 spawnPosition, eEntityType entityType);
+	const Entity* addBuilding(Worker& worker, const Map& map, glm::vec3 spawnPosition, eEntityType entityType);
 	void reduceResources(eEntityType addedEntityType);
 	void increaseCurrentPopulationAmount(eEntityType entityType);
 	void increasePopulationLimit();
 	void revalidateExistingUnitPaths(const Map& map);
-	void instructWorkerToBuild(eEntityType entityType, const glm::vec3& mouseToGroundPosition, Map& map);
+	void instructWorkerToBuild(eEntityType entityType, const glm::vec3& mouseToGroundPosition, const Map& map);
 	void addResources(Worker& worker);
 
 	template <class Unit>
