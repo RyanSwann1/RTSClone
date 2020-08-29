@@ -51,7 +51,7 @@ int Worker::extractResources()
 
 bool Worker::build(const std::function<const Entity*(Worker&)>& buildingCommand, const glm::vec3& buildPosition, const Map& map)
 {
-	if (!m_buildingCommand)
+	if (!map.isPositionOccupied(buildPosition) && !m_buildingCommand)
 	{
 		m_buildingCommand = buildingCommand;
 		moveTo(Globals::convertToMiddleGridPosition(buildPosition), map, 
@@ -130,10 +130,9 @@ void Worker::update(float deltaTime, const UnitSpawnerBuilding& HQ, const Map& m
 		assert(m_pathToPosition.empty() && m_buildingCommand);
 		const Entity* newBuilding = m_buildingCommand(*this);
 		m_buildingCommand = nullptr;
+		GameEventHandler::getInstance().addEvent({ eGameEventType::RemovePlannedBuilding, m_owningFaction.getName(), getID() });
 		if (newBuilding)
 		{
-			GameEventHandler::getInstance().addEvent({ eGameEventType::RemovePlannedBuilding, m_owningFaction.getName(), getID() });
-
 			glm::vec3 destination = PathFinding::getInstance().getClosestPositionOutsideAABB(m_position,
 				newBuilding->getAABB(), newBuilding->getPosition(), map);
 			moveTo(destination, map, [&](const glm::ivec2& position) { return getAllAdjacentPositions(position, map); });
@@ -153,7 +152,7 @@ void Worker::moveTo(const glm::vec3& destinationPosition, const Map& map, const 
 	assert(state == eUnitState::Moving || state == eUnitState::MovingToBuildingPosition || 
 		state == eUnitState::MovingToMinerals || state == eUnitState::ReturningMineralsToHQ);
 
-	if (m_buildingCommand && (state == eUnitState::Moving || state == eUnitState::MovingToMinerals))
+	if (m_buildingCommand && state != eUnitState::MovingToBuildingPosition)
 	{
 		GameEventHandler::getInstance().addEvent({ eGameEventType::RemovePlannedBuilding, m_owningFaction.getName(), getID() });
 		m_buildingCommand = nullptr;
