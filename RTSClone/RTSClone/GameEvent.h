@@ -17,6 +17,7 @@ struct GameEvent
 	GameEvent(eGameEventType gameEventType, eFactionName senderFaction, int senderID, int targetID);
 	GameEvent(eGameEventType gameEventType, eFactionName senderFaction, int senderID, int targetID,
 		const glm::vec3& startingPosition, const glm::vec3& endingPosition);
+	GameEvent(eGameEventType gameEventType, eFactionName senderFaction, const glm::vec3& position);
 
 	eGameEventType type;
 	eFactionName senderFaction;

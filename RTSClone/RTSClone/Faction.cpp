@@ -6,9 +6,11 @@
 //PlannedBuilding
 PlannedBuilding::PlannedBuilding(int workerID, const glm::vec3& spawnPosition, eEntityType entityType)
     : workerID(workerID),
-    spawnPosition(spawnPosition),
+    spawnPosition(Globals::convertToMiddleGridPosition(spawnPosition)),
     entityType(entityType)
-{}
+{
+    assert(entityType == eEntityType::Barracks || entityType == eEntityType::SupplyDepot);
+}
 
 //Faction
 Faction::Faction(eFactionName factionName, const glm::vec3& hqStartingPosition, const glm::vec3& mineralsStartingPosition)
@@ -124,11 +126,12 @@ void Faction::handleEvent(const GameEvent& gameEvent)
     case eGameEventType::RemovePlannedBuilding:
     {
         assert(gameEvent.senderFaction == m_factionName);
-        int senderID = gameEvent.senderID;
-        auto buildingToSpawn = std::find_if(m_plannedBuildings.begin(), m_plannedBuildings.end(), [senderID](const auto& buildingToSpawn)
+        const glm::vec3& buildingPosition = gameEvent.startingPosition;
+        auto buildingToSpawn = std::find_if(m_plannedBuildings.begin(), m_plannedBuildings.end(), [&buildingPosition](const auto& buildingToSpawn)
         {
-            return buildingToSpawn.workerID == senderID;
+            return buildingToSpawn.spawnPosition == buildingPosition;
         });
+
         assert(buildingToSpawn != m_plannedBuildings.end());
         m_plannedBuildings.erase(buildingToSpawn);
     }

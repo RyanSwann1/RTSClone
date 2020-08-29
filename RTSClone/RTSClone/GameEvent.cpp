@@ -28,3 +28,12 @@ GameEvent::GameEvent(eGameEventType gameEventType, eFactionName senderFaction, i
 	startingPosition(startingPosition),
 	endingPosition(endingPosition)
 {}
+
+GameEvent::GameEvent(eGameEventType gameEventType, eFactionName senderFaction, const glm::vec3 & position)
+	: type(gameEventType),
+	senderFaction(senderFaction),
+	senderID(Globals::INVALID_ENTITY_ID),
+	targetID(Globals::INVALID_ENTITY_ID),
+	startingPosition(position),
+	endingPosition()
+{}

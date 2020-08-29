@@ -143,7 +143,7 @@ void Worker::update(float deltaTime, const UnitSpawnerBuilding& HQ, const Map& m
 		
 		const Entity* newBuilding = m_buildingCommands.front().command(*this);
 		m_buildingCommands.pop();
-		GameEventHandler::getInstance().addEvent({ eGameEventType::RemovePlannedBuilding, m_owningFaction.getName(), getID() });
+		GameEventHandler::getInstance().addEvent({ eGameEventType::RemovePlannedBuilding, m_owningFaction.getName(), newBuilding->getPosition() });
 		if (!m_buildingCommands.empty())
 		{
 			moveTo(m_buildingCommands.front().buildPosition, map, 
