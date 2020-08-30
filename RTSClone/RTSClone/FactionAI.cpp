@@ -17,19 +17,28 @@
 
 namespace
 {
-	constexpr int STARTING_WORKER_COUNT = 5;
+	constexpr int STARTING_WORKER_COUNT = 2;
 	constexpr float DELAY_TIME = 3.0f;
 }
 
+//AIAction
+AIAction::AIAction(eEntityType entityTypeToSpawn, const glm::vec3& spawnPosition)
+	: entityTypeToSpawn(entityTypeToSpawn),
+	spawnPosition(spawnPosition)
+{}
+
+//FactionAI
 FactionAI::FactionAI(eFactionName factionName, const glm::vec3& hqStartingPosition, const glm::vec3& mineralsStartingPosition)
 	: Faction(factionName, hqStartingPosition, mineralsStartingPosition),
-	m_unitSpawnQueue(),
+	m_spawnQueue(),
 	m_delayTimer(DELAY_TIME, true)
 {
 	for (int i = 0; i < STARTING_WORKER_COUNT; ++i)
 	{
-		m_unitSpawnQueue.push(eEntityType::Worker);
+		m_spawnQueue.push({ eEntityType::Worker, {} });
 	}
+
+	m_spawnQueue.push({ eEntityType::SupplyDepot, {35.0f, Globals::GROUND_HEIGHT, 120.0f} });
 }
 
 void FactionAI::update(float deltaTime, const Map & map, const Faction& opposingFaction)
@@ -38,21 +47,22 @@ void FactionAI::update(float deltaTime, const Map & map, const Faction& opposing
 
 	m_delayTimer.update(deltaTime);
 
-	if (!m_unitSpawnQueue.empty() && m_delayTimer.isExpired())
+	if (!m_spawnQueue.empty() && m_delayTimer.isExpired())
 	{
+		const AIAction& aiAction = m_spawnQueue.front();
 		m_delayTimer.resetElaspedTime();
 
-		switch (m_unitSpawnQueue.front())
+		switch (aiAction.entityTypeToSpawn)
 		{
 		case eEntityType::Unit:
-			if (!m_barracks.empty() && spawnUnit<Unit>(map, m_units, m_unitSpawnQueue.front(), m_barracks.back()))
+			if (!m_barracks.empty() && spawnUnit<Unit>(map, m_units, aiAction.entityTypeToSpawn, m_barracks.back()))
 			{
-				m_unitSpawnQueue.pop();
+				m_spawnQueue.pop();
 			}
 			break;
 		case eEntityType::Worker:
 		{
-			Worker* addedWorker = spawnUnit<Worker>(map, m_workers, m_unitSpawnQueue.front(), m_HQ);
+			Worker* addedWorker = spawnUnit<Worker>(map, m_workers, aiAction.entityTypeToSpawn, m_HQ);
 			if (addedWorker)
 			{
 				assert(!m_minerals.empty());
@@ -64,12 +74,38 @@ void FactionAI::update(float deltaTime, const Map & map, const Faction& opposing
 				addedWorker->moveTo(destination, map, [&](const glm::ivec2& position) { return getAllAdjacentPositions(position, map); },
 					eUnitState::MovingToMinerals, &mineralToHarvest);
 			
-				m_unitSpawnQueue.pop();
+				m_spawnQueue.pop();
 			}
 		}
+			break;
+		case eEntityType::SupplyDepot:
+			instructWorkerToBuild(aiAction.entityTypeToSpawn, aiAction.spawnPosition, map);
+			m_spawnQueue.pop();
 			break;
 		default:
 			assert(false);
 		}
-	}	
+	}
+}
+
+void FactionAI::instructWorkerToBuild(eEntityType entityType, const glm::vec3& position, const Map& map)
+{
+	if (Globals::isPositionInMapBounds(position) && !map.isPositionOccupied(position) && !m_workers.empty())
+	{
+		Worker* closestWorker = nullptr;
+		float closestDistance = std::numeric_limits<float>::max();
+
+		for (auto& worker : m_workers)
+		{
+			float distance = Globals::getSqrDistance(position, worker.getPosition());
+			if (distance < closestDistance)
+			{
+				closestWorker = &worker;
+				closestDistance = distance;
+			}
+		}
+
+		assert(closestWorker);
+		Faction::instructWorkerToBuild(entityType, position, map, *closestWorker);
+	}
 }

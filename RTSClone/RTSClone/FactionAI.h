@@ -3,6 +3,14 @@
 #include "Faction.h"
 #include <queue>
 
+struct AIAction
+{
+	AIAction(eEntityType entityTypeToSpawn, const glm::vec3& spawnPosition);
+
+	eEntityType entityTypeToSpawn;
+	glm::vec3 spawnPosition;
+};
+
 class FactionAI : public Faction
 {
 public:
@@ -11,6 +19,8 @@ public:
 	void update(float deltaTime, const Map& map, const Faction& opposingFaction);
 
 private:
-	std::queue<eEntityType> m_unitSpawnQueue;
+	std::queue<AIAction> m_spawnQueue;
 	Timer m_delayTimer;
+
+	void instructWorkerToBuild(eEntityType entityType, const glm::vec3& position, const Map& map);
 };
