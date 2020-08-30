@@ -12,6 +12,7 @@
 namespace
 {
 	constexpr float HARVEST_TIME = 2.0f;
+	constexpr float BUILD_TIME = 2.0f;
 	constexpr float MOVEMENT_SPEED = 7.5f;
 	constexpr int RESOURCE_CAPACITY = 30;
 	constexpr int RESOURCE_INCREMENT = 10;
@@ -31,6 +32,7 @@ Worker::Worker(const Faction& owningFaction, const glm::vec3& startingPosition)
 	m_buildingCommands(),
 	m_currentResourceAmount(0),
 	m_harvestTimer(HARVEST_TIME, false),
+	m_buildTimer(BUILD_TIME, false),
 	m_mineralToHarvest(nullptr)
 {}
 
@@ -39,6 +41,7 @@ Worker::Worker(const Faction& owningFaction, const glm::vec3 & startingPosition,
 	m_buildingCommands(),
 	m_currentResourceAmount(0),
 	m_harvestTimer(HARVEST_TIME, false),
+	m_buildTimer(BUILD_TIME, false),
 	m_mineralToHarvest(nullptr)
 {
 	moveTo(destinationPosition, map,
@@ -145,7 +148,15 @@ void Worker::update(float deltaTime, const UnitSpawnerBuilding& HQ, const Map& m
 		break;
 	case eUnitState::Building:
 		assert(m_pathToPosition.empty() && !m_buildingCommands.empty());
-		
+		m_buildTimer.update(deltaTime);
+		m_buildTimer.setActive(true);
+		if (!m_buildTimer.isExpired())
+		{
+			break;
+		}
+
+		m_buildTimer.resetElaspedTime();
+		m_buildTimer.setActive(false);
 		const Entity* newBuilding = m_buildingCommands.front().command(*this);
 		m_buildingCommands.pop();
 		if (newBuilding)
@@ -191,6 +202,7 @@ void Worker::moveTo(const glm::vec3& destinationPosition, const Map& map, const 
 	if (state != eUnitState::MovingToBuildingPosition && !m_buildingCommands.empty())
 	{
 		GameEventHandler::getInstance().addEvent({ eGameEventType::RemoveAllWorkerPlannedBuildings, m_owningFaction.getName(), getID() });
+		m_buildTimer.resetElaspedTime();
 		clearBuildingCommands();
 	}
 	else if (state == eUnitState::Moving)

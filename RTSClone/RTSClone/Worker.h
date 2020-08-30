@@ -11,7 +11,7 @@ struct BuildingCommand
 {
 	BuildingCommand(const std::function<const Entity* (Worker&)>& command, const glm::vec3& buildPosition);
 
-	std::function<const Entity* (Worker&)> command;
+	std::function<const Entity*(Worker&)> command;
 	glm::vec3 buildPosition;
 };
 
@@ -39,6 +39,7 @@ private:
 	std::queue<BuildingCommand> m_buildingCommands;
 	int m_currentResourceAmount;
 	Timer m_harvestTimer;
+	Timer m_buildTimer;
 	const Mineral* m_mineralToHarvest;
 
 	void clearBuildingCommands();
