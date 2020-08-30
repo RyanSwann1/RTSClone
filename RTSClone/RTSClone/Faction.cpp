@@ -180,6 +180,16 @@ void Faction::handleEvent(const GameEvent& gameEvent, const Map& map)
                 m_allEntities.erase(entity);
             }
             break;
+            case eEntityType::SupplyDepot:
+                auto supplyDepot = std::find_if(m_supplyDepots.begin(), m_supplyDepots.end(), [targetID](const auto& supplyDepot)
+                {
+                    return supplyDepot.getID() == targetID;
+                });
+                assert(supplyDepot != m_supplyDepots.end());
+
+                m_supplyDepots.erase(supplyDepot);
+                m_allEntities.erase(entity);
+            break;
             }
         }
     }
