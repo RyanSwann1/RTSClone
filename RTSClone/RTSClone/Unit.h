@@ -19,7 +19,7 @@ enum class eUnitState
 	ReturningMineralsToHQ,
 	Harvesting,
 	MovingToBuildingPosition,
-	Attacking,
+	AttackingTarget,
 	Building
 };
 

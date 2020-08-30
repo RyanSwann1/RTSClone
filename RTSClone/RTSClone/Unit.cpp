@@ -117,7 +117,7 @@ void Unit::setTargetID(int entityTargetID, const glm::vec3& targetPosition)
 			m_pathToPosition.push_back(closestDestination);
 		}
 
-		m_currentState = eUnitState::Attacking;
+		m_currentState = eUnitState::AttackingTarget;
 	}
 }
 
@@ -178,7 +178,7 @@ void Unit::update(float deltaTime, const Faction& opposingFaction, const Map& ma
 			if (targetEntity)
 			{
 				m_targetEntityID = targetEntity->getID();
-				m_currentState = eUnitState::Attacking;
+				m_currentState = eUnitState::AttackingTarget;
 			}
 		}
 		break;
@@ -190,7 +190,7 @@ void Unit::update(float deltaTime, const Faction& opposingFaction, const Map& ma
 			{
 				if (Globals::getSqrDistance(targetEntity->getPosition(), m_position) <= UNIT_ATTACK_RANGE * UNIT_ATTACK_RANGE)
 				{
-					m_currentState = eUnitState::Attacking;
+					m_currentState = eUnitState::AttackingTarget;
 				}
 			}
 			else
@@ -213,24 +213,28 @@ void Unit::update(float deltaTime, const Faction& opposingFaction, const Map& ma
 			if (targetEntity)
 			{
 				m_targetEntityID = targetEntity->getID();
-				m_currentState = eUnitState::Attacking;
+				m_currentState = eUnitState::AttackingTarget;
 			}
 		}
 		break;
-	case eUnitState::Attacking:
+	case eUnitState::AttackingTarget:
 	{
 		assert(m_targetEntityID != Globals::INVALID_ENTITY_ID);
-		
 		bool newPosition = false;
 		if (m_attackTimer.isExpired())
 		{
 			const Entity* targetEntity = opposingFaction.getEntity(m_targetEntityID);
 			if (!targetEntity)
 			{
-				m_targetEntityID = Globals::INVALID_ENTITY_ID;
-				m_currentState = eUnitState::Idle;
+				targetEntity = opposingFaction.getEntity(m_position, UNIT_ATTACK_RANGE);
+				if (!targetEntity)
+				{
+					m_targetEntityID = Globals::INVALID_ENTITY_ID;
+					m_currentState = eUnitState::Idle;
+				}
 			}
-			else
+
+			if (targetEntity)
 			{
 				if (Globals::getSqrDistance(targetEntity->getPosition(), m_position) <= UNIT_ATTACK_RANGE * UNIT_ATTACK_RANGE)
 				{
@@ -240,8 +244,8 @@ void Unit::update(float deltaTime, const Faction& opposingFaction, const Map& ma
 				else
 				{
 					moveTo(targetEntity->getPosition(), map,
-						[&](const glm::ivec2& position) { return getAllAdjacentPositions(position, map, units, *this); }, eUnitState::Attacking);
-					
+						[&](const glm::ivec2& position) { return getAllAdjacentPositions(position, map, units, *this); }, eUnitState::AttackingTarget);
+
 					newPosition = true;
 				}
 			}
