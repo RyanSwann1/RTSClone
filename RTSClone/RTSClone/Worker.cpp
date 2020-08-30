@@ -70,7 +70,7 @@ bool Worker::build(const std::function<const Entity*(Worker&)>& buildingCommand,
 {
 	if (!map.isPositionOccupied(buildPosition))
 	{
-		m_buildingCommands.emplace(buildingCommand, buildPosition);
+		m_buildingCommands.emplace(buildingCommand, Globals::convertToMiddleGridPosition(buildPosition));
 		if (m_buildingCommands.size() == size_t(1))
 		{
 			moveTo(Globals::convertToMiddleGridPosition(buildPosition), map,
