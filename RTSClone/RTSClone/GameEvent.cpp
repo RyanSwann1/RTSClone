@@ -1,6 +1,17 @@
 #include "GameEvent.h"
 #include "Globals.h"
 
+GameEvent::GameEvent(eGameEventType gameEventType)
+	: type(gameEventType),
+	senderFaction(),
+	senderID(Globals::INVALID_ENTITY_ID),
+	targetID(Globals::INVALID_ENTITY_ID),
+	startingPosition(),
+	endingPosition()
+{
+	assert(gameEventType == eGameEventType::RevalidateMovementPaths);
+}
+
 //GameEvent
 GameEvent::GameEvent(eGameEventType gameEventType, eFactionName senderFaction, int senderID)
 	: type(gameEventType),

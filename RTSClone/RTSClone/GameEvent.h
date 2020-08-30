@@ -9,11 +9,13 @@ enum class eGameEventType
 	RemovePlannedBuilding,
 	RemoveAllWorkerPlannedBuildings,
 	AddResources,
-	SpawnProjectile
+	SpawnProjectile,
+	RevalidateMovementPaths
 };
 
 struct GameEvent
 {
+	GameEvent(eGameEventType gameEventType);
 	GameEvent(eGameEventType gameEventType, eFactionName senderFaction, int senderID);
 	GameEvent(eGameEventType gameEventType, eFactionName senderFaction, int senderID, int targetID);
 	GameEvent(eGameEventType gameEventType, eFactionName senderFaction, int senderID, int targetID,

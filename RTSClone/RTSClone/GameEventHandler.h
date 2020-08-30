@@ -6,6 +6,7 @@
 #include "GameEvent.h"
 #include <queue>
 
+class Map;
 class ProjectileHandler;
 class FactionPlayer;
 class FactionAI;
@@ -19,7 +20,7 @@ public:
 	}
 
 	void addEvent(const GameEvent& gameEvent);
-	void handleEvents(FactionPlayer& player, FactionAI& playerAI, ProjectileHandler& projectileHandler);
+	void handleEvents(FactionPlayer& player, FactionAI& playerAI, ProjectileHandler& projectileHandler, const Map& map);
 	
 private:
 	GameEventHandler();

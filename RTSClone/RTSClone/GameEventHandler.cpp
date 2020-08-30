@@ -13,7 +13,7 @@ void GameEventHandler::addEvent(const GameEvent& gameEvent)
 	m_gameEvents.push(gameEvent);
 }
 
-void GameEventHandler::handleEvents(FactionPlayer& player, FactionAI& playerAI, ProjectileHandler& projectileHandler)
+void GameEventHandler::handleEvents(FactionPlayer& player, FactionAI& playerAI, ProjectileHandler& projectileHandler, const Map& map)
 {
 	while (!m_gameEvents.empty())
 	{
@@ -23,36 +23,40 @@ void GameEventHandler::handleEvents(FactionPlayer& player, FactionAI& playerAI, 
 		case eGameEventType::Attack:
 			if (gameEvent.senderFaction == eFactionName::Player)
 			{
-				playerAI.handleEvent(gameEvent);
+				playerAI.handleEvent(gameEvent, map);
 			}
 			else if(gameEvent.senderFaction == eFactionName::AI)
 			{
-				player.handleEvent(gameEvent);
+				player.handleEvent(gameEvent, map);
 			}
 			break;
 		case eGameEventType::RemovePlannedBuilding:
 		case eGameEventType::RemoveAllWorkerPlannedBuildings:
 			if (gameEvent.senderFaction == eFactionName::Player)
 			{
-				player.handleEvent(gameEvent);
+				player.handleEvent(gameEvent, map);
 			}
 			else if (gameEvent.senderFaction == eFactionName::AI)
 			{
-				playerAI.handleEvent(gameEvent);
+				playerAI.handleEvent(gameEvent, map);
 			}
 			break;
 		case eGameEventType::AddResources:
 			if (gameEvent.senderFaction == eFactionName::Player)
 			{
-				player.handleEvent(gameEvent);
+				player.handleEvent(gameEvent, map);
 			}
 			else if (gameEvent.senderFaction == eFactionName::AI)
 			{
-				playerAI.handleEvent(gameEvent);
+				playerAI.handleEvent(gameEvent, map);
 			}
 			break;
 		case eGameEventType::SpawnProjectile:
 			projectileHandler.addProjectile(gameEvent);
+			break;
+		case eGameEventType::RevalidateMovementPaths:
+			player.handleEvent(gameEvent, map);
+			playerAI.handleEvent(gameEvent, map);
 			break;
 		default:
 			assert(false);
