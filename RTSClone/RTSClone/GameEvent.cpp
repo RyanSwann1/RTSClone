@@ -9,7 +9,10 @@ GameEvent::GameEvent(eGameEventType gameEventType, eFactionName senderFaction, i
 	targetID(Globals::INVALID_ENTITY_ID),
 	startingPosition(),
 	endingPosition()
-{}
+{
+	assert(gameEventType == eGameEventType::RemoveAllWorkerPlannedBuildings ||
+		gameEventType == eGameEventType::AddResources);
+}
 
 GameEvent::GameEvent(eGameEventType gameEventType, eFactionName senderFaction, int senderID, int targetID)
 	: type(gameEventType),
@@ -18,7 +21,9 @@ GameEvent::GameEvent(eGameEventType gameEventType, eFactionName senderFaction, i
 	targetID(targetID),
 	startingPosition(),
 	endingPosition()
-{}
+{
+	assert(gameEventType == eGameEventType::Attack);
+}
 
 GameEvent::GameEvent(eGameEventType gameEventType, eFactionName senderFaction, int senderID, int targetID, const glm::vec3 & startingPosition, const glm::vec3 & endingPosition)
 	: type(gameEventType),
@@ -27,7 +32,9 @@ GameEvent::GameEvent(eGameEventType gameEventType, eFactionName senderFaction, i
 	targetID(targetID),
 	startingPosition(startingPosition),
 	endingPosition(endingPosition)
-{}
+{
+	assert(gameEventType == eGameEventType::SpawnProjectile);
+}
 
 GameEvent::GameEvent(eGameEventType gameEventType, eFactionName senderFaction, const glm::vec3 & position)
 	: type(gameEventType),
@@ -36,4 +43,6 @@ GameEvent::GameEvent(eGameEventType gameEventType, eFactionName senderFaction, c
 	targetID(Globals::INVALID_ENTITY_ID),
 	startingPosition(position),
 	endingPosition()
-{}
+{
+	assert(gameEventType == eGameEventType::RemovePlannedBuilding);
+}
