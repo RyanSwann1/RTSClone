@@ -371,17 +371,19 @@ bool Faction::isEntityAffordable(eEntityType entityType) const
 
 const Entity* Faction::addBuilding(Worker& worker, const Map& map, glm::vec3 spawnPosition, eEntityType entityType)
 {
-    if (m_currentPopulationLimit + Globals::POPULATION_INCREMENT < Globals::MAX_POPULATION &&
-        isEntityAffordable(entityType) &&
+    if (isEntityAffordable(entityType) &&
         PathFinding::getInstance().isPositionAvailable(spawnPosition, map, m_units, m_workers, worker))
     {
         Entity* addedBuilding = nullptr;
         switch (entityType)
         {
         case eEntityType::SupplyDepot:
-            m_supplyDepots.emplace_back(spawnPosition);
-            addedBuilding = &m_supplyDepots.back();
-            increasePopulationLimit();
+            if (m_currentPopulationLimit + Globals::POPULATION_INCREMENT <= Globals::MAX_POPULATION)
+            {
+                m_supplyDepots.emplace_back(spawnPosition);
+                addedBuilding = &m_supplyDepots.back();
+                increasePopulationLimit();
+            }
             break;
         case eEntityType::Barracks:
             m_barracks.emplace_back(spawnPosition, eEntityType::Barracks);
@@ -391,13 +393,15 @@ const Entity* Faction::addBuilding(Worker& worker, const Map& map, glm::vec3 spa
             assert(false);
         }
 
-        reduceResources(entityType);
-        revalidateExistingUnitPaths(map);
-        assert(addedBuilding);
-        m_allEntities.push_back(addedBuilding);
-        GameEventHandler::getInstance().addEvent({ eGameEventType::RevalidateMovementPaths });
+        if (addedBuilding)
+        {
+            reduceResources(entityType);
+            revalidateExistingUnitPaths(map);
+            m_allEntities.push_back(addedBuilding);
+            GameEventHandler::getInstance().addEvent({ eGameEventType::RevalidateMovementPaths });
 
-        return addedBuilding;
+            return addedBuilding;
+        }
     }
 
     return nullptr;
