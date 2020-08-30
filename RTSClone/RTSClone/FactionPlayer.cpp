@@ -445,3 +445,18 @@ void FactionPlayer::instructUnitToAttack(Unit& unit, int targetEntityID, const F
             [&](const glm::ivec2& position) { return getAllAdjacentPositions(position, map, m_units, unit); });
     }
 }
+
+void FactionPlayer::instructWorkerToBuild(eEntityType entityType, const glm::vec3& position, const Map& map)
+{
+    if (Globals::isPositionInMapBounds(position) && !map.isPositionOccupied(position))
+    {
+        auto selectedWorker = std::find_if(m_workers.begin(), m_workers.end(), [](const auto& worker)
+        {
+            return worker.isSelected();
+        });
+        if (selectedWorker != m_workers.end())
+        {
+            Faction::instructWorkerToBuild(entityType, position, map, *selectedWorker);
+        }
+    }
+}
