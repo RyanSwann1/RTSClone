@@ -79,7 +79,7 @@ void FactionAI::update(float deltaTime, const Map & map, const Faction& opposing
 		}
 			break;
 		case eEntityType::SupplyDepot:
-			instructWorkerToBuild(aiAction.entityTypeToSpawn, aiAction.spawnPosition, map);
+			if(instructWorkerToBuild(aiAction.entityTypeToSpawn, aiAction.spawnPosition, map));
 			m_spawnQueue.pop();
 			break;
 		default:
@@ -88,7 +88,7 @@ void FactionAI::update(float deltaTime, const Map & map, const Faction& opposing
 	}
 }
 
-void FactionAI::instructWorkerToBuild(eEntityType entityType, const glm::vec3& position, const Map& map)
+bool FactionAI::instructWorkerToBuild(eEntityType entityType, const glm::vec3& position, const Map& map)
 {
 	if (Globals::isPositionInMapBounds(position) && !map.isPositionOccupied(position) && !m_workers.empty())
 	{
@@ -106,6 +106,8 @@ void FactionAI::instructWorkerToBuild(eEntityType entityType, const glm::vec3& p
 		}
 
 		assert(closestWorker);
-		Faction::instructWorkerToBuild(entityType, position, map, *closestWorker);
+		return Faction::instructWorkerToBuild(entityType, position, map, *closestWorker);
 	}
+
+	return false;
 }

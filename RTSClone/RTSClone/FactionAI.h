@@ -22,5 +22,5 @@ private:
 	std::queue<AIAction> m_spawnQueue;
 	Timer m_delayTimer;
 
-	void instructWorkerToBuild(eEntityType entityType, const glm::vec3& position, const Map& map);
+	bool instructWorkerToBuild(eEntityType entityType, const glm::vec3& position, const Map& map);
 };

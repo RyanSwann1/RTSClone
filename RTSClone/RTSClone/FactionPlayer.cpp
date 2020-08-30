@@ -446,7 +446,7 @@ void FactionPlayer::instructUnitToAttack(Unit& unit, int targetEntityID, const F
     }
 }
 
-void FactionPlayer::instructWorkerToBuild(eEntityType entityType, const glm::vec3& position, const Map& map)
+bool FactionPlayer::instructWorkerToBuild(eEntityType entityType, const glm::vec3& position, const Map& map)
 {
     if (Globals::isPositionInMapBounds(position) && !map.isPositionOccupied(position))
     {
@@ -456,7 +456,9 @@ void FactionPlayer::instructWorkerToBuild(eEntityType entityType, const glm::vec
         });
         if (selectedWorker != m_workers.end())
         {
-            Faction::instructWorkerToBuild(entityType, position, map, *selectedWorker);
+            return Faction::instructWorkerToBuild(entityType, position, map, *selectedWorker);
         }
     }
+
+    return false;
 }

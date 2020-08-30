@@ -62,7 +62,7 @@ protected:
 	void increaseCurrentPopulationAmount(eEntityType entityType);
 	void increasePopulationLimit();
 	void revalidateExistingUnitPaths(const Map& map);
-	void instructWorkerToBuild(eEntityType entityType, const glm::vec3& position, const Map& map, Worker& worker);
+	bool instructWorkerToBuild(eEntityType entityType, const glm::vec3& position, const Map& map, Worker& worker);
 	void addResources(Worker& worker);
 
 	template <class Unit>

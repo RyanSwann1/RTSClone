@@ -471,7 +471,7 @@ void Faction::revalidateExistingUnitPaths(const Map& map)
     }
 }
 
-void Faction::instructWorkerToBuild(eEntityType entityType, const glm::vec3& position, const Map& map, Worker& worker)
+bool Faction::instructWorkerToBuild(eEntityType entityType, const glm::vec3& position, const Map& map, Worker& worker)
 {
     assert(Globals::isPositionInMapBounds(position) && !map.isPositionOccupied(position));
     
@@ -489,9 +489,10 @@ void Faction::instructWorkerToBuild(eEntityType entityType, const glm::vec3& pos
         if (plannedBuilding == m_plannedBuildings.cend())
         {
             if (worker.build([this, &map, buildPosition, entityType](Worker& worker)
-            { return addBuilding(worker, map, buildPosition, entityType); }, buildPosition, map))
+                { return addBuilding(worker, map, buildPosition, entityType); }, buildPosition, map))
             {
                 m_plannedBuildings.emplace_back(worker.getID(), buildPosition, entityType);
+                return true;
             }
         }
     }
@@ -499,4 +500,6 @@ void Faction::instructWorkerToBuild(eEntityType entityType, const glm::vec3& pos
     default:
         assert(false);
     }
+
+    return false;
 }
