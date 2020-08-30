@@ -471,19 +471,16 @@ void Faction::revalidateExistingUnitPaths(const Map& map)
     }
 }
 
-void Faction::instructWorkerToBuild(eEntityType entityType, const glm::vec3& mouseToGroundPosition, const Map& map)
+void Faction::instructWorkerToBuild(eEntityType entityType, const glm::vec3& position, const Map& map, Worker& worker)
 {
-    if (!Globals::isPositionInMapBounds(mouseToGroundPosition) || map.isPositionOccupied(mouseToGroundPosition))
-    {
-        return;
-    }
-
+    assert(Globals::isPositionInMapBounds(position) && !map.isPositionOccupied(position));
+    
     switch (entityType)
     {
     case eEntityType::Barracks:
     case eEntityType::SupplyDepot:
     {
-        glm::vec3 buildPosition = Globals::convertToNodePosition(mouseToGroundPosition);
+        glm::vec3 buildPosition = Globals::convertToNodePosition(position);
         auto plannedBuilding = std::find_if(m_plannedBuildings.cbegin(), m_plannedBuildings.cend(), [&buildPosition](const auto& plannedBuilding)
         {
             return plannedBuilding.spawnPosition == Globals::convertToMiddleGridPosition(buildPosition);
@@ -491,17 +488,10 @@ void Faction::instructWorkerToBuild(eEntityType entityType, const glm::vec3& mou
 
         if (plannedBuilding == m_plannedBuildings.cend())
         {
-            auto selectedWorker = std::find_if(m_workers.begin(), m_workers.end(), [](const auto& worker)
+            if (worker.build([this, &map, buildPosition, entityType](Worker& worker)
+            { return addBuilding(worker, map, buildPosition, entityType); }, buildPosition, map))
             {
-                return worker.isSelected();
-            });
-            if (selectedWorker != m_workers.end())
-            {
-                if (selectedWorker->build([this, &map, buildPosition, entityType](Worker& worker)
-                { return addBuilding(worker, map, buildPosition, entityType); }, buildPosition, map))
-                {
-                    m_plannedBuildings.emplace_back(selectedWorker->getID(), buildPosition, entityType);
-                }
+                m_plannedBuildings.emplace_back(worker.getID(), buildPosition, entityType);
             }
         }
     }
