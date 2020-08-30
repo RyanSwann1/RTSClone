@@ -23,4 +23,5 @@ private:
 	Timer m_delayTimer;
 
 	bool instructWorkerToBuild(eEntityType entityType, const glm::vec3& position, const Map& map);
+	const Mineral& getRandomMineral() const;
 };

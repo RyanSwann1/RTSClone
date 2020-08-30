@@ -368,7 +368,8 @@ void FactionPlayer::moveMultipleSelectedUnits(const glm::vec3& mouseToGroundPosi
                     {
                         glm::vec3 destination = PathFinding::getInstance().getClosestPositionOutsideAABB(selectedUnit->getPosition(),
                             mineralToHarvest->getAABB(), mineralToHarvest->getPosition(), map);
-                        static_cast<Worker*>(selectedUnit)->moveTo(mouseToGroundPosition, map, 
+
+                        static_cast<Worker*>(selectedUnit)->moveTo(destination, map, 
                             [&](const glm::ivec2& position) { return getAllAdjacentPositions(position, map); },
                             eUnitState::MovingToMinerals, mineralToHarvest);
                     }

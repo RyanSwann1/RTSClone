@@ -50,7 +50,6 @@ void FactionAI::update(float deltaTime, const Map & map, const Faction& opposing
 	if (!m_spawnQueue.empty() && m_delayTimer.isExpired())
 	{
 		const AIAction& aiAction = m_spawnQueue.front();
-		m_delayTimer.resetElaspedTime();
 
 		switch (aiAction.entityTypeToSpawn)
 		{
@@ -65,9 +64,7 @@ void FactionAI::update(float deltaTime, const Map & map, const Faction& opposing
 			Worker* addedWorker = spawnUnit<Worker>(map, m_workers, aiAction.entityTypeToSpawn, m_HQ);
 			if (addedWorker)
 			{
-				assert(!m_minerals.empty());
-				int mineralIndex = Globals::getRandomNumber(0, m_minerals.size() - 1);
-				const Mineral& mineralToHarvest = m_minerals[mineralIndex];
+				const Mineral& mineralToHarvest = getRandomMineral();
 				glm::vec3 destination = PathFinding::getInstance().getClosestPositionOutsideAABB(addedWorker->getPosition(),
 					mineralToHarvest.getAABB(), mineralToHarvest.getPosition(), map);
 
@@ -84,6 +81,24 @@ void FactionAI::update(float deltaTime, const Map & map, const Faction& opposing
 			break;
 		default:
 			assert(false);
+		}
+	}
+
+	if (m_delayTimer.isExpired())
+	{
+		m_delayTimer.resetElaspedTime();
+
+		for (auto& worker : m_workers)
+		{
+			if (worker.getCurrentState() == eUnitState::Idle)
+			{
+				const Mineral& mineralToHarvest = getRandomMineral();
+				glm::vec3 destination = PathFinding::getInstance().getClosestPositionOutsideAABB(worker.getPosition(),
+					mineralToHarvest.getAABB(), mineralToHarvest.getPosition(), map);
+
+				worker.moveTo(destination, map, [&](const glm::ivec2& position) { return getAllAdjacentPositions(position, map); },
+					eUnitState::MovingToMinerals, &mineralToHarvest);
+			}
 		}
 	}
 }
@@ -110,4 +125,10 @@ bool FactionAI::instructWorkerToBuild(eEntityType entityType, const glm::vec3& p
 	}
 
 	return false;
+}
+
+const Mineral& FactionAI::getRandomMineral() const
+{
+	assert(!m_minerals.empty());
+	return m_minerals[Globals::getRandomNumber(0, m_minerals.size() - 1)];
 }
