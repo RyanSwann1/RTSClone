@@ -30,7 +30,7 @@ public:
 	const Entity* getEntity(int entityID) const;
 	int getEntityIDAtPosition(const glm::vec3& position) const;
 
-	void handleEvent(const GameEvent& gameEvent);
+	void handleEvent(const GameEvent& gameEvent, const Map& map);
 	void update(float deltaTime, const Map& map, const Faction& opposingFaction);
 	void render(ShaderHandler& shaderHandler) const;
 	void renderPlannedBuildings(ShaderHandler& shaderHandler) const;

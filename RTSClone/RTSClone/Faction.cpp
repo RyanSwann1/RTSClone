@@ -152,7 +152,7 @@ int Faction::getEntityIDAtPosition(const glm::vec3& position) const
     }
 }
 
-void Faction::handleEvent(const GameEvent& gameEvent)
+void Faction::handleEvent(const GameEvent& gameEvent, const Map& map)
 {
     switch (gameEvent.type)
     {
@@ -222,6 +222,9 @@ void Faction::handleEvent(const GameEvent& gameEvent)
             addResources(*worker);
         }
     }
+        break;
+    case eGameEventType::RevalidateMovementPaths:
+        revalidateExistingUnitPaths(map);
         break;
     default:
         assert(false);
@@ -390,9 +393,10 @@ const Entity* Faction::addBuilding(Worker& worker, const Map& map, glm::vec3 spa
 
         reduceResources(entityType);
         revalidateExistingUnitPaths(map);
-
         assert(addedBuilding);
         m_allEntities.push_back(addedBuilding);
+        GameEventHandler::getInstance().addEvent({ eGameEventType::RevalidateMovementPaths });
+
         return addedBuilding;
     }
 
@@ -449,7 +453,7 @@ void Faction::revalidateExistingUnitPaths(const Map& map)
         {
             glm::vec3 destination = unit.getDestination();
             unit.moveTo(destination, map, [&](const glm::ivec2& position)
-            { return getAllAdjacentPositions(position, map, m_units, unit); });
+            { return getAllAdjacentPositions(position, map, m_units, unit); }, unit.getCurrentState());
         }
     }
 
