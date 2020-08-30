@@ -3,12 +3,20 @@
 #include "Faction.h"
 #include <queue>
 
+enum class eAIImmediateAction
+{
+	Harvest = 0,
+	BuildSupplyDepot
+};
+
 struct AIAction
 {
-	AIAction(eEntityType entityTypeToSpawn, const glm::vec3& spawnPosition);
+	AIAction(eEntityType entityTypeToSpawn, eAIImmediateAction immediateAction);
+	AIAction(eEntityType entityTypeToSpawn, eAIImmediateAction immediateAction, const glm::vec3& buildPosition);
 
 	eEntityType entityTypeToSpawn;
-	glm::vec3 spawnPosition;
+	eAIImmediateAction immediateAction;
+	glm::vec3 buildPosition;
 };
 
 class FactionAI : public Faction
@@ -23,5 +31,6 @@ private:
 	Timer m_delayTimer;
 
 	bool instructWorkerToBuild(eEntityType entityType, const glm::vec3& position, const Map& map);
+	bool instructWorkerToBuild(eEntityType entityType, const glm::vec3& position, const Map& map, Worker& worker);
 	const Mineral& getRandomMineral() const;
 };
