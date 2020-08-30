@@ -150,7 +150,7 @@ void Unit::moveTo(const glm::vec3& destinationPosition, const Map& map, const Ge
 	}
 }
 
-void Unit::update(float deltaTime, const Faction& opposingFaction, const Map& map, const std::list<Unit>& units)
+void Unit::update(float deltaTime, const Faction& opposingFaction, const Map& map)
 {
 	assert(opposingFaction.getName() != m_owningFaction.getName());
 	m_attackTimer.update(deltaTime);
@@ -248,8 +248,8 @@ void Unit::update(float deltaTime, const Faction& opposingFaction, const Map& ma
 				}
 				else
 				{
-					moveTo(targetEntity->getPosition(), map,
-						[&](const glm::ivec2& position) { return getAllAdjacentPositions(position, map, units, *this); }, eUnitState::AttackingTarget);
+					moveTo(targetEntity->getPosition(), map, [&](const glm::ivec2& position) 
+						{ return getAllAdjacentPositions(position, map, m_owningFaction.getUnits(), *this); }, eUnitState::AttackingTarget);
 				}
 			}
 		}

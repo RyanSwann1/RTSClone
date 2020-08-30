@@ -83,10 +83,9 @@ bool Worker::build(const std::function<const Entity*(Worker&)>& buildingCommand,
 	return false;
 }
 
-void Worker::update(float deltaTime, const UnitSpawnerBuilding& HQ, const Map& map, const Faction& opposingFaction,
-	const std::list<Unit>& units)
+void Worker::update(float deltaTime, const UnitSpawnerBuilding& HQ, const Map& map, const Faction& opposingFaction)
 {
-	Unit::update(deltaTime, opposingFaction, map, units);
+	Unit::update(deltaTime, opposingFaction, map);
 
 	switch (m_currentState)
 	{

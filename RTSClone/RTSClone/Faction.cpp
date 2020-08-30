@@ -61,6 +61,11 @@ eFactionName Faction::getName() const
     return m_factionName;
 }
 
+const std::list<Unit>& Faction::getUnits() const
+{
+    return m_units;
+}
+
 const Entity* Faction::getEntity(const glm::vec3& position, float maxDistance, bool prioritizeUnits) const
 {
     const Entity* closestEntity = nullptr;
@@ -250,12 +255,12 @@ void Faction::update(float deltaTime, const Map& map, const Faction& opposingFac
 {
     for (auto& unit : m_units)
     {
-        unit.update(deltaTime, opposingFaction, map, m_units);
+        unit.update(deltaTime, opposingFaction, map);
     }
 
     for (auto& worker : m_workers)
     {
-        worker.update(deltaTime, m_HQ, map, opposingFaction, m_units);
+        worker.update(deltaTime, m_HQ, map, opposingFaction);
     }
 
     handleCollisions<Unit>(m_units, map);

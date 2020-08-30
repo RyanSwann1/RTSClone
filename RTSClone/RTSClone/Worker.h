@@ -29,8 +29,7 @@ public:
 	int extractResources();	
 
 	bool build(const std::function<const Entity*(Worker&)>& buildingCommand, const glm::vec3& buildPosition, const Map& map);
-	void update(float deltaTime, const UnitSpawnerBuilding& HQ, const Map& map, const Faction& opposingFaction,
-		const std::list<Unit>& units);
+	void update(float deltaTime, const UnitSpawnerBuilding& HQ, const Map& map, const Faction& opposingFaction);
 	void moveTo(const glm::vec3& destinationPosition, const Map& map, const GetAllAdjacentPositions& getAdjacentPositions, 
 		eUnitState state = eUnitState::Moving, const Mineral* mineralToHarvest = nullptr);
 	void render(ShaderHandler& shaderHandler) const;
