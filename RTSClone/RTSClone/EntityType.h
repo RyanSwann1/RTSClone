@@ -8,5 +8,6 @@ enum class eEntityType
 	SupplyDepot,
 	Barracks,
 	Mineral,
-	Projectile
+	Projectile,
+	Max = Projectile
 };

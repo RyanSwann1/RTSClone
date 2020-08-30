@@ -2,6 +2,23 @@
 #include "GameEventHandler.h"
 #include "ModelManager.h"
 #include "GameEvent.h"
+#include "TypeComparison.h"
+
+namespace
+{
+    const TypeComparison<eEntityType> BUILDING_TYPES =
+    {
+        {eEntityType::HQ,
+        eEntityType::SupplyDepot,
+        eEntityType::Barracks}
+    }; 
+
+    const TypeComparison<eEntityType> UNIT_TYPES =
+    {
+        {eEntityType::Unit,
+        eEntityType::Worker}
+    };
+}
 
 //PlannedBuilding
 PlannedBuilding::PlannedBuilding(int workerID, const glm::vec3& spawnPosition, eEntityType entityType)
@@ -44,18 +61,44 @@ eFactionName Faction::getName() const
     return m_factionName;
 }
 
-const Entity* Faction::getEntity(const glm::vec3& position, float maxDistance) const
+const Entity* Faction::getEntity(const glm::vec3& position, float maxDistance, bool prioritizeUnits) const
 {
     const Entity* closestEntity = nullptr;
     float closestEntityDistance = maxDistance * maxDistance;
     
-    for (const auto& entity : m_allEntities)
+    if (prioritizeUnits)
     {
-        float distance = Globals::getSqrDistance(entity->getPosition(), position);
-        if (distance < maxDistance * maxDistance)
+        for (const auto& entity : m_allEntities)
         {
-            closestEntity = entity;
-            closestEntityDistance = distance;
+            float distance = Globals::getSqrDistance(entity->getPosition(), position);
+            if (!closestEntity && distance < closestEntityDistance)
+            {
+                closestEntity = entity;
+                closestEntityDistance = distance;
+            }
+            else if (closestEntity && BUILDING_TYPES.isMatch(closestEntity->getEntityType()) && UNIT_TYPES.isMatch(entity->getEntityType()) &&
+                Globals::getSqrDistance(entity->getPosition(), position) < maxDistance * maxDistance)
+            {
+                closestEntity = entity;
+                closestEntityDistance = distance;
+            }
+            else if (closestEntity && distance < closestEntityDistance)
+            {
+                closestEntity = entity;
+                closestEntityDistance = distance;
+            }
+        }
+    }
+    else
+    {
+        for (const auto& entity : m_allEntities)
+        {
+            float distance = Globals::getSqrDistance(entity->getPosition(), position);
+            if (distance < closestEntityDistance)
+            {
+                closestEntity = entity;
+                closestEntityDistance = distance;
+            }
         }
     }
 

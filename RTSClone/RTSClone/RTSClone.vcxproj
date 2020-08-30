@@ -228,6 +228,7 @@
     <ClInclude Include="assimp\include\vector3.h" />
     <ClInclude Include="assimp\include\version.h" />
     <ClInclude Include="EntityType.h" />
+    <ClInclude Include="TypeComparison.h" />
     <ClInclude Include="Faction.h" />
     <ClInclude Include="FactionAI.h" />
     <ClInclude Include="FactionName.h" />
