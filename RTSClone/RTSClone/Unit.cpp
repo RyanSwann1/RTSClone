@@ -218,9 +218,14 @@ void Unit::update(float deltaTime, const Faction& opposingFaction, const Map& ma
 		}
 		break;
 	case eUnitState::AttackingTarget:
-	{
 		assert(m_targetEntityID != Globals::INVALID_ENTITY_ID);
-		bool newPosition = false;
+		if (!m_pathToPosition.empty() && m_position != m_pathToPosition.back())
+		{
+			glm::vec3 closestDestination = m_pathToPosition.back();
+			m_pathToPosition.clear();
+			m_pathToPosition.push_back(closestDestination);
+		}
+
 		if (m_attackTimer.isExpired())
 		{
 			const Entity* targetEntity = opposingFaction.getEntity(m_targetEntityID);
@@ -245,19 +250,10 @@ void Unit::update(float deltaTime, const Faction& opposingFaction, const Map& ma
 				{
 					moveTo(targetEntity->getPosition(), map,
 						[&](const glm::ivec2& position) { return getAllAdjacentPositions(position, map, units, *this); }, eUnitState::AttackingTarget);
-
-					newPosition = true;
 				}
 			}
 		}
-
-		if (!newPosition && !m_pathToPosition.empty() && m_position != m_pathToPosition.back())
-		{
-			glm::vec3 closestDestination = m_pathToPosition.back();
-			m_pathToPosition.clear();
-			m_pathToPosition.push_back(closestDestination);
-		}
-	}
+	
 		break;
 	}
 
