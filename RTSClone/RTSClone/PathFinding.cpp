@@ -353,27 +353,27 @@ void PathFinding::getPathToPosition(const Unit& unit, const glm::vec3& destinati
 void PathFinding::convertPathToWaypoints(std::vector<glm::vec3>& pathToPosition, const Unit& unit, const std::list<Unit>& units,
 	const Map& map)
 {
-	assert(!units.empty());
 	if (pathToPosition.size() <= size_t(1))
 	{
 		return;
 	}
 
-	std::queue<glm::vec3> positionsToDelete;
+	std::queue<glm::vec3> positionsToKeep;
 	int startingIndex = static_cast<int>(pathToPosition.size()) - 1;
-	int i = startingIndex - 1;
-	bool destinationReached = false;
-	while (startingIndex > 0 && !destinationReached)
+	int positionIndex = startingIndex - 1;
+	while (positionIndex > 0)
 	{
+		assert(startingIndex > 0);
 		glm::vec3 startingPosition = pathToPosition[startingIndex];
-		glm::vec3 targetPosition = pathToPosition[i];
+		glm::vec3 targetPosition = pathToPosition[positionIndex];
 		glm::vec3 position = startingPosition;
-		float MAX_RAY = glm::distance(targetPosition, startingPosition);
+		float distance = glm::distance(targetPosition, startingPosition);
+		constexpr float step = 0.1f;
 		bool collision = false;
-
-		for (float ray = 0.1f; ray <= MAX_RAY; ray += 0.1f)
+		
+		for (int ray = 0; ray <= std::ceil(distance / step); ++ray)
 		{
-			position = position + glm::normalize(targetPosition - startingPosition) * 0.1f;
+			position = position + glm::normalize(targetPosition - startingPosition) * step;
 
 			auto cIter = std::find_if(units.cbegin(), units.cend(), [&position, &unit](const auto& otherUnit)
 			{
@@ -387,37 +387,29 @@ void PathFinding::convertPathToWaypoints(std::vector<glm::vec3>& pathToPosition,
 			}
 		}
 
-		if (!collision)
+		if (collision)
 		{
-			positionsToDelete.push(pathToPosition[i]);
-				
-			if (i - 1 > 0)
-			{
-				--i;
-			}
-			else
-			{
-				destinationReached = true;
-			}
+			++positionIndex;
+			positionsToKeep.push(pathToPosition[positionIndex]);
+			startingIndex = positionIndex;
+			--positionIndex;
 		}
 		else
 		{
-			startingIndex = i;
-			i = startingIndex - 1;
+			--positionIndex;
 		}
 	}
 
-	assert(positionsToDelete.size() < pathToPosition.size());
-	while (!positionsToDelete.empty())
+	assert(positionsToKeep.size() < pathToPosition.size());
+	glm::vec3 destination = pathToPosition.front();
+	pathToPosition.clear();
+	while (!positionsToKeep.empty())
 	{
-		const glm::vec3& positionToDelete = positionsToDelete.front();
-		auto iter = std::find_if(pathToPosition.begin(), pathToPosition.end(), [&positionToDelete](const auto& position)
-		{
-			return position == positionToDelete;
-		});
-		assert(iter != pathToPosition.end());
-			
-		pathToPosition.erase(iter);
-		positionsToDelete.pop();
+		const glm::vec3& positionToKeep = positionsToKeep.front();
+		pathToPosition.push_back(positionToKeep);
+		positionsToKeep.pop();
 	}
+
+	pathToPosition.push_back(destination);
+	std::reverse(pathToPosition.begin(), pathToPosition.end());
 }
