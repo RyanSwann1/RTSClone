@@ -213,7 +213,7 @@ void Worker::moveTo(const glm::vec3& destinationPosition, const Map& map, const 
 	{
 		m_mineralToHarvest = mineralToHarvest;
 	}
-			
+
 	glm::vec3 previousClosestDestination = m_position;
 	if (!m_pathToPosition.empty())
 	{
@@ -223,6 +223,7 @@ void Worker::moveTo(const glm::vec3& destinationPosition, const Map& map, const 
 	m_pathToPosition.clear();
 	PathFinding::getInstance().getPathToPosition(*this, destinationPosition, m_pathToPosition,
 		[&](const glm::ivec2& position) { return getAllAdjacentPositions(position, map); }, true);
+	PathFinding::getInstance().convertPathToWaypoints(m_pathToPosition, *this, m_owningFaction.getUnits(), map);
 	if (!m_pathToPosition.empty())
 	{
 		m_currentState = state;
