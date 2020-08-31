@@ -361,7 +361,7 @@ void PathFinding::convertPathToWaypoints(std::vector<glm::vec3>& pathToPosition,
 	std::queue<glm::vec3> positionsToKeep;
 	int startingIndex = static_cast<int>(pathToPosition.size()) - 1;
 	int positionIndex = startingIndex - 1;
-	while (positionIndex > 0)
+	while (positionIndex >= 0)
 	{
 		assert(startingIndex > 0);
 		glm::vec3 startingPosition = pathToPosition[startingIndex];
@@ -377,7 +377,7 @@ void PathFinding::convertPathToWaypoints(std::vector<glm::vec3>& pathToPosition,
 
 			auto cIter = std::find_if(units.cbegin(), units.cend(), [&position, &unit](const auto& otherUnit)
 			{
-				return &unit != &otherUnit && otherUnit.getAABB().contains(position);
+				return unit.getID() != otherUnit.getID() && otherUnit.getAABB().contains(position);
 			});
 
 			if (cIter != units.cend() || map.isPositionOccupied(position))
@@ -391,8 +391,9 @@ void PathFinding::convertPathToWaypoints(std::vector<glm::vec3>& pathToPosition,
 		{
 			++positionIndex;
 			positionsToKeep.push(pathToPosition[positionIndex]);
+			assert(positionsToKeep.size() <= pathToPosition.size());
 			startingIndex = positionIndex;
-			--positionIndex;
+			positionIndex -= 2;
 		}
 		else
 		{
