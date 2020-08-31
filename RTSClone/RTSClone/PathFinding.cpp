@@ -270,7 +270,7 @@ glm::vec3 PathFinding::getClosestPositionOutsideAABB(const glm::vec3& entityPosi
 }
 
 void PathFinding::getPathToPosition(const Unit& unit, const glm::vec3& destination, std::vector<glm::vec3>& pathToPosition, 
-	const GetAllAdjacentPositions& getAdjacentPositions, bool includeWorldDestinationPosition)
+	const GetAllAdjacentPositions& getAdjacentPositions)
 {
 	assert(getAdjacentPositions && pathToPosition.empty());
 
@@ -297,9 +297,15 @@ void PathFinding::getPathToPosition(const Unit& unit, const glm::vec3& destinati
 
 		if (currentNode.position == destinationOnGrid)
 		{
-			if (includeWorldDestinationPosition)
+			switch (unit.getEntityType())
 			{
+			case eEntityType::Unit:
+				break;
+			case eEntityType::Worker:
 				pathToPosition.push_back(destination);
+				break;
+			default:
+				assert(false);
 			}
 
 			getPathFromClosedQueue(pathToPosition, startingPositionOnGrid, currentNode, m_closedQueue);
