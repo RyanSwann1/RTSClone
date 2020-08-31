@@ -132,6 +132,7 @@ void Unit::moveTo(const glm::vec3& destinationPosition, const Map& map, const Ge
 
 	m_pathToPosition.clear();
 	PathFinding::getInstance().getPathToPosition(*this, destinationPosition, m_pathToPosition, getAdjacentPositions);
+	PathFinding::getInstance().convertPathToWaypoints(m_pathToPosition, *this, m_owningFaction.getUnits(), map);
 	if (!m_pathToPosition.empty())
 	{
 		m_currentState = state;
