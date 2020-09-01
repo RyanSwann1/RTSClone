@@ -103,22 +103,10 @@ void Unit::resetTargetID()
 	m_targetEntityID = Globals::INVALID_ENTITY_ID;
 }
 
-void Unit::setTargetID(int entityTargetID, const glm::vec3& targetPosition)
+void Unit::setTargetID(int entityTargetID)
 {
 	assert(entityTargetID != Globals::INVALID_ENTITY_ID);
 	m_targetEntityID = entityTargetID;
-
-	if (Globals::getSqrDistance(targetPosition, m_position) <= UNIT_ATTACK_RANGE * UNIT_ATTACK_RANGE)
-	{
-		if (!m_pathToPosition.empty() && m_position != m_pathToPosition.back())
-		{
-			glm::vec3 closestDestination = m_pathToPosition.back();
-			m_pathToPosition.clear();
-			m_pathToPosition.push_back(closestDestination);
-		}
-
-		m_currentState = eUnitState::AttackingTarget;
-	}
 }
 
 void Unit::moveTo(const glm::vec3& destinationPosition, const Map& map, const GetAllAdjacentPositions& getAdjacentPositions, 
@@ -192,6 +180,18 @@ void Unit::update(float deltaTime, const Faction& opposingFaction, const Map& ma
 				if (Globals::getSqrDistance(targetEntity->getPosition(), m_position) <= UNIT_ATTACK_RANGE * UNIT_ATTACK_RANGE)
 				{
 					m_currentState = eUnitState::AttackingTarget;
+
+					if (!m_pathToPosition.empty())
+					{
+						glm::vec3 destination = m_pathToPosition.front();
+						m_pathToPosition.clear();
+
+						if (!Globals::isOnMiddlePosition(m_position))
+						{
+							m_pathToPosition.push_back(PathFinding::getInstance().getClosestPositionToDestination(m_position, destination,
+								[&](const glm::ivec2& position) { return getAllAdjacentPositions(position, map, m_owningFaction.getUnits(), *this); }));
+						}
+					}
 				}
 			}
 			else
@@ -220,12 +220,6 @@ void Unit::update(float deltaTime, const Faction& opposingFaction, const Map& ma
 		break;
 	case eUnitState::AttackingTarget:
 		assert(m_targetEntityID != Globals::INVALID_ENTITY_ID);
-		if (!m_pathToPosition.empty() && m_position != m_pathToPosition.back())
-		{
-			glm::vec3 closestDestination = m_pathToPosition.back();
-			m_pathToPosition.clear();
-			m_pathToPosition.push_back(closestDestination);
-		}
 
 		if (m_attackTimer.isExpired())
 		{
@@ -249,8 +243,8 @@ void Unit::update(float deltaTime, const Faction& opposingFaction, const Map& ma
 				}
 				else
 				{
-					moveTo(targetEntity->getPosition(), map, [&](const glm::ivec2& position) 
-						{ return getAllAdjacentPositions(position, map, m_owningFaction.getUnits(), *this); }, eUnitState::AttackingTarget);
+					//moveTo(targetEntity->getPosition(), map, [&](const glm::ivec2& position) 
+					//	{ return getAllAdjacentPositions(position, map, m_owningFaction.getUnits(), *this); }, eUnitState::AttackingTarget);
 				}
 			}
 		}

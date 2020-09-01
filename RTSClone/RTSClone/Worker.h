@@ -9,7 +9,7 @@
 
 struct BuildingCommand
 {
-	BuildingCommand(const std::function<const Entity* (Worker&)>& command, const glm::vec3& buildPosition);
+	BuildingCommand(const std::function<const Entity*(Worker&)>& command, const glm::vec3& buildPosition);
 
 	std::function<const Entity*(Worker&)> command;
 	glm::vec3 buildPosition;

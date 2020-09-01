@@ -74,7 +74,6 @@ protected:
 			switch (entityType)
 			{
 			case eEntityType::Unit:
-			{
 				if (building.isWaypointActive())
 				{
 					units.emplace_back(*this, Globals::convertToNodePosition(building.getUnitSpawnPosition()), PathFinding::getInstance().getClosestAvailablePosition(
@@ -83,9 +82,8 @@ protected:
 				else
 				{
 					units.emplace_back(*this, Globals::convertToNodePosition(PathFinding::getInstance().getClosestAvailablePosition(building.getUnitSpawnPosition(),
-							m_units, m_workers, map)));
+						m_units, m_workers, map)));
 				}
-			}
 			break;
 			case eEntityType::Worker:
 				if (building.isWaypointActive())

@@ -39,7 +39,7 @@ public:
 	eUnitState getCurrentState() const;
 
 	void resetTargetID();
-	void setTargetID(int entityTargetID, const glm::vec3& targetPosition);
+	void setTargetID(int entityTargetID);
 	void moveTo(const glm::vec3& destinationPosition, const Map& map, const GetAllAdjacentPositions& getAdjacentPositions, 
 		eUnitState state = eUnitState::Moving);
 	void update(float deltaTime, const Faction& opposingFaction, const Map& map);
