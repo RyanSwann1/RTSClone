@@ -215,6 +215,17 @@ void Unit::update(float deltaTime, const Faction& opposingFaction, const Map& ma
 			{
 				m_targetEntityID = targetEntity->getID();
 				m_currentState = eUnitState::AttackingTarget;
+
+				if (!m_pathToPosition.empty())
+				{
+					m_pathToPosition.clear();
+
+					if (!Globals::isOnMiddlePosition(m_position))
+					{
+						m_pathToPosition.push_back(PathFinding::getInstance().getClosestPositionToDestination(m_position, targetEntity->getPosition(),
+							[&](const glm::ivec2& position) { return getAllAdjacentPositions(position, map, m_owningFaction.getUnits(), *this); }));
+					}
+				}
 			}
 		}
 		break;
@@ -243,8 +254,8 @@ void Unit::update(float deltaTime, const Faction& opposingFaction, const Map& ma
 				}
 				else
 				{
-					//moveTo(targetEntity->getPosition(), map, [&](const glm::ivec2& position) 
-					//	{ return getAllAdjacentPositions(position, map, m_owningFaction.getUnits(), *this); }, eUnitState::AttackingTarget);
+					moveTo(targetEntity->getPosition(), map, [&](const glm::ivec2& position) 
+						{ return getAllAdjacentPositions(position, map, m_owningFaction.getUnits(), *this); });
 				}
 			}
 		}
