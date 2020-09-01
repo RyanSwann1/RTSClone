@@ -107,6 +107,13 @@ namespace Globals
 		return x + y + z;
 	}
 
+	inline bool isOnMiddlePosition(const glm::vec3& position)
+	{
+		return static_cast<int>(position.x) % Globals::NODE_SIZE == 0 &&
+			position.y == Globals::GROUND_HEIGHT &&
+			static_cast<int>(position.z) % Globals::NODE_SIZE == 0;
+	}
+
 	inline glm::vec3 convertToNodePosition(const glm::vec3& position)
 	{
 		glm::vec3 newPosition = { std::floor(position.x), std::floor(position.y), std::floor(position.z) };
