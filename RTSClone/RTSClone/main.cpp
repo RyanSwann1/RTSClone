@@ -81,8 +81,8 @@ int main()
 	Ground ground;
 #endif // RENDER_GROUND
 	std::unique_ptr<Map> map = std::make_unique<Map>();
-	FactionAI playerAI(eFactionName::AI, { 35.0f, Globals::GROUND_HEIGHT, 100.0f }, { 70.0f, Globals::GROUND_HEIGHT, 100.0f});
 	FactionPlayer player(eFactionName::Player, { 35.0f, Globals::GROUND_HEIGHT, 15.f }, { 70.0f, Globals::GROUND_HEIGHT, Globals::NODE_SIZE });
+	FactionAI playerAI(eFactionName::AI, { 35.0f, Globals::GROUND_HEIGHT, 100.0f }, { 70.0f, Globals::GROUND_HEIGHT, 100.0f}, player);
 	sf::Clock gameClock;
 	Camera camera;
 	ProjectileHandler projectileHandler;

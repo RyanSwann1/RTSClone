@@ -22,11 +22,12 @@ struct AIAction
 class FactionAI : public Faction
 {
 public:
-	FactionAI(eFactionName factionName, const glm::vec3& hqStartingPosition, const glm::vec3& mineralsStartingPosition);
+	FactionAI(eFactionName factionName, const glm::vec3& hqStartingPosition, const glm::vec3& mineralsStartingPosition, const Faction& opposingFaction);
 
 	void update(float deltaTime, const Map& map, const Faction& opposingFaction);
 
 private:
+	const Faction& m_opposingFaction;
 	std::queue<AIAction> m_spawnQueue;
 	Timer m_delayTimer;
 

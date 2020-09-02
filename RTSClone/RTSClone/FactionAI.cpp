@@ -35,8 +35,10 @@ AIAction::AIAction(eEntityType entityTypeToSpawn, eAIImmediateAction immediateAc
 {}
 
 //FactionAI
-FactionAI::FactionAI(eFactionName factionName, const glm::vec3& hqStartingPosition, const glm::vec3& mineralsStartingPosition)
+FactionAI::FactionAI(eFactionName factionName, const glm::vec3& hqStartingPosition, const glm::vec3& mineralsStartingPosition, 
+	const Faction& opposingFaction)
 	: Faction(factionName, hqStartingPosition, mineralsStartingPosition),
+	m_opposingFaction(opposingFaction),
 	m_spawnQueue(),
 	m_delayTimer(DELAY_TIME, true)
 {
