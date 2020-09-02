@@ -395,10 +395,9 @@ void PathFinding::convertPathToWaypoints(std::vector<glm::vec3>& pathToPosition,
 	}
 
 	static std::queue<glm::vec3> positionsToKeep;
-	bool reachedDestination = false;
 	int positionIndex = 0;
 	glm::vec3 startingPosition = unit.getPosition();
-	while (!reachedDestination)
+	while (startingPosition != pathToPosition.front() && positionIndex < pathToPosition.size()) 
 	{
 		glm::vec3 targetPosition = pathToPosition[positionIndex];
 		glm::vec3 position = startingPosition;
@@ -427,20 +426,12 @@ void PathFinding::convertPathToWaypoints(std::vector<glm::vec3>& pathToPosition,
 			positionsToKeep.push(pathToPosition[positionIndex]);
 			startingPosition = pathToPosition[positionIndex];
 			positionIndex = 0;
-			if (startingPosition == pathToPosition.front())
-			{
-				reachedDestination = true;
-			}
-			
+
 			assert(positionsToKeep.size() <= pathToPosition.size());
 		}
 		else
 		{
 			++positionIndex;
-			if (positionIndex == pathToPosition.size())
-			{
-				reachedDestination = true;
-			}
 		}
 	}
 
