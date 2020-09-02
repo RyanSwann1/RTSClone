@@ -394,19 +394,18 @@ void PathFinding::convertPathToWaypoints(std::vector<glm::vec3>& pathToPosition,
 		return;
 	}
 
-	std::queue<glm::vec3> positionsToKeep;
-	int startingIndex = static_cast<int>(pathToPosition.size()) - 1;
-	int positionIndex = startingIndex - 1;
-	while (positionIndex >= 0)
+	static std::queue<glm::vec3> positionsToKeep;
+	bool reachedDestination = false;
+	int positionIndex = 0;
+	glm::vec3 startingPosition = unit.getPosition();
+	while (!reachedDestination)
 	{
-		assert(startingIndex > 0);
-		glm::vec3 startingPosition = pathToPosition[startingIndex];
 		glm::vec3 targetPosition = pathToPosition[positionIndex];
 		glm::vec3 position = startingPosition;
 		float distance = glm::distance(targetPosition, startingPosition);
 		constexpr float step = 0.1f;
 		bool collision = false;
-		
+
 		for (int ray = 0; ray <= std::ceil(distance / step); ++ray)
 		{
 			position = position + glm::normalize(targetPosition - startingPosition) * step;
@@ -423,30 +422,38 @@ void PathFinding::convertPathToWaypoints(std::vector<glm::vec3>& pathToPosition,
 			}
 		}
 
-		if (collision)
+		if (!collision)
 		{
-			++positionIndex;
 			positionsToKeep.push(pathToPosition[positionIndex]);
+			startingPosition = pathToPosition[positionIndex];
+			positionIndex = 0;
+			if (startingPosition == pathToPosition.front())
+			{
+				reachedDestination = true;
+			}
+			
 			assert(positionsToKeep.size() <= pathToPosition.size());
-			startingIndex = positionIndex;
-			positionIndex -= 2;
 		}
 		else
 		{
-			--positionIndex;
+			++positionIndex;
+			if (positionIndex == pathToPosition.size())
+			{
+				reachedDestination = true;
+			}
 		}
 	}
 
-	assert(positionsToKeep.size() < pathToPosition.size());
-	glm::vec3 destination = pathToPosition.front();
-	pathToPosition.clear();
-	while (!positionsToKeep.empty())
+	if (!positionsToKeep.empty())
 	{
-		const glm::vec3& positionToKeep = positionsToKeep.front();
-		pathToPosition.push_back(positionToKeep);
-		positionsToKeep.pop();
-	}
+		pathToPosition.clear();
+		while (!positionsToKeep.empty())
+		{
+			const glm::vec3& positionToKeep = positionsToKeep.front();
+			pathToPosition.push_back(positionToKeep);
+			positionsToKeep.pop();
+		}
 
-	pathToPosition.push_back(destination);
-	std::reverse(pathToPosition.begin(), pathToPosition.end());
+		std::reverse(pathToPosition.begin(), pathToPosition.end());
+	}
 }
