@@ -12,6 +12,5 @@ SupplyDepot::SupplyDepot(const glm::vec3& startingPosition)
 
 SupplyDepot::~SupplyDepot()
 {
-	assert(getID() != Globals::INVALID_ENTITY_ID);
 	GameMessenger::getInstance().broadcast<GameMessages::MapModification<eGameMessageType::RemoveEntityFromMap>>({ m_AABB });
 }

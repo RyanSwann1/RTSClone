@@ -44,7 +44,6 @@ UnitSpawnerBuilding::UnitSpawnerBuilding(const glm::vec3& startingPosition, eEnt
 
 UnitSpawnerBuilding::~UnitSpawnerBuilding()
 {
-	assert(getID() != Globals::INVALID_ENTITY_ID);
 	GameMessenger::getInstance().broadcast<GameMessages::MapModification<eGameMessageType::RemoveEntityFromMap>>({ m_AABB });
 }
 
