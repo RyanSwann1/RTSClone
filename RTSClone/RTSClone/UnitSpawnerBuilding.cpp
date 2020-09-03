@@ -23,6 +23,18 @@ namespace
 	}
 }
 
+//Barracks
+Barracks::Barracks(const glm::vec3& startingPosition)
+	: UnitSpawnerBuilding(startingPosition, eEntityType::Barracks)
+{
+}
+
+//HQ
+HQ::HQ(const glm::vec3& startingPosition)
+	: UnitSpawnerBuilding(startingPosition, eEntityType::HQ)
+{
+}
+
 UnitSpawnerBuilding::UnitSpawnerBuilding(const glm::vec3& startingPosition, eEntityType entityType)
 	: Entity(startingPosition, entityType),
 	m_waypointPosition(m_position)

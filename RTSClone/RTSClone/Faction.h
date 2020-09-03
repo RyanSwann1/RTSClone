@@ -52,8 +52,8 @@ protected:
 	std::list<Unit> m_units;
 	std::list<Worker> m_workers;
 	std::list<SupplyDepot> m_supplyDepots;
-	std::list<UnitSpawnerBuilding> m_barracks;
-	UnitSpawnerBuilding m_HQ;
+	std::list<Barracks> m_barracks;
+	HQ m_HQ;
 
 	bool isExceedPopulationLimit(eEntityType entityType) const;
 	bool isEntityAffordable(eEntityType entityType) const;
