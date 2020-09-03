@@ -1,11 +1,10 @@
 #include "UnitSpawnerBuilding.h"
 #include "Camera.h"
+#include "GameMessenger.h"
+#include "GameMessages.h"
 #include "Model.h"
 #include "Globals.h"
 #include "ModelManager.h"
-#include "GameMessenger.h"
-#include "GameMessages.h"
-#include "UniqueEntityIDDistributer.h"
 
 namespace
 {
@@ -21,26 +20,21 @@ namespace
 		
 		return position;
 	}
+
+	constexpr float TIME_BETWEEN_WORKER_SPAWN = 2.0f;
+	constexpr float TIME_BETWEEN_UNIT_SPAWN = 3.0f;
+	constexpr int MAX_UNITS_SPAWNABLE = 5;
 }
 
 //Barracks
 Barracks::Barracks(const glm::vec3& startingPosition)
-	: UnitSpawnerBuilding(startingPosition, eEntityType::Barracks)
-{
-}
+	: UnitSpawnerBuilding(startingPosition, eEntityType::Barracks, TIME_BETWEEN_UNIT_SPAWN)
+{}
 
 //HQ
 HQ::HQ(const glm::vec3& startingPosition)
-	: UnitSpawnerBuilding(startingPosition, eEntityType::HQ)
-{
-}
-
-UnitSpawnerBuilding::UnitSpawnerBuilding(const glm::vec3& startingPosition, eEntityType entityType)
-	: Entity(startingPosition, entityType),
-	m_waypointPosition(m_position)
-{
-	GameMessenger::getInstance().broadcast<GameMessages::MapModification<eGameMessageType::AddEntityToMap>>({ m_AABB });	
-}
+	: UnitSpawnerBuilding(startingPosition, eEntityType::HQ, TIME_BETWEEN_WORKER_SPAWN)
+{}
 
 UnitSpawnerBuilding::~UnitSpawnerBuilding()
 {
@@ -65,9 +59,18 @@ glm::vec3 UnitSpawnerBuilding::getUnitSpawnPosition() const
 	}
 	else
 	{
-		return getSpawnPosition(m_AABB, 
-			glm::normalize(glm::vec3(Globals::getRandomNumber(-1.0f, 1.0f), Globals::GROUND_HEIGHT, Globals::getRandomNumber(-1.0f, 1.0f))), 
+		return getSpawnPosition(m_AABB,
+			glm::normalize(glm::vec3(Globals::getRandomNumber(-1.0f, 1.0f), Globals::GROUND_HEIGHT, Globals::getRandomNumber(-1.0f, 1.0f))),
 			m_position);
+	}
+}
+
+void UnitSpawnerBuilding::addUnitToSpawn(const std::function<Entity* (const UnitSpawnerBuilding&)>& unitToSpawn)
+{
+	if (static_cast<int>(m_unitsToSpawn.size()) < MAX_UNITS_SPAWNABLE)
+	{
+		m_unitsToSpawn.push_back(unitToSpawn);
+		m_spawnTimer.setActive(true);
 	}
 }
 
@@ -86,12 +89,47 @@ void UnitSpawnerBuilding::setWaypointPosition(const glm::vec3& position)
 	}
 }
 
-void UnitSpawnerBuilding::render(ShaderHandler & shaderHandler) const
+void UnitSpawnerBuilding::update(float deltaTime)
+{
+	m_spawnTimer.update(deltaTime);
+	if (m_spawnTimer.isExpired() && !m_unitsToSpawn.empty())
+	{
+		m_spawnTimer.resetElaspedTime();
+		
+		auto& unitToSpawn = m_unitsToSpawn.back();
+		if (!unitToSpawn(*this))
+		{
+			m_unitsToSpawn.clear();
+			m_spawnTimer.setActive(false);
+		}
+		else
+		{
+			m_unitsToSpawn.pop_back();
+
+			if (m_unitsToSpawn.empty())
+			{
+				m_spawnTimer.setActive(false);
+			}
+		}
+	}
+}
+
+void UnitSpawnerBuilding::render(ShaderHandler& shaderHandler) const
 {
 	if (isSelected() && isWaypointActive())
 	{
 		ModelManager::getInstance().getModel(eModelName::Waypoint).render(shaderHandler, m_waypointPosition);
 	}
-	
+
 	Entity::render(shaderHandler);
+}
+
+UnitSpawnerBuilding::UnitSpawnerBuilding(const glm::vec3& startingPosition, eEntityType entityType, float spawnTimerExpirationTime)
+	: Entity(startingPosition, entityType),
+	m_spawnTimer(spawnTimerExpirationTime, false),
+	m_waypointPosition(m_position),
+	m_unitsToSpawn()
+{
+	m_unitsToSpawn.reserve(static_cast<size_t>(MAX_UNITS_SPAWNABLE));
+	GameMessenger::getInstance().broadcast<GameMessages::MapModification<eGameMessageType::AddEntityToMap>>({ m_AABB });
 }
