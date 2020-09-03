@@ -197,20 +197,22 @@ void FactionPlayer::handleInput(const sf::Event& currentSFMLEvent, const sf::Win
         {
         case sf::Keyboard::U:
         {
-            auto barracks = std::find_if(m_barracks.begin(), m_barracks.end(), [](const auto& barracks)
+            auto selectedBarracks = std::find_if(m_barracks.begin(), m_barracks.end(), [](const auto & barracks)
             {
                 return barracks.isSelected();
             });
-            if (barracks != m_barracks.end())
+            if (selectedBarracks != m_barracks.end())
             {
-                spawnUnit<Unit>(map, m_units, eEntityType::Unit, *barracks);
+                selectedBarracks->addUnitToSpawn([&](const UnitSpawnerBuilding& building) 
+                    { return spawnUnit<Unit>(map, m_units, eEntityType::Unit, building); });
             }
         }
             break;
         case sf::Keyboard::W:
             if (m_HQ.isSelected())
             {
-                spawnUnit<Worker>(map, m_workers, eEntityType::Worker, m_HQ);
+                m_HQ.addUnitToSpawn([&](const UnitSpawnerBuilding& building) 
+                    { return spawnUnit<Worker>(map, m_workers, eEntityType::Worker, building); });
             }
             break;
         case sf::Keyboard::B:

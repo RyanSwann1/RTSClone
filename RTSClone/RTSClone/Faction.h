@@ -67,7 +67,7 @@ protected:
 	void addResources(Worker& worker);
 
 	template <class Unit>
-	Unit* spawnUnit(const Map& map, std::list<Unit>& units, eEntityType entityType, UnitSpawnerBuilding& building)
+	Entity* spawnUnit(const Map& map, std::list<Unit>& units, eEntityType entityType, const UnitSpawnerBuilding& building)
 	{
 		if (isEntityAffordable(entityType) && !isExceedPopulationLimit(entityType))
 		{
@@ -77,14 +77,14 @@ protected:
 				if (building.isWaypointActive())
 				{
 					units.emplace_back(*this, Globals::convertToNodePosition(building.getUnitSpawnPosition()), PathFinding::getInstance().getClosestAvailablePosition(
-							building.getWaypointPosition(), m_units, m_workers, map), map);
+						building.getWaypointPosition(), m_units, m_workers, map), map);
 				}
 				else
 				{
 					units.emplace_back(*this, Globals::convertToNodePosition(PathFinding::getInstance().getClosestAvailablePosition(building.getUnitSpawnPosition(),
 						m_units, m_workers, map)));
 				}
-			break;
+				break;
 			case eEntityType::Worker:
 				if (building.isWaypointActive())
 				{

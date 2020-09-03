@@ -281,6 +281,13 @@ void Faction::update(float deltaTime, const Map& map, const Faction& opposingFac
         worker.update(deltaTime, m_HQ, map, opposingFaction);
     }
 
+    for (auto& barracks : m_barracks)
+    {
+        barracks.update(deltaTime);
+    }
+
+    m_HQ.update(deltaTime);
+
     handleCollisions<Unit>(m_units, map);
     handleCollisions<Worker>(m_workers, map);
 }
