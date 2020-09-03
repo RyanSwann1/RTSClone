@@ -352,15 +352,16 @@ void PathFinding::getPathToPosition(const Unit& unit, const glm::vec3& destinati
 				}
 				else
 				{
-					if (Globals::getSqrDistance(glm::vec2(destinationOnGrid), glm::vec2(adjacentPosition.position)) < shortestDistance * shortestDistance)
+					float sqrDistance = Globals::getSqrDistance(glm::vec2(destinationOnGrid), glm::vec2(adjacentPosition.position));
+					if (sqrDistance < shortestDistance)
 					{
 						closestAvailablePosition = adjacentPosition.position;
-						shortestDistance = glm::distance(glm::vec2(destinationOnGrid), glm::vec2(adjacentPosition.position));
+						shortestDistance = sqrDistance;
 					}
-
+					
 					PriorityQueueNode adjacentNode(adjacentPosition.position, currentNode.position,
 						currentNode.g + Globals::getSqrDistance(glm::vec2(adjacentPosition.position), glm::vec2(currentNode.position)),
-						Globals::getSqrDistance(glm::vec2(destinationOnGrid), glm::vec2(adjacentPosition.position)));
+						sqrDistance);
 
 					if (m_openQueue.isSuccessorNodeValid(adjacentNode))
 					{
