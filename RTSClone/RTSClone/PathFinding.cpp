@@ -431,7 +431,6 @@ void PathFinding::convertPathToWaypoints(std::vector<glm::vec3>& pathToPosition,
 			//TODO: Due to duplications - need to investigate
 			if (positionsToKeep.size() > pathToPosition.size())
 			{
-				std::cout << "hit\n";
 				return;
 			}
 		}

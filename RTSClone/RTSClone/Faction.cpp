@@ -186,6 +186,7 @@ void Faction::handleEvent(const GameEvent& gameEvent, const Map& map)
             }
             break;
             case eEntityType::SupplyDepot:
+            {
                 auto supplyDepot = std::find_if(m_supplyDepots.begin(), m_supplyDepots.end(), [targetID](const auto& supplyDepot)
                 {
                     return supplyDepot.getID() == targetID;
@@ -194,7 +195,24 @@ void Faction::handleEvent(const GameEvent& gameEvent, const Map& map)
 
                 m_supplyDepots.erase(supplyDepot);
                 m_allEntities.erase(entity);
+            }
             break;
+            case eEntityType::Barracks:
+            {
+                auto barracks = std::find_if(m_barracks.begin(), m_barracks.end(), [targetID](const auto& barracks)
+                {
+                    return barracks.getID() == targetID;
+                });
+                assert(barracks != m_barracks.end());
+
+                m_barracks.erase(barracks);
+                m_allEntities.erase(entity);
+            }
+                break;
+            case eEntityType::HQ:
+                break;
+            default:
+                assert(false);
             }
         }
     }
