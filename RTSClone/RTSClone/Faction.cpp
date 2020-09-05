@@ -216,6 +216,18 @@ void Faction::handleEvent(const GameEvent& gameEvent, const Map& map)
                 break;
             case eEntityType::HQ:
                 break;
+            case eEntityType::Unit:
+            {
+                auto unit = std::find_if(m_units.begin(), m_units.end(), [targetID](const auto& unit)
+                {
+                    return unit.getID() == targetID;
+                });
+                assert(unit != m_units.end());
+
+                m_units.erase(unit);
+                m_allEntities.erase(entity);
+            }
+                break;
             default:
                 assert(false);
             }
