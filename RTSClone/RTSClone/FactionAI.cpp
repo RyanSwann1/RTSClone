@@ -1,4 +1,5 @@
 #include "FactionAI.h"
+#include "AdjacentPositions.h"
 
 //Levels
 //Strategyt level - general - thgought about game state as a whole  where units are - lacing resources? Or attack enemy base - all high level
@@ -130,6 +131,15 @@ void FactionAI::update(float deltaTime, const Map & map, const Faction& opposing
 
 				worker.moveTo(destination, map, [&](const glm::ivec2& position) { return getAllAdjacentPositions(position, map); },
 					eUnitState::MovingToMinerals, &mineralToHarvest);
+			}
+		}
+
+		for (auto& unit : m_units)
+		{
+			if (unit.getCurrentState() == eUnitState::Idle)
+			{
+				unit.moveTo(opposingFaction.getHQPosition(), map, [&](const glm::ivec2& position)
+					{ return getAllAdjacentPositions(position, map, m_units, unit); }, eUnitState::AttackMoving);
 			}
 		}
 	}

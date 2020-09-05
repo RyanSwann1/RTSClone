@@ -24,6 +24,7 @@ class Map;
 class Faction : private NonMovable, private NonCopyable
 {
 public:
+	const glm::vec3& getHQPosition() const;
 	eFactionName getName() const;
 	const std::list<Unit>& getUnits() const;
 	const Entity* getEntity(const glm::vec3& position, float maxDistance, bool prioritizeUnits = true) const;

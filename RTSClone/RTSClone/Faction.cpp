@@ -56,6 +56,11 @@ Faction::Faction(eFactionName factionName, const glm::vec3& hqStartingPosition, 
     }
 }
 
+const glm::vec3& Faction::getHQPosition() const
+{
+    return m_HQ.getPosition();
+}
+
 eFactionName Faction::getName() const
 {
     return m_factionName;
