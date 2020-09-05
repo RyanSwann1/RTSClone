@@ -97,7 +97,14 @@ void FactionAI::update(float deltaTime, const Map & map, const Faction& opposing
 			}
 				break;
 			case eActionType::BuildSupplyDepot:
-				
+				if (isEntityAffordable(eEntityType::SupplyDepot))
+				{
+					Worker* availableWorker = getAvailableWorker(action.position);
+					if (availableWorker && instructWorkerToBuild(eEntityType::SupplyDepot, action.position, map, *availableWorker))
+					{
+						m_actionQueue.pop();
+					}
+				}
 				break;
 			default:
 				assert(false);
