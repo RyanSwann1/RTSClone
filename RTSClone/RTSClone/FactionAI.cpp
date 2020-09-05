@@ -19,6 +19,7 @@ namespace
 {
 	constexpr float DELAY_TIME = 3.0f;
 	constexpr int STARTING_WORKER_COUNT = 4;
+	constexpr int STARTING_UNIT_COUNT = 1;
 }
 
 //AIAction
@@ -46,6 +47,11 @@ FactionAI::FactionAI(eFactionName factionName, const glm::vec3& hqStartingPositi
 		m_spawnQueue.push(eEntityType::Worker);
 	}
 
+	for (int i = 0; i < STARTING_UNIT_COUNT; ++i)
+	{
+		m_spawnQueue.push(eEntityType::Unit);
+	}
+
 	m_actionQueue.push({ eActionType::BuildSupplyDepot, {35.0f, Globals::GROUND_HEIGHT, 120.0f} });
 	m_actionQueue.push({ eActionType::BuildBarracks, {45.0f, Globals::GROUND_HEIGHT, 120.0f} });
 }
@@ -66,17 +72,20 @@ void FactionAI::update(float deltaTime, const Map & map, const Faction& opposing
 			switch (entityTypeToSpawn)
 			{
 			case eEntityType::Worker:
-				m_HQ.addUnitToSpawn([&](const UnitSpawnerBuilding& building) 
-					{ return spawnUnit<Worker>(map, m_workers, eEntityType::Worker, building); });
+				if (Faction::addUnitToSpawn(entityTypeToSpawn, map, m_HQ))
+				{
+					m_spawnQueue.pop();
+				}
 				break;
 			case eEntityType::Unit:
-
+				if (!m_barracks.empty() && Faction::addUnitToSpawn(entityTypeToSpawn, map, m_barracks.back()))
+				{
+					m_spawnQueue.pop();
+				}
 				break;
 			default:
 				assert(false);
 			}
-
-			m_spawnQueue.pop();
 		}
 
 		if (!m_actionQueue.empty())

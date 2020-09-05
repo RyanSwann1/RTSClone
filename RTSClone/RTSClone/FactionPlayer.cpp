@@ -203,16 +203,14 @@ void FactionPlayer::handleInput(const sf::Event& currentSFMLEvent, const sf::Win
             });
             if (selectedBarracks != m_barracks.end())
             {
-                selectedBarracks->addUnitToSpawn([&](const UnitSpawnerBuilding& building) 
-                    { return spawnUnit<Unit>(map, m_units, eEntityType::Unit, building); });
+                Faction::addUnitToSpawn(eEntityType::Unit, map, *selectedBarracks);
             }
         }
             break;
         case sf::Keyboard::W:
             if (m_HQ.isSelected())
             {
-                m_HQ.addUnitToSpawn([&](const UnitSpawnerBuilding& building) 
-                    { return spawnUnit<Worker>(map, m_workers, eEntityType::Worker, building); });
+                Faction::addUnitToSpawn(eEntityType::Worker, map, m_HQ);
             }
             break;
         case sf::Keyboard::B:
