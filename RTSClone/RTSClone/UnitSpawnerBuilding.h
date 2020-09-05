@@ -6,6 +6,7 @@
 
 class UnitSpawnerBuilding : public Entity, private NonMovable
 {
+	friend class Faction;
 public:
 	~UnitSpawnerBuilding();
 
@@ -13,7 +14,6 @@ public:
 	const glm::vec3& getWaypointPosition() const;
 	glm::vec3 getUnitSpawnPosition() const;
 
-	void addUnitToSpawn(const std::function<Entity*(const UnitSpawnerBuilding&)>& unitToSpawn);
 	void setWaypointPosition(const glm::vec3& position);
 	void update(float deltaTime);
 	void render(ShaderHandler& shaderHandler) const;
@@ -25,11 +25,13 @@ private:
 	Timer m_spawnTimer;
 	glm::vec3 m_waypointPosition;
 	std::vector<std::function<Entity*(const UnitSpawnerBuilding&)>> m_unitsToSpawn;
+
+	void addUnitToSpawn(const std::function<Entity* (const UnitSpawnerBuilding&)>& unitToSpawn);
 };
 
 class Barracks : public UnitSpawnerBuilding
-{
-public:
+{		
+public:	
 	Barracks(const glm::vec3& startingPosition);
 };
 
