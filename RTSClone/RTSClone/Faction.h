@@ -59,6 +59,7 @@ protected:
 	bool isEntityAffordable(eEntityType entityType) const;
 
 	const Entity* addBuilding(Worker& worker, const Map& map, glm::vec3 spawnPosition, eEntityType entityType);
+	bool addUnitToSpawn(eEntityType unitType, const Map& map, UnitSpawnerBuilding& building);
 	void reduceResources(eEntityType addedEntityType);
 	void increaseCurrentPopulationAmount(eEntityType entityType);
 	void increasePopulationLimit();

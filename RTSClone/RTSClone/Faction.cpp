@@ -447,6 +447,32 @@ const Entity* Faction::addBuilding(Worker& worker, const Map& map, glm::vec3 spa
     return nullptr;
 }
 
+bool Faction::addUnitToSpawn(eEntityType unitType, const Map& map, UnitSpawnerBuilding& building)
+{
+    if (isEntityAffordable(unitType) && !isExceedPopulationLimit(unitType))
+    {
+        switch (unitType)
+        {
+        case eEntityType::Unit:
+            assert(building.getEntityType() == eEntityType::Barracks);
+            building.addUnitToSpawn([this, &map, unitType](const UnitSpawnerBuilding& building)
+                { return this->spawnUnit<Unit>(map, this->m_units, unitType, building); });
+            break;
+        case eEntityType::Worker:
+            assert(building.getEntityType() == eEntityType::HQ);
+            building.addUnitToSpawn([this, &map, unitType](const UnitSpawnerBuilding& building)
+                { return this->spawnUnit<Worker>(map, this->m_workers, unitType, building); });
+            break;
+        default:
+            assert(false);
+        }
+
+        return true;
+    }
+
+    return false;
+}
+
 void Faction::reduceResources(eEntityType addedEntityType)
 {
     assert(isEntityAffordable(addedEntityType));
