@@ -17,37 +17,37 @@
 
 namespace
 {
-	constexpr int STARTING_WORKER_COUNT = 2;
 	constexpr float DELAY_TIME = 3.0f;
+	constexpr int STARTING_WORKER_COUNT = 4;
 }
 
 //AIAction
-AIAction::AIAction(eEntityType entityTypeToSpawn, eAIImmediateAction immediateAction)
-	: entityTypeToSpawn(entityTypeToSpawn),
-	immediateAction(immediateAction),
-	buildPosition()
+AIAction::AIAction(eActionType actionType)
+	: actionType(actionType),
+	position()
 {}
 
-AIAction::AIAction(eEntityType entityTypeToSpawn, eAIImmediateAction immediateAction, const glm::vec3& buildPosition)
-	: entityTypeToSpawn(entityTypeToSpawn),
-	immediateAction(immediateAction),
-	buildPosition(buildPosition)
+AIAction::AIAction(eActionType actionType, const glm::vec3& position)
+	: actionType(actionType),
+	position(position)
 {}
 
 //FactionAI
 FactionAI::FactionAI(eFactionName factionName, const glm::vec3& hqStartingPosition, const glm::vec3& mineralsStartingPosition, 
 	const Faction& opposingFaction)
 	: Faction(factionName, hqStartingPosition, mineralsStartingPosition),
-	m_opposingFaction(opposingFaction),
+	m_opposingFaction(opposingFaction), 
 	m_spawnQueue(),
+	m_actionQueue(),
 	m_delayTimer(DELAY_TIME, true)
 {
 	for (int i = 0; i < STARTING_WORKER_COUNT; ++i)
 	{
-		m_spawnQueue.push({ eEntityType::Worker, eAIImmediateAction::Harvest });
+		m_spawnQueue.push(eEntityType::Worker);
 	}
 
-	m_spawnQueue.push({ eEntityType::Worker, eAIImmediateAction::BuildSupplyDepot, {35.0f, Globals::GROUND_HEIGHT, 120.0f} });
+	m_actionQueue.push({ eActionType::BuildSupplyDepot, {35.0f, Globals::GROUND_HEIGHT, 120.0f} });
+	m_actionQueue.push({ eActionType::BuildBarracks, {45.0f, Globals::GROUND_HEIGHT, 120.0f} });
 }
 
 void FactionAI::update(float deltaTime, const Map & map, const Faction& opposingFaction)
@@ -56,47 +56,53 @@ void FactionAI::update(float deltaTime, const Map & map, const Faction& opposing
 
 	m_delayTimer.update(deltaTime);
 
-	if (!m_spawnQueue.empty() && m_delayTimer.isExpired())
-	{
-		const AIAction& aiAction = m_spawnQueue.front();
-		switch (aiAction.entityTypeToSpawn)
-		{
-		case eEntityType::Worker:
-		{
-			Worker* addedWorker = spawnUnit<Worker>(map, m_workers, aiAction.entityTypeToSpawn, m_HQ);
-			if (addedWorker)
-			{
-				switch (aiAction.immediateAction)
-				{
-				case eAIImmediateAction::Harvest:
-				{
-					const Mineral& mineralToHarvest = getRandomMineral();
-					glm::vec3 destination = PathFinding::getInstance().getClosestPositionOutsideAABB(addedWorker->getPosition(),
-						mineralToHarvest.getAABB(), mineralToHarvest.getPosition(), map);
-
-					addedWorker->moveTo(destination, map, [&](const glm::ivec2& position) { return getAllAdjacentPositions(position, map); },
-						eUnitState::MovingToMinerals, &mineralToHarvest);
-				}
-					break;
-				case eAIImmediateAction::BuildSupplyDepot:
-					instructWorkerToBuild(eEntityType::SupplyDepot, aiAction.buildPosition, map, *addedWorker);
-					break;
-				default:
-					assert(false);
-				}
-
-				m_spawnQueue.pop(); 
-			}
-		}
-			break;
-		default:
-			assert(false);
-		}
-	}
-
 	if (m_delayTimer.isExpired())
 	{
 		m_delayTimer.resetElaspedTime();
+
+		if(!m_spawnQueue.empty())
+		{
+			eEntityType entityTypeToSpawn = m_spawnQueue.front();
+			switch (entityTypeToSpawn)
+			{
+			case eEntityType::Worker:
+				m_HQ.addUnitToSpawn([&](const UnitSpawnerBuilding& building) 
+					{ return spawnUnit<Worker>(map, m_workers, eEntityType::Worker, building); });
+				break;
+			case eEntityType::Unit:
+
+				break;
+			default:
+				assert(false);
+			}
+
+			m_spawnQueue.pop();
+		}
+
+		if (!m_actionQueue.empty())
+		{
+			const AIAction& action = m_actionQueue.front();
+			switch (action.actionType)
+			{
+			case eActionType::BuildBarracks:
+			{
+				if (isEntityAffordable(eEntityType::Barracks))
+				{
+					Worker* availableWorker = getAvailableWorker(action.position);
+					if (availableWorker && instructWorkerToBuild(eEntityType::Barracks, action.position, map, *availableWorker))
+					{
+						m_actionQueue.pop();
+					}
+				}
+			}
+				break;
+			case eActionType::BuildSupplyDepot:
+				
+				break;
+			default:
+				assert(false);
+			}
+		}
 
 		for (auto& worker : m_workers)
 		{
@@ -113,30 +119,6 @@ void FactionAI::update(float deltaTime, const Map & map, const Faction& opposing
 	}
 }
 
-bool FactionAI::instructWorkerToBuild(eEntityType entityType, const glm::vec3& position, const Map& map)
-{
-	if (Globals::isPositionInMapBounds(position) && !map.isPositionOccupied(position) && !m_workers.empty())
-	{
-		Worker* closestWorker = nullptr;
-		float closestDistance = std::numeric_limits<float>::max();
-
-		for (auto& worker : m_workers)
-		{
-			float distance = Globals::getSqrDistance(position, worker.getPosition());
-			if (distance < closestDistance)
-			{
-				closestWorker = &worker;
-				closestDistance = distance;
-			}
-		}
-
-		assert(closestWorker);
-		return Faction::instructWorkerToBuild(entityType, position, map, *closestWorker);
-	}
-
-	return false;
-}
-
 bool FactionAI::instructWorkerToBuild(eEntityType entityType, const glm::vec3& position, const Map& map, Worker& worker)
 {
 	if (Globals::isPositionInMapBounds(position) && !map.isPositionOccupied(position) && !m_workers.empty())
@@ -151,4 +133,47 @@ const Mineral& FactionAI::getRandomMineral() const
 {
 	assert(!m_minerals.empty());
 	return m_minerals[Globals::getRandomNumber(0, m_minerals.size() - 1)];
+}
+
+Worker* FactionAI::getAvailableWorker(const glm::vec3& position)
+{
+	if (m_workers.empty())
+	{
+		return nullptr;
+	}
+	
+	Worker* selectedWorker = nullptr;
+	float closestDistance = std::numeric_limits<float>::max();
+	for (auto& availableWorker : m_workers)
+	{
+		float distance = Globals::getSqrDistance(position, availableWorker.getPosition());
+		bool selectWorker = false;
+		if (!selectedWorker)
+		{
+			selectWorker = true;
+		}
+		else if (availableWorker.getCurrentState() == eUnitState::Idle &&
+			selectedWorker->getCurrentState() != eUnitState::Idle)
+		{
+			selectWorker = true;
+		}
+		else if (availableWorker.getCurrentState() == eUnitState::Idle &&
+			selectedWorker->getCurrentState() == eUnitState::Idle &&
+			distance < closestDistance)
+		{
+			selectWorker = true;
+		}
+		else if (distance < closestDistance)
+		{
+			selectWorker = true;
+		}
+
+		if (selectWorker)
+		{
+			selectedWorker = &availableWorker;
+			closestDistance = distance;
+		}
+	}
+
+	return selectedWorker;
 }

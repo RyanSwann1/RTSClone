@@ -3,20 +3,19 @@
 #include "Faction.h"
 #include <queue>
 
-enum class eAIImmediateAction
+enum class eActionType
 {
-	Harvest = 0,
-	BuildSupplyDepot
+	BuildSupplyDepot,
+	BuildBarracks
 };
 
 struct AIAction
 {
-	AIAction(eEntityType entityTypeToSpawn, eAIImmediateAction immediateAction);
-	AIAction(eEntityType entityTypeToSpawn, eAIImmediateAction immediateAction, const glm::vec3& buildPosition);
+	AIAction(eActionType actionType);
+	AIAction(eActionType actionType, const glm::vec3& position);
 
-	eEntityType entityTypeToSpawn;
-	eAIImmediateAction immediateAction;
-	glm::vec3 buildPosition;
+	eActionType actionType;
+	glm::vec3 position;
 };
 
 class FactionAI : public Faction
@@ -28,10 +27,11 @@ public:
 
 private:
 	const Faction& m_opposingFaction;
-	std::queue<AIAction> m_spawnQueue;
+	std::queue<eEntityType> m_spawnQueue;
+	std::queue<AIAction> m_actionQueue;
 	Timer m_delayTimer;
 
-	bool instructWorkerToBuild(eEntityType entityType, const glm::vec3& position, const Map& map);
 	bool instructWorkerToBuild(eEntityType entityType, const glm::vec3& position, const Map& map, Worker& worker);
 	const Mineral& getRandomMineral() const;
+	Worker* getAvailableWorker(const glm::vec3& position);
 };
