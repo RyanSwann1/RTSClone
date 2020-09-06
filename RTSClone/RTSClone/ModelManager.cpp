@@ -35,6 +35,8 @@ namespace
 	constexpr glm::vec3 WORKER_SCALE{ 0.8f, 0.8f, 0.8f };
 	constexpr glm::vec3 SUPPLY_DEPOT_SCALE{ 1.0f, 1.0f, 1.0f };
 	constexpr glm::vec3 BARRACKS_SCALE{ 0.5f, 0.5f, 0.5f };
+	constexpr glm::vec3 WORKER_MINERAL_SCALE = { 0.2f, 0.2f, 0.2f };
+	constexpr glm::vec3 PROJECTILE_SCALE = { 0.75f, 0.75f, 0.75f };
 
 	constexpr glm::vec3 UNIT_AABB_SIZE_FROM_CENTER = { 3.0f, 1.0f, 3.0f };
 	constexpr glm::vec3 HQ_AABB_SIZE_FROM_CENTER = { 9.0f, 1.0f, 3.0f };
@@ -73,93 +75,28 @@ ModelManager::ModelManager()
 	: m_models(),
 	m_loadedAllModels(true)
 {
-	std::unique_ptr<Model> unitModel = Model::create("spaceCraft1.obj", false,
-		UNIT_AABB_SIZE_FROM_CENTER, eModelName::Unit, UNIT_SCALE);
-	assert(unitModel);
-	if (!unitModel)
-	{
-		std::cout << "Failed to load SpaceCraft model\n";
-		m_loadedAllModels = false;
-	}
-	m_models[static_cast<int>(unitModel->modelName)] = std::move(unitModel);
+	loadModel("spaceCraft1.obj", false, UNIT_AABB_SIZE_FROM_CENTER, eModelName::Unit, UNIT_SCALE);
+	loadModel("portal.obj", true, HQ_AABB_SIZE_FROM_CENTER, eModelName::HQ, HQ_SCALE);
+	loadModel("rocksOre.obj", true, MINERAL_AABB_SIZE_FROM_CENTER, eModelName::Mineral, MINERAL_SCALE);
+	loadModel("rocksOre.obj", true, WORKER_MINERAL_AABB_SIZE_FROM_CENTER, eModelName::WorkerMineral, WORKER_MINERAL_SCALE);
+	loadModel("laserSabel.obj", false, WAYPOINT_AABB_SIZE_FROM_CENTER, eModelName::Waypoint, WAYPOINT_SCALE);
+	loadModel("robot.obj", false, WORKER_AABB_SIZE_FROM_CENTER, eModelName::Worker, WORKER_SCALE);
+	loadModel("laserSabel.obj", false, PROJECTILE_AABB_SIZE_FROM_CENTER, eModelName::Projectile, PROJECTILE_SCALE);
+	loadModel("satelliteDish.obj", false, SUPPLY_DEPOT_AABB_SIZE_FROM_CENTER, eModelName::SupplyDepot, SUPPLY_DEPOT_SCALE);
+	loadModel("buildingOpen.obj", true, BARRACKS_AABB_SIZE_FROM_CENTER, eModelName::Barracks, BARRACKS_SCALE);
+}
 
-	std::unique_ptr<Model> headquartersModel = Model::create("portal.obj", true,
-		HQ_AABB_SIZE_FROM_CENTER, eModelName::HQ, HQ_SCALE);
-	assert(headquartersModel);
-	if (!headquartersModel)
+void ModelManager::loadModel(const std::string& fileName, bool renderFromCenterPosition, const glm::vec3& AABBSizeFromCenter, 
+	eModelName modelName, const glm::vec3& scale)
+{
+	std::unique_ptr<Model> model = Model::create(fileName, renderFromCenterPosition,
+		AABBSizeFromCenter, modelName, scale);
+	assert(model);
+	if (!model)
 	{
-		std::cout << "Failed to load portal model\n";
+		std::cout << "Failed to load " << fileName << "\n";
 		m_loadedAllModels = false;
 	}
-	m_models[static_cast<int>(headquartersModel->modelName)] = std::move(headquartersModel);
 
-	std::unique_ptr<Model> mineralModel = Model::create("rocksOre.obj", true,
-		MINERAL_AABB_SIZE_FROM_CENTER, eModelName::Mineral, MINERAL_SCALE);
-	assert(mineralModel);
-	if (!mineralModel)
-	{
-		std::cout << "Rocks Ore Model not found\n";
-		m_loadedAllModels = false;
-	}
-	m_models[static_cast<int>(mineralModel->modelName)] = std::move(mineralModel);
-
-	std::unique_ptr<Model> workerMineralModel = Model::create("rocksOre.obj", true,
-		WORKER_MINERAL_AABB_SIZE_FROM_CENTER, eModelName::WorkerMineral , { 0.2f, 0.2f, 0.2f });
-	assert(workerMineralModel);
-	if (!workerMineralModel)
-	{
-		std::cout << "Rocks Ore Model not found\n";
-		m_loadedAllModels = false;
-	}
-	m_models[static_cast<int>(workerMineralModel->modelName)] = std::move(workerMineralModel);
-
-	std::unique_ptr<Model> waypointModel = Model::create("laserSabel.obj", false,
-		WAYPOINT_AABB_SIZE_FROM_CENTER, eModelName::Waypoint, WAYPOINT_SCALE);
-	assert(waypointModel);
-	if (!waypointModel)
-	{
-		std::cout << "Failed to load laserSabel Model\n";
-		m_loadedAllModels = false;
-	}
-	m_models[static_cast<int>(waypointModel->modelName)] = std::move(waypointModel);
-
-	std::unique_ptr<Model> workerModel = Model::create("robot.obj", false,
-		WORKER_AABB_SIZE_FROM_CENTER, eModelName::Worker, WORKER_SCALE);
-	assert(workerModel);
-	if (!workerModel)
-	{
-		std::cout << "Failed to load: robot.obj\n";
-		m_loadedAllModels = false;
-	}
-	m_models[static_cast<int>(workerModel->modelName)] = std::move(workerModel);
-
-	std::unique_ptr<Model> projectileModel = Model::create("laserSabel.obj", false,
-		PROJECTILE_AABB_SIZE_FROM_CENTER, eModelName::Projectile, { 0.75f, 0.75f, 0.75f });
-	assert(projectileModel);
-	if (!projectileModel)
-	{
-		std::cout << "Couldn't load projectile model\n";
-		m_loadedAllModels = false;
-	}
-	m_models[static_cast<int>(eModelName::Projectile)] = std::move(projectileModel);
-
-	std::unique_ptr<Model> supplyDepotModel = Model::create("satelliteDish.obj", false,
-		SUPPLY_DEPOT_AABB_SIZE_FROM_CENTER, eModelName::SupplyDepot, SUPPLY_DEPOT_SCALE);
-	assert(supplyDepotModel);
-	if (!supplyDepotModel)
-	{
-		std::cout << "failed to load satelliteDishModel\n";
-		m_loadedAllModels = false;
-	}
-	m_models[static_cast<int>(supplyDepotModel->modelName)] = std::move(supplyDepotModel);
-
-	std::unique_ptr<Model> barracksModel = Model::create("buildingOpen.obj", true,
-		BARRACKS_AABB_SIZE_FROM_CENTER, eModelName::Barracks, BARRACKS_SCALE);
-	assert(barracksModel);
-	if (!barracksModel)
-	{
-		std::cout << "Couldn't load buildingOpen.obj\n";
-		m_loadedAllModels = false;
-	}
-	m_models[static_cast<int>(barracksModel->modelName)] = std::move(barracksModel);
+	m_models[static_cast<int>(model->modelName)] = std::move(model);
 }
