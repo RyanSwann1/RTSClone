@@ -27,6 +27,24 @@ namespace
 			assert(false);
 		}
 	}
+
+	constexpr glm::vec3 UNIT_SCALE{ 0.35f, 0.35f, 0.35f };
+	constexpr glm::vec3 HQ_SCALE{ 1.2f, 1.0f, 0.9f };
+	constexpr glm::vec3 MINERAL_SCALE{ 0.6f, 0.6f, 0.6f };
+	constexpr glm::vec3 WAYPOINT_SCALE{ 1.0f, 1.0f, 1.0f };
+	constexpr glm::vec3 WORKER_SCALE{ 0.8f, 0.8f, 0.8f };
+	constexpr glm::vec3 SUPPLY_DEPOT_SCALE{ 1.0f, 1.0f, 1.0f };
+	constexpr glm::vec3 BARRACKS_SCALE{ 0.5f, 0.5f, 0.5f };
+
+	constexpr glm::vec3 UNIT_AABB_SIZE_FROM_CENTER = { 3.0f, 1.0f, 3.0f };
+	constexpr glm::vec3 HQ_AABB_SIZE_FROM_CENTER = { 9.0f, 1.0f, 3.0f };
+	constexpr glm::vec3 MINERAL_AABB_SIZE_FROM_CENTER = { 3.0f, 1.0f, 3.0f };
+	constexpr glm::vec3 WORKER_MINERAL_AABB_SIZE_FROM_CENTER = { 0.0f, 0.0f, 0.0f };
+	constexpr glm::vec3 WAYPOINT_AABB_SIZE_FROM_CENTER = { 2.0f, 1.0f, 2.0f };
+	constexpr glm::vec3 WORKER_AABB_SIZE_FROM_CENTER = { 1.5f, 1.0f, 1.5f };
+	constexpr glm::vec3 PROJECTILE_AABB_SIZE_FROM_CENTER = { 1.0f, 1.0f, 1.0f };
+	constexpr glm::vec3 SUPPLY_DEPOT_AABB_SIZE_FROM_CENTER = { 3.0f, 1.0f, 3.0f };
+	constexpr glm::vec3 BARRACKS_AABB_SIZE_FROM_CENTER = { 3.0f, 1.0f, 3.0f };
 }
 
 bool ModelManager::isAllModelsLoaded() const
@@ -56,7 +74,7 @@ ModelManager::ModelManager()
 	m_loadedAllModels(true)
 {
 	std::unique_ptr<Model> unitModel = Model::create("spaceCraft1.obj", false,
-		{ 3, 1.0f, 3 }, eModelName::Unit, Globals::UNIT_AABB_SIZE);
+		UNIT_AABB_SIZE_FROM_CENTER, eModelName::Unit, UNIT_SCALE);
 	assert(unitModel);
 	if (!unitModel)
 	{
@@ -66,7 +84,7 @@ ModelManager::ModelManager()
 	m_models[static_cast<int>(unitModel->modelName)] = std::move(unitModel);
 
 	std::unique_ptr<Model> headquartersModel = Model::create("portal.obj", true,
-		glm::vec3(9.0f, 1.0f, 3.0f), eModelName::HQ, Globals::HQ_AABB_SIZE);
+		HQ_AABB_SIZE_FROM_CENTER, eModelName::HQ, HQ_SCALE);
 	assert(headquartersModel);
 	if (!headquartersModel)
 	{
@@ -76,7 +94,7 @@ ModelManager::ModelManager()
 	m_models[static_cast<int>(headquartersModel->modelName)] = std::move(headquartersModel);
 
 	std::unique_ptr<Model> mineralModel = Model::create("rocksOre.obj", true,
-		glm::vec3(3.0f, 1.0f, 3.0f), eModelName::Mineral, Globals::MINERAL_AABB_SIZE);
+		MINERAL_AABB_SIZE_FROM_CENTER, eModelName::Mineral, MINERAL_SCALE);
 	assert(mineralModel);
 	if (!mineralModel)
 	{
@@ -86,7 +104,7 @@ ModelManager::ModelManager()
 	m_models[static_cast<int>(mineralModel->modelName)] = std::move(mineralModel);
 
 	std::unique_ptr<Model> workerMineralModel = Model::create("rocksOre.obj", true,
-		glm::vec3(0.0f, 0.0f, 0.0f), eModelName::WorkerMineral , { 0.2f, 0.2f, 0.2f });
+		WORKER_MINERAL_AABB_SIZE_FROM_CENTER, eModelName::WorkerMineral , { 0.2f, 0.2f, 0.2f });
 	assert(workerMineralModel);
 	if (!workerMineralModel)
 	{
@@ -96,7 +114,7 @@ ModelManager::ModelManager()
 	m_models[static_cast<int>(workerMineralModel->modelName)] = std::move(workerMineralModel);
 
 	std::unique_ptr<Model> waypointModel = Model::create("laserSabel.obj", false,
-		glm::vec3(2.0f, 1.0f, 2.0f), eModelName::Waypoint, Globals::WAYPOINT_AABB_SIZE);
+		WAYPOINT_AABB_SIZE_FROM_CENTER, eModelName::Waypoint, WAYPOINT_SCALE);
 	assert(waypointModel);
 	if (!waypointModel)
 	{
@@ -106,7 +124,7 @@ ModelManager::ModelManager()
 	m_models[static_cast<int>(waypointModel->modelName)] = std::move(waypointModel);
 
 	std::unique_ptr<Model> workerModel = Model::create("robot.obj", false,
-		{ 1.5f, 1.0f, 1.5f }, eModelName::Worker, Globals::WORKER_AABB_SIZE);
+		WORKER_AABB_SIZE_FROM_CENTER, eModelName::Worker, WORKER_SCALE);
 	assert(workerModel);
 	if (!workerModel)
 	{
@@ -116,7 +134,7 @@ ModelManager::ModelManager()
 	m_models[static_cast<int>(workerModel->modelName)] = std::move(workerModel);
 
 	std::unique_ptr<Model> projectileModel = Model::create("laserSabel.obj", false,
-		{ 1.0f, 1.0f, 1.0f }, eModelName::Projectile, { 0.75f, 0.75f, 0.75f });
+		PROJECTILE_AABB_SIZE_FROM_CENTER, eModelName::Projectile, { 0.75f, 0.75f, 0.75f });
 	assert(projectileModel);
 	if (!projectileModel)
 	{
@@ -126,7 +144,7 @@ ModelManager::ModelManager()
 	m_models[static_cast<int>(eModelName::Projectile)] = std::move(projectileModel);
 
 	std::unique_ptr<Model> supplyDepotModel = Model::create("satelliteDish.obj", false,
-		glm::vec3(3.0f, 1.0f, 3.0f), eModelName::SupplyDepot, Globals::SUPPLY_DEPOT_AABB_SIZE);
+		SUPPLY_DEPOT_AABB_SIZE_FROM_CENTER, eModelName::SupplyDepot, SUPPLY_DEPOT_SCALE);
 	assert(supplyDepotModel);
 	if (!supplyDepotModel)
 	{
@@ -136,7 +154,7 @@ ModelManager::ModelManager()
 	m_models[static_cast<int>(supplyDepotModel->modelName)] = std::move(supplyDepotModel);
 
 	std::unique_ptr<Model> barracksModel = Model::create("buildingOpen.obj", true,
-		glm::vec3(3.0f, 1.0f, 3.0f), eModelName::Barracks, Globals::BARRACKS_AABB_SIZE);
+		BARRACKS_AABB_SIZE_FROM_CENTER, eModelName::Barracks, BARRACKS_SCALE);
 	assert(barracksModel);
 	if (!barracksModel)
 	{
