@@ -10,19 +10,19 @@ namespace
 	const std::string MODELS_DIRECTORY = "models/";
 }
 
-Model::Model(bool renderFromCentrePosition, const glm::vec3& sizeFromCentre, eModelName modelName, const glm::vec3& scale)
+Model::Model(bool renderFromCentrePosition, const glm::vec3& AABBSizeFromCenter, eModelName modelName, const glm::vec3& scale)
 	: modelName(modelName),
 	renderFromCentrePosition(renderFromCentrePosition),
-	sizeFromCentre(sizeFromCentre),
+	AABBSizeFromCenter(AABBSizeFromCenter),
 	scale(scale),
 	meshes(),
 	textures()
 {}
 
 std::unique_ptr<Model> Model::create(const std::string & filePath, bool renderFromCentrePosition, 
-	const glm::vec3& sizeFromCentre, eModelName modelName, const glm::vec3& scale)
+	const glm::vec3& AABBSizeFromCenter, eModelName modelName, const glm::vec3& scale)
 {
-	Model* model = new Model(renderFromCentrePosition, sizeFromCentre, modelName, scale);
+	Model* model = new Model(renderFromCentrePosition, AABBSizeFromCenter, modelName, scale);
 	if (!ModelLoader::loadModel(MODELS_DIRECTORY + filePath, *model))
 	{
 		delete model;
@@ -46,8 +46,8 @@ void Model::render(ShaderHandler& shaderHandler, const glm::vec3& position) cons
 	glm::vec3 modelPosition = position;
 	if (renderFromCentrePosition)
 	{
-		modelPosition.x += sizeFromCentre.x;
-		modelPosition.z -= sizeFromCentre.z;
+		modelPosition.x += AABBSizeFromCenter.x;
+		modelPosition.z -= AABBSizeFromCenter.z;
 	}
 	glm::mat4 model = glm::translate(glm::mat4(1.0), modelPosition);
 	model = glm::scale(model, scale);

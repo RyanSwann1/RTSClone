@@ -139,12 +139,12 @@ void AABB::update(const glm::vec3& position)
 
 void AABB::reset(const glm::vec3& position, const Model& model)
 {
-	m_left = position.x - model.sizeFromCentre.x;
-	m_right = position.x + model.sizeFromCentre.x;
-	m_top = position.y + model.sizeFromCentre.y;
-	m_bottom = position.y - model.sizeFromCentre.y;
-	m_forward = position.z + model.sizeFromCentre.z;
-	m_back = position.z - model.sizeFromCentre.z;
+	m_left = position.x - model.AABBSizeFromCenter.x;
+	m_right = position.x + model.AABBSizeFromCenter.x;
+	m_top = position.y + model.AABBSizeFromCenter.y;
+	m_bottom = position.y - model.AABBSizeFromCenter.y;
+	m_forward = position.z + model.AABBSizeFromCenter.z;
+	m_back = position.z - model.AABBSizeFromCenter.z;
 }
 
 void AABB::reset(const glm::vec3& position, const glm::vec3& size)
