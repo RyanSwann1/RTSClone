@@ -84,22 +84,22 @@ PathFinding::PathFinding()
 {}
 
 bool PathFinding::isPositionAvailable(const glm::vec3& nodePosition, const Map& map, const std::list<Unit>& units, const std::list<Worker>& workers, 
-	const Worker& workerSender) const
+	int senderID) const
 {
 	assert(nodePosition == Globals::convertToNodePosition(nodePosition));
 
 	if (!map.isPositionOccupied(nodePosition))
 	{
-		auto unit = std::find_if(units.cbegin(), units.cend(), [&nodePosition](const auto& unit) -> bool
+		auto unit = std::find_if(units.cbegin(), units.cend(), [&nodePosition, senderID](const auto& unit) -> bool
 		{
-			return Globals::convertToNodePosition(unit.getPosition()) == nodePosition;
+			return unit.getID() != senderID && Globals::convertToNodePosition(unit.getPosition()) == nodePosition;
 		});
 
 		if (unit == units.cend())
 		{
-			auto worker = std::find_if(workers.cbegin(), workers.cend(), [&nodePosition, &workerSender](const auto& worker) -> bool
+			auto worker = std::find_if(workers.cbegin(), workers.cend(), [&nodePosition, senderID](const auto& worker) -> bool
 			{
-				return &worker != &workerSender && Globals::convertToNodePosition(worker.getPosition()) == nodePosition;
+				return worker.getID() != senderID && Globals::convertToNodePosition(worker.getPosition()) == nodePosition;
 			});
 			if (worker != workers.cend())
 			{
