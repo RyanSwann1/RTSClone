@@ -453,7 +453,6 @@ const Entity* Faction::addBuilding(Worker& worker, const Map& map, glm::vec3 spa
         if (addedBuilding)
         {
             reduceResources(entityType);
-            revalidateExistingUnitPaths(map);
             m_allEntities.push_back(addedBuilding);
             GameEventHandler::getInstance().addEvent({ eGameEventType::RevalidateMovementPaths });
 
