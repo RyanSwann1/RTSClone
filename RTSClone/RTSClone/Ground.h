@@ -2,7 +2,6 @@
 
 #include "NonCopyable.h"
 #include "NonMovable.h"
-#include "glm/glm.hpp"
 
 class ShaderHandler;
 class Ground : private NonMovable, private NonCopyable

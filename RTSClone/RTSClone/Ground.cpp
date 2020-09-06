@@ -2,6 +2,7 @@
 #include "Globals.h"
 #include "glad.h"
 #include "ShaderHandler.h"
+#include "glm/glm.hpp"
 #include <array>
 
 namespace

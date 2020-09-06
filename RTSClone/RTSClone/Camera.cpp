@@ -80,9 +80,9 @@ glm::vec3 Camera::getMouseToGroundPosition(const sf::Window& window) const
 	glm::vec3 rayPositionFromMouse = calculateMouseRay(getProjection(window), getView(), window,
 		{ sf::Mouse::getPosition(window).x, sf::Mouse::getPosition(window).y });
 
-	for (float i = 0; i <= MAX_RAY_TO_GROUND_DISTANCE; i += 1.0f)
+	for (int i = 0; i <= MAX_RAY_TO_GROUND_DISTANCE; ++i)
 	{
-		glm::vec3 pos = rayPositionFromMouse * i + position;
+		glm::vec3 pos = rayPositionFromMouse * static_cast<float>(i) + position;
 		if (pos.y <= 0)
 		{
 			return { pos.x, Globals::GROUND_HEIGHT, pos.z };
