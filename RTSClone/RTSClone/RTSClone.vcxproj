@@ -114,15 +114,15 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>RENDER_AABB;RENDER_PATHING;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>GAME;RENDER_AABB;RENDER_PATHING;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(ProjectDir)assimp\include;$(ProjectDir)SFML-2.5.1\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)..\Shared\assimp\include;$(ProjectDir)..\Shared\SFML-2.5.1\include;$(ProjectDir)..\Shared</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>assimp.lib;sfml-window-d.lib;sfml-graphics-d.lib;sfml-system-d.lib;sfml-network-d.lib;winmm.lib;opengl32.lib;freetype.lib;vorbis.lib;vorbisenc.lib;vorbisfile.lib;openal32.lib;sfml-audio-d.lib;flac.lib;ogg.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>opengl32.lib;$(ProjectDir)SFML-2.5.1\lib;$(ProjectDir)assimp\lib</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>opengl32.lib;$(ProjectDir)..\Shared\SFML-2.5.1\lib;$(ProjectDir)..\Shared\assimp\lib</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -145,7 +145,13 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="AABB.cpp" />
+    <ClCompile Include="..\Shared\AABB.cpp" />
+    <ClCompile Include="..\Shared\Camera.cpp" />
+    <ClCompile Include="..\Shared\Mesh.cpp" />
+    <ClCompile Include="..\Shared\Model.cpp" />
+    <ClCompile Include="..\Shared\ModelLoader.cpp" />
+    <ClCompile Include="..\Shared\ModelManager.cpp" />
+    <ClCompile Include="..\Shared\ShaderHandler.cpp" />
     <ClCompile Include="AdjacentPositions.cpp" />
     <ClCompile Include="Faction.cpp" />
     <ClCompile Include="FactionAI.cpp" />
@@ -158,7 +164,6 @@
     <ClCompile Include="ProjectileHandler.cpp" />
     <ClCompile Include="Worker.cpp" />
     <ClCompile Include="UnitSpawnerBuilding.cpp" />
-    <ClCompile Include="Camera.cpp" />
     <ClCompile Include="Entity.cpp" />
     <ClCompile Include="glad.c" />
     <ClCompile Include="Ground.cpp" />
@@ -170,21 +175,25 @@
     <ClCompile Include="imgui_impl\imgui_impl_sfml.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Map.cpp" />
-    <ClCompile Include="Mesh.cpp" />
     <ClCompile Include="Mineral.cpp" />
-    <ClCompile Include="Model.cpp" />
-    <ClCompile Include="ModelLoader.cpp" />
-    <ClCompile Include="ModelManager.cpp" />
     <ClCompile Include="PathFinding.cpp" />
     <ClCompile Include="PriorityQueue.cpp" />
-    <ClCompile Include="ShaderHandler.cpp" />
     <ClCompile Include="SupplyDepot.cpp" />
     <ClCompile Include="Texture.cpp" />
     <ClCompile Include="Timer.cpp" />
     <ClCompile Include="Unit.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="AABB.h" />
+    <ClInclude Include="..\Shared\AABB.h" />
+    <ClInclude Include="..\Shared\Camera.h" />
+    <ClInclude Include="..\Shared\Mesh.h" />
+    <ClInclude Include="..\Shared\Model.h" />
+    <ClInclude Include="..\Shared\ModelLoader.h" />
+    <ClInclude Include="..\Shared\ModelManager.h" />
+    <ClInclude Include="..\Shared\ModelName.h" />
+    <ClInclude Include="..\Shared\NonCopyable.h" />
+    <ClInclude Include="..\Shared\NonMovable.h" />
+    <ClInclude Include="..\Shared\ShaderHandler.h" />
     <ClInclude Include="AdjacentPositions.h" />
     <ClInclude Include="assimp\include\ai_assert.h" />
     <ClInclude Include="assimp\include\anim.h" />
@@ -244,7 +253,6 @@
     <ClInclude Include="UniqueEntityIDDistributer.h" />
     <ClInclude Include="Worker.h" />
     <ClInclude Include="UnitSpawnerBuilding.h" />
-    <ClInclude Include="Camera.h" />
     <ClInclude Include="Entity.h" />
     <ClInclude Include="glad.h" />
     <ClInclude Include="Globals.h" />
@@ -260,17 +268,9 @@
     <ClInclude Include="imgui_impl\imgui_wrapper.h" />
     <ClInclude Include="khrplatform.h" />
     <ClInclude Include="Map.h" />
-    <ClInclude Include="Mesh.h" />
     <ClInclude Include="Mineral.h" />
-    <ClInclude Include="Model.h" />
-    <ClInclude Include="ModelLoader.h" />
-    <ClInclude Include="ModelManager.h" />
-    <ClInclude Include="ModelName.h" />
-    <ClInclude Include="NonCopyable.h" />
-    <ClInclude Include="NonMovable.h" />
     <ClInclude Include="PathFinding.h" />
     <ClInclude Include="PriorityQueue.h" />
-    <ClInclude Include="ShaderHandler.h" />
     <ClInclude Include="SupplyDepot.h" />
     <ClInclude Include="Texture.h" />
     <ClInclude Include="Timer.h" />
