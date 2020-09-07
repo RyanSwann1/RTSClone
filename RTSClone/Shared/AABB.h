@@ -8,12 +8,16 @@
 
 struct Model;
 class ShaderHandler;
+#ifdef GAME
 class Unit;
+#endif // GAME
 struct AABB
 {
 	AABB();
 	AABB(const glm::vec3& position, const glm::vec3& size);
+#ifdef GAME
 	AABB(const std::vector<Unit*>& selectedUnits);
+#endif // GAME
 
 	bool contains(const glm::vec3& position) const;
 	bool contains(const AABB& other) const;

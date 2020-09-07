@@ -116,10 +116,13 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)..\Shared\assimp\include;$(ProjectDir)..\Shared\SFML-2.5.1\include;$(ProjectDir)..\Shared</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>opengl32.lib;$(ProjectDir)..\Shared\SFML-2.5.1\lib;$(ProjectDir)..\Shared\assimp\lib</AdditionalLibraryDirectories>
+      <AdditionalDependencies>assimp.lib;sfml-window-d.lib;sfml-graphics-d.lib;sfml-system-d.lib;sfml-network-d.lib;winmm.lib;opengl32.lib;freetype.lib;vorbis.lib;vorbisenc.lib;vorbisfile.lib;openal32.lib;sfml-audio-d.lib;flac.lib;ogg.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -139,7 +142,29 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\Shared\AABB.cpp" />
+    <ClCompile Include="..\Shared\Camera.cpp" />
+    <ClCompile Include="..\Shared\glad.c" />
+    <ClCompile Include="..\Shared\Mesh.cpp" />
+    <ClCompile Include="..\Shared\Model.cpp" />
+    <ClCompile Include="..\Shared\ModelLoader.cpp" />
+    <ClCompile Include="..\Shared\ModelManager.cpp" />
+    <ClCompile Include="..\Shared\ShaderHandler.cpp" />
     <ClCompile Include="main.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\Shared\AABB.h" />
+    <ClInclude Include="..\Shared\Camera.h" />
+    <ClInclude Include="..\Shared\glad.h" />
+    <ClInclude Include="..\Shared\khrplatform.h" />
+    <ClInclude Include="..\Shared\Mesh.h" />
+    <ClInclude Include="..\Shared\Model.h" />
+    <ClInclude Include="..\Shared\ModelLoader.h" />
+    <ClInclude Include="..\Shared\ModelManager.h" />
+    <ClInclude Include="..\Shared\ModelName.h" />
+    <ClInclude Include="..\Shared\NonCopyable.h" />
+    <ClInclude Include="..\Shared\NonMovable.h" />
+    <ClInclude Include="..\Shared\ShaderHandler.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -1,5 +1,4 @@
 #include "ModelManager.h"
-#include "Globals.h"
 #ifdef GAME
 #include "EntityType.h"
 #endif // GAME

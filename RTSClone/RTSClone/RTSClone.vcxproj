@@ -147,6 +147,7 @@
   <ItemGroup>
     <ClCompile Include="..\Shared\AABB.cpp" />
     <ClCompile Include="..\Shared\Camera.cpp" />
+    <ClCompile Include="..\Shared\glad.c" />
     <ClCompile Include="..\Shared\Mesh.cpp" />
     <ClCompile Include="..\Shared\Model.cpp" />
     <ClCompile Include="..\Shared\ModelLoader.cpp" />
@@ -165,7 +166,6 @@
     <ClCompile Include="Worker.cpp" />
     <ClCompile Include="UnitSpawnerBuilding.cpp" />
     <ClCompile Include="Entity.cpp" />
-    <ClCompile Include="glad.c" />
     <ClCompile Include="Ground.cpp" />
     <ClCompile Include="imgui\imgui.cpp" />
     <ClCompile Include="imgui\imgui_demo.cpp" />
@@ -186,6 +186,8 @@
   <ItemGroup>
     <ClInclude Include="..\Shared\AABB.h" />
     <ClInclude Include="..\Shared\Camera.h" />
+    <ClInclude Include="..\Shared\glad.h" />
+    <ClInclude Include="..\Shared\khrplatform.h" />
     <ClInclude Include="..\Shared\Mesh.h" />
     <ClInclude Include="..\Shared\Model.h" />
     <ClInclude Include="..\Shared\ModelLoader.h" />
@@ -254,7 +256,6 @@
     <ClInclude Include="Worker.h" />
     <ClInclude Include="UnitSpawnerBuilding.h" />
     <ClInclude Include="Entity.h" />
-    <ClInclude Include="glad.h" />
     <ClInclude Include="Globals.h" />
     <ClInclude Include="Ground.h" />
     <ClInclude Include="imgui\imconfig.h" />
@@ -266,7 +267,6 @@
     <ClInclude Include="imgui_impl\imgui_impl_opengl3.h" />
     <ClInclude Include="imgui_impl\imgui_impl_sfml.h" />
     <ClInclude Include="imgui_impl\imgui_wrapper.h" />
-    <ClInclude Include="khrplatform.h" />
     <ClInclude Include="Map.h" />
     <ClInclude Include="Mineral.h" />
     <ClInclude Include="PathFinding.h" />

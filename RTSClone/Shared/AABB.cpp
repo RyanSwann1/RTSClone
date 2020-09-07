@@ -1,6 +1,8 @@
 #include "AABB.h"
 #include "Model.h"
+#ifdef GAME
 #include "Unit.h"
+#endif // GAME
 #include <limits>
 
 #ifdef RENDER_AABB
@@ -59,6 +61,7 @@ AABB::AABB(const glm::vec3& position, const glm::vec3& size)
 	reset(position, size);
 }
 
+#ifdef GAME
 AABB::AABB(const std::vector<Unit*>& selectedUnits)
 	: m_left(std::numeric_limits<float>::max()),
 	m_right(0.0f),
@@ -92,6 +95,7 @@ AABB::AABB(const std::vector<Unit*>& selectedUnits)
 		}
 	}
 }
+#endif // GAME
 
 bool AABB::contains(const glm::vec3& position) const
 {
