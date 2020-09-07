@@ -1,13 +1,19 @@
 #include "GameObject.h"
 #include "ModelManager.h"
 
-GameObject::GameObject(eModelName modelName, const glm::vec3& startingPosition, const glm::vec3& startingScale)
+GameObject::GameObject(eModelName modelName, const glm::vec3& startingPosition)
 	: modelName(modelName),
-	position(startingPosition),
-	scale(startingScale)
-{}
+	position(startingPosition)
+{
+	AABB.reset(position, ModelManager::getInstance().getModel(modelName));
+}
 
 void GameObject::render(ShaderHandler& shaderHandler) const
 {
 	ModelManager::getInstance().getModel(modelName).render(shaderHandler, *this);
+}
+
+void GameObject::renderAABB(ShaderHandler& shaderHandler)
+{
+	AABB.render(shaderHandler);
 }

@@ -1,16 +1,22 @@
 #pragma once
 
+#include "NonCopyable.h"
+#include "NonMovable.h"
 #include "ModelName.h"
 #include "glm/glm.hpp"
+#include "AABB.h"
 
 class ShaderHandler;
 struct GameObject
 {
-	GameObject(eModelName modelName, const glm::vec3& startingPosition, const glm::vec3& startingScale);
+	GameObject(eModelName modelName, const glm::vec3& startingPosition);
 
 	void render(ShaderHandler& shaderHandler) const;
+#ifdef RENDER_AABB
+	void renderAABB(ShaderHandler& shaderHandler);
+#endif // RENDER_AABB
 
 	eModelName modelName;
 	glm::vec3 position;
-	glm::vec3 scale;
+	AABB AABB;
 };
