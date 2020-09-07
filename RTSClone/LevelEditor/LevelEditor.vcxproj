@@ -156,6 +156,7 @@
     <ClInclude Include="..\Shared\AABB.h" />
     <ClInclude Include="..\Shared\Camera.h" />
     <ClInclude Include="..\Shared\glad.h" />
+    <ClInclude Include="..\Shared\Globals.h" />
     <ClInclude Include="..\Shared\khrplatform.h" />
     <ClInclude Include="..\Shared\Mesh.h" />
     <ClInclude Include="..\Shared\Model.h" />

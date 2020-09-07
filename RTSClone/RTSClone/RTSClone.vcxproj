@@ -187,6 +187,7 @@
     <ClInclude Include="..\Shared\AABB.h" />
     <ClInclude Include="..\Shared\Camera.h" />
     <ClInclude Include="..\Shared\glad.h" />
+    <ClInclude Include="..\Shared\Globals.h" />
     <ClInclude Include="..\Shared\khrplatform.h" />
     <ClInclude Include="..\Shared\Mesh.h" />
     <ClInclude Include="..\Shared\Model.h" />
@@ -256,7 +257,6 @@
     <ClInclude Include="Worker.h" />
     <ClInclude Include="UnitSpawnerBuilding.h" />
     <ClInclude Include="Entity.h" />
-    <ClInclude Include="Globals.h" />
     <ClInclude Include="Ground.h" />
     <ClInclude Include="imgui\imconfig.h" />
     <ClInclude Include="imgui\imgui.h" />
