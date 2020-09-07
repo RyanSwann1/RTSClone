@@ -7,11 +7,6 @@
 #include "glm/gtc/matrix_transform.hpp"
 #include "glm/gtx/transform.hpp"
 
-namespace
-{
-	const std::string MODELS_DIRECTORY = "../Shared/models/";
-}
-
 Model::Model(bool renderFromCentrePosition, const glm::vec3& AABBSizeFromCenter, eModelName modelName, const glm::vec3& scale)
 	: modelName(modelName),
 	renderFromCentrePosition(renderFromCentrePosition),
@@ -21,11 +16,11 @@ Model::Model(bool renderFromCentrePosition, const glm::vec3& AABBSizeFromCenter,
 	textures()
 {}
 
-std::unique_ptr<Model> Model::create(const std::string & filePath, bool renderFromCentrePosition, 
+std::unique_ptr<Model> Model::create(const std::string & fileName, bool renderFromCentrePosition, 
 	const glm::vec3& AABBSizeFromCenter, eModelName modelName, const glm::vec3& scale)
 {
 	Model* model = new Model(renderFromCentrePosition, AABBSizeFromCenter, modelName, scale);
-	if (!ModelLoader::loadModel(MODELS_DIRECTORY + filePath, *model))
+	if (!ModelLoader::loadModel(fileName, *model))
 	{
 		delete model;
 		return std::unique_ptr<Model>();

@@ -13,7 +13,7 @@ class Entity;
 class ShaderHandler;
 struct Model : private NonMovable, private NonCopyable
 {
-	static std::unique_ptr<Model> create(const std::string& filePath, bool renderFromCentrePosition, 
+	static std::unique_ptr<Model> create(const std::string& fileName, bool renderFromCentrePosition, 
 		const glm::vec3& AABBSizeFromCenter, eModelName modelName, const glm::vec3& scale);
 
 	void attachMeshesToVAO() const;

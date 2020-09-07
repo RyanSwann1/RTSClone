@@ -7,6 +7,11 @@
 #include <iostream>
 #include <SFML/Graphics.hpp>
 
+namespace
+{
+    const std::string MODELS_DIRECTORY = "../Shared/models/";
+}
+
 void processNode(aiNode* node, const aiScene* scene, Model& model, std::vector<MeshTextureDetails>& loadedTextures, const std::string& directory);
 Mesh processMesh(aiMesh* mesh, const aiScene* scene, std::vector<MeshTextureDetails>& loadedTextures, const std::string& directory);
 unsigned int TextureFromFile(const char* path, const std::string& directory);
@@ -14,17 +19,17 @@ void loadMaterialTextures(aiMaterial* mat, aiTextureType type, const std::string
     const std::string& directory, std::vector<MeshTextureDetails>& meshTextureDetails);
 Material loadMaterial(aiMaterial* mat);
 
-bool ModelLoader::loadModel(const std::string& filePath, Model& model)
+bool ModelLoader::loadModel(const std::string& fileName, Model& model)
 {
     Assimp::Importer importer;
-    const aiScene* scene = importer.ReadFile(filePath, aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_CalcTangentSpace);
+    const aiScene* scene = importer.ReadFile(MODELS_DIRECTORY + fileName, aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_CalcTangentSpace);
     if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
     {
         std::cout << "ERROR::ASSIMP:: " << importer.GetErrorString() << "\n";
         return false;
     }
 
-    std::string directory = filePath.substr(0, filePath.find_last_of('/'));
+    std::string directory = (MODELS_DIRECTORY + fileName).substr(0, (MODELS_DIRECTORY + fileName).find_last_of('/'));
     std::vector<MeshTextureDetails> loadedTextures;
     processNode(scene->mRootNode, scene, model, loadedTextures, directory);
 

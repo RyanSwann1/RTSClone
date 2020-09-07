@@ -5,5 +5,5 @@
 struct Model;
 namespace ModelLoader
 {
-	bool loadModel(const std::string& filePath, Model& model);
+	bool loadModel(const std::string& fileName, Model& model);
 }
