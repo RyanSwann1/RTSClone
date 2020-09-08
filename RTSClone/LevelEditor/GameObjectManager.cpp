@@ -28,6 +28,21 @@ void GameObjectManager::addGameObject(eModelName modelName, const glm::vec3& pos
 	}
 }
 
+void GameObjectManager::removeGameObject(const glm::vec3& position)
+{
+	if (Globals::isPositionInMapBounds(position))
+	{
+		auto gameObject = std::find_if(m_gameObjects.begin(), m_gameObjects.end(), [&position](const auto& gameObject)
+		{
+			return gameObject.AABB.contains(position);
+		});
+		if (gameObject != m_gameObjects.end())
+		{
+			m_gameObjects.erase(gameObject);
+		}
+	}
+}
+
 void GameObjectManager::render(ShaderHandler& shaderHandler) const
 {
 	for (const auto& gameObject : m_gameObjects)
@@ -36,6 +51,7 @@ void GameObjectManager::render(ShaderHandler& shaderHandler) const
 	}
 }
 
+#ifdef RENDER_AABB
 void GameObjectManager::renderGameObjectAABB(ShaderHandler& shaderHandler)
 {
 	for (auto& gameObject : m_gameObjects)
@@ -43,3 +59,4 @@ void GameObjectManager::renderGameObjectAABB(ShaderHandler& shaderHandler)
 		gameObject.renderAABB(shaderHandler);
 	}
 }
+#endif // RENDER_AABB
