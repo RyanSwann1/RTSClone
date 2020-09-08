@@ -17,11 +17,7 @@
 #include "imgui_impl/imgui_wrapper.h"
 #include "GameEventHandler.h"
 #include "ProjectileHandler.h"
-
-#define RENDER_GROUND
-#ifdef RENDER_GROUND
-#include "Ground.h"
-#endif // RENDER_GROUND
+#include "Level.h"
 
 //AI
 //https://www.youtube.com/watch?v=V3qASwCM-PE&list=PLdgLYFdStKu03Dv9GUsXBDQMdyJbkDb8i
@@ -77,15 +73,16 @@ int main()
 		return -1;
 	}
 
-#ifdef RENDER_GROUND
-	Ground ground;
-#endif // RENDER_GROUND
-	std::unique_ptr<Map> map = std::make_unique<Map>();
-	FactionPlayer player(eFactionName::Player, { 35.0f, Globals::GROUND_HEIGHT, 15.f }, { 70.0f, Globals::GROUND_HEIGHT, Globals::NODE_SIZE });
-	FactionAI playerAI(eFactionName::AI, { 35.0f, Globals::GROUND_HEIGHT, 100.0f }, { 70.0f, Globals::GROUND_HEIGHT, 100.0f}, player);
+	std::unique_ptr<Level> level = Level::create("Level.txt");
+	assert(level);
+	if (!level)
+	{
+		std::cout << "Unable to load level.\n";
+		return -1;
+	}
+
 	sf::Clock gameClock;
 	Camera camera;
-	ProjectileHandler projectileHandler;
 
 	shaderHandler->switchToShader(eShaderType::SelectionBox);
 	shaderHandler->setUniformMat4f(eShaderType::SelectionBox, "uOrthographic", glm::ortho(0.0f, static_cast<float>(windowSize.x),
@@ -114,7 +111,7 @@ int main()
 				}
 			}
 
-			player.handleInput(currentSFMLEvent, window, camera, *map, deltaTime, playerAI);
+			level->handleInput(window, camera, currentSFMLEvent);
 		}
 
 		ImGui_SFML_OpenGL3::startFrame();
@@ -122,13 +119,8 @@ int main()
 		ImGui::ShowDemoWindow();
 
 		//Update
-		projectileHandler.update(deltaTime, player, playerAI);
-		player.update(deltaTime, *map, playerAI);
-		playerAI.update(deltaTime, *map, player);
+		level->update(deltaTime);
 		camera.update(window, deltaTime);
-
-		//Handle Game Events
-		GameEventHandler::getInstance().handleEvents(player, playerAI, projectileHandler, *map);
 
 		//Render
 		glm::mat4 view = camera.getView(); 
@@ -141,7 +133,7 @@ int main()
 		shaderHandler->setUniformMat4f(eShaderType::Debug, "uProjection", projection);
 
 #ifdef RENDER_GROUND
-		ground.render(*shaderHandler);
+		level->renderGround(*shaderHandler);
 #endif // RENDER_GROUND
 
 		shaderHandler->switchToShader(eShaderType::Default);
@@ -149,35 +141,29 @@ int main()
 		shaderHandler->setUniformMat4f(eShaderType::Default, "uProjection", projection);
 		shaderHandler->setUniform1f(eShaderType::Default, "uOpacity", 1.0f);
 	
-		player.render(*shaderHandler);
-		playerAI.render(*shaderHandler);
-		projectileHandler.render(*shaderHandler);
+		level->render(*shaderHandler);
 
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		glDisable(GL_DEPTH_TEST);
 
 		shaderHandler->setUniform1f(eShaderType::Default, "uOpacity", 0.5f);
-		player.renderPlannedBuildings(*shaderHandler);
-		playerAI.renderPlannedBuildings(*shaderHandler);
+		level->renderPlannedBuildings(*shaderHandler);
 
 		shaderHandler->switchToShader(eShaderType::Debug);
 		shaderHandler->setUniformMat4f(eShaderType::Debug, "uView", view);
 		shaderHandler->setUniformMat4f(eShaderType::Debug, "uProjection", projection);
 
 #ifdef RENDER_AABB
-		player.renderAABB(*shaderHandler);
-		playerAI.renderAABB(*shaderHandler);
-		projectileHandler.renderAABB(*shaderHandler);
+		level->renderAABB(*shaderHandler);
 #endif // RENDER_AABB
 
 #ifdef RENDER_PATHING
-		player.renderPathing(*shaderHandler);
-		playerAI.renderPathing(*shaderHandler);
+		level->renderPathing(*shaderHandler);
 #endif // RENDER_PATHING
 		
 		shaderHandler->switchToShader(eShaderType::SelectionBox);
-		player.renderSelectionBox(window);
+		level->renderSelectionBox(window);
 		glDisable(GL_BLEND);
 		glEnable(GL_DEPTH_TEST);
 		ImGui::EndFrame();
