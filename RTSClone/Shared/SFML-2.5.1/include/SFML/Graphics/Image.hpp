@@ -153,7 +153,7 @@ public:
     /// \see create, loadFromFile, loadFromMemory
     ///
     ////////////////////////////////////////////////////////////
-    bool saveToFile(const std::string& filename) const;
+    bool saveLevelToFile(const std::string& filename) const;
 
     ////////////////////////////////////////////////////////////
     /// \brief Return the size (width and height) of the image

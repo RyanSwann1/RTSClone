@@ -96,7 +96,7 @@ FactionPlayer::FactionPlayer(eFactionName factionName, const glm::vec3& hqStarti
 {}
 
 void FactionPlayer::handleInput(const sf::Event& currentSFMLEvent, const sf::Window& window, const Camera& camera, const Map& map, 
-    float deltaTime, const Faction& opposingFaction)
+    const Faction& opposingFaction)
 {
     switch (currentSFMLEvent.type)
     {

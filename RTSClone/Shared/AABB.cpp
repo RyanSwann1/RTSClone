@@ -61,6 +61,17 @@ AABB::AABB(const glm::vec3& position, const glm::vec3& size)
 	reset(position, size);
 }
 
+AABB::AABB(const glm::vec3& position, const Model& model)
+	: m_left(0.0f),
+	m_right(0.0f),
+	m_top(0.0f),
+	m_bottom(0.0f),
+	m_forward(0.0f),
+	m_back(0.0f)
+{
+	reset(position, model);
+}
+
 #ifdef GAME
 AABB::AABB(const std::vector<Unit*>& selectedUnits)
 	: m_left(std::numeric_limits<float>::max()),

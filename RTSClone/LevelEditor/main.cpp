@@ -7,7 +7,7 @@
 #include "Globals.h"
 #include "GameObject.h"
 #include "GameObjectManager.h"
-#include "LevelFileSaver.h"
+#include "LevelFileHandler.h"
 #include <SFML/Graphics.hpp>
 #include <iostream>
 
@@ -83,7 +83,7 @@ int main()
 				}
 				else if (currentSFMLEvent.key.code == sf::Keyboard::Enter)
 				{
-					LevelFileSaver::saveLevelToFile(gameObjectManager);
+					LevelFileHandler::saveLevelToFile(gameObjectManager);
 				}
 				break;
 			}

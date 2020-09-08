@@ -15,6 +15,7 @@ struct AABB
 {
 	AABB();
 	AABB(const glm::vec3& position, const glm::vec3& size);
+	AABB(const glm::vec3& position, const Model& model);
 #ifdef GAME
 	AABB(const std::vector<Unit*>& selectedUnits);
 #endif // GAME

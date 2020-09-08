@@ -4,9 +4,7 @@
 #ifdef GAME
 #include "Entity.h"
 #endif // GAME
-#ifdef LEVEL_EDITOR
 #include "GameObject.h"
-#endif // LEVEL_EDITOR
 #include "glm/gtc/matrix_transform.hpp"
 #include "glm/gtx/transform.hpp"
 
@@ -80,7 +78,6 @@ void Model::render(ShaderHandler& shaderHandler, const Entity& entity) const
 }
 #endif // GAME
 
-#ifdef LEVEL_EDITOR
 void Model::render(ShaderHandler& shaderHandler, const GameObject& gameObject) const
 {
 	glm::vec3 modelPosition = gameObject.position;
@@ -90,7 +87,7 @@ void Model::render(ShaderHandler& shaderHandler, const GameObject& gameObject) c
 		modelPosition.z -= AABBSizeFromCenter.z;
 	}
 	glm::mat4 model = glm::translate(glm::mat4(1.0), modelPosition);
-	model = glm::scale(model, gameObject.scale);
+	model = glm::scale(model, scale);
 	shaderHandler.setUniformMat4f(eShaderType::Default, "uModel", model);
 
 	for (const auto& mesh : meshes)
@@ -98,4 +95,3 @@ void Model::render(ShaderHandler& shaderHandler, const GameObject& gameObject) c
 		mesh.render(shaderHandler);
 	}
 }
-#endif // LEVEL_EDITOR

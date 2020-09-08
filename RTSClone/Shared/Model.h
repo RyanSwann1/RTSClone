@@ -7,9 +7,7 @@
 #include <string>
 #include <memory>
 
-#ifdef LEVEL_EDITOR
 struct GameObject;
-#endif // LEVEL_EDITOR
 #ifdef GAME
 class Entity;
 #endif // GAME
@@ -21,14 +19,12 @@ struct Model : private NonMovable, private NonCopyable
 
 	void attachMeshesToVAO() const;
 	void render(ShaderHandler& shaderHandler, const glm::vec3& position) const;
+	void render(ShaderHandler& shaderHandler, const GameObject& gameObject) const;
 
 #ifdef GAME
 	void render(ShaderHandler& shaderHandler, const Entity& entity) const;
 #endif // GAME
 
-#ifdef LEVEL_EDITOR
-	void render(ShaderHandler& shaderHandler, const GameObject& gameObject) const;
-#endif // LEVEL_EDITOR
 
 	const eModelName modelName;
 	const bool renderFromCentrePosition;

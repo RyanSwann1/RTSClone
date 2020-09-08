@@ -15,7 +15,7 @@ public:
 	
 	void addProjectile(const GameEvent& gameEvent);
 	void update(float deltaTime, const FactionPlayer& player, const FactionAI& playerAI);
-	void render(ShaderHandler& shaderHandler);
+	void render(ShaderHandler& shaderHandler) const;
 
 #ifdef RENDER_AABB
 	void renderAABB(ShaderHandler& shaderHandler);

@@ -41,11 +41,11 @@ bool LevelFileHandler::loadLevelFromFile(const std::string& fileName, std::vecto
 	while(getline(file, line))
 	{
 		std::stringstream stream{ line };
-		std::string raw_model_name;
+		std::string rawModelName;
 		glm::vec3 position;
-		stream >> raw_model_name >> position.x >> position.y >> position.z;
+		stream >> rawModelName >> position.x >> position.y >> position.z;
 	
-		scenery.emplace_back(static_cast<eModelName>(std::stoi(raw_model_name)), position);
+		scenery.emplace_back(static_cast<eModelName>(std::stoi(rawModelName)), position);
 	}
 
 	return true;

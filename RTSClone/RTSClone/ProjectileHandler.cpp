@@ -46,7 +46,7 @@ void ProjectileHandler::update(float deltaTime, const FactionPlayer& player, con
 	}
 }
 
-void ProjectileHandler::render(ShaderHandler& shaderHandler)
+void ProjectileHandler::render(ShaderHandler& shaderHandler) const
 {
 	for (const auto& projectile : m_projectiles)
 	{

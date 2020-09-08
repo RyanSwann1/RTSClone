@@ -2,7 +2,9 @@
 
 enum class eModelName
 {
-	Unit = 0,
+	Terrain = 0,
+	Meteor,
+	Unit,
 	HQ,
 	Mineral,
 	WorkerMineral,
