@@ -1,6 +1,7 @@
 #pragma once
 
 #include "glm/glm.hpp"
+#include "AABB.h"
 #include <SFML/Graphics.hpp>
 #include <iostream>
 #include <array>
@@ -32,6 +33,14 @@ namespace Globals
 		0, 1, 2,
 		2, 3, 0
 	};
+
+	inline bool isWithinMapBounds(const AABB& AABB)
+	{
+		return AABB.m_left >= 0 &&
+			AABB.m_right < Globals::MAP_SIZE * Globals::NODE_SIZE&&
+			AABB.m_back >= 0 &&
+			AABB.m_forward < Globals::MAP_SIZE * Globals::NODE_SIZE;
+	}
 
 	inline bool isPositionInMapBounds(const glm::ivec2& position)
 	{
