@@ -7,6 +7,11 @@ GameObjectManager::GameObjectManager()
 	: m_gameObjects()
 {}
 
+const std::vector<GameObject>& GameObjectManager::getGameObjects() const
+{
+	return m_gameObjects;
+}
+
 void GameObjectManager::addGameObject(eModelName modelName, const glm::vec3& position)
 {
 	AABB newGameObjectAABB(position, ModelManager::getInstance().getModel(modelName));

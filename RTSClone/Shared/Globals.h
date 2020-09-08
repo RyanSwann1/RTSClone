@@ -6,9 +6,11 @@
 #include <iostream>
 #include <array>
 #include <random>
+#include <string>
 
 namespace Globals
 { 
+	const std::string SHARED_FILE_DIRECTORY = "../Shared/";
 	constexpr unsigned int INVALID_OPENGL_ID = 0;
 	constexpr float GROUND_HEIGHT = 0.0f;
 	constexpr int MAP_SIZE = 30;

@@ -114,7 +114,7 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>LEVEL_EDITOR;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>LEVEL_EDITOR;RENDER_AABB;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)..\Shared\assimp\include;$(ProjectDir)..\Shared\SFML-2.5.1\include;$(ProjectDir)..\Shared</AdditionalIncludeDirectories>
     </ClCompile>
@@ -150,7 +150,9 @@
     <ClCompile Include="..\Shared\ModelLoader.cpp" />
     <ClCompile Include="..\Shared\ModelManager.cpp" />
     <ClCompile Include="..\Shared\ShaderHandler.cpp" />
+    <ClCompile Include="LevelFileSaver.cpp" />
     <ClCompile Include="GameObject.cpp" />
+    <ClCompile Include="GameObjectManager.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -167,7 +169,17 @@
     <ClInclude Include="..\Shared\NonCopyable.h" />
     <ClInclude Include="..\Shared\NonMovable.h" />
     <ClInclude Include="..\Shared\ShaderHandler.h" />
+    <ClInclude Include="LevelFileSaver.h" />
     <ClInclude Include="GameObject.h" />
+    <ClInclude Include="GameObjectManager.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\Shared\Shaders\DebugFragmentShader.glsl" />
+    <None Include="..\Shared\Shaders\DebugVertexShader.glsl" />
+    <None Include="..\Shared\Shaders\FragmentShader.glsl" />
+    <None Include="..\Shared\Shaders\SelectionBoxFragmentShader.glsl" />
+    <None Include="..\Shared\Shaders\SelectionBoxVertexShader.glsl" />
+    <None Include="..\Shared\Shaders\VertexShader.glsl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

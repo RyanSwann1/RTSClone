@@ -45,6 +45,12 @@
     <ClCompile Include="GameObject.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="GameObjectManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="LevelFileSaver.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Shared\AABB.h">
@@ -89,5 +95,19 @@
     <ClInclude Include="GameObject.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="GameObjectManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="LevelFileSaver.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\Shared\Shaders\DebugFragmentShader.glsl" />
+    <None Include="..\Shared\Shaders\DebugVertexShader.glsl" />
+    <None Include="..\Shared\Shaders\FragmentShader.glsl" />
+    <None Include="..\Shared\Shaders\SelectionBoxFragmentShader.glsl" />
+    <None Include="..\Shared\Shaders\SelectionBoxVertexShader.glsl" />
+    <None Include="..\Shared\Shaders\VertexShader.glsl" />
   </ItemGroup>
 </Project>

@@ -13,6 +13,8 @@ class GameObjectManager : private NonCopyable, private NonMovable
 public:
 	GameObjectManager();
 
+	const std::vector<GameObject>& getGameObjects() const;
+
 	void addGameObject(eModelName modelName, const glm::vec3& position);
 	void render(ShaderHandler& shaderHandler) const;
 

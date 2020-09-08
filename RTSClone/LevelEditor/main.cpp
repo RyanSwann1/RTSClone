@@ -4,6 +4,10 @@
 #include "ShaderHandler.h"
 #include "glm/gtc/matrix_transform.hpp"
 #include "Camera.h"
+#include "Globals.h"
+#include "GameObject.h"
+#include "GameObjectManager.h"
+#include "LevelFileSaver.h"
 #include <SFML/Graphics.hpp>
 #include <iostream>
 
@@ -18,8 +22,8 @@ int main()
 	settings.attributeFlags = sf::ContextSettings::Core;
 	glm::uvec2 windowSize(1280, 800);
 	//glm::uvec2 windowSize(1980, 1080);
-	sf::Window window(sf::VideoMode(windowSize.x, windowSize.y), "RTS Clone", sf::Style::Default, settings);
-	//sf::Window window(sf::VideoMode(windowSize.x, windowSize.y), "RTS Clone", sf::Style::Fullscreen, settings);
+	sf::Window window(sf::VideoMode(windowSize.x, windowSize.y), "Level Editor", sf::Style::Default, settings);
+	//sf::Window window(sf::VideoMode(windowSize.x, windowSize.y), "Level Editor", sf::Style::Fullscreen, settings);
 	window.setFramerateLimit(60);
 	window.setMouseCursorGrabbed(true);
 	gladLoadGL();
@@ -41,12 +45,10 @@ int main()
 		return -1;
 	}
 
+	GameObjectManager gameObjectManager;
 	sf::Clock gameClock;
 	Camera camera;
-
-	shaderHandler->switchToShader(eShaderType::SelectionBox);
-	shaderHandler->setUniformMat4f(eShaderType::SelectionBox, "uOrthographic", glm::ortho(0.0f, static_cast<float>(windowSize.x),
-		static_cast<float>(windowSize.y), 0.0f));
+	glm::vec3 previousMousePosition = { 0.0f, Globals::GROUND_HEIGHT, 0.0f };
 
 	std::cout << glGetError() << "\n";
 	std::cout << glGetError() << "\n";
@@ -60,22 +62,35 @@ int main()
 		sf::Event currentSFMLEvent;
 		while (window.pollEvent(currentSFMLEvent))
 		{
-			if (currentSFMLEvent.type == sf::Event::Closed)
-			{
+			switch(currentSFMLEvent.type)
+			{ 
+			case sf::Event::Closed:
 				window.close();
-			}
-			else if (currentSFMLEvent.type == sf::Event::KeyPressed)
-			{
+				break;
+			case sf::Event::KeyPressed:
 				if (currentSFMLEvent.key.code == sf::Keyboard::Escape)
 				{
 					window.close();
 				}
+				else if (currentSFMLEvent.key.code == sf::Keyboard::M)
+				{
+					glm::vec3 position = Globals::convertToNodePosition(camera.getMouseToGroundPosition(window));
+					if (position != previousMousePosition)
+					{
+						previousMousePosition = position;
+						gameObjectManager.addGameObject(eModelName::Meteor, previousMousePosition);
+					}
+				}
+				else if (currentSFMLEvent.key.code == sf::Keyboard::Enter)
+				{
+					LevelFileSaver::saveLevelToFile(gameObjectManager);
+				}
+				break;
 			}
 		}
 
 		//Update
 		camera.update(window, deltaTime);
-
 
 		//Render
 		glm::mat4 view = camera.getView();
@@ -83,38 +98,28 @@ int main()
 
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		shaderHandler->switchToShader(eShaderType::Debug);
-		shaderHandler->setUniformMat4f(eShaderType::Debug, "uView", view);
-		shaderHandler->setUniformMat4f(eShaderType::Debug, "uProjection", projection);
-
-#ifdef RENDER_GROUND
-		ground.render(*shaderHandler);
-#endif // RENDER_GROUND
-
 		shaderHandler->switchToShader(eShaderType::Default);
 		shaderHandler->setUniformMat4f(eShaderType::Default, "uView", view);
 		shaderHandler->setUniformMat4f(eShaderType::Default, "uProjection", projection);
 		shaderHandler->setUniform1f(eShaderType::Default, "uOpacity", 1.0f);
 
+		gameObjectManager.render(*shaderHandler);
+
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		glDisable(GL_DEPTH_TEST);
-
-		shaderHandler->setUniform1f(eShaderType::Default, "uOpacity", 0.5f);
 
 		shaderHandler->switchToShader(eShaderType::Debug);
 		shaderHandler->setUniformMat4f(eShaderType::Debug, "uView", view);
 		shaderHandler->setUniformMat4f(eShaderType::Debug, "uProjection", projection);
 
 #ifdef RENDER_AABB
-		player.renderAABB(*shaderHandler);
-		playerAI.renderAABB(*shaderHandler);
-		projectileHandler.renderAABB(*shaderHandler);
+		gameObjectManager.renderGameObjectAABB(*shaderHandler);
 #endif // RENDER_AABB
 
-		shaderHandler->switchToShader(eShaderType::SelectionBox);
 		glDisable(GL_BLEND);
 		glEnable(GL_DEPTH_TEST);
+
 		window.display();
 	}
 
