@@ -2,19 +2,6 @@
 #include "LevelFileHandler.h"
 #include "GameEventHandler.h"
 
-//FactionPlayer player(eFactionName::Player, { 35.0f, Globals::GROUND_HEIGHT, 15.f }, { 70.0f, Globals::GROUND_HEIGHT, Globals::NODE_SIZE });
-//FactionAI playerAI(eFactionName::AI, { 35.0f, Globals::GROUND_HEIGHT, 100.0f }, { 70.0f, Globals::GROUND_HEIGHT, 100.0f }, player);
-
-//Level(std::vector<GameObject>&& scenery);
-//const std::vector<GameObject> m_scenery;
-//Map m_map;
-//ProjectileHandler m_projectileHandler;
-//FactionPlayer m_player;
-//FactionAI m_playerAI;
-//#ifdef RENDER_GROUND
-//Ground m_ground;
-//#endif // RENDER_GROUND
-
 Level::Level(std::vector<GameObject>&& scenery)
 	: m_scenery(std::move(scenery)),
 	m_map(),
