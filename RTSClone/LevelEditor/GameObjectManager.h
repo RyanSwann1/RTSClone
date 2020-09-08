@@ -1,13 +1,10 @@
 #pragma once
 
-#define GLM_ENABLE_EXPERIMENTAL
-#include "glm/gtx/hash.hpp"
 #include "glm/glm.hpp"
 #include "NonCopyable.h"
 #include "NonMovable.h"
 #include "GameObject.h"
 #include <vector>
-#include <unordered_map>
 
 class ShaderHandler;
 enum class eModelName;
@@ -17,9 +14,12 @@ public:
 	GameObjectManager();
 
 	void addGameObject(eModelName modelName, const glm::vec3& position);
-
 	void render(ShaderHandler& shaderHandler) const;
 
+#ifdef RENDER_AABB
+	void renderGameObjectAABB(ShaderHandler& shaderHandler);
+#endif // RENDER_AABB
+
 private:
-	std::unordered_map<glm::vec3, GameObject> m_gameObjects;
+	std::vector<GameObject> m_gameObjects;
 };
