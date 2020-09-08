@@ -59,6 +59,7 @@ Mesh processMesh(aiMesh* mesh, const aiScene* scene, std::vector<MeshTextureDeta
     std::vector<Vertex> vertices;
     vertices.reserve(static_cast<size_t>(mesh->mNumVertices));
     for (unsigned int i = 0; i < mesh->mNumVertices; i++)
+    for (unsigned int i = 0; i < mesh->mNumVertices; i++)
     {
         glm::vec3 position = { mesh->mVertices[i].x, mesh->mVertices[i].y, mesh->mVertices[i].z };
         glm::vec3 normal = { mesh->mNormals[i].x, mesh->mNormals[i].y, mesh->mNormals[i].z };
@@ -126,7 +127,7 @@ Material loadMaterial(aiMaterial* mat)
     aiColor3D color(0.f, 0.f, 0.f);
 
     mat->Get(AI_MATKEY_COLOR_DIFFUSE, color);
-    material.Diffuse = glm::vec3(color.r, color.b, color.g);
+    material.Diffuse = glm::vec3(color.r, color.g, color.b);
 
     return material;
 }
