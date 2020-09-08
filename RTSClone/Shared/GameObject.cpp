@@ -3,10 +3,9 @@
 
 GameObject::GameObject(eModelName modelName, const glm::vec3& startingPosition)
 	: modelName(modelName),
-	position(startingPosition)
-{
-	AABB.reset(position, ModelManager::getInstance().getModel(modelName));
-}
+	position(startingPosition),
+	AABB(startingPosition, ModelManager::getInstance().getModel(modelName))
+{}
 
 void GameObject::render(ShaderHandler& shaderHandler) const
 {
