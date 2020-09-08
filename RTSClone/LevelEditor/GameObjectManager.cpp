@@ -1,10 +1,31 @@
 #include "GameObjectManager.h"
 #include "ModelManager.h"
 #include "Globals.h"
+#include "LevelFileHandler.h"
 #include <assert.h>
+
+std::unique_ptr<GameObjectManager> GameObjectManager::create(std::string levelName)
+{
+	std::vector<GameObject> gameObjects;
+	if (!levelName.empty())
+	{
+		if (LevelFileHandler::loadLevelFromFile(levelName, gameObjects))
+		{
+			return std::unique_ptr<GameObjectManager>(new GameObjectManager(std::move(gameObjects)));
+		}
+
+		assert(false);
+	}
+
+	return std::unique_ptr<GameObjectManager>(new GameObjectManager());
+}
 
 GameObjectManager::GameObjectManager()
 	: m_gameObjects()
+{}
+
+GameObjectManager::GameObjectManager(std::vector<GameObject>&& gameObjectsFromFile)
+	: m_gameObjects(std::move(gameObjectsFromFile))
 {}
 
 const std::vector<GameObject>& GameObjectManager::getGameObjects() const
