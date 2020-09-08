@@ -81,7 +81,7 @@ ModelManager::ModelManager()
 	m_loadedAllModels(true)
 {
 	loadModel("terrain.obj", false, { 37.5f, 1.0f, 37.5f }, eModelName::Terrain, { 75.0f, 1.0f, 75.0f });
-	loadModel("meteorFull.obj", false, { 7.5f, 1.0f, 7.5f }, eModelName::Meteor, { 1.0f, 1.0f, 1.0f });
+	loadModel("meteorFull.obj", false, { 5.0f, 1.0f, 5.0f }, eModelName::Meteor, { 1.0f, 1.0f, 1.0f });
 	loadModel("spaceCraft1.obj", false, UNIT_AABB_SIZE_FROM_CENTER, eModelName::Unit, UNIT_SCALE);
 	loadModel("portal.obj", true, HQ_AABB_SIZE_FROM_CENTER, eModelName::HQ, HQ_SCALE);
 	loadModel("rocksOre.obj", true, MINERAL_AABB_SIZE_FROM_CENTER, eModelName::Mineral, MINERAL_SCALE);

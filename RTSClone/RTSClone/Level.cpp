@@ -1,6 +1,8 @@
 #include "Level.h"
 #include "LevelFileHandler.h"
 #include "GameEventHandler.h"
+#include "GameMessenger.h"
+#include "GameMessages.h"
 
 Level::Level(std::vector<GameObject>&& scenery)
 	: m_scenery(std::move(scenery)),
@@ -8,7 +10,12 @@ Level::Level(std::vector<GameObject>&& scenery)
 	m_projectileHandler(),
 	m_player(eFactionName::Player, { 35.0f, Globals::GROUND_HEIGHT, 15.f }, { 70.0f, Globals::GROUND_HEIGHT, Globals::NODE_SIZE }),
 	m_playerAI(eFactionName::AI, { 35.0f, Globals::GROUND_HEIGHT, 100.0f }, { 70.0f, Globals::GROUND_HEIGHT, 100.0f }, m_player)
-{}
+{
+	for (const auto& gameObject : m_scenery)
+	{
+		GameMessenger::getInstance().broadcast<GameMessages::MapModification<eGameMessageType::AddEntityToMap>>({ gameObject.AABB });
+	}
+}
 
 std::unique_ptr<Level> Level::create(const std::string& levelName)
 {
@@ -19,6 +26,14 @@ std::unique_ptr<Level> Level::create(const std::string& levelName)
 	}
 
 	return std::unique_ptr<Level>(new Level(std::move(scenery)));
+}
+
+Level::~Level()
+{
+	for (const auto& gameObject : m_scenery)
+	{
+		GameMessenger::getInstance().broadcast<GameMessages::MapModification<eGameMessageType::RemoveEntityFromMap>>({ gameObject.AABB });
+	}
 }
 
 void Level::handleInput(const sf::Window& window, const Camera& camera, const sf::Event& currentSFMLEvent)
