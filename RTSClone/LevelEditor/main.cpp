@@ -8,6 +8,7 @@
 #include "GameObject.h"
 #include "GameObjectManager.h"
 #include "LevelFileHandler.h"
+#include "SelectionBox.h"
 #include <SFML/Graphics.hpp>
 #include <iostream>
 
@@ -45,6 +46,11 @@ int main()
 		return -1;
 	}
 
+	shaderHandler->switchToShader(eShaderType::SelectionBox);
+	shaderHandler->setUniformMat4f(eShaderType::SelectionBox, "uOrthographic", glm::ortho(0.0f, static_cast<float>(windowSize.x),
+		static_cast<float>(windowSize.y), 0.0f));
+
+	SelectionBox selectionBox;
 	GameObjectManager gameObjectManager = GameObjectManager::create("Level.txt");
 	sf::Clock gameClock;
 	Camera camera;
@@ -99,6 +105,25 @@ int main()
 					break;
 				}
 				break;
+			case sf::Event::MouseButtonPressed:
+				switch (currentSFMLEvent.mouseButton.button)
+				{
+				case sf::Mouse::Button::Left:
+				{
+					selectionBox.setStartingPosition(window, camera.getMouseToGroundPosition(window));
+				}
+					break;
+				}
+				break;
+			case sf::Event::MouseButtonReleased:
+				selectionBox.reset();
+				break;
+			case sf::Event::MouseMoved:
+				if (selectionBox.active)
+				{
+					selectionBox.setSize(camera.getMouseToGroundPosition(window));
+				}
+				break;
 			}
 		}
 
@@ -130,6 +155,8 @@ int main()
 		gameObjectManager.renderGameObjectAABB(*shaderHandler);
 #endif // RENDER_AABB
 
+		shaderHandler->switchToShader(eShaderType::SelectionBox);
+		selectionBox.render(window);
 		glDisable(GL_BLEND);
 		glEnable(GL_DEPTH_TEST);
 
