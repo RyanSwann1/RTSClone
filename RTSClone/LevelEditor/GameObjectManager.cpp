@@ -2,6 +2,7 @@
 #include "ModelManager.h"
 #include "Globals.h"
 #include "LevelFileHandler.h"
+#include "SelectionBox.h"
 #include <assert.h>
 
 GameObjectManager::GameObjectManager(GameObjectManager&& orig) noexcept
@@ -71,6 +72,14 @@ void GameObjectManager::removeGameObject(const glm::vec3& position)
 		{
 			m_gameObjects.erase(gameObject);
 		}
+	}
+}
+
+void GameObjectManager::update(const SelectionBox& selectionBox)
+{
+	for (auto& gameObject : m_gameObjects)
+	{
+		gameObject.selected = gameObject.AABB.contains(selectionBox.AABB);
 	}
 }
 

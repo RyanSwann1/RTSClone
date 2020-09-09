@@ -122,6 +122,7 @@ int main()
 				if (selectionBox.active)
 				{
 					selectionBox.setSize(camera.getMouseToGroundPosition(window));
+					gameObjectManager.update(selectionBox);
 				}
 				break;
 			}

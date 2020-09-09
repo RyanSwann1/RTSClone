@@ -8,6 +8,7 @@
 #include <string>
 #include <memory>
 
+struct SelectionBox;
 class ShaderHandler;
 enum class eModelName;
 class GameObjectManager : private NonCopyable
@@ -21,6 +22,7 @@ public:
 
 	void addGameObject(eModelName modelName, const glm::vec3& position);
 	void removeGameObject(const glm::vec3& position);
+	void update(const SelectionBox& selectionBox);
 	void render(ShaderHandler& shaderHandler) const;
 
 #ifdef RENDER_AABB
