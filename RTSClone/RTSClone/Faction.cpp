@@ -86,7 +86,8 @@ const Entity* Faction::getEntity(const glm::vec3& position, float maxDistance, b
                 closestEntity = entity;
                 closestEntityDistance = distance;
             }
-            else if (closestEntity && BUILDING_TYPES.isMatch(closestEntity->getEntityType()) && UNIT_TYPES.isMatch(entity->getEntityType()) &&
+            else if (closestEntity && BUILDING_TYPES.isMatch(closestEntity->getEntityType()) && 
+                UNIT_TYPES.isMatch(entity->getEntityType()) &&
                 Globals::getSqrDistance(entity->getPosition(), position) < maxDistance * maxDistance)
             {
                 closestEntity = entity;

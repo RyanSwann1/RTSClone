@@ -16,7 +16,9 @@ void GameObject::render(ShaderHandler& shaderHandler) const
 	ModelManager::getInstance().getModel(modelName).render(shaderHandler, *this);
 }
 
+#ifdef RENDER_AABB
 void GameObject::renderAABB(ShaderHandler& shaderHandler)
 {
 	AABB.render(shaderHandler);
 }
+#endif // RENDER_AABB

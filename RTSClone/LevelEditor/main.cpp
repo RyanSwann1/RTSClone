@@ -50,8 +50,9 @@ int main()
 	shaderHandler->setUniformMat4f(eShaderType::SelectionBox, "uOrthographic", glm::ortho(0.0f, static_cast<float>(windowSize.x),
 		static_cast<float>(windowSize.y), 0.0f));
 
+	const std::string levelName = "Level.txt";
 	SelectionBox selectionBox;
-	GameObjectManager gameObjectManager = GameObjectManager::create("Level.txt");
+	GameObjectManager gameObjectManager = GameObjectManager::create(levelName);
 	sf::Clock gameClock;
 	Camera camera;
 	glm::vec3 previousMousePosition = { 0.0f, Globals::GROUND_HEIGHT, 0.0f };
@@ -68,8 +69,8 @@ int main()
 		sf::Event currentSFMLEvent;
 		while (window.pollEvent(currentSFMLEvent))
 		{
-			switch(currentSFMLEvent.type)
-			{ 
+			switch (currentSFMLEvent.type)
+			{
 			case sf::Event::Closed:
 				window.close();
 				break;
@@ -88,9 +89,9 @@ int main()
 						gameObjectManager.addGameObject(eModelName::Meteor, previousMousePosition);
 					}
 				}
-					break;
+				break;
 				case sf::Keyboard::Enter:
-					LevelFileHandler::saveLevelToFile(gameObjectManager);
+					LevelFileHandler::saveLevelToFile(levelName, gameObjectManager);
 					break;
 				case sf::Keyboard::R:
 					gameObjectManager.removeGameObject(camera.getMouseToGroundPosition(window));
@@ -98,25 +99,26 @@ int main()
 				case sf::Keyboard::T:
 					gameObjectManager.removeAllSelectedGameObjects();
 					break;
-				case sf::Keyboard::O:
+				case sf::Keyboard::K:
+				{
 					glm::vec3 position = Globals::convertToNodePosition(camera.getMouseToGroundPosition(window));
 					if (position != previousMousePosition)
 					{
 						previousMousePosition = position;
-						gameObjectManager.addGameObject(eModelName::SatelliteDishLarge, previousMousePosition);
+						gameObjectManager.addGameObject(eModelName::RocksTall, previousMousePosition);
 					}
+				}
 					break;
 				}
-				break;
 			case sf::Event::MouseButtonPressed:
+			{
 				switch (currentSFMLEvent.mouseButton.button)
 				{
 				case sf::Mouse::Button::Left:
-				{
 					selectionBox.setStartingPosition(window, camera.getMouseToGroundPosition(window));
+				break;
 				}
-					break;
-				}
+			}
 				break;
 			case sf::Event::MouseButtonReleased:
 				selectionBox.reset();
