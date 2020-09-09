@@ -151,6 +151,7 @@
     <ClCompile Include="..\Shared\Model.cpp" />
     <ClCompile Include="..\Shared\ModelLoader.cpp" />
     <ClCompile Include="..\Shared\ModelManager.cpp" />
+    <ClCompile Include="..\Shared\SelectionBox.cpp" />
     <ClCompile Include="..\Shared\ShaderHandler.cpp" />
     <ClCompile Include="GameObjectManager.cpp" />
     <ClCompile Include="main.cpp" />
@@ -170,6 +171,7 @@
     <ClInclude Include="..\Shared\ModelName.h" />
     <ClInclude Include="..\Shared\NonCopyable.h" />
     <ClInclude Include="..\Shared\NonMovable.h" />
+    <ClInclude Include="..\Shared\SelectionBox.h" />
     <ClInclude Include="..\Shared\ShaderHandler.h" />
     <ClInclude Include="GameObjectManager.h" />
   </ItemGroup>
