@@ -10,11 +10,13 @@
 
 class ShaderHandler;
 enum class eModelName;
-class GameObjectManager : private NonCopyable, private NonMovable
+class GameObjectManager : private NonCopyable
 {
 public:
-	static std::unique_ptr<GameObjectManager> create(std::string levelName = std::string());
-	
+	GameObjectManager(GameObjectManager&&) noexcept;
+	GameObjectManager& operator=(GameObjectManager&&) noexcept;
+	static GameObjectManager create(std::string name = std::string());
+
 	const std::vector<GameObject>& getGameObjects() const;
 
 	void addGameObject(eModelName modelName, const glm::vec3& position);

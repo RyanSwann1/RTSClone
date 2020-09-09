@@ -4,20 +4,30 @@
 #include "LevelFileHandler.h"
 #include <assert.h>
 
-std::unique_ptr<GameObjectManager> GameObjectManager::create(std::string levelName)
+GameObjectManager::GameObjectManager(GameObjectManager&& orig) noexcept
+	: m_gameObjects(std::move(orig.m_gameObjects))
+{}
+
+GameObjectManager& GameObjectManager::operator=(GameObjectManager&& orig) noexcept
+{
+	m_gameObjects = std::move(orig.m_gameObjects);
+	return *this;
+}
+
+GameObjectManager GameObjectManager::create(std::string levelName)
 {
 	std::vector<GameObject> gameObjects;
 	if (!levelName.empty())
 	{
 		if (LevelFileHandler::loadLevelFromFile(levelName, gameObjects))
 		{
-			return std::unique_ptr<GameObjectManager>(new GameObjectManager(std::move(gameObjects)));
+			return GameObjectManager(std::move(gameObjects));
 		}
 
 		assert(false);
 	}
-
-	return std::unique_ptr<GameObjectManager>(new GameObjectManager());
+	
+	return GameObjectManager();
 }
 
 GameObjectManager::GameObjectManager()

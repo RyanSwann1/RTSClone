@@ -24,7 +24,7 @@ int main()
 	//glm::uvec2 windowSize(1980, 1080);
 	sf::Window window(sf::VideoMode(windowSize.x, windowSize.y), "Level Editor", sf::Style::Default, settings);
 	//sf::Window window(sf::VideoMode(windowSize.x, windowSize.y), "Level Editor", sf::Style::Fullscreen, settings);
-	window.setFramerateLimit(30);
+	window.setFramerateLimit(60);
 	window.setMouseCursorGrabbed(true);
 	gladLoadGL();
 
@@ -45,7 +45,7 @@ int main()
 		return -1;
 	}
 
-	std::unique_ptr<GameObjectManager> gameObjectManager = GameObjectManager::create("Level.txt");
+	GameObjectManager gameObjectManager = GameObjectManager::create("Level.txt");
 	sf::Clock gameClock;
 	Camera camera;
 	glm::vec3 previousMousePosition = { 0.0f, Globals::GROUND_HEIGHT, 0.0f };
@@ -79,22 +79,22 @@ int main()
 					if (position != previousMousePosition)
 					{
 						previousMousePosition = position;
-						gameObjectManager->addGameObject(eModelName::Meteor, previousMousePosition);
+						gameObjectManager.addGameObject(eModelName::Meteor, previousMousePosition);
 					}
 				}
 					break;
 				case sf::Keyboard::Enter:
-					LevelFileHandler::saveLevelToFile(*gameObjectManager);
+					LevelFileHandler::saveLevelToFile(gameObjectManager);
 					break;
 				case sf::Keyboard::R:
-					gameObjectManager->removeGameObject(camera.getMouseToGroundPosition(window));
+					gameObjectManager.removeGameObject(camera.getMouseToGroundPosition(window));
 					break;
 				case sf::Keyboard::O:
 					glm::vec3 position = Globals::convertToNodePosition(camera.getMouseToGroundPosition(window));
 					if (position != previousMousePosition)
 					{
 						previousMousePosition = position;
-						gameObjectManager->addGameObject(eModelName::SatelliteDishLarge, previousMousePosition);
+						gameObjectManager.addGameObject(eModelName::SatelliteDishLarge, previousMousePosition);
 					}
 					break;
 				}
@@ -116,7 +116,7 @@ int main()
 		shaderHandler->setUniformMat4f(eShaderType::Default, "uProjection", projection);
 		shaderHandler->setUniform1f(eShaderType::Default, "uOpacity", 1.0f);
 
-		gameObjectManager->render(*shaderHandler);
+		gameObjectManager.render(*shaderHandler);
 
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -127,7 +127,7 @@ int main()
 		shaderHandler->setUniformMat4f(eShaderType::Debug, "uProjection", projection);
 
 #ifdef RENDER_AABB
-		gameObjectManager->renderGameObjectAABB(*shaderHandler);
+		gameObjectManager.renderGameObjectAABB(*shaderHandler);
 #endif // RENDER_AABB
 
 		glDisable(GL_BLEND);
