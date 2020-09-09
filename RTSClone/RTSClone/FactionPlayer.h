@@ -1,28 +1,8 @@
 #pragma once
 
 #include "Faction.h"
+#include "SelectionBox.h"
 #include <SFML/Graphics.hpp>
-
-struct SelectionBox : private NonMovable, private NonCopyable
-{
-	SelectionBox();
-	~SelectionBox();
-
-	void setStartingPosition(const sf::Window& window, const glm::vec3& position);
-	void setSize(const glm::vec3& position);
-	void reset();
-	void render(const sf::Window& window) const;
-
-	AABB AABB;
-	bool active;
-	glm::vec3 mouseToGroundPosition;
-	glm::vec2 startingPositionScreenPosition;
-	glm::vec3 startingPositionWorldPosition;
-
-private:
-	unsigned int vaoID;
-	unsigned int vboID;
-};
 
 struct Camera;
 class FactionPlayer : public Faction
