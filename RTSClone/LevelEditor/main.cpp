@@ -12,6 +12,9 @@
 #include <SFML/Graphics.hpp>
 #include <iostream>
 
+#include <imgui/imgui.h>
+#include <imgui_impl/imgui_wrapper.h>
+
 int main()
 {
 	sf::ContextSettings settings;
@@ -28,6 +31,8 @@ int main()
 	window.setFramerateLimit(60);
 	window.setMouseCursorGrabbed(true);
 	gladLoadGL();
+
+	ImGui_SFML_OpenGL3::init(window);
 
 	glViewport(0, 0, windowSize.x, windowSize.y);
 	glEnable(GL_DEPTH_TEST);
@@ -135,6 +140,12 @@ int main()
 
 		//Update
 		camera.update(window, deltaTime);
+		ImGui_SFML_OpenGL3::startFrame();
+
+		// imgui stuffs, inputs/ update game etc
+
+		// DEMO!
+		ImGui::ShowDemoWindow(); //No idea if that is the correct name btw
 
 		//Render
 		glm::mat4 view = camera.getView();
@@ -166,6 +177,7 @@ int main()
 		glDisable(GL_BLEND);
 		glEnable(GL_DEPTH_TEST);
 
+		ImGui_SFML_OpenGL3::endFrame(); 
 		window.display();
 	}
 
