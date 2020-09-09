@@ -5,6 +5,11 @@
 #include "SelectionBox.h"
 #include <assert.h>
 
+namespace
+{
+	constexpr glm::vec3 TERRAIN_STARTING_POSITION = { 0.0f, Globals::GROUND_HEIGHT - 0.01f, 0.0f };
+}
+
 GameObjectManager::GameObjectManager(GameObjectManager&& orig) noexcept
 	: m_gameObjects(std::move(orig.m_gameObjects))
 {}
@@ -15,20 +20,15 @@ GameObjectManager& GameObjectManager::operator=(GameObjectManager&& orig) noexce
 	return *this;
 }
 
-GameObjectManager GameObjectManager::create(std::string levelName)
+GameObjectManager GameObjectManager::create(std::string fileName)
 {
 	std::vector<GameObject> gameObjects;
-	if (!levelName.empty())
+	if (!LevelFileHandler::loadLevelFromFile(fileName, gameObjects))
 	{
-		if (LevelFileHandler::loadLevelFromFile(levelName, gameObjects))
-		{
-			return GameObjectManager(std::move(gameObjects));
-		}
-
-		assert(false);
+		gameObjects.emplace_back(eModelName::Terrain, TERRAIN_STARTING_POSITION);
 	}
-	
-	return GameObjectManager();
+
+	return GameObjectManager(std::move(gameObjects));
 }
 
 GameObjectManager::GameObjectManager()
@@ -49,6 +49,7 @@ void GameObjectManager::addGameObject(eModelName modelName, const glm::vec3& pos
 	AABB newGameObjectAABB(position, ModelManager::getInstance().getModel(modelName));
 	if(Globals::isWithinMapBounds(newGameObjectAABB))
 	{
+
 		auto gameObject = std::find_if(m_gameObjects.cbegin(), m_gameObjects.cend(), [&newGameObjectAABB](const auto& gameObject)
 		{
 			return gameObject.AABB.contains(newGameObjectAABB);
@@ -64,13 +65,17 @@ void GameObjectManager::removeGameObject(const glm::vec3& position)
 {
 	if (Globals::isPositionInMapBounds(position))
 	{
-		auto gameObject = std::find_if(m_gameObjects.begin(), m_gameObjects.end(), [&position](const auto& gameObject)
+		for (auto gameObject = m_gameObjects.begin(); gameObject != m_gameObjects.end();)
 		{
-			return gameObject.AABB.contains(position);
-		});
-		if (gameObject != m_gameObjects.end())
-		{
-			m_gameObjects.erase(gameObject);
+			if (gameObject->modelName != eModelName::Terrain && 
+				gameObject->AABB.contains(position))
+			{
+				gameObject = m_gameObjects.erase(gameObject);
+			}
+			else
+			{
+				++gameObject;
+			}
 		}
 	}
 }
@@ -94,7 +99,10 @@ void GameObjectManager::update(const SelectionBox& selectionBox)
 {
 	for (auto& gameObject : m_gameObjects)
 	{
-		gameObject.selected = gameObject.AABB.contains(selectionBox.AABB);
+		if (gameObject.modelName != eModelName::Terrain)
+		{
+			gameObject.selected = gameObject.AABB.contains(selectionBox.AABB);
+		}
 	}
 }
 
@@ -111,7 +119,10 @@ void GameObjectManager::renderGameObjectAABB(ShaderHandler& shaderHandler)
 {
 	for (auto& gameObject : m_gameObjects)
 	{
-		gameObject.renderAABB(shaderHandler);
+		if (gameObject.modelName != eModelName::Terrain)
+		{
+			gameObject.renderAABB(shaderHandler);
+		}
 	}
 }
 #endif // RENDER_AABB

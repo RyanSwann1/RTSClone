@@ -16,7 +16,7 @@ class GameObjectManager : private NonCopyable
 public:
 	GameObjectManager(GameObjectManager&&) noexcept;
 	GameObjectManager& operator=(GameObjectManager&&) noexcept;
-	static GameObjectManager create(std::string name = std::string());
+	static GameObjectManager create(std::string fileName = std::string());
 
 	const std::vector<GameObject>& getGameObjects() const;
 
