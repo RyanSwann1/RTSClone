@@ -127,14 +127,6 @@ int main()
 		glm::mat4 projection = camera.getProjection(window);
 
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		
-		shaderHandler->switchToShader(eShaderType::Debug);
-		shaderHandler->setUniformMat4f(eShaderType::Debug, "uView", view);
-		shaderHandler->setUniformMat4f(eShaderType::Debug, "uProjection", projection);
-
-#ifdef RENDER_GROUND
-		level->renderGround(*shaderHandler);
-#endif // RENDER_GROUND
 
 		shaderHandler->switchToShader(eShaderType::Default);
 		shaderHandler->setUniformMat4f(eShaderType::Default, "uView", view);

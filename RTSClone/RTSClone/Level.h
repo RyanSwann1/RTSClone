@@ -12,11 +12,6 @@
 #include <memory>
 #include <SFML/Graphics.hpp>
 
-#define RENDER_GROUND
-#ifdef RENDER_GROUND
-#include "Ground.h"
-#endif // RENDER_GROUND
-
 struct Camera;
 class ShaderHandler;
 class Level : private NonCopyable, private NonMovable
@@ -39,10 +34,6 @@ public:
 	void renderPathing(ShaderHandler& shaderHandler);
 #endif // RENDER_PATHING
 
-#ifdef RENDER_GROUND
-	void renderGround(ShaderHandler& shaderHandler) const;
-#endif // RENDER_GROUND
-
 private:
 	Level(std::vector<GameObject>&& scenery);
 	const std::vector<GameObject> m_scenery;
@@ -50,7 +41,4 @@ private:
 	ProjectileHandler m_projectileHandler;
 	FactionPlayer m_player;
 	FactionAI m_playerAI;
-#ifdef RENDER_GROUND
-	Ground m_ground;
-#endif // RENDER_GROUND
 };

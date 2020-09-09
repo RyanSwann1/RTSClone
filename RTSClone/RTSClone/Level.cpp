@@ -13,7 +13,10 @@ Level::Level(std::vector<GameObject>&& scenery)
 {
 	for (const auto& gameObject : m_scenery)
 	{
-		GameMessenger::getInstance().broadcast<GameMessages::MapModification<eGameMessageType::AddEntityToMap>>({ gameObject.AABB });
+		if (gameObject.modelName != eModelName::Terrain)
+		{
+			GameMessenger::getInstance().broadcast<GameMessages::MapModification<eGameMessageType::AddEntityToMap>>({ gameObject.AABB });
+		}
 	}
 }
 
@@ -32,7 +35,10 @@ Level::~Level()
 {
 	for (const auto& gameObject : m_scenery)
 	{
-		GameMessenger::getInstance().broadcast<GameMessages::MapModification<eGameMessageType::RemoveEntityFromMap>>({ gameObject.AABB });
+		if (gameObject.modelName != eModelName::Terrain)
+		{
+			GameMessenger::getInstance().broadcast<GameMessages::MapModification<eGameMessageType::RemoveEntityFromMap>>({ gameObject.AABB });
+		}
 	}
 }
 
@@ -89,10 +95,3 @@ void Level::renderPathing(ShaderHandler& shaderHandler)
 	m_playerAI.renderPathing(shaderHandler);
 }
 #endif // RENDER_PATHING
-
-#ifdef RENDER_GROUND
-void Level::renderGround(ShaderHandler& shaderHandler) const
-{
-	m_ground.render(shaderHandler);
-}
-#endif // RENDER_GROUND
