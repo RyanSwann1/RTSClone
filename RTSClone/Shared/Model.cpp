@@ -92,6 +92,12 @@ void Model::render(ShaderHandler& shaderHandler, const GameObject& gameObject) c
 
 	for (const auto& mesh : meshes)
 	{
+#ifdef LEVEL_EDITOR
+		mesh.render(shaderHandler, gameObject.selected);
+#endif // LEVEL_EDITOR
+
+#ifdef GAME
 		mesh.render(shaderHandler);
+#endif // GAME
 	}
 }

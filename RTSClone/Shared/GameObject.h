@@ -19,4 +19,7 @@ struct GameObject
 	eModelName modelName;
 	glm::vec3 position;
 	AABB AABB;
+#ifdef LEVEL_EDITOR
+	bool selected;
+#endif // LEVEL_EDITOR
 };

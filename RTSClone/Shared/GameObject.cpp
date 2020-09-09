@@ -5,7 +5,11 @@ GameObject::GameObject(eModelName modelName, const glm::vec3& startingPosition)
 	: modelName(modelName),
 	position(startingPosition),
 	AABB(startingPosition, ModelManager::getInstance().getModel(modelName))
-{}
+{
+#ifdef LEVEL_EDITOR
+	selected = false;
+#endif // LEVEL_EDITOR
+}
 
 void GameObject::render(ShaderHandler& shaderHandler) const
 {

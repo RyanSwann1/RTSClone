@@ -18,7 +18,6 @@ namespace
     };
 };
 
-//SelectionBox
 SelectionBox::SelectionBox()
     : AABB(),
     active(false),
