@@ -95,6 +95,9 @@ int main()
 				case sf::Keyboard::R:
 					gameObjectManager.removeGameObject(camera.getMouseToGroundPosition(window));
 					break;
+				case sf::Keyboard::T:
+					gameObjectManager.removeAllSelectedGameObjects();
+					break;
 				case sf::Keyboard::O:
 					glm::vec3 position = Globals::convertToNodePosition(camera.getMouseToGroundPosition(window));
 					if (position != previousMousePosition)

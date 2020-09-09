@@ -22,6 +22,8 @@ public:
 
 	void addGameObject(eModelName modelName, const glm::vec3& position);
 	void removeGameObject(const glm::vec3& position);
+	void removeAllSelectedGameObjects();
+
 	void update(const SelectionBox& selectionBox);
 	void render(ShaderHandler& shaderHandler) const;
 

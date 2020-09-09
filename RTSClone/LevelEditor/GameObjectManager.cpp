@@ -75,6 +75,21 @@ void GameObjectManager::removeGameObject(const glm::vec3& position)
 	}
 }
 
+void GameObjectManager::removeAllSelectedGameObjects()
+{
+	for (auto gameObject = m_gameObjects.begin(); gameObject != m_gameObjects.end();)
+	{
+		if (gameObject->selected)
+		{
+			gameObject = m_gameObjects.erase(gameObject);
+		}
+		else
+		{
+			++gameObject;
+		}
+	}
+}
+
 void GameObjectManager::update(const SelectionBox& selectionBox)
 {
 	for (auto& gameObject : m_gameObjects)
