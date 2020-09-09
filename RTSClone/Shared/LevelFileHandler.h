@@ -10,7 +10,7 @@ class GameObjectManager;
 namespace LevelFileHandler
 {
 #ifdef LEVEL_EDITOR
-	void saveLevelToFile(const GameObjectManager& gameObjectManager);
+	void saveLevelToFile(const std::string& fileName, const GameObjectManager& gameObjectManager);
 #endif // LEVEL_EDITOR
 
 	bool loadLevelFromFile(const std::string& fileName, std::vector<GameObject>& scenery);

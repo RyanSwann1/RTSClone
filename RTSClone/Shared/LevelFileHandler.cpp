@@ -9,17 +9,17 @@
 #include <sstream>
 
 #ifdef LEVEL_EDITOR
-void LevelFileHandler::saveLevelToFile(const GameObjectManager& gameObjectManager)
+void LevelFileHandler::saveLevelToFile(const std::string& fileName, const GameObjectManager& gameObjectManager)
 {
 	std::stringstream stringStream;
-
+	
 	for (const auto& gameObject : gameObjectManager.getGameObjects())
 	{
 		stringStream << static_cast<int>(gameObject.modelName) << " " <<
 			gameObject.position.x << " " << gameObject.position.y << " " << gameObject.position.z << "\n";
 	}
 
-	std::ofstream file(Globals::SHARED_FILE_DIRECTORY + "Level.txt");
+	std::ofstream file(Globals::SHARED_FILE_DIRECTORY + fileName);
 	file << stringStream.str();
 	file.close();
 	stringStream.clear();
@@ -31,7 +31,6 @@ bool LevelFileHandler::loadLevelFromFile(const std::string& fileName, std::vecto
 	assert(scenery.empty());
 
 	std::ifstream file(Globals::SHARED_FILE_DIRECTORY + fileName);
-	assert(file.good());
 	if (!file.is_open())
 	{
 		return false;
