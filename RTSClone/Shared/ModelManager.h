@@ -3,6 +3,9 @@
 #include "Model.h"
 #include <memory>
 #include <array>
+#ifdef LEVEL_EDITOR
+#include <unordered_map>
+#endif // LEVEL_EDITOR
 
 #ifdef GAME
 enum class eEntityType;
@@ -17,6 +20,11 @@ public:
 	}
 
 	bool isAllModelsLoaded() const;
+#ifdef LEVEL_EDITOR
+	const std::array<std::string, static_cast<size_t>(eModelName::Max) + 1> getModelNames() const;
+	eModelName getModelName(const std::string& modelName) const;
+#endif // LEVEL_EDITOR
+	
 	const Model& getModel(eModelName modelName) const;
 #ifdef GAME
 	const Model& getModel(eEntityType entityType) const;
@@ -26,6 +34,24 @@ private:
 	ModelManager();
 	std::array<std::unique_ptr<Model>, static_cast<size_t>(eModelName::Max) + 1> m_models;
 	bool m_loadedAllModels;
+#ifdef LEVEL_EDITOR
+	std::unordered_map<std::string, eModelName> m_modelNameConversions;
+	const std::array<std::string, static_cast<size_t>(eModelName::Max) + 1> m_modelNames
+	{
+		"Terrain",
+		"Meteor",
+		"RocksTall",
+		"Unit",
+		"HQ",
+		"Mineral",
+		"WorkerMineral",
+		"Waypoint",
+		"Worker",
+		"Projectile",
+		"SupplyDepot",
+		"Barracks"
+	};
+#endif // LEVEL_EDITOR
 
 	void loadModel(const std::string& fileName, bool renderFromCenterPosition, const glm::vec3& AABBSizeFromCenter,
 		eModelName modelName, const glm::vec3& scale);

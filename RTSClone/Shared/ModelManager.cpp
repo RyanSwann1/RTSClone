@@ -57,6 +57,21 @@ bool ModelManager::isAllModelsLoaded() const
 	return m_loadedAllModels;
 }
 
+#ifdef LEVEL_EDITOR
+const std::array<std::string, static_cast<size_t>(eModelName::Max) + 1> ModelManager::getModelNames() const
+{
+	return m_modelNames;
+}
+
+eModelName ModelManager::getModelName(const std::string& modelName) const
+{
+	auto iter = m_modelNameConversions.find(modelName);
+	assert(iter != m_modelNameConversions.cend());
+
+	return iter->second;
+}
+#endif // LEVEL_EDITOR
+
 const Model& ModelManager::getModel(eModelName modelName) const
 {
 	assert(m_models[static_cast<int>(modelName)] &&
@@ -80,8 +95,9 @@ ModelManager::ModelManager()
 	: m_models(),
 	m_loadedAllModels(true)
 {
-	loadModel("terrain.obj", false, { 37.5f, 1.0f, 37.5f }, eModelName::Terrain, { 75.0f, 1.0f, 75.0f });
+	loadModel("terrain.obj", false, { 0.0f, 0.0f, 0.0f }, eModelName::Terrain, { 500.0f, 1.0f, 500.0f });
 	loadModel("meteorFull.obj", false, { 5.0f, 1.0f, 5.0f }, eModelName::Meteor, { 1.0f, 1.0f, 1.0f });
+	loadModel("rocksTall.obj", true, { 5.0f, 1.0f, 5.0f }, eModelName::RocksTall, { 1.0f, 1.0f, 1.0f });
 	loadModel("spaceCraft1.obj", false, UNIT_AABB_SIZE_FROM_CENTER, eModelName::Unit, UNIT_SCALE);
 	loadModel("portal.obj", true, HQ_AABB_SIZE_FROM_CENTER, eModelName::HQ, HQ_SCALE);
 	loadModel("rocksOre.obj", true, MINERAL_AABB_SIZE_FROM_CENTER, eModelName::Mineral, MINERAL_SCALE);
@@ -91,6 +107,21 @@ ModelManager::ModelManager()
 	loadModel("laserSabel.obj", false, PROJECTILE_AABB_SIZE_FROM_CENTER, eModelName::Projectile, PROJECTILE_SCALE);
 	loadModel("satelliteDish.obj", false, SUPPLY_DEPOT_AABB_SIZE_FROM_CENTER, eModelName::SupplyDepot, SUPPLY_DEPOT_SCALE);
 	loadModel("buildingOpen.obj", true, BARRACKS_AABB_SIZE_FROM_CENTER, eModelName::Barracks, BARRACKS_SCALE);
+
+#ifdef LEVEL_EDITOR
+	m_modelNameConversions.emplace("Terrain", eModelName::Terrain);
+	m_modelNameConversions.emplace("Meteor", eModelName::Meteor);
+	m_modelNameConversions.emplace("RocksTall", eModelName::RocksTall);
+	m_modelNameConversions.emplace("Unit", eModelName::Unit);
+	m_modelNameConversions.emplace("HQ", eModelName::HQ);
+	m_modelNameConversions.emplace("Mineral", eModelName::Mineral);
+	m_modelNameConversions.emplace("WorkerMineral", eModelName::WorkerMineral);
+	m_modelNameConversions.emplace("Waypoint", eModelName::Waypoint);
+	m_modelNameConversions.emplace("Worker", eModelName::Worker);
+	m_modelNameConversions.emplace("Projectile", eModelName::Projectile);
+	m_modelNameConversions.emplace("SupplyDepot", eModelName::SupplyDepot);
+	m_modelNameConversions.emplace("Barracks", eModelName::Barracks);
+#endif // LEVEL_EDITOR
 }
 
 void ModelManager::loadModel(const std::string& fileName, bool renderFromCenterPosition, const glm::vec3& AABBSizeFromCenter, 
