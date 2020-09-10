@@ -37,25 +37,6 @@ void GameObjectManager::addGameObject(eModelName modelName, const glm::vec3& pos
 	}
 }
 
-void GameObjectManager::removeGameObject(const glm::vec3& position)
-{
-	if (Globals::isPositionInMapBounds(position))
-	{
-		for (auto gameObject = m_gameObjects.begin(); gameObject != m_gameObjects.end();)
-		{
-			if (gameObject->modelName != eModelName::Terrain && 
-				gameObject->AABB.contains(position))
-			{
-				gameObject = m_gameObjects.erase(gameObject);
-			}
-			else
-			{
-				++gameObject;
-			}
-		}
-	}
-}
-
 void GameObjectManager::removeAllSelectedGameObjects()
 {
 	for (auto gameObject = m_gameObjects.begin(); gameObject != m_gameObjects.end();)

@@ -93,10 +93,7 @@ int main()
 				case sf::Keyboard::Enter:
 					LevelFileHandler::saveLevelToFile(levelName, gameObjectManager);
 					break;
-				case sf::Keyboard::R:
-					gameObjectManager.removeGameObject(camera.getMouseToGroundPosition(window));
-					break;
-				case sf::Keyboard::T:
+				case sf::Keyboard::Delete:
 					gameObjectManager.removeAllSelectedGameObjects();
 					break;
 				}
