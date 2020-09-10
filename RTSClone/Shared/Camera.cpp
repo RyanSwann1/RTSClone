@@ -61,6 +61,7 @@ Camera::Camera()
 {
 	setFront();
 	right = glm::normalize(glm::cross(front, up));
+	up = glm::normalize(glm::cross(right, front));
 }
 
 glm::mat4 Camera::getView() const
