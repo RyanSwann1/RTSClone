@@ -116,13 +116,19 @@ int main()
 				break;
 			case sf::Event::MouseMoved:
 			{
+				glm::vec3 mouseToGroundPosition = camera.getMouseToGroundPosition(window);
 				if (selectionBox.active)
 				{
-					selectionBox.setSize(camera.getMouseToGroundPosition(window));
+					selectionBox.setSize(mouseToGroundPosition);
 					gameObjectManager.update(selectionBox);
 				}
-
-				plannedGameObject.position = Globals::convertToNodePosition(camera.getMouseToGroundPosition(window));
+				
+				glm::vec3 newPosition = Globals::convertToNodePosition(mouseToGroundPosition);
+				AABB AABB(newPosition, ModelManager::getInstance().getModel(plannedGameObject.modelName));
+				if (Globals::isWithinMapBounds(AABB))
+				{
+					plannedGameObject.position = newPosition;
+				}
 			}
 				break;
 			}
