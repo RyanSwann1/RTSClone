@@ -19,8 +19,8 @@ struct Camera : private NonCopyable, private NonMovable
 	const float nearPlaneDistance;
 	const float farPlaneDistance;
 	glm::vec3 front;
-	glm::vec3 right;
 	glm::vec3 up;
+	glm::vec3 right;
 	glm::vec2 rotation;
 	glm::vec3 position;
 

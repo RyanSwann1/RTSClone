@@ -53,16 +53,12 @@ Camera::Camera()
 	sensitivity(SENSITIVITY),
 	nearPlaneDistance(NEAR_PLANE_DISTANCE),
 	farPlaneDistance(FAR_PLANE_DISTANCE),
-	front(),
-	right(),
-	up(),
+	front({ 0.0f, 0.0f, -1.0f }),
+	up({ 0.0f, 1.0f, 0.0f }),
+	right(glm::normalize(glm::cross(up, front))),
 	rotation(STARTING_ROTATION),
 	position(STARTING_POSITION)
-{
-	front = { 0.0f, -1.0f, 0.0f };
-	right = glm::normalize(glm::cross({ 0.0f, 1.0f, 0.0f }, front));
-	up = { 0.0f, 1.0f, 0.0f };
-}
+{}
 
 glm::mat4 Camera::getView() const
 {
