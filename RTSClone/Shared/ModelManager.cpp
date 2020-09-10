@@ -50,6 +50,67 @@ namespace
 	constexpr glm::vec3 PROJECTILE_AABB_SIZE_FROM_CENTER = { 1.0f, 1.0f, 1.0f };
 	constexpr glm::vec3 SUPPLY_DEPOT_AABB_SIZE_FROM_CENTER = { 3.0f, 1.0f, 3.0f };
 	constexpr glm::vec3 BARRACKS_AABB_SIZE_FROM_CENTER = { 3.0f, 1.0f, 3.0f };
+
+	void loadModel(const std::string& fileName, bool renderFromCenterPosition, const glm::vec3& AABBSizeFromCenter,
+		eModelName modelName, const glm::vec3& scale, std::array<std::unique_ptr<Model>, static_cast<size_t>(eModelName::Max) + 1>& models,
+		bool& loadedAllModels)
+	{
+		std::unique_ptr<Model> model = Model::create(fileName, renderFromCenterPosition,
+			AABBSizeFromCenter, modelName, scale);
+		assert(model);
+		if (!model)
+		{
+			std::cout << "Failed to load " << fileName << "\n";
+			loadedAllModels = false;
+		}
+
+		assert(!models[static_cast<int>(model->modelName)]);
+		models[static_cast<int>(model->modelName)] = std::move(model);
+	}
+
+	std::array<std::unique_ptr<Model>, static_cast<size_t>(eModelName::Max) + 1> loadModels(bool& loadedAllModels)
+	{
+		std::array<std::unique_ptr<Model>, static_cast<size_t>(eModelName::Max) + 1> models;
+		loadModel("terrain.obj", false, { 0.0f, 0.0f, 0.0f }, eModelName::Terrain, { 500.0f, 1.0f, 500.0f },
+			models, loadedAllModels);
+
+		loadModel("meteorFull.obj", false, { 5.0f, 1.0f, 5.0f }, eModelName::Meteor, { 1.0f, 1.0f, 1.0f },
+			models, loadedAllModels);
+
+		loadModel("rocksTall.obj", true, { 5.0f, 1.0f, 5.0f }, eModelName::RocksTall, { 1.0f, 1.0f, 1.0f },
+			models, loadedAllModels);
+
+		loadModel("spaceCraft1.obj", false, UNIT_AABB_SIZE_FROM_CENTER, eModelName::Unit, UNIT_SCALE,
+			models, loadedAllModels);
+		
+		loadModel("portal.obj", true, HQ_AABB_SIZE_FROM_CENTER, eModelName::HQ, HQ_SCALE,
+			models, loadedAllModels);
+		
+		loadModel("rocksOre.obj", true, MINERAL_AABB_SIZE_FROM_CENTER, eModelName::Mineral, MINERAL_SCALE,
+			models, loadedAllModels);
+		
+		loadModel("rocksOre.obj", true, WORKER_MINERAL_AABB_SIZE_FROM_CENTER, eModelName::WorkerMineral, WORKER_MINERAL_SCALE,
+			models, loadedAllModels);
+		
+		loadModel("laserSabel.obj", false, WAYPOINT_AABB_SIZE_FROM_CENTER, eModelName::Waypoint, WAYPOINT_SCALE,
+			models, loadedAllModels);
+		
+		loadModel("robot.obj", false, WORKER_AABB_SIZE_FROM_CENTER, eModelName::Worker, WORKER_SCALE,
+			models, loadedAllModels);
+		
+		loadModel("laserSabel.obj", false, PROJECTILE_AABB_SIZE_FROM_CENTER, eModelName::Projectile, PROJECTILE_SCALE,
+			models, loadedAllModels);
+		
+		loadModel("satelliteDish.obj", false, SUPPLY_DEPOT_AABB_SIZE_FROM_CENTER, eModelName::SupplyDepot, SUPPLY_DEPOT_SCALE,
+			models, loadedAllModels);
+		
+		loadModel("buildingOpen.obj", true, BARRACKS_AABB_SIZE_FROM_CENTER, eModelName::Barracks, BARRACKS_SCALE,
+			models, loadedAllModels);
+		
+
+		assert(std::find(models.cbegin(), models.cend(), nullptr) == models.cend());
+		return models;
+	}
 }
 
 bool ModelManager::isAllModelsLoaded() const
@@ -92,22 +153,9 @@ const Model& ModelManager::getModel(eEntityType entityType) const
 #endif // GAME
 
 ModelManager::ModelManager()
-	: m_models(),
-	m_loadedAllModels(true)
+	: m_loadedAllModels(true),
+	m_models(loadModels(m_loadedAllModels))
 {
-	loadModel("terrain.obj", false, { 0.0f, 0.0f, 0.0f }, eModelName::Terrain, { 500.0f, 1.0f, 500.0f });
-	loadModel("meteorFull.obj", false, { 5.0f, 1.0f, 5.0f }, eModelName::Meteor, { 1.0f, 1.0f, 1.0f });
-	loadModel("rocksTall.obj", true, { 5.0f, 1.0f, 5.0f }, eModelName::RocksTall, { 1.0f, 1.0f, 1.0f });
-	loadModel("spaceCraft1.obj", false, UNIT_AABB_SIZE_FROM_CENTER, eModelName::Unit, UNIT_SCALE);
-	loadModel("portal.obj", true, HQ_AABB_SIZE_FROM_CENTER, eModelName::HQ, HQ_SCALE);
-	loadModel("rocksOre.obj", true, MINERAL_AABB_SIZE_FROM_CENTER, eModelName::Mineral, MINERAL_SCALE);
-	loadModel("rocksOre.obj", true, WORKER_MINERAL_AABB_SIZE_FROM_CENTER, eModelName::WorkerMineral, WORKER_MINERAL_SCALE);
-	loadModel("laserSabel.obj", false, WAYPOINT_AABB_SIZE_FROM_CENTER, eModelName::Waypoint, WAYPOINT_SCALE);
-	loadModel("robot.obj", false, WORKER_AABB_SIZE_FROM_CENTER, eModelName::Worker, WORKER_SCALE);
-	loadModel("laserSabel.obj", false, PROJECTILE_AABB_SIZE_FROM_CENTER, eModelName::Projectile, PROJECTILE_SCALE);
-	loadModel("satelliteDish.obj", false, SUPPLY_DEPOT_AABB_SIZE_FROM_CENTER, eModelName::SupplyDepot, SUPPLY_DEPOT_SCALE);
-	loadModel("buildingOpen.obj", true, BARRACKS_AABB_SIZE_FROM_CENTER, eModelName::Barracks, BARRACKS_SCALE);
-
 #ifdef LEVEL_EDITOR
 	m_modelNameConversions.emplace("Terrain", eModelName::Terrain);
 	m_modelNameConversions.emplace("Meteor", eModelName::Meteor);
@@ -122,19 +170,4 @@ ModelManager::ModelManager()
 	m_modelNameConversions.emplace("SupplyDepot", eModelName::SupplyDepot);
 	m_modelNameConversions.emplace("Barracks", eModelName::Barracks);
 #endif // LEVEL_EDITOR
-}
-
-void ModelManager::loadModel(const std::string& fileName, bool renderFromCenterPosition, const glm::vec3& AABBSizeFromCenter, 
-	eModelName modelName, const glm::vec3& scale)
-{
-	std::unique_ptr<Model> model = Model::create(fileName, renderFromCenterPosition,
-		AABBSizeFromCenter, modelName, scale);
-	assert(model);
-	if (!model)
-	{
-		std::cout << "Failed to load " << fileName << "\n";
-		m_loadedAllModels = false;
-	}
-
-	m_models[static_cast<int>(model->modelName)] = std::move(model);
 }
