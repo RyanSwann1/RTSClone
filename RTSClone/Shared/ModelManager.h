@@ -35,7 +35,7 @@ private:
 	bool m_loadedAllModels;
 	const std::array<std::unique_ptr<Model>, static_cast<size_t>(eModelName::Max) + 1> m_models;
 #ifdef LEVEL_EDITOR
-	std::unordered_map<std::string, eModelName> m_modelNameConversions;
+	const std::unordered_map<std::string, eModelName> m_modelNameConversions;
 	const std::array<std::string, static_cast<size_t>(eModelName::Max) + 1> m_modelNames
 	{
 		"Terrain",
