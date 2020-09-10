@@ -4,7 +4,7 @@
 
 namespace
 {
-	constexpr float MAX_RAY_TO_GROUND_DISTANCE = 500.0f;
+	constexpr float MAX_RAY_TO_GROUND_DISTANCE = 1500.0f;
 	constexpr float MOVEMENT_SPEED = 110.0f;
 	constexpr float SENSITIVITY = 0.1f;
 	constexpr float NEAR_PLANE_DISTANCE = 0.1f;
@@ -53,12 +53,15 @@ Camera::Camera()
 	sensitivity(SENSITIVITY),
 	nearPlaneDistance(NEAR_PLANE_DISTANCE),
 	farPlaneDistance(FAR_PLANE_DISTANCE),
-	front({ 0.0f, 0.0f, -1.0f }),
+	front(),
 	up({ 0.0f, 1.0f, 0.0f }),
-	right(glm::normalize(glm::cross(up, front))),
+	right(),
 	rotation(STARTING_ROTATION),
 	position(STARTING_POSITION)
-{}
+{
+	setFront();
+	right = glm::normalize(glm::cross(front, up));
+}
 
 glm::mat4 Camera::getView() const
 {
@@ -73,36 +76,26 @@ glm::mat4 Camera::getProjection(const sf::Window& window) const
 
 glm::vec3 Camera::getMouseToGroundPosition(const sf::Window& window) const
 {
+	assert(position.y > 0.0f);
+
 	glm::vec3 rayPositionFromMouse = calculateMouseRay(getProjection(window), getView(), window,
 		{ sf::Mouse::getPosition(window).x, sf::Mouse::getPosition(window).y });
 
-	for (int i = 0; i <= MAX_RAY_TO_GROUND_DISTANCE; ++i)
+	glm::vec3 rayPosition = position;
+	int i = position.y;
+	while (rayPosition.y > 0.0f)
 	{
-		glm::vec3 pos = rayPositionFromMouse * static_cast<float>(i) + position;
-		if (pos.y <= 0)
-		{
-			return { pos.x, Globals::GROUND_HEIGHT, pos.z };
-		}
+		rayPosition = rayPositionFromMouse * static_cast<float>(i) + position;
+		++i;
 	}
 
-	assert(false);
+	return { rayPosition.x, Globals::GROUND_HEIGHT, rayPosition.z };
 }
 
-void Camera::update(const sf::Window& window, float deltaTime)
+void Camera::update(float deltaTime)
 {
 	moveByArrowKeys(deltaTime);
-
-	// make sure that when pitch is out of bounds, screen doesn't get flipped
-	if (rotation.x > 89.0f)
-		rotation.x = 89.0f;
-	if (rotation.x < -89.0f)
-		rotation.x = -89.0f;
-
-	glm::vec3 v = {
-		glm::cos(glm::radians(rotation.y)) * glm::cos(glm::radians(rotation.x)),
-		glm::sin(glm::radians(rotation.x)),
-		glm::sin(glm::radians(rotation.y)) * glm::cos(glm::radians(rotation.x)) };
-	front = glm::normalize(v);
+	setFront();
 }
 
 void Camera::moveByArrowKeys(float deltaTime)
@@ -125,4 +118,19 @@ void Camera::moveByArrowKeys(float deltaTime)
 		position.x -= glm::cos(glm::radians(rotation.y)) * MOVEMENT_SPEED * deltaTime;
 		position.z -= glm::sin(glm::radians(rotation.y)) * MOVEMENT_SPEED * deltaTime;
 	}
+}
+
+void Camera::setFront()
+{
+	// make sure that when pitch is out of bounds, screen doesn't get flipped
+	if (rotation.x > 89.0f)
+		rotation.x = 89.0f;
+	if (rotation.x < -89.0f)
+		rotation.x = -89.0f;
+
+	glm::vec3 v = {
+		glm::cos(glm::radians(rotation.y)) * glm::cos(glm::radians(rotation.x)),
+		glm::sin(glm::radians(rotation.x)),
+		glm::sin(glm::radians(rotation.y)) * glm::cos(glm::radians(rotation.x)) };
+	front = glm::normalize(v);
 }
