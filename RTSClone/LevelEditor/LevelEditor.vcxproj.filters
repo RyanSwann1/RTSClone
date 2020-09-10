@@ -13,107 +13,179 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="imgui">
+      <UniqueIdentifier>{d7997625-61ea-40d9-88f8-7075f0859b97}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="shaders">
+      <UniqueIdentifier>{01b1274b-e9b7-4609-88d0-bd38c370b1cf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src">
+      <UniqueIdentifier>{3cdc307e-a692-4483-9e0b-22715327035f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="main.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="..\Shared\imgui\imgui_widgets.cpp">
+      <Filter>imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Shared\imgui\imgui.cpp">
+      <Filter>imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Shared\imgui\imgui_demo.cpp">
+      <Filter>imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Shared\imgui\imgui_draw.cpp">
+      <Filter>imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Shared\imgui_impl\imgui_impl_opengl3.cpp">
+      <Filter>imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Shared\imgui_impl\imgui_impl_sfml.cpp">
+      <Filter>imgui</Filter>
     </ClCompile>
     <ClCompile Include="..\Shared\AABB.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="..\Shared\Camera.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Shared\glad.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Shared\Mesh.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Shared\Model.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Shared\ModelLoader.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Shared\ModelManager.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Shared\ShaderHandler.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="GameObjectManager.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Shared\LevelFileHandler.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="..\Shared\GameObject.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="GameObjectManager.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Shared\glad.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Shared\LevelFileHandler.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="main.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Shared\Mesh.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Shared\Model.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Shared\ModelLoader.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Shared\ModelManager.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="PlayableAreaDisplay.cpp">
+      <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="..\Shared\SelectionBox.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Shared\ShaderHandler.cpp">
+      <Filter>src</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\Shared\AABB.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="..\Shared\imgui\imstb_truetype.h">
+      <Filter>imgui</Filter>
     </ClInclude>
-    <ClInclude Include="..\Shared\Camera.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="..\Shared\imgui_impl\imgui_impl_opengl3.h">
+      <Filter>imgui</Filter>
     </ClInclude>
-    <ClInclude Include="..\Shared\glad.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="..\Shared\imgui_impl\imgui_impl_sfml.h">
+      <Filter>imgui</Filter>
     </ClInclude>
-    <ClInclude Include="..\Shared\khrplatform.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="..\Shared\imgui\imgui_internal.h">
+      <Filter>imgui</Filter>
     </ClInclude>
-    <ClInclude Include="..\Shared\Mesh.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="..\Shared\imgui_impl\imgui_wrapper.h">
+      <Filter>imgui</Filter>
     </ClInclude>
-    <ClInclude Include="..\Shared\Model.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="..\Shared\imgui\imstb_rectpack.h">
+      <Filter>imgui</Filter>
     </ClInclude>
-    <ClInclude Include="..\Shared\ModelLoader.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="..\Shared\imgui\imstb_textedit.h">
+      <Filter>imgui</Filter>
     </ClInclude>
-    <ClInclude Include="..\Shared\ModelManager.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="..\Shared\imgui\imgui.h">
+      <Filter>imgui</Filter>
     </ClInclude>
-    <ClInclude Include="..\Shared\ModelName.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Shared\NonCopyable.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Shared\NonMovable.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="..\Shared\imgui\imconfig.h">
+      <Filter>imgui</Filter>
     </ClInclude>
     <ClInclude Include="..\Shared\ShaderHandler.h">
-      <Filter>Header Files</Filter>
+      <Filter>src</Filter>
     </ClInclude>
-    <ClInclude Include="..\Shared\Globals.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="..\Shared\AABB.h">
+      <Filter>src</Filter>
     </ClInclude>
-    <ClInclude Include="GameObjectManager.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Shared\LevelFileHandler.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="..\Shared\Camera.h">
+      <Filter>src</Filter>
     </ClInclude>
     <ClInclude Include="..\Shared\GameObject.h">
-      <Filter>Header Files</Filter>
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="GameObjectManager.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Shared\glad.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Shared\Globals.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Shared\khrplatform.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Shared\LevelFileHandler.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Shared\Mesh.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Shared\Model.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Shared\ModelLoader.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Shared\ModelManager.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Shared\ModelName.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Shared\NonCopyable.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Shared\NonMovable.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="PlayableAreaDisplay.h">
+      <Filter>src</Filter>
     </ClInclude>
     <ClInclude Include="..\Shared\SelectionBox.h">
-      <Filter>Header Files</Filter>
+      <Filter>src</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\Shared\Shaders\DebugFragmentShader.glsl" />
-    <None Include="..\Shared\Shaders\DebugVertexShader.glsl" />
-    <None Include="..\Shared\Shaders\FragmentShader.glsl" />
-    <None Include="..\Shared\Shaders\SelectionBoxFragmentShader.glsl" />
-    <None Include="..\Shared\Shaders\SelectionBoxVertexShader.glsl" />
-    <None Include="..\Shared\Shaders\VertexShader.glsl" />
+    <None Include="..\Shared\Shaders\VertexShader.glsl">
+      <Filter>shaders</Filter>
+    </None>
+    <None Include="..\Shared\Shaders\DebugFragmentShader.glsl">
+      <Filter>shaders</Filter>
+    </None>
+    <None Include="..\Shared\Shaders\DebugVertexShader.glsl">
+      <Filter>shaders</Filter>
+    </None>
+    <None Include="..\Shared\Shaders\FragmentShader.glsl">
+      <Filter>shaders</Filter>
+    </None>
+    <None Include="..\Shared\Shaders\SelectionBoxFragmentShader.glsl">
+      <Filter>shaders</Filter>
+    </None>
+    <None Include="..\Shared\Shaders\SelectionBoxVertexShader.glsl">
+      <Filter>shaders</Filter>
+    </None>
   </ItemGroup>
 </Project>

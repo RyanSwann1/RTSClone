@@ -114,7 +114,7 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>LEVEL_EDITOR;RENDER_AABB;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>LEVEL_EDITOR;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)..\Shared\assimp\include;$(ProjectDir)..\Shared\SFML-2.5.1\include;$(ProjectDir)..\Shared</AdditionalIncludeDirectories>
     </ClCompile>
@@ -146,6 +146,12 @@
     <ClCompile Include="..\Shared\Camera.cpp" />
     <ClCompile Include="..\Shared\GameObject.cpp" />
     <ClCompile Include="..\Shared\glad.c" />
+    <ClCompile Include="..\Shared\imgui\imgui.cpp" />
+    <ClCompile Include="..\Shared\imgui\imgui_demo.cpp" />
+    <ClCompile Include="..\Shared\imgui\imgui_draw.cpp" />
+    <ClCompile Include="..\Shared\imgui\imgui_widgets.cpp" />
+    <ClCompile Include="..\Shared\imgui_impl\imgui_impl_opengl3.cpp" />
+    <ClCompile Include="..\Shared\imgui_impl\imgui_impl_sfml.cpp" />
     <ClCompile Include="..\Shared\LevelFileHandler.cpp" />
     <ClCompile Include="..\Shared\Mesh.cpp" />
     <ClCompile Include="..\Shared\Model.cpp" />
@@ -155,6 +161,7 @@
     <ClCompile Include="..\Shared\ShaderHandler.cpp" />
     <ClCompile Include="GameObjectManager.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="PlayableAreaDisplay.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Shared\AABB.h" />
@@ -162,6 +169,15 @@
     <ClInclude Include="..\Shared\GameObject.h" />
     <ClInclude Include="..\Shared\glad.h" />
     <ClInclude Include="..\Shared\Globals.h" />
+    <ClInclude Include="..\Shared\imgui\imconfig.h" />
+    <ClInclude Include="..\Shared\imgui\imgui.h" />
+    <ClInclude Include="..\Shared\imgui\imgui_internal.h" />
+    <ClInclude Include="..\Shared\imgui\imstb_rectpack.h" />
+    <ClInclude Include="..\Shared\imgui\imstb_textedit.h" />
+    <ClInclude Include="..\Shared\imgui\imstb_truetype.h" />
+    <ClInclude Include="..\Shared\imgui_impl\imgui_impl_opengl3.h" />
+    <ClInclude Include="..\Shared\imgui_impl\imgui_impl_sfml.h" />
+    <ClInclude Include="..\Shared\imgui_impl\imgui_wrapper.h" />
     <ClInclude Include="..\Shared\khrplatform.h" />
     <ClInclude Include="..\Shared\LevelFileHandler.h" />
     <ClInclude Include="..\Shared\Mesh.h" />
@@ -174,6 +190,7 @@
     <ClInclude Include="..\Shared\SelectionBox.h" />
     <ClInclude Include="..\Shared\ShaderHandler.h" />
     <ClInclude Include="GameObjectManager.h" />
+    <ClInclude Include="PlayableAreaDisplay.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\Shared\Shaders\DebugFragmentShader.glsl" />

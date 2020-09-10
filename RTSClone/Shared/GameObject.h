@@ -9,6 +9,9 @@
 class ShaderHandler;
 struct GameObject
 {
+#ifdef LEVEL_EDITOR
+	GameObject();
+#endif // LEVEL_EDITOR
 	GameObject(eModelName modelName, const glm::vec3& startingPosition);
 
 	void render(ShaderHandler& shaderHandler) const;
@@ -23,3 +26,14 @@ struct GameObject
 	bool selected;
 #endif // LEVEL_EDITOR
 };
+
+#ifdef LEVEL_EDITOR
+struct PlannedGameObject : public GameObject
+{
+	PlannedGameObject();
+
+	void render(ShaderHandler& shaderHandler) const;
+
+	bool active;
+};
+#endif // LEVEL_EDITOR
