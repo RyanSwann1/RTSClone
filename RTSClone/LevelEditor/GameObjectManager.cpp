@@ -46,18 +46,14 @@ const std::vector<GameObject>& GameObjectManager::getGameObjects() const
 
 void GameObjectManager::addGameObject(eModelName modelName, const glm::vec3& position)
 {
-	AABB newGameObjectAABB(position, ModelManager::getInstance().getModel(modelName));
-	if(Globals::isWithinMapBounds(newGameObjectAABB))
+	assert(Globals::isOnNodePosition(position));
+	auto gameObject = std::find_if(m_gameObjects.cbegin(), m_gameObjects.cend(), [&position](const auto& gameObject)
 	{
-
-		auto gameObject = std::find_if(m_gameObjects.cbegin(), m_gameObjects.cend(), [&newGameObjectAABB](const auto& gameObject)
-		{
-			return gameObject.AABB.contains(newGameObjectAABB);
-		});
-		if (gameObject == m_gameObjects.cend())
-		{
-			m_gameObjects.emplace_back(modelName, position);
-		}
+		return gameObject.position == position;
+	});
+	if (gameObject == m_gameObjects.cend())
+	{
+		m_gameObjects.emplace_back(modelName, position);
 	}
 }
 

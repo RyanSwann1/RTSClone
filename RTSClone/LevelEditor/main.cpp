@@ -106,7 +106,11 @@ int main()
 				switch (currentSFMLEvent.mouseButton.button)
 				{
 				case sf::Mouse::Button::Left:
-					selectionBox.setStartingPosition(window, camera.getMouseToGroundPosition(window));
+				{
+					glm::vec3 mouseToGroundPosition = camera.getMouseToGroundPosition(window);
+					selectionBox.setStartingPosition(window, mouseToGroundPosition);
+					gameObjectManager.addGameObject(plannedGameObject.modelName, plannedGameObject.position);
+				}
 				break;
 				}
 			}
