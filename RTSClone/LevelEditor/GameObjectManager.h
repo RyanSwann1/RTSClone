@@ -11,12 +11,10 @@
 struct SelectionBox;
 class ShaderHandler;
 enum class eModelName;
-class GameObjectManager : private NonCopyable
+class GameObjectManager : private NonCopyable, private NonMovable
 {
 public:
-	GameObjectManager(GameObjectManager&&) noexcept;
-	GameObjectManager& operator=(GameObjectManager&&) noexcept;
-	static GameObjectManager create(std::string fileName = std::string());
+	GameObjectManager(std::string fileName = std::string());
 
 	const std::vector<GameObject>& getGameObjects() const;
 
@@ -32,7 +30,5 @@ public:
 #endif // RENDER_AABB
 
 private:
-	GameObjectManager();
-	GameObjectManager(std::vector<GameObject>&& gameObjectsFromFile);
 	std::vector<GameObject> m_gameObjects;
 };

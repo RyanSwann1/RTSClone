@@ -10,34 +10,14 @@ namespace
 	constexpr glm::vec3 TERRAIN_STARTING_POSITION = { 0.0f, Globals::GROUND_HEIGHT - 0.01f, 0.0f };
 }
 
-GameObjectManager::GameObjectManager(GameObjectManager&& orig) noexcept
-	: m_gameObjects(std::move(orig.m_gameObjects))
-{}
-
-GameObjectManager& GameObjectManager::operator=(GameObjectManager&& orig) noexcept
-{
-	m_gameObjects = std::move(orig.m_gameObjects);
-	return *this;
-}
-
-GameObjectManager GameObjectManager::create(std::string fileName)
-{
-	std::vector<GameObject> gameObjects;
-	if (!LevelFileHandler::loadLevelFromFile(fileName, gameObjects))
-	{
-		gameObjects.emplace_back(eModelName::Terrain, TERRAIN_STARTING_POSITION);
-	}
-
-	return GameObjectManager(std::move(gameObjects));
-}
-
-GameObjectManager::GameObjectManager()
+GameObjectManager::GameObjectManager(std::string fileName)
 	: m_gameObjects()
-{}
-
-GameObjectManager::GameObjectManager(std::vector<GameObject>&& gameObjectsFromFile)
-	: m_gameObjects(std::move(gameObjectsFromFile))
-{}
+{
+	if (!LevelFileHandler::loadLevelFromFile(fileName, m_gameObjects))
+	{
+		m_gameObjects.emplace_back(eModelName::Terrain, TERRAIN_STARTING_POSITION);
+	}
+}
 
 const std::vector<GameObject>& GameObjectManager::getGameObjects() const
 {

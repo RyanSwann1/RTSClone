@@ -59,7 +59,7 @@ int main()
 	const std::string levelName = "Level.txt";
 	PlayableAreaDisplay playableAreaDisplay;
 	SelectionBox selectionBox;
-	GameObjectManager gameObjectManager = GameObjectManager::create(levelName);
+	GameObjectManager gameObjectManager(levelName);
 	sf::Clock gameClock;
 	Camera camera;
 	glm::vec3 previousMousePosition = { 0.0f, Globals::GROUND_HEIGHT, 0.0f };
