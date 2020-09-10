@@ -91,7 +91,22 @@ void GameObjectManager::removeAllSelectedGameObjects()
 	}
 }
 
-void GameObjectManager::update(const SelectionBox& selectionBox)
+void GameObjectManager::selectGameObjectAtPosition(const glm::vec3& position)
+{
+	for (auto gameObject = m_gameObjects.begin(); gameObject != m_gameObjects.end(); ++gameObject)
+	{
+		if (gameObject->AABB.contains(position))
+		{
+			gameObject->selected = true;
+		}
+		else
+		{
+			gameObject->selected = false;
+		}
+	}
+}
+
+void GameObjectManager::selectCollidingGameObjects(const SelectionBox& selectionBox)
 {
 	for (auto& gameObject : m_gameObjects)
 	{

@@ -25,10 +25,10 @@ int main()
 	settings.majorVersion = 3;
 	settings.minorVersion = 3;
 	settings.attributeFlags = sf::ContextSettings::Core;
-	//glm::uvec2 windowSize(1280, 800);
-	glm::uvec2 windowSize(1980, 1080);
-	//sf::Window window(sf::VideoMode(windowSize.x, windowSize.y), "Level Editor", sf::Style::Default, settings);
-	sf::Window window(sf::VideoMode(windowSize.x, windowSize.y), "Level Editor", sf::Style::Fullscreen, settings);
+	glm::uvec2 windowSize(1280, 800);
+	//glm::uvec2 windowSize(1980, 1080);
+	sf::Window window(sf::VideoMode(windowSize.x, windowSize.y), "Level Editor", sf::Style::Default, settings);
+	//sf::Window window(sf::VideoMode(windowSize.x, windowSize.y), "Level Editor", sf::Style::Fullscreen, settings);
 	window.setFramerateLimit(60);
 	window.setMouseCursorGrabbed(true);
 	gladLoadGL();
@@ -106,13 +106,15 @@ int main()
 				{
 				case sf::Mouse::Button::Left:
 				{
+					glm::vec3 mouseToGroundPosition = camera.getMouseToGroundPosition(window);
+					gameObjectManager.selectGameObjectAtPosition(mouseToGroundPosition);
 					if (plannedGameObject.active)
 					{
 						gameObjectManager.addGameObject(plannedGameObject.modelName, plannedGameObject.position);
 					}
 					else
 					{
-						glm::vec3 mouseToGroundPosition = camera.getMouseToGroundPosition(window);
+						
 						selectionBox.setStartingPosition(window, mouseToGroundPosition);
 					}
 				}
@@ -133,7 +135,7 @@ int main()
 				if (selectionBox.active)
 				{
 					selectionBox.setSize(mouseToGroundPosition);
-					gameObjectManager.update(selectionBox);
+					gameObjectManager.selectCollidingGameObjects(selectionBox);
 				}
 				
 				glm::vec3 newPosition = Globals::convertToNodePosition(mouseToGroundPosition);
@@ -150,7 +152,6 @@ int main()
 		//Update
 		camera.update(deltaTime);
 		ImGui_SFML_OpenGL3::startFrame();
-
 		ImGui::SetNextWindowSize(ImVec2(175, 440), ImGuiCond_FirstUseEver);
 		if (ImGui::Begin("Models", nullptr, ImGuiWindowFlags_MenuBar))
 		{
