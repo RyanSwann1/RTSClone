@@ -25,10 +25,10 @@ int main()
 	settings.majorVersion = 3;
 	settings.minorVersion = 3;
 	settings.attributeFlags = sf::ContextSettings::Core;
-	glm::uvec2 windowSize(1280, 800);
-	//glm::uvec2 windowSize(1980, 1080);
-	sf::Window window(sf::VideoMode(windowSize.x, windowSize.y), "Level Editor", sf::Style::Default, settings);
-	//sf::Window window(sf::VideoMode(windowSize.x, windowSize.y), "Level Editor", sf::Style::Fullscreen, settings);
+	//glm::uvec2 windowSize(1280, 800);
+	glm::uvec2 windowSize(1980, 1080);
+	//sf::Window window(sf::VideoMode(windowSize.x, windowSize.y), "Level Editor", sf::Style::Default, settings);
+	sf::Window window(sf::VideoMode(windowSize.x, windowSize.y), "Level Editor", sf::Style::Fullscreen, settings);
 	window.setFramerateLimit(60);
 	window.setMouseCursorGrabbed(true);
 	gladLoadGL();
@@ -65,7 +65,6 @@ int main()
 	glm::vec3 previousMousePosition = { 0.0f, Globals::GROUND_HEIGHT, 0.0f };
 	PlannedGameObject plannedGameObject;
 	plannedGameObject.modelName = eModelName::RocksTall;
-	plannedGameObject.active = true;
 	int selected = 0;
 
 	std::cout << glGetError() << "\n";
@@ -107,10 +106,20 @@ int main()
 				{
 				case sf::Mouse::Button::Left:
 				{
-					glm::vec3 mouseToGroundPosition = camera.getMouseToGroundPosition(window);
-					selectionBox.setStartingPosition(window, mouseToGroundPosition);
-					gameObjectManager.addGameObject(plannedGameObject.modelName, plannedGameObject.position);
+					if (plannedGameObject.active)
+					{
+						gameObjectManager.addGameObject(plannedGameObject.modelName, plannedGameObject.position);
+					}
+					else
+					{
+						glm::vec3 mouseToGroundPosition = camera.getMouseToGroundPosition(window);
+						selectionBox.setStartingPosition(window, mouseToGroundPosition);
+					}
 				}
+				break;
+				case sf::Mouse::Button::Right:
+					plannedGameObject.active = false;
+					break;
 				break;
 				}
 			}
@@ -142,7 +151,7 @@ int main()
 		camera.update(deltaTime);
 		ImGui_SFML_OpenGL3::startFrame();
 
-		ImGui::SetNextWindowSize(ImVec2(500, 440), ImGuiCond_FirstUseEver);
+		ImGui::SetNextWindowSize(ImVec2(175, 440), ImGuiCond_FirstUseEver);
 		if (ImGui::Begin("Models", nullptr, ImGuiWindowFlags_MenuBar))
 		{
 			if (ImGui::BeginMenuBar())
@@ -168,6 +177,7 @@ int main()
 				{
 					selected = i;
 					plannedGameObject.modelName = ModelManager::getInstance().getModelName(modelNames[i]);
+					plannedGameObject.active = true;
 				}
 			}
 			ImGui::EndChild();
