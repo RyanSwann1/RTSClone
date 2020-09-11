@@ -147,7 +147,6 @@
   <ItemGroup>
     <ClCompile Include="..\Shared\AABB.cpp" />
     <ClCompile Include="..\Shared\Camera.cpp" />
-    <ClCompile Include="..\Shared\GameObject.cpp" />
     <ClCompile Include="..\Shared\glad.c" />
     <ClCompile Include="..\Shared\LevelFileHandler.cpp" />
     <ClCompile Include="..\Shared\Mesh.cpp" />
@@ -169,7 +168,6 @@
     <ClCompile Include="ProjectileHandler.cpp" />
     <ClCompile Include="Worker.cpp" />
     <ClCompile Include="UnitSpawnerBuilding.cpp" />
-    <ClCompile Include="Entity.cpp" />
     <ClCompile Include="imgui\imgui.cpp" />
     <ClCompile Include="imgui\imgui_demo.cpp" />
     <ClCompile Include="imgui\imgui_draw.cpp" />
@@ -189,7 +187,6 @@
   <ItemGroup>
     <ClInclude Include="..\Shared\AABB.h" />
     <ClInclude Include="..\Shared\Camera.h" />
-    <ClInclude Include="..\Shared\GameObject.h" />
     <ClInclude Include="..\Shared\glad.h" />
     <ClInclude Include="..\Shared\Globals.h" />
     <ClInclude Include="..\Shared\khrplatform.h" />
@@ -263,7 +260,6 @@
     <ClInclude Include="UniqueEntityIDDistributer.h" />
     <ClInclude Include="Worker.h" />
     <ClInclude Include="UnitSpawnerBuilding.h" />
-    <ClInclude Include="Entity.h" />
     <ClInclude Include="imgui\imconfig.h" />
     <ClInclude Include="imgui\imgui.h" />
     <ClInclude Include="imgui\imgui_internal.h" />
