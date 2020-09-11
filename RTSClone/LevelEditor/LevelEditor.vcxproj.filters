@@ -48,9 +48,6 @@
     <ClCompile Include="..\Shared\Camera.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="GameObjectManager.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
     <ClCompile Include="..\Shared\glad.c">
       <Filter>src</Filter>
     </ClCompile>
@@ -82,6 +79,9 @@
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="..\Shared\Entity.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="EntityManager.cpp">
       <Filter>src</Filter>
     </ClCompile>
   </ItemGroup>
@@ -123,9 +123,6 @@
       <Filter>src</Filter>
     </ClInclude>
     <ClInclude Include="..\Shared\GameObject.h">
-      <Filter>src</Filter>
-    </ClInclude>
-    <ClInclude Include="GameObjectManager.h">
       <Filter>src</Filter>
     </ClInclude>
     <ClInclude Include="..\Shared\glad.h">
@@ -171,6 +168,9 @@
       <Filter>src</Filter>
     </ClInclude>
     <ClInclude Include="..\Shared\UniqueEntityIDDistributer.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="EntityManager.h">
       <Filter>src</Filter>
     </ClInclude>
   </ItemGroup>

@@ -5,12 +5,12 @@
 
 class Entity;
 #ifdef LEVEL_EDITOR
-class GameObjectManager;
+class EntityManager;
 #endif // LEVEL_EDITOR
 namespace LevelFileHandler
 {
 #ifdef LEVEL_EDITOR
-	void saveLevelToFile(const std::string& fileName, const GameObjectManager& gameObjectManager);
+	void saveLevelToFile(const std::string& fileName, const EntityManager& entityManager);
 #endif // LEVEL_EDITOR
 
 	bool loadLevelFromFile(const std::string& fileName, std::vector<Entity>& scenery);

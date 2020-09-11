@@ -1,4 +1,4 @@
-#include "GameObjectManager.h"
+#include "EntityManager.h"
 #include "ModelManager.h"
 #include "Globals.h"
 #include "LevelFileHandler.h"
@@ -11,7 +11,7 @@ namespace
 	constexpr glm::vec3 TERRAIN_STARTING_POSITION = { 0.0f, Globals::GROUND_HEIGHT - 0.01f, 0.0f };
 }
 
-GameObjectManager::GameObjectManager(std::string fileName)
+EntityManager::EntityManager(std::string fileName)
 	: m_entities()
 {
 	if (!LevelFileHandler::loadLevelFromFile(fileName, m_entities))
@@ -20,25 +20,25 @@ GameObjectManager::GameObjectManager(std::string fileName)
 	}
 }
 
-const std::vector<Entity>& GameObjectManager::getEntities() const
+const std::vector<Entity>& EntityManager::getEntities() const
 {
 	return m_entities;
 }
 
-void GameObjectManager::addGameObject(eModelName modelName, const glm::vec3& position)
+void EntityManager::addEntity(eModelName modelName, const glm::vec3& position)
 {
 	assert(Globals::isOnNodePosition(position));
-	auto gameObject = std::find_if(m_entities.cbegin(), m_entities.cend(), [&position](const auto& gameObject)
+	auto entity = std::find_if(m_entities.cbegin(), m_entities.cend(), [&position](const auto& gameObject)
 	{
 		return gameObject.getPosition() == position;
 	});
-	if (gameObject == m_entities.cend())
+	if (entity == m_entities.cend())
 	{
 		m_entities.emplace_back(modelName, position);
 	}
 }
 
-void GameObjectManager::removeAllSelectedGameObjects()
+void EntityManager::removeAllSelectedEntities()
 {
 	for (auto entity = m_entities.begin(); entity != m_entities.end();)
 	{
@@ -53,7 +53,7 @@ void GameObjectManager::removeAllSelectedGameObjects()
 	}
 }
 
-void GameObjectManager::selectGameObjectAtPosition(const glm::vec3& position)
+void EntityManager::selectEntityAtPosition(const glm::vec3& position)
 {
 	for (auto entity = m_entities.begin(); entity != m_entities.end(); ++entity)
 	{
@@ -61,7 +61,7 @@ void GameObjectManager::selectGameObjectAtPosition(const glm::vec3& position)
 	}
 }
 
-void GameObjectManager::selectCollidingGameObjects(const SelectionBox& selectionBox)
+void EntityManager::SelectEntities(const SelectionBox& selectionBox)
 {
 	for (auto& entity : m_entities)
 	{
@@ -72,7 +72,7 @@ void GameObjectManager::selectCollidingGameObjects(const SelectionBox& selection
 	}
 }
 
-void GameObjectManager::render(ShaderHandler& shaderHandler) const
+void EntityManager::render(ShaderHandler& shaderHandler) const
 {
 	for (const auto& entity : m_entities)
 	{
@@ -81,13 +81,13 @@ void GameObjectManager::render(ShaderHandler& shaderHandler) const
 }
 
 #ifdef RENDER_AABB
-void GameObjectManager::renderGameObjectAABB(ShaderHandler& shaderHandler)
+void EntityManager::renderEntityAABB(ShaderHandler& shaderHandler)
 {
-	for (auto& gameObject : m_gameObjects)
+	for (auto& entity : m_entities)
 	{
-		if (gameObject.modelName != eModelName::Terrain)
+		if (entity.modelName != eModelName::Terrain)
 		{
-			gameObject.renderAABB(shaderHandler);
+			entity.renderAABB(shaderHandler);
 		}
 	}
 }

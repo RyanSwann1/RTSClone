@@ -1,6 +1,6 @@
 #include "LevelFileHandler.h"
 #ifdef LEVEL_EDITOR
-#include "GameObjectManager.h"
+#include "EntityManager.h"
 #endif // LEVEL_EDITOR
 #include "Globals.h"
 #include "Entity.h"
@@ -9,14 +9,14 @@
 #include <sstream>
 
 #ifdef LEVEL_EDITOR
-void LevelFileHandler::saveLevelToFile(const std::string& fileName, const GameObjectManager& gameObjectManager)
+void LevelFileHandler::saveLevelToFile(const std::string& fileName, const EntityManager& entityManager)
 {
 	std::stringstream stringStream;
 	
-	for (const auto& gameObject : gameObjectManager.getEntities())
+	for (const auto& entity : entityManager.getEntities())
 	{
-		stringStream << static_cast<int>(gameObject.getModelName()) << " " <<
-			gameObject.getPosition().x << " " << gameObject.getPosition().y << " " << gameObject.getPosition().z << "\n";
+		stringStream << static_cast<int>(entity.getModelName()) << " " <<
+			entity.getPosition().x << " " << entity.getPosition().y << " " << entity.getPosition().z << "\n";
 	}
 
 	std::ofstream file(Globals::SHARED_FILE_DIRECTORY + fileName);
