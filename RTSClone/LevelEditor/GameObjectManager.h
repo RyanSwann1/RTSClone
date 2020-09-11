@@ -1,9 +1,8 @@
 #pragma once
 
 #include "glm/glm.hpp"
-#include "NonCopyable.h"
 #include "NonMovable.h"
-#include "GameObject.h"
+#include "Entity.h"
 #include <vector>
 #include <string>
 #include <memory>
@@ -16,7 +15,7 @@ class GameObjectManager : private NonCopyable, private NonMovable
 public:
 	GameObjectManager(std::string fileName = std::string());
 
-	const std::vector<GameObject>& getGameObjects() const;
+	const std::vector<Entity>& getEntities() const;
 
 	void addGameObject(eModelName modelName, const glm::vec3& position);
 	void removeAllSelectedGameObjects();
@@ -29,5 +28,5 @@ public:
 #endif // RENDER_AABB
 
 private:
-	std::vector<GameObject> m_gameObjects;
+	std::vector<Entity> m_entities;
 };

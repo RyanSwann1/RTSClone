@@ -4,6 +4,7 @@
 #include "LevelFileHandler.h"
 #include "SelectionBox.h"
 #include <assert.h>
+#include <imgui/imgui.h>
 
 namespace
 {
@@ -11,78 +12,71 @@ namespace
 }
 
 GameObjectManager::GameObjectManager(std::string fileName)
-	: m_gameObjects()
+	: m_entities()
 {
-	if (!LevelFileHandler::loadLevelFromFile(fileName, m_gameObjects))
+	if (!LevelFileHandler::loadLevelFromFile(fileName, m_entities))
 	{
-		m_gameObjects.emplace_back(eModelName::Terrain, TERRAIN_STARTING_POSITION);
+		m_entities.emplace_back(eModelName::Terrain, TERRAIN_STARTING_POSITION);
 	}
 }
 
-const std::vector<GameObject>& GameObjectManager::getGameObjects() const
+const std::vector<Entity>& GameObjectManager::getEntities() const
 {
-	return m_gameObjects;
+	return m_entities;
 }
 
 void GameObjectManager::addGameObject(eModelName modelName, const glm::vec3& position)
 {
 	assert(Globals::isOnNodePosition(position));
-	auto gameObject = std::find_if(m_gameObjects.cbegin(), m_gameObjects.cend(), [&position](const auto& gameObject)
+	auto gameObject = std::find_if(m_entities.cbegin(), m_entities.cend(), [&position](const auto& gameObject)
 	{
-		return gameObject.position == position;
+		return gameObject.getPosition() == position;
 	});
-	if (gameObject == m_gameObjects.cend())
+	if (gameObject == m_entities.cend())
 	{
-		m_gameObjects.emplace_back(modelName, position);
+		m_entities.emplace_back(modelName, position);
 	}
 }
 
 void GameObjectManager::removeAllSelectedGameObjects()
 {
-	for (auto gameObject = m_gameObjects.begin(); gameObject != m_gameObjects.end();)
+	for (auto entity = m_entities.begin(); entity != m_entities.end();)
 	{
-		if (gameObject->selected)
+		if (entity->isSelected())
 		{
-			gameObject = m_gameObjects.erase(gameObject);
+			entity = m_entities.erase(entity);
 		}
 		else
 		{
-			++gameObject;
+			++entity;
 		}
 	}
 }
 
 void GameObjectManager::selectGameObjectAtPosition(const glm::vec3& position)
 {
-	for (auto gameObject = m_gameObjects.begin(); gameObject != m_gameObjects.end(); ++gameObject)
+	for (auto entity = m_entities.begin(); entity != m_entities.end(); ++entity)
 	{
-		if (gameObject->AABB.contains(position))
-		{
-			gameObject->selected = true;
-		}
-		else
-		{
-			gameObject->selected = false;
-		}
+		entity->setSelected(entity->getAABB().contains(position));
 	}
 }
 
 void GameObjectManager::selectCollidingGameObjects(const SelectionBox& selectionBox)
 {
-	for (auto& gameObject : m_gameObjects)
+	for (auto& entity : m_entities)
 	{
-		if (gameObject.modelName != eModelName::Terrain)
+		if (entity.getModelName() != eModelName::Terrain)
 		{
-			gameObject.selected = gameObject.AABB.contains(selectionBox.AABB);
+			entity.setSelected(selectionBox.AABB.contains(entity.getAABB()));
 		}
 	}
 }
 
 void GameObjectManager::render(ShaderHandler& shaderHandler) const
 {
-	for (const auto& gameObject : m_gameObjects)
+	for (const auto& entity : m_entities)
 	{
-		gameObject.render(shaderHandler);
+		entity.render(shaderHandler);
 	}
 }
 
