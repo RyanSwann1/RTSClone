@@ -111,6 +111,7 @@ int main()
 						}
 						else
 						{
+							plannedEntityActive = false;
 							selectionBox.setStartingPosition(window, mouseToGroundPosition);
 						}
 					}
@@ -125,6 +126,9 @@ int main()
 				break;
 			case sf::Event::MouseButtonReleased:
 				selectionBox.reset();
+				break;
+			case sf::Event::MouseWheelMoved:
+				camera.zoom(currentSFMLEvent.mouseWheel.delta);
 				break;
 			case sf::Event::MouseMoved:
 			{

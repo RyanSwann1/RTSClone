@@ -13,6 +13,9 @@ struct Camera : private NonCopyable, private NonMovable
 	glm::mat4 getProjection(const sf::Window& window) const;
 	glm::vec3 getMouseToGroundPosition(const sf::Window& window) const;
 	void update(float deltaTime);
+#ifdef LEVEL_EDITOR
+	void zoom(float mouseWheelDelta);
+#endif // LEVEL_EDITOR
 
 	const float FOV;
 	const float sensitivity;

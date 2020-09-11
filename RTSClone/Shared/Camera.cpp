@@ -46,6 +46,10 @@ namespace
 
 		return worldRay;
 	}
+
+	constexpr float ZOOM_STEP = 7.5f;
+	constexpr float MAXIMUM_ZOOM_HEIGHT = 25.0f;
+	constexpr float MINIMUM_ZOOM_HEIGHT = 150.0f;
 }
 
 Camera::Camera()
@@ -98,6 +102,29 @@ void Camera::update(float deltaTime)
 	moveByArrowKeys(deltaTime);
 	setFront();
 }
+
+#ifdef LEVEL_EDITOR
+void Camera::zoom(float mouseWheelDelta)
+{
+	glm::vec3 newPosition = { 0.0f, 0.0f, 0.0f };
+	if (mouseWheelDelta > 0.0f)
+	{
+		newPosition = position + glm::normalize(front) * ZOOM_STEP;
+		if (newPosition.y >= MAXIMUM_ZOOM_HEIGHT)
+		{
+			position = newPosition;
+		}
+	}
+	else
+	{
+		newPosition = position - glm::normalize(front) * ZOOM_STEP;
+		if (newPosition.y <= MINIMUM_ZOOM_HEIGHT)
+		{
+			position = newPosition;
+		}
+	}
+}
+#endif // LEVEL_EDITOR
 
 void Camera::moveByArrowKeys(float deltaTime)
 {
