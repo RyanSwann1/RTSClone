@@ -5,14 +5,12 @@
 #include "glm/gtc/matrix_transform.hpp"
 #include "Camera.h"
 #include "Globals.h"
-#include "GameObject.h"
-#include "GameObjectManager.h"
+#include "EntityManager.h"
 #include "LevelFileHandler.h"
 #include "SelectionBox.h"
 #include "PlayableAreaDisplay.h"
 #include <SFML/Graphics.hpp>
 #include <iostream>
-
 #include <imgui/imgui.h>
 #include <imgui_impl/imgui_wrapper.h>
 
@@ -59,12 +57,12 @@ int main()
 	const std::string levelName = "Level.txt";
 	PlayableAreaDisplay playableAreaDisplay;
 	SelectionBox selectionBox;
-	GameObjectManager gameObjectManager(levelName);
+	EntityManager entityManager(levelName);
 	sf::Clock gameClock;
 	Camera camera;
 	glm::vec3 previousMousePosition = { 0.0f, Globals::GROUND_HEIGHT, 0.0f };
-	PlannedGameObject plannedGameObject;
-	plannedGameObject.modelName = eModelName::RocksTall;
+	bool plannedEntityActive = false;
+	Entity plannedEntity(eModelName::RocksTall, { 0.0f, 0.0f, 0.0f });
 	int selected = 0;
 
 	std::cout << glGetError() << "\n";
@@ -89,35 +87,37 @@ int main()
 				case sf::Keyboard::Escape:
 					window.close();
 					break;
-				break;
 				case sf::Keyboard::Enter:
-					LevelFileHandler::saveLevelToFile(levelName, gameObjectManager);
+					LevelFileHandler::saveLevelToFile(levelName, entityManager);
 					break;
 				case sf::Keyboard::Delete:
-					gameObjectManager.removeAllSelectedGameObjects();
+					entityManager.removeAllSelectedEntities();
 					break;
 				}
+				break;
 			case sf::Event::MouseButtonPressed:
 			{
 				switch (currentSFMLEvent.mouseButton.button)
 				{
 				case sf::Mouse::Button::Left:
 				{
-					glm::vec3 mouseToGroundPosition = camera.getMouseToGroundPosition(window);
-					gameObjectManager.selectGameObjectAtPosition(mouseToGroundPosition);
-					if (plannedGameObject.active)
+					if (!ImGui::IsWindowHovered(ImGuiHoveredFlags_::ImGuiHoveredFlags_AnyWindow))
 					{
-						gameObjectManager.addGameObject(plannedGameObject.modelName, plannedGameObject.position);
-					}
-					else
-					{
-						
-						selectionBox.setStartingPosition(window, mouseToGroundPosition);
+						glm::vec3 mouseToGroundPosition = camera.getMouseToGroundPosition(window);
+						entityManager.selectEntityAtPosition(mouseToGroundPosition);
+						if (plannedEntityActive)
+						{
+							entityManager.addEntity(plannedEntity.getModelName(), plannedEntity.getPosition());
+						}
+						else
+						{
+							selectionBox.setStartingPosition(window, mouseToGroundPosition);
+						}
 					}
 				}
 				break;
 				case sf::Mouse::Button::Right:
-					plannedGameObject.active = false;
+					plannedEntityActive = false;
 					break;
 				break;
 				}
@@ -128,18 +128,25 @@ int main()
 				break;
 			case sf::Event::MouseMoved:
 			{
-				glm::vec3 mouseToGroundPosition = camera.getMouseToGroundPosition(window);
-				if (selectionBox.active)
+				if (!ImGui::IsWindowHovered(ImGuiHoveredFlags_::ImGuiHoveredFlags_AnyWindow))
 				{
-					selectionBox.setSize(mouseToGroundPosition);
-					gameObjectManager.selectCollidingGameObjects(selectionBox);
-				}
-				
-				glm::vec3 newPosition = Globals::convertToNodePosition(mouseToGroundPosition);
-				AABB AABB(newPosition, ModelManager::getInstance().getModel(plannedGameObject.modelName));
-				if (Globals::isWithinMapBounds(AABB))
-				{
-					plannedGameObject.position = newPosition;
+					glm::vec3 mouseToGroundPosition = camera.getMouseToGroundPosition(window);
+					if (selectionBox.active)
+					{
+						selectionBox.setSize(mouseToGroundPosition);
+
+						if (selectionBox.isMinimumSize())
+						{
+							entityManager.selectEntities(selectionBox);
+						}
+					}
+
+					glm::vec3 newPosition = Globals::convertToNodePosition(mouseToGroundPosition);
+					AABB AABB(newPosition, ModelManager::getInstance().getModel(plannedEntity.getModelName()));
+					if (Globals::isWithinMapBounds(AABB))
+					{
+						plannedEntity.setPosition(newPosition);
+					}
 				}
 			}
 				break;
@@ -149,7 +156,7 @@ int main()
 		//Update
 		camera.update(deltaTime);
 		ImGui_SFML_OpenGL3::startFrame();
-		ImGui::SetNextWindowSize(ImVec2(175, 440), ImGuiCond_FirstUseEver);
+		ImGui::SetNextWindowSize(ImVec2(175, windowSize.y), ImGuiCond_FirstUseEver);
 		if (ImGui::Begin("Models", nullptr, ImGuiWindowFlags_MenuBar))
 		{
 			if (ImGui::BeginMenuBar())
@@ -166,7 +173,7 @@ int main()
 				ImGui::EndMenuBar();
 			}
 
-			ImGui::BeginChild("left pane", ImVec2(175, 0), true);
+			ImGui::BeginChild("left pane", ImVec2(175, 200), true);
 			const auto& modelNames = ModelManager::getInstance().getModelNames();
 			for (int i = 0; i < modelNames.size(); i++)
 			{
@@ -174,17 +181,32 @@ int main()
 				if (ImGui::Selectable(label.c_str(), selected == i))
 				{
 					selected = i;
-					plannedGameObject.modelName = ModelManager::getInstance().getModelName(modelNames[i]);
-					plannedGameObject.active = true;
+					plannedEntity.setModelName(ModelManager::getInstance().getModelName(modelNames[i]));
+					plannedEntityActive = true;
 				}
 			}
 			ImGui::EndChild();
 			ImGui::SameLine();
+
+			Entity* selectedEntity = entityManager.getSelectedEntity();
+			if (selectedEntity)
+			{
+				ImGui::Separator();
+				//ImGui::NextColumn();
+				ImGui::BeginChild("Position", ImVec2(150, 150));
+				ImGui::Text("Entity Position");
+				if (ImGui::InputFloat("x", &selectedEntity->getPosition().x, Globals::NODE_SIZE) ||
+					ImGui::InputFloat("z", &selectedEntity->getPosition().z, Globals::NODE_SIZE))
+				{
+					selectedEntity->resetAABB();
+				}
+				ImGui::EndChild();
+			}
 		}
 		ImGui::End();
 
 		// DEMO!
-		//ImGui::ShowDemoWindow(); //No idea if that is the correct name btw
+		ImGui::ShowDemoWindow(); //No idea if that is the correct name btw
 
 		//Render
 		glm::mat4 view = camera.getView();
@@ -197,13 +219,15 @@ int main()
 		shaderHandler->setUniformMat4f(eShaderType::Default, "uProjection", projection);
 
 		shaderHandler->setUniform1f(eShaderType::Default, "uOpacity", 1.0f);
-		gameObjectManager.render(*shaderHandler);
-		plannedGameObject.render(*shaderHandler);
+		entityManager.render(*shaderHandler);
+		if (plannedEntityActive)
+		{
+			plannedEntity.render(*shaderHandler);
+		}
 
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		glDisable(GL_DEPTH_TEST);
-
 
 		shaderHandler->switchToShader(eShaderType::Debug);
 		shaderHandler->setUniformMat4f(eShaderType::Debug, "uView", view);
