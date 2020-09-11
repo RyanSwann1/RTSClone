@@ -10,6 +10,8 @@ struct SelectionBox : private NonCopyable, private NonMovable
 	SelectionBox();
 	~SelectionBox();
 
+	bool isMinimumSize() const;
+
 	void setStartingPosition(const sf::Window& window, const glm::vec3& position);
 	void setSize(const glm::vec3& position);
 	void reset();

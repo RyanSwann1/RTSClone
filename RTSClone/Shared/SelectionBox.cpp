@@ -16,6 +16,8 @@ namespace
             glm::ivec2(glm::min(startingPosition.x, startingPosition.x + size.x), glm::max(startingPosition.y, startingPosition.y + size.y))
         };
     };
+
+    constexpr float MINIMUM_SIZE = 5.0f;
 };
 
 SelectionBox::SelectionBox()
@@ -40,6 +42,11 @@ SelectionBox::~SelectionBox()
     glDeleteBuffers(1, &vboID);
 }
 
+bool SelectionBox::isMinimumSize() const
+{
+    return Globals::getSqrDistance(mouseToGroundPosition, startingPositionWorldPosition) >= MINIMUM_SIZE;
+}
+
 void SelectionBox::setStartingPosition(const sf::Window& window, const glm::vec3& position)
 {
     startingPositionWorldPosition = position;
@@ -61,7 +68,7 @@ void SelectionBox::reset()
 
 void SelectionBox::render(const sf::Window& window) const
 {
-    if (active)
+    if (active && isMinimumSize())
     {
         glm::vec2 endingPosition = { sf::Mouse::getPosition(window).x, sf::Mouse::getPosition(window).y };
         std::array<glm::ivec2, 6> quadCoords = getSelectionBoxQuadCoords(startingPositionScreenPosition,

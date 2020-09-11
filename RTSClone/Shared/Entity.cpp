@@ -41,7 +41,9 @@ Entity::Entity(eModelName modelName, const glm::vec3& startingPosition)
 	m_ID(UniqueEntityIDDistributer::getInstance().getUniqueEntityID()),
 	m_modelName(modelName),
 	m_selected(false)
-{}
+{
+	m_AABB.reset(m_position, ModelManager::getInstance().getModel(m_modelName));
+}
 
 void Entity::setModelName(eModelName modelName)
 {

@@ -257,7 +257,6 @@
     <ClInclude Include="Graph.h" />
     <ClInclude Include="Projectile.h" />
     <ClInclude Include="ProjectileHandler.h" />
-    <ClInclude Include="UniqueEntityIDDistributer.h" />
     <ClInclude Include="Worker.h" />
     <ClInclude Include="UnitSpawnerBuilding.h" />
     <ClInclude Include="imgui\imconfig.h" />

@@ -323,9 +323,6 @@
     <ClInclude Include="Faction.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="UniqueEntityIDDistributer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="UnitSpawnerBuilding.h">
       <Filter>Header Files</Filter>
     </ClInclude>
