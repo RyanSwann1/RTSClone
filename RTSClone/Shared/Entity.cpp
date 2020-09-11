@@ -1,10 +1,11 @@
 #include "Entity.h"
 #include "Model.h"
 #include "ShaderHandler.h"
-#include "Map.h"
 #include "ModelManager.h"
+#include "Globals.h"
 #include "UniqueEntityIDDistributer.h"
 
+#ifdef GAME
 Entity::Entity(const glm::vec3& startingPosition, eEntityType entityType)
 	: m_position(0.0f, 0.0f, 0.0f),
 	m_AABB(),
@@ -25,20 +26,47 @@ Entity::Entity(const glm::vec3& startingPosition, eEntityType entityType)
 	case eEntityType::Projectile:
 		m_position = startingPosition;
 		break;
-	default: 
+	default:
 		assert(false);
 	}
-	
+
 	m_AABB.reset(m_position, ModelManager::getInstance().getModel(m_type));
 }
+#endif // GAME
+
+#ifdef LEVEL_EDITOR
+Entity::Entity(eModelName modelName, const glm::vec3& startingPosition)
+	: m_position(startingPosition),
+	m_AABB(),
+	m_ID(UniqueEntityIDDistributer::getInstance().getUniqueEntityID()),
+	m_modelName(modelName),
+	m_selected(false)
+{}
+
+void Entity::setModelName(eModelName modelName)
+{
+	m_modelName = modelName;
+}
+
+void Entity::setPosition(const glm::vec3 & position)
+{
+	m_position = position;
+}
+#endif // LEVEL_EDITOR
 
 Entity::Entity(Entity&& orig) noexcept
 	: m_position(orig.m_position),
 	m_AABB(std::move(orig.m_AABB)),
 	m_ID(orig.m_ID),
-	m_type(orig.m_type),
 	m_selected(orig.m_selected)
 {
+#ifdef GAME
+	m_type = orig.m_type;
+#endif // GAME
+#ifdef LEVEL_EDITOR
+	m_modelName = orig.m_modelName;
+#endif // LEVEL_EDITOR
+
 	orig.m_ID = Globals::INVALID_ENTITY_ID;
 }
 
@@ -47,7 +75,12 @@ Entity& Entity::operator=(Entity&& orig) noexcept
 	m_position = orig.m_position;
 	m_AABB = std::move(orig.m_AABB);
 	m_ID = orig.m_ID;
+#ifdef GAME
 	m_type = orig.m_type;
+#endif // GAME
+#ifdef LEVEL_EDITOR
+	m_modelName = orig.m_modelName;
+#endif // LEVEL_EDITOR
 	m_selected = orig.m_selected;
 
 	orig.m_ID = Globals::INVALID_ENTITY_ID;
@@ -59,10 +92,19 @@ int Entity::getID() const
 	return m_ID;
 }
 
+#ifdef LEVEL_EDITOR
+eModelName Entity::getModelName() const
+{
+	return m_modelName;
+}
+#endif // LEVEL_EDITOR
+
+#ifdef GAME
 eEntityType Entity::getEntityType() const
 {
 	return m_type;
 }
+#endif // GAME
 
 const glm::vec3& Entity::getPosition() const
 {
@@ -86,7 +128,13 @@ void Entity::setSelected(bool selected)
 
 void Entity::render(ShaderHandler& shaderHandler) const
 {
+#ifdef GAME
 	ModelManager::getInstance().getModel(m_type).render(shaderHandler, *this);
+#endif // GAME
+
+#ifdef LEVEL_EDITOR
+	ModelManager::getInstance().getModel(m_modelName).render(shaderHandler, *this);
+#endif // LEVEL_EDITOR
 }
 
 #ifdef RENDER_AABB
