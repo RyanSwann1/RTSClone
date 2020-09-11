@@ -15,12 +15,13 @@ class EntityManager : private NonCopyable, private NonMovable
 public:
 	EntityManager(std::string fileName = std::string());
 
+	Entity* getSelectedEntity();
 	const std::vector<Entity>& getEntities() const;
-
+	
 	void addEntity(eModelName modelName, const glm::vec3& position);
 	void removeAllSelectedEntities();
 	void selectEntityAtPosition(const glm::vec3& position);
-	void SelectEntities(const SelectionBox& selectionBox);
+	void selectEntities(const SelectionBox& selectionBox);
 	void render(ShaderHandler& shaderHandler) const;
 
 #ifdef RENDER_AABB
@@ -29,4 +30,5 @@ public:
 
 private:
 	std::vector<Entity> m_entities;
+	int m_selectedEntityID;
 };

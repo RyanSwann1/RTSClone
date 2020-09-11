@@ -12,12 +12,24 @@ namespace
 }
 
 EntityManager::EntityManager(std::string fileName)
-	: m_entities()
+	: m_entities(),
+	m_selectedEntityID(Globals::INVALID_ENTITY_ID)
 {
 	if (!LevelFileHandler::loadLevelFromFile(fileName, m_entities))
 	{
 		m_entities.emplace_back(eModelName::Terrain, TERRAIN_STARTING_POSITION);
 	}
+}
+
+Entity* EntityManager::getSelectedEntity()
+{
+	int selectedEntityID = m_selectedEntityID;
+	auto selectedEntity = std::find_if(m_entities.begin(), m_entities.end(), [selectedEntityID](const auto& entity)
+	{
+		return entity.getID() == selectedEntityID;
+	});
+
+	return (selectedEntity != m_entities.end() ? &(*selectedEntity) : nullptr);
 }
 
 const std::vector<Entity>& EntityManager::getEntities() const
@@ -44,6 +56,11 @@ void EntityManager::removeAllSelectedEntities()
 	{
 		if (entity->isSelected())
 		{
+			if (entity->getID() == m_selectedEntityID)
+			{
+				m_selectedEntityID = Globals::INVALID_ENTITY_ID;
+			}
+
 			entity = m_entities.erase(entity);
 		}
 		else
@@ -55,14 +72,25 @@ void EntityManager::removeAllSelectedEntities()
 
 void EntityManager::selectEntityAtPosition(const glm::vec3& position)
 {
+	m_selectedEntityID = Globals::INVALID_ENTITY_ID;
 	for (auto entity = m_entities.begin(); entity != m_entities.end(); ++entity)
 	{
-		entity->setSelected(entity->getAABB().contains(position));
+		if (entity->getAABB().contains(position))
+		{
+			entity->setSelected(true);
+			m_selectedEntityID = entity->getID();
+		}
+		else
+		{
+			entity->setSelected(false);
+		}
 	}
 }
 
-void EntityManager::SelectEntities(const SelectionBox& selectionBox)
+void EntityManager::selectEntities(const SelectionBox& selectionBox)
 {
+	m_selectedEntityID = Globals::INVALID_ENTITY_ID;
+
 	for (auto& entity : m_entities)
 	{
 		if (entity.getModelName() != eModelName::Terrain)
