@@ -91,15 +91,24 @@ bool EntityManager::selectEntityAtPosition(const glm::vec3& position)
 
 void EntityManager::selectEntities(const SelectionBox& selectionBox)
 {
-	m_selectedEntityID = Globals::INVALID_ENTITY_ID;
-
+	int selectedEntityCount = 0;
 	for (auto& entity : m_entities)
 	{
 		if (entity.getModelName() != eModelName::Terrain)
 		{
 			entity.setSelected(selectionBox.AABB.contains(entity.getAABB()));
+			if (entity.isSelected())
+			{
+				++selectedEntityCount;
+				m_selectedEntityID = entity.getID();
+			}
 		}
 	}
+
+	if (selectedEntityCount > 1)
+	{
+		m_selectedEntityID = Globals::INVALID_ENTITY_ID;
+	}	
 }
 
 void EntityManager::render(ShaderHandler& shaderHandler) const
