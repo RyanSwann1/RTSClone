@@ -3,7 +3,7 @@
 #include <string>
 #include <vector>
 
-struct GameObject;
+class Entity;
 #ifdef LEVEL_EDITOR
 class GameObjectManager;
 #endif // LEVEL_EDITOR
@@ -13,5 +13,5 @@ namespace LevelFileHandler
 	void saveLevelToFile(const std::string& fileName, const GameObjectManager& gameObjectManager);
 #endif // LEVEL_EDITOR
 
-	bool loadLevelFromFile(const std::string& fileName, std::vector<GameObject>& scenery);
+	bool loadLevelFromFile(const std::string& fileName, std::vector<Entity>& scenery);
 }

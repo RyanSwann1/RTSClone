@@ -3,7 +3,7 @@
 #include "GameObjectManager.h"
 #endif // LEVEL_EDITOR
 #include "Globals.h"
-#include "GameObject.h"
+#include "Entity.h"
 #include "ModelName.h"
 #include <fstream>
 #include <sstream>
@@ -13,10 +13,10 @@ void LevelFileHandler::saveLevelToFile(const std::string& fileName, const GameOb
 {
 	std::stringstream stringStream;
 	
-	for (const auto& gameObject : gameObjectManager.getGameObjects())
+	for (const auto& gameObject : gameObjectManager.getEntities())
 	{
-		stringStream << static_cast<int>(gameObject.modelName) << " " <<
-			gameObject.position.x << " " << gameObject.position.y << " " << gameObject.position.z << "\n";
+		stringStream << static_cast<int>(gameObject.getModelName()) << " " <<
+			gameObject.getPosition().x << " " << gameObject.getPosition().y << " " << gameObject.getPosition().z << "\n";
 	}
 
 	std::ofstream file(Globals::SHARED_FILE_DIRECTORY + fileName);
@@ -26,7 +26,7 @@ void LevelFileHandler::saveLevelToFile(const std::string& fileName, const GameOb
 }
 #endif // LEVEL_EDITOR
 
-bool LevelFileHandler::loadLevelFromFile(const std::string& fileName, std::vector<GameObject>& scenery)
+bool LevelFileHandler::loadLevelFromFile(const std::string& fileName, std::vector<Entity>& scenery)
 {
 	assert(scenery.empty());
 
