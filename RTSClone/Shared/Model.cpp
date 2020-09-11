@@ -1,10 +1,7 @@
 #include "Model.h"
 #include "ShaderHandler.h"
 #include "ModelLoader.h"
-#ifdef GAME
 #include "Entity.h"
-#endif // GAME
-#include "GameObject.h"
 #include "glm/gtc/matrix_transform.hpp"
 #include "glm/gtx/transform.hpp"
 
@@ -57,7 +54,6 @@ void Model::render(ShaderHandler& shaderHandler, const glm::vec3& position) cons
 	}
 }
 
-#ifdef GAME
 void Model::render(ShaderHandler& shaderHandler, const Entity& entity) const
 {
 	glm::vec3 entityPosition = entity.getPosition();
@@ -74,30 +70,5 @@ void Model::render(ShaderHandler& shaderHandler, const Entity& entity) const
 	for (const auto& mesh : meshes)
 	{
 		mesh.render(shaderHandler, entity.isSelected());
-	}
-}
-#endif // GAME
-
-void Model::render(ShaderHandler& shaderHandler, const GameObject& gameObject) const
-{
-	glm::vec3 modelPosition = gameObject.position;
-	if (renderFromCentrePosition)
-	{
-		modelPosition.x += AABBSizeFromCenter.x;
-		modelPosition.z -= AABBSizeFromCenter.z;
-	}
-	glm::mat4 model = glm::translate(glm::mat4(1.0), modelPosition);
-	model = glm::scale(model, scale);
-	shaderHandler.setUniformMat4f(eShaderType::Default, "uModel", model);
-
-	for (const auto& mesh : meshes)
-	{
-#ifdef LEVEL_EDITOR
-		mesh.render(shaderHandler, gameObject.selected);
-#endif // LEVEL_EDITOR
-
-#ifdef GAME
-		mesh.render(shaderHandler);
-#endif // GAME
 	}
 }

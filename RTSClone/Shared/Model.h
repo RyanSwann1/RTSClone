@@ -7,10 +7,7 @@
 #include <string>
 #include <memory>
 
-struct GameObject;
-#ifdef GAME
 class Entity;
-#endif // GAME
 class ShaderHandler;
 struct Model : private NonMovable, private NonCopyable
 {
@@ -19,13 +16,9 @@ struct Model : private NonMovable, private NonCopyable
 
 	void attachMeshesToVAO() const;
 	void render(ShaderHandler& shaderHandler, const glm::vec3& position) const;
-	void render(ShaderHandler& shaderHandler, const GameObject& gameObject) const;
-
-#ifdef GAME
 	void render(ShaderHandler& shaderHandler, const Entity& entity) const;
-#endif // GAME
 
-
+	const std::string nameText;
 	const eModelName modelName;
 	const bool renderFromCentrePosition;
 	const glm::vec3 AABBSizeFromCenter;
