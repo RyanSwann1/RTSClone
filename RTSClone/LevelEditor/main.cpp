@@ -104,8 +104,8 @@ int main()
 					if (!ImGui::IsWindowHovered(ImGuiHoveredFlags_::ImGuiHoveredFlags_AnyWindow))
 					{
 						glm::vec3 mouseToGroundPosition = camera.getMouseToGroundPosition(window);
-						entityManager.selectEntityAtPosition(mouseToGroundPosition);
-						if (plannedEntityActive)
+						bool entitySelected = entityManager.selectEntityAtPosition(mouseToGroundPosition);
+						if (plannedEntityActive && !entitySelected)
 						{
 							entityManager.addEntity(plannedEntity.getModelName(), plannedEntity.getPosition());
 						}

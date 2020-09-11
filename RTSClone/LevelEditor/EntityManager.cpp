@@ -70,7 +70,7 @@ void EntityManager::removeAllSelectedEntities()
 	}
 }
 
-void EntityManager::selectEntityAtPosition(const glm::vec3& position)
+bool EntityManager::selectEntityAtPosition(const glm::vec3& position)
 {
 	m_selectedEntityID = Globals::INVALID_ENTITY_ID;
 	for (auto entity = m_entities.begin(); entity != m_entities.end(); ++entity)
@@ -85,6 +85,8 @@ void EntityManager::selectEntityAtPosition(const glm::vec3& position)
 			entity->setSelected(false);
 		}
 	}
+
+	return m_selectedEntityID != Globals::INVALID_ENTITY_ID;
 }
 
 void EntityManager::selectEntities(const SelectionBox& selectionBox)
