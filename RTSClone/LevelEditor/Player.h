@@ -6,7 +6,7 @@
 
 struct Player
 {
-	Player();
+	Player(const glm::vec3& startingHQPosition, const glm::vec3& startingMineralPosition);
 
 	void render(ShaderHandler& shaderHandler) const;
 

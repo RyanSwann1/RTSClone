@@ -15,6 +15,8 @@
 #include <imgui/imgui.h>
 #include <imgui_impl/imgui_wrapper.h>
 
+//https://eliasdaler.github.io/using-imgui-with-sfml-pt2/#getting-back-to-the-context-of-the-window-tree-etc
+
 void showPlayerDetails(Player& player, const std::string& playerName, const std::string& playerType, int ID)
 {
 	ImGui::PushID(ID); // Use object uid as identifier. Most commonly you could also use the object pointer as a base ID.
@@ -101,8 +103,8 @@ int main()
 	EntityManager entityManager(levelName);
 	sf::Clock gameClock;
 	Camera camera;
-	Player player;
-	Player playerAI;
+	Player player({ 35.0f, Globals::GROUND_HEIGHT, 15.f }, { 70.0f, Globals::GROUND_HEIGHT, Globals::NODE_SIZE });
+	Player playerAI({ 35.0f, Globals::GROUND_HEIGHT, 100.0f }, { 70.0f, Globals::GROUND_HEIGHT, 100.0f });
 	glm::vec3 previousMousePosition = { 0.0f, Globals::GROUND_HEIGHT, 0.0f };
 	bool plannedEntityActive = false;
 	bool showPlayerMenu = false;
@@ -269,7 +271,7 @@ int main()
 		}
 
 		//Demo
-		ImGui::ShowDemoWindow();
+		//ImGui::ShowDemoWindow();
 
 		//Render
 		glm::mat4 view = camera.getView();

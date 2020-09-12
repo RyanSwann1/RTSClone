@@ -1,13 +1,15 @@
 #include "Player.h"
 
-Player::Player()
+Player::Player(const glm::vec3& startingHQPosition, const glm::vec3& startingMineralPosition)
 	: m_minerals(),
-	m_HQ(eModelName::HQ, { 0.0f, 0.0f, 0.0f })
+	m_HQ(eModelName::HQ, Globals::convertToNodePosition(startingHQPosition))
 {
+	glm::vec3 mineralSpawnPosition = Globals::convertToNodePosition(startingMineralPosition);
 	for(auto& mineral : m_minerals)
 	{
 		mineral.setModelName(eModelName::Mineral);
-		mineral.setPosition({ 0.0f, 0.0f, 0.0f });
+		mineral.setPosition(mineralSpawnPosition);
+		mineralSpawnPosition.z += Globals::NODE_SIZE;
 	}
 }
 
