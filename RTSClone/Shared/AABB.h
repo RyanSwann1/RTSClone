@@ -11,14 +11,21 @@ class ShaderHandler;
 #ifdef GAME
 class Unit;
 #endif // GAME
-struct AABB
+class AABB
 {
+public:
 	AABB();
 	AABB(const glm::vec3& position, const glm::vec3& size);
 	AABB(const glm::vec3& position, const Model& model);
 #ifdef GAME
 	AABB(const std::vector<Unit*>& selectedUnits);
 #endif // GAME
+	float getLeft() const;
+	float getRight() const;
+	float getTop() const;
+	float getBottom() const;
+	float getForward() const;
+	float getBack() const;
 
 	bool contains(const glm::vec3& position) const;
 	bool contains(const AABB& other) const;
@@ -33,6 +40,7 @@ struct AABB
 	Mesh m_mesh;
 #endif // RENDER_AABB
 
+private:
 	float m_left;
 	float m_right;
 	float m_top;

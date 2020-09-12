@@ -108,6 +108,31 @@ AABB::AABB(const std::vector<Unit*>& selectedUnits)
 }
 #endif // GAME
 
+float AABB::getLeft() const
+{
+	return m_left;
+}
+float AABB::getRight() const
+{
+	return m_right;
+}
+float AABB::getTop() const
+{
+	return m_top;
+}
+float AABB::getBottom() const
+{
+	return m_bottom;
+}
+float AABB::getForward() const
+{
+	return m_forward;
+}
+float AABB::getBack() const
+{
+	return m_back;
+}
+
 bool AABB::contains(const glm::vec3& position) const
 {
 	return position.x >= m_left &&
