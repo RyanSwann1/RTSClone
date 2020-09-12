@@ -9,10 +9,61 @@
 #include "LevelFileHandler.h"
 #include "SelectionBox.h"
 #include "PlayableAreaDisplay.h"
+#include "Player.h"
 #include <SFML/Graphics.hpp>
 #include <iostream>
 #include <imgui/imgui.h>
 #include <imgui_impl/imgui_wrapper.h>
+
+void showPlayerDetails(Player& player)
+{
+	struct funcs
+	{
+		static void ShowDummyObject(Player& player, const std::string& playerName, const std::string& playerType, int ID)
+		{
+			ImGui::PushID(ID); // Use object uid as identifier. Most commonly you could also use the object pointer as a base ID.
+			ImGui::AlignTextToFramePadding();  // Text and Tree nodes are less high than regular widgets, here we add vertical spacing to make the tree lines equal high.
+			bool node_open = ImGui::TreeNode(playerName.c_str(), "%s_%u", playerType.c_str(), ID);
+			ImGui::NextColumn();
+			ImGui::AlignTextToFramePadding();
+			ImGui::NextColumn();
+			if (node_open)
+			{
+				{
+					ImGui::PushID(0);
+					ImGui::AlignTextToFramePadding();
+					ImGui::TreeNodeEx("HQ", ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_NoTreePushOnOpen | ImGuiTreeNodeFlags_Bullet);
+					ImGui::NextColumn();
+					if (ImGui::InputFloat("x", &player.m_HQ.getPosition().x, Globals::NODE_SIZE) ||
+						ImGui::InputFloat("z", &player.m_HQ.getPosition().z, Globals::NODE_SIZE))
+					{
+						player.m_HQ.resetAABB();
+					}
+					ImGui::PopID();
+				}
+
+				for (int i = 0; i < player.m_minerals.size(); ++i)
+				{
+					ImGui::PushID(i);
+					ImGui::AlignTextToFramePadding();
+					ImGui::TreeNodeEx("Mineral", ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_NoTreePushOnOpen | ImGuiTreeNodeFlags_Bullet, "Mineral_%d", i + 1);
+					ImGui::NextColumn();
+					if (ImGui::InputFloat("x", &player.m_minerals[i].getPosition().x, Globals::NODE_SIZE) ||
+						ImGui::InputFloat("z", &player.m_minerals[i].getPosition().z, Globals::NODE_SIZE))
+					{
+						player.m_minerals[i].resetAABB();
+					}
+					ImGui::PopID();
+				}
+			
+				ImGui::TreePop();
+			}
+			ImGui::PopID();
+		}
+	};
+
+	funcs::ShowDummyObject(player, "Player", "Human", 0);
+}
 
 int main()
 {
@@ -60,8 +111,10 @@ int main()
 	EntityManager entityManager(levelName);
 	sf::Clock gameClock;
 	Camera camera;
+	Player player;
 	glm::vec3 previousMousePosition = { 0.0f, Globals::GROUND_HEIGHT, 0.0f };
 	bool plannedEntityActive = false;
+	bool showPlayerMenu = false;
 	Entity plannedEntity(eModelName::RocksTall, { 0.0f, 0.0f, 0.0f });
 	int selected = 0;
 
@@ -161,12 +214,17 @@ int main()
 		camera.update(deltaTime);
 		ImGui_SFML_OpenGL3::startFrame();
 		ImGui::SetNextWindowSize(ImVec2(175, windowSize.y), ImGuiCond_FirstUseEver);
-		if (ImGui::Begin("Models", nullptr, ImGuiWindowFlags_MenuBar))
+		if (ImGui::Begin("Models", nullptr, ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoMove))
 		{
 			if (ImGui::BeginMenuBar())
 			{
 				if (ImGui::BeginMenu("File"))
 				{
+					if (ImGui::MenuItem("Player Details"))
+					{
+						showPlayerMenu = true;
+						//ImGui::EndChild();
+					}
 					if (ImGui::MenuItem("Close"))
 					{
 						window.close();
@@ -177,7 +235,7 @@ int main()
 				ImGui::EndMenuBar();
 			}
 
-			ImGui::BeginChild("left pane", ImVec2(175, 200), true);
+			ImGui::BeginChild("left pane", ImVec2(175, 250), true);
 			const auto& modelNames = ModelManager::getInstance().getModelNames();
 			for (int i = 0; i < modelNames.size(); i++)
 			{
@@ -196,9 +254,8 @@ int main()
 			if (selectedEntity)
 			{
 				ImGui::Separator();
-				//ImGui::NextColumn();
-				ImGui::BeginChild("Position", ImVec2(150, 150));
-				ImGui::Text("Entity Position");
+				ImGui::BeginChild("Position", ImVec2(150, 250));
+				ImGui::Text("Selected Entity Position");
 				if (ImGui::InputFloat("x", &selectedEntity->getPosition().x, Globals::NODE_SIZE) ||
 					ImGui::InputFloat("z", &selectedEntity->getPosition().z, Globals::NODE_SIZE))
 				{
@@ -206,11 +263,22 @@ int main()
 				}
 				ImGui::EndChild();
 			}
+
 		}
 		ImGui::End();
 
-		// DEMO!
-		ImGui::ShowDemoWindow(); //No idea if that is the correct name btw
+		if (showPlayerMenu)
+		{
+			ImGui::SetNextWindowPos(ImVec2(700, 700), ImGuiCond_FirstUseEver);
+			ImGui::Begin("Players", &showPlayerMenu, ImGuiWindowFlags_None);
+			ImGui::BeginChild("Players One");
+			showPlayerDetails(player);
+			ImGui::EndChild();
+			ImGui::End();
+		}
+
+		//Demo
+		ImGui::ShowDemoWindow();
 
 		//Render
 		glm::mat4 view = camera.getView();
@@ -228,6 +296,7 @@ int main()
 		{
 			plannedEntity.render(*shaderHandler);
 		}
+		player.render(*shaderHandler);
 
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
