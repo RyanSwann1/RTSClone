@@ -14,6 +14,24 @@ Model::Model(bool renderFromCentrePosition, const glm::vec3& AABBSizeFromCenter,
 	textures()
 {}
 
+void Model::render(ShaderHandler & shaderHandler, glm::vec3 entityPosition, bool entitySelected) const
+{
+	if (renderFromCentrePosition)
+	{
+		entityPosition.x += AABBSizeFromCenter.x;
+		entityPosition.z -= AABBSizeFromCenter.z;
+	}
+
+	glm::mat4 model = glm::translate(glm::mat4(1.0f), entityPosition);
+	model = glm::scale(model, scale);
+	shaderHandler.setUniformMat4f(eShaderType::Default, "uModel", model);
+
+	for (const auto& mesh : meshes)
+	{
+		mesh.render(shaderHandler, entitySelected);
+	}
+}
+
 std::unique_ptr<Model> Model::create(const std::string & fileName, bool renderFromCentrePosition, 
 	const glm::vec3& AABBSizeFromCenter, eModelName modelName, const glm::vec3& scale)
 {
@@ -38,37 +56,10 @@ void Model::attachMeshesToVAO() const
 
 void Model::render(ShaderHandler& shaderHandler, const glm::vec3& position) const
 {	
-	glm::vec3 modelPosition = position;
-	if (renderFromCentrePosition)
-	{
-		modelPosition.x += AABBSizeFromCenter.x;
-		modelPosition.z -= AABBSizeFromCenter.z;
-	}
-	glm::mat4 model = glm::translate(glm::mat4(1.0), modelPosition);
-	model = glm::scale(model, scale);
-	shaderHandler.setUniformMat4f(eShaderType::Default, "uModel", model);
-
-	for (const auto& mesh : meshes)
-	{
-		mesh.render(shaderHandler);
-	}
+	render(shaderHandler, position, false);
 }
 
 void Model::render(ShaderHandler& shaderHandler, const Entity& entity) const
 {
-	glm::vec3 entityPosition = entity.getPosition();
-	if (renderFromCentrePosition)
-	{
-		entityPosition.x += (entity.getAABB().m_right - entity.getAABB().m_left) / 2.0f;
-		entityPosition.z -= (entity.getAABB().m_forward - entity.getAABB().m_back) / 2.0f;
-	}
-
-	glm::mat4 model = glm::translate(glm::mat4(1.0f), entityPosition);
-	model = glm::scale(model, scale);
-	shaderHandler.setUniformMat4f(eShaderType::Default, "uModel", model);
-
-	for (const auto& mesh : meshes)
-	{
-		mesh.render(shaderHandler, entity.isSelected());
-	}
+	render(shaderHandler, entity.getPosition(), entity.isSelected());
 }

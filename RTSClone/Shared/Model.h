@@ -28,4 +28,6 @@ struct Model : private NonMovable, private NonCopyable
 	
 private:
 	Model(bool renderFromCentrePosition, const glm::vec3& sizeFromCentre, eModelName modelName, const glm::vec3& scale);
+
+	void render(ShaderHandler& shaderHandler, glm::vec3 entityPosition, bool entitySelected) const;
 };
