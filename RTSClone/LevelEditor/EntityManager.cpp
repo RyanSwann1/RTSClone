@@ -23,13 +23,19 @@ EntityManager::EntityManager(std::string fileName)
 
 Entity* EntityManager::getSelectedEntity()
 {
-	int selectedEntityID = m_selectedEntityID;
-	auto selectedEntity = std::find_if(m_entities.begin(), m_entities.end(), [selectedEntityID](const auto& entity)
+	if(m_selectedEntityID != Globals::INVALID_ENTITY_ID)
 	{
-		return entity.getID() == selectedEntityID;
-	});
+		int selectedEntityID = m_selectedEntityID;
+		auto selectedEntity = std::find_if(m_entities.begin(), m_entities.end(), [selectedEntityID](const auto& entity)
+		{
+			return entity.getID() == selectedEntityID;
+		});
+		
+		assert(selectedEntity != m_entities.end());
+		return &(*selectedEntity);
+	}
 
-	return (selectedEntity != m_entities.end() ? &(*selectedEntity) : nullptr);
+	return nullptr;
 }
 
 const std::vector<Entity>& EntityManager::getEntities() const
