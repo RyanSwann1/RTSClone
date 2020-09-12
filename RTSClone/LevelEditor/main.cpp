@@ -19,28 +19,26 @@ void showPlayerDetails(Player& player, const std::string& playerName, const std:
 {
 	ImGui::PushID(ID); // Use object uid as identifier. Most commonly you could also use the object pointer as a base ID.
 	ImGui::AlignTextToFramePadding();  // Text and Tree nodes are less high than regular widgets, here we add vertical spacing to make the tree lines equal high.
-	bool node_open = ImGui::TreeNode(playerName.c_str(), "%s_%u", playerType.c_str(), ID);
+	bool nodeOpen = ImGui::TreeNode(playerName.c_str(), "%s_%u", playerType.c_str(), ID);
 	ImGui::NextColumn();
 	ImGui::AlignTextToFramePadding();
 	ImGui::NextColumn();
-	if (node_open)
+	if (nodeOpen)
 	{
+		ImGui::PushID(0);
+		ImGui::AlignTextToFramePadding();
+		ImGui::TreeNodeEx("HQ", ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_NoTreePushOnOpen | ImGuiTreeNodeFlags_Bullet);
+		ImGui::NextColumn();
+		if (ImGui::InputFloat("x", &player.m_HQ.getPosition().x, Globals::NODE_SIZE) ||
+			ImGui::InputFloat("z", &player.m_HQ.getPosition().z, Globals::NODE_SIZE))
 		{
-			ImGui::PushID(0);
-			ImGui::AlignTextToFramePadding();
-			ImGui::TreeNodeEx("HQ", ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_NoTreePushOnOpen | ImGuiTreeNodeFlags_Bullet);
-			ImGui::NextColumn();
-			if (ImGui::InputFloat("x", &player.m_HQ.getPosition().x, Globals::NODE_SIZE) ||
-				ImGui::InputFloat("z", &player.m_HQ.getPosition().z, Globals::NODE_SIZE))
-			{
-				player.m_HQ.resetAABB();
-			}
-			ImGui::PopID();
+			player.m_HQ.resetAABB();
 		}
+		ImGui::PopID();	
 
 		for (int i = 0; i < player.m_minerals.size(); ++i)
 		{
-			ImGui::PushID(i);
+			ImGui::PushID(i + 1);
 			ImGui::AlignTextToFramePadding();
 			ImGui::TreeNodeEx("Mineral", ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_NoTreePushOnOpen | ImGuiTreeNodeFlags_Bullet, "Mineral_%d", i + 1);
 			ImGui::NextColumn();
@@ -104,6 +102,7 @@ int main()
 	sf::Clock gameClock;
 	Camera camera;
 	Player player;
+	Player playerAI;
 	glm::vec3 previousMousePosition = { 0.0f, Globals::GROUND_HEIGHT, 0.0f };
 	bool plannedEntityActive = false;
 	bool showPlayerMenu = false;
@@ -264,6 +263,7 @@ int main()
 			ImGui::Begin("Players", &showPlayerMenu, ImGuiWindowFlags_None);
 			ImGui::BeginChild("Players One");
 			showPlayerDetails(player, "Player", "Human", 0);
+			showPlayerDetails(playerAI, "Player", "AI", 1);
 			ImGui::EndChild();
 			ImGui::End();
 		}
@@ -288,6 +288,7 @@ int main()
 			plannedEntity.render(*shaderHandler);
 		}
 		player.render(*shaderHandler);
+		playerAI.render(*shaderHandler);
 
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);

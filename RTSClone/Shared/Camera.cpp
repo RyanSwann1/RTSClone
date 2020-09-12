@@ -107,7 +107,7 @@ void Camera::update(float deltaTime)
 void Camera::zoom(float mouseWheelDelta)
 {
 	glm::vec3 newPosition = { 0.0f, 0.0f, 0.0f };
-	if (mouseWheelDelta > 0.0f)
+	if (mouseWheelDelta > 0)
 	{
 		newPosition = position + glm::normalize(front) * ZOOM_STEP;
 		if (newPosition.y >= MAXIMUM_ZOOM_HEIGHT)
