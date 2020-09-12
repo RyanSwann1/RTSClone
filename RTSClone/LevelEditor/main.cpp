@@ -15,54 +15,46 @@
 #include <imgui/imgui.h>
 #include <imgui_impl/imgui_wrapper.h>
 
-void showPlayerDetails(Player& player)
+void showPlayerDetails(Player& player, const std::string& playerName, const std::string& playerType, int ID)
 {
-	struct funcs
+	ImGui::PushID(ID); // Use object uid as identifier. Most commonly you could also use the object pointer as a base ID.
+	ImGui::AlignTextToFramePadding();  // Text and Tree nodes are less high than regular widgets, here we add vertical spacing to make the tree lines equal high.
+	bool node_open = ImGui::TreeNode(playerName.c_str(), "%s_%u", playerType.c_str(), ID);
+	ImGui::NextColumn();
+	ImGui::AlignTextToFramePadding();
+	ImGui::NextColumn();
+	if (node_open)
 	{
-		static void ShowDummyObject(Player& player, const std::string& playerName, const std::string& playerType, int ID)
 		{
-			ImGui::PushID(ID); // Use object uid as identifier. Most commonly you could also use the object pointer as a base ID.
-			ImGui::AlignTextToFramePadding();  // Text and Tree nodes are less high than regular widgets, here we add vertical spacing to make the tree lines equal high.
-			bool node_open = ImGui::TreeNode(playerName.c_str(), "%s_%u", playerType.c_str(), ID);
-			ImGui::NextColumn();
+			ImGui::PushID(0);
 			ImGui::AlignTextToFramePadding();
+			ImGui::TreeNodeEx("HQ", ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_NoTreePushOnOpen | ImGuiTreeNodeFlags_Bullet);
 			ImGui::NextColumn();
-			if (node_open)
+			if (ImGui::InputFloat("x", &player.m_HQ.getPosition().x, Globals::NODE_SIZE) ||
+				ImGui::InputFloat("z", &player.m_HQ.getPosition().z, Globals::NODE_SIZE))
 			{
-				{
-					ImGui::PushID(0);
-					ImGui::AlignTextToFramePadding();
-					ImGui::TreeNodeEx("HQ", ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_NoTreePushOnOpen | ImGuiTreeNodeFlags_Bullet);
-					ImGui::NextColumn();
-					if (ImGui::InputFloat("x", &player.m_HQ.getPosition().x, Globals::NODE_SIZE) ||
-						ImGui::InputFloat("z", &player.m_HQ.getPosition().z, Globals::NODE_SIZE))
-					{
-						player.m_HQ.resetAABB();
-					}
-					ImGui::PopID();
-				}
-
-				for (int i = 0; i < player.m_minerals.size(); ++i)
-				{
-					ImGui::PushID(i);
-					ImGui::AlignTextToFramePadding();
-					ImGui::TreeNodeEx("Mineral", ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_NoTreePushOnOpen | ImGuiTreeNodeFlags_Bullet, "Mineral_%d", i + 1);
-					ImGui::NextColumn();
-					if (ImGui::InputFloat("x", &player.m_minerals[i].getPosition().x, Globals::NODE_SIZE) ||
-						ImGui::InputFloat("z", &player.m_minerals[i].getPosition().z, Globals::NODE_SIZE))
-					{
-						player.m_minerals[i].resetAABB();
-					}
-					ImGui::PopID();
-				}
-			
-				ImGui::TreePop();
+				player.m_HQ.resetAABB();
 			}
 			ImGui::PopID();
 		}
-	};
 
-	funcs::ShowDummyObject(player, "Player", "Human", 0);
+		for (int i = 0; i < player.m_minerals.size(); ++i)
+		{
+			ImGui::PushID(i);
+			ImGui::AlignTextToFramePadding();
+			ImGui::TreeNodeEx("Mineral", ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_NoTreePushOnOpen | ImGuiTreeNodeFlags_Bullet, "Mineral_%d", i + 1);
+			ImGui::NextColumn();
+			if (ImGui::InputFloat("x", &player.m_minerals[i].getPosition().x, Globals::NODE_SIZE) ||
+				ImGui::InputFloat("z", &player.m_minerals[i].getPosition().z, Globals::NODE_SIZE))
+			{
+				player.m_minerals[i].resetAABB();
+			}
+			ImGui::PopID();
+		}
+			
+		ImGui::TreePop();
+	}
+	ImGui::PopID();
 }
 
 int main()
@@ -223,7 +215,6 @@ int main()
 					if (ImGui::MenuItem("Player Details"))
 					{
 						showPlayerMenu = true;
-						//ImGui::EndChild();
 					}
 					if (ImGui::MenuItem("Close"))
 					{
@@ -272,7 +263,7 @@ int main()
 			ImGui::SetNextWindowPos(ImVec2(700, 700), ImGuiCond_FirstUseEver);
 			ImGui::Begin("Players", &showPlayerMenu, ImGuiWindowFlags_None);
 			ImGui::BeginChild("Players One");
-			showPlayerDetails(player);
+			showPlayerDetails(player, "Player", "Human", 0);
 			ImGui::EndChild();
 			ImGui::End();
 		}
