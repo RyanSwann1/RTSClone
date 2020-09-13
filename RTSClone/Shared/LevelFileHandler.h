@@ -11,7 +11,7 @@ class EntityManager;
 namespace LevelFileHandler
 {
 #ifdef LEVEL_EDITOR
-	void saveLevelToFile(const std::string& fileName, const EntityManager& entityManager, 
+	bool saveLevelToFile(const std::string& fileName, const EntityManager& entityManager, 
 		const Player& player, const Player& playerAI);
 	bool loadLevelFromFile(const std::string& fileName, EntityManager& entityManager,
 		Player& player, Player& playerAI);

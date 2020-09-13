@@ -10,15 +10,22 @@
 #include <sstream>
 
 #ifdef LEVEL_EDITOR
-void LevelFileHandler::saveLevelToFile(const std::string& fileName, const EntityManager& entityManager,
+bool LevelFileHandler::saveLevelToFile(const std::string& fileName, const EntityManager& entityManager,
 	const Player& player, const Player& playerAI)
 {
 	std::ofstream file(Globals::SHARED_FILE_DIRECTORY + fileName);
+	assert(file.is_open());
+	if (!file.is_open())
+	{
+		return false;
+	}
+
 	file << player;
 	file << playerAI;
 	file << entityManager;
-	
 	file.close();
+
+	return true;
 }
 
 bool LevelFileHandler::loadLevelFromFile(const std::string& fileName, EntityManager& entityManager, Player& player, Player& playerAI)
@@ -32,7 +39,6 @@ bool LevelFileHandler::loadLevelFromFile(const std::string& fileName, EntityMana
 	file >> player;
 	file >> playerAI;
 	file >> entityManager;
-
 	file.close();
 
 	return true;
