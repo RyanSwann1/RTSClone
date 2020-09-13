@@ -13,6 +13,7 @@ struct Player
 
 	void render(ShaderHandler& shaderHandler) const;
 	
+	friend const std::ifstream& operator>>(std::ifstream& file, Player& player);
 	friend std::ostream& operator<<(std::ostream& ostream, const Player& player);
 
 	const ePlayerType type;
