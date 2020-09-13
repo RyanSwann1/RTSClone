@@ -5,24 +5,20 @@
 #include "Globals.h"
 #include "Entity.h"
 #include "ModelName.h"
+#include "Player.h"
 #include <fstream>
 #include <sstream>
 
 #ifdef LEVEL_EDITOR
-void LevelFileHandler::saveLevelToFile(const std::string& fileName, const EntityManager& entityManager)
+void LevelFileHandler::saveLevelToFile(const std::string& fileName, const EntityManager& entityManager,
+	const Player& player, const Player& playerAI)
 {
-	std::stringstream stringStream;
-	
-	for (const auto& entity : entityManager.getEntities())
-	{
-		stringStream << static_cast<int>(entity.getModelName()) << " " <<
-			entity.getPosition().x << " " << entity.getPosition().y << " " << entity.getPosition().z << "\n";
-	}
-
 	std::ofstream file(Globals::SHARED_FILE_DIRECTORY + fileName);
-	file << stringStream.str();
+	file << player;
+	file << playerAI;
+	file << entityManager;
+	
 	file.close();
-	stringStream.clear();
 }
 #endif // LEVEL_EDITOR
 
