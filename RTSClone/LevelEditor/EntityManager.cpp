@@ -15,10 +15,7 @@ EntityManager::EntityManager(std::string fileName)
 	: m_entities(),
 	m_selectedEntityID(Globals::INVALID_ENTITY_ID)
 {
-	if (!LevelFileHandler::loadLevelFromFile(fileName, m_entities))
-	{
-		m_entities.emplace_back(eModelName::Terrain, TERRAIN_STARTING_POSITION);
-	}
+	m_entities.emplace_back(eModelName::Terrain, TERRAIN_STARTING_POSITION);
 }
 
 Entity* EntityManager::getSelectedEntity()
@@ -137,3 +134,15 @@ void EntityManager::renderEntityAABB(ShaderHandler& shaderHandler)
 	}
 }
 #endif // RENDER_AABB
+
+std::ostream& operator<<(std::ostream& ostream, const EntityManager& entityManager)
+{
+	ostream << Globals::TEXT_HEADER_SCENERY;
+	for (const auto& entity : entityManager.m_entities)
+	{
+		ostream << static_cast<int>(entity.getModelName()) << " " <<
+			entity.getPosition().x << " " << entity.getPosition().y << " " << entity.getPosition().z << "\n";
+	}
+	
+	return ostream;
+}

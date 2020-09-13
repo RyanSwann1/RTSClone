@@ -4,8 +4,8 @@
 #include "NonMovable.h"
 #include "Entity.h"
 #include <vector>
-#include <string>
 #include <memory>
+#include <ostream>
 
 struct SelectionBox;
 class ShaderHandler;
@@ -23,6 +23,8 @@ public:
 	bool selectEntityAtPosition(const glm::vec3& position);
 	void selectEntities(const SelectionBox& selectionBox);
 	void render(ShaderHandler& shaderHandler) const;
+
+	friend std::ostream& operator<<(std::ostream& ostream, const EntityManager& entityManager);
 
 #ifdef RENDER_AABB
 	void renderEntityAABB(ShaderHandler& shaderHandler);
