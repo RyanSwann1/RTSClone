@@ -31,23 +31,23 @@ void showPlayerDetails(Player& player, const std::string& playerName, const std:
 		ImGui::AlignTextToFramePadding();
 		ImGui::TreeNodeEx("HQ", ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_NoTreePushOnOpen | ImGuiTreeNodeFlags_Bullet);
 		ImGui::NextColumn();
-		if (ImGui::InputFloat("x", &player.m_HQ.getPosition().x, Globals::NODE_SIZE) ||
-			ImGui::InputFloat("z", &player.m_HQ.getPosition().z, Globals::NODE_SIZE))
+		if (ImGui::InputFloat("x", &player.HQ.getPosition().x, Globals::NODE_SIZE) ||
+			ImGui::InputFloat("z", &player.HQ.getPosition().z, Globals::NODE_SIZE))
 		{
-			player.m_HQ.resetAABB();
+			player.HQ.resetAABB();
 		}
 		ImGui::PopID();	
 
-		for (int i = 0; i < player.m_minerals.size(); ++i)
+		for (int i = 0; i < player.minerals.size(); ++i)
 		{
 			ImGui::PushID(i + 1);
 			ImGui::AlignTextToFramePadding();
 			ImGui::TreeNodeEx("Mineral", ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_NoTreePushOnOpen | ImGuiTreeNodeFlags_Bullet, "Mineral_%d", i + 1);
 			ImGui::NextColumn();
-			if (ImGui::InputFloat("x", &player.m_minerals[i].getPosition().x, Globals::NODE_SIZE) ||
-				ImGui::InputFloat("z", &player.m_minerals[i].getPosition().z, Globals::NODE_SIZE))
+			if (ImGui::InputFloat("x", &player.minerals[i].getPosition().x, Globals::NODE_SIZE) ||
+				ImGui::InputFloat("z", &player.minerals[i].getPosition().z, Globals::NODE_SIZE))
 			{
-				player.m_minerals[i].resetAABB();
+				player.minerals[i].resetAABB();
 			}
 			ImGui::PopID();
 		}
@@ -56,6 +56,8 @@ void showPlayerDetails(Player& player, const std::string& playerName, const std:
 	}
 	ImGui::PopID();
 }
+
+constexpr glm::vec3 TERRAIN_STARTING_POSITION = { 0.0f, Globals::GROUND_HEIGHT - 0.01f, 0.0f };
 
 int main()
 {
@@ -66,10 +68,10 @@ int main()
 	settings.majorVersion = 3;
 	settings.minorVersion = 3;
 	settings.attributeFlags = sf::ContextSettings::Core;
-	glm::uvec2 windowSize(1280, 800);
-	//glm::uvec2 windowSize(1980, 1080);
-	sf::Window window(sf::VideoMode(windowSize.x, windowSize.y), "Level Editor", sf::Style::Default, settings);
-	//sf::Window window(sf::VideoMode(windowSize.x, windowSize.y), "Level Editor", sf::Style::Fullscreen, settings);
+	//glm::uvec2 windowSize(1280, 800);
+	glm::uvec2 windowSize(1980, 1080);
+	//sf::Window window(sf::VideoMode(windowSize.x, windowSize.y), "Level Editor", sf::Style::Default, settings);
+	sf::Window window(sf::VideoMode(windowSize.x, windowSize.y), "Level Editor", sf::Style::Fullscreen, settings);
 	window.setFramerateLimit(60);
 	window.setMouseCursorGrabbed(true);
 	gladLoadGL();
@@ -100,16 +102,22 @@ int main()
 	const std::string levelName = "Level.txt";
 	PlayableAreaDisplay playableAreaDisplay;
 	SelectionBox selectionBox;
-	EntityManager entityManager(levelName);
+	EntityManager entityManager;
 	sf::Clock gameClock;
 	Camera camera;
-	Player player({ 35.0f, Globals::GROUND_HEIGHT, 15.f }, { 70.0f, Globals::GROUND_HEIGHT, Globals::NODE_SIZE });
-	Player playerAI({ 35.0f, Globals::GROUND_HEIGHT, 100.0f }, { 70.0f, Globals::GROUND_HEIGHT, 100.0f });
+	Player player(ePlayerType::Human, { 35.0f, Globals::GROUND_HEIGHT, 15.f }, { 70.0f, Globals::GROUND_HEIGHT, Globals::NODE_SIZE });
+	Player playerAI(ePlayerType::AI, { 35.0f, Globals::GROUND_HEIGHT, 100.0f }, { 70.0f, Globals::GROUND_HEIGHT, 100.0f });
 	glm::vec3 previousMousePosition = { 0.0f, Globals::GROUND_HEIGHT, 0.0f };
 	bool plannedEntityActive = false;
 	bool showPlayerMenu = false;
 	Entity plannedEntity(eModelName::RocksTall, { 0.0f, 0.0f, 0.0f });
 	int selected = 0;
+	
+	if (!LevelFileHandler::loadLevelFromFile(levelName, entityManager, player, playerAI))
+	{
+		std::cout << "Failed to load level\n";
+		entityManager.addEntity(eModelName::Terrain, TERRAIN_STARTING_POSITION);
+	}
 
 	std::cout << glGetError() << "\n";
 	std::cout << glGetError() << "\n";
@@ -134,7 +142,10 @@ int main()
 					window.close();
 					break;
 				case sf::Keyboard::Enter:
-					LevelFileHandler::saveLevelToFile(levelName, entityManager);
+					if (!LevelFileHandler::saveLevelToFile(levelName, entityManager, player, playerAI))
+					{
+						std::cout << "Unable to save file " + levelName << "\n";
+					}
 					break;
 				case sf::Keyboard::Delete:
 					entityManager.removeAllSelectedEntities();
