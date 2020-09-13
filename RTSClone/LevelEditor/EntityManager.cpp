@@ -5,18 +5,13 @@
 #include "SelectionBox.h"
 #include <assert.h>
 #include <imgui/imgui.h>
+#include <fstream>
+#include <sstream>
 
-namespace
-{
-	constexpr glm::vec3 TERRAIN_STARTING_POSITION = { 0.0f, Globals::GROUND_HEIGHT - 0.01f, 0.0f };
-}
-
-EntityManager::EntityManager(std::string fileName)
+EntityManager::EntityManager()
 	: m_entities(),
 	m_selectedEntityID(Globals::INVALID_ENTITY_ID)
-{
-	m_entities.emplace_back(eModelName::Terrain, TERRAIN_STARTING_POSITION);
-}
+{}
 
 Entity* EntityManager::getSelectedEntity()
 {
@@ -42,7 +37,11 @@ const std::vector<Entity>& EntityManager::getEntities() const
 
 void EntityManager::addEntity(eModelName modelName, const glm::vec3& position)
 {
-	assert(Globals::isOnNodePosition(position));
+	if (modelName != eModelName::Terrain)
+	{
+		assert(Globals::isOnNodePosition(position));
+	}
+
 	auto entity = std::find_if(m_entities.cbegin(), m_entities.cend(), [&position](const auto& gameObject)
 	{
 		return gameObject.getPosition() == position;
@@ -135,9 +134,42 @@ void EntityManager::renderEntityAABB(ShaderHandler& shaderHandler)
 }
 #endif // RENDER_AABB
 
+const std::ifstream& operator>>(std::ifstream& file, EntityManager& entityManager)
+{
+	assert(file.is_open());
+	bool beginReadingFromFile = false;
+	std::string line;
+	while (getline(file, line))
+	{
+		if (beginReadingFromFile)
+		{
+			if (line[0] == *Globals::TEXT_HEADER_BEGINNING.c_str())
+			{
+				file.clear();
+				file.seekg(0);
+				break;
+			}
+
+			std::stringstream stream{ line };
+			std::string rawModelName;
+			glm::vec3 position;
+			stream >> rawModelName >> position.x >> position.y >> position.z;
+
+			entityManager.m_entities.emplace_back(static_cast<eModelName>(std::stoi(rawModelName)), position);
+		}
+		else if (line == Globals::TEXT_HEADER_SCENERY)
+		{
+			assert(!beginReadingFromFile);
+			beginReadingFromFile = true;
+		}
+	}
+
+	return file;
+}
+
 std::ostream& operator<<(std::ostream& ostream, const EntityManager& entityManager)
 {
-	ostream << Globals::TEXT_HEADER_SCENERY;
+	ostream << Globals::TEXT_HEADER_SCENERY << "\n";
 	for (const auto& entity : entityManager.m_entities)
 	{
 		ostream << static_cast<int>(entity.getModelName()) << " " <<

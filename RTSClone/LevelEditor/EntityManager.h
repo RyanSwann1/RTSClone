@@ -13,7 +13,7 @@ enum class eModelName;
 class EntityManager : private NonCopyable, private NonMovable
 {
 public:
-	EntityManager(std::string fileName = std::string());
+	EntityManager();
 
 	Entity* getSelectedEntity();
 	const std::vector<Entity>& getEntities() const;
@@ -24,6 +24,7 @@ public:
 	void selectEntities(const SelectionBox& selectionBox);
 	void render(ShaderHandler& shaderHandler) const;
 
+	friend const std::ifstream& operator>>(std::ifstream& file, EntityManager& entityManager);
 	friend std::ostream& operator<<(std::ostream& ostream, const EntityManager& entityManager);
 
 #ifdef RENDER_AABB
