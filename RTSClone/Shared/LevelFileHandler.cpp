@@ -20,6 +20,23 @@ void LevelFileHandler::saveLevelToFile(const std::string& fileName, const Entity
 	
 	file.close();
 }
+
+bool LevelFileHandler::loadLevelFromFile(const std::string& fileName, EntityManager& entityManager, Player& player, Player& playerAI)
+{
+	std::ifstream file(Globals::SHARED_FILE_DIRECTORY + fileName);
+	if (!file.is_open())
+	{
+		return false;
+	}
+
+	file >> player;
+	file >> playerAI;
+	file >> entityManager;
+
+	file.close();
+
+	return true;
+}
 #endif // LEVEL_EDITOR
 
 bool LevelFileHandler::loadLevelFromFile(const std::string& fileName, std::vector<Entity>& scenery)
