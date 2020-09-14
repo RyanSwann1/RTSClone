@@ -111,26 +111,6 @@ namespace
 		assert(std::find(models.cbegin(), models.cend(), nullptr) == models.cend());
 		return models;
 	}
-
-	std::unordered_map<std::string, eModelName> getModelNameConversions()
-	{
-		std::unordered_map<std::string, eModelName> modelNameConversions;
-
-		modelNameConversions.emplace("Terrain", eModelName::Terrain);
-		modelNameConversions.emplace("Meteor", eModelName::Meteor);
-		modelNameConversions.emplace("RocksTall", eModelName::RocksTall);
-		modelNameConversions.emplace("Unit", eModelName::Unit);
-		modelNameConversions.emplace("HQ", eModelName::HQ);
-		modelNameConversions.emplace("Mineral", eModelName::Mineral);
-		modelNameConversions.emplace("WorkerMineral", eModelName::WorkerMineral);
-		modelNameConversions.emplace("Waypoint", eModelName::Waypoint);
-		modelNameConversions.emplace("Worker", eModelName::Worker);
-		modelNameConversions.emplace("Projectile", eModelName::Projectile);
-		modelNameConversions.emplace("SupplyDepot", eModelName::SupplyDepot);
-		modelNameConversions.emplace("Barracks", eModelName::Barracks);
-	
-		return modelNameConversions;
-	}
 }
 
 bool ModelManager::isAllModelsLoaded() const
@@ -174,8 +154,5 @@ const Model& ModelManager::getModel(eEntityType entityType) const
 
 ModelManager::ModelManager()
 	: m_loadedAllModels(true),
-	m_models(loadModels(m_loadedAllModels)),
-#ifdef LEVEL_EDITOR
-	m_modelNameConversions(getModelNameConversions())
-#endif // LEVEL_EDITOR
+	m_models(loadModels(m_loadedAllModels))
 {}

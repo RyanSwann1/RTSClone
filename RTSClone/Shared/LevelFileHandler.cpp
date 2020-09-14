@@ -3,12 +3,14 @@
 #include "EntityManager.h"
 #include "Player.h"
 #endif // LEVEL_EDITOR
-#include "Globals.h"
-#include "Entity.h"
-#include "ModelName.h"
+#ifdef GAME
 #include "FactionPlayer.h"
 #include "FactionAI.h"
 #include "SceneryGameObject.h"
+#endif // GAME
+#include "Globals.h"
+#include "Entity.h"
+#include "ModelName.h"
 #include <fstream>
 #include <sstream>
 

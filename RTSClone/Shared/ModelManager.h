@@ -34,8 +34,21 @@ private:
 	ModelManager();
 	bool m_loadedAllModels;
 	const std::array<std::unique_ptr<Model>, static_cast<size_t>(eModelName::Max) + 1> m_models;
-#ifdef LEVEL_EDITOR
-	const std::unordered_map<std::string, eModelName> m_modelNameConversions;
+#ifdef LEVEL_EDITOR	
+	const std::unordered_map<std::string, eModelName> m_modelNameConversions
+	{
+		{"Terrain", eModelName::Terrain},
+		{"Meteor", eModelName::Meteor},
+		{"RocksTall", eModelName::RocksTall},
+		{"Unit", eModelName::Unit},
+		{"Mineral", eModelName::Mineral},
+		{"WorkerMineral", eModelName::WorkerMineral},
+		{"Waypoint", eModelName::Waypoint},
+		{"Worker", eModelName::Worker},
+		{"Projectile", eModelName::Projectile},
+		{"SupplyDepot", eModelName::SupplyDepot},
+		{"Barracks", eModelName::Barracks}
+	};
 	const std::array<std::string, static_cast<size_t>(eModelName::Max) + 1> m_modelNames
 	{
 		"Terrain",
