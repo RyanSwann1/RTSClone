@@ -20,10 +20,14 @@ public:
 	Entity& operator=(Entity&&) noexcept;
 
 #ifdef LEVEL_EDITOR
+	Entity();
 	Entity(eModelName modelName, const glm::vec3& startingPosition);
+	glm::vec3& getPosition();
 	void setModelName(eModelName modelName);
 	void setPosition(const glm::vec3& position);
 	eModelName getModelName() const;
+
+	void resetAABB();
 #endif // LEVEL_EDITOR
 #ifdef GAME
 	eEntityType getEntityType() const;

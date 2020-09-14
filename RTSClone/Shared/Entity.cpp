@@ -35,6 +35,14 @@ Entity::Entity(const glm::vec3& startingPosition, eEntityType entityType)
 #endif // GAME
 
 #ifdef LEVEL_EDITOR
+Entity::Entity()
+	: m_position(),
+	m_AABB(),
+	m_ID(UniqueEntityIDDistributer::getInstance().getUniqueEntityID()),
+	m_modelName(),
+	m_selected(false)
+{}
+
 Entity::Entity(eModelName modelName, const glm::vec3& startingPosition)
 	: m_position(startingPosition),
 	m_AABB(),
@@ -45,6 +53,11 @@ Entity::Entity(eModelName modelName, const glm::vec3& startingPosition)
 	m_AABB.reset(m_position, ModelManager::getInstance().getModel(m_modelName));
 }
 
+glm::vec3& Entity::getPosition()
+{
+	return m_position;
+}
+
 void Entity::setModelName(eModelName modelName)
 {
 	m_modelName = modelName;
@@ -53,6 +66,15 @@ void Entity::setModelName(eModelName modelName)
 void Entity::setPosition(const glm::vec3 & position)
 {
 	m_position = position;
+}
+
+eModelName Entity::getModelName() const
+{
+	return m_modelName;
+}
+void Entity::resetAABB()
+{
+	m_AABB.reset(m_position, ModelManager::getInstance().getModel(m_modelName));
 }
 #endif // LEVEL_EDITOR
 
@@ -93,13 +115,6 @@ int Entity::getID() const
 {
 	return m_ID;
 }
-
-#ifdef LEVEL_EDITOR
-eModelName Entity::getModelName() const
-{
-	return m_modelName;
-}
-#endif // LEVEL_EDITOR
 
 #ifdef GAME
 eEntityType Entity::getEntityType() const
