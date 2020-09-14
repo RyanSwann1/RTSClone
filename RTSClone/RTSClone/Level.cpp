@@ -3,68 +3,97 @@
 #include "GameEventHandler.h"
 #include "GameMessenger.h"
 #include "GameMessages.h"
+#include "ModelManager.h"
 
-Level::Level(std::vector<GameObject>&& scenery)
+namespace
+{
+	Faction& getFaction(std::vector<std::unique_ptr<Faction>>& factions, eFactionName factionName)
+	{
+		auto faction = std::find_if(factions.begin(), factions.end(), [factionName](const auto& faction)
+		{
+			return faction->getName() == factionName;
+		});
+		assert(faction != factions.end());
+		
+		return *faction->get();
+	}
+}
+
+Level::Level(std::vector<SceneryGameObject>&& scenery, std::vector<std::unique_ptr<Faction>>&& factions)
 	: m_scenery(std::move(scenery)),
 	m_map(),
 	m_projectileHandler(),
-	m_player(eFactionName::Player, { 35.0f, Globals::GROUND_HEIGHT, 15.f }, { 70.0f, Globals::GROUND_HEIGHT, Globals::NODE_SIZE }),
-	m_playerAI(eFactionName::AI, { 35.0f, Globals::GROUND_HEIGHT, 100.0f }, { 70.0f, Globals::GROUND_HEIGHT, 100.0f }, m_player)
+	m_factions(std::move(factions)),
+	m_player(static_cast<FactionPlayer*>(&getFaction(m_factions, eFactionName::Player))),
+	m_playerAI(static_cast<FactionAI*>(&getFaction(m_factions, eFactionName::AI)))
 {
 	for (const auto& gameObject : m_scenery)
 	{
 		if (gameObject.modelName != eModelName::Terrain)
 		{
-			GameMessenger::getInstance().broadcast<GameMessages::MapModification<eGameMessageType::AddEntityToMap>>({ gameObject.AABB });
+			AABB AABB(gameObject.position, ModelManager::getInstance().getModel(gameObject.modelName));
+			GameMessenger::getInstance().broadcast<GameMessages::MapModification<eGameMessageType::AddEntityToMap>>({ AABB });
 		}
 	}
 }
 
 std::unique_ptr<Level> Level::create(const std::string& levelName)
 {
-	std::vector<GameObject> scenery;
-	if (!LevelFileHandler::loadLevelFromFile(levelName, scenery))
+	std::vector<SceneryGameObject> scenery;
+	std::vector<std::unique_ptr<Faction>> factions;
+	if (!LevelFileHandler::loadLevelFromFile(levelName, scenery, factions))
 	{
 		return std::unique_ptr<Level>();
 	}
 
-	return std::unique_ptr<Level>(new Level(std::move(scenery)));
+	return std::unique_ptr<Level>(new Level(std::move(scenery), std::move(factions)));
 }
 
 Level::~Level()
 {
-	for (const auto& gameObject : m_scenery)
+	for (auto gameObject = m_scenery.begin(); gameObject != m_scenery.end();)
 	{
-		if (gameObject.modelName != eModelName::Terrain)
+		if (gameObject->modelName != eModelName::Terrain)
 		{
-			GameMessenger::getInstance().broadcast<GameMessages::MapModification<eGameMessageType::RemoveEntityFromMap>>({ gameObject.AABB });
+			AABB AABB(gameObject->position, ModelManager::getInstance().getModel(gameObject->modelName));
+			GameMessenger::getInstance().broadcast<GameMessages::MapModification<eGameMessageType::RemoveEntityFromMap>>({ AABB });
 		}
+
+		gameObject = m_scenery.erase(gameObject);
 	}
 }
 
 void Level::handleInput(const sf::Window& window, const Camera& camera, const sf::Event& currentSFMLEvent)
 {
-	m_player.handleInput(currentSFMLEvent, window, camera, m_map, m_playerAI);
+	m_player->handleInput(currentSFMLEvent, window, camera, m_map, *m_playerAI);
 }
 
 void Level::update(float deltaTime)
 {
-	m_projectileHandler.update(deltaTime, m_player, m_playerAI);
-	m_player.update(deltaTime, m_map, m_playerAI);
-	m_playerAI.update(deltaTime, m_map, m_player);
+	m_projectileHandler.update(deltaTime, *m_player, *m_playerAI);
+	
+	m_player->update(deltaTime, m_map, *m_playerAI);
+	m_playerAI->update(deltaTime, m_map, *m_player);
+	//m_player.update(deltaTime, m_map, m_playerAI);
+	//m_playerAI.update(deltaTime, m_map, m_player);
 
-	GameEventHandler::getInstance().handleEvents(m_player, m_playerAI, m_projectileHandler, m_map);
+	GameEventHandler::getInstance().handleEvents(*m_player, *m_playerAI, m_projectileHandler, m_map);
 }
 
 void Level::renderSelectionBox(const sf::Window& window) const
 {
-	m_player.renderSelectionBox(window);
+	m_player->renderSelectionBox(window);
+	//m_player.renderSelectionBox(window);
 }
 
 void Level::renderPlannedBuildings(ShaderHandler& shaderHandler) const
 {
-	m_player.renderPlannedBuildings(shaderHandler);
-	m_playerAI.renderPlannedBuildings(shaderHandler);
+	for (auto& faction : m_factions)
+	{
+		faction->renderPlannedBuildings(shaderHandler);
+	}
+	//m_player.renderPlannedBuildings(shaderHandler);
+	//m_playerAI.renderPlannedBuildings(shaderHandler);
 }
 
 void Level::render(ShaderHandler& shaderHandler) const
@@ -74,16 +103,23 @@ void Level::render(ShaderHandler& shaderHandler) const
 		gameObject.render(shaderHandler);
 	}
 
-	m_player.render(shaderHandler);
-	m_playerAI.render(shaderHandler);
+	for(auto& faction : m_factions)
+	{
+		faction->render(shaderHandler);
+	}
+
 	m_projectileHandler.render(shaderHandler);
 }
+
 
 #ifdef RENDER_AABB
 void Level::renderAABB(ShaderHandler& shaderHandler)
 {
-	m_player.renderAABB(shaderHandler);
-	m_playerAI.renderAABB(shaderHandler);
+	for (auto& faction : m_factions)
+	{
+		faction->renderAABB(shaderHandler);
+	}
+
 	m_projectileHandler.renderAABB(shaderHandler);
 }
 #endif // RENDER_AABB
@@ -91,7 +127,9 @@ void Level::renderAABB(ShaderHandler& shaderHandler)
 #ifdef RENDER_PATHING
 void Level::renderPathing(ShaderHandler& shaderHandler)
 {
-	m_player.renderPathing(shaderHandler);
-	m_playerAI.renderPathing(shaderHandler);
+	for (auto& faction : m_factions)
+	{
+		faction->renderPathing(shaderHandler);
+	}
 }
 #endif // RENDER_PATHING
