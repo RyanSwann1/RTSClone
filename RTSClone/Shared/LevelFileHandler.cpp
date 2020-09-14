@@ -77,7 +77,7 @@ void loadInPlayer(std::ifstream& file, std::vector<std::unique_ptr<Faction>>& fa
 	assert(file.is_open());
 	bool beginReadingFromFile = false;
 	std::string line;
-	glm::vec3 hqStartingPosition;
+	glm::vec3 hqStartingPosition = { 0.0f, 0.0f, 0.0f };
 	std::array<glm::vec3, Globals::MAX_MINERALS_PER_FACTION> mineralPositions;
 	while (getline(file, line))
 	{
@@ -151,7 +151,6 @@ void loadInScenery(std::ifstream& file, std::vector<SceneryGameObject>& scenery)
 			stream >> rawModelName >> position.x >> position.y >> position.z;
 
 			scenery.emplace_back(static_cast<eModelName>(std::stoi(rawModelName)), position);
-			//entityManager.m_entities.emplace_back(static_cast<eModelName>(std::stoi(rawModelName)), position);
 		}
 		else if (line == Globals::TEXT_HEADER_SCENERY)
 		{

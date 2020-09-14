@@ -1,7 +1,6 @@
 #include "GameEventHandler.h"
 #include "Globals.h"
-#include "FactionPlayer.h"
-#include "FactionAI.h"
+#include "Faction.h"
 #include "ProjectileHandler.h"
 
 GameEventHandler::GameEventHandler()
@@ -13,7 +12,7 @@ void GameEventHandler::addEvent(const GameEvent& gameEvent)
 	m_gameEvents.push(gameEvent);
 }
 
-void GameEventHandler::handleEvents(FactionPlayer& player, FactionAI& playerAI, ProjectileHandler& projectileHandler, const Map& map)
+void GameEventHandler::handleEvents(Faction& player, Faction& playerAI, ProjectileHandler& projectileHandler, const Map& map)
 {
 	while (!m_gameEvents.empty())
 	{

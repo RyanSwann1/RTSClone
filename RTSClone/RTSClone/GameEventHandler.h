@@ -8,8 +8,7 @@
 
 class Map;
 class ProjectileHandler;
-class FactionPlayer;
-class FactionAI;
+class Faction;
 class GameEventHandler : private NonCopyable, private NonMovable
 {
 public:
@@ -20,7 +19,7 @@ public:
 	}
 
 	void addEvent(const GameEvent& gameEvent);
-	void handleEvents(FactionPlayer& player, FactionAI& playerAI, ProjectileHandler& projectileHandler, const Map& map);
+	void handleEvents(Faction& player, Faction& playerAI, ProjectileHandler& projectileHandler, const Map& map);
 	
 private:
 	GameEventHandler();

@@ -1,6 +1,5 @@
 #include "ProjectileHandler.h"
-#include "FactionPlayer.h"
-#include "FactionAI.h"
+#include "Faction.h"
 #include "GameEventHandler.h"
 
 ProjectileHandler::ProjectileHandler()
@@ -12,7 +11,7 @@ void ProjectileHandler::addProjectile(const GameEvent& gameEvent)
 	m_projectiles.emplace_back(gameEvent);
 }
 
-void ProjectileHandler::update(float deltaTime, const FactionPlayer& player, const FactionAI& playerAI)
+void ProjectileHandler::update(float deltaTime, const Faction& player, const Faction& playerAI)
 {
 	for (auto projectile = m_projectiles.begin(); projectile != m_projectiles.end();)
 	{	

@@ -5,8 +5,7 @@
 #include "Projectile.h"
 #include <vector>
 
-class FactionAI;
-class FactionPlayer;
+class Faction;
 class ShaderHandler;
 class ProjectileHandler : private NonCopyable, private NonMovable
 {
@@ -14,7 +13,7 @@ public:
 	ProjectileHandler();
 	
 	void addProjectile(const GameEvent& gameEvent);
-	void update(float deltaTime, const FactionPlayer& player, const FactionAI& playerAI);
+	void update(float deltaTime, const Faction& player, const Faction& playerAI);
 	void render(ShaderHandler& shaderHandler) const;
 
 #ifdef RENDER_AABB
