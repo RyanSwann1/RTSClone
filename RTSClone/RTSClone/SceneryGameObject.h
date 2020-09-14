@@ -5,14 +5,18 @@
 #include "ModelName.h"
 
 class ShaderHandler;
-struct SceneryGameObject : private NonCopyable
+class SceneryGameObject : private NonCopyable
 {
+public:
 	SceneryGameObject(eModelName modelName, const glm::vec3& position);
 	SceneryGameObject(SceneryGameObject&&) noexcept;
 	SceneryGameObject& operator=(SceneryGameObject&&) noexcept;
+	~SceneryGameObject();
 
 	void render(ShaderHandler& shaderHandler) const;
 
-	eModelName modelName;
-	glm::vec3 position;
+private:
+	eModelName m_modelName;
+	glm::vec3 m_position;
+	bool m_active;
 };

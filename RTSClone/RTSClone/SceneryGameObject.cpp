@@ -2,26 +2,52 @@
 #include "GameMessenger.h"
 #include "GameMessages.h"
 #include "ModelManager.h"
+#include "Globals.h"
 
 SceneryGameObject::SceneryGameObject(eModelName modelName, const glm::vec3& position)
-	: modelName(modelName),
-	position(position)
-{}
+	: m_modelName(modelName),
+	m_position(position),
+	m_active(true)
+{
+	if (m_modelName != eModelName::Terrain)
+	{
+		AABB AABB(m_position, ModelManager::getInstance().getModel(m_modelName));
+		GameMessenger::getInstance().broadcast<GameMessages::MapModification<eGameMessageType::AddEntityToMap>>({ AABB });
+	}
+}
+
+SceneryGameObject::~SceneryGameObject()
+{
+	if (m_active)
+	{
+		if (m_modelName != eModelName::Terrain)
+		{
+			AABB AABB(m_position, ModelManager::getInstance().getModel(m_modelName));
+			GameMessenger::getInstance().broadcast<GameMessages::MapModification<eGameMessageType::RemoveEntityFromMap>>({ AABB });
+		}
+	}
+}
 
 SceneryGameObject::SceneryGameObject(SceneryGameObject&& orig) noexcept
-	: modelName(orig.modelName),
-	position(orig.position)
-{}
+	: m_modelName(orig.m_modelName),
+	m_position(orig.m_position),
+	m_active(orig.m_active)
+{
+	orig.m_active = false;
+}
 
 SceneryGameObject& SceneryGameObject::operator=(SceneryGameObject&& orig) noexcept
 {
-	modelName = orig.modelName;
-	position = orig.position;
+	m_modelName = orig.m_modelName;
+	m_position = orig.m_position;
+	m_active = orig.m_active;
+
+	orig.m_active = false;
 
 	return *this;
 }
 
 void SceneryGameObject::render(ShaderHandler& shaderHandler) const
 {
-	ModelManager::getInstance().getModel(modelName).render(shaderHandler, position);
+	ModelManager::getInstance().getModel(m_modelName).render(shaderHandler, m_position);
 }
