@@ -18,7 +18,6 @@ class Level : private NonCopyable, private NonMovable
 {
 public:
 	static std::unique_ptr<Level> create(const std::string& levelName);
-	~Level();
 	
 	void handleInput(const sf::Window& window, const Camera& camera, const sf::Event& currentSFMLEvent, const Map& map);
 	void update(float deltaTime, const Map& map);

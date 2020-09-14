@@ -147,6 +147,7 @@
   <ItemGroup>
     <ClCompile Include="..\Shared\AABB.cpp" />
     <ClCompile Include="..\Shared\Camera.cpp" />
+    <ClCompile Include="..\Shared\Entity.cpp" />
     <ClCompile Include="..\Shared\glad.c" />
     <ClCompile Include="..\Shared\LevelFileHandler.cpp" />
     <ClCompile Include="..\Shared\Mesh.cpp" />
@@ -166,6 +167,7 @@
     <ClCompile Include="Level.cpp" />
     <ClCompile Include="Projectile.cpp" />
     <ClCompile Include="ProjectileHandler.cpp" />
+    <ClCompile Include="SceneryGameObject.cpp" />
     <ClCompile Include="Worker.cpp" />
     <ClCompile Include="UnitSpawnerBuilding.cpp" />
     <ClCompile Include="imgui\imgui.cpp" />
@@ -187,6 +189,7 @@
   <ItemGroup>
     <ClInclude Include="..\Shared\AABB.h" />
     <ClInclude Include="..\Shared\Camera.h" />
+    <ClInclude Include="..\Shared\Entity.h" />
     <ClInclude Include="..\Shared\glad.h" />
     <ClInclude Include="..\Shared\Globals.h" />
     <ClInclude Include="..\Shared\khrplatform.h" />
@@ -243,6 +246,7 @@
     <ClInclude Include="assimp\include\vector3.h" />
     <ClInclude Include="assimp\include\version.h" />
     <ClInclude Include="EntityType.h" />
+    <ClInclude Include="SceneryGameObject.h" />
     <ClInclude Include="Level.h" />
     <ClInclude Include="TypeComparison.h" />
     <ClInclude Include="Faction.h" />

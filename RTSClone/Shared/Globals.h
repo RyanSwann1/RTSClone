@@ -11,6 +11,10 @@
 namespace Globals
 { 
 	const std::string SHARED_FILE_DIRECTORY = "../Shared/";
+	const std::string TEXT_HEADER_BEGINNING = "#";
+	const std::string TEXT_HEADER_PLAYER = TEXT_HEADER_BEGINNING + "Player";
+	const std::string TEXT_HEADER_PLAYERAI = TEXT_HEADER_BEGINNING + "PlayerAI";
+	const std::string TEXT_HEADER_SCENERY = TEXT_HEADER_BEGINNING + "Scenery";
 	constexpr unsigned int INVALID_OPENGL_ID = 0;
 	constexpr float GROUND_HEIGHT = 0.0f;
 	constexpr int MAP_SIZE = 30;
@@ -38,10 +42,10 @@ namespace Globals
 
 	inline bool isWithinMapBounds(const AABB& AABB)
 	{
-		return AABB.m_left >= 0 &&
-			AABB.m_right < Globals::MAP_SIZE * Globals::NODE_SIZE&&
-			AABB.m_back >= 0 &&
-			AABB.m_forward < Globals::MAP_SIZE * Globals::NODE_SIZE;
+		return AABB.getLeft() >= 0 &&
+			AABB.getRight() < Globals::MAP_SIZE * Globals::NODE_SIZE&&
+			AABB.getBack() >= 0 &&
+			AABB.getForward() < Globals::MAP_SIZE * Globals::NODE_SIZE;
 	}
 
 	inline bool isPositionInMapBounds(const glm::ivec2& position)
@@ -108,6 +112,13 @@ namespace Globals
 		float z = glm::pow(positionB.z - positionA.z, 2);
 
 		return x + y + z;
+	}
+
+	inline bool isOnNodePosition(const glm::vec3& position)
+	{
+		return static_cast<int>(position.x) % Globals::NODE_SIZE == 0 &&
+			position.y == Globals::GROUND_HEIGHT &&
+			static_cast<int>(position.z) % Globals::NODE_SIZE == 0;
 	}
 
 	inline bool isOnMiddlePosition(const glm::vec3& position)

@@ -4,7 +4,7 @@
 #include <vector>
 #include <memory>
 
-struct SceneryGameObject;
+class SceneryGameObject;
 class Faction;
 struct Player;
 class Entity;

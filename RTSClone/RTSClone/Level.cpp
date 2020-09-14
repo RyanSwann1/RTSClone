@@ -25,16 +25,7 @@ Level::Level(std::vector<SceneryGameObject>&& scenery, std::vector<std::unique_p
 	m_factions(std::move(factions)),
 	m_player(static_cast<FactionPlayer*>(&getFaction(m_factions, eFactionName::Player))),
 	m_playerAI(static_cast<FactionAI*>(&getFaction(m_factions, eFactionName::AI)))
-{
-	for (const auto& gameObject : m_scenery)
-	{
-		if (gameObject.modelName != eModelName::Terrain)
-		{
-			AABB AABB(gameObject.position, ModelManager::getInstance().getModel(gameObject.modelName));
-			GameMessenger::getInstance().broadcast<GameMessages::MapModification<eGameMessageType::AddEntityToMap>>({ AABB });
-		}
-	}
-}
+{}
 
 std::unique_ptr<Level> Level::create(const std::string& levelName)
 {
@@ -46,20 +37,6 @@ std::unique_ptr<Level> Level::create(const std::string& levelName)
 	}
 
 	return std::unique_ptr<Level>(new Level(std::move(scenery), std::move(factions)));
-}
-
-Level::~Level()
-{
-	for (auto gameObject = m_scenery.begin(); gameObject != m_scenery.end();)
-	{
-		if (gameObject->modelName != eModelName::Terrain)
-		{
-			AABB AABB(gameObject->position, ModelManager::getInstance().getModel(gameObject->modelName));
-			GameMessenger::getInstance().broadcast<GameMessages::MapModification<eGameMessageType::RemoveEntityFromMap>>({ AABB });
-		}
-
-		gameObject = m_scenery.erase(gameObject);
-	}
 }
 
 void Level::handleInput(const sf::Window& window, const Camera& camera, const sf::Event& currentSFMLEvent, const Map& map)

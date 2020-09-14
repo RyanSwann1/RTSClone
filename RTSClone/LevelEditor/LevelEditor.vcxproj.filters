@@ -84,6 +84,9 @@
     <ClCompile Include="EntityManager.cpp">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="Player.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Shared\imgui\imstb_truetype.h">
@@ -120,9 +123,6 @@
       <Filter>src</Filter>
     </ClInclude>
     <ClInclude Include="..\Shared\Camera.h">
-      <Filter>src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Shared\GameObject.h">
       <Filter>src</Filter>
     </ClInclude>
     <ClInclude Include="..\Shared\glad.h">
@@ -172,6 +172,12 @@
     </ClInclude>
     <ClInclude Include="EntityManager.h">
       <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="Player.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Shared\PlayerType.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

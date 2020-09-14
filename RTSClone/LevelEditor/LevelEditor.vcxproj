@@ -162,12 +162,12 @@
     <ClCompile Include="EntityManager.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="PlayableAreaDisplay.cpp" />
+    <ClCompile Include="Player.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Shared\AABB.h" />
     <ClInclude Include="..\Shared\Camera.h" />
     <ClInclude Include="..\Shared\Entity.h" />
-    <ClInclude Include="..\Shared\GameObject.h" />
     <ClInclude Include="..\Shared\glad.h" />
     <ClInclude Include="..\Shared\Globals.h" />
     <ClInclude Include="..\Shared\imgui\imconfig.h" />
@@ -188,11 +188,13 @@
     <ClInclude Include="..\Shared\ModelName.h" />
     <ClInclude Include="..\Shared\NonCopyable.h" />
     <ClInclude Include="..\Shared\NonMovable.h" />
+    <ClInclude Include="..\Shared\PlayerType.h" />
     <ClInclude Include="..\Shared\SelectionBox.h" />
     <ClInclude Include="..\Shared\ShaderHandler.h" />
     <ClInclude Include="..\Shared\UniqueEntityIDDistributer.h" />
     <ClInclude Include="EntityManager.h" />
     <ClInclude Include="PlayableAreaDisplay.h" />
+    <ClInclude Include="Player.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\Shared\Shaders\DebugFragmentShader.glsl" />
