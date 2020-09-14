@@ -2,7 +2,10 @@
 
 #include <string>
 #include <vector>
+#include <memory>
 
+struct SceneryGameObject;
+class Faction;
 struct Player;
 class Entity;
 #ifdef LEVEL_EDITOR
@@ -17,5 +20,8 @@ namespace LevelFileHandler
 		Player& player, Player& playerAI);
 #endif // LEVEL_EDITOR
 
-	bool loadLevelFromFile(const std::string& fileName, std::vector<Entity>& scenery);
+#ifdef GAME
+	bool loadLevelFromFile(const std::string& fileName, std::vector<SceneryGameObject>& scenery, 
+		std::vector<std::unique_ptr<Faction>>& factions);
+#endif // GAME
 }
