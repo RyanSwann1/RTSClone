@@ -19,6 +19,35 @@ void loadInPlayer(std::ifstream& file, std::vector<std::unique_ptr<Faction>>& fa
 void loadInScenery(std::ifstream& file, std::vector<SceneryGameObject>& scenery);
 #endif // GAME
 
+void LevelFileHandler::loadFromFile(std::ifstream& file, const std::function<void(const std::string&)>& data, 
+	const std::function<bool(const std::string&)>& conditional)
+{
+	assert(file.is_open());
+	bool beginReadingFromFile = false;
+	std::string line;
+	while (getline(file, line))
+	{
+		if (beginReadingFromFile)
+		{
+			if (line[0] == *Globals::TEXT_HEADER_BEGINNING.c_str())
+			{
+				file.clear();
+				file.seekg(0);
+				break;
+			}
+
+			data(line);
+		}
+		else if (conditional(line))
+		{
+			assert(!beginReadingFromFile);
+			beginReadingFromFile = true;
+		}
+	}
+	
+	assert(beginReadingFromFile);
+}
+
 #ifdef LEVEL_EDITOR
 bool LevelFileHandler::saveLevelToFile(const std::string& fileName, const EntityManager& entityManager,
 	const Player& player, const Player& playerAI)
@@ -77,49 +106,39 @@ bool LevelFileHandler::loadLevelFromFile(const std::string& fileName, std::vecto
 void loadInPlayer(std::ifstream& file, std::vector<std::unique_ptr<Faction>>& factions, const std::string& textHeaderFile)
 {
 	assert(file.is_open());
-	bool beginReadingFromFile = false;
-	std::string line;
 	glm::vec3 hqStartingPosition = { 0.0f, 0.0f, 0.0f };
 	std::array<glm::vec3, Globals::MAX_MINERALS_PER_FACTION> mineralPositions;
-	while (getline(file, line))
+
+	auto data = [&hqStartingPosition, &mineralPositions](const std::string& line)
 	{
-		if (beginReadingFromFile)
+		std::stringstream stream{ line };
+		std::string rawModelName;
+		glm::vec3 position;
+		stream >> rawModelName >> position.x >> position.y >> position.z;
+		switch (static_cast<eModelName>(std::stoi(rawModelName)))
 		{
-			if (line[0] == *Globals::TEXT_HEADER_BEGINNING.c_str())
-			{
-				file.clear();
-				file.seekg(0);
-				break;
-			}
-
-			std::stringstream stream{ line };
-			std::string rawModelName;
-			glm::vec3 position;
-			stream >> rawModelName >> position.x >> position.y >> position.z;
-			switch (static_cast<eModelName>(std::stoi(rawModelName)))
-			{
-			case eModelName::HQ:
-				hqStartingPosition = position;
-				break;
-			case eModelName::Mineral:
-			{
-				int mineralIndex = -1;
-				stream >> mineralIndex;
-				assert(mineralIndex >= 0 && mineralIndex < Globals::MAX_MINERALS_PER_FACTION);
-
-				mineralPositions[mineralIndex] = position;
-			}
+		case eModelName::HQ:
+			hqStartingPosition = position;
 			break;
-			}
-		}
-		else if (line == textHeaderFile)
+		case eModelName::Mineral:
 		{
-			assert(!beginReadingFromFile);
-			beginReadingFromFile = true;
-		}
-	}
+			int mineralIndex = -1;
+			stream >> mineralIndex;
+			assert(mineralIndex >= 0 && mineralIndex < Globals::MAX_MINERALS_PER_FACTION);
 
-	assert(beginReadingFromFile);
+			mineralPositions[mineralIndex] = position;
+		}
+		break;
+		}
+	};
+
+	auto conditional = [&textHeaderFile](const std::string& line)
+	{
+		return line == textHeaderFile;
+	};
+
+	LevelFileHandler::loadFromFile(file, data, conditional);
+
 	if (textHeaderFile == Globals::TEXT_HEADER_PLAYER)
 	{
 		factions.emplace_back(std::make_unique<FactionPlayer>(eFactionName::Player, hqStartingPosition, mineralPositions));
@@ -128,39 +147,31 @@ void loadInPlayer(std::ifstream& file, std::vector<std::unique_ptr<Faction>>& fa
 	{
 		factions.emplace_back(std::make_unique<FactionAI>(eFactionName::AI, hqStartingPosition, mineralPositions));
 	}
+	else
+	{
+		assert(false);
+	}
 }
 
 void loadInScenery(std::ifstream& file, std::vector<SceneryGameObject>& scenery)
 {
 	assert(file.is_open() && scenery.empty());
 
-	bool beginReadingFromFile = false;
-	std::string line;
-	while (getline(file, line))
+	auto data = [&scenery](const std::string& line)
 	{
-		if (beginReadingFromFile)
-		{
-			if (line[0] == *Globals::TEXT_HEADER_BEGINNING.c_str())
-			{
-				file.clear();
-				file.seekg(0);
-				break;
-			}
+		std::stringstream stream{ line };
+		std::string rawModelName;
+		glm::vec3 position;
+		stream >> rawModelName >> position.x >> position.y >> position.z;
 
-			std::stringstream stream{ line };
-			std::string rawModelName;
-			glm::vec3 position;
-			stream >> rawModelName >> position.x >> position.y >> position.z;
+		scenery.emplace_back(static_cast<eModelName>(std::stoi(rawModelName)), position);
+	};
 
-			scenery.emplace_back(static_cast<eModelName>(std::stoi(rawModelName)), position);
-		}
-		else if (line == Globals::TEXT_HEADER_SCENERY)
-		{
-			assert(!beginReadingFromFile);
-			beginReadingFromFile = true;
-		}
-	}
+	auto conditional = [](const std::string& line)
+	{
+		return line == Globals::TEXT_HEADER_SCENERY;
+	};
 
-	assert(beginReadingFromFile);
+	LevelFileHandler::loadFromFile(file, data, conditional);
 }
 #endif // GAME
