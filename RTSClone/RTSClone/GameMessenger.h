@@ -55,6 +55,7 @@ public:
 	void broadcast(GameEvent gameEvent)
 	{
 		const auto& listeners = m_listeners[static_cast<int>(GameEvent::getType())];
+		assert(!listeners.empty());
 		for (const auto& listener : listeners)
 		{
 			reinterpret_cast<std::function<void(const GameEvent&)> const&>(listener.m_listener)(gameEvent);
