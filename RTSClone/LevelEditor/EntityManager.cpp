@@ -136,33 +136,22 @@ void EntityManager::renderEntityAABB(ShaderHandler& shaderHandler)
 
 const std::ifstream& operator>>(std::ifstream& file, EntityManager& entityManager)
 {
-	assert(file.is_open());
-	bool beginReadingFromFile = false;
-	std::string line;
-	while (getline(file, line))
+	auto data = [&entityManager](const std::string& line)
 	{
-		if (beginReadingFromFile)
-		{
-			if (line[0] == *Globals::TEXT_HEADER_BEGINNING.c_str())
-			{
-				file.clear();
-				file.seekg(0);
-				break;
-			}
+		std::stringstream stream{ line };
+		std::string rawModelName;
+		glm::vec3 position;
+		stream >> rawModelName >> position.x >> position.y >> position.z;
 
-			std::stringstream stream{ line };
-			std::string rawModelName;
-			glm::vec3 position;
-			stream >> rawModelName >> position.x >> position.y >> position.z;
+		entityManager.m_entities.emplace_back(static_cast<eModelName>(std::stoi(rawModelName)), position);
+	};
 
-			entityManager.m_entities.emplace_back(static_cast<eModelName>(std::stoi(rawModelName)), position);
-		}
-		else if (line == Globals::TEXT_HEADER_SCENERY)
-		{
-			assert(!beginReadingFromFile);
-			beginReadingFromFile = true;
-		}
-	}
+	auto conditional = [](const std::string& line)
+	{
+		return line == Globals::TEXT_HEADER_SCENERY;
+	};
+
+	LevelFileHandler::loadFromFile(file, data, conditional);
 
 	return file;
 }
