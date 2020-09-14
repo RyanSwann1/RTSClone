@@ -47,9 +47,9 @@ bool Map::isPositionOccupied(const glm::ivec2& position) const
 
 void Map::addEntityToMap(const GameMessages::MapModification<eGameMessageType::AddEntityToMap>& gameEvent)
 {
-	for (int x = gameEvent.entityAABB.m_left; x < gameEvent.entityAABB.m_right; ++x)
+	for (int x = static_cast<int>(gameEvent.entityAABB.getLeft()); x < static_cast<int>(gameEvent.entityAABB.getRight()); ++x)
 	{
-		for (int y = gameEvent.entityAABB.m_back; y < gameEvent.entityAABB.m_forward; ++y)
+		for (int y = static_cast<int>(gameEvent.entityAABB.getBack()); y < static_cast<int>(gameEvent.entityAABB.getForward()); ++y)
 		{
 			glm::ivec2 positionOnGrid = Globals::convertToGridPosition({ x, Globals::GROUND_HEIGHT, y });
 			assert(Globals::isPositionInMapBounds(positionOnGrid));
@@ -60,9 +60,9 @@ void Map::addEntityToMap(const GameMessages::MapModification<eGameMessageType::A
 
 void Map::removeEntityFromMap(const GameMessages::MapModification<eGameMessageType::RemoveEntityFromMap>& gameEvent)
 {
-	for (int x = gameEvent.entityAABB.m_left; x < gameEvent.entityAABB.m_right; ++x)
+	for (int x = static_cast<int>(gameEvent.entityAABB.getLeft()); x < static_cast<int>(gameEvent.entityAABB.getRight()); ++x)
 	{
-		for (int y = gameEvent.entityAABB.m_back; y < gameEvent.entityAABB.m_forward; ++y)
+		for (int y = static_cast<int>(gameEvent.entityAABB.getBack()); y < static_cast<int>(gameEvent.entityAABB.getForward()); ++y)
 		{
 			glm::ivec2 positionOnGrid = Globals::convertToGridPosition({ x, Globals::GROUND_HEIGHT, y });
 			assert(Globals::isPositionInMapBounds(positionOnGrid));

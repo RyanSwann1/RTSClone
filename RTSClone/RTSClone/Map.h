@@ -11,7 +11,7 @@ namespace GameMessages
 	template <eGameMessageType type>
 	struct MapModification;
 }
-struct AABB;
+class AABB;
 class Map : private NonMovable, private NonCopyable
 {
 public:

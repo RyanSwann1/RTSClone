@@ -73,8 +73,6 @@ void Level::update(float deltaTime, const Map& map)
 	
 	m_player->update(deltaTime, map, *m_playerAI);
 	m_playerAI->update(deltaTime, map, *m_player);
-	//m_player.update(deltaTime, m_map, m_playerAI);
-	//m_playerAI.update(deltaTime, m_map, m_player);
 
 	GameEventHandler::getInstance().handleEvents(*m_player, *m_playerAI, m_projectileHandler, map);
 }
@@ -82,7 +80,6 @@ void Level::update(float deltaTime, const Map& map)
 void Level::renderSelectionBox(const sf::Window& window) const
 {
 	m_player->renderSelectionBox(window);
-	//m_player.renderSelectionBox(window);
 }
 
 void Level::renderPlannedBuildings(ShaderHandler& shaderHandler) const
@@ -91,8 +88,6 @@ void Level::renderPlannedBuildings(ShaderHandler& shaderHandler) const
 	{
 		faction->renderPlannedBuildings(shaderHandler);
 	}
-	//m_player.renderPlannedBuildings(shaderHandler);
-	//m_playerAI.renderPlannedBuildings(shaderHandler);
 }
 
 void Level::render(ShaderHandler& shaderHandler) const
