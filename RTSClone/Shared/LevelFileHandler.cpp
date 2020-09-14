@@ -31,8 +31,6 @@ void LevelFileHandler::loadFromFile(std::ifstream& file, const std::function<voi
 		{
 			if (line[0] == *Globals::TEXT_HEADER_BEGINNING.c_str())
 			{
-				file.clear();
-				file.seekg(0);
 				break;
 			}
 
@@ -45,6 +43,8 @@ void LevelFileHandler::loadFromFile(std::ifstream& file, const std::function<voi
 		}
 	}
 	
+	file.clear();
+	file.seekg(0);
 	assert(beginReadingFromFile);
 }
 
