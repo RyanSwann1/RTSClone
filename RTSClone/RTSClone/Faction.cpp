@@ -18,6 +18,25 @@ namespace
         {eEntityType::Unit,
         eEntityType::Worker}
     };
+
+    std::array<Mineral, Globals::MAX_MINERALS_PER_FACTION> getMinerals(
+        const std::array<glm::vec3, Globals::MAX_MINERALS_PER_FACTION>& mineralPositions)
+    {   
+        //Done in this way because of how the constructors/move constructors are setup
+        int i = 0;
+        std::array<Mineral, Globals::MAX_MINERALS_PER_FACTION> minerals = 
+        {
+            mineralPositions[i],
+            mineralPositions[++i],
+            mineralPositions[++i],
+            mineralPositions[++i],
+            mineralPositions[++i]
+        };
+
+        assert(i + 1 == static_cast<int>(mineralPositions.size()));
+        
+        return minerals;
+    }
 }
 
 //PlannedBuilding
@@ -30,9 +49,10 @@ PlannedBuilding::PlannedBuilding(int workerID, const glm::vec3& spawnPosition, e
 }
 
 //Faction
-Faction::Faction(eFactionName factionName, const glm::vec3& hqStartingPosition, const glm::vec3& mineralsStartingPosition)
+Faction::Faction(eFactionName factionName, const glm::vec3& hqStartingPosition, 
+    const std::array<glm::vec3, Globals::MAX_MINERALS_PER_FACTION>& mineralPositions)
     : m_plannedBuildings(),
-    m_minerals(),
+    m_minerals(getMinerals(mineralPositions)),
     m_allEntities(),
     m_units(),
     m_workers(),
@@ -45,15 +65,6 @@ Faction::Faction(eFactionName factionName, const glm::vec3& hqStartingPosition, 
     m_currentPopulationLimit(Globals::STARTING_POPULATION)
 {
     m_allEntities.push_back(&m_HQ);
-
-    m_minerals.reserve(Globals::MAX_MINERALS_PER_FACTION);
-    glm::vec3 startingPosition = mineralsStartingPosition;
-    for (int i = 0; i < Globals::MAX_MINERALS_PER_FACTION; ++i)
-    {
-        glm::vec3 position = mineralsStartingPosition;
-        position.z += Globals::NODE_SIZE * i;
-        m_minerals.emplace_back(Globals::convertToNodePosition(position));
-    }
 }
 
 const glm::vec3& Faction::getHQPosition() const

@@ -35,10 +35,9 @@ AIAction::AIAction(eActionType actionType, const glm::vec3& position)
 {}
 
 //FactionAI
-FactionAI::FactionAI(eFactionName factionName, const glm::vec3& hqStartingPosition, const glm::vec3& mineralsStartingPosition, 
-	const Faction& opposingFaction)
-	: Faction(factionName, hqStartingPosition, mineralsStartingPosition),
-	m_opposingFaction(opposingFaction), 
+FactionAI::FactionAI(eFactionName factionName, const glm::vec3& hqStartingPosition, 
+	const std::array<glm::vec3, Globals::MAX_MINERALS_PER_FACTION>& mineralPositions)
+	: Faction(factionName, hqStartingPosition, mineralPositions),
 	m_spawnQueue(),
 	m_actionQueue(),
 	m_delayTimer(DELAY_TIME, true)
@@ -134,14 +133,14 @@ void FactionAI::update(float deltaTime, const Map & map, const Faction& opposing
 			}
 		}
 
-		for (auto& unit : m_units)
-		{
-			if (unit.getCurrentState() == eUnitState::Idle)
-			{
-				unit.moveTo(opposingFaction.getHQPosition(), map, [&](const glm::ivec2& position)
-					{ return getAllAdjacentPositions(position, map, m_units, unit); }, eUnitState::AttackMoving);
-			}
-		}
+		//for (auto& unit : m_units)
+		//{
+		//	if (unit.getCurrentState() == eUnitState::Idle)
+		//	{
+		//		unit.moveTo(opposingFaction.getHQPosition(), map, [&](const glm::ivec2& position)
+		//			{ return getAllAdjacentPositions(position, map, m_units, unit); }, eUnitState::AttackMoving);
+		//	}
+		//}
 	}
 }
 
@@ -158,7 +157,7 @@ bool FactionAI::instructWorkerToBuild(eEntityType entityType, const glm::vec3& p
 const Mineral& FactionAI::getRandomMineral() const
 {
 	assert(!m_minerals.empty());
-	return m_minerals[Globals::getRandomNumber(0, m_minerals.size() - 1)];
+	return m_minerals[Globals::getRandomNumber(0, static_cast<int>(m_minerals.size()) - 1)];
 }
 
 Worker* FactionAI::getAvailableWorker(const glm::vec3& position)

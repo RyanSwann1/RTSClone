@@ -8,7 +8,8 @@ struct Camera;
 class FactionPlayer : public Faction
 {
 public:
-	FactionPlayer(eFactionName factionName, const glm::vec3& hqStartingPosition, const glm::vec3& mineralsStartingPosition);
+	FactionPlayer(eFactionName factionName, const glm::vec3& hqStartingPosition, 
+		const std::array<glm::vec3, Globals::MAX_MINERALS_PER_FACTION>& mineralPositions);
 
 	void handleInput(const sf::Event& currentSFMLEvent, const sf::Window& window, const Camera& camera, const Map& map, 
 		const Faction& opposingFaction);

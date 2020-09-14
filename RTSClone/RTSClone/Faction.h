@@ -24,6 +24,7 @@ class Map;
 class Faction : private NonMovable, private NonCopyable
 {
 public:
+	virtual ~Faction() {}
 	const glm::vec3& getHQPosition() const;
 	eFactionName getName() const;
 	const std::list<Unit>& getUnits() const;
@@ -33,7 +34,7 @@ public:
 	int getEntityIDAtPosition(const glm::vec3& position) const;
 
 	void handleEvent(const GameEvent& gameEvent, const Map& map);
-	void update(float deltaTime, const Map& map, const Faction& opposingFaction);
+	virtual void update(float deltaTime, const Map& map, const Faction& opposingFaction);
 	void render(ShaderHandler& shaderHandler) const;
 	void renderPlannedBuildings(ShaderHandler& shaderHandler) const;
 
@@ -46,9 +47,10 @@ public:
 #endif // RENDER_AABB
 
 protected:
-	Faction(eFactionName factionName, const glm::vec3& hqStartingPosition, const glm::vec3& mineralsStartingPosition);
+	Faction(eFactionName factionName, const glm::vec3& hqStartingPosition, 
+		const std::array<glm::vec3, Globals::MAX_MINERALS_PER_FACTION>& mineralPositions);
+	std::array<Mineral, Globals::MAX_MINERALS_PER_FACTION> m_minerals;
 	std::vector<PlannedBuilding> m_plannedBuildings;
-	std::vector<Mineral> m_minerals;
 	std::vector<Entity*> m_allEntities;
 	std::list<Unit> m_units;
 	std::list<Worker> m_workers;

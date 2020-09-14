@@ -10,8 +10,9 @@
 #include <array>
 #include <algorithm>
 
-FactionPlayer::FactionPlayer(eFactionName factionName, const glm::vec3& hqStartingPosition, const glm::vec3& mineralsStartingPosition)
-    : Faction(factionName, hqStartingPosition, mineralsStartingPosition),
+FactionPlayer::FactionPlayer(eFactionName factionName, const glm::vec3& hqStartingPosition, 
+    const std::array<glm::vec3, Globals::MAX_MINERALS_PER_FACTION>& mineralPositions)
+    : Faction(factionName, hqStartingPosition, mineralPositions),
     m_selectionBox(),
     m_previousMouseToGroundPosition(),
     m_attackMoveSelected(false)
