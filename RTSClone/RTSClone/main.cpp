@@ -73,6 +73,7 @@ int main()
 		return -1;
 	}
 
+	std::unique_ptr<Map> map = std::make_unique<Map>();
 	std::unique_ptr<Level> level = Level::create("Level.txt");
 	assert(level);
 	if (!level)
@@ -80,7 +81,6 @@ int main()
 		std::cout << "Unable to load level.\n";
 		return -1;
 	}
-
 	sf::Clock gameClock;
 	Camera camera;
 
@@ -111,7 +111,7 @@ int main()
 				}
 			}
 
-			level->handleInput(window, camera, currentSFMLEvent);
+			level->handleInput(window, camera, currentSFMLEvent, *map);
 		}
 
 		ImGui_SFML_OpenGL3::startFrame();
@@ -119,8 +119,8 @@ int main()
 		ImGui::ShowDemoWindow();
 
 		//Update
-		level->update(deltaTime);
-		camera.update(window, deltaTime);
+		level->update(deltaTime, *map);
+		camera.update(deltaTime);
 
 		//Render
 		glm::mat4 view = camera.getView(); 

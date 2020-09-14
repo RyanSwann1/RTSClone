@@ -3,7 +3,6 @@
 #include "NonCopyable.h"
 #include "NonMovable.h"
 #include "ProjectileHandler.h"
-#include "Map.h"
 #include "FactionPlayer.h"
 #include "FactionAI.h"
 #include "SceneryGameObject.h"
@@ -12,6 +11,7 @@
 #include <memory>
 #include <SFML/Graphics.hpp>
 
+class Map;
 struct Camera;
 class ShaderHandler;
 class Level : private NonCopyable, private NonMovable
@@ -20,8 +20,8 @@ public:
 	static std::unique_ptr<Level> create(const std::string& levelName);
 	~Level();
 	
-	void handleInput(const sf::Window& window, const Camera& camera, const sf::Event& currentSFMLEvent);
-	void update(float deltaTime);
+	void handleInput(const sf::Window& window, const Camera& camera, const sf::Event& currentSFMLEvent, const Map& map);
+	void update(float deltaTime, const Map& map);
 	void renderSelectionBox(const sf::Window& window) const;
 	void renderPlannedBuildings(ShaderHandler& shaderHandler) const;
 	void render(ShaderHandler& shaderHandler) const;
@@ -36,7 +36,7 @@ public:
 private:
 	Level(std::vector<SceneryGameObject>&& scenery, std::vector<std::unique_ptr<Faction>>&& factions);
 	std::vector<SceneryGameObject> m_scenery;
-	Map m_map;
+	
 	ProjectileHandler m_projectileHandler;
 	std::vector<std::unique_ptr<Faction>> m_factions;
 	FactionPlayer* m_player;

@@ -21,7 +21,6 @@ namespace
 
 Level::Level(std::vector<SceneryGameObject>&& scenery, std::vector<std::unique_ptr<Faction>>&& factions)
 	: m_scenery(std::move(scenery)),
-	m_map(),
 	m_projectileHandler(),
 	m_factions(std::move(factions)),
 	m_player(static_cast<FactionPlayer*>(&getFaction(m_factions, eFactionName::Player))),
@@ -63,21 +62,21 @@ Level::~Level()
 	}
 }
 
-void Level::handleInput(const sf::Window& window, const Camera& camera, const sf::Event& currentSFMLEvent)
+void Level::handleInput(const sf::Window& window, const Camera& camera, const sf::Event& currentSFMLEvent, const Map& map)
 {
-	m_player->handleInput(currentSFMLEvent, window, camera, m_map, *m_playerAI);
+	m_player->handleInput(currentSFMLEvent, window, camera, map, *m_playerAI);
 }
 
-void Level::update(float deltaTime)
+void Level::update(float deltaTime, const Map& map)
 {
 	m_projectileHandler.update(deltaTime, *m_player, *m_playerAI);
 	
-	m_player->update(deltaTime, m_map, *m_playerAI);
-	m_playerAI->update(deltaTime, m_map, *m_player);
+	m_player->update(deltaTime, map, *m_playerAI);
+	m_playerAI->update(deltaTime, map, *m_player);
 	//m_player.update(deltaTime, m_map, m_playerAI);
 	//m_playerAI.update(deltaTime, m_map, m_player);
 
-	GameEventHandler::getInstance().handleEvents(*m_player, *m_playerAI, m_projectileHandler, m_map);
+	GameEventHandler::getInstance().handleEvents(*m_player, *m_playerAI, m_projectileHandler, map);
 }
 
 void Level::renderSelectionBox(const sf::Window& window) const
