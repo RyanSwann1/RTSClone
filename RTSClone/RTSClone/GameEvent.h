@@ -1,6 +1,6 @@
 #pragma once
 
-#include "FactionName.h"
+#include "FactionController.h"
 #include "glm/glm.hpp"
 
 enum class eGameEventType
@@ -16,15 +16,18 @@ enum class eGameEventType
 struct GameEvent
 {
 	GameEvent(eGameEventType gameEventType);
-	GameEvent(eGameEventType gameEventType, eFactionName senderFaction, int senderID);
-	GameEvent(eGameEventType gameEventType, eFactionName senderFaction, int senderID, int targetID);
-	GameEvent(eGameEventType gameEventType, eFactionName senderFaction, int senderID, int targetID,
+	GameEvent(eGameEventType gameEventType, eFactionController senderFaction, int senderID);
+	GameEvent(eGameEventType gameEventType, eFactionController senderFaction, int senderID, 
+		eFactionController targetFaction, int targetID);
+	GameEvent(eGameEventType gameEventType, eFactionController senderFaction, int senderID, 
+		eFactionController targetFaction, int targetID,
 		const glm::vec3& startingPosition, const glm::vec3& endingPosition);
-	GameEvent(eGameEventType gameEventType, eFactionName senderFaction, const glm::vec3& position);
+	GameEvent(eGameEventType gameEventType, eFactionController senderFaction, const glm::vec3& position);
 
 	eGameEventType type;
-	eFactionName senderFaction;
+	eFactionController senderFaction;
 	int senderID;
+	eFactionController targetFaction;
 	int targetID;
 	glm::vec3 startingPosition;
 	glm::vec3 endingPosition;
