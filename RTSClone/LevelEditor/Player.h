@@ -9,7 +9,8 @@
 
 struct Player : private NonCopyable
 {
-	Player(eFactionController factionController, const glm::vec3& startingHQPosition, const glm::vec3& startingMineralPosition);
+	Player(eFactionController factionController);
+	Player(eFactionController factionController, const glm::vec3& hqStartingPosition, const glm::vec3& startingMineralPosition);
 	Player(Player&&) noexcept;
 	Player& operator=(Player&&) noexcept;
 

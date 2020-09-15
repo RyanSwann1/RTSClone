@@ -4,13 +4,25 @@
 #include <fstream>
 #include <functional>
 
-Player::Player(eFactionController controller, const glm::vec3& startingHQPosition, const glm::vec3& startingMineralPosition)
+Player::Player(eFactionController controller)
 	: controller(controller),
-	HQ(eModelName::HQ, Globals::convertToNodePosition(startingHQPosition)),
+	HQ(),
+	minerals()
+{
+	HQ.setModelName(eModelName::HQ); //TODO: Change to constructor
+	for (auto& mineral : minerals)
+	{
+		mineral.setModelName(eModelName::Mineral);
+	}
+}
+
+Player::Player(eFactionController factionController, const glm::vec3& hqStartingPosition, const glm::vec3& startingMineralPosition)
+	: controller(factionController),
+	HQ(eModelName::HQ, hqStartingPosition),
 	minerals()
 {
 	glm::vec3 mineralSpawnPosition = Globals::convertToNodePosition(startingMineralPosition);
-	for(auto& mineral : minerals)
+	for (auto& mineral : minerals)
 	{
 		mineral.setModelName(eModelName::Mineral);
 		mineral.setPosition(mineralSpawnPosition);
@@ -58,7 +70,7 @@ const std::ifstream& operator>>(std::ifstream& file, Player& player)
 			break;
 		case eModelName::Mineral:
 		{
-			int mineralIndex = -1;
+			int mineralIndex = 0;
 			stream >> mineralIndex;
 			assert(mineralIndex >= 0 && mineralIndex < player.minerals.size());
 
@@ -71,19 +83,7 @@ const std::ifstream& operator>>(std::ifstream& file, Player& player)
 	eFactionController factionController = player.controller;
 	auto conditional = [factionController](const std::string& line)
 	{
-		switch (factionController)
-		{
-		case eFactionController::Player:
-			return line == Globals::TEXT_HEADER_PLAYER;
-		case eFactionController::AI_1:
-			return line == Globals::TEXT_HEADER_PLAYERAI_1;
-		case eFactionController::AI_2:
-			return line == Globals::TEXT_HEADER_PLAYERAI_2;
-		case eFactionController::AI_3:
-			return line == Globals::TEXT_HEADER_PLAYERAI_3;
-		default:
-			assert(false);
-		}
+		return line == FACTION_CONTROLLER_DETAILS[static_cast<int>(factionController)].text;
 	};
 
 	LevelFileHandler::loadFromFile(file, data, conditional);
@@ -93,23 +93,7 @@ const std::ifstream& operator>>(std::ifstream& file, Player& player)
 
 std::ostream& operator<<(std::ostream& ostream, const Player& player)
 {
-	switch (player.controller)
-	{
-	case eFactionController::Player:
-		ostream << Globals::TEXT_HEADER_PLAYER << "\n";
-		break;
-	case eFactionController::AI_1:
-		ostream << Globals::TEXT_HEADER_PLAYERAI_1 << "\n";
-		break;
-	case eFactionController::AI_2:
-		ostream << Globals::TEXT_HEADER_PLAYERAI_2 << "\n";
-		break;
-	case eFactionController::AI_3:
-		ostream << Globals::TEXT_HEADER_PLAYERAI_3 << "\n";
-		break;
-	default:
-		assert(false);
-	}
+	ostream << FACTION_CONTROLLER_DETAILS[static_cast<int>(player.controller)].text << "\n";
 
 	ostream << static_cast<int>(player.HQ.getModelName()) << " " <<  
 		player.HQ.getPosition().x << " " << player.HQ.getPosition().y << " " << player.HQ.getPosition().z << "\n";
