@@ -3,6 +3,7 @@
 #include "Entity.h"
 #include "AdjacentPositions.h"
 #include "Timer.h"
+#include "UnitTarget.h"
 #include <functional>
 #include <vector>
 #include <list>
@@ -33,16 +34,16 @@ public:
 	Unit(const Faction& owningFaction, const glm::vec3& startingPosition, const glm::vec3& destinationPosition, 
 		const Map& map, eEntityType entityType = eEntityType::Unit);
 		 
-	int getTargetID() const;
 	bool isPathEmpty() const;
 	const glm::vec3& getDestination() const;
 	eUnitState getCurrentState() const;
 
-	void resetTargetID();
-	void setTargetID(int entityTargetID);
+	void resetTarget();
+	void setTarget(int targetID, eFactionController targetFaction);
+	//void setTargetID(int entityTargetID);
 	void moveTo(const glm::vec3& destinationPosition, const Map& map, const GetAllAdjacentPositions& getAdjacentPositions, 
 		eUnitState state = eUnitState::Moving);
-	void update(float deltaTime, const Faction& opposingFaction, const Map& map);
+	void update(float deltaTime, const std::vector<const Faction*>& opposingFactions, const Map& map);
 
 #ifdef RENDER_PATHING
 	void renderPathMesh(ShaderHandler& shaderHandler);
@@ -56,7 +57,8 @@ protected:
 
 private:
 	Timer m_attackTimer;
-	int m_targetEntityID;
+	UnitTarget m_target;
+	//int m_targetEntityID;
 #ifdef RENDER_PATHING
 	Mesh m_renderPathMesh;
 #endif // RENDER_PATHING

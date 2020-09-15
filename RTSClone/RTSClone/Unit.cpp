@@ -62,7 +62,7 @@ Unit::Unit(const Faction& owningFaction, const glm::vec3& startingPosition, eEnt
 	m_front(),
 	m_pathToPosition(),
 	m_attackTimer(TIME_BETWEEN_ATTACK, true),
-	m_targetEntityID(Globals::INVALID_ENTITY_ID)
+	m_target()
 {}
 
 Unit::Unit(const Faction& owningFaction, const glm::vec3 & startingPosition, const glm::vec3 & destinationPosition, const Map & map, eEntityType entityType)
@@ -72,14 +72,9 @@ Unit::Unit(const Faction& owningFaction, const glm::vec3 & startingPosition, con
 	m_front(),
 	m_pathToPosition(),
 	m_attackTimer(TIME_BETWEEN_ATTACK, true),
-	m_targetEntityID(Globals::INVALID_ENTITY_ID)
+	m_target()
 {
 	moveTo(destinationPosition, map, [&](const glm::ivec2& position) { return getAllAdjacentPositions(position, map); });
-}
-
-int Unit::getTargetID() const
-{
-	return m_targetEntityID;
 }
 
 bool Unit::isPathEmpty() const
@@ -98,15 +93,15 @@ eUnitState Unit::getCurrentState() const
 	return m_currentState;
 }
 
-void Unit::resetTargetID()
+void Unit::resetTarget()
 {
-	m_targetEntityID = Globals::INVALID_ENTITY_ID;
+	m_target.ID = Globals::INVALID_ENTITY_ID;
 }
 
-void Unit::setTargetID(int entityTargetID)
+void Unit::setTarget(int targetID, eFactionController targetFaction)
 {
-	assert(entityTargetID != Globals::INVALID_ENTITY_ID);
-	m_targetEntityID = entityTargetID;
+	m_target.ID = targetID;
+	m_target.factionController = targetFaction;
 }
 
 void Unit::moveTo(const glm::vec3& destinationPosition, const Map& map, const GetAllAdjacentPositions& getAdjacentPositions, 
@@ -139,9 +134,8 @@ void Unit::moveTo(const glm::vec3& destinationPosition, const Map& map, const Ge
 	}
 }
 
-void Unit::update(float deltaTime, const Faction& opposingFaction, const Map& map)
+void Unit::update(float deltaTime, const std::vector<const Faction*>& opposingFactions, const Map& map)
 {
-	assert(opposingFaction.getName() != m_owningFaction.getName());
 	m_attackTimer.update(deltaTime);
 
 	if (!m_pathToPosition.empty())
@@ -160,21 +154,32 @@ void Unit::update(float deltaTime, const Faction& opposingFaction, const Map& ma
 	switch (m_currentState)
 	{
 	case eUnitState::Idle:
-		assert(m_targetEntityID == Globals::INVALID_ENTITY_ID && m_pathToPosition.empty());
+		assert(m_target.ID == Globals::INVALID_ENTITY_ID && m_pathToPosition.empty());
 		if (m_attackTimer.isExpired() && getEntityType() == eEntityType::Unit)
 		{
-			const Entity* targetEntity = opposingFaction.getEntity(m_position, UNIT_ATTACK_RANGE);
-			if (targetEntity)
+			for (const auto& opposingFaction : opposingFactions)
 			{
-				m_targetEntityID = targetEntity->getID();
-				m_currentState = eUnitState::AttackingTarget;
+				const Entity* targetEntity = opposingFaction->getEntity(m_position, UNIT_ATTACK_RANGE);
+				if (targetEntity)
+				{
+					m_target.factionController = opposingFaction->getController();
+					m_target.ID = targetEntity->getID();
+					m_currentState = eUnitState::AttackingTarget;
+					break;
+				}
 			}
 		}
 		break;
 	case eUnitState::Moving:
-		if (Globals::isEntityIDValid(m_targetEntityID))
+		if (Globals::isEntityIDValid(m_target.ID))
 		{
-			const Entity* targetEntity = opposingFaction.getEntity(m_targetEntityID);
+			eFactionController targetFactionController = m_target.factionController;
+			auto opposingFaction = std::find_if(opposingFactions.begin(), opposingFactions.end(), [targetFactionController](const auto& faction)
+			{
+				return faction->getController() == targetFactionController;
+			});
+			assert(opposingFaction != opposingFactions.end());
+			const Entity* targetEntity = (*opposingFaction)->getEntity(m_target.ID);
 			if (targetEntity)
 			{
 				if (Globals::getSqrDistance(targetEntity->getPosition(), m_position) <= UNIT_ATTACK_RANGE * UNIT_ATTACK_RANGE)
@@ -196,7 +201,7 @@ void Unit::update(float deltaTime, const Faction& opposingFaction, const Map& ma
 			}
 			else
 			{
-				m_targetEntityID = Globals::INVALID_ENTITY_ID;
+				m_target.ID = Globals::INVALID_ENTITY_ID;
 				m_currentState = eUnitState::Idle;
 				m_pathToPosition.clear();
 			}
@@ -204,44 +209,75 @@ void Unit::update(float deltaTime, const Faction& opposingFaction, const Map& ma
 		else if (m_pathToPosition.empty())
 		{
 			m_currentState = eUnitState::Idle;
-			m_targetEntityID = Globals::INVALID_ENTITY_ID;
+			m_target.ID = Globals::INVALID_ENTITY_ID;
 		}
 		break;
 	case eUnitState::AttackMoving:
 		if (m_attackTimer.isExpired())
 		{
-			const Entity* targetEntity = opposingFaction.getEntity(m_position, UNIT_ATTACK_RANGE);
-			if (targetEntity)
+			for (const auto& opposingFaction : opposingFactions)
 			{
-				m_targetEntityID = targetEntity->getID();
-				m_currentState = eUnitState::AttackingTarget;
-
-				if (!m_pathToPosition.empty())
+				const Entity* targetEntity = opposingFaction->getEntity(m_position, UNIT_ATTACK_RANGE);
+				if (targetEntity)
 				{
-					m_pathToPosition.clear();
+					m_target.ID = targetEntity->getID();
+					m_target.factionController = opposingFaction->getController();
+					m_currentState = eUnitState::AttackingTarget;
 
-					if (!Globals::isOnMiddlePosition(m_position))
+					if (!m_pathToPosition.empty())
 					{
-						m_pathToPosition.push_back(PathFinding::getInstance().getClosestPositionToDestination(m_position, targetEntity->getPosition(),
-							[&](const glm::ivec2& position) { return getAllAdjacentPositions(position, map, m_owningFaction.getUnits(), *this); }));
+						m_pathToPosition.clear();
+
+						if (!Globals::isOnMiddlePosition(m_position))
+						{
+							m_pathToPosition.push_back(PathFinding::getInstance().getClosestPositionToDestination(m_position, targetEntity->getPosition(),
+								[&](const glm::ivec2& position) { return getAllAdjacentPositions(position, map, m_owningFaction.getUnits(), *this); }));
+						}
 					}
 				}
 			}
+			//const Entity* targetEntity = opposingFaction.getEntity(m_position, UNIT_ATTACK_RANGE);
+			//if (targetEntity)
+			//{
+			//	m_target.ID = targetEntity->getID();
+			//	//m_targetEntityID = targetEntity->getID();
+			//	m_currentState = eUnitState::AttackingTarget;
+			//	if (!m_pathToPosition.empty())
+			//	{
+			//		m_pathToPosition.clear();
+			//		if (!Globals::isOnMiddlePosition(m_position))
+			//		{
+			//			m_pathToPosition.push_back(PathFinding::getInstance().getClosestPositionToDestination(m_position, targetEntity->getPosition(),
+			//				[&](const glm::ivec2& position) { return getAllAdjacentPositions(position, map, m_owningFaction.getUnits(), *this); }));
+			//		}
+			//	}
+			//}
 		}
 		break;
 	case eUnitState::AttackingTarget:
-		assert(m_targetEntityID != Globals::INVALID_ENTITY_ID);
+		assert(m_target.ID != Globals::INVALID_ENTITY_ID);
 
 		if (m_attackTimer.isExpired())
 		{
-			const Entity* targetEntity = opposingFaction.getEntity(m_targetEntityID);
+			eFactionController targetFactionController = m_target.factionController;
+			auto opposingFaction = std::find_if(opposingFactions.begin(), opposingFactions.end(), [targetFactionController](const auto& faction)
+			{
+				return faction->getController() == targetFactionController;
+			});
+			assert(opposingFaction != opposingFactions.end());
+			const Entity* targetEntity = (*opposingFaction)->getEntity(m_target.ID);
 			if (!targetEntity)
 			{
-				targetEntity = opposingFaction.getEntity(m_position, UNIT_ATTACK_RANGE);
+				targetEntity = (*opposingFaction)->getEntity(m_position, UNIT_ATTACK_RANGE);
 				if (!targetEntity)
 				{
-					m_targetEntityID = Globals::INVALID_ENTITY_ID;
+					m_target.ID = Globals::INVALID_ENTITY_ID;
+					//m_targetEntityID = Globals::INVALID_ENTITY_ID;
 					m_currentState = eUnitState::Idle;
+				}
+				else
+				{
+					m_target.ID = targetEntity->getID();
 				}
 			}
 
@@ -249,8 +285,8 @@ void Unit::update(float deltaTime, const Faction& opposingFaction, const Map& ma
 			{
 				if (Globals::getSqrDistance(targetEntity->getPosition(), m_position) <= UNIT_ATTACK_RANGE * UNIT_ATTACK_RANGE)
 				{
-					GameEventHandler::getInstance().addEvent({ eGameEventType::SpawnProjectile, m_owningFaction.getName(), getID(),
-						targetEntity->getID(), m_position, targetEntity->getPosition() });
+					GameEventHandler::getInstance().addEvent({ eGameEventType::SpawnProjectile, m_owningFaction.getController(), getID(),
+						(*opposingFaction)->getController(), targetEntity->getID(), m_position, targetEntity->getPosition() });
 				}
 				else
 				{
