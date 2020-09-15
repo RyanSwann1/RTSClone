@@ -18,13 +18,14 @@ struct AIAction
 	glm::vec3 position;
 };
 
+class FactionHandler;
 class FactionAI : public Faction
 {
 public:
 	FactionAI(eFactionController factionController, const glm::vec3& hqStartingPosition, 
 		const std::array<glm::vec3, Globals::MAX_MINERALS_PER_FACTION>& mineralPositions);
 
-	void update(float deltaTime, const Map& map, const std::vector<const Faction*>& opposingFactions) override;
+	void update(float deltaTime, const Map& map, FactionHandler& factionHandler) override;
 
 private:
 	std::queue<eEntityType> m_spawnQueue;

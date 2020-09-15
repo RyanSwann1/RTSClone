@@ -3,6 +3,7 @@
 #include "ModelManager.h"
 #include "GameEvent.h"
 #include "TypeComparison.h"
+#include "FactionHandler.h"
 
 namespace
 {
@@ -298,16 +299,16 @@ void Faction::addResources(Worker& worker)
     m_currentResourceAmount += worker.extractResources();
 }
 
-void Faction::update(float deltaTime, const Map& map, const std::vector<const Faction*>& opposingFactions)
+void Faction::update(float deltaTime, const Map& map, FactionHandler& factionHandler)
 {
     for (auto& unit : m_units)
     {
-        unit.update(deltaTime, opposingFactions, map);
+        unit.update(deltaTime, factionHandler, map);
     }
 
     for (auto& worker : m_workers)
     {
-        worker.update(deltaTime, m_HQ, map, opposingFactions);
+        worker.update(deltaTime, m_HQ, map, factionHandler);
     }
 
     for (auto& barracks : m_barracks)

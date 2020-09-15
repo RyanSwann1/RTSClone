@@ -19,6 +19,7 @@ struct PlannedBuilding
 };
 
 struct GameEvent;
+class FactionHandler;
 class ShaderHandler;
 class Map;
 class Faction : private NonMovable, private NonCopyable
@@ -34,7 +35,7 @@ public:
 	int getEntityIDAtPosition(const glm::vec3& position) const;
 
 	void handleEvent(const GameEvent& gameEvent, const Map& map);
-	virtual void update(float deltaTime, const Map& map, const std::vector<const Faction*>& opposingFaction);
+	virtual void update(float deltaTime, const Map& map, FactionHandler& factionHandler);
 	void render(ShaderHandler& shaderHandler) const;
 	void renderPlannedBuildings(ShaderHandler& shaderHandler) const;
 

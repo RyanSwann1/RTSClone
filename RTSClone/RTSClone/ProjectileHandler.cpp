@@ -1,6 +1,7 @@
 #include "ProjectileHandler.h"
 #include "Faction.h"
 #include "GameEventHandler.h"
+#include "FactionHandler.h"
 
 ProjectileHandler::ProjectileHandler()
 	: m_projectiles()
@@ -11,21 +12,15 @@ void ProjectileHandler::addProjectile(const GameEvent& gameEvent)
 	m_projectiles.emplace_back(gameEvent);
 }
 
-void ProjectileHandler::update(float deltaTime, const std::vector<std::unique_ptr<Faction>>& factions)
+void ProjectileHandler::update(float deltaTime, const FactionHandler& factionHandler)
 {
 	for (auto projectile = m_projectiles.begin(); projectile != m_projectiles.end();)
 	{	
 		projectile->update(deltaTime);
-	
-		bool projectileCollision = false;
-		eFactionController targetFactionController = projectile->getSenderEvent().targetFaction;
-		auto targetFaction = std::find_if(factions.begin(), factions.end(), [targetFactionController](const auto& faction)
-		{
-			return faction->getController() == targetFactionController;
-		});
-		assert(targetFaction != factions.end());
 
-		projectileCollision = targetFaction->get()->getEntity(projectile->getAABB(), projectile->getSenderEvent().targetID);
+		const Faction& targetFaction = factionHandler.getFaction(projectile->getSenderEvent().targetFaction);
+		bool projectileCollision = false;
+		projectileCollision = targetFaction.getEntity(projectile->getAABB(), projectile->getSenderEvent().targetID);
 
 		if (projectileCollision || projectile->isReachedDestination())
 		{

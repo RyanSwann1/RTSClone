@@ -64,7 +64,6 @@ void FactionPlayer::handleInput(const sf::Event& currentSFMLEvent, const sf::Win
                     break;
                 }
             }
-            //int targetEntityID = opposingFaction.getEntityIDAtPosition(mouseToGroundPosition);
             if (Globals::isEntityIDValid(targetEntityID))
             {
                 for (auto& unit : m_units)

@@ -56,9 +56,9 @@ FactionAI::FactionAI(eFactionController factionController, const glm::vec3& hqSt
 	//m_actionQueue.push({ eActionType::BuildBarracks, {45.0f, Globals::GROUND_HEIGHT, 120.0f} });
 }
 
-void FactionAI::update(float deltaTime, const Map & map, const std::vector<const Faction*>& opposingFactions)
+void FactionAI::update(float deltaTime, const Map & map, FactionHandler& factionHandler)
 {
-	Faction::update(deltaTime, map, opposingFactions);
+	Faction::update(deltaTime, map, factionHandler);
 
 	m_delayTimer.update(deltaTime);
 

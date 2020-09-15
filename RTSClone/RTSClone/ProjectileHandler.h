@@ -6,15 +6,15 @@
 #include <vector>
 #include <memory>
 
-class Faction;
 class ShaderHandler;
+class FactionHandler;
 class ProjectileHandler : private NonCopyable, private NonMovable
 {
 public:
 	ProjectileHandler();
 	
 	void addProjectile(const GameEvent& gameEvent);
-	void update(float deltaTime, const std::vector<std::unique_ptr<Faction>>& factions);
+	void update(float deltaTime, const FactionHandler& factionHandler);
 	void render(ShaderHandler& shaderHandler) const;
 
 #ifdef RENDER_AABB
