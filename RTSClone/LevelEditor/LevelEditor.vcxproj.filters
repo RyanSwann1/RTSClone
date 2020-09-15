@@ -87,6 +87,9 @@
     <ClCompile Include="Player.cpp">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="FactionController.cpp">
+      <Filter>Header Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Shared\imgui\imstb_truetype.h">
@@ -177,6 +180,9 @@
       <Filter>src</Filter>
     </ClInclude>
     <ClInclude Include="..\Shared\PlayerType.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Shared\FactionController.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

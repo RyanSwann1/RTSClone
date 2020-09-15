@@ -59,6 +59,21 @@ void showPlayerDetails(Player& player, const std::string& playerName, const std:
 
 constexpr glm::vec3 TERRAIN_STARTING_POSITION = { 0.0f, Globals::GROUND_HEIGHT - 0.01f, 0.0f };
 
+constexpr std::array<glm::vec3, static_cast<size_t>(eFactionController::Max) + 1> PLAYER_HQ_STARTING_POSITIONS =
+{
+	glm::vec3(35.0f, Globals::GROUND_HEIGHT, 15.0f),
+	glm::vec3(35.0f, Globals::GROUND_HEIGHT, 150.0f),
+	glm::vec3(135.0f, Globals::GROUND_HEIGHT, 150.0f),
+	glm::vec3(135.0f, Globals::GROUND_HEIGHT, 15.0f)
+};
+constexpr std::array<glm::vec3, static_cast<size_t>(eFactionController::Max) + 1> PLAYER_MINERAL_STARTING_POSITIONS =
+{
+	glm::vec3(70.0f, Globals::GROUND_HEIGHT, Globals::NODE_SIZE),
+	glm::vec3(70.0f, Globals::GROUND_HEIGHT, 150.0f),
+	glm::vec3(170.0f, Globals::GROUND_HEIGHT, 150.0f),
+	glm::vec3(170.0f, Globals::GROUND_HEIGHT, Globals::NODE_SIZE)
+};
+
 int main()
 {
 	sf::ContextSettings settings;
@@ -105,19 +120,29 @@ int main()
 	EntityManager entityManager;
 	sf::Clock gameClock;
 	Camera camera;
-	Player player(ePlayerType::Human, { 35.0f, Globals::GROUND_HEIGHT, 15.f }, { 70.0f, Globals::GROUND_HEIGHT, Globals::NODE_SIZE });
-	Player playerAI(ePlayerType::AI, { 35.0f, Globals::GROUND_HEIGHT, 100.0f }, { 70.0f, Globals::GROUND_HEIGHT, 100.0f });
+	std::vector<Player> players;
+	players.reserve(static_cast<int>(eFactionController::Max) + 1);
+	
 	glm::vec3 previousMousePosition = { 0.0f, Globals::GROUND_HEIGHT, 0.0f };
 	bool plannedEntityActive = false;
 	bool showPlayerMenu = false;
 	Entity plannedEntity(eModelName::RocksTall, { 0.0f, 0.0f, 0.0f });
-	int selected = 0;
-	
-	if (!LevelFileHandler::loadLevelFromFile(levelName, entityManager, player, playerAI))
+	int selected = 0;	
+	const auto& i = FACTION_CONTROLLER_DETAILS;
+
+	if (!LevelFileHandler::loadLevelFromFile(levelName, entityManager, players))
 	{
-		std::cout << "Failed to load level\n";
+		std::cout << "Failed to load level: " << levelName << "\n";
 		entityManager.addEntity(eModelName::Terrain, TERRAIN_STARTING_POSITION);
+		
+		players.emplace_back(eFactionController::Player, PLAYER_HQ_STARTING_POSITIONS[static_cast<int>(eFactionController::Player)], 
+			PLAYER_MINERAL_STARTING_POSITIONS[static_cast<int>(eFactionController::Player)]);
+
+		players.emplace_back(eFactionController::AI_1, PLAYER_HQ_STARTING_POSITIONS[static_cast<int>(eFactionController::AI_1)],
+			PLAYER_MINERAL_STARTING_POSITIONS[static_cast<int>(eFactionController::AI_1)]);
 	}
+
+	int totalPlayers = static_cast<int>(players.size());
 
 	std::cout << glGetError() << "\n";
 	std::cout << glGetError() << "\n";
@@ -142,7 +167,7 @@ int main()
 					window.close();
 					break;
 				case sf::Keyboard::Enter:
-					if (!LevelFileHandler::saveLevelToFile(levelName, entityManager, player, playerAI))
+					if (!LevelFileHandler::saveLevelToFile(levelName, entityManager, players))
 					{
 						std::cout << "Unable to save file " + levelName << "\n";
 					}
@@ -275,14 +300,55 @@ int main()
 			ImGui::SetNextWindowPos(ImVec2(700, 700), ImGuiCond_FirstUseEver);
 			ImGui::Begin("Players", &showPlayerMenu, ImGuiWindowFlags_None);
 			ImGui::BeginChild("Players One");
-			showPlayerDetails(player, "Player", "Human", 0);
-			showPlayerDetails(playerAI, "Player", "AI", 1);
+			int newPlayerTotal = totalPlayers;
+			if (ImGui::InputInt("Player Amount", &newPlayerTotal, 1, ImGuiInputTextFlags_ReadOnly))
+			{
+				if (newPlayerTotal >= Globals::MIN_FACTIONS && newPlayerTotal <= Globals::MAX_FACTIONS)
+				{
+					totalPlayers = newPlayerTotal;
+					if (totalPlayers > static_cast<int>(players.size()))
+					{
+						eFactionController factionController;
+						switch (totalPlayers)
+						{
+						case Globals::MAX_FACTIONS - Globals::MIN_FACTIONS / 2:
+							factionController = eFactionController::AI_2;
+							break;
+						case Globals::MAX_FACTIONS:
+							factionController = eFactionController::AI_3;
+							break;
+						default:
+							assert(false);
+						}
+
+						players.emplace_back(factionController, PLAYER_HQ_STARTING_POSITIONS[totalPlayers - 1],
+							PLAYER_MINERAL_STARTING_POSITIONS[totalPlayers - 1]);
+					}
+					else if (totalPlayers < static_cast<int>(players.size()))
+					{
+						players.pop_back();
+					}
+				}
+			};
+			for (int i = 0; i < totalPlayers; ++i)
+			{
+				if (i == 0)
+				{
+					showPlayerDetails(players[i], "Player", "Human", i);
+					
+				}
+				else
+				{
+					showPlayerDetails(players[i], "Player", "AI", i);
+				}
+			}
+
 			ImGui::EndChild();
 			ImGui::End();
 		}
 
 		//Demo
-		//ImGui::ShowDemoWindow();
+		ImGui::ShowDemoWindow();
 
 		//Render
 		glm::mat4 view = camera.getView();
@@ -300,8 +366,13 @@ int main()
 		{
 			plannedEntity.render(*shaderHandler);
 		}
-		player.render(*shaderHandler);
-		playerAI.render(*shaderHandler);
+		for (auto& player : players)
+		{
+			player.render(*shaderHandler);
+		}
+		//player.render(*shaderHandler);
+		//playerAI1.render(*shaderHandler);
+		//playerAI2.render(*shaderHandler);
 
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
