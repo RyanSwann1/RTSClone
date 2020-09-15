@@ -21,11 +21,10 @@ struct AIAction
 class FactionAI : public Faction
 {
 public:
-	FactionAI(eFactionName factionName, const glm::vec3& hqStartingPosition, 
+	FactionAI(eFactionController factionController, const glm::vec3& hqStartingPosition, 
 		const std::array<glm::vec3, Globals::MAX_MINERALS_PER_FACTION>& mineralPositions);
 
-
-	void update(float deltaTime, const Map& map, const Faction& opposingFaction) override;
+	void update(float deltaTime, const Map& map, const std::vector<const Faction*>& opposingFactions) override;
 
 private:
 	std::queue<eEntityType> m_spawnQueue;

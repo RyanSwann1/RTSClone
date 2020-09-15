@@ -49,7 +49,7 @@ PlannedBuilding::PlannedBuilding(int workerID, const glm::vec3& spawnPosition, e
 }
 
 //Faction
-Faction::Faction(eFactionName factionName, const glm::vec3& hqStartingPosition, 
+Faction::Faction(eFactionController factionController, const glm::vec3& hqStartingPosition, 
     const std::array<glm::vec3, Globals::MAX_MINERALS_PER_FACTION>& mineralPositions)
     : m_plannedBuildings(),
     m_minerals(getMinerals(mineralPositions)),
@@ -59,7 +59,7 @@ Faction::Faction(eFactionName factionName, const glm::vec3& hqStartingPosition,
     m_supplyDepots(),
     m_barracks(),
     m_HQ(Globals::convertToNodePosition(hqStartingPosition)),
-    m_factionName(factionName),
+    m_controller(factionController),
     m_currentResourceAmount(Globals::STARTING_RESOURCES),
     m_currentPopulationAmount(0),
     m_currentPopulationLimit(Globals::STARTING_POPULATION)
@@ -72,9 +72,9 @@ const glm::vec3& Faction::getHQPosition() const
     return m_HQ.getPosition();
 }
 
-eFactionName Faction::getName() const
+eFactionController Faction::getController() const
 {
-    return m_factionName;
+    return m_controller;
 }
 
 const std::list<Unit>& Faction::getUnits() const
@@ -180,7 +180,7 @@ void Faction::handleEvent(const GameEvent& gameEvent, const Map& map)
     {
     case eGameEventType::Attack:
     {
-        assert(gameEvent.senderFaction != m_factionName);
+        assert(gameEvent.senderFaction != m_controller);
         int targetID = gameEvent.targetID;
         auto entity = std::find_if(m_allEntities.begin(), m_allEntities.end(), [targetID](const auto& entity)
         {
@@ -248,7 +248,7 @@ void Faction::handleEvent(const GameEvent& gameEvent, const Map& map)
         break;
     case eGameEventType::RemovePlannedBuilding:
     {
-        assert(gameEvent.senderFaction == m_factionName);
+        assert(gameEvent.senderFaction == m_controller);
         const glm::vec3& buildingPosition = gameEvent.startingPosition;
         auto buildingToSpawn = std::find_if(m_plannedBuildings.begin(), m_plannedBuildings.end(), [&buildingPosition](const auto& buildingToSpawn)
         {
@@ -298,16 +298,16 @@ void Faction::addResources(Worker& worker)
     m_currentResourceAmount += worker.extractResources();
 }
 
-void Faction::update(float deltaTime, const Map& map, const Faction& opposingFaction)
+void Faction::update(float deltaTime, const Map& map, const std::vector<const Faction*>& opposingFactions)
 {
     for (auto& unit : m_units)
     {
-        unit.update(deltaTime, opposingFaction, map);
+        unit.update(deltaTime, opposingFactions, map);
     }
 
     for (auto& worker : m_workers)
     {
-        worker.update(deltaTime, m_HQ, map, opposingFaction);
+        worker.update(deltaTime, m_HQ, map, opposingFactions);
     }
 
     for (auto& barracks : m_barracks)

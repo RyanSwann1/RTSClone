@@ -6,7 +6,7 @@
 #include "PathFinding.h"
 #include "SupplyDepot.h"
 #include "Mineral.h"
-#include "FactionName.h"
+#include "FactionController.h"
 #include <list>
 
 struct PlannedBuilding
@@ -26,7 +26,7 @@ class Faction : private NonMovable, private NonCopyable
 public:
 	virtual ~Faction() {}
 	const glm::vec3& getHQPosition() const;
-	eFactionName getName() const;
+	eFactionController getController() const;
 	const std::list<Unit>& getUnits() const;
 	const Entity* getEntity(const glm::vec3& position, float maxDistance, bool prioritizeUnits = true) const;
 	const Entity* getEntity(const AABB& AABB, int entityID) const;
@@ -34,7 +34,7 @@ public:
 	int getEntityIDAtPosition(const glm::vec3& position) const;
 
 	void handleEvent(const GameEvent& gameEvent, const Map& map);
-	virtual void update(float deltaTime, const Map& map, const Faction& opposingFaction);
+	virtual void update(float deltaTime, const Map& map, const std::vector<const Faction*>& opposingFaction);
 	void render(ShaderHandler& shaderHandler) const;
 	void renderPlannedBuildings(ShaderHandler& shaderHandler) const;
 
@@ -47,7 +47,7 @@ public:
 #endif // RENDER_AABB
 
 protected:
-	Faction(eFactionName factionName, const glm::vec3& hqStartingPosition, 
+	Faction(eFactionController factionController, const glm::vec3& hqStartingPosition, 
 		const std::array<glm::vec3, Globals::MAX_MINERALS_PER_FACTION>& mineralPositions);
 	std::array<Mineral, Globals::MAX_MINERALS_PER_FACTION> m_minerals;
 	std::vector<PlannedBuilding> m_plannedBuildings;
@@ -116,7 +116,7 @@ protected:
 	}
 
 private:
-	const eFactionName m_factionName;
+	const eFactionController m_controller;
 	int m_currentResourceAmount;
 	int m_currentPopulationAmount;
 	int m_currentPopulationLimit;

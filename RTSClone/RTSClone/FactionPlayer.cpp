@@ -10,16 +10,16 @@
 #include <array>
 #include <algorithm>
 
-FactionPlayer::FactionPlayer(eFactionName factionName, const glm::vec3& hqStartingPosition, 
+FactionPlayer::FactionPlayer(eFactionController factionController, const glm::vec3& hqStartingPosition, 
     const std::array<glm::vec3, Globals::MAX_MINERALS_PER_FACTION>& mineralPositions)
-    : Faction(factionName, hqStartingPosition, mineralPositions),
+    : Faction(factionController, hqStartingPosition, mineralPositions),
     m_selectionBox(),
     m_previousMouseToGroundPosition(),
     m_attackMoveSelected(false)
 {}
 
 void FactionPlayer::handleInput(const sf::Event& currentSFMLEvent, const sf::Window& window, const Camera& camera, const Map& map, 
-    const Faction& opposingFaction)
+    const std::vector<const Faction*>& opposingFactions)
 {
     switch (currentSFMLEvent.type)
     {
@@ -51,15 +51,27 @@ void FactionPlayer::handleInput(const sf::Event& currentSFMLEvent, const sf::Win
         }
         else if (currentSFMLEvent.mouseButton.button == sf::Mouse::Right)
         {
+            //TODO: Change what sending into instructUnitToAttack - send actual entity instead
             glm::vec3 mouseToGroundPosition = camera.getMouseToGroundPosition(window);
-            int targetEntityID = opposingFaction.getEntityIDAtPosition(mouseToGroundPosition);
+            int targetEntityID = Globals::INVALID_ENTITY_ID;
+            const Faction* opposingFaction = nullptr;
+            for (const auto& faction : opposingFactions)
+            {
+                targetEntityID = faction->getEntityIDAtPosition(mouseToGroundPosition);
+                if (Globals::isEntityIDValid(targetEntityID))
+                {
+                    opposingFaction = faction;
+                    break;
+                }
+            }
+            //int targetEntityID = opposingFaction.getEntityIDAtPosition(mouseToGroundPosition);
             if (Globals::isEntityIDValid(targetEntityID))
             {
                 for (auto& unit : m_units)
                 {
                     if (unit.isSelected())
                     {
-                        instructUnitToAttack(unit, targetEntityID, opposingFaction, map);
+                        instructUnitToAttack(unit, targetEntityID, *opposingFaction, map);
                     }
                 }
             }
@@ -195,7 +207,7 @@ void FactionPlayer::moveSingularSelectedUnit(const glm::vec3& mouseToGroundPosit
     });
     if (selectedUnit != m_units.end())
     {
-        selectedUnit->resetTargetID();
+        selectedUnit->resetTarget();
         eUnitState state = (m_attackMoveSelected ? eUnitState::AttackMoving : eUnitState::Moving);
         selectedUnit->moveTo(Globals::convertToNodePosition(mouseToGroundPosition), map,
             [&](const glm::ivec2& position) { return getAllAdjacentPositions(position, map, m_units, *selectedUnit); }, state);
@@ -206,7 +218,7 @@ void FactionPlayer::moveSingularSelectedUnit(const glm::vec3& mouseToGroundPosit
             return worker.isSelected() == true;
         });
         assert(selectedWorker != m_workers.end());
-        selectedWorker->resetTargetID();
+        selectedWorker->resetTarget();
 
         const Mineral* mineralToHarvest = nullptr;
         for (const auto& mineral : m_minerals)
@@ -319,7 +331,7 @@ void FactionPlayer::moveMultipleSelectedUnits(const glm::vec3& mouseToGroundPosi
                     {
                     case eEntityType::Unit:
                     {
-                        selectedUnit->resetTargetID();
+                        selectedUnit->resetTarget();
                         eUnitState state = (m_attackMoveSelected ? eUnitState::AttackMoving : eUnitState::Moving);
 
                         selectedUnit->moveTo(Globals::convertToNodePosition(mouseToGroundPosition - (averagePosition - selectedUnit->getPosition())), map,
@@ -328,7 +340,7 @@ void FactionPlayer::moveMultipleSelectedUnits(const glm::vec3& mouseToGroundPosi
                     }
                         break;
                     case eEntityType::Worker:
-                        selectedUnit->resetTargetID();
+                        selectedUnit->resetTarget();
                         static_cast<Worker*>(selectedUnit)->moveTo(mouseToGroundPosition - (averagePosition - selectedUnit->getPosition()), map,
                             [&](const glm::ivec2& position) { return getAllAdjacentPositions(position, map); });
                         break;
@@ -362,7 +374,8 @@ void FactionPlayer::instructUnitToAttack(Unit& unit, int targetEntityID, const F
 
     const Entity* targetEntity = opposingFaction.getEntity(targetEntityID);
     assert(targetEntity);
-    unit.setTargetID(targetEntityID);
+    unit.setTarget(targetEntityID, opposingFaction.getController());
+    //unit.setTargetID(targetEntityID);
     if (unit.getCurrentState() != eUnitState::AttackingTarget)
     {
         unit.moveTo(targetEntity->getPosition(), map,

@@ -35,9 +35,9 @@ AIAction::AIAction(eActionType actionType, const glm::vec3& position)
 {}
 
 //FactionAI
-FactionAI::FactionAI(eFactionName factionName, const glm::vec3& hqStartingPosition, 
+FactionAI::FactionAI(eFactionController factionController, const glm::vec3& hqStartingPosition, 
 	const std::array<glm::vec3, Globals::MAX_MINERALS_PER_FACTION>& mineralPositions)
-	: Faction(factionName, hqStartingPosition, mineralPositions),
+	: Faction(factionController, hqStartingPosition, mineralPositions),
 	m_spawnQueue(),
 	m_actionQueue(),
 	m_delayTimer(DELAY_TIME, true)
@@ -47,18 +47,18 @@ FactionAI::FactionAI(eFactionName factionName, const glm::vec3& hqStartingPositi
 		m_spawnQueue.push(eEntityType::Worker);
 	}
 
-	for (int i = 0; i < STARTING_UNIT_COUNT; ++i)
-	{
-		m_spawnQueue.push(eEntityType::Unit);
-	}
+	//for (int i = 0; i < STARTING_UNIT_COUNT; ++i)
+	//{
+	//	m_spawnQueue.push(eEntityType::Unit);
+	//}
 
-	m_actionQueue.push({ eActionType::BuildSupplyDepot, {35.0f, Globals::GROUND_HEIGHT, 120.0f} });
-	m_actionQueue.push({ eActionType::BuildBarracks, {45.0f, Globals::GROUND_HEIGHT, 120.0f} });
+	//m_actionQueue.push({ eActionType::BuildSupplyDepot, {35.0f, Globals::GROUND_HEIGHT, 120.0f} });
+	//m_actionQueue.push({ eActionType::BuildBarracks, {45.0f, Globals::GROUND_HEIGHT, 120.0f} });
 }
 
-void FactionAI::update(float deltaTime, const Map & map, const Faction& opposingFaction)
+void FactionAI::update(float deltaTime, const Map & map, const std::vector<const Faction*>& opposingFactions)
 {
-	Faction::update(deltaTime, map, opposingFaction);
+	Faction::update(deltaTime, map, opposingFactions);
 
 	m_delayTimer.update(deltaTime);
 
