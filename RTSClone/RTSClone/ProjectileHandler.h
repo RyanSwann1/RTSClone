@@ -4,6 +4,7 @@
 #include "NonMovable.h"
 #include "Projectile.h"
 #include <vector>
+#include <memory>
 
 class Faction;
 class ShaderHandler;
@@ -13,7 +14,7 @@ public:
 	ProjectileHandler();
 	
 	void addProjectile(const GameEvent& gameEvent);
-	void update(float deltaTime, const Faction& player, const Faction& playerAI);
+	void update(float deltaTime, const std::vector<std::unique_ptr<Faction>>& factions);
 	void render(ShaderHandler& shaderHandler) const;
 
 #ifdef RENDER_AABB

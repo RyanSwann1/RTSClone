@@ -11,29 +11,28 @@ void ProjectileHandler::addProjectile(const GameEvent& gameEvent)
 	m_projectiles.emplace_back(gameEvent);
 }
 
-void ProjectileHandler::update(float deltaTime, const Faction& player, const Faction& playerAI)
+void ProjectileHandler::update(float deltaTime, const std::vector<std::unique_ptr<Faction>>& factions)
 {
 	for (auto projectile = m_projectiles.begin(); projectile != m_projectiles.end();)
 	{	
 		projectile->update(deltaTime);
 	
 		bool projectileCollision = false;
-		switch (projectile->getSenderEvent().senderFaction)
+		eFactionController targetFactionController = projectile->getSenderEvent().targetFaction;
+		auto targetFaction = std::find_if(factions.begin(), factions.end(), [targetFactionController](const auto& faction)
 		{
-		case eFactionName::Player:
-			projectileCollision = playerAI.getEntity(projectile->getAABB(), projectile->getSenderEvent().targetID);
-			break;
-		case eFactionName::AI:
-			projectileCollision = player.getEntity(projectile->getAABB(), projectile->getSenderEvent().targetID);
-			break;
-		}
+			return faction->getController() == targetFactionController;
+		});
+		assert(targetFaction != factions.end());
+
+		projectileCollision = targetFaction->get()->getEntity(projectile->getAABB(), projectile->getSenderEvent().targetID);
 
 		if (projectileCollision || projectile->isReachedDestination())
 		{
 			if (projectileCollision)
 			{
 				GameEventHandler::getInstance().addEvent({ eGameEventType::Attack, projectile->getSenderEvent().senderFaction,
-					projectile->getID(), projectile->getSenderEvent().targetID });
+					projectile->getID(), projectile->getSenderEvent().targetFaction, projectile->getSenderEvent().targetID });
 			}
 
 			projectile = m_projectiles.erase(projectile);
