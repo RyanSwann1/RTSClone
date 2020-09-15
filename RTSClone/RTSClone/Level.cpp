@@ -21,28 +21,11 @@ namespace
 
 Level::Level(std::vector<SceneryGameObject>&& scenery, std::vector<std::unique_ptr<Faction>>&& factions)
 	: m_scenery(std::move(scenery)),
-	m_projectileHandler(),
 	m_factions(std::move(factions)),
-	m_opposingFactions(),
-	m_player(static_cast<FactionPlayer*>(&getFaction(m_factions, eFactionController::Player)))
-{
-	m_opposingFactions.reserve(m_factions.size() - static_cast<size_t>(1));
-}
-
-const std::vector<const Faction*>& Level::getOpposingFactions(eFactionController factionController)
-{
-	m_opposingFactions.clear();
-
-	for (const auto& faction : m_factions)
-	{
-		if (faction->getController() != factionController)
-		{
-			m_opposingFactions.push_back(faction.get());
-		}
-	}
-
-	return m_opposingFactions;
-}
+	m_factionHandler(m_factions),
+	m_projectileHandler(),
+	m_player(static_cast<FactionPlayer&>(getFaction(m_factions, eFactionController::Player)))
+{}
 
 std::unique_ptr<Level> Level::create(const std::string& levelName)
 {
@@ -58,24 +41,25 @@ std::unique_ptr<Level> Level::create(const std::string& levelName)
 
 void Level::handleInput(const sf::Window& window, const Camera& camera, const sf::Event& currentSFMLEvent, const Map& map)
 {
-	m_player->handleInput(currentSFMLEvent, window, camera, map, getOpposingFactions(m_player->getController()));
+	m_player.handleInput(currentSFMLEvent, window, camera, map, m_factionHandler.getOpposingFactions(eFactionController::Player));
+	// getOpposingFactions(m_player->getController()));
 }
 
 void Level::update(float deltaTime, const Map& map)
 {
-	m_projectileHandler.update(deltaTime, m_factions);
+	m_projectileHandler.update(deltaTime, m_factionHandler);
 	
 	for (auto& faction : m_factions)
 	{
-		faction->update(deltaTime, map, getOpposingFactions(faction->getController()));
+		faction->update(deltaTime, map, m_factionHandler);
 	}
 
-	GameEventHandler::getInstance().handleEvents(m_factions, m_projectileHandler, map);
+	GameEventHandler::getInstance().handleEvents(m_factionHandler, m_projectileHandler, map);
 }
 
 void Level::renderSelectionBox(const sf::Window& window) const
 {
-	m_player->renderSelectionBox(window);
+	m_player.renderSelectionBox(window);
 }
 
 void Level::renderPlannedBuildings(ShaderHandler& shaderHandler) const
@@ -100,7 +84,6 @@ void Level::render(ShaderHandler& shaderHandler) const
 
 	m_projectileHandler.render(shaderHandler);
 }
-
 
 #ifdef RENDER_AABB
 void Level::renderAABB(ShaderHandler& shaderHandler)

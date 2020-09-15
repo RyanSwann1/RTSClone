@@ -6,6 +6,7 @@
 #include "FactionPlayer.h"
 #include "FactionAI.h"
 #include "SceneryGameObject.h"
+#include "FactionHandler.h"
 #include <string>
 #include <vector>
 #include <memory>
@@ -36,10 +37,8 @@ private:
 	Level(std::vector<SceneryGameObject>&& scenery, std::vector<std::unique_ptr<Faction>>&& factions);
 	
 	std::vector<SceneryGameObject> m_scenery;
-	ProjectileHandler m_projectileHandler;
 	std::vector<std::unique_ptr<Faction>> m_factions;
-	std::vector<const Faction*> m_opposingFactions;
-	FactionPlayer* m_player;
-
-	const std::vector<const Faction*>& getOpposingFactions(eFactionController factionController);
+	FactionHandler m_factionHandler;
+	ProjectileHandler m_projectileHandler;
+	FactionPlayer& m_player;
 };	
