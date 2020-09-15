@@ -145,6 +145,7 @@
     <ClCompile Include="..\Shared\AABB.cpp" />
     <ClCompile Include="..\Shared\Camera.cpp" />
     <ClCompile Include="..\Shared\Entity.cpp" />
+    <ClCompile Include="..\Shared\FactionController.cpp" />
     <ClCompile Include="..\Shared\glad.c" />
     <ClCompile Include="..\Shared\imgui\imgui.cpp" />
     <ClCompile Include="..\Shared\imgui\imgui_demo.cpp" />
@@ -160,7 +161,6 @@
     <ClCompile Include="..\Shared\SelectionBox.cpp" />
     <ClCompile Include="..\Shared\ShaderHandler.cpp" />
     <ClCompile Include="EntityManager.cpp" />
-    <ClCompile Include="FactionController.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="PlayableAreaDisplay.cpp" />
     <ClCompile Include="Player.cpp" />
@@ -190,7 +190,6 @@
     <ClInclude Include="..\Shared\ModelName.h" />
     <ClInclude Include="..\Shared\NonCopyable.h" />
     <ClInclude Include="..\Shared\NonMovable.h" />
-    <ClInclude Include="..\Shared\PlayerType.h" />
     <ClInclude Include="..\Shared\SelectionBox.h" />
     <ClInclude Include="..\Shared\ShaderHandler.h" />
     <ClInclude Include="..\Shared\UniqueEntityIDDistributer.h" />

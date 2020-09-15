@@ -87,8 +87,8 @@
     <ClCompile Include="Player.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="FactionController.cpp">
-      <Filter>Header Files</Filter>
+    <ClCompile Include="..\Shared\FactionController.cpp">
+      <Filter>src</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -179,11 +179,8 @@
     <ClInclude Include="Player.h">
       <Filter>src</Filter>
     </ClInclude>
-    <ClInclude Include="..\Shared\PlayerType.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\Shared\FactionController.h">
-      <Filter>Header Files</Filter>
+      <Filter>src</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
