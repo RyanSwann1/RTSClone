@@ -255,7 +255,6 @@
     <ClInclude Include="TypeComparison.h" />
     <ClInclude Include="Faction.h" />
     <ClInclude Include="FactionAI.h" />
-    <ClInclude Include="FactionName.h" />
     <ClInclude Include="FactionPlayer.h" />
     <ClInclude Include="GameEvent.h" />
     <ClInclude Include="GameEventHandler.h" />
