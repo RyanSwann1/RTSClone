@@ -160,6 +160,7 @@
     <ClCompile Include="AdjacentPositions.cpp" />
     <ClCompile Include="Faction.cpp" />
     <ClCompile Include="FactionAI.cpp" />
+    <ClCompile Include="FactionHandler.cpp" />
     <ClCompile Include="FactionPlayer.cpp" />
     <ClCompile Include="GameEvent.cpp" />
     <ClCompile Include="GameEventHandler.cpp" />
@@ -249,6 +250,7 @@
     <ClInclude Include="assimp\include\vector3.h" />
     <ClInclude Include="assimp\include\version.h" />
     <ClInclude Include="EntityType.h" />
+    <ClInclude Include="FactionHandler.h" />
     <ClInclude Include="SceneryGameObject.h" />
     <ClInclude Include="Level.h" />
     <ClInclude Include="UnitTarget.h" />

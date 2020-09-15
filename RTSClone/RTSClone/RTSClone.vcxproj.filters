@@ -141,6 +141,9 @@
     <ClCompile Include="UnitTarget.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="FactionHandler.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="assimp\include\Compiler\poppack1.h">
@@ -423,6 +426,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="UnitTarget.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="FactionHandler.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
