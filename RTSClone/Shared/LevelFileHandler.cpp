@@ -19,6 +19,10 @@ void loadInPlayer(std::ifstream& file, std::vector<std::unique_ptr<Faction>>& fa
 void loadInScenery(std::ifstream& file, std::vector<SceneryGameObject>& scenery);
 #endif // GAME
 
+#ifdef LEVEL_EDITOR
+bool isPlayerActive(std::ifstream& file, eFactionController factionController);
+#endif // LEVEL_EDITOR
+
 void LevelFileHandler::loadFromFile(std::ifstream& file, const std::function<void(const std::string&)>& data, 
 	const std::function<bool(const std::string&)>& conditional)
 {
@@ -50,7 +54,7 @@ void LevelFileHandler::loadFromFile(std::ifstream& file, const std::function<voi
 
 #ifdef LEVEL_EDITOR
 bool LevelFileHandler::saveLevelToFile(const std::string& fileName, const EntityManager& entityManager,
-	const Player& player, const Player& playerAI)
+	const std::vector<Player>& players)
 {
 	std::ofstream file(Globals::SHARED_FILE_DIRECTORY + fileName);
 	assert(file.is_open());
@@ -59,28 +63,75 @@ bool LevelFileHandler::saveLevelToFile(const std::string& fileName, const Entity
 		return false;
 	}
 
-	file << player;
-	file << playerAI;
+	for (auto& player : players)
+	{
+		file << player;
+	}
+
 	file << entityManager;
 	file.close();
 
 	return true;
 }
 
-bool LevelFileHandler::loadLevelFromFile(const std::string& fileName, EntityManager& entityManager, Player& player, Player& playerAI)
+bool LevelFileHandler::loadLevelFromFile(const std::string& fileName, EntityManager& entityManager, std::vector<Player>& players)
 {
 	std::ifstream file(Globals::SHARED_FILE_DIRECTORY + fileName);
 	if (!file.is_open())
 	{
 		return false;
 	}
+	
+	for (const auto& factionControllerDetails : FACTION_CONTROLLER_DETAILS)
+	{
+		switch (factionControllerDetails.controller)
+		{
+		case eFactionController::Player:	
+		case eFactionController::AI_1:
+			assert(isPlayerActive(file, factionControllerDetails.controller));
+			players.emplace_back(factionControllerDetails.controller);
+			break;
+		case eFactionController::AI_2:
+		case eFactionController::AI_3:
+			if (isPlayerActive(file, factionControllerDetails.controller))
+			{
+				players.emplace_back(factionControllerDetails.controller);
+			}
+			break;
+		default:
+			assert(false);
+		}
+	}
 
-	file >> player;
-	file >> playerAI;
+	for (auto& player : players)
+	{
+		file >> player;
+	}
+
 	file >> entityManager;
 	file.close();
 
 	return true;
+}
+
+bool isPlayerActive(std::ifstream& file, eFactionController factionController)
+{
+	assert(file.is_open());
+	bool playerFound = false;
+	std::string line;
+	while (getline(file, line))
+	{
+		if (line == FACTION_CONTROLLER_DETAILS[static_cast<int>(factionController)].text)
+		{
+			playerFound = true;
+			break;
+		}
+	}
+
+	file.clear();
+	file.seekg(0);
+
+	return playerFound;
 }
 #endif // LEVEL_EDITOR
 

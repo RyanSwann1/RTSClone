@@ -19,9 +19,9 @@ namespace LevelFileHandler
 
 #ifdef LEVEL_EDITOR
 	bool saveLevelToFile(const std::string& fileName, const EntityManager& entityManager, 
-		const Player& player, const Player& playerAI);
+		const std::vector<Player>& players);
 	bool loadLevelFromFile(const std::string& fileName, EntityManager& entityManager,
-		Player& player, Player& playerAI);
+		std::vector<Player>& players);
 #endif // LEVEL_EDITOR
 
 #ifdef GAME
