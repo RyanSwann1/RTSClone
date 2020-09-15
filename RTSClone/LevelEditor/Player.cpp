@@ -4,8 +4,8 @@
 #include <fstream>
 #include <functional>
 
-Player::Player(ePlayerType playerType, const glm::vec3& startingHQPosition, const glm::vec3& startingMineralPosition)
-	: type(playerType),
+Player::Player(eFactionController controller, const glm::vec3& startingHQPosition, const glm::vec3& startingMineralPosition)
+	: controller(controller),
 	HQ(eModelName::HQ, Globals::convertToNodePosition(startingHQPosition)),
 	minerals()
 {
@@ -16,6 +16,21 @@ Player::Player(ePlayerType playerType, const glm::vec3& startingHQPosition, cons
 		mineral.setPosition(mineralSpawnPosition);
 		mineralSpawnPosition.z += Globals::NODE_SIZE;
 	}
+}
+
+Player::Player(Player&& orig) noexcept
+	: controller(orig.controller),
+	HQ(std::move(orig.HQ)),
+	minerals(std::move(orig.minerals))
+{}
+
+Player& Player::operator=(Player&& orig) noexcept
+{
+	controller = orig.controller;
+	HQ = std::move(orig.HQ);
+	minerals = std::move(orig.minerals);
+
+	return *this;
 }
 
 void Player::render(ShaderHandler& shaderHandler) const
@@ -53,11 +68,11 @@ const std::ifstream& operator>>(std::ifstream& file, Player& player)
 		}
 	};
 
-	ePlayerType playerType = player.type;
-	auto conditional = [playerType](const std::string& line)
+	eFactionController factionController = player.controller;
+	auto conditional = [factionController](const std::string& line)
 	{
-		return (playerType == ePlayerType::Human && line == Globals::TEXT_HEADER_PLAYER) ||
-			(playerType == ePlayerType::AI && line == Globals::TEXT_HEADER_PLAYERAI);
+		return (factionController == eFactionController::Player && line == Globals::TEXT_HEADER_PLAYER) ||
+			(factionController == eFactionController::AI_1 && line == Globals::TEXT_HEADER_PLAYERAI);
 	};
 
 	LevelFileHandler::loadFromFile(file, data, conditional);
@@ -67,12 +82,12 @@ const std::ifstream& operator>>(std::ifstream& file, Player& player)
 
 std::ostream& operator<<(std::ostream& ostream, const Player& player)
 {
-	switch (player.type)
+	switch (player.controller)
 	{
-	case ePlayerType::Human:
+	case eFactionController::Player:
 		ostream << Globals::TEXT_HEADER_PLAYER << "\n";
 		break;
-	case ePlayerType::AI:
+	case eFactionController::AI_1:
 		ostream << Globals::TEXT_HEADER_PLAYERAI << "\n";
 		break;
 	default:
