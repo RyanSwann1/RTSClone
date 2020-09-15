@@ -7,11 +7,11 @@
 
 namespace
 {
-	Faction& getFaction(std::vector<std::unique_ptr<Faction>>& factions, eFactionName factionName)
+	Faction& getFaction(std::vector<std::unique_ptr<Faction>>& factions, eFactionController factionController)
 	{
-		auto faction = std::find_if(factions.begin(), factions.end(), [factionName](const auto& faction)
+		auto faction = std::find_if(factions.begin(), factions.end(), [factionController](const auto& faction)
 		{
-			return faction->getName() == factionName;
+			return faction->getController() == factionController;
 		});
 		assert(faction != factions.end());
 		
@@ -23,9 +23,26 @@ Level::Level(std::vector<SceneryGameObject>&& scenery, std::vector<std::unique_p
 	: m_scenery(std::move(scenery)),
 	m_projectileHandler(),
 	m_factions(std::move(factions)),
-	m_player(static_cast<FactionPlayer*>(&getFaction(m_factions, eFactionName::Player))),
-	m_playerAI(static_cast<FactionAI*>(&getFaction(m_factions, eFactionName::AI)))
-{}
+	m_opposingFactions(),
+	m_player(static_cast<FactionPlayer*>(&getFaction(m_factions, eFactionController::Player)))
+{
+	m_opposingFactions.reserve(m_factions.size() - static_cast<size_t>(1));
+}
+
+const std::vector<const Faction*>& Level::getOpposingFactions(eFactionController factionController)
+{
+	m_opposingFactions.clear();
+
+	for (const auto& faction : m_factions)
+	{
+		if (faction->getController() != factionController)
+		{
+			m_opposingFactions.push_back(faction.get());
+		}
+	}
+
+	return m_opposingFactions;
+}
 
 std::unique_ptr<Level> Level::create(const std::string& levelName)
 {
@@ -41,17 +58,19 @@ std::unique_ptr<Level> Level::create(const std::string& levelName)
 
 void Level::handleInput(const sf::Window& window, const Camera& camera, const sf::Event& currentSFMLEvent, const Map& map)
 {
-	m_player->handleInput(currentSFMLEvent, window, camera, map, *m_playerAI);
+	m_player->handleInput(currentSFMLEvent, window, camera, map, getOpposingFactions(m_player->getController()));
 }
 
 void Level::update(float deltaTime, const Map& map)
 {
-	m_projectileHandler.update(deltaTime, *m_player, *m_playerAI);
+	m_projectileHandler.update(deltaTime, m_factions);
 	
-	m_player->update(deltaTime, map, *m_playerAI);
-	m_playerAI->update(deltaTime, map, *m_player);
+	for (auto& faction : m_factions)
+	{
+		faction->update(deltaTime, map, getOpposingFactions(faction->getController()));
+	}
 
-	GameEventHandler::getInstance().handleEvents(*m_player, *m_playerAI, m_projectileHandler, map);
+	GameEventHandler::getInstance().handleEvents(m_factions, m_projectileHandler, map);
 }
 
 void Level::renderSelectionBox(const sf::Window& window) const

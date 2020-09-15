@@ -34,10 +34,12 @@ public:
 
 private:
 	Level(std::vector<SceneryGameObject>&& scenery, std::vector<std::unique_ptr<Faction>>&& factions);
-	std::vector<SceneryGameObject> m_scenery;
 	
+	std::vector<SceneryGameObject> m_scenery;
 	ProjectileHandler m_projectileHandler;
 	std::vector<std::unique_ptr<Faction>> m_factions;
+	std::vector<const Faction*> m_opposingFactions;
 	FactionPlayer* m_player;
-	FactionAI* m_playerAI;
+
+	const std::vector<const Faction*>& getOpposingFactions(eFactionController factionController);
 };	
