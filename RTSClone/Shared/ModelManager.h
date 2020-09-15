@@ -41,6 +41,7 @@ private:
 		{"Meteor", eModelName::Meteor},
 		{"RocksTall", eModelName::RocksTall},
 		{"Unit", eModelName::Unit},
+		{"HQ", eModelName::HQ},
 		{"Mineral", eModelName::Mineral},
 		{"WorkerMineral", eModelName::WorkerMineral},
 		{"Waypoint", eModelName::Waypoint},

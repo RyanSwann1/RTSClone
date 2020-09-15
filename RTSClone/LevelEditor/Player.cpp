@@ -71,8 +71,19 @@ const std::ifstream& operator>>(std::ifstream& file, Player& player)
 	eFactionController factionController = player.controller;
 	auto conditional = [factionController](const std::string& line)
 	{
-		return (factionController == eFactionController::Player && line == Globals::TEXT_HEADER_PLAYER) ||
-			(factionController == eFactionController::AI_1 && line == Globals::TEXT_HEADER_PLAYERAI);
+		switch (factionController)
+		{
+		case eFactionController::Player:
+			return line == Globals::TEXT_HEADER_PLAYER;
+		case eFactionController::AI_1:
+			return line == Globals::TEXT_HEADER_PLAYERAI_1;
+		case eFactionController::AI_2:
+			return line == Globals::TEXT_HEADER_PLAYERAI_2;
+		case eFactionController::AI_3:
+			return line == Globals::TEXT_HEADER_PLAYERAI_3;
+		default:
+			assert(false);
+		}
 	};
 
 	LevelFileHandler::loadFromFile(file, data, conditional);
@@ -88,7 +99,13 @@ std::ostream& operator<<(std::ostream& ostream, const Player& player)
 		ostream << Globals::TEXT_HEADER_PLAYER << "\n";
 		break;
 	case eFactionController::AI_1:
-		ostream << Globals::TEXT_HEADER_PLAYERAI << "\n";
+		ostream << Globals::TEXT_HEADER_PLAYERAI_1 << "\n";
+		break;
+	case eFactionController::AI_2:
+		ostream << Globals::TEXT_HEADER_PLAYERAI_2 << "\n";
+		break;
+	case eFactionController::AI_3:
+		ostream << Globals::TEXT_HEADER_PLAYERAI_3 << "\n";
 		break;
 	default:
 		assert(false);
