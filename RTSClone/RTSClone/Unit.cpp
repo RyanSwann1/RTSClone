@@ -7,6 +7,7 @@
 #include "Faction.h"
 #include "GameEventHandler.h"
 #include "GameEvent.h"
+#include "FactionHandler.h"
 
 namespace
 {
@@ -134,7 +135,7 @@ void Unit::moveTo(const glm::vec3& destinationPosition, const Map& map, const Ge
 	}
 }
 
-void Unit::update(float deltaTime, const std::vector<const Faction*>& opposingFactions, const Map& map)
+void Unit::update(float deltaTime, FactionHandler& factionHandler, const Map& map)
 {
 	m_attackTimer.update(deltaTime);
 
@@ -157,7 +158,7 @@ void Unit::update(float deltaTime, const std::vector<const Faction*>& opposingFa
 		assert(m_target.ID == Globals::INVALID_ENTITY_ID && m_pathToPosition.empty());
 		if (m_attackTimer.isExpired() && getEntityType() == eEntityType::Unit)
 		{
-			for (const auto& opposingFaction : opposingFactions)
+			for (const auto& opposingFaction : factionHandler.getOpposingFactions(m_owningFaction.getController()))
 			{
 				const Entity* targetEntity = opposingFaction->getEntity(m_position, UNIT_ATTACK_RANGE);
 				if (targetEntity)
@@ -173,13 +174,7 @@ void Unit::update(float deltaTime, const std::vector<const Faction*>& opposingFa
 	case eUnitState::Moving:
 		if (Globals::isEntityIDValid(m_target.ID))
 		{
-			eFactionController targetFactionController = m_target.factionController;
-			auto opposingFaction = std::find_if(opposingFactions.begin(), opposingFactions.end(), [targetFactionController](const auto& faction)
-			{
-				return faction->getController() == targetFactionController;
-			});
-			assert(opposingFaction != opposingFactions.end());
-			const Entity* targetEntity = (*opposingFaction)->getEntity(m_target.ID);
+			const Entity* targetEntity = factionHandler.getFaction(m_target.factionController).getEntity(m_target.ID);
 			if (targetEntity)
 			{
 				if (Globals::getSqrDistance(targetEntity->getPosition(), m_position) <= UNIT_ATTACK_RANGE * UNIT_ATTACK_RANGE)
@@ -215,7 +210,7 @@ void Unit::update(float deltaTime, const std::vector<const Faction*>& opposingFa
 	case eUnitState::AttackMoving:
 		if (m_attackTimer.isExpired())
 		{
-			for (const auto& opposingFaction : opposingFactions)
+			for (const auto& opposingFaction : factionHandler.getOpposingFactions(m_owningFaction.getController()))
 			{
 				const Entity* targetEntity = opposingFaction->getEntity(m_position, UNIT_ATTACK_RANGE);
 				if (targetEntity)
@@ -243,16 +238,11 @@ void Unit::update(float deltaTime, const std::vector<const Faction*>& opposingFa
 
 		if (m_attackTimer.isExpired())
 		{
-			eFactionController targetFactionController = m_target.factionController;
-			auto opposingFaction = std::find_if(opposingFactions.begin(), opposingFactions.end(), [targetFactionController](const auto& faction)
-			{
-				return faction->getController() == targetFactionController;
-			});
-			assert(opposingFaction != opposingFactions.end());
-			const Entity* targetEntity = (*opposingFaction)->getEntity(m_target.ID);
+			const Faction& opposingFaction = factionHandler.getFaction(m_target.factionController);
+			const Entity* targetEntity = opposingFaction.getEntity(m_target.ID);
 			if (!targetEntity)
 			{
-				targetEntity = (*opposingFaction)->getEntity(m_position, UNIT_ATTACK_RANGE);
+				targetEntity = opposingFaction.getEntity(m_position, UNIT_ATTACK_RANGE);
 				if (!targetEntity)
 				{
 					m_target.ID = Globals::INVALID_ENTITY_ID;
@@ -269,7 +259,7 @@ void Unit::update(float deltaTime, const std::vector<const Faction*>& opposingFa
 				if (Globals::getSqrDistance(targetEntity->getPosition(), m_position) <= UNIT_ATTACK_RANGE * UNIT_ATTACK_RANGE)
 				{
 					GameEventHandler::getInstance().addEvent({ eGameEventType::SpawnProjectile, m_owningFaction.getController(), getID(),
-						(*opposingFaction)->getController(), targetEntity->getID(), m_position, targetEntity->getPosition() });
+						opposingFaction.getController(), targetEntity->getID(), m_position, targetEntity->getPosition() });
 				}
 				else
 				{

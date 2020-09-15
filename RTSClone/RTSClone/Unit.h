@@ -27,6 +27,7 @@ enum class eUnitState
 class Faction;
 class Map;
 class ShaderHandler;
+class FactionHandler;
 class Unit : public Entity, private NonMovable
 {
 public:
@@ -43,7 +44,7 @@ public:
 	//void setTargetID(int entityTargetID);
 	void moveTo(const glm::vec3& destinationPosition, const Map& map, const GetAllAdjacentPositions& getAdjacentPositions, 
 		eUnitState state = eUnitState::Moving);
-	void update(float deltaTime, const std::vector<const Faction*>& opposingFactions, const Map& map);
+	void update(float deltaTime, FactionHandler& factionHandler, const Map& map);
 
 #ifdef RENDER_PATHING
 	void renderPathMesh(ShaderHandler& shaderHandler);
