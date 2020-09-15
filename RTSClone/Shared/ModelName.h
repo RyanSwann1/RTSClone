@@ -4,6 +4,7 @@ enum class eModelName
 {
 	Terrain = 0,
 	Meteor,
+	RocksTall,
 	Unit,
 	HQ,
 	Mineral,

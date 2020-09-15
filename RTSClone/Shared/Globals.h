@@ -2,6 +2,7 @@
 
 #include "glm/glm.hpp"
 #include "AABB.h"
+#include "FactionController.h"
 #include <SFML/Graphics.hpp>
 #include <iostream>
 #include <array>
@@ -12,8 +13,10 @@ namespace Globals
 { 
 	const std::string SHARED_FILE_DIRECTORY = "../Shared/";
 	const std::string TEXT_HEADER_BEGINNING = "#";
-	const std::string TEXT_HEADER_PLAYER = TEXT_HEADER_BEGINNING + "Player";
-	const std::string TEXT_HEADER_PLAYERAI = TEXT_HEADER_BEGINNING + "PlayerAI";
+	//const std::string TEXT_HEADER_PLAYER = TEXT_HEADER_BEGINNING + "Player";
+	//const std::string TEXT_HEADER_PLAYERAI_1 = TEXT_HEADER_BEGINNING + "PlayerAI_1";
+	//const std::string TEXT_HEADER_PLAYERAI_2 = TEXT_HEADER_BEGINNING + "PlayerAI_2";
+	//const std::string TEXT_HEADER_PLAYERAI_3 = TEXT_HEADER_BEGINNING + "PlayerAI_3";
 	const std::string TEXT_HEADER_SCENERY = TEXT_HEADER_BEGINNING + "Scenery";
 	constexpr unsigned int INVALID_OPENGL_ID = 0;
 	constexpr float GROUND_HEIGHT = 0.0f;
@@ -21,6 +24,8 @@ namespace Globals
 	constexpr int NODE_SIZE = 6;
 	constexpr int INVALID_ENTITY_ID = -1;
 	constexpr size_t MAX_MINERALS_PER_FACTION = 5;
+	constexpr int MIN_FACTIONS = 2;
+	constexpr int MAX_FACTIONS = 4;
 
 	constexpr int STARTING_RESOURCES = 500;
 	constexpr int WORKER_RESOURCE_COST = 50;

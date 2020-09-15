@@ -6,12 +6,10 @@ FactionControllerDetails::FactionControllerDetails()
 	text()
 {}
 
-FactionControllerDetails::FactionControllerDetails(eFactionController controller, const std::string& t)
+FactionControllerDetails::FactionControllerDetails(eFactionController controller, const std::string& text)
 	: controller(controller),
-	text(t)
-{
-	int i = 0;
-}
+	text(text)
+{}
 
 const std::array<FactionControllerDetails, static_cast<size_t>(eFactionController::Max) + 1> FACTION_CONTROLLER_DETAILS =
 {

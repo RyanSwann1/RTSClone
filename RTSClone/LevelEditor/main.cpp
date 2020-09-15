@@ -58,7 +58,6 @@ void showPlayerDetails(Player& player, const std::string& playerName, const std:
 }
 
 constexpr glm::vec3 TERRAIN_STARTING_POSITION = { 0.0f, Globals::GROUND_HEIGHT - 0.01f, 0.0f };
-
 constexpr std::array<glm::vec3, static_cast<size_t>(eFactionController::Max) + 1> PLAYER_HQ_STARTING_POSITIONS =
 {
 	glm::vec3(35.0f, Globals::GROUND_HEIGHT, 15.0f),

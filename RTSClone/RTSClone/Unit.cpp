@@ -236,22 +236,6 @@ void Unit::update(float deltaTime, const std::vector<const Faction*>& opposingFa
 					}
 				}
 			}
-			//const Entity* targetEntity = opposingFaction.getEntity(m_position, UNIT_ATTACK_RANGE);
-			//if (targetEntity)
-			//{
-			//	m_target.ID = targetEntity->getID();
-			//	//m_targetEntityID = targetEntity->getID();
-			//	m_currentState = eUnitState::AttackingTarget;
-			//	if (!m_pathToPosition.empty())
-			//	{
-			//		m_pathToPosition.clear();
-			//		if (!Globals::isOnMiddlePosition(m_position))
-			//		{
-			//			m_pathToPosition.push_back(PathFinding::getInstance().getClosestPositionToDestination(m_position, targetEntity->getPosition(),
-			//				[&](const glm::ivec2& position) { return getAllAdjacentPositions(position, map, m_owningFaction.getUnits(), *this); }));
-			//		}
-			//	}
-			//}
 		}
 		break;
 	case eUnitState::AttackingTarget:
@@ -272,7 +256,6 @@ void Unit::update(float deltaTime, const std::vector<const Faction*>& opposingFa
 				if (!targetEntity)
 				{
 					m_target.ID = Globals::INVALID_ENTITY_ID;
-					//m_targetEntityID = Globals::INVALID_ENTITY_ID;
 					m_currentState = eUnitState::Idle;
 				}
 				else

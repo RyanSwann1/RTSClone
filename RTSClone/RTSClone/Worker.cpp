@@ -50,7 +50,7 @@ Worker::Worker(const Faction& owningFaction, const glm::vec3 & startingPosition,
 
 Worker::~Worker()
 {
-	GameEventHandler::getInstance().addEvent({ eGameEventType::RemoveAllWorkerPlannedBuildings, m_owningFaction.getName(), getID() });
+	GameEventHandler::getInstance().addEvent({ eGameEventType::RemoveAllWorkerPlannedBuildings, m_owningFaction.getController(), getID() });
 }
 
 bool Worker::isHoldingResources() const
@@ -83,9 +83,9 @@ bool Worker::build(const std::function<const Entity*(Worker&)>& buildingCommand,
 	return false;
 }
 
-void Worker::update(float deltaTime, const UnitSpawnerBuilding& HQ, const Map& map, const Faction& opposingFaction)
+void Worker::update(float deltaTime, const UnitSpawnerBuilding& HQ, const Map& map, const std::vector<const Faction*>& opposingFactions)
 {
-	Unit::update(deltaTime, opposingFaction, map);
+	Unit::update(deltaTime, opposingFactions, map);
 
 	switch (m_currentState)
 	{
@@ -99,7 +99,7 @@ void Worker::update(float deltaTime, const UnitSpawnerBuilding& HQ, const Map& m
 		assert(isHoldingResources());
 		if (m_pathToPosition.empty())
 		{
-			GameEventHandler::getInstance().addEvent({ eGameEventType::AddResources, m_owningFaction.getName(), getID() });
+			GameEventHandler::getInstance().addEvent({ eGameEventType::AddResources, m_owningFaction.getController(), getID() });
 			if (m_mineralToHarvest)
 			{
 				glm::vec3 destination = PathFinding::getInstance().getClosestPositionOutsideAABB(m_position,
@@ -160,11 +160,11 @@ void Worker::update(float deltaTime, const UnitSpawnerBuilding& HQ, const Map& m
 		m_buildingCommands.pop();
 		if (newBuilding)
 		{
-			GameEventHandler::getInstance().addEvent({ eGameEventType::RemovePlannedBuilding, m_owningFaction.getName(), newBuilding->getPosition() });
+			GameEventHandler::getInstance().addEvent({ eGameEventType::RemovePlannedBuilding, m_owningFaction.getController(), newBuilding->getPosition() });
 		}
 		else
 		{
-			GameEventHandler::getInstance().addEvent({ eGameEventType::RemoveAllWorkerPlannedBuildings, m_owningFaction.getName(), getID() });
+			GameEventHandler::getInstance().addEvent({ eGameEventType::RemoveAllWorkerPlannedBuildings, m_owningFaction.getController(), getID() });
 			clearBuildingCommands();
 		}
 		
@@ -200,7 +200,7 @@ void Worker::moveTo(const glm::vec3& destinationPosition, const Map& map, const 
 
 	if (state != eUnitState::MovingToBuildingPosition && !m_buildingCommands.empty())
 	{
-		GameEventHandler::getInstance().addEvent({ eGameEventType::RemoveAllWorkerPlannedBuildings, m_owningFaction.getName(), getID() });
+		GameEventHandler::getInstance().addEvent({ eGameEventType::RemoveAllWorkerPlannedBuildings, m_owningFaction.getController(), getID() });
 		m_buildTimer.resetElaspedTime();
 		clearBuildingCommands();
 	}
