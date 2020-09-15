@@ -5,6 +5,8 @@
 #include "glm/glm.hpp"
 #include "GameEvent.h"
 #include <queue>
+#include <vector>
+#include <memory>
 
 class Map;
 class ProjectileHandler;
@@ -19,7 +21,7 @@ public:
 	}
 
 	void addEvent(const GameEvent& gameEvent);
-	void handleEvents(Faction& player, Faction& playerAI, ProjectileHandler& projectileHandler, const Map& map);
+	void handleEvents(std::vector<std::unique_ptr<Faction>>& factions, ProjectileHandler& projectileHandler, const Map& map);
 	
 private:
 	GameEventHandler();

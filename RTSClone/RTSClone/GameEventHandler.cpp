@@ -12,7 +12,7 @@ void GameEventHandler::addEvent(const GameEvent& gameEvent)
 	m_gameEvents.push(gameEvent);
 }
 
-void GameEventHandler::handleEvents(Faction& player, Faction& playerAI, ProjectileHandler& projectileHandler, const Map& map)
+void GameEventHandler::handleEvents(std::vector<std::unique_ptr<Faction>>& factions, ProjectileHandler& projectileHandler, const Map& map)
 {
 	while (!m_gameEvents.empty())
 	{
@@ -20,42 +20,47 @@ void GameEventHandler::handleEvents(Faction& player, Faction& playerAI, Projecti
 		switch (gameEvent.type)
 		{
 		case eGameEventType::Attack:
-			if (gameEvent.senderFaction == eFactionName::Player)
+		{
+			auto faction = std::find_if(factions.begin(), factions.end(), [&gameEvent](const auto& faction)
 			{
-				playerAI.handleEvent(gameEvent, map);
-			}
-			else if(gameEvent.senderFaction == eFactionName::AI)
-			{
-				player.handleEvent(gameEvent, map);
-			}
+				return faction->getController() == gameEvent.targetFaction;
+			});
+			assert(faction != factions.end());
+
+			faction->get()->handleEvent(gameEvent, map);
+		}
 			break;
 		case eGameEventType::RemovePlannedBuilding:
 		case eGameEventType::RemoveAllWorkerPlannedBuildings:
-			if (gameEvent.senderFaction == eFactionName::Player)
+		{
+			auto faction = std::find_if(factions.begin(), factions.end(), [&gameEvent](const auto& faction)
 			{
-				player.handleEvent(gameEvent, map);
-			}
-			else if (gameEvent.senderFaction == eFactionName::AI)
-			{
-				playerAI.handleEvent(gameEvent, map);
-			}
+				return faction->getController() == gameEvent.targetFaction;
+			});
+			assert(faction != factions.end());
+
+			faction->get()->handleEvent(gameEvent, map);
+		}
 			break;
 		case eGameEventType::AddResources:
-			if (gameEvent.senderFaction == eFactionName::Player)
+		{
+			auto faction = std::find_if(factions.begin(), factions.end(), [&gameEvent](const auto& faction)
 			{
-				player.handleEvent(gameEvent, map);
-			}
-			else if (gameEvent.senderFaction == eFactionName::AI)
-			{
-				playerAI.handleEvent(gameEvent, map);
-			}
+				return faction->getController() == gameEvent.senderFaction;
+			});
+			assert(faction != factions.end());
+
+			faction->get()->handleEvent(gameEvent, map);
+		}
 			break;
 		case eGameEventType::SpawnProjectile:
 			projectileHandler.addProjectile(gameEvent);
 			break;
 		case eGameEventType::RevalidateMovementPaths:
-			player.handleEvent(gameEvent, map);
-			playerAI.handleEvent(gameEvent, map);
+			for (auto& faction : factions)
+			{
+				faction->handleEvent(gameEvent, map);
+			}
 			break;
 		default:
 			assert(false);
