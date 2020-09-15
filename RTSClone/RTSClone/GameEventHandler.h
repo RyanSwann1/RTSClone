@@ -10,7 +10,7 @@
 
 class Map;
 class ProjectileHandler;
-class Faction;
+class FactionHandler;
 class GameEventHandler : private NonCopyable, private NonMovable
 {
 public:
@@ -21,7 +21,7 @@ public:
 	}
 
 	void addEvent(const GameEvent& gameEvent);
-	void handleEvents(std::vector<std::unique_ptr<Faction>>& factions, ProjectileHandler& projectileHandler, const Map& map);
+	void handleEvents(FactionHandler& factionHandler, ProjectileHandler& projectileHandler, const Map& map);
 	
 private:
 	GameEventHandler();
