@@ -15,17 +15,17 @@
 #include <sstream>
 
 #ifdef GAME
-void loadInPlayer(std::ifstream& file, std::vector<std::unique_ptr<Faction>>& factions, const std::string& textHeaderFile);
+void loadInPlayer(std::ifstream& file, std::vector<std::unique_ptr<Faction>>& factions, 
+	const FactionControllerDetails& factionControllerDetails);
 void loadInScenery(std::ifstream& file, std::vector<SceneryGameObject>& scenery);
 #endif // GAME
 
-#ifdef LEVEL_EDITOR
 bool isPlayerActive(std::ifstream& file, eFactionController factionController);
-#endif // LEVEL_EDITOR
 
 void LevelFileHandler::loadFromFile(std::ifstream& file, const std::function<void(const std::string&)>& data, 
 	const std::function<bool(const std::string&)>& conditional)
 {
+	//TODO: Add error check on functionpointers
 	assert(file.is_open());
 	bool beginReadingFromFile = false;
 	std::string line;
@@ -113,6 +113,7 @@ bool LevelFileHandler::loadLevelFromFile(const std::string& fileName, EntityMana
 
 	return true;
 }
+#endif // LEVEL_EDITOR
 
 bool isPlayerActive(std::ifstream& file, eFactionController factionController)
 {
@@ -133,13 +134,12 @@ bool isPlayerActive(std::ifstream& file, eFactionController factionController)
 
 	return playerFound;
 }
-#endif // LEVEL_EDITOR
 
 #ifdef GAME
 bool LevelFileHandler::loadLevelFromFile(const std::string& fileName, std::vector<SceneryGameObject>& scenery, 
 	std::vector<std::unique_ptr<Faction>>& factions)
 {
-	assert(scenery.empty());
+	assert(scenery.empty() && factions.empty());
 
 	std::ifstream file(Globals::SHARED_FILE_DIRECTORY + fileName);
 	if (!file.is_open())
@@ -147,14 +147,34 @@ bool LevelFileHandler::loadLevelFromFile(const std::string& fileName, std::vecto
 		return false;
 	}
 
-	loadInPlayer(file, factions, Globals::TEXT_HEADER_PLAYER);
-	loadInPlayer(file, factions, Globals::TEXT_HEADER_PLAYERAI);
+	for (const auto& factionControllerDetails : FACTION_CONTROLLER_DETAILS)
+	{
+		switch (factionControllerDetails.controller)
+		{
+		case eFactionController::Player:
+		case eFactionController::AI_1:
+			assert(isPlayerActive(file, factionControllerDetails.controller));
+			loadInPlayer(file, factions, factionControllerDetails);
+			break;
+		case eFactionController::AI_2:
+		case eFactionController::AI_3:
+			if (isPlayerActive(file, factionControllerDetails.controller))
+			{
+				loadInPlayer(file, factions, factionControllerDetails);
+			}
+			break;
+		default:
+			assert(false);
+		}
+	}
+
 	loadInScenery(file, scenery);
 
 	return true;
 }
 
-void loadInPlayer(std::ifstream& file, std::vector<std::unique_ptr<Faction>>& factions, const std::string& textHeaderFile)
+void loadInPlayer(std::ifstream& file, std::vector<std::unique_ptr<Faction>>& factions, 
+	const FactionControllerDetails& factionControllerDetails)
 {
 	assert(file.is_open());
 	glm::vec3 hqStartingPosition = { 0.0f, 0.0f, 0.0f };
@@ -183,23 +203,27 @@ void loadInPlayer(std::ifstream& file, std::vector<std::unique_ptr<Faction>>& fa
 		}
 	};
 
-	auto conditional = [&textHeaderFile](const std::string& line)
+	const std::string& text = factionControllerDetails.text;
+	auto conditional = [&text](const std::string& line)
 	{
-		return line == textHeaderFile;
+		return line == text;
 	};
 
 	LevelFileHandler::loadFromFile(file, data, conditional);
 
-	if (textHeaderFile == Globals::TEXT_HEADER_PLAYER)
+	switch (factionControllerDetails.controller)
 	{
-		factions.emplace_back(std::make_unique<FactionPlayer>(eFactionName::Player, hqStartingPosition, mineralPositions));
-	}
-	else if (textHeaderFile == Globals::TEXT_HEADER_PLAYERAI)
-	{
-		factions.emplace_back(std::make_unique<FactionAI>(eFactionName::AI, hqStartingPosition, mineralPositions));
-	}
-	else
-	{
+	case eFactionController::Player:
+		factions.emplace_back(std::make_unique<FactionPlayer>(factionControllerDetails.controller, 
+			hqStartingPosition, mineralPositions));
+		break;
+	case eFactionController::AI_1:
+	case eFactionController::AI_2:
+	case eFactionController::AI_3:
+		factions.emplace_back(std::make_unique<FactionAI>(factionControllerDetails.controller, 
+			hqStartingPosition, mineralPositions));
+		break;
+	default:
 		assert(false);
 	}
 }
