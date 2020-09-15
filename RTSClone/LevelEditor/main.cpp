@@ -165,12 +165,6 @@ int main()
 				case sf::Keyboard::Escape:
 					window.close();
 					break;
-				case sf::Keyboard::Enter:
-					if (!LevelFileHandler::saveLevelToFile(levelName, entityManager, players))
-					{
-						std::cout << "Unable to save file " + levelName << "\n";
-					}
-					break;
 				case sf::Keyboard::Delete:
 					entityManager.removeAllSelectedEntities();
 					break;
@@ -251,6 +245,13 @@ int main()
 					if (ImGui::MenuItem("Player Details"))
 					{
 						showPlayerMenu = true;
+					}
+					if (ImGui::MenuItem("Save"))
+					{
+						if (!LevelFileHandler::saveLevelToFile(levelName, entityManager, players))
+						{
+							std::cout << "Unable to save file " + levelName << "\n";
+						}
 					}
 					if (ImGui::MenuItem("Close"))
 					{
