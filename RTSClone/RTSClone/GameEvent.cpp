@@ -13,6 +13,18 @@ GameEvent::GameEvent(eGameEventType gameEventType)
 	assert(gameEventType == eGameEventType::RevalidateMovementPaths);
 }
 
+GameEvent::GameEvent(eGameEventType gameEventType, eFactionController senderFaction)
+	: type(gameEventType),
+	senderFaction(senderFaction),
+	senderID(Globals::INVALID_ENTITY_ID),
+	targetFaction(),
+	targetID(Globals::INVALID_ENTITY_ID),
+	startingPosition(),
+	endingPosition()
+{
+	assert(gameEventType == eGameEventType::FactionEliminated);
+}
+
 //GameEvent
 GameEvent::GameEvent(eGameEventType gameEventType, eFactionController senderFaction, int senderID)
 	: type(gameEventType),
