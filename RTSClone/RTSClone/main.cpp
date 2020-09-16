@@ -74,6 +74,7 @@ int main()
 	}
 
 	std::unique_ptr<Map> map = std::make_unique<Map>();
+	std::string levelName = "Level.txt";
 	std::unique_ptr<Level> level = Level::create("Level.txt");
 	assert(level);
 	if (!level)
@@ -83,6 +84,7 @@ int main()
 	}
 	sf::Clock gameClock;
 	Camera camera;
+	bool resetLevel = false;
 
 	shaderHandler->switchToShader(eShaderType::SelectionBox);
 	shaderHandler->setUniformMat4f(eShaderType::SelectionBox, "uOrthographic", glm::ortho(0.0f, static_cast<float>(windowSize.x),
@@ -114,12 +116,26 @@ int main()
 			level->handleInput(window, camera, currentSFMLEvent, *map);
 		}
 
+		if (resetLevel)
+		{
+			resetLevel = false;
+			level.release();
+
+			level = Level::create("Level.txt");
+			assert(level);
+			if (!level)
+			{
+				std::cout << "Unable to load level.\n";
+				return -1;
+			}
+		}
+
 		ImGui_SFML_OpenGL3::startFrame();
 
 		ImGui::ShowDemoWindow();
 
 		//Update
-		level->update(deltaTime, *map);
+		level->update(deltaTime, *map, resetLevel);
 		camera.update(deltaTime);
 
 		//Render

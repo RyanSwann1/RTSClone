@@ -5,6 +5,24 @@
 #include "GameMessages.h"
 #include "ModelManager.h"
 
+namespace
+{
+	int getActiveFactionCount(const std::array<std::unique_ptr<Faction>, static_cast<size_t>(eFactionController::Max) + 1>& factions)
+	{
+		int activeFactions = 0;
+		for (const auto& faction : factions)
+		{
+			if (faction)
+			{
+				++activeFactions;
+			}
+		}
+
+		assert(activeFactions > 0);
+		return activeFactions;
+	}
+}
+
 Level::Level(std::vector<SceneryGameObject>&& scenery, 
 	std::array<std::unique_ptr<Faction>, static_cast<size_t>(eFactionController::Max) + 1>&& factions)
 	: m_scenery(std::move(scenery)),
@@ -63,7 +81,7 @@ void Level::handleInput(const sf::Window& window, const Camera& camera, const sf
 	m_player.handleInput(currentSFMLEvent, window, camera, map, m_factionHandler.getOpposingFactions(eFactionController::Player));
 }
 
-void Level::update(float deltaTime, const Map& map)
+void Level::update(float deltaTime, const Map& map, bool& resetLevel)
 {
 	m_projectileHandler.update(deltaTime, m_factionHandler);
 	
@@ -76,6 +94,10 @@ void Level::update(float deltaTime, const Map& map)
 	}
 
 	GameEventHandler::getInstance().handleEvents(m_factionHandler, m_projectileHandler, map, *this);
+	if (getActiveFactionCount(m_factions) == 1)
+	{
+		resetLevel = true;
+	}
 }
 
 void Level::renderSelectionBox(const sf::Window& window) const

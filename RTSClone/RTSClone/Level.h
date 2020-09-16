@@ -22,7 +22,7 @@ public:
 	
 	void handleEvent(const GameEvent& gameEvent);
 	void handleInput(const sf::Window& window, const Camera& camera, const sf::Event& currentSFMLEvent, const Map& map);
-	void update(float deltaTime, const Map& map);
+	void update(float deltaTime, const Map& map, bool& resetLevel);
 	void renderSelectionBox(const sf::Window& window) const;
 	void renderPlannedBuildings(ShaderHandler& shaderHandler) const;
 	void render(ShaderHandler& shaderHandler) const;
