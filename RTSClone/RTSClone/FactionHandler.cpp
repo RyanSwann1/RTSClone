@@ -1,14 +1,28 @@
 #include "FactionHandler.h"
 #include "FactionPlayer.h"
 
-FactionHandler::FactionHandler(const std::vector<std::unique_ptr<Faction>>& factions)
+FactionHandler::FactionHandler(const std::array<std::unique_ptr<Faction>, static_cast<size_t>(eFactionController::Max) + 1>& factions)
 	: m_factions(factions),
 	m_opposingFactions()
 {
-	m_opposingFactions.reserve(m_factions.size() - static_cast<size_t>(1));
+	int factionCount = 0;
+	for (const auto& faction : m_factions)
+	{
+		if (faction)
+		{
+			++factionCount;
+		}
+	}
+
+	m_opposingFactions.reserve(static_cast<size_t>(factionCount));
 }
 
-const std::vector<std::unique_ptr<Faction>>& FactionHandler::getFactions() const
+bool FactionHandler::isFactionActive(eFactionController factionController) const
+{
+	return m_factions[static_cast<int>(factionController)].get();
+}
+
+const std::array<std::unique_ptr<Faction>, static_cast<size_t>(eFactionController::Max) + 1>& FactionHandler::getFactions() const
 {
 	return m_factions;
 }
@@ -19,7 +33,7 @@ const std::vector<const Faction*>& FactionHandler::getOpposingFactions(eFactionC
 
 	for (const auto& faction : m_factions)
 	{
-		if (faction->getController() != factionController)
+		if (faction && faction->getController() != factionController)
 		{
 			m_opposingFactions.push_back(faction.get());
 		}
@@ -30,7 +44,7 @@ const std::vector<const Faction*>& FactionHandler::getOpposingFactions(eFactionC
 
 const Faction& FactionHandler::getFaction(eFactionController factionController) const
 {
-	assert(static_cast<int>(factionController) < static_cast<int>(m_factions.size()) &&
+	assert(m_factions[static_cast<int>(factionController)] &&
 		m_factions[static_cast<int>(factionController)]->getController() == factionController);
 
 	return *m_factions[static_cast<int>(factionController)].get();
@@ -38,7 +52,7 @@ const Faction& FactionHandler::getFaction(eFactionController factionController) 
 
 Faction& FactionHandler::fgetFaction(eFactionController factionController)
 {
-	assert(static_cast<int>(factionController) < static_cast<int>(m_factions.size()) &&
+	assert(m_factions[static_cast<int>(factionController)] &&
 		m_factions[static_cast<int>(factionController)]->getController() == factionController);
 
 	return *m_factions[static_cast<int>(factionController)].get();
