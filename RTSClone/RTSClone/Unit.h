@@ -58,6 +58,7 @@ protected:
 
 private:
 	Timer m_attackTimer;
+	Timer m_lineOfSightTimer;
 	UnitTarget m_target;
 	//int m_targetEntityID;
 #ifdef RENDER_PATHING
