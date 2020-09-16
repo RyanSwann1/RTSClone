@@ -24,6 +24,23 @@ Map::~Map()
 	GameMessenger::getInstance().unsubscribe<GameMessages::MapModification<eGameMessageType::RemoveEntityFromMap>>(this);
 }
 
+bool Map::isAABBOccupied(const AABB& AABB) const
+{
+	for (int x = static_cast<int>(AABB.getLeft()); x <= static_cast<int>(AABB.getRight()); ++x)
+	{
+		for (int y = static_cast<int>(AABB.getBack()); y <= static_cast<int>(AABB.getForward()); ++y)
+		{
+			glm::ivec2 positionOnGrid = Globals::convertToGridPosition({ x, Globals::GROUND_HEIGHT, y });
+			if (m_map[Globals::convertTo1D(positionOnGrid)])
+			{
+				return false;
+			}
+		}
+	}
+
+	return true;
+}
+
 bool Map::isPositionOccupied(const glm::vec3& position) const
 {
 	if (Globals::isPositionInMapBounds(position))

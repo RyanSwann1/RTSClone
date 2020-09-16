@@ -18,6 +18,7 @@ public:
 	Map();
 	~Map();
 
+	bool isAABBOccupied(const AABB& AABB) const;
 	bool isPositionOccupied(const glm::vec3& position) const;
 	bool isPositionOccupied(const glm::ivec2& position) const;
 
