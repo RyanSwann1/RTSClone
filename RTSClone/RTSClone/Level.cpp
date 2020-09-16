@@ -25,7 +25,15 @@ Level::Level(std::vector<SceneryGameObject>&& scenery, std::vector<std::unique_p
 	m_factionHandler(m_factions),
 	m_projectileHandler(),
 	m_player(static_cast<FactionPlayer&>(getFaction(m_factions, eFactionController::Player)))
-{}
+{
+	for (auto& faction : m_factions)
+	{
+		if (faction->getController() != eFactionController::Player)
+		{
+			static_cast<FactionAI&>(*faction.get()).setTargetFaction(m_factionHandler.getOpposingFactions(faction->getController()));
+		}
+	}
+}
 
 std::unique_ptr<Level> Level::create(const std::string& levelName)
 {
@@ -42,7 +50,6 @@ std::unique_ptr<Level> Level::create(const std::string& levelName)
 void Level::handleInput(const sf::Window& window, const Camera& camera, const sf::Event& currentSFMLEvent, const Map& map)
 {
 	m_player.handleInput(currentSFMLEvent, window, camera, map, m_factionHandler.getOpposingFactions(eFactionController::Player));
-	// getOpposingFactions(m_player->getController()));
 }
 
 void Level::update(float deltaTime, const Map& map)

@@ -26,6 +26,7 @@ public:
 	FactionAI(eFactionController factionController, const glm::vec3& hqStartingPosition, 
 		const std::array<glm::vec3, Globals::MAX_MINERALS_PER_FACTION>& mineralPositions);
 
+	void setTargetFaction(const std::vector<const Faction*>& opposingFactions);
 	void update(float deltaTime, const Map& map, FactionHandler& factionHandler) override;
 
 private:
@@ -34,6 +35,7 @@ private:
 	Timer m_delayTimer;
 	Graph m_graph;
 	std::queue<glm::ivec2> m_frontier;
+	const Faction* m_targetFaction;
 
 	bool instructWorkerToBuild(eEntityType entityType, const glm::vec3& position, const Map& map, Worker& worker);
 	const Mineral& getRandomMineral() const;

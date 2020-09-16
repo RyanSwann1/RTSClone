@@ -1,6 +1,7 @@
 #include "FactionAI.h"
 #include "AdjacentPositions.h"
 #include "ModelManager.h"
+#include <limits>
 
 //Levels
 //Strategyt level - general - thgought about game state as a whole  where units are - lacing resources? Or attack enemy base - all high level
@@ -19,7 +20,7 @@
 
 namespace
 {
-	constexpr float DELAY_TIME = 3.0f;
+	constexpr float DELAY_TIME = 10.0f;
 	constexpr int STARTING_WORKER_COUNT = 4;
 	constexpr int STARTING_UNIT_COUNT = 1;
 }
@@ -43,15 +44,35 @@ FactionAI::FactionAI(eFactionController factionController, const glm::vec3& hqSt
 	m_actionQueue(),
 	m_delayTimer(DELAY_TIME, true),
 	m_graph(),
-	m_frontier()
+	m_frontier(),
+	m_targetFaction(nullptr)
 {
 	for (int i = 0; i < STARTING_WORKER_COUNT; ++i)
 	{
 		m_spawnQueue.push(eEntityType::Worker);
 	}
 
+	m_spawnQueue.push(eEntityType::Unit);
+
 	m_actionQueue.emplace(eActionType::BuildBarracks);
 	m_actionQueue.emplace(eActionType::BuildSupplyDepot);
+}
+
+void FactionAI::setTargetFaction(const std::vector<const Faction*>& opposingFactions)
+{
+	assert(!opposingFactions.empty());
+	float targetFactionDistance = std::numeric_limits<float>::max();
+	for (const auto& faction : opposingFactions)
+	{
+		float distance = Globals::getSqrDistance(faction->getHQPosition(), m_HQ.getPosition());
+		if (distance < targetFactionDistance)
+		{
+			m_targetFaction = faction;
+			targetFactionDistance = distance;
+		}
+	}
+
+	assert(m_targetFaction);
 }
 
 void FactionAI::update(float deltaTime, const Map & map, FactionHandler& factionHandler)
@@ -137,14 +158,15 @@ void FactionAI::update(float deltaTime, const Map & map, FactionHandler& faction
 			}
 		}
 
-		//for (auto& unit : m_units)
-		//{
-		//	if (unit.getCurrentState() == eUnitState::Idle)
-		//	{
-		//		unit.moveTo(opposingFaction.getHQPosition(), map, [&](const glm::ivec2& position)
-		//			{ return getAllAdjacentPositions(position, map, m_units, unit); }, eUnitState::AttackMoving);
-		//	}
-		//}
+		for (auto& unit : m_units)
+		{
+			if (unit.getCurrentState() == eUnitState::Idle)
+			{
+				assert(m_targetFaction);
+				unit.moveTo(m_targetFaction->getHQPosition(), map, [&](const glm::ivec2& position)
+					{ return getAllAdjacentPositions(position, map, m_units, unit); }, eUnitState::AttackMoving);
+			}
+		}
 	}
 }
 
