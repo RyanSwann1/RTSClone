@@ -3,6 +3,7 @@
 #include "Faction.h"
 #include "ProjectileHandler.h"
 #include "FactionHandler.h"
+#include "Level.h"
 
 GameEventHandler::GameEventHandler()
 	: m_gameEvents()
@@ -13,7 +14,7 @@ void GameEventHandler::addEvent(const GameEvent& gameEvent)
 	m_gameEvents.push(gameEvent);
 }
 
-void GameEventHandler::handleEvents(FactionHandler& factionHandler, ProjectileHandler& projectileHandler, const Map& map)
+void GameEventHandler::handleEvents(FactionHandler& factionHandler, ProjectileHandler& projectileHandler, const Map& map, Level& level)
 {
 	while (!m_gameEvents.empty())
 	{
@@ -21,12 +22,18 @@ void GameEventHandler::handleEvents(FactionHandler& factionHandler, ProjectileHa
 		switch (gameEvent.type)
 		{
 		case eGameEventType::Attack:
-			factionHandler.fgetFaction(gameEvent.targetFaction).handleEvent(gameEvent, map);
+			if (factionHandler.isFactionActive(gameEvent.targetFaction))
+			{
+				factionHandler.fgetFaction(gameEvent.targetFaction).handleEvent(gameEvent, map);
+			}
 			break;
 		case eGameEventType::RemovePlannedBuilding:
 		case eGameEventType::RemoveAllWorkerPlannedBuildings:
 		case eGameEventType::AddResources:
-			factionHandler.fgetFaction(gameEvent.senderFaction).handleEvent(gameEvent, map);
+			if (factionHandler.isFactionActive(gameEvent.senderFaction))
+			{
+				factionHandler.fgetFaction(gameEvent.senderFaction).handleEvent(gameEvent, map);
+			}
 			break;
 		case eGameEventType::SpawnProjectile:
 			projectileHandler.addProjectile(gameEvent);
@@ -34,8 +41,14 @@ void GameEventHandler::handleEvents(FactionHandler& factionHandler, ProjectileHa
 		case eGameEventType::RevalidateMovementPaths:
 			for (auto& faction : factionHandler.getFactions())
 			{
-				faction->handleEvent(gameEvent, map);
+				if (faction)
+				{
+					faction->handleEvent(gameEvent, map);
+				}
 			}
+			break;
+		case eGameEventType::FactionEliminated:
+			level.handleEvent(gameEvent);
 			break;
 		default:
 			assert(false);

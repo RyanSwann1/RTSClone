@@ -8,6 +8,7 @@
 #include <vector>
 #include <memory>
 
+class Level;
 class Map;
 class ProjectileHandler;
 class FactionHandler;
@@ -21,7 +22,7 @@ public:
 	}
 
 	void addEvent(const GameEvent& gameEvent);
-	void handleEvents(FactionHandler& factionHandler, ProjectileHandler& projectileHandler, const Map& map);
+	void handleEvents(FactionHandler& factionHandler, ProjectileHandler& projectileHandler, const Map& map, Level& level);
 	
 private:
 	GameEventHandler();
