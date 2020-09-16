@@ -15,7 +15,7 @@
 #include <sstream>
 
 #ifdef GAME
-void loadInPlayer(std::ifstream& file, std::vector<std::unique_ptr<Faction>>& factions, 
+void loadInPlayer(std::ifstream& file, std::array<std::unique_ptr<Faction>, static_cast<size_t>(eFactionController::Max) + 1>& factions,
 	const FactionControllerDetails& factionControllerDetails);
 void loadInScenery(std::ifstream& file, std::vector<SceneryGameObject>& scenery);
 #endif // GAME
@@ -137,9 +137,9 @@ bool isPlayerActive(std::ifstream& file, eFactionController factionController)
 
 #ifdef GAME
 bool LevelFileHandler::loadLevelFromFile(const std::string& fileName, std::vector<SceneryGameObject>& scenery, 
-	std::vector<std::unique_ptr<Faction>>& factions)
+	std::array<std::unique_ptr<Faction>, static_cast<size_t>(eFactionController::Max) + 1>& factions)
 {
-	assert(scenery.empty() && factions.empty());
+	assert(scenery.empty());
 
 	std::ifstream file(Globals::SHARED_FILE_DIRECTORY + fileName);
 	if (!file.is_open())
@@ -173,7 +173,7 @@ bool LevelFileHandler::loadLevelFromFile(const std::string& fileName, std::vecto
 	return true;
 }
 
-void loadInPlayer(std::ifstream& file, std::vector<std::unique_ptr<Faction>>& factions, 
+void loadInPlayer(std::ifstream& file, std::array<std::unique_ptr<Faction>, static_cast<size_t>(eFactionController::Max) + 1>& factions,
 	const FactionControllerDetails& factionControllerDetails)
 {
 	assert(file.is_open());
@@ -214,14 +214,14 @@ void loadInPlayer(std::ifstream& file, std::vector<std::unique_ptr<Faction>>& fa
 	switch (factionControllerDetails.controller)
 	{
 	case eFactionController::Player:
-		factions.emplace_back(std::make_unique<FactionPlayer>(factionControllerDetails.controller, 
-			hqStartingPosition, mineralPositions));
+		factions[static_cast<int>(factionControllerDetails.controller)] = std::make_unique<FactionPlayer>(factionControllerDetails.controller,
+			hqStartingPosition, mineralPositions);
 		break;
 	case eFactionController::AI_1:
 	case eFactionController::AI_2:
 	case eFactionController::AI_3:
-		factions.emplace_back(std::make_unique<FactionAI>(factionControllerDetails.controller, 
-			hqStartingPosition, mineralPositions));
+		factions[static_cast<int>(factionControllerDetails.controller)] = std::make_unique<FactionAI>(factionControllerDetails.controller,
+			hqStartingPosition, mineralPositions);
 		break;
 	default:
 		assert(false);

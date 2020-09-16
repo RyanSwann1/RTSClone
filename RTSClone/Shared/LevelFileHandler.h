@@ -1,9 +1,12 @@
 #pragma once
 
+#include "FactionController.h"
+
 #include <string>
 #include <vector>
 #include <memory>
 #include <functional>
+#include <array>
 
 class SceneryGameObject;
 class Faction;
@@ -25,7 +28,7 @@ namespace LevelFileHandler
 #endif // LEVEL_EDITOR
 
 #ifdef GAME
-	bool loadLevelFromFile(const std::string& fileName, std::vector<SceneryGameObject>& scenery, 
-		std::vector<std::unique_ptr<Faction>>& factions);
+	bool loadLevelFromFile(const std::string& fileName, std::vector<SceneryGameObject>& scenery,
+		std::array<std::unique_ptr<Faction>, static_cast<size_t>(eFactionController::Max) + 1>& factions);
 #endif // GAME
 }
