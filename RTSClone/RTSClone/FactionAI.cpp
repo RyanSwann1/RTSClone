@@ -60,7 +60,7 @@ FactionAI::FactionAI(eFactionController factionController, const glm::vec3& hqSt
 
 void FactionAI::setTargetFaction(const std::vector<const Faction*>& opposingFactions)
 {
-	assert(!opposingFactions.empty());
+	m_targetFaction = nullptr;
 	float targetFactionDistance = std::numeric_limits<float>::max();
 	for (const auto& faction : opposingFactions)
 	{
@@ -71,8 +71,6 @@ void FactionAI::setTargetFaction(const std::vector<const Faction*>& opposingFact
 			targetFactionDistance = distance;
 		}
 	}
-
-	assert(m_targetFaction);
 }
 
 void FactionAI::update(float deltaTime, const Map & map, FactionHandler& factionHandler)
@@ -158,13 +156,15 @@ void FactionAI::update(float deltaTime, const Map & map, FactionHandler& faction
 			}
 		}
 
-		for (auto& unit : m_units)
+		if (m_targetFaction)
 		{
-			if (unit.getCurrentState() == eUnitState::Idle)
+			for (auto& unit : m_units)
 			{
-				assert(m_targetFaction);
-				unit.moveTo(m_targetFaction->getHQPosition(), map, [&](const glm::ivec2& position)
+				if (unit.getCurrentState() == eUnitState::Idle)
+				{
+					unit.moveTo(m_targetFaction->getHQPosition(), map, [&](const glm::ivec2& position)
 					{ return getAllAdjacentPositions(position, map, m_units, unit); }, eUnitState::AttackMoving);
+				}
 			}
 		}
 	}
