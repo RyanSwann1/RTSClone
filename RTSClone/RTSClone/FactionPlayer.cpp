@@ -51,26 +51,26 @@ void FactionPlayer::handleInput(const sf::Event& currentSFMLEvent, const sf::Win
         }
         else if (currentSFMLEvent.mouseButton.button == sf::Mouse::Right)
         {
-            //TODO: Change what sending into instructUnitToAttack - send actual entity instead
             glm::vec3 mouseToGroundPosition = camera.getMouseToGroundPosition(window);
-            int targetEntityID = Globals::INVALID_ENTITY_ID;
-            const Faction* opposingFaction = nullptr;
+            eFactionController targetEntityOwningFaction;
+            const Entity* targetEntity = nullptr;
             for (const auto& faction : opposingFactions)
             {
-                targetEntityID = faction->getEntityIDAtPosition(mouseToGroundPosition);
-                if (Globals::isEntityIDValid(targetEntityID))
+                targetEntity = faction->getEntity(mouseToGroundPosition);
+                if (targetEntity)
                 {
-                    opposingFaction = faction;
+                    targetEntity;
+                    targetEntityOwningFaction = faction->getController();
                     break;
                 }
             }
-            if (Globals::isEntityIDValid(targetEntityID))
+            if (targetEntity)
             {
                 for (auto& unit : m_units)
                 {
                     if (unit.isSelected())
                     {
-                        instructUnitToAttack(unit, targetEntityID, *opposingFaction, map);
+                        instructUnitToAttack(unit, targetEntity, targetEntityOwningFaction, map);
                     }
                 }
             }
@@ -367,13 +367,11 @@ void FactionPlayer::instructWorkerReturnMinerals(const Map& map)
     }
 }
 
-void FactionPlayer::instructUnitToAttack(Unit& unit, int targetEntityID, const Faction& opposingFaction, const Map& map)
+void FactionPlayer::instructUnitToAttack(Unit& unit, const Entity* targetEntity, eFactionController targetEntityOwningFaction, const Map& map)
 {
-    assert(Globals::isEntityIDValid(targetEntityID));
-
-    const Entity* targetEntity = opposingFaction.getEntity(targetEntityID);
     assert(targetEntity);
-    unit.setTarget(targetEntityID, opposingFaction.getController());
+
+    unit.setTarget(targetEntity->getID(), targetEntityOwningFaction);
     if (unit.getCurrentState() != eUnitState::AttackingTarget)
     {
         unit.moveTo(targetEntity->getPosition(), map,
