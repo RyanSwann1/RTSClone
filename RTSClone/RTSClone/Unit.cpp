@@ -54,6 +54,31 @@ namespace
 		mesh.attachToVAO();
 	};
 #endif // RENDER_PATHING
+
+	bool isTargetInLineOfSight(const glm::vec3& unitPosition, const Entity* targetEntity, const Map& map)
+	{
+		assert(targetEntity);
+		glm::vec3 direction = glm::normalize(targetEntity->getPosition() - unitPosition);
+		constexpr float step = 0.5f;
+		float distance = glm::distance(targetEntity->getPosition(), unitPosition);
+		bool targetEntityVisible = true;
+
+		for (int i = 0; i < std::ceil(distance / step); ++i)
+		{
+			glm::vec3 position = unitPosition + direction * static_cast<float>(i);
+			if (targetEntity->getAABB().contains(position))
+			{
+				break;
+			}
+			else if (map.isPositionOccupied(position))
+			{
+				targetEntityVisible = false;
+				break;
+			}
+		}
+
+		return targetEntityVisible;
+	}
 }
 
 Unit::Unit(const Faction& owningFaction, const glm::vec3& startingPosition, eEntityType entityType)
@@ -163,9 +188,18 @@ void Unit::update(float deltaTime, FactionHandler& factionHandler, const Map& ma
 				const Entity* targetEntity = opposingFaction->getEntity(m_position, UNIT_ATTACK_RANGE);
 				if (targetEntity)
 				{
+					if (isTargetInLineOfSight(m_position, targetEntity, map))
+					{
+						m_currentState = eUnitState::AttackingTarget;
+					}
+					else
+					{
+						moveTo(targetEntity->getPosition(), map, [&](const glm::vec2& position)
+						{ return getAllAdjacentPositions(position, map, m_owningFaction.getUnits(), *this); }, eUnitState::Moving);
+					}
+
 					m_target.factionController = opposingFaction->getController();
 					m_target.ID = targetEntity->getID();
-					m_currentState = eUnitState::AttackingTarget;
 					break;
 				}
 			}
@@ -177,7 +211,12 @@ void Unit::update(float deltaTime, FactionHandler& factionHandler, const Map& ma
 			const Entity* targetEntity = factionHandler.getFaction(m_target.factionController).getEntity(m_target.ID);
 			if (targetEntity)
 			{
-				if (Globals::getSqrDistance(targetEntity->getPosition(), m_position) <= UNIT_ATTACK_RANGE * UNIT_ATTACK_RANGE)
+				if (!isTargetInLineOfSight(m_position, targetEntity, map))
+				{
+					moveTo(targetEntity->getPosition(), map, [&](const glm::vec2& position)
+					{ return getAllAdjacentPositions(position, map, m_owningFaction.getUnits(), *this); }, eUnitState::Moving);
+				}
+				else if(Globals::getSqrDistance(targetEntity->getPosition(), m_position) <= UNIT_ATTACK_RANGE * UNIT_ATTACK_RANGE)
 				{
 					m_currentState = eUnitState::AttackingTarget;
 
@@ -256,6 +295,8 @@ void Unit::update(float deltaTime, FactionHandler& factionHandler, const Map& ma
 
 			if (targetEntity)
 			{
+				assert(isTargetInLineOfSight(m_position, targetEntity, map));
+
 				if (Globals::getSqrDistance(targetEntity->getPosition(), m_position) <= UNIT_ATTACK_RANGE * UNIT_ATTACK_RANGE)
 				{
 					GameEventHandler::getInstance().addEvent({ eGameEventType::SpawnProjectile, m_owningFaction.getController(), getID(),
