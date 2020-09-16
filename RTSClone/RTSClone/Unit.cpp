@@ -146,18 +146,18 @@ void Unit::moveTo(const glm::vec3& destinationPosition, const Map& map, const Ge
 	PathFinding::getInstance().convertPathToWaypoints(m_pathToPosition, *this, m_owningFaction.getUnits(), map);
 	if (!m_pathToPosition.empty())
 	{
-		m_currentState = state;
+		switchToState(state);
 	}
 	else
 	{
 		if (closestDestination != m_position)
 		{
 			m_pathToPosition.push_back(closestDestination);
-			m_currentState = state;
+			switchToState(state);
 		}
 		else
 		{
-			m_currentState = eUnitState::Idle;
+			switchToState(eUnitState::Idle);
 		}
 	}
 }
@@ -193,12 +193,12 @@ void Unit::update(float deltaTime, FactionHandler& factionHandler, const Map& ma
 				{
 					if (isTargetInLineOfSight(m_position, targetEntity, map))
 					{
-						m_currentState = eUnitState::AttackingTarget;
+						switchToState(eUnitState::AttackingTarget);
 					}
 					else
 					{
 						moveTo(targetEntity->getPosition(), map, [&](const glm::ivec2& position)
-							{ return getAllAdjacentPositions(position, map, m_owningFaction.getUnits(), *this); }, eUnitState::Moving);
+							{ return getAllAdjacentPositions(position, map, m_owningFaction.getUnits(), *this); });
 					}
 
 					m_target.set(opposingFaction->getController(), targetEntity->getID());
@@ -228,7 +228,7 @@ void Unit::update(float deltaTime, FactionHandler& factionHandler, const Map& ma
 						}
 						else
 						{
-							m_currentState = eUnitState::AttackingTarget;
+							switchToState(eUnitState::AttackingTarget);
 
 							if (!m_pathToPosition.empty())
 							{
@@ -247,15 +247,12 @@ void Unit::update(float deltaTime, FactionHandler& factionHandler, const Map& ma
 			}
 			else
 			{
-				m_target.reset();
-				m_currentState = eUnitState::Idle;
-				m_pathToPosition.clear();
+				switchToState(eUnitState::Idle);
 			}
 		}
 		else if (m_pathToPosition.empty())
 		{
-			m_currentState = eUnitState::Idle;
-			m_target.reset();
+			switchToState(eUnitState::Idle);
 		}
 		break;
 	case eUnitState::AttackMoving:
@@ -268,7 +265,7 @@ void Unit::update(float deltaTime, FactionHandler& factionHandler, const Map& ma
 				if (targetEntity)
 				{
 					m_target.set(opposingFaction->getController(), targetEntity->getID());
-					m_currentState = eUnitState::AttackingTarget;
+					switchToState(eUnitState::AttackingTarget);
 
 					if (!m_pathToPosition.empty())
 					{
@@ -298,8 +295,7 @@ void Unit::update(float deltaTime, FactionHandler& factionHandler, const Map& ma
 					targetEntity = opposingFaction.getEntity(m_position, UNIT_ATTACK_RANGE);
 					if (!targetEntity)
 					{
-						m_target.reset();
-						m_currentState = eUnitState::Idle;
+						switchToState(eUnitState::Idle);
 					}
 					else
 					{
@@ -324,8 +320,7 @@ void Unit::update(float deltaTime, FactionHandler& factionHandler, const Map& ma
 			}
 			else
 			{
-				m_target.reset();
-				m_currentState = eUnitState::Idle;
+				switchToState(eUnitState::Idle);
 			}
 		}
 	
@@ -336,6 +331,29 @@ void Unit::update(float deltaTime, FactionHandler& factionHandler, const Map& ma
 	{
 		m_attackTimer.resetElaspedTime();
 	}
+}
+
+void Unit::switchToState(eUnitState newState)
+{
+	switch (newState)
+	{
+	case eUnitState::Idle:
+	case eUnitState::MovingToMinerals:
+	case eUnitState::ReturningMineralsToHQ:
+	case eUnitState::MovingToBuildingPosition:
+	case eUnitState::Building:
+		m_target.reset();
+		break;
+	case eUnitState::Moving:
+	case eUnitState::AttackMoving:
+	case eUnitState::Harvesting:
+	case eUnitState::AttackingTarget:
+		break;
+	default:
+		assert(false);
+	}
+
+	m_currentState = newState;
 }
 
 #ifdef RENDER_PATHING

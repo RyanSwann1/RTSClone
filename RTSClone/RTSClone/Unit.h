@@ -55,11 +55,12 @@ protected:
 	glm::vec3 m_front;
 	std::vector<glm::vec3> m_pathToPosition;
 
+	void switchToState(eUnitState newState);
+
 private:
 	Timer m_attackTimer;
 	Timer m_lineOfSightTimer;
 	UnitTarget m_target;
-	//int m_targetEntityID;
 #ifdef RENDER_PATHING
 	Mesh m_renderPathMesh;
 #endif // RENDER_PATHING
