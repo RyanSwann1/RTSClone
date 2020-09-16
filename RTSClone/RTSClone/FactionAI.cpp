@@ -1,5 +1,6 @@
 #include "FactionAI.h"
 #include "AdjacentPositions.h"
+#include "ModelManager.h"
 
 //Levels
 //Strategyt level - general - thgought about game state as a whole  where units are - lacing resources? Or attack enemy base - all high level
@@ -40,20 +41,17 @@ FactionAI::FactionAI(eFactionController factionController, const glm::vec3& hqSt
 	: Faction(factionController, hqStartingPosition, mineralPositions),
 	m_spawnQueue(),
 	m_actionQueue(),
-	m_delayTimer(DELAY_TIME, true)
+	m_delayTimer(DELAY_TIME, true),
+	m_graph(),
+	m_frontier()
 {
 	for (int i = 0; i < STARTING_WORKER_COUNT; ++i)
 	{
 		m_spawnQueue.push(eEntityType::Worker);
 	}
 
-	//for (int i = 0; i < STARTING_UNIT_COUNT; ++i)
-	//{
-	//	m_spawnQueue.push(eEntityType::Unit);
-	//}
-
-	//m_actionQueue.push({ eActionType::BuildSupplyDepot, {35.0f, Globals::GROUND_HEIGHT, 120.0f} });
-	//m_actionQueue.push({ eActionType::BuildBarracks, {45.0f, Globals::GROUND_HEIGHT, 120.0f} });
+	m_actionQueue.emplace(eActionType::BuildBarracks);
+	m_actionQueue.emplace(eActionType::BuildSupplyDepot);
 }
 
 void FactionAI::update(float deltaTime, const Map & map, FactionHandler& factionHandler)
@@ -95,10 +93,12 @@ void FactionAI::update(float deltaTime, const Map & map, FactionHandler& faction
 			{
 			case eActionType::BuildBarracks:
 			{
-				if (isEntityAffordable(eEntityType::Barracks))
+				glm::vec3 buildPosition = { 0.0f, 0.0f, 0.0f };
+				if (isEntityAffordable(eEntityType::Barracks) && 
+					isBuildingSpawnAvailable(m_HQ.getPosition(), eEntityType::Barracks, map, buildPosition))
 				{
-					Worker* availableWorker = getAvailableWorker(action.position);
-					if (availableWorker && instructWorkerToBuild(eEntityType::Barracks, action.position, map, *availableWorker))
+					Worker* availableWorker = getAvailableWorker(buildPosition);
+					if (availableWorker && instructWorkerToBuild(eEntityType::Barracks, buildPosition, map, *availableWorker))
 					{
 						m_actionQueue.pop();
 					}
@@ -106,14 +106,18 @@ void FactionAI::update(float deltaTime, const Map & map, FactionHandler& faction
 			}
 				break;
 			case eActionType::BuildSupplyDepot:
-				if (isEntityAffordable(eEntityType::SupplyDepot))
+			{
+				glm::vec3 buildPosition = { 0.0f, 0.0f, 0.0f };
+				if (isEntityAffordable(eEntityType::SupplyDepot) && 
+					isBuildingSpawnAvailable(m_HQ.getPosition(), eEntityType::SupplyDepot, map, buildPosition))
 				{
-					Worker* availableWorker = getAvailableWorker(action.position);
-					if (availableWorker && instructWorkerToBuild(eEntityType::SupplyDepot, action.position, map, *availableWorker))
+					Worker* availableWorker = getAvailableWorker(buildPosition);
+					if (availableWorker && instructWorkerToBuild(eEntityType::SupplyDepot, buildPosition, map, *availableWorker))
 					{
 						m_actionQueue.pop();
 					}
 				}
+			}
 				break;
 			default:
 				assert(false);
@@ -201,4 +205,47 @@ Worker* FactionAI::getAvailableWorker(const glm::vec3& position)
 	}
 
 	return selectedWorker;
+}
+
+bool FactionAI::isBuildingSpawnAvailable(const glm::vec3& startingPosition, eEntityType entityTypeToBuild, const Map& map, 
+	glm::vec3& buildPosition)
+{
+	m_graph.reset(m_frontier);
+
+	m_frontier.push(Globals::convertToGridPosition(startingPosition));
+	bool foundBuildPosition = false;
+	glm::ivec2 buildPositionOnGrid = { 0.0f, 0.0f };
+
+	while (!foundBuildPosition && !m_frontier.empty())
+	{
+		glm::ivec2 position = m_frontier.front();
+		m_frontier.pop();
+
+		std::array<AdjacentPosition, ALL_DIRECTIONS_ON_GRID.size()> adjacentPositions = getAllAdjacentPositions(position, map);
+		for (const auto& adjacentPosition : adjacentPositions)
+		{
+			if (adjacentPosition.valid)
+			{
+				AABB buildingAABB(Globals::convertToWorldPosition(adjacentPosition.position), 
+					ModelManager::getInstance().getModel(entityTypeToBuild));
+
+				if (!map.isAABBOccupied(buildingAABB))
+				{
+					foundBuildPosition = true;
+					buildPositionOnGrid = adjacentPosition.position;
+					break;
+				}
+				else if(!m_graph.isPositionVisited(adjacentPosition.position))
+				{
+					m_graph.addToGraph(adjacentPosition.position, position);
+					m_frontier.push(adjacentPosition.position);
+				}
+			}
+		}
+
+		assert(m_frontier.size() <= Globals::MAP_SIZE * Globals::MAP_SIZE);
+	}
+
+	buildPosition = Globals::convertToWorldPosition(buildPositionOnGrid);
+	return foundBuildPosition;
 }
