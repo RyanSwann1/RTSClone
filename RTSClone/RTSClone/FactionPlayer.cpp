@@ -371,7 +371,7 @@ void FactionPlayer::instructUnitToAttack(Unit& unit, const Entity* targetEntity,
 {
     assert(targetEntity);
 
-    unit.setTarget(targetEntity->getID(), targetEntityOwningFaction);
+    unit.setTarget(targetEntityOwningFaction, targetEntity->getID());
     if (unit.getCurrentState() != eUnitState::AttackingTarget)
     {
         unit.moveTo(targetEntity->getPosition(), map,

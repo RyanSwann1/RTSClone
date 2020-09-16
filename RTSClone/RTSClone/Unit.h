@@ -40,8 +40,7 @@ public:
 	eUnitState getCurrentState() const;
 
 	void resetTarget();
-	void setTarget(int targetID, eFactionController targetFaction);
-	//void setTargetID(int entityTargetID);
+	void setTarget(eFactionController targetFaction, int targetID);
 	void moveTo(const glm::vec3& destinationPosition, const Map& map, const GetAllAdjacentPositions& getAdjacentPositions, 
 		eUnitState state = eUnitState::Moving);
 	void update(float deltaTime, FactionHandler& factionHandler, const Map& map);

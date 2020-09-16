@@ -124,13 +124,12 @@ eUnitState Unit::getCurrentState() const
 
 void Unit::resetTarget()
 {
-	m_target.ID = Globals::INVALID_ENTITY_ID;
+	m_target.reset();
 }
 
-void Unit::setTarget(int targetID, eFactionController targetFaction)
+void Unit::setTarget(eFactionController targetFaction, int targetID)
 {
-	m_target.ID = targetID;
-	m_target.factionController = targetFaction;
+	m_target.set(targetFaction, targetID);
 }
 
 void Unit::moveTo(const glm::vec3& destinationPosition, const Map& map, const GetAllAdjacentPositions& getAdjacentPositions, 
@@ -184,7 +183,7 @@ void Unit::update(float deltaTime, FactionHandler& factionHandler, const Map& ma
 	switch (m_currentState)
 	{
 	case eUnitState::Idle:
-		assert(m_target.ID == Globals::INVALID_ENTITY_ID && m_pathToPosition.empty());
+		assert(m_target.getID() == Globals::INVALID_ENTITY_ID && m_pathToPosition.empty());
 		if (m_attackTimer.isExpired() && getEntityType() == eEntityType::Unit)
 		{
 			for (const auto& opposingFaction : factionHandler.getOpposingFactions(m_owningFaction.getController()))
@@ -202,17 +201,16 @@ void Unit::update(float deltaTime, FactionHandler& factionHandler, const Map& ma
 						{ return getAllAdjacentPositions(position, map, m_owningFaction.getUnits(), *this); }, eUnitState::Moving);
 					}
 
-					m_target.factionController = opposingFaction->getController();
-					m_target.ID = targetEntity->getID();
+					m_target.set(opposingFaction->getController(), targetEntity->getID());
 					break;
 				}
 			}
 		}
 		break;
 	case eUnitState::Moving:
-		if (Globals::isEntityIDValid(m_target.ID))
+		if (Globals::isEntityIDValid(m_target.getID()))
 		{
-			const Entity* targetEntity = factionHandler.getFaction(m_target.factionController).getEntity(m_target.ID);
+			const Entity* targetEntity = factionHandler.getFaction(m_target.getFactionController()).getEntity(m_target.getID());
 			if (targetEntity)
 			{
 				if(Globals::getSqrDistance(targetEntity->getPosition(), m_position) <= UNIT_ATTACK_RANGE * UNIT_ATTACK_RANGE)
@@ -245,7 +243,7 @@ void Unit::update(float deltaTime, FactionHandler& factionHandler, const Map& ma
 			}
 			else
 			{
-				m_target.ID = Globals::INVALID_ENTITY_ID;
+				m_target.reset();
 				m_currentState = eUnitState::Idle;
 				m_pathToPosition.clear();
 			}
@@ -253,7 +251,7 @@ void Unit::update(float deltaTime, FactionHandler& factionHandler, const Map& ma
 		else if (m_pathToPosition.empty())
 		{
 			m_currentState = eUnitState::Idle;
-			m_target.ID = Globals::INVALID_ENTITY_ID;
+			m_target.reset();
 		}
 		break;
 	case eUnitState::AttackMoving:
@@ -264,8 +262,7 @@ void Unit::update(float deltaTime, FactionHandler& factionHandler, const Map& ma
 				const Entity* targetEntity = opposingFaction->getEntity(m_position, UNIT_ATTACK_RANGE);
 				if (targetEntity)
 				{
-					m_target.ID = targetEntity->getID();
-					m_target.factionController = opposingFaction->getController();
+					m_target.set(opposingFaction->getController(), targetEntity->getID());
 					m_currentState = eUnitState::AttackingTarget;
 
 					if (!m_pathToPosition.empty())
@@ -283,23 +280,23 @@ void Unit::update(float deltaTime, FactionHandler& factionHandler, const Map& ma
 		}
 		break;
 	case eUnitState::AttackingTarget:
-		assert(m_target.ID != Globals::INVALID_ENTITY_ID);
+		assert(m_target.getID() != Globals::INVALID_ENTITY_ID);
 
 		if (m_attackTimer.isExpired())
 		{
-			const Faction& opposingFaction = factionHandler.getFaction(m_target.factionController);
-			const Entity* targetEntity = opposingFaction.getEntity(m_target.ID);
+			const Faction& opposingFaction = factionHandler.getFaction(m_target.getFactionController());
+			const Entity* targetEntity = opposingFaction.getEntity(m_target.getID());
 			if (!targetEntity)
 			{
 				targetEntity = opposingFaction.getEntity(m_position, UNIT_ATTACK_RANGE);
 				if (!targetEntity)
 				{
-					m_target.ID = Globals::INVALID_ENTITY_ID;
+					m_target.reset();
 					m_currentState = eUnitState::Idle;
 				}
 				else
 				{
-					m_target.ID = targetEntity->getID();
+					m_target.set(opposingFaction.getController(), targetEntity->getID());
 				}
 			}
 
