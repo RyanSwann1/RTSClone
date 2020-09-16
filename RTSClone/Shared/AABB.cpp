@@ -155,16 +155,6 @@ bool AABB::contains(const AABB& other) const
 
 void AABB::update(const glm::vec3& position)
 {
-	assert(glm::abs(m_left) > 0.0f &&
-		glm::abs(m_right) > 0.0f &&
-		glm::abs(m_top) > 0.0f &&
-		glm::abs(m_bottom) > 0.0f &&
-		glm::abs(m_forward) > 0.0f &&
-		glm::abs(m_back) > 0.0f &&
-		m_right > m_left &&
-		m_top > m_bottom &&
-		m_forward > m_back);
-
 	float x = (m_right - m_left) / 2.0f;
 	float y = (m_top - m_bottom) / 2.0f;
 	float z = (m_forward - m_back) / 2.0f;

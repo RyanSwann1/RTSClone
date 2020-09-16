@@ -120,14 +120,13 @@ int main()
 	sf::Clock gameClock;
 	Camera camera;
 	std::vector<Player> players;
-	players.reserve(static_cast<int>(eFactionController::Max) + 1);
+	players.reserve(static_cast<size_t>(eFactionController::Max) + static_cast<size_t>(1));
 	
 	glm::vec3 previousMousePosition = { 0.0f, Globals::GROUND_HEIGHT, 0.0f };
 	bool plannedEntityActive = false;
 	bool showPlayerMenu = false;
 	Entity plannedEntity(eModelName::RocksTall, { 0.0f, 0.0f, 0.0f });
 	int selected = 0;	
-	const auto& i = FACTION_CONTROLLER_DETAILS;
 
 	if (!LevelFileHandler::loadLevelFromFile(levelName, entityManager, players))
 	{
