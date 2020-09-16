@@ -5,32 +5,25 @@
 #include "GameMessages.h"
 #include "ModelManager.h"
 
-namespace
-{
-	Faction& getFaction(std::vector<std::unique_ptr<Faction>>& factions, eFactionController factionController)
-	{
-		auto faction = std::find_if(factions.begin(), factions.end(), [factionController](const auto& faction)
-		{
-			return faction->getController() == factionController;
-		});
-		assert(faction != factions.end());
-		
-		return *faction->get();
-	}
-}
-
-Level::Level(std::vector<SceneryGameObject>&& scenery, std::vector<std::unique_ptr<Faction>>&& factions)
+Level::Level(std::vector<SceneryGameObject>&& scenery, 
+	std::array<std::unique_ptr<Faction>, static_cast<size_t>(eFactionController::Max) + 1>&& factions)
 	: m_scenery(std::move(scenery)),
 	m_factions(std::move(factions)),
 	m_factionHandler(m_factions),
 	m_projectileHandler(),
-	m_player(static_cast<FactionPlayer&>(getFaction(m_factions, eFactionController::Player)))
+	m_player(static_cast<FactionPlayer&>(*m_factions[static_cast<int>(eFactionController::Player)])) 
+{
+	setAITargetFaction();
+}
+
+void Level::setAITargetFaction()
 {
 	for (auto& faction : m_factions)
 	{
-		if (faction->getController() != eFactionController::Player)
+		if (faction && faction->getController() != eFactionController::Player)
 		{
-			static_cast<FactionAI&>(*faction.get()).setTargetFaction(m_factionHandler.getOpposingFactions(faction->getController()));
+			static_cast<FactionAI&>(*faction.get()).setTargetFaction(
+				m_factionHandler.getOpposingFactions(faction->getController()));
 		}
 	}
 }
@@ -38,13 +31,31 @@ Level::Level(std::vector<SceneryGameObject>&& scenery, std::vector<std::unique_p
 std::unique_ptr<Level> Level::create(const std::string& levelName)
 {
 	std::vector<SceneryGameObject> scenery;
-	std::vector<std::unique_ptr<Faction>> factions;
+	std::array<std::unique_ptr<Faction>, static_cast<size_t>(eFactionController::Max) + 1> factions;
 	if (!LevelFileHandler::loadLevelFromFile(levelName, scenery, factions))
 	{
 		return std::unique_ptr<Level>();
 	}
 
 	return std::unique_ptr<Level>(new Level(std::move(scenery), std::move(factions)));
+}
+
+void Level::handleEvent(const GameEvent& gameEvent)
+{
+	switch (gameEvent.type)
+	{
+	case eGameEventType::FactionEliminated:
+	{
+		assert(m_factions[static_cast<int>(gameEvent.senderFaction)] &&
+			m_factions[static_cast<int>(gameEvent.senderFaction)]->getController() == gameEvent.senderFaction);
+
+		m_factions[static_cast<int>(gameEvent.senderFaction)].release();
+		setAITargetFaction();
+	}	
+		break;
+	default:
+		assert(false);
+	}
 }
 
 void Level::handleInput(const sf::Window& window, const Camera& camera, const sf::Event& currentSFMLEvent, const Map& map)
@@ -58,10 +69,13 @@ void Level::update(float deltaTime, const Map& map)
 	
 	for (auto& faction : m_factions)
 	{
-		faction->update(deltaTime, map, m_factionHandler);
+		if (faction)
+		{
+			faction->update(deltaTime, map, m_factionHandler);
+		}
 	}
 
-	GameEventHandler::getInstance().handleEvents(m_factionHandler, m_projectileHandler, map);
+	GameEventHandler::getInstance().handleEvents(m_factionHandler, m_projectileHandler, map, *this);
 }
 
 void Level::renderSelectionBox(const sf::Window& window) const
@@ -73,7 +87,10 @@ void Level::renderPlannedBuildings(ShaderHandler& shaderHandler) const
 {
 	for (auto& faction : m_factions)
 	{
-		faction->renderPlannedBuildings(shaderHandler);
+		if (faction)
+		{
+			faction->renderPlannedBuildings(shaderHandler);
+		}
 	}
 }
 
@@ -86,7 +103,10 @@ void Level::render(ShaderHandler& shaderHandler) const
 
 	for(auto& faction : m_factions)
 	{
-		faction->render(shaderHandler);
+		if (faction)
+		{
+			faction->render(shaderHandler);
+		}
 	}
 
 	m_projectileHandler.render(shaderHandler);
@@ -97,7 +117,10 @@ void Level::renderAABB(ShaderHandler& shaderHandler)
 {
 	for (auto& faction : m_factions)
 	{
-		faction->renderAABB(shaderHandler);
+		if (faction)
+		{
+			faction->renderAABB(shaderHandler);
+		}
 	}
 
 	m_projectileHandler.renderAABB(shaderHandler);
@@ -109,7 +132,10 @@ void Level::renderPathing(ShaderHandler& shaderHandler)
 {
 	for (auto& faction : m_factions)
 	{
-		faction->renderPathing(shaderHandler);
+		if (faction)
+		{
+			faction->renderPathing(shaderHandler);
+		}
 	}
 }
 #endif // RENDER_PATHING

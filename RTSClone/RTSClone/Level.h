@@ -20,6 +20,7 @@ class Level : private NonCopyable, private NonMovable
 public:
 	static std::unique_ptr<Level> create(const std::string& levelName);
 	
+	void handleEvent(const GameEvent& gameEvent);
 	void handleInput(const sf::Window& window, const Camera& camera, const sf::Event& currentSFMLEvent, const Map& map);
 	void update(float deltaTime, const Map& map);
 	void renderSelectionBox(const sf::Window& window) const;
@@ -34,11 +35,14 @@ public:
 #endif // RENDER_PATHING
 
 private:
-	Level(std::vector<SceneryGameObject>&& scenery, std::vector<std::unique_ptr<Faction>>&& factions);
+	Level(std::vector<SceneryGameObject>&& scenery, 
+		std::array<std::unique_ptr<Faction>, static_cast<size_t>(eFactionController::Max) + 1>&& factions);
 	
 	std::vector<SceneryGameObject> m_scenery;
-	std::vector<std::unique_ptr<Faction>> m_factions;
+	std::array<std::unique_ptr<Faction>, static_cast<size_t>(eFactionController::Max) + 1> m_factions;
 	FactionHandler m_factionHandler;
 	ProjectileHandler m_projectileHandler;
 	FactionPlayer& m_player;
+
+	void setAITargetFaction();
 };	
