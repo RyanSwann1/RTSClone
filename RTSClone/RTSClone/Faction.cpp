@@ -158,16 +158,33 @@ const Entity* Faction::getEntity(int entityID) const
     return nullptr;
 }
 
-int Faction::getEntityIDAtPosition(const glm::vec3& position) const
+const Entity* Faction::getEntity(const glm::vec3& position) const
 {
-    auto cIter = std::find_if(m_allEntities.cbegin(), m_allEntities.cend(), [&position](const auto& entity)
+    auto entity = std::find_if(m_allEntities.cbegin(), m_allEntities.cend(), [&position](const auto& entity)
     {
         return entity->getAABB().contains(position);
     });
 
-    if (cIter != m_allEntities.cend())
+    if (entity != m_allEntities.cend())
     {
-        return (*cIter)->getID();
+        return (*entity);
+    }
+    else
+    {
+        return nullptr;
+    }
+}
+
+int Faction::getEntityIDAtPosition(const glm::vec3& position) const
+{
+    auto entity = std::find_if(m_allEntities.cbegin(), m_allEntities.cend(), [&position](const auto& entity)
+    {
+        return entity->getAABB().contains(position);
+    });
+
+    if (entity != m_allEntities.cend())
+    {
+        return (*entity)->getID();
     }
     else
     {
