@@ -210,7 +210,11 @@ void Unit::update(float deltaTime, FactionHandler& factionHandler, const Map& ma
 	case eUnitState::Moving:
 		if (Globals::isEntityIDValid(m_target.getID()))
 		{
-			const Entity* targetEntity = factionHandler.getFaction(m_target.getFactionController()).getEntity(m_target.getID());
+			const Entity* targetEntity = nullptr;
+			if (factionHandler.isFactionActive(m_target.getFactionController()))
+			{
+				targetEntity = factionHandler.getFaction(m_target.getFactionController()).getEntity(m_target.getID());
+			}
 			if (targetEntity)
 			{
 				if(Globals::getSqrDistance(targetEntity->getPosition(), m_position) <= UNIT_ATTACK_RANGE * UNIT_ATTACK_RANGE)
@@ -255,6 +259,7 @@ void Unit::update(float deltaTime, FactionHandler& factionHandler, const Map& ma
 		}
 		break;
 	case eUnitState::AttackMoving:
+		//TODO: Fix bug - not switching to idle
 		if (m_attackTimer.isExpired())
 		{
 			for (const auto& opposingFaction : factionHandler.getOpposingFactions(m_owningFaction.getController()))
@@ -284,35 +289,43 @@ void Unit::update(float deltaTime, FactionHandler& factionHandler, const Map& ma
 
 		if (m_attackTimer.isExpired())
 		{
-			const Faction& opposingFaction = factionHandler.getFaction(m_target.getFactionController());
-			const Entity* targetEntity = opposingFaction.getEntity(m_target.getID());
-			if (!targetEntity)
+			if (factionHandler.isFactionActive(m_target.getFactionController()))
 			{
-				targetEntity = opposingFaction.getEntity(m_position, UNIT_ATTACK_RANGE);
+				const Faction& opposingFaction = factionHandler.getFaction(m_target.getFactionController());
+				const Entity* targetEntity = opposingFaction.getEntity(m_target.getID());
 				if (!targetEntity)
 				{
-					m_target.reset();
-					m_currentState = eUnitState::Idle;
+					targetEntity = opposingFaction.getEntity(m_position, UNIT_ATTACK_RANGE);
+					if (!targetEntity)
+					{
+						m_target.reset();
+						m_currentState = eUnitState::Idle;
+					}
+					else
+					{
+						m_target.set(opposingFaction.getController(), targetEntity->getID());
+					}
 				}
-				else
+
+				if (targetEntity)
 				{
-					m_target.set(opposingFaction.getController(), targetEntity->getID());
+					if ((Globals::getSqrDistance(targetEntity->getPosition(), m_position) > UNIT_ATTACK_RANGE * UNIT_ATTACK_RANGE) ||
+						!isTargetInLineOfSight(m_position, targetEntity, map))
+					{
+						moveTo(targetEntity->getPosition(), map, [&](const glm::ivec2& position)
+						{ return getAllAdjacentPositions(position, map, m_owningFaction.getUnits(), *this); });
+					}
+					else if (Globals::getSqrDistance(targetEntity->getPosition(), m_position) <= UNIT_ATTACK_RANGE * UNIT_ATTACK_RANGE)
+					{
+						GameEventHandler::getInstance().addEvent({ eGameEventType::SpawnProjectile, m_owningFaction.getController(), getID(),
+							opposingFaction.getController(), targetEntity->getID(), m_position, targetEntity->getPosition() });
+					}
 				}
 			}
-
-			if (targetEntity)
+			else
 			{
-				if ((Globals::getSqrDistance(targetEntity->getPosition(), m_position) > UNIT_ATTACK_RANGE * UNIT_ATTACK_RANGE) ||
-					!isTargetInLineOfSight(m_position, targetEntity, map))
-				{
-					moveTo(targetEntity->getPosition(), map, [&](const glm::ivec2& position)
-						{ return getAllAdjacentPositions(position, map, m_owningFaction.getUnits(), *this); });
-				}
-				else if (Globals::getSqrDistance(targetEntity->getPosition(), m_position) <= UNIT_ATTACK_RANGE * UNIT_ATTACK_RANGE)
-				{
-					GameEventHandler::getInstance().addEvent({ eGameEventType::SpawnProjectile, m_owningFaction.getController(), getID(),
-						opposingFaction.getController(), targetEntity->getID(), m_position, targetEntity->getPosition() });
-				}
+				m_target.reset();
+				m_currentState = eUnitState::Idle;
 			}
 		}
 	
