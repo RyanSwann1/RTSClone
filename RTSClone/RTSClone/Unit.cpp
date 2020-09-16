@@ -183,7 +183,7 @@ void Unit::update(float deltaTime, FactionHandler& factionHandler, const Map& ma
 	switch (m_currentState)
 	{
 	case eUnitState::Idle:
-		assert(m_target.getID() == Globals::INVALID_ENTITY_ID && m_pathToPosition.empty());
+		assert(m_target.getID() == Globals::INVALID_ENTITY_ID);
 		if (m_attackTimer.isExpired() && getEntityType() == eEntityType::Unit)
 		{
 			for (const auto& opposingFaction : factionHandler.getOpposingFactions(m_owningFaction.getController()))
@@ -197,8 +197,8 @@ void Unit::update(float deltaTime, FactionHandler& factionHandler, const Map& ma
 					}
 					else
 					{
-						moveTo(targetEntity->getPosition(), map, [&](const glm::vec2& position)
-						{ return getAllAdjacentPositions(position, map, m_owningFaction.getUnits(), *this); }, eUnitState::Moving);
+						moveTo(targetEntity->getPosition(), map, [&](const glm::ivec2& position)
+							{ return getAllAdjacentPositions(position, map, m_owningFaction.getUnits(), *this); }, eUnitState::Moving);
 					}
 
 					m_target.set(opposingFaction->getController(), targetEntity->getID());
@@ -219,7 +219,7 @@ void Unit::update(float deltaTime, FactionHandler& factionHandler, const Map& ma
 					{
 						if (!isTargetInLineOfSight(m_position, targetEntity, map))
 						{
-							moveTo(targetEntity->getPosition(), map, [&](const glm::vec2& position)
+							moveTo(targetEntity->getPosition(), map, [&](const glm::ivec2& position)
 							{ return getAllAdjacentPositions(position, map, m_owningFaction.getUnits(), *this); }, eUnitState::Moving);
 						}
 						else
@@ -302,17 +302,16 @@ void Unit::update(float deltaTime, FactionHandler& factionHandler, const Map& ma
 
 			if (targetEntity)
 			{
-				assert(isTargetInLineOfSight(m_position, targetEntity, map));
-
-				if (Globals::getSqrDistance(targetEntity->getPosition(), m_position) <= UNIT_ATTACK_RANGE * UNIT_ATTACK_RANGE)
+				if ((Globals::getSqrDistance(targetEntity->getPosition(), m_position) > UNIT_ATTACK_RANGE * UNIT_ATTACK_RANGE) ||
+					!isTargetInLineOfSight(m_position, targetEntity, map))
+				{
+					moveTo(targetEntity->getPosition(), map, [&](const glm::ivec2& position)
+						{ return getAllAdjacentPositions(position, map, m_owningFaction.getUnits(), *this); });
+				}
+				else if (Globals::getSqrDistance(targetEntity->getPosition(), m_position) <= UNIT_ATTACK_RANGE * UNIT_ATTACK_RANGE)
 				{
 					GameEventHandler::getInstance().addEvent({ eGameEventType::SpawnProjectile, m_owningFaction.getController(), getID(),
 						opposingFaction.getController(), targetEntity->getID(), m_position, targetEntity->getPosition() });
-				}
-				else
-				{
-					moveTo(targetEntity->getPosition(), map, [&](const glm::ivec2& position) 
-						{ return getAllAdjacentPositions(position, map, m_owningFaction.getUnits(), *this); });
 				}
 			}
 		}
