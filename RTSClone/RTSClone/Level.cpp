@@ -4,6 +4,7 @@
 #include "GameMessenger.h"
 #include "GameMessages.h"
 #include "ModelManager.h"
+#include "Camera.h"
 
 namespace
 {
@@ -58,6 +59,11 @@ std::unique_ptr<Level> Level::create(const std::string& levelName)
 	return std::unique_ptr<Level>(new Level(std::move(scenery), std::move(factions)));
 }
 
+Level::~Level()
+{
+	GameMessenger::getInstance().broadcast<GameMessages::BaseMessage<eGameMessageType::UIClearDisplayEntity>>({});
+}
+
 void Level::handleEvent(const GameEvent& gameEvent)
 {
 	switch (gameEvent.type)
@@ -79,6 +85,33 @@ void Level::handleEvent(const GameEvent& gameEvent)
 void Level::handleInput(const sf::Window& window, const Camera& camera, const sf::Event& currentSFMLEvent, const Map& map)
 {
 	m_player.handleInput(currentSFMLEvent, window, camera, map, m_factionHandler.getOpposingFactions(eFactionController::Player));
+
+	if (currentSFMLEvent.type == sf::Event::MouseButtonPressed &&
+		currentSFMLEvent.mouseButton.button == sf::Mouse::Left)
+	{
+		glm::vec3 mouseToGroundPosition = camera.getMouseToGroundPosition(window);
+		const Entity* targetEntity = nullptr;
+		for (const auto& faction : m_factions)
+		{
+			if (faction)
+			{
+				targetEntity = faction->getEntity(mouseToGroundPosition);
+				if (targetEntity)
+				{			
+					break;
+				}
+			}
+		}
+
+		if (!targetEntity)
+		{
+			GameMessenger::getInstance().broadcast<GameMessages::BaseMessage<eGameMessageType::UIClearDisplayEntity>>({});
+		}
+		else
+		{
+			GameMessenger::getInstance().broadcast<GameMessages::UIDisplayEntity>({ 2, targetEntity->getEntityType() });
+		}
+	}
 }
 
 void Level::update(float deltaTime, const Map& map, bool& resetLevel)
@@ -92,6 +125,8 @@ void Level::update(float deltaTime, const Map& map, bool& resetLevel)
 			faction->update(deltaTime, map, m_factionHandler);
 		}
 	}
+
+
 
 	GameEventHandler::getInstance().handleEvents(m_factionHandler, m_projectileHandler, map, *this);
 	if (getActiveFactionCount(m_factions) == 1)
