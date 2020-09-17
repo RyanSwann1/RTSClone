@@ -20,7 +20,7 @@
 
 namespace
 {
-	constexpr float DELAY_TIME = 10.0f;
+	constexpr float DELAY_TIME = 15.0f;
 	constexpr int STARTING_WORKER_COUNT = 4;
 	constexpr int STARTING_UNIT_COUNT = 1;
 }

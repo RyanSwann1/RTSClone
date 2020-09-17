@@ -7,6 +7,7 @@
 #include "FactionAI.h"
 #include "SceneryGameObject.h"
 #include "FactionHandler.h"
+#include "EntityTarget.h"
 #include <string>
 #include <vector>
 #include <memory>
@@ -44,6 +45,7 @@ private:
 	FactionHandler m_factionHandler;
 	ProjectileHandler m_projectileHandler;
 	FactionPlayer& m_player;
+	EntityTarget m_selectedTarget;
 
 	void setAITargetFaction();
 };	

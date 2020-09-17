@@ -19,6 +19,7 @@ namespace
 			}
 		}
 
+
 		assert(activeFactions > 0);
 		return activeFactions;
 	}
@@ -30,7 +31,8 @@ Level::Level(std::vector<SceneryGameObject>&& scenery,
 	m_factions(std::move(factions)),
 	m_factionHandler(m_factions),
 	m_projectileHandler(),
-	m_player(static_cast<FactionPlayer&>(*m_factions[static_cast<int>(eFactionController::Player)])) 
+	m_player(static_cast<FactionPlayer&>(*m_factions[static_cast<int>(eFactionController::Player)])),
+	m_selectedTarget()
 {
 	setAITargetFaction();
 }
@@ -91,6 +93,7 @@ void Level::handleInput(const sf::Window& window, const Camera& camera, const sf
 	{
 		glm::vec3 mouseToGroundPosition = camera.getMouseToGroundPosition(window);
 		const Entity* targetEntity = nullptr;
+		eFactionController targetEntityFaction;
 		for (const auto& faction : m_factions)
 		{
 			if (faction)
@@ -98,6 +101,7 @@ void Level::handleInput(const sf::Window& window, const Camera& camera, const sf
 				targetEntity = faction->getEntity(mouseToGroundPosition);
 				if (targetEntity)
 				{			
+					targetEntityFaction = faction->getController();
 					break;
 				}
 			}
@@ -105,10 +109,13 @@ void Level::handleInput(const sf::Window& window, const Camera& camera, const sf
 
 		if (!targetEntity)
 		{
+			m_selectedTarget.reset();
 			GameMessenger::getInstance().broadcast<GameMessages::BaseMessage<eGameMessageType::UIClearDisplayEntity>>({});
 		}
 		else
 		{
+			m_selectedTarget.set(targetEntityFaction, targetEntity->getID());
+
 			GameMessenger::getInstance().broadcast<GameMessages::UIDisplayEntity>(
 				{ targetEntity->getHealth(), targetEntity->getEntityType() });
 		}
@@ -128,11 +135,29 @@ void Level::update(float deltaTime, const Map& map, bool& resetLevel)
 	}
 
 
-
 	GameEventHandler::getInstance().handleEvents(m_factionHandler, m_projectileHandler, map, *this);
 	if (getActiveFactionCount(m_factions) == 1)
 	{
 		resetLevel = true;
+	}
+
+	if (m_factionHandler.isFactionActive(m_selectedTarget.getFactionController()))
+	{
+		const Entity* targetEntity = m_factionHandler.getFaction(m_selectedTarget.getFactionController()).getEntity(m_selectedTarget.getID());
+		if (!targetEntity)
+		{
+			m_selectedTarget.reset();
+			GameMessenger::getInstance().broadcast<GameMessages::BaseMessage<eGameMessageType::UIClearDisplayEntity>>({});
+		}
+		else
+		{
+			GameMessenger::getInstance().broadcast<GameMessages::UIDisplayEntity>(
+				{ targetEntity->getHealth(), targetEntity->getEntityType() });
+		}
+	}
+	else
+	{
+		m_selectedTarget.reset();
 	}
 }
 
