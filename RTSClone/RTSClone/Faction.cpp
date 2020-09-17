@@ -22,10 +22,10 @@ namespace
 
     std::array<Mineral, Globals::MAX_MINERALS_PER_FACTION> getMinerals(
         const std::array<glm::vec3, Globals::MAX_MINERALS_PER_FACTION>& mineralPositions)
-    {   
+    {
         //Done in this way because of how the constructors/move constructors are setup
         int i = 0;
-        std::array<Mineral, Globals::MAX_MINERALS_PER_FACTION> minerals = 
+        std::array<Mineral, Globals::MAX_MINERALS_PER_FACTION> minerals =
         {
             mineralPositions[i],
             mineralPositions[++i],
@@ -35,9 +35,9 @@ namespace
         };
 
         assert(i + 1 == static_cast<int>(mineralPositions.size()));
-        
+
         return minerals;
-    }
+    };
 }
 
 //PlannedBuilding
@@ -66,6 +66,21 @@ Faction::Faction(eFactionController factionController, const glm::vec3& hqStarti
     m_currentPopulationLimit(Globals::STARTING_POPULATION)
 {
     m_allEntities.push_back(&m_HQ);
+}
+
+int Faction::getCurrentPopulationAmount() const
+{
+    return m_currentPopulationAmount;
+}
+
+int Faction::getMaximumPopulationAmount() const
+{
+    return m_currentPopulationLimit;
+}
+
+int Faction::getCurrentResourceAmount() const
+{
+    return m_currentResourceAmount;
 }
 
 const glm::vec3& Faction::getHQPosition() const
@@ -198,70 +213,75 @@ void Faction::handleEvent(const GameEvent& gameEvent, const Map& map)
     {
     case eGameEventType::Attack:
     {
-        assert(gameEvent.senderFaction != m_controller);
+        assert(gameEvent.senderFaction != m_controller && gameEvent.damage > 0 && gameEvent.targetID != Globals::INVALID_ENTITY_ID);
         int targetID = gameEvent.targetID;
         auto entity = std::find_if(m_allEntities.begin(), m_allEntities.end(), [targetID](const auto& entity)
         {
             return entity->getID() == targetID;
         });
+
         if (entity != m_allEntities.end())
         {
-            switch ((*entity)->getEntityType())
+            (*entity)->reduceHealth(gameEvent.damage);
+            if ((*entity)->isDead())
             {
-            case eEntityType::Worker:
-            {
-                auto worker = std::find_if(m_workers.begin(), m_workers.end(), [targetID](const auto& worker)
+                switch ((*entity)->getEntityType())
                 {
-                    return worker.getID() == targetID;
-                });
-                assert(worker != m_workers.end());
-
-                m_workers.erase(worker);
-                m_allEntities.erase(entity);
-            }
-            break;
-            case eEntityType::SupplyDepot:
-            {
-                auto supplyDepot = std::find_if(m_supplyDepots.begin(), m_supplyDepots.end(), [targetID](const auto& supplyDepot)
+                case eEntityType::Worker:
                 {
-                    return supplyDepot.getID() == targetID;
-                });
-                assert(supplyDepot != m_supplyDepots.end());
+                    auto worker = std::find_if(m_workers.begin(), m_workers.end(), [targetID](const auto& worker)
+                    {
+                        return worker.getID() == targetID;
+                    });
+                    assert(worker != m_workers.end());
 
-                m_supplyDepots.erase(supplyDepot);
-                m_allEntities.erase(entity);
-            }
-            break;
-            case eEntityType::Barracks:
-            {
-                auto barracks = std::find_if(m_barracks.begin(), m_barracks.end(), [targetID](const auto& barracks)
-                {
-                    return barracks.getID() == targetID;
-                });
-                assert(barracks != m_barracks.end());
-
-                m_barracks.erase(barracks);
-                m_allEntities.erase(entity);
-            }
+                    m_workers.erase(worker);
+                    m_allEntities.erase(entity);
+                }
                 break;
-            case eEntityType::HQ:
-                GameEventHandler::getInstance().addEvent({ eGameEventType::FactionEliminated, m_controller });
-                break;
-            case eEntityType::Unit:
-            {
-                auto unit = std::find_if(m_units.begin(), m_units.end(), [targetID](const auto& unit)
+                case eEntityType::SupplyDepot:
                 {
-                    return unit.getID() == targetID;
-                });
-                assert(unit != m_units.end());
+                    auto supplyDepot = std::find_if(m_supplyDepots.begin(), m_supplyDepots.end(), [targetID](const auto& supplyDepot)
+                    {
+                        return supplyDepot.getID() == targetID;
+                    });
+                    assert(supplyDepot != m_supplyDepots.end());
 
-                m_units.erase(unit);
-                m_allEntities.erase(entity);
-            }
+                    m_supplyDepots.erase(supplyDepot);
+                    m_allEntities.erase(entity);
+                }
                 break;
-            default:
-                assert(false);
-            }
+                case eEntityType::Barracks:
+                {
+                    auto barracks = std::find_if(m_barracks.begin(), m_barracks.end(), [targetID](const auto& barracks)
+                    {
+                        return barracks.getID() == targetID;
+                    });
+                    assert(barracks != m_barracks.end());
+
+                    m_barracks.erase(barracks);
+                    m_allEntities.erase(entity);
+                }
+                break;
+                case eEntityType::HQ:
+                    GameEventHandler::getInstance().addEvent({ eGameEventType::FactionEliminated, m_controller });
+                    break;
+                case eEntityType::Unit:
+                {
+                    auto unit = std::find_if(m_units.begin(), m_units.end(), [targetID](const auto& unit)
+                    {
+                        return unit.getID() == targetID;
+                    });
+                    assert(unit != m_units.end());
+
+                    m_units.erase(unit);
+                    m_allEntities.erase(entity);
+                }
+                break;
+                default:
+                    assert(false);
+                }
+            }   
         }
     }
         break;

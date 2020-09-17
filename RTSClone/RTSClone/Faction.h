@@ -26,6 +26,7 @@ class Faction : private NonMovable, private NonCopyable
 {
 public:
 	virtual ~Faction() {}
+
 	const glm::vec3& getHQPosition() const;
 	eFactionController getController() const;
 	const std::list<Unit>& getUnits() const;
@@ -60,6 +61,9 @@ protected:
 	std::list<Barracks> m_barracks;
 	HQ m_HQ;
 
+	int getCurrentPopulationAmount() const;
+	int getMaximumPopulationAmount() const;
+	int getCurrentResourceAmount() const;
 	bool isExceedPopulationLimit(eEntityType entityType) const;
 	bool isEntityAffordable(eEntityType entityType) const;
 
