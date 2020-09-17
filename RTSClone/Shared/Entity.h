@@ -31,6 +31,9 @@ public:
 #endif // LEVEL_EDITOR
 #ifdef GAME
 	eEntityType getEntityType() const;
+	int getHealth() const;
+	void reduceHealth(int damage);
+	bool isDead() const;
 #endif // GAME
 	int getID() const;
 	const glm::vec3& getPosition() const;
@@ -45,7 +48,7 @@ public:
 
 protected:	
 #ifdef GAME
-	Entity(const glm::vec3& startingPosition, eEntityType entityType);
+	Entity(const glm::vec3& startingPosition, eEntityType entityType, int health = 0);
 #endif // GAME
 	glm::vec3 m_position;
 	AABB m_AABB;
@@ -53,6 +56,7 @@ protected:
 private:
 	int m_ID;
 #ifdef GAME
+	int m_health;
 	eEntityType m_type;
 #endif // GAME
 #ifdef LEVEL_EDITOR

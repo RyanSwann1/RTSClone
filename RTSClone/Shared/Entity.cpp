@@ -6,10 +6,11 @@
 #include "UniqueEntityIDDistributer.h"
 
 #ifdef GAME
-Entity::Entity(const glm::vec3& startingPosition, eEntityType entityType)
+Entity::Entity(const glm::vec3& startingPosition, eEntityType entityType, int health)
 	: m_position(0.0f, 0.0f, 0.0f),
 	m_AABB(),
 	m_ID(UniqueEntityIDDistributer::getInstance().getUniqueEntityID()),
+	m_health(health),
 	m_type(entityType),
 	m_selected(false)
 {
@@ -85,6 +86,7 @@ Entity::Entity(Entity&& orig) noexcept
 	m_selected(orig.m_selected)
 {
 #ifdef GAME
+	m_health = orig.m_health;
 	m_type = orig.m_type;
 #endif // GAME
 #ifdef LEVEL_EDITOR
@@ -100,6 +102,7 @@ Entity& Entity::operator=(Entity&& orig) noexcept
 	m_AABB = std::move(orig.m_AABB);
 	m_ID = orig.m_ID;
 #ifdef GAME
+	m_health = orig.m_health;
 	m_type = orig.m_type;
 #endif // GAME
 #ifdef LEVEL_EDITOR
@@ -120,6 +123,22 @@ int Entity::getID() const
 eEntityType Entity::getEntityType() const
 {
 	return m_type;
+}
+
+int Entity::getHealth() const
+{
+	return m_health;
+}
+
+void Entity::reduceHealth(int damage)
+{
+	assert(m_health > 0);
+	m_health -= damage;
+}
+
+bool Entity::isDead() const
+{
+	return m_health <= 0;
 }
 #endif // GAME
 
