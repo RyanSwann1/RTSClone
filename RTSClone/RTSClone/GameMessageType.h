@@ -4,5 +4,6 @@ enum class eGameMessageType
 {
 	AddEntityToMap = 0,
 	RemoveEntityFromMap,
-	Max = RemoveEntityFromMap
+	UIDisplayResourceCount,
+	Max = UIDisplayResourceCount
 };

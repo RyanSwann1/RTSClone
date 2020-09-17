@@ -3,6 +3,7 @@
 #include "GameMessageType.h"
 #include "AABB.h"
 
+//Caller is not meant to go out of scope. 
 namespace GameMessages
 {
 	//CRTP - C++
@@ -20,5 +21,14 @@ namespace GameMessages
 		{}
 
 		const AABB& entityAABB;
+	};
+
+	struct UIDisplayResourceCount : public BaseMessage<eGameMessageType::UIDisplayResourceCount>
+	{
+		UIDisplayResourceCount(int resourceAmount)
+			: resourceAmount(resourceAmount)
+		{}
+
+		const int resourceAmount;
 	};
 }
