@@ -42,13 +42,13 @@ public:
 		auto& listeners = m_listeners[static_cast<int>(GameMessage::getType())];
 		assert(isOwnerAlreadyRegistered(listeners, ownerAddress));
 
-		auto iter = std::find_if(listeners.begin(), listeners.end(), [ownerAddress](const auto& listener)
+		auto listener = std::find_if(listeners.begin(), listeners.end(), [ownerAddress](const auto& listener)
 		{
 			return listener.m_ownerAddress == ownerAddress;
 		});
 
-		assert(iter != listeners.end());
-		listeners.erase(iter);
+		assert(listener != listeners.end());
+		listeners.erase(listener);
 	}
 
 	template <typename GameMessage>

@@ -5,7 +5,7 @@
 
 namespace GameMessages
 {
-	struct UIDisplayResourceCount;
+	struct UIDisplayPlayerDetails;
 };
 class UIManager : private NonCopyable, private NonMovable
 {
@@ -14,5 +14,5 @@ public:
 	~UIManager();
 
 private:
-	void onDisplayResourceCount(const GameMessages::UIDisplayResourceCount& gameMessage);
+	void onDisplayResourceCount(const GameMessages::UIDisplayPlayerDetails& gameMessage);
 };

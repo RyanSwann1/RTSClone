@@ -167,7 +167,8 @@ void FactionPlayer::update(float deltaTime, const Map& map, FactionHandler& fact
 {
     Faction::update(deltaTime, map, factionHandler);
 
-    GameMessenger::getInstance().broadcast<GameMessages::UIDisplayResourceCount>({ getCurrentResourceAmount() });
+    GameMessenger::getInstance().broadcast<GameMessages::UIDisplayPlayerDetails>(
+        { getCurrentResourceAmount(), getCurrentPopulationAmount(), getMaximumPopulationAmount() });
 }
 
 void FactionPlayer::renderSelectionBox(const sf::Window& window) const

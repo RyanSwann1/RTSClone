@@ -23,12 +23,16 @@ namespace GameMessages
 		const AABB& entityAABB;
 	};
 
-	struct UIDisplayResourceCount : public BaseMessage<eGameMessageType::UIDisplayResourceCount>
+	struct UIDisplayPlayerDetails : public BaseMessage<eGameMessageType::UIDisplayPlayerDetails>
 	{
-		UIDisplayResourceCount(int resourceAmount)
-			: resourceAmount(resourceAmount)
+		UIDisplayPlayerDetails(int resourceAmount, int currentPopulationAmount, int maximumPopulationAmount)
+			: resourceAmount(resourceAmount),
+			currentPopulationAmount(currentPopulationAmount),
+			maximumPopulationAmount(maximumPopulationAmount)
 		{}
 
 		const int resourceAmount;
+		const int currentPopulationAmount;
+		const int maximumPopulationAmount;
 	};
 }
