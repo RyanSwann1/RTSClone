@@ -13,7 +13,9 @@ public:
 
 	void handleInput(const sf::Event& currentSFMLEvent, const sf::Window& window, const Camera& camera, const Map& map, 
 		const std::vector<const Faction*>& opposingFactions);
+	void update(float deltaTime, const Map& map, FactionHandler& factionHandler) override;
 	void renderSelectionBox(const sf::Window& window) const;
+
 
 private:
 	SelectionBox m_selectionBox;

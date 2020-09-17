@@ -6,6 +6,8 @@
 #include "ModelManager.h"
 #include "PathFinding.h"
 #include "Mineral.h"
+#include "GameMessenger.h"
+#include "GameMessages.h"
 #include <assert.h>
 #include <array>
 #include <algorithm>
@@ -159,6 +161,13 @@ void FactionPlayer::handleInput(const sf::Event& currentSFMLEvent, const sf::Win
         }
         break;
     }
+}
+
+void FactionPlayer::update(float deltaTime, const Map& map, FactionHandler& factionHandler)
+{
+    Faction::update(deltaTime, map, factionHandler);
+
+    GameMessenger::getInstance().broadcast<GameMessages::UIDisplayResourceCount>({ getCurrentResourceAmount() });
 }
 
 void FactionPlayer::renderSelectionBox(const sf::Window& window) const
