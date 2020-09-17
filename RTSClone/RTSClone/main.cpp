@@ -13,11 +13,12 @@
 #include "FactionAI.h"
 #include "ModelManager.h"
 #include "Mineral.h"
-#include "imgui/imgui.h"
-#include "imgui_impl/imgui_wrapper.h"
 #include "GameEventHandler.h"
+#include <imgui/imgui.h>
+#include <imgui_impl/imgui_wrapper.h>
 #include "ProjectileHandler.h"
 #include "Level.h"
+#include "UIManager.h"
 
 //AI
 //https://www.youtube.com/watch?v=V3qASwCM-PE&list=PLdgLYFdStKu03Dv9GUsXBDQMdyJbkDb8i
@@ -84,6 +85,7 @@ int main()
 	}
 	sf::Clock gameClock;
 	Camera camera;
+	UIManager UIManager;
 	bool resetLevel = false;
 
 	shaderHandler->switchToShader(eShaderType::SelectionBox);
@@ -174,7 +176,7 @@ int main()
 		level->renderSelectionBox(window);
 		glDisable(GL_BLEND);
 		glEnable(GL_DEPTH_TEST);
-		ImGui::EndFrame();
+		ImGui_SFML_OpenGL3::endFrame();
 		window.display();
 	}
 
