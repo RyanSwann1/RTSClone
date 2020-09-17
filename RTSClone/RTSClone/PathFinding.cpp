@@ -10,6 +10,21 @@
 
 namespace
 {
+	bool isPriorityQueueWithinSizeLimit(const PriorityQueue& priorityQueue)
+	{
+		return static_cast<int>(priorityQueue.getSize()) <= Globals::MAP_SIZE * Globals::MAP_SIZE;
+	}
+
+	bool isFrontierWithinSizeLimit(const std::queue<glm::ivec2>& frontier)
+	{
+		return static_cast<int>(frontier.size()) <= Globals::MAP_SIZE * Globals::MAP_SIZE;
+	}
+
+	bool isPathWithinSizeLimit(const std::vector<glm::vec3>& pathToPosition)
+	{
+		return static_cast<int>(pathToPosition.size()) <= Globals::MAP_SIZE * Globals::MAP_SIZE;
+	}
+
 	void getPathFromVisitedNodes(const glm::ivec2& startingPosition, const glm::ivec2& destinationPositionOnGrid, 
 		std::vector<glm::vec3>& pathToPosition, Graph& graph)
 	{
@@ -21,7 +36,7 @@ namespace
 			pathToPosition.push_back(Globals::convertToWorldPosition(position));
 			position = graph.getPreviousPosition(position);
 
-			assert(pathToPosition.size() <= Globals::MAP_SIZE * Globals::MAP_SIZE);
+			assert(isPathWithinSizeLimit(pathToPosition));
 		}
 	}
 
@@ -39,7 +54,7 @@ namespace
 			pathToPosition.push_back(Globals::convertToWorldPosition(positionOnGrid));
 			positionOnGrid = graph.getPreviousPosition(positionOnGrid);
 
-			assert(pathToPosition.size() <= Globals::MAP_SIZE * Globals::MAP_SIZE);
+			assert(isPathWithinSizeLimit(pathToPosition));
 		}
 	}
 
@@ -55,7 +70,7 @@ namespace
 			parentPosition = parentNode.parentPosition;
 
 			pathToPosition.push_back(Globals::convertToWorldPosition(parentNode.position));
-			assert(pathToPosition.size() <= Globals::MAP_SIZE * Globals::MAP_SIZE);
+			assert(isPathWithinSizeLimit(pathToPosition));
 		}
 	}
 
@@ -71,7 +86,7 @@ namespace
 			parentPosition = parentNode.parentPosition;
 
 			pathToPosition.push_back(Globals::convertToWorldPosition(parentNode.position));
-			assert(pathToPosition.size() <= Globals::MAP_SIZE * Globals::MAP_SIZE);
+			assert(isPathWithinSizeLimit(pathToPosition));
 		}
 	}
 }
@@ -213,7 +228,7 @@ glm::vec3 PathFinding::getClosestAvailablePosition(const glm::vec3& startingPosi
 			}
 		}
 
-		assert(m_frontier.size() < Globals::MAP_SIZE * Globals::MAP_SIZE);
+		assert(isFrontierWithinSizeLimit(m_frontier));
 	}
 
 	return Globals::convertToWorldPosition(availablePositionOnGrid);
@@ -326,8 +341,7 @@ void PathFinding::getPathToPosition(const Unit& unit, const glm::vec3& destinati
 
 		m_closedQueue.add(currentNode);
 
-		assert(m_openQueue.getSize() <= static_cast<size_t>(Globals::MAP_SIZE * Globals::MAP_SIZE) &&
-			m_closedQueue.getSize() <= static_cast<size_t>(Globals::MAP_SIZE * Globals::MAP_SIZE));
+		assert(isPriorityQueueWithinSizeLimit(m_openQueue) && isPriorityQueueWithinSizeLimit(m_closedQueue));
 	}
 
 	if (pathToPosition.empty())

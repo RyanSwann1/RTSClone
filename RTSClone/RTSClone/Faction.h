@@ -44,7 +44,7 @@ public:
 #ifdef RENDER_PATHING
 	void renderPathing(ShaderHandler& shaderHandler);
 #endif // RENDER_PATHING
-
+		
 #ifdef RENDER_AABB
 	void renderAABB(ShaderHandler& shaderHandler);
 #endif // RENDER_AABB

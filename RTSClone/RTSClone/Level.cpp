@@ -19,7 +19,6 @@ namespace
 			}
 		}
 
-
 		assert(activeFactions > 0);
 		return activeFactions;
 	}
