@@ -177,7 +177,7 @@
     <ClCompile Include="ProjectileHandler.cpp" />
     <ClCompile Include="SceneryGameObject.cpp" />
     <ClCompile Include="UIManager.cpp" />
-    <ClCompile Include="UnitTarget.cpp" />
+    <ClCompile Include="EntityTarget.cpp" />
     <ClCompile Include="Worker.cpp" />
     <ClCompile Include="UnitSpawnerBuilding.cpp" />
     <ClCompile Include="main.cpp" />
@@ -262,7 +262,7 @@
     <ClInclude Include="SceneryGameObject.h" />
     <ClInclude Include="Level.h" />
     <ClInclude Include="UIManager.h" />
-    <ClInclude Include="UnitTarget.h" />
+    <ClInclude Include="EntityTarget.h" />
     <ClInclude Include="TypeComparison.h" />
     <ClInclude Include="Faction.h" />
     <ClInclude Include="FactionAI.h" />

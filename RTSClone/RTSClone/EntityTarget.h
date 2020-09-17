@@ -2,11 +2,11 @@
 
 #include "FactionController.h"
 
-class UnitTarget
+class EntityTarget
 {
 public:
-	UnitTarget();
-	UnitTarget(eFactionController factionController, int targetID);
+	EntityTarget();
+	EntityTarget(eFactionController factionController, int targetID);
 
 	eFactionController getFactionController() const;
 	int getID() const;

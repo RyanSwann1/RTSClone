@@ -3,7 +3,7 @@
 #include "Entity.h"
 #include "AdjacentPositions.h"
 #include "Timer.h"
-#include "UnitTarget.h"
+#include "EntityTarget.h"
 #include "Globals.h"
 #include <functional>
 #include <vector>
@@ -61,7 +61,7 @@ protected:
 private:
 	Timer m_attackTimer;
 	Timer m_lineOfSightTimer;
-	UnitTarget m_target;
+	EntityTarget m_target;
 #ifdef RENDER_PATHING
 	Mesh m_renderPathMesh;
 #endif // RENDER_PATHING

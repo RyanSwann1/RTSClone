@@ -120,9 +120,6 @@
     <ClCompile Include="..\Shared\FactionController.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="UnitTarget.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="FactionHandler.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -145,6 +142,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="UIManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="EntityTarget.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -395,9 +395,6 @@
     <ClInclude Include="..\Shared\FactionController.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="UnitTarget.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="FactionHandler.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -429,6 +426,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="UIManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EntityTarget.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
