@@ -5,7 +5,7 @@
 #include "UniqueEntityIDDistributer.h"
 
 SupplyDepot::SupplyDepot(const glm::vec3& startingPosition)
-	: Entity(startingPosition, eEntityType::SupplyDepot)
+	: Entity(startingPosition, eEntityType::SupplyDepot, 10)
 {
 	GameMessenger::getInstance().broadcast<GameMessages::MapModification<eGameMessageType::AddEntityToMap>>({ m_AABB });
 }

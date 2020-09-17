@@ -28,12 +28,12 @@ namespace
 
 //Barracks
 Barracks::Barracks(const glm::vec3& startingPosition)
-	: UnitSpawnerBuilding(startingPosition, eEntityType::Barracks, TIME_BETWEEN_UNIT_SPAWN)
+	: UnitSpawnerBuilding(startingPosition, eEntityType::Barracks, TIME_BETWEEN_UNIT_SPAWN, Globals::BARRACKS_STARTING_HEALTH)
 {}
 
 //HQ
 HQ::HQ(const glm::vec3& startingPosition)
-	: UnitSpawnerBuilding(startingPosition, eEntityType::HQ, TIME_BETWEEN_WORKER_SPAWN)
+	: UnitSpawnerBuilding(startingPosition, eEntityType::HQ, TIME_BETWEEN_WORKER_SPAWN, Globals::HQ_STARTING_HEALTH)
 {}
 
 UnitSpawnerBuilding::~UnitSpawnerBuilding()
@@ -124,8 +124,8 @@ void UnitSpawnerBuilding::render(ShaderHandler& shaderHandler) const
 	Entity::render(shaderHandler);
 }
 
-UnitSpawnerBuilding::UnitSpawnerBuilding(const glm::vec3& startingPosition, eEntityType entityType, float spawnTimerExpirationTime)
-	: Entity(startingPosition, entityType),
+UnitSpawnerBuilding::UnitSpawnerBuilding(const glm::vec3& startingPosition, eEntityType entityType, float spawnTimerExpirationTime, int health)
+	: Entity(startingPosition, entityType, health),
 	m_spawnTimer(spawnTimerExpirationTime, false),
 	m_waypointPosition(m_position),
 	m_unitsToSpawn()

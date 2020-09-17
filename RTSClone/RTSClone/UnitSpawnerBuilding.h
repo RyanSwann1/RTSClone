@@ -19,7 +19,7 @@ public:
 	void render(ShaderHandler& shaderHandler) const;
 
 protected:
-	UnitSpawnerBuilding(const glm::vec3& startingPosition, eEntityType entityType, float spawnTimerExpirationTime);
+	UnitSpawnerBuilding(const glm::vec3& startingPosition, eEntityType entityType, float spawnTimerExpirationTime, int health);
 
 private:
 	Timer m_spawnTimer;

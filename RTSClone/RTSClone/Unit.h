@@ -4,6 +4,7 @@
 #include "AdjacentPositions.h"
 #include "Timer.h"
 #include "UnitTarget.h"
+#include "Globals.h"
 #include <functional>
 #include <vector>
 #include <list>
@@ -31,9 +32,9 @@ class FactionHandler;
 class Unit : public Entity, private NonMovable
 {
 public:
-	Unit(const Faction& owningFaction, const glm::vec3& startingPosition, eEntityType entityType = eEntityType::Unit);
+	Unit(const Faction& owningFaction, const glm::vec3& startingPosition, eEntityType entityType = eEntityType::Unit, int health = Globals::UNIT_STARTING_HEALTH);
 	Unit(const Faction& owningFaction, const glm::vec3& startingPosition, const glm::vec3& destinationPosition, 
-		const Map& map, eEntityType entityType = eEntityType::Unit);
+		const Map& map, eEntityType entityType = eEntityType::Unit, int health = Globals::UNIT_STARTING_HEALTH);
 		 
 	bool isPathEmpty() const;
 	const glm::vec3& getDestination() const;

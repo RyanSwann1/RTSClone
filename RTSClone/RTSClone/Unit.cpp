@@ -15,6 +15,7 @@ namespace
 	constexpr float UNIT_ATTACK_RANGE = 5.0f * Globals::NODE_SIZE;
 	constexpr float TIME_BETWEEN_ATTACK = 1.0f;
 	constexpr float TIME_BETWEEN_LINE_OF_SIGHT = 0.25f;
+	constexpr int DAMAGE = 2;
 
 #ifdef RENDER_PATHING
 	constexpr glm::vec3 PATH_COLOUR = { 1.0f, 0.27f, 0.0f };
@@ -82,8 +83,8 @@ namespace
 	}
 }
 
-Unit::Unit(const Faction& owningFaction, const glm::vec3& startingPosition, eEntityType entityType)
-	: Entity(startingPosition, entityType),
+Unit::Unit(const Faction& owningFaction, const glm::vec3& startingPosition, eEntityType entityType, int health)
+	: Entity(startingPosition, entityType, health),
 	m_owningFaction(owningFaction),
 	m_currentState(eUnitState::Idle),
 	m_front(),
@@ -93,8 +94,9 @@ Unit::Unit(const Faction& owningFaction, const glm::vec3& startingPosition, eEnt
 	m_lineOfSightTimer(TIME_BETWEEN_LINE_OF_SIGHT, true)
 {}
 
-Unit::Unit(const Faction& owningFaction, const glm::vec3 & startingPosition, const glm::vec3 & destinationPosition, const Map & map, eEntityType entityType)
-	: Entity(startingPosition, entityType),
+Unit::Unit(const Faction& owningFaction, const glm::vec3 & startingPosition, const glm::vec3 & destinationPosition, 
+	const Map & map, eEntityType entityType, int health)
+	: Entity(startingPosition, entityType, health),
 	m_owningFaction(owningFaction),
 	m_currentState(eUnitState::Idle),
 	m_front(),
@@ -312,12 +314,12 @@ void Unit::update(float deltaTime, FactionHandler& factionHandler, const Map& ma
 						!isTargetInLineOfSight(m_position, targetEntity, map))
 					{
 						moveTo(targetEntity->getPosition(), map, [&](const glm::ivec2& position)
-						{ return getAllAdjacentPositions(position, map, m_owningFaction.getUnits(), *this); });
+							{ return getAllAdjacentPositions(position, map, m_owningFaction.getUnits(), *this); });
 					}
 					else if (Globals::getSqrDistance(targetEntity->getPosition(), m_position) <= UNIT_ATTACK_RANGE * UNIT_ATTACK_RANGE)
 					{
 						GameEventHandler::getInstance().addEvent({ eGameEventType::SpawnProjectile, m_owningFaction.getController(), getID(),
-							opposingFaction.getController(), targetEntity->getID(), m_position, targetEntity->getPosition() });
+							opposingFaction.getController(), targetEntity->getID(), DAMAGE, m_position, targetEntity->getPosition() });
 					}
 				}
 			}
