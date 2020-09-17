@@ -92,49 +92,28 @@ bool PathFinding::isPositionAvailable(const glm::vec3& nodePosition, const Map& 
 	{
 		auto unit = std::find_if(units.cbegin(), units.cend(), [&nodePosition, senderID](const auto& unit) -> bool
 		{
-			return unit.getID() != senderID && Globals::convertToNodePosition(unit.getPosition()) == nodePosition;
+			if (senderID != Globals::INVALID_ENTITY_ID)
+			{
+				return unit.getID() != senderID && Globals::convertToNodePosition(unit.getPosition()) == nodePosition;
+			}
+			else
+			{
+				return Globals::convertToNodePosition(unit.getPosition()) == nodePosition;
+			}
 		});
 
 		if (unit == units.cend())
 		{
 			auto worker = std::find_if(workers.cbegin(), workers.cend(), [&nodePosition, senderID](const auto& worker) -> bool
 			{
-				return worker.getID() != senderID && Globals::convertToNodePosition(worker.getPosition()) == nodePosition;
-			});
-			if (worker != workers.cend())
-			{
-				return false;
-			}
-			else
-			{
-				return true;
-			}
-		}
-		else
-		{
-			return false;
-		}
-	}
-
-	return false;
-}
-
-bool PathFinding::isPositionAvailable(const glm::vec3& nodePosition, const Map& map, const std::list<Unit>& units, const std::list<Worker>& workers) const
-{
-	assert(nodePosition == Globals::convertToNodePosition(nodePosition));
-
-	if (!map.isPositionOccupied(nodePosition))
-	{
-		auto unit = std::find_if(units.cbegin(), units.cend(), [&nodePosition](const auto& unit) -> bool
-		{
-			return Globals::convertToNodePosition(unit.getPosition()) == nodePosition;
-		});
-
-		if (unit == units.cend())
-		{
-			auto worker = std::find_if(workers.cbegin(), workers.cend(), [&nodePosition](const auto& harvester) -> bool
-			{
-				return Globals::convertToNodePosition(harvester.getPosition()) == nodePosition;
+				if (senderID != Globals::INVALID_ENTITY_ID)
+				{
+					return worker.getID() != senderID && Globals::convertToNodePosition(worker.getPosition()) == nodePosition;
+				}
+				else
+				{
+					return Globals::convertToNodePosition(worker.getPosition()) == nodePosition;
+				}
 			});
 			if (worker != workers.cend())
 			{
