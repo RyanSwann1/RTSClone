@@ -190,23 +190,6 @@ const Entity* Faction::getEntity(const glm::vec3& position) const
     }
 }
 
-int Faction::getEntityIDAtPosition(const glm::vec3& position) const
-{
-    auto entity = std::find_if(m_allEntities.cbegin(), m_allEntities.cend(), [&position](const auto& entity)
-    {
-        return entity->getAABB().contains(position);
-    });
-
-    if (entity != m_allEntities.cend())
-    {
-        return (*entity)->getID();
-    }
-    else
-    {
-        return Globals::INVALID_ENTITY_ID;
-    }
-}
-
 void Faction::handleEvent(const GameEvent& gameEvent, const Map& map)
 {
     switch (gameEvent.type)

@@ -34,7 +34,6 @@ public:
 	const Entity* getEntity(const AABB& AABB, int entityID) const;
 	const Entity* getEntity(int entityID) const;
 	const Entity* getEntity(const glm::vec3& position) const;
-	int getEntityIDAtPosition(const glm::vec3& position) const;
 
 	void handleEvent(const GameEvent& gameEvent, const Map& map);
 	virtual void update(float deltaTime, const Map& map, FactionHandler& factionHandler);
