@@ -197,36 +197,6 @@ const std::vector<glm::vec3>& PathFinding::getFormationPositions(const glm::vec3
 	return unitFormationPositions;
 }
 
-glm::vec3 PathFinding::getClosestPositionToDestination(const glm::vec3& startingPosition, const glm::vec3& destination, 
-	const GetAllAdjacentPositions& getAdjacentPositions)
-{
-	assert(getAdjacentPositions);
-
-	glm::ivec2 startingPositionOnGrid = Globals::convertToGridPosition(startingPosition);
-	glm::ivec2 destinationOnGrid = Globals::convertToGridPosition(destination);
-	glm::ivec2 closestPositionOnGrid = startingPositionOnGrid;
-
-	std::array<AdjacentPosition, ALL_DIRECTIONS_ON_GRID.size()> adjacentPositions = getAdjacentPositions(startingPositionOnGrid);
-	for (const auto& adjacentPosition : adjacentPositions)
-	{
-		if (!adjacentPosition.valid)
-		{
-			continue;
-		}
-		else
-		{
-			if (Globals::getSqrDistance(glm::vec2(destinationOnGrid), glm::vec2(adjacentPosition.position)) < 
-				Globals::getSqrDistance(glm::vec2(destinationOnGrid), glm::vec2(closestPositionOnGrid)))
-			{
-				closestPositionOnGrid = adjacentPosition.position;
-			}
-		}
-	}
-
-	assert(closestPositionOnGrid != startingPositionOnGrid);
-	return Globals::convertToWorldPosition(closestPositionOnGrid);
-}
-
 glm::vec3 PathFinding::getClosestAvailablePosition(const glm::vec3& startingPosition, const std::list<Unit>& units, 
 	const std::list<Worker>& workers, const Map& map)
 {

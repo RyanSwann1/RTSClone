@@ -83,9 +83,6 @@ public:
 	const std::vector<glm::vec3>& getFormationPositions(const glm::vec3& startingPosition, const std::vector<Unit*>& selectedUnits,
 		const Map& map);
 
-	glm::vec3 getClosestPositionToDestination(const glm::vec3& startingPosition, const glm::vec3& destination, 
-		const GetAllAdjacentPositions& getAdjacentPositions);
-
 	glm::vec3 getClosestAvailablePosition(const glm::vec3& startingPosition, const std::list<Unit>& units, 
 		const std::list<Worker>& workers, const Map& map);
 
