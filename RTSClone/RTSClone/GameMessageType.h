@@ -5,5 +5,7 @@ enum class eGameMessageType
 	AddEntityToMap = 0,
 	RemoveEntityFromMap,
 	UIDisplayPlayerDetails,
-	Max = UIDisplayPlayerDetails
+	UIDisplayEntity,
+	UIClearDisplayEntity,
+	Max = UIClearDisplayEntity
 };

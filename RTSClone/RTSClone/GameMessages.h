@@ -2,6 +2,7 @@
 
 #include "GameMessageType.h"
 #include "AABB.h"
+#include "EntityType.h"
 
 //Caller is not meant to go out of scope. 
 namespace GameMessages
@@ -34,5 +35,16 @@ namespace GameMessages
 		const int resourceAmount;
 		const int currentPopulationAmount;
 		const int maximumPopulationAmount;
+	};
+
+	struct UIDisplayEntity : public BaseMessage<eGameMessageType::UIDisplayEntity>
+	{
+		UIDisplayEntity(int entityHealth, eEntityType entityType)
+			: entityHealth(entityHealth),
+			entityType(entityType)
+		{}
+
+		const int entityHealth;
+		const eEntityType entityType;
 	};
 }
