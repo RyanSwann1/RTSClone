@@ -109,7 +109,8 @@ void Level::handleInput(const sf::Window& window, const Camera& camera, const sf
 		}
 		else
 		{
-			GameMessenger::getInstance().broadcast<GameMessages::UIDisplayEntity>({ 2, targetEntity->getEntityType() });
+			GameMessenger::getInstance().broadcast<GameMessages::UIDisplayEntity>(
+				{ targetEntity->getHealth(), targetEntity->getEntityType() });
 		}
 	}
 }

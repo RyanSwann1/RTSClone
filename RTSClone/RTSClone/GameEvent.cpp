@@ -7,6 +7,7 @@ GameEvent::GameEvent(eGameEventType gameEventType)
 	senderID(Globals::INVALID_ENTITY_ID),
 	targetFaction(),
 	targetID(Globals::INVALID_ENTITY_ID),
+	damage(0),
 	startingPosition(),
 	endingPosition()
 {
@@ -19,19 +20,20 @@ GameEvent::GameEvent(eGameEventType gameEventType, eFactionController senderFact
 	senderID(Globals::INVALID_ENTITY_ID),
 	targetFaction(),
 	targetID(Globals::INVALID_ENTITY_ID),
+	damage(0),
 	startingPosition(),
 	endingPosition()
 {
 	assert(gameEventType == eGameEventType::FactionEliminated);
 }
 
-//GameEvent
 GameEvent::GameEvent(eGameEventType gameEventType, eFactionController senderFaction, int senderID)
 	: type(gameEventType),
 	senderFaction(senderFaction),
 	senderID(senderID),
 	targetFaction(),
 	targetID(Globals::INVALID_ENTITY_ID),
+	damage(0),
 	startingPosition(),
 	endingPosition()
 {
@@ -40,12 +42,13 @@ GameEvent::GameEvent(eGameEventType gameEventType, eFactionController senderFact
 }
 
 GameEvent::GameEvent(eGameEventType gameEventType, eFactionController senderFaction, int senderID, 
-	eFactionController targetFaction, int targetID)
+	eFactionController targetFaction, int targetID, int damage)
 	: type(gameEventType),
 	senderFaction(senderFaction),
 	senderID(senderID),
 	targetFaction(targetFaction),
 	targetID(targetID),
+	damage(damage),
 	startingPosition(),
 	endingPosition()
 {
@@ -53,12 +56,13 @@ GameEvent::GameEvent(eGameEventType gameEventType, eFactionController senderFact
 }
 
 GameEvent::GameEvent(eGameEventType gameEventType, eFactionController senderFaction, int senderID, eFactionController targetFaction, int targetID,
-	 const glm::vec3 & startingPosition, const glm::vec3 & endingPosition)
+	int damage, const glm::vec3 & startingPosition, const glm::vec3 & endingPosition)
 	: type(gameEventType),
 	senderFaction(senderFaction),
 	senderID(senderID),
 	targetFaction(targetFaction),
 	targetID(targetID),
+	damage(damage),
 	startingPosition(startingPosition),
 	endingPosition(endingPosition)
 {
@@ -71,6 +75,7 @@ GameEvent::GameEvent(eGameEventType gameEventType, eFactionController senderFact
 	senderID(Globals::INVALID_ENTITY_ID),
 	targetFaction(),
 	targetID(Globals::INVALID_ENTITY_ID),
+	damage(0),
 	startingPosition(position),
 	endingPosition()
 {
