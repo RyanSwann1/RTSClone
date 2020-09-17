@@ -17,7 +17,7 @@
 class Worker;
 class Unit;
 class Map;
-class PathFinding : private NonMovable, private NonCopyable
+class PathFinding : private NonCopyable, private NonMovable
 {
 public:
 	static PathFinding& getInstance()
@@ -96,6 +96,7 @@ public:
 private:
 	PathFinding();
 
+	std::vector<glm::vec3> m_unitFormationPositions;
 	//BFS
 	Graph m_graph;
 	std::queue<glm::ivec2> m_frontier;

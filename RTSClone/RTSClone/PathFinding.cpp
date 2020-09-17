@@ -77,7 +77,8 @@ namespace
 }
 
 PathFinding::PathFinding()
-	: m_graph(),
+	: m_unitFormationPositions(),
+	m_graph(),
 	m_frontier(),
 	m_openQueue(static_cast<size_t>(Globals::MAP_SIZE * Globals::MAP_SIZE)),
 	m_closedQueue(static_cast<size_t>(Globals::MAP_SIZE * Globals::MAP_SIZE))
@@ -139,13 +140,12 @@ const std::vector<glm::vec3>& PathFinding::getFormationPositions(const glm::vec3
 	//TODO: Sort by closest
 	assert(!selectedUnits.empty() && std::find(selectedUnits.cbegin(), selectedUnits.cend(), nullptr) == selectedUnits.cend());
 	m_graph.reset(m_frontier);
+	m_unitFormationPositions.clear();
 
-	static std::vector<glm::vec3> unitFormationPositions;
-	unitFormationPositions.clear();
 	int selectedUnitIndex = 0;
 	m_frontier.push(Globals::convertToGridPosition(startingPosition));
 
-	while (!m_frontier.empty() && unitFormationPositions.size() < selectedUnits.size())
+	while (!m_frontier.empty() && m_unitFormationPositions.size() < selectedUnits.size())
 	{
 		glm::ivec2 position = m_frontier.front();
 		m_frontier.pop();
@@ -161,10 +161,10 @@ const std::vector<glm::vec3>& PathFinding::getFormationPositions(const glm::vec3
 					m_frontier.push(adjacentPosition.position);
 
 					assert(selectedUnitIndex < selectedUnits.size());
-					unitFormationPositions.emplace_back(Globals::convertToWorldPosition(adjacentPosition.position));
+					m_unitFormationPositions.emplace_back(Globals::convertToWorldPosition(adjacentPosition.position));
 					++selectedUnitIndex;
 					
-					if (unitFormationPositions.size() == selectedUnits.size())
+					if (m_unitFormationPositions.size() == selectedUnits.size())
 					{
 						break;
 					}
@@ -173,7 +173,7 @@ const std::vector<glm::vec3>& PathFinding::getFormationPositions(const glm::vec3
 		}
 	}
 
-	return unitFormationPositions;
+	return m_unitFormationPositions;
 }
 
 glm::vec3 PathFinding::getClosestAvailablePosition(const glm::vec3& startingPosition, const std::list<Unit>& units, 
