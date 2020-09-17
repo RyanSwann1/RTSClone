@@ -16,7 +16,6 @@ public:
 	void update(float deltaTime, const Map& map, FactionHandler& factionHandler) override;
 	void renderSelectionBox(const sf::Window& window) const;
 
-
 private:
 	SelectionBox m_selectionBox;
 	glm::vec3 m_previousMouseToGroundPosition;

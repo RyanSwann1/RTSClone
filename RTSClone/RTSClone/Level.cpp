@@ -157,6 +157,7 @@ void Level::update(float deltaTime, const Map& map, bool& resetLevel)
 	else
 	{
 		m_selectedTarget.reset();
+		GameMessenger::getInstance().broadcast<GameMessages::BaseMessage<eGameMessageType::UIClearDisplayEntity>>({});
 	}
 }
 
