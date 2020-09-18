@@ -22,9 +22,11 @@ public:
 	static std::unique_ptr<Level> create(const std::string& levelName);
 	~Level();
 
+	bool isComplete() const;
+
 	void handleEvent(const GameEvent& gameEvent);
 	void handleInput(const sf::Window& window, const Camera& camera, const sf::Event& currentSFMLEvent, const Map& map);
-	void update(float deltaTime, const Map& map, bool& resetLevel);
+	void update(float deltaTime, const Map& map);
 	void renderSelectionBox(const sf::Window& window) const;
 	void renderPlannedBuildings(ShaderHandler& shaderHandler) const;
 	void render(ShaderHandler& shaderHandler) const;

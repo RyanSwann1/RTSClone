@@ -100,6 +100,12 @@ Level::~Level()
 	GameMessenger::getInstance().broadcast<GameMessages::BaseMessage<eGameMessageType::UIClearDisplayEntity>>({});
 }
 
+bool Level::isComplete() const
+{
+	assert(getActiveFactionCount(m_factions) >= 1);
+	return getActiveFactionCount(m_factions) == 1;
+}
+
 void Level::handleEvent(const GameEvent& gameEvent)
 {
 	switch (gameEvent.type)
@@ -147,7 +153,7 @@ void Level::handleInput(const sf::Window& window, const Camera& camera, const sf
 	}
 }
 
-void Level::update(float deltaTime, const Map& map, bool& resetLevel)
+void Level::update(float deltaTime, const Map& map)
 {
 	m_projectileHandler.update(deltaTime, m_factionHandler);
 	
@@ -162,11 +168,6 @@ void Level::update(float deltaTime, const Map& map, bool& resetLevel)
 	GameEventHandler::getInstance().handleEvents(m_factionHandler, m_projectileHandler, map, *this);
 
 	handleGUI();
-
-	if (getActiveFactionCount(m_factions) == 1)
-	{
-		resetLevel = true;
-	}
 }
 
 void Level::renderSelectionBox(const sf::Window& window) const

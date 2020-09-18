@@ -86,7 +86,6 @@ int main()
 	sf::Clock gameClock;
 	Camera camera;
 	UIManager UIManager;
-	bool resetLevel = false;
 
 	shaderHandler->switchToShader(eShaderType::SelectionBox);
 	shaderHandler->setUniformMat4f(eShaderType::SelectionBox, "uOrthographic", glm::ortho(0.0f, static_cast<float>(windowSize.x),
@@ -118,9 +117,8 @@ int main()
 			level->handleInput(window, camera, currentSFMLEvent, *map);
 		}
 
-		if (resetLevel)
+		if (level->isComplete())
 		{
-			resetLevel = false;
 			level.release();
 
 			level = Level::create("Level.txt");
@@ -137,7 +135,7 @@ int main()
 		ImGui::ShowDemoWindow();
 
 		//Update
-		level->update(deltaTime, *map, resetLevel);
+		level->update(deltaTime, *map);
 		camera.update(deltaTime);
 
 		//Render

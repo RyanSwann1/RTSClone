@@ -134,7 +134,6 @@ void Entity::reduceHealth(int damage)
 {
 	assert(m_health > 0);
 	m_health -= damage;
-	std::max(m_health, 0);
 }
 
 bool Entity::isDead() const

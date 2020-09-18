@@ -26,7 +26,7 @@ void LevelFileHandler::loadFromFile(std::ifstream& file, const std::function<voi
 	const std::function<bool(const std::string&)>& conditional)
 {
 	//TODO: Add error check on functionpointers
-	assert(file.is_open());
+	assert(file.is_open() && data && conditional);
 	bool beginReadingFromFile = false;
 	std::string line;
 	while (getline(file, line))
