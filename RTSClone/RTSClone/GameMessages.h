@@ -4,6 +4,7 @@
 #include "AABB.h"
 #include "EntityType.h"
 #include "FactionController.h"
+#include "Globals.h"
 
 //Caller is not meant to go out of scope. 
 namespace GameMessages
@@ -27,29 +28,56 @@ namespace GameMessages
 
 	struct UIDisplayPlayerDetails : public BaseMessage<eGameMessageType::UIDisplayPlayerDetails>
 	{
+		UIDisplayPlayerDetails()
+			: resourceAmount(0),
+			currentPopulationAmount(0),
+			maximumPopulationAmount(0)
+		{}
+
 		UIDisplayPlayerDetails(int resourceAmount, int currentPopulationAmount, int maximumPopulationAmount)
 			: resourceAmount(resourceAmount),
 			currentPopulationAmount(currentPopulationAmount),
 			maximumPopulationAmount(maximumPopulationAmount)
 		{}
 
-		const int resourceAmount;
-		const int currentPopulationAmount;
-		const int maximumPopulationAmount;
+		int resourceAmount;
+		int currentPopulationAmount;
+		int maximumPopulationAmount;
 	};
 
 	struct UIDisplayEntity : public BaseMessage<eGameMessageType::UIDisplayEntity>
 	{
-		UIDisplayEntity(eFactionController owningFaction, int entityID, eEntityType entityType, int quantity)
+		UIDisplayEntity()
+			: owningFaction(),
+			entityID(Globals::INVALID_ENTITY_ID),
+			entityType(),
+			health(0),
+			queueSize(0)
+		{}
+		UIDisplayEntity(eFactionController owningFaction, int entityID, eEntityType entityType, int health)
 			: owningFaction(owningFaction),
 			entityID(entityID),
 			entityType(entityType),
-			quantity(quantity)
-		{}
+			health(health),
+			queueSize(0)
+		{
+			assert(!Globals::UNIT_SPAWNER_TYPES.isMatch(entityType));
+		}
 
-		const eFactionController owningFaction;
-		const int entityID;
-		const eEntityType entityType;
-		const int quantity;
+		UIDisplayEntity(eFactionController owningFaction, int entityID, eEntityType entityType, int health, int queueSize)
+			: owningFaction(owningFaction),
+			entityID(entityID),
+			entityType(entityType),
+			health(health),
+			queueSize(queueSize)
+		{
+			assert(Globals::UNIT_SPAWNER_TYPES.isMatch(entityType));
+		}
+
+		eFactionController owningFaction;
+		int entityID;
+		eEntityType entityType;
+		int health;
+		int queueSize;
 	};
 }
