@@ -20,30 +20,9 @@ namespace
 	};
 }
 
-void Widget::deactivate()
-{
-	m_active = false;
-}
-
-//Widget
-Widget::Widget()
-	: m_active(false)
-{}
-
 PlayerDetailsWidget::PlayerDetailsWidget()
-	: Widget(),
-	m_resourcesAmount(0),
-	m_currentPopulation(0),
-	m_maxPopulation(0)
+	: Widget()
 {}
-
-void PlayerDetailsWidget::set(const GameMessages::UIDisplayPlayerDetails& gameMessage)
-{
-	m_active = true;
-	m_resourcesAmount = gameMessage.resourceAmount;
-	m_currentPopulation = gameMessage.currentPopulationAmount;
-	m_maxPopulation = gameMessage.maximumPopulationAmount;
-}
 
 void PlayerDetailsWidget::render(const sf::Window& window)
 {
@@ -53,13 +32,13 @@ void PlayerDetailsWidget::render(const sf::Window& window)
 		ImGui::Begin("Player", nullptr, ImGuiWindowFlags_NoResize);
 		ImGui::Text("Resources:");
 		ImGui::SameLine();
-		ImGui::Text(std::to_string(m_resourcesAmount).c_str());
+		ImGui::Text(std::to_string(m_receivedMessage.currentPopulationAmount).c_str());
 		ImGui::Text("Population:");
 		ImGui::SameLine();
-		ImGui::Text(std::to_string(m_currentPopulation).c_str());
+		ImGui::Text(std::to_string(m_receivedMessage.currentPopulationAmount).c_str());
 		ImGui::Text("Max Population:");
 		ImGui::SameLine();
-		ImGui::Text(std::to_string(m_maxPopulation).c_str());
+		ImGui::Text(std::to_string(m_receivedMessage.maximumPopulationAmount).c_str());
 		
 		ImGui::End();
 
@@ -68,49 +47,26 @@ void PlayerDetailsWidget::render(const sf::Window& window)
 }
 
 EntityWidget::EntityWidget()
-	: Widget(),
-	m_owningFaction(),
-	m_entityID(Globals::INVALID_ENTITY_ID),
-	m_entityType(),
-	m_entityHealth(0),
-	m_unitSpawnerQueueSize(0)
+	: Widget()
 {}
-
-void EntityWidget::set(const GameMessages::UIDisplayEntity& gameMessage)
-{
-	m_active = true;
-	m_owningFaction = gameMessage.owningFaction;
-	m_entityID = gameMessage.entityID;
-	m_entityType = gameMessage.entityType;
-
-	if (!Globals::UNIT_SPAWNER_TYPES.isMatch(m_entityType))
-	{
-		m_unitSpawnerQueueSize = 0;
-		m_entityHealth = gameMessage.quantity;
-	}
-	else
-	{
-		m_entityHealth = 0;
-		m_unitSpawnerQueueSize = gameMessage.quantity;
-	}
-}
 
 void EntityWidget::render(const sf::Window& window)
 {
 	if (m_active)
 	{
 		ImGui::Begin("Entity", nullptr);
-		if (!Globals::UNIT_SPAWNER_TYPES.isMatch(m_entityType))
+		if (!Globals::UNIT_SPAWNER_TYPES.isMatch(m_receivedMessage.entityType))
 		{
-			ImGui::Text(ENTITY_NAME_CONVERSIONS[static_cast<int>(m_entityType)].c_str());
+			ImGui::Text(ENTITY_NAME_CONVERSIONS[static_cast<int>(m_receivedMessage.entityType)].c_str());
 			ImGui::SameLine();
-			ImGui::Text(std::to_string(m_entityHealth).c_str());
+			ImGui::Text(std::to_string(m_receivedMessage.health).c_str());
 		}
 		else
 		{
-			ImGui::Text(ENTITY_NAME_CONVERSIONS[static_cast<int>(m_entityType)].c_str());
+			ImGui::Text(ENTITY_NAME_CONVERSIONS[static_cast<int>(m_receivedMessage.entityType)].c_str());
+			ImGui::Text(std::to_string(m_receivedMessage.health).c_str());
 			ImGui::Text("Queue");
-			ImGui::Text(std::to_string(m_unitSpawnerQueueSize).c_str());
+			ImGui::Text(std::to_string(m_receivedMessage.queueSize).c_str());
 		}
 
 		ImGui::End();

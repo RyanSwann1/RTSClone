@@ -5,54 +5,42 @@
 #include "EntityType.h"
 #include "FactionController.h"
 #include "GameMessageType.h"
+#include "GameMessages.h"
 #include <SFML/Graphics.hpp>
 
-namespace GameMessages
-{
-	struct UIDisplayPlayerDetails;
-	struct UIDisplayEntity;
-	template <eGameMessageType type>
-	struct BaseMessage;
-};
-
+template <class MessageType>
 class Widget
 {
 public:
-	void deactivate();
+	void deactivate()
+	{
+		m_active = false;
+	}
+	void set(const MessageType& gameMessage)
+	{
+		m_active = true;
+		m_receivedMessage = gameMessage;
+	}
 
 protected:
-	Widget();
+	Widget()
+		: m_active(false),
+		m_receivedMessage()
+	{}
 	bool m_active;
+	MessageType m_receivedMessage;
 };
 
-class PlayerDetailsWidget : public Widget
+struct PlayerDetailsWidget : public Widget<GameMessages::UIDisplayPlayerDetails>
 {
-public:
 	PlayerDetailsWidget();
-	
-	void set(const GameMessages::UIDisplayPlayerDetails& gameMessage);
 	void render(const sf::Window& window);
-
-private:
-	int m_resourcesAmount;
-	int m_currentPopulation;
-	int m_maxPopulation;
 };
 
-class EntityWidget : public Widget
+struct EntityWidget : public Widget<GameMessages::UIDisplayEntity>
 {
-public:
 	EntityWidget();
-
-	void set(const GameMessages::UIDisplayEntity& gameMessage);
 	void render(const sf::Window& window);
-
-private:
-	eFactionController m_owningFaction;
-	int m_entityID;
-	eEntityType m_entityType;
-	int m_entityHealth;
-	int m_unitSpawnerQueueSize;
 };
 
 class UIManager : private NonCopyable, private NonMovable
