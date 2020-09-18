@@ -48,4 +48,5 @@ private:
 	EntityTarget m_selectedTarget;
 
 	void setAITargetFaction();
+	void handleGUI();
 };	
