@@ -212,6 +212,7 @@ void Faction::handleEvent(const GameEvent& gameEvent, const Map& map)
                 {
                 case eEntityType::Worker:
                 {
+                    decreaseCurrentPopulationAmount(*(*entity));
                     auto worker = std::find_if(m_workers.begin(), m_workers.end(), [targetID](const auto& worker)
                     {
                         return worker.getID() == targetID;
@@ -251,6 +252,7 @@ void Faction::handleEvent(const GameEvent& gameEvent, const Map& map)
                     break;
                 case eEntityType::Unit:
                 {
+                    decreaseCurrentPopulationAmount(*(*entity));
                     auto unit = std::find_if(m_units.begin(), m_units.end(), [targetID](const auto& unit)
                     {
                         return unit.getID() == targetID;
@@ -553,6 +555,22 @@ void Faction::increaseCurrentPopulationAmount(eEntityType entityType)
         break;
     case eEntityType::Worker:
         m_currentPopulationAmount += Globals::WORKER_POPULATION_COST;
+        break;
+    default:
+        assert(false);
+    }
+}
+
+void Faction::decreaseCurrentPopulationAmount(const Entity& entity)
+{
+    assert(entity.isDead());
+    switch (entity.getEntityType())
+    {
+    case eEntityType::Unit:
+        m_currentPopulationAmount -= Globals::UNIT_POPULATION_COST;
+        break;
+    case eEntityType::Worker:
+        m_currentPopulationAmount -= Globals::WORKER_POPULATION_COST;
         break;
     default:
         assert(false);

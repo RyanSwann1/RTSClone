@@ -32,7 +32,7 @@ void PlayerDetailsWidget::render(const sf::Window& window)
 		ImGui::Begin("Player", nullptr, ImGuiWindowFlags_NoResize);
 		ImGui::Text("Resources:");
 		ImGui::SameLine();
-		ImGui::Text(std::to_string(m_receivedMessage.currentPopulationAmount).c_str());
+		ImGui::Text(std::to_string(m_receivedMessage.resourceAmount).c_str());
 		ImGui::Text("Population:");
 		ImGui::SameLine();
 		ImGui::Text(std::to_string(m_receivedMessage.currentPopulationAmount).c_str());

@@ -63,17 +63,11 @@ protected:
 	int getCurrentPopulationAmount() const;
 	int getMaximumPopulationAmount() const;
 	int getCurrentResourceAmount() const;
-	bool isExceedPopulationLimit(eEntityType entityType) const;
 	bool isEntityAffordable(eEntityType entityType) const;
 
 	const Entity* addBuilding(Worker& worker, const Map& map, glm::vec3 spawnPosition, eEntityType entityType);
 	bool addUnitToSpawn(eEntityType unitType, const Map& map, UnitSpawnerBuilding& building);
-	void reduceResources(eEntityType addedEntityType);
-	void increaseCurrentPopulationAmount(eEntityType entityType);
-	void increasePopulationLimit();
-	void revalidateExistingUnitPaths(const Map& map);
 	bool instructWorkerToBuild(eEntityType entityType, const glm::vec3& position, const Map& map, Worker& worker);
-	void addResources(Worker& worker);
 
 	template <class Unit>
 	Entity* spawnUnit(const Map& map, std::list<Unit>& units, eEntityType entityType, const UnitSpawnerBuilding& building)
@@ -125,6 +119,15 @@ private:
 	int m_currentResourceAmount;
 	int m_currentPopulationAmount;
 	int m_currentPopulationLimit;
+
+	bool isExceedPopulationLimit(eEntityType entityType) const;
+
+	void reduceResources(eEntityType addedEntityType);
+	void increaseCurrentPopulationAmount(eEntityType entityType);
+	void decreaseCurrentPopulationAmount(const Entity& entity);
+	void increasePopulationLimit();
+	void revalidateExistingUnitPaths(const Map& map);
+	void addResources(Worker& worker);
 
 	template <class Entity>
 	void handleCollisions(std::list<Entity>& entities, const Map& map)
