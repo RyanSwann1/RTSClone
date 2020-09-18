@@ -100,6 +100,22 @@ Level::~Level()
 	GameMessenger::getInstance().broadcast<GameMessages::BaseMessage<eGameMessageType::UIClearDisplayEntity>>({});
 }
 
+eFactionController Level::getWinningFactionController() const
+{
+	assert(isComplete());
+	eFactionController winningFaction;
+	for (const auto& faction : m_factions)
+	{
+		if (faction)
+		{
+			winningFaction = faction->getController();
+			break;
+		}
+	}
+
+	return winningFaction;
+}
+
 bool Level::isComplete() const
 {
 	assert(getActiveFactionCount(m_factions) >= 1);

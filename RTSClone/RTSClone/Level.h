@@ -22,6 +22,7 @@ public:
 	static std::unique_ptr<Level> create(const std::string& levelName);
 	~Level();
 
+	eFactionController getWinningFactionController() const;
 	bool isComplete() const;
 
 	void handleEvent(const GameEvent& gameEvent);
