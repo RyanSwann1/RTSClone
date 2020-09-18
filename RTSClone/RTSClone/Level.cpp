@@ -103,6 +103,10 @@ void Level::handleInput(const sf::Window& window, const Camera& camera, const sf
 					targetEntityFaction = faction->getController();
 					break;
 				}
+				else
+				{
+
+				}
 			}
 		}
 
@@ -115,8 +119,18 @@ void Level::handleInput(const sf::Window& window, const Camera& camera, const sf
 		{
 			m_selectedTarget.set(targetEntityFaction, targetEntity->getID());
 
-			GameMessenger::getInstance().broadcast<GameMessages::UIDisplayEntity>(
-				{ targetEntity->getHealth(), targetEntity->getEntityType() });
+			if (!Globals::UNIT_SPAWNER_TYPES.isMatch(targetEntity->getEntityType()))
+			{
+				GameMessenger::getInstance().broadcast<GameMessages::UIDisplayEntity>(
+					{ m_selectedTarget.getFactionController(), m_selectedTarget.getID(), targetEntity->getEntityType(), 
+					targetEntity->getHealth() });
+			}
+			else
+			{
+				GameMessenger::getInstance().broadcast<GameMessages::UIDisplayEntity>(
+					{ m_selectedTarget.getFactionController(), m_selectedTarget.getID(), targetEntity->getEntityType(),
+					static_cast<const UnitSpawnerBuilding&>(*targetEntity).getCurrentSpawnCount() });
+			}
 		}
 	}
 }
@@ -150,8 +164,18 @@ void Level::update(float deltaTime, const Map& map, bool& resetLevel)
 		}
 		else
 		{
-			GameMessenger::getInstance().broadcast<GameMessages::UIDisplayEntity>(
-				{ targetEntity->getHealth(), targetEntity->getEntityType() });
+			if (!Globals::UNIT_SPAWNER_TYPES.isMatch(targetEntity->getEntityType()))
+			{
+				GameMessenger::getInstance().broadcast<GameMessages::UIDisplayEntity>(
+					{ m_selectedTarget.getFactionController(), m_selectedTarget.getID(), targetEntity->getEntityType(), 
+					targetEntity->getHealth()});
+			}
+			else
+			{
+				GameMessenger::getInstance().broadcast<GameMessages::UIDisplayEntity>(
+					{ m_selectedTarget.getFactionController(), m_selectedTarget.getID(), targetEntity->getEntityType(),
+					static_cast<const UnitSpawnerBuilding&>(*targetEntity).getCurrentSpawnCount() });
+			}
 		}
 	}
 	else
