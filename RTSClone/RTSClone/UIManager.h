@@ -43,6 +43,12 @@ struct EntityWidget : public Widget<GameMessages::UIDisplayEntity>
 	void render(const sf::Window& window);
 };
 
+struct WinningFaction : public Widget<GameMessages::UIDisplayWinner>
+{
+	WinningFaction();
+	void render(const sf::Window& window);
+};
+
 class UIManager : private NonCopyable, private NonMovable
 {
 public:

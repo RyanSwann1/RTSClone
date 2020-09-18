@@ -63,7 +63,6 @@ namespace GameMessages
 		{
 			assert(!Globals::UNIT_SPAWNER_TYPES.isMatch(entityType));
 		}
-
 		UIDisplayEntity(eFactionController owningFaction, int entityID, eEntityType entityType, int health, int queueSize)
 			: owningFaction(owningFaction),
 			entityID(entityID),
@@ -79,5 +78,14 @@ namespace GameMessages
 		eEntityType entityType;
 		int health;
 		int queueSize;
+	};
+
+	struct UIDisplayWinner : public BaseMessage<eGameMessageType::UIDisplayWinner>
+	{
+		UIDisplayWinner(eFactionController winningFaction)
+			: winningFaction(winningFaction)
+		{}
+
+		eFactionController winningFaction;
 	};
 }

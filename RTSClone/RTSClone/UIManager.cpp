@@ -18,8 +18,17 @@ namespace
 		"Mineral",
 		"Projectile"
 	};
+
+	const std::array<std::string, static_cast<size_t>(eFactionController::Max) + 1> FACTION_NAME_CONVERSIONS =
+	{
+		"Player",
+		"AI_1",
+		"AI_2",
+		"AI_3"
+	};
 }
 
+//PlayerDetailsWidget
 PlayerDetailsWidget::PlayerDetailsWidget()
 	: Widget()
 {}
@@ -46,6 +55,7 @@ void PlayerDetailsWidget::render(const sf::Window& window)
 	}
 }
 
+//EntityWidget
 EntityWidget::EntityWidget()
 	: Widget()
 {}
@@ -70,6 +80,19 @@ void EntityWidget::render(const sf::Window& window)
 		}
 
 		ImGui::End();
+	}
+}
+
+//WinningFactionWidget
+WinningFaction::WinningFaction()
+	: Widget()
+{}
+
+void WinningFaction::render(const sf::Window& window)
+{
+	if (m_active)
+	{
+		ImGui::Begin("Winning Faction", nullptr);
 	}
 }
 
@@ -115,3 +138,4 @@ void UIManager::onClearDisplayEntity(const GameMessages::BaseMessage<eGameMessag
 {
 	m_entityWidget.deactivate();
 }
+
