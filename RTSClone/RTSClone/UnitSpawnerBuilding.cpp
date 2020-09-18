@@ -41,6 +41,11 @@ UnitSpawnerBuilding::~UnitSpawnerBuilding()
 	GameMessenger::getInstance().broadcast<GameMessages::MapModification<eGameMessageType::RemoveEntityFromMap>>({ m_AABB });
 }
 
+int UnitSpawnerBuilding::getCurrentSpawnCount() const
+{
+	return static_cast<int>(m_unitsToSpawn.size());
+}
+
 bool UnitSpawnerBuilding::isWaypointActive() const
 {
 	return m_waypointPosition != m_position;

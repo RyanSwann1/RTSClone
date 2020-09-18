@@ -72,7 +72,7 @@ void FactionPlayer::handleInput(const sf::Event& currentSFMLEvent, const sf::Win
                 {
                     if (unit.isSelected())
                     {
-                        instructUnitToAttack(unit, targetEntity, targetEntityOwningFaction, map);
+                        instructUnitToAttack(unit, *targetEntity, targetEntityOwningFaction, map);
                     }
                 }
             }
@@ -377,14 +377,12 @@ void FactionPlayer::instructWorkerReturnMinerals(const Map& map)
     }
 }
 
-void FactionPlayer::instructUnitToAttack(Unit& unit, const Entity* targetEntity, eFactionController targetEntityOwningFaction, const Map& map)
+void FactionPlayer::instructUnitToAttack(Unit& unit, const Entity& targetEntity, eFactionController targetEntityOwningFaction, const Map& map)
 {
-    assert(targetEntity);
-
-    unit.setTarget(targetEntityOwningFaction, targetEntity->getID());
+    unit.setTarget(targetEntityOwningFaction, targetEntity.getID());
     if (unit.getCurrentState() != eUnitState::AttackingTarget)
     {
-        unit.moveTo(targetEntity->getPosition(), map,
+        unit.moveTo(targetEntity.getPosition(), map,
             [&](const glm::ivec2& position) { return getAllAdjacentPositions(position, map, m_units, unit); });
     }
 }

@@ -15,7 +15,7 @@ namespace
 	constexpr float UNIT_ATTACK_RANGE = 5.0f * Globals::NODE_SIZE;
 	constexpr float TIME_BETWEEN_ATTACK = 1.0f;
 	constexpr float TIME_BETWEEN_LINE_OF_SIGHT = 0.25f;
-	constexpr int DAMAGE = 2;
+	constexpr int DAMAGE = 1;
 
 #ifdef RENDER_PATHING
 	constexpr glm::vec3 PATH_COLOUR = { 1.0f, 0.27f, 0.0f };
@@ -261,7 +261,7 @@ void Unit::update(float deltaTime, FactionHandler& factionHandler, const Map& ma
 				}
 			}
 		}
-		if (m_pathToPosition.empty() && m_target.getID() == Globals::INVALID_ENTITY_ID)
+		if (m_pathToPosition.empty())
 		{
 			switchToState(eUnitState::Idle);
 		}

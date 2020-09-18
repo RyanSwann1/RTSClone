@@ -144,6 +144,8 @@ int main()
 		glm::mat4 view = camera.getView(); 
 		glm::mat4 projection = camera.getProjection(window);
 
+		UIManager.render(window);
+
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		shaderHandler->switchToShader(eShaderType::Default);
@@ -180,6 +182,7 @@ int main()
 		window.display();
 	}
 
+	level.release();
 	ImGui_SFML_OpenGL3::shutdown();
 	return 0;
 }

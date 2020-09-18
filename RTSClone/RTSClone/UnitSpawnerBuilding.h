@@ -10,6 +10,7 @@ class UnitSpawnerBuilding : public Entity, private NonMovable
 public:
 	~UnitSpawnerBuilding();
 
+	int getCurrentSpawnCount() const;
 	bool isWaypointActive() const;
 	const glm::vec3& getWaypointPosition() const;
 	glm::vec3 getUnitSpawnPosition() const;

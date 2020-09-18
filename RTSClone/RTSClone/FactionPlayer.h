@@ -26,7 +26,7 @@ private:
 	void moveSingularSelectedUnit(const glm::vec3& mouseToGroundPosition, const Map& map);
 	void moveMultipleSelectedUnits(const glm::vec3& mouseToGroundPosition, const Map& map);
 	void instructWorkerReturnMinerals(const Map& map);
-	void instructUnitToAttack(Unit& Unit, const Entity* targetEntity, eFactionController targetEntityOwningFaction, const Map& map);
+	void instructUnitToAttack(Unit& Unit, const Entity& targetEntity, eFactionController targetEntityOwningFaction, const Map& map);
 	bool instructWorkerToBuild(eEntityType entityType, const glm::vec3& position, const Map& map);
 
 	template <class Entity>

@@ -3,6 +3,7 @@
 #include "glm/glm.hpp"
 #include "AABB.h"
 #include "FactionController.h"
+#include "TypeComparison.h"
 #include <SFML/Graphics.hpp>
 #include <iostream>
 #include <array>
@@ -39,6 +40,8 @@ namespace Globals
 	constexpr int WORKER_POPULATION_COST = 1;
 	constexpr int UNIT_POPULATION_COST = 2;
 	constexpr int POPULATION_INCREMENT = 5;
+
+	const TypeComparison<eEntityType> UNIT_SPAWNER_TYPES({ eEntityType::HQ, eEntityType::Barracks });
 
 	constexpr int CUBE_FACE_INDICIE_COUNT = 4;
 	constexpr std::array<unsigned int, 6> CUBE_FACE_INDICIES =
