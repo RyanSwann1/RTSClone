@@ -3,6 +3,7 @@
 #include "GameMessageType.h"
 #include "AABB.h"
 #include "EntityType.h"
+#include "FactionController.h"
 
 //Caller is not meant to go out of scope. 
 namespace GameMessages
@@ -39,12 +40,16 @@ namespace GameMessages
 
 	struct UIDisplayEntity : public BaseMessage<eGameMessageType::UIDisplayEntity>
 	{
-		UIDisplayEntity(int entityHealth, eEntityType entityType)
-			: entityHealth(entityHealth),
-			entityType(entityType)
+		UIDisplayEntity(eFactionController owningFaction, int entityID, eEntityType entityType, int quantity)
+			: owningFaction(owningFaction),
+			entityID(entityID),
+			entityType(entityType),
+			quantity(quantity)
 		{}
 
-		const int entityHealth;
+		const eFactionController owningFaction;
+		const int entityID;
 		const eEntityType entityType;
+		const int quantity;
 	};
 }

@@ -3,7 +3,9 @@
 #include "NonCopyable.h"
 #include "NonMovable.h"
 #include "EntityType.h"
+#include "FactionController.h"
 #include "GameMessageType.h"
+#include <SFML/Graphics.hpp>
 
 namespace GameMessages
 {
@@ -13,32 +15,44 @@ namespace GameMessages
 	struct BaseMessage;
 };
 
-struct Widget
+class Widget
 {
-	Widget();
+public:
+	void deactivate();
 
-	bool active;
+protected:
+	Widget();
+	bool m_active;
 };
 
-struct PlayerDetailsWidget : public Widget
+class PlayerDetailsWidget : public Widget
 {
+public:
 	PlayerDetailsWidget();
 	
-	void render();
+	void set(const GameMessages::UIDisplayPlayerDetails& gameMessage);
+	void render(const sf::Window& window);
 
-	int resourcesAmount;
-	int currentPopulation;
-	int maxPopulation;
+private:
+	int m_resourcesAmount;
+	int m_currentPopulation;
+	int m_maxPopulation;
 };
 
-struct EntityWidget : public Widget
+class EntityWidget : public Widget
 {
+public:
 	EntityWidget();
 
-	void render();
+	void set(const GameMessages::UIDisplayEntity& gameMessage);
+	void render(const sf::Window& window);
 
-	eEntityType entityType;
-	int entityHealth;
+private:
+	eFactionController m_owningFaction;
+	int m_entityID;
+	eEntityType m_entityType;
+	int m_entityHealth;
+	int m_unitSpawnerQueueSize;
 };
 
 class UIManager : private NonCopyable, private NonMovable
@@ -47,7 +61,7 @@ public:
 	UIManager();
 	~UIManager();
 
-	void render();
+	void render(const sf::Window& window);
 
 private:
 	PlayerDetailsWidget m_playerDetailsWidget;

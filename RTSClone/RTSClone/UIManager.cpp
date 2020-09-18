@@ -2,6 +2,7 @@
 #include "GameMessages.h"
 #include "GameMessenger.h"
 #include "GameMessageType.h"
+#include "Globals.h"
 #include <imgui/imgui.h>
 #include <string>
 
@@ -19,53 +20,99 @@ namespace
 	};
 }
 
+void Widget::deactivate()
+{
+	m_active = false;
+}
+
 //Widget
 Widget::Widget()
-	: active(false)
+	: m_active(false)
 {}
 
 PlayerDetailsWidget::PlayerDetailsWidget()
 	: Widget(),
-	resourcesAmount(0),
-	currentPopulation(0),
-	maxPopulation(0)
+	m_resourcesAmount(0),
+	m_currentPopulation(0),
+	m_maxPopulation(0)
 {}
 
-void PlayerDetailsWidget::render()
+void PlayerDetailsWidget::set(const GameMessages::UIDisplayPlayerDetails& gameMessage)
 {
-	if (active)
+	m_active = true;
+	m_resourcesAmount = gameMessage.resourceAmount;
+	m_currentPopulation = gameMessage.currentPopulationAmount;
+	m_maxPopulation = gameMessage.maximumPopulationAmount;
+}
+
+void PlayerDetailsWidget::render(const sf::Window& window)
+{
+	if (m_active)
 	{
-		ImGui::Begin("Player", nullptr);
+		ImGui::SetNextWindowSize(ImVec2(750, 750), ImGuiCond_FirstUseEver);
+		ImGui::Begin("Player", nullptr, ImGuiWindowFlags_NoResize);
 		ImGui::Text("Resources:");
 		ImGui::SameLine();
-		ImGui::Text(std::to_string(resourcesAmount).c_str());
+		ImGui::Text(std::to_string(m_resourcesAmount).c_str());
 		ImGui::Text("Population:");
 		ImGui::SameLine();
-		ImGui::Text(std::to_string(currentPopulation).c_str());
+		ImGui::Text(std::to_string(m_currentPopulation).c_str());
 		ImGui::Text("Max Population:");
 		ImGui::SameLine();
-		ImGui::Text(std::to_string(maxPopulation).c_str());
+		ImGui::Text(std::to_string(m_maxPopulation).c_str());
 		
 		ImGui::End();
 
-		active = false;
+		m_active = false;
 	}
 }
 
 EntityWidget::EntityWidget()
 	: Widget(),
-	entityType(),
-	entityHealth(0)
+	m_owningFaction(),
+	m_entityID(Globals::INVALID_ENTITY_ID),
+	m_entityType(),
+	m_entityHealth(0),
+	m_unitSpawnerQueueSize(0)
 {}
 
-void EntityWidget::render()
+void EntityWidget::set(const GameMessages::UIDisplayEntity& gameMessage)
 {
-	if (active)
+	m_active = true;
+	m_owningFaction = gameMessage.owningFaction;
+	m_entityID = gameMessage.entityID;
+	m_entityType = gameMessage.entityType;
+
+	if (!Globals::UNIT_SPAWNER_TYPES.isMatch(m_entityType))
+	{
+		m_unitSpawnerQueueSize = 0;
+		m_entityHealth = gameMessage.quantity;
+	}
+	else
+	{
+		m_entityHealth = 0;
+		m_unitSpawnerQueueSize = gameMessage.quantity;
+	}
+}
+
+void EntityWidget::render(const sf::Window& window)
+{
+	if (m_active)
 	{
 		ImGui::Begin("Entity", nullptr);
-		ImGui::Text(ENTITY_NAME_CONVERSIONS[static_cast<int>(entityType)].c_str());
-		ImGui::SameLine();
-		ImGui::Text(std::to_string(entityHealth).c_str());
+		if (!Globals::UNIT_SPAWNER_TYPES.isMatch(m_entityType))
+		{
+			ImGui::Text(ENTITY_NAME_CONVERSIONS[static_cast<int>(m_entityType)].c_str());
+			ImGui::SameLine();
+			ImGui::Text(std::to_string(m_entityHealth).c_str());
+		}
+		else
+		{
+			ImGui::Text(ENTITY_NAME_CONVERSIONS[static_cast<int>(m_entityType)].c_str());
+			ImGui::Text("Queue");
+			ImGui::Text(std::to_string(m_unitSpawnerQueueSize).c_str());
+		}
+
 		ImGui::End();
 	}
 }
@@ -92,28 +139,23 @@ UIManager::~UIManager()
 	GameMessenger::getInstance().unsubscribe<GameMessages::BaseMessage<eGameMessageType::UIClearDisplayEntity>>(this);
 }
 
-void UIManager::render()
+void UIManager::render(const sf::Window& window)
 {
-	m_playerDetailsWidget.render();
-	m_entityWidget.render();	
+	m_playerDetailsWidget.render(window);
+	m_entityWidget.render(window);	
 }
 
 void UIManager::onDisplayPlayerDetails(const GameMessages::UIDisplayPlayerDetails& gameMessage)
 {
-	m_playerDetailsWidget.active = true;
-	m_playerDetailsWidget.resourcesAmount = gameMessage.resourceAmount;
-	m_playerDetailsWidget.currentPopulation = gameMessage.currentPopulationAmount;
-	m_playerDetailsWidget.maxPopulation = gameMessage.maximumPopulationAmount;
+	m_playerDetailsWidget.set(gameMessage);
 }
 
 void UIManager::onDisplayEntity(const GameMessages::UIDisplayEntity& gameMessage)
 {
-	m_entityWidget.active = true;
-	m_entityWidget.entityType = gameMessage.entityType;
-	m_entityWidget.entityHealth = gameMessage.entityHealth;
+	m_entityWidget.set(gameMessage);
 }
 
 void UIManager::onClearDisplayEntity(const GameMessages::BaseMessage<eGameMessageType::UIClearDisplayEntity>& gameMessage)
 {
-	m_entityWidget.active = false;
+	m_entityWidget.deactivate();
 }
