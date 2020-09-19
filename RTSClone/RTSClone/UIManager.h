@@ -9,7 +9,7 @@
 #include <SFML/Graphics.hpp>
 
 template <class MessageType>
-class Widget
+class Widget : private NonCopyable, private NonMovable
 {
 public:
 	void deactivate()
@@ -43,9 +43,9 @@ struct EntityWidget : public Widget<GameMessages::UIDisplayEntity>
 	void render(const sf::Window& window);
 };
 
-struct WinningFaction : public Widget<GameMessages::UIDisplayWinner>
+struct WinningFactionWidget : public Widget<GameMessages::UIDisplayWinner>
 {
-	WinningFaction();
+	WinningFactionWidget();
 	void render(const sf::Window& window);
 };
 
@@ -60,8 +60,11 @@ public:
 private:
 	PlayerDetailsWidget m_playerDetailsWidget;
 	EntityWidget m_entityWidget;
+	WinningFactionWidget m_winningFactionWidget;
 
 	void onDisplayPlayerDetails(const GameMessages::UIDisplayPlayerDetails& gameMessage);
 	void onDisplayEntity(const GameMessages::UIDisplayEntity& gameMessage);
+	void onDisplayWinningFaction(const GameMessages::UIDisplayWinner& gameMessage);
 	void onClearDisplayEntity(const GameMessages::BaseMessage<eGameMessageType::UIClearDisplayEntity>& gameMessage);
+	void onClearDisplayWinner(const GameMessages::BaseMessage<eGameMessageType::UIClearWinner>& gameMessage);
 };
