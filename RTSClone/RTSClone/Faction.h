@@ -136,17 +136,25 @@ private:
 		for (auto& entity : entities)
 		{
 			if (entity.getCurrentState() == eUnitState::Idle)
-			{
-				for (const auto& otherEntity : entities)
+			{	
+				if (map.isPositionOccupied(entity.getPosition()))
 				{
-					if (&entity != &otherEntity &&
-						std::find(handledUnits.cbegin(), handledUnits.cend(), &otherEntity) == handledUnits.cend() &&
-						otherEntity.getCurrentState() == eUnitState::Idle &&
-						entity.getAABB().contains(otherEntity.getAABB()))
+					entity.moveTo(PathFinding::getInstance().getClosestAvailablePosition<Entity>(entity, entities, map), map,
+						[&](const glm::ivec2& position) { return getAllAdjacentPositions(position, map); });
+				}
+				else
+				{
+					for (const auto& otherEntity : entities)
 					{
-						entity.moveTo(PathFinding::getInstance().getClosestAvailablePosition<Entity>(entity, entities, map), map,
-							[&](const glm::ivec2& position) { return getAllAdjacentPositions(position, map); });
-						break;
+						if (&entity != &otherEntity &&
+							std::find(handledUnits.cbegin(), handledUnits.cend(), &otherEntity) == handledUnits.cend() &&
+							otherEntity.getCurrentState() == eUnitState::Idle &&
+							entity.getAABB().contains(otherEntity.getAABB()))
+						{
+							entity.moveTo(PathFinding::getInstance().getClosestAvailablePosition<Entity>(entity, entities, map), map,
+								[&](const glm::ivec2& position) { return getAllAdjacentPositions(position, map); });
+							break;
+						}
 					}
 				}
 			}
