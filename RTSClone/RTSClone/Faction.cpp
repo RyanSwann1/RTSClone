@@ -464,8 +464,7 @@ bool Faction::isEntityAffordable(eEntityType entityType) const
 
 const Entity* Faction::addBuilding(Worker& worker, const Map& map, glm::vec3 spawnPosition, eEntityType entityType)
 {
-    if (isEntityAffordable(entityType) &&
-        PathFinding::getInstance().isPositionAvailable(spawnPosition, map, m_units, m_workers, worker.getID()))
+    if (isEntityAffordable(entityType) && !map.isPositionOccupied(spawnPosition))
     {
         Entity* addedBuilding = nullptr;
         switch (entityType)
