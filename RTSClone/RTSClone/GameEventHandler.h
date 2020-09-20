@@ -14,6 +14,7 @@ class ProjectileHandler;
 class FactionHandler;
 class GameEventHandler : private NonCopyable, private NonMovable
 {
+	friend class Level;
 public:
 	static GameEventHandler& getInstance()
 	{
@@ -22,10 +23,11 @@ public:
 	}
 
 	void addEvent(const GameEvent& gameEvent);
-	void handleEvents(FactionHandler& factionHandler, ProjectileHandler& projectileHandler, const Map& map, Level& level);
 	
 private:
 	GameEventHandler();
 
 	std::queue<GameEvent> m_gameEvents;
+
+	void handleEvents(Level& level, const Map& map);
 };

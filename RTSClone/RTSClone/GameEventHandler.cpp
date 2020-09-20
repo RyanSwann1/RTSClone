@@ -9,12 +9,7 @@ GameEventHandler::GameEventHandler()
 	: m_gameEvents()
 {}
 
-void GameEventHandler::addEvent(const GameEvent& gameEvent)
-{
-	m_gameEvents.push(gameEvent);
-}
-
-void GameEventHandler::handleEvents(FactionHandler& factionHandler, ProjectileHandler& projectileHandler, const Map& map, Level& level)
+void GameEventHandler::handleEvents(Level & level, const Map & map)
 {
 	while (!m_gameEvents.empty())
 	{
@@ -22,41 +17,24 @@ void GameEventHandler::handleEvents(FactionHandler& factionHandler, ProjectileHa
 		switch (gameEvent.type)
 		{
 		case eGameEventType::Attack:
-			if (factionHandler.isFactionActive(gameEvent.targetFaction))
-			{
-				factionHandler.fgetFaction(gameEvent.targetFaction).handleEvent(gameEvent, map);
-			}
-			break;
 		case eGameEventType::RemovePlannedBuilding:
 		case eGameEventType::RemoveAllWorkerPlannedBuildings:
 		case eGameEventType::AddResources:
-			if (factionHandler.isFactionActive(gameEvent.senderFaction))
-			{
-				factionHandler.fgetFaction(gameEvent.senderFaction).handleEvent(gameEvent, map);
-			}
-			break;
 		case eGameEventType::SpawnProjectile:
-			projectileHandler.addProjectile(gameEvent);
-			break;
 		case eGameEventType::RevalidateMovementPaths:
-			for (auto& faction : factionHandler.getFactions())
-			{
-				if (faction)
-				{
-					faction->handleEvent(gameEvent, map);
-				}
-			}
-			break;
 		case eGameEventType::FactionEliminated:
-			level.handleEvent(gameEvent, map);
-			break;
 		case eGameEventType::SpawnUnit:
 			level.handleEvent(gameEvent, map);
 			break;
 		default:
-			assert(false);
+			assert(false); 
 		}
 
 		m_gameEvents.pop();
 	}
+}
+
+void GameEventHandler::addEvent(const GameEvent& gameEvent)
+{
+	m_gameEvents.push(gameEvent);
 }

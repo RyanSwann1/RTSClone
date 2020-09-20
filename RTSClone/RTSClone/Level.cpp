@@ -126,6 +126,32 @@ void Level::handleEvent(const GameEvent& gameEvent, const Map& map)
 {
 	switch (gameEvent.type)
 	{
+	case eGameEventType::Attack:
+		if (m_factions[static_cast<int>(gameEvent.targetFaction)])
+		{
+			m_factions[static_cast<int>(gameEvent.targetFaction)]->handleEvent(gameEvent, map);
+		}
+		break;
+	case eGameEventType::RemovePlannedBuilding:
+	case eGameEventType::RemoveAllWorkerPlannedBuildings:
+	case eGameEventType::AddResources:
+		if (m_factions[static_cast<int>(gameEvent.senderFaction)])
+		{
+			m_factions[static_cast<int>(gameEvent.senderFaction)]->handleEvent(gameEvent, map);
+		}
+		break;
+	case eGameEventType::SpawnProjectile:
+		m_projectileHandler.addProjectile(gameEvent);
+		break;
+	case eGameEventType::RevalidateMovementPaths:
+		for(auto& faction : m_factions)
+		{
+			if (faction)
+			{
+				faction->handleEvent(gameEvent, map);
+			}
+		}
+		break;
 	case eGameEventType::FactionEliminated:
 	{
 		assert(m_factions[static_cast<int>(gameEvent.senderFaction)] &&
@@ -196,7 +222,8 @@ void Level::update(float deltaTime, const Map& map)
 		}
 	}
 	
-	GameEventHandler::getInstance().handleEvents(m_factionHandler, m_projectileHandler, map, *this);
+	GameEventHandler::getInstance().handleEvents(*this, map);
+	//GameEventHandler::getInstance().handleEvents(m_factionHandler, m_projectileHandler, map, *this);
 
 	handleGUI();
 }
