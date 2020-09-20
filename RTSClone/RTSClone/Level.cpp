@@ -31,7 +31,7 @@ Level::Level(std::vector<SceneryGameObject>&& scenery,
 	m_factions(std::move(factions)),
 	m_factionHandler(m_factions),
 	m_projectileHandler(),
-	m_selectedTarget()
+	m_selectedTargetGUI()
 {
 	setAITargetFaction();
 }
@@ -50,13 +50,13 @@ void Level::setAITargetFaction()
 
 void Level::handleGUI()
 {
-	if (m_selectedTarget.getID() != Globals::INVALID_ENTITY_ID &&
-		m_factionHandler.isFactionActive(m_selectedTarget.getFactionController()))
+	if (m_selectedTargetGUI.getID() != Globals::INVALID_ENTITY_ID &&
+		m_factionHandler.isFactionActive(m_selectedTargetGUI.getFactionController()))
 	{
-		const Entity* targetEntity = m_factionHandler.getFaction(m_selectedTarget.getFactionController()).getEntity(m_selectedTarget.getID());
+		const Entity* targetEntity = m_factionHandler.getFaction(m_selectedTargetGUI.getFactionController()).getEntity(m_selectedTargetGUI.getID());
 		if (!targetEntity)
 		{
-			m_selectedTarget.reset();
+			m_selectedTargetGUI.reset();
 			GameMessenger::getInstance().broadcast<GameMessages::BaseMessage<eGameMessageType::UIClearDisplayEntity>>({});
 		}
 		else
@@ -64,13 +64,13 @@ void Level::handleGUI()
 			if (!Globals::UNIT_SPAWNER_TYPES.isMatch(targetEntity->getEntityType()))
 			{
 				GameMessenger::getInstance().broadcast<GameMessages::UIDisplayEntity>(
-					{ m_selectedTarget.getFactionController(), m_selectedTarget.getID(), targetEntity->getEntityType(),
+					{ m_selectedTargetGUI.getFactionController(), m_selectedTargetGUI.getID(), targetEntity->getEntityType(),
 					targetEntity->getHealth() });
 			}
 			else
 			{
 				GameMessenger::getInstance().broadcast<GameMessages::UIDisplayEntity>(
-					{ m_selectedTarget.getFactionController(), m_selectedTarget.getID(), targetEntity->getEntityType(),
+					{ m_selectedTargetGUI.getFactionController(), m_selectedTargetGUI.getID(), targetEntity->getEntityType(),
 					targetEntity->getHealth(),
 					static_cast<const UnitSpawnerBuilding&>(*targetEntity).getCurrentSpawnCount() });
 			}
@@ -78,7 +78,7 @@ void Level::handleGUI()
 	}
 	else
 	{
-		m_selectedTarget.reset();
+		m_selectedTargetGUI.reset();
 		GameMessenger::getInstance().broadcast<GameMessages::BaseMessage<eGameMessageType::UIClearDisplayEntity>>({});
 	}
 }
@@ -197,7 +197,7 @@ void Level::handleInput(const sf::Window& window, const Camera& camera, const sf
 				targetEntity = faction->getEntity(mouseToGroundPosition);
 				if (targetEntity)
 				{	
-					m_selectedTarget.set(faction->getController(), targetEntity->getID());
+					m_selectedTargetGUI.set(faction->getController(), targetEntity->getID());
 					break;
 				}
 			}
@@ -205,14 +205,14 @@ void Level::handleInput(const sf::Window& window, const Camera& camera, const sf
 
 		if(!targetEntity)
 		{
-			m_selectedTarget.reset();
+			m_selectedTargetGUI.reset();
 		}
 	}
 
 	if (m_factions[static_cast<int>(eFactionController::Player)])
 	{
 		static_cast<FactionPlayer&>(*m_factions[static_cast<int>(eFactionController::Player)]).handleInput(
-			currentSFMLEvent, window, camera, map, m_factionHandler.getOpposingFactions(eFactionController::Player), m_selectedTarget);
+			currentSFMLEvent, window, camera, map, m_factionHandler.getOpposingFactions(eFactionController::Player), m_selectedTargetGUI);
 	}
 }
 

@@ -23,7 +23,7 @@ FactionPlayer::FactionPlayer(eFactionController factionController, const glm::ve
 {}
 
 void FactionPlayer::handleInput(const sf::Event& currentSFMLEvent, const sf::Window& window, const Camera& camera, const Map& map,
-    const std::vector<const Faction*>& opposingFactions, EntityTarget& selectedTarget)
+    const std::vector<const Faction*>& opposingFactions, EntityTarget& selectedTargetGUI)
 {
     switch (currentSFMLEvent.type)
     {
@@ -47,7 +47,7 @@ void FactionPlayer::handleInput(const sf::Event& currentSFMLEvent, const sf::Win
             else
             {
                 selectAllUnits = true;
-                selectedTarget.reset();
+                selectedTargetGUI.reset();
             }
 
             selectUnit<Unit>(m_units, mouseToGroundPosition, selectAllUnits);
@@ -153,11 +153,11 @@ void FactionPlayer::handleInput(const sf::Event& currentSFMLEvent, const sf::Win
             if (entitiesSelected == 1)
             {
                 assert(selectedEntity);
-                selectedTarget.set(getController(), selectedEntity->getID());
+                selectedTargetGUI.set(getController(), selectedEntity->getID());
             }
             else if(entitiesSelected > 1)
             {
-                selectedTarget.reset();
+                selectedTargetGUI.reset();
             }
         }
         else if (m_plannedBuilding.active)

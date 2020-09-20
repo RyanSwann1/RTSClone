@@ -13,7 +13,7 @@ public:
 		const std::array<glm::vec3, Globals::MAX_MINERALS_PER_FACTION>& mineralPositions);
 
 	void handleInput(const sf::Event& currentSFMLEvent, const sf::Window& window, const Camera& camera, const Map& map, 
-		const std::vector<const Faction*>& opposingFactions, EntityTarget& selectedTarget);
+		const std::vector<const Faction*>& opposingFactions, EntityTarget& selectedTargetGUI);
 	
 	void handleEvent(const GameEvent& gameEvent, const Map& map) override;
 	void update(float deltaTime, const Map& map, FactionHandler& factionHandler) override;

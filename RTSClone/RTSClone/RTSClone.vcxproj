@@ -173,6 +173,7 @@
     <ClCompile Include="GameMessenger.cpp" />
     <ClCompile Include="Graph.cpp" />
     <ClCompile Include="Level.cpp" />
+    <ClCompile Include="PlannedBuilding.cpp" />
     <ClCompile Include="Projectile.cpp" />
     <ClCompile Include="ProjectileHandler.cpp" />
     <ClCompile Include="SceneryGameObject.cpp" />
@@ -259,6 +260,7 @@
     <ClInclude Include="assimp\include\version.h" />
     <ClInclude Include="EntityType.h" />
     <ClInclude Include="FactionHandler.h" />
+    <ClInclude Include="PlannedBuilding.h" />
     <ClInclude Include="SceneryGameObject.h" />
     <ClInclude Include="Level.h" />
     <ClInclude Include="UIManager.h" />
