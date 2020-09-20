@@ -26,7 +26,7 @@ GameEvent::GameEvent(eGameEventType gameEventType, eEntityType entityType, int t
 	endingPosition(),
 	entityType(entityType)
 {
-	assert(gameEventType == eGameEventType::SpawnUnit);
+	assert(gameEventType == eGameEventType::SpawnUnit || gameEventType == eGameEventType::ActivatePlayerPlannedBuilding);
 }
 
 GameEvent::GameEvent(eGameEventType gameEventType, eFactionController senderFaction)

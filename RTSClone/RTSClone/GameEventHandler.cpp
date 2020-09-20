@@ -24,6 +24,7 @@ void GameEventHandler::handleEvents(Level & level, const Map & map)
 		case eGameEventType::RevalidateMovementPaths:
 		case eGameEventType::FactionEliminated:
 		case eGameEventType::SpawnUnit:
+		case eGameEventType::ActivatePlayerPlannedBuilding:
 			level.handleEvent(gameEvent, map);
 			break;
 		default:

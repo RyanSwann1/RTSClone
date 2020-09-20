@@ -167,6 +167,12 @@ void Level::handleEvent(const GameEvent& gameEvent, const Map& map)
 			m_factions[static_cast<int>(gameEvent.targetFaction)]->handleEvent(gameEvent, map);
 		}
 		break;
+	case eGameEventType::ActivatePlayerPlannedBuilding:
+		if (m_factions[static_cast<int>(gameEvent.targetFaction)])
+		{
+			m_factions[static_cast<int>(gameEvent.targetFaction)]->handleEvent(gameEvent, map);
+		}
+		break;
 	default:
 		assert(false);
 	}
@@ -223,7 +229,6 @@ void Level::update(float deltaTime, const Map& map)
 	}
 	
 	GameEventHandler::getInstance().handleEvents(*this, map);
-	//GameEventHandler::getInstance().handleEvents(m_factionHandler, m_projectileHandler, map, *this);
 
 	handleGUI();
 }
