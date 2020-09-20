@@ -47,6 +47,7 @@ void FactionPlayer::handleInput(const sf::Event& currentSFMLEvent, const sf::Win
             else
             {
                 selectAllUnits = true;
+                selectedTarget.reset();
             }
 
             selectUnit<Unit>(m_units, mouseToGroundPosition, selectAllUnits);
@@ -153,6 +154,10 @@ void FactionPlayer::handleInput(const sf::Event& currentSFMLEvent, const sf::Win
             {
                 assert(selectedEntity);
                 selectedTarget.set(getController(), selectedEntity->getID());
+            }
+            else if(entitiesSelected > 1)
+            {
+                selectedTarget.reset();
             }
         }
         else if (m_plannedBuilding.active)
