@@ -81,6 +81,12 @@ void EntityWidget::render(const sf::Window& window)
 					GameEventHandler::getInstance().addEvent(
 						{ eGameEventType::ActivatePlayerPlannedBuilding, eEntityType::Barracks, m_receivedMessage.entityID });
 				}
+
+				if (ImGui::Button("Supply Depot"))
+				{
+					GameEventHandler::getInstance().addEvent(
+						{ eGameEventType::ActivatePlayerPlannedBuilding, eEntityType::SupplyDepot, m_receivedMessage.entityID });
+				}
 			}
 		}
 		else
