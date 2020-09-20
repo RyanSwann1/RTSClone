@@ -8,6 +8,7 @@
 #include "Mineral.h"
 #include "GameMessenger.h"
 #include "GameMessages.h"
+#include "GameEvent.h"
 #include <assert.h>
 #include <array>
 #include <algorithm>
@@ -127,6 +128,10 @@ void FactionPlayer::handleInput(const sf::Event& currentSFMLEvent, const sf::Win
                 worker.setSelected(m_selectionBox.AABB.contains(worker.getAABB()));
             }
         }
+        else if (m_plannedBuilding.active)
+        {
+            m_plannedBuilding.spawnPosition = Globals::convertToNodePosition(camera.getMouseToGroundPosition(window));
+        }
         break;
     case sf::Event::KeyPressed:
         switch (currentSFMLEvent.key.code)
@@ -163,12 +168,34 @@ void FactionPlayer::handleInput(const sf::Event& currentSFMLEvent, const sf::Win
     }
 }
 
+void FactionPlayer::handleEvent(const GameEvent& gameEvent, const Map& map)
+{
+    Faction::handleEvent(gameEvent, map);
+
+    switch (gameEvent.type)
+    {
+    case eGameEventType::ActivatePlayerPlannedBuilding:
+        assert(gameEvent.entityType == eEntityType::Barracks || gameEvent.entityType == eEntityType::SupplyDepot);
+        m_plannedBuilding.active = true;
+        m_plannedBuilding.entityType = gameEvent.entityType;
+        m_plannedBuilding.workerID = gameEvent.targetID;
+        break;
+    }
+}
+
 void FactionPlayer::update(float deltaTime, const Map& map, FactionHandler& factionHandler)
 {
     Faction::update(deltaTime, map, factionHandler);
 
     GameMessenger::getInstance().broadcast<GameMessages::UIDisplayPlayerDetails>(
         { getCurrentResourceAmount(), getCurrentPopulationAmount(), getMaximumPopulationAmount() });
+}
+
+void FactionPlayer::render(ShaderHandler& shaderHandler) const
+{
+    Faction::render(shaderHandler);
+
+    m_plannedBuilding.render(shaderHandler);
 }
 
 void FactionPlayer::renderSelectionBox(const sf::Window& window) const

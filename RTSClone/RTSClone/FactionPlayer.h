@@ -13,10 +13,14 @@ public:
 
 	void handleInput(const sf::Event& currentSFMLEvent, const sf::Window& window, const Camera& camera, const Map& map, 
 		const std::vector<const Faction*>& opposingFactions);
+	
+	void handleEvent(const GameEvent& gameEvent, const Map& map) override;
 	void update(float deltaTime, const Map& map, FactionHandler& factionHandler) override;
+	void render(ShaderHandler& shaderHandler) const override;
 	void renderSelectionBox(const sf::Window& window) const;
 
 private:
+	PlannedBuilding m_plannedBuilding;
 	SelectionBox m_selectionBox;
 	glm::vec3 m_previousMouseToGroundPosition;
 	bool m_attackMoveSelected;
