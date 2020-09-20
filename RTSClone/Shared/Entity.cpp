@@ -132,7 +132,6 @@ int Entity::getHealth() const
 
 void Entity::reduceHealth(int damage)
 {
-	assert(m_health > 0);
 	m_health -= damage;
 }
 

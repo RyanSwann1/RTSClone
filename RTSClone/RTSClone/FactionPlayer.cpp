@@ -172,30 +172,6 @@ void FactionPlayer::handleInput(const sf::Event& currentSFMLEvent, const sf::Win
     case sf::Event::KeyPressed:
         switch (currentSFMLEvent.key.code)
         {
-        case sf::Keyboard::U:
-        {
-            auto selectedBarracks = std::find_if(m_barracks.begin(), m_barracks.end(), [](const auto & barracks)
-            {
-                return barracks.isSelected();
-            });
-            if (selectedBarracks != m_barracks.end())
-            {
-                Faction::addUnitToSpawn(eEntityType::Unit, map, *selectedBarracks);
-            }
-        }
-            break;
-        case sf::Keyboard::W:
-            if (m_HQ.isSelected())
-            {
-                Faction::addUnitToSpawn(eEntityType::Worker, map, m_HQ);
-            }
-            break;
-        case sf::Keyboard::B:
-            instructWorkerToBuild(eEntityType::SupplyDepot, camera.getMouseToGroundPosition(window), map);
-            break;
-        case sf::Keyboard::N:
-            instructWorkerToBuild(eEntityType::Barracks, camera.getMouseToGroundPosition(window), map);
-            break;
         case sf::Keyboard::A:
             m_attackMoveSelected = true;
             break;
