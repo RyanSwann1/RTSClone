@@ -66,10 +66,12 @@ void EntityWidget::render(const sf::Window& window)
 {
 	if (m_active)
 	{
-		ImGui::Begin("Entity", nullptr);
+		ImGui::SetNextWindowPos(ImVec2(500, 650));
+		ImGui::SetNextWindowSize(ImVec2(300, 300));
+		ImGui::Begin(ENTITY_NAME_CONVERSIONS[static_cast<int>(m_receivedMessage.entityType)].c_str(), nullptr, 
+			ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse);
 		if (!Globals::UNIT_SPAWNER_TYPES.isMatch(m_receivedMessage.entityType))
 		{
-			ImGui::Text(ENTITY_NAME_CONVERSIONS[static_cast<int>(m_receivedMessage.entityType)].c_str());
 			ImGui::Text("Health:");
 			ImGui::SameLine();
 			ImGui::Text(std::to_string(m_receivedMessage.health).c_str());
@@ -91,7 +93,6 @@ void EntityWidget::render(const sf::Window& window)
 		}
 		else
 		{
-			ImGui::Text(ENTITY_NAME_CONVERSIONS[static_cast<int>(m_receivedMessage.entityType)].c_str());
 			ImGui::Text("Health:");
 			ImGui::SameLine();
 			ImGui::Text(std::to_string(m_receivedMessage.health).c_str());
