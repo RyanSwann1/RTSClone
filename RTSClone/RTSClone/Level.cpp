@@ -185,12 +185,6 @@ void Level::handleInput(const sf::Window& window, const Camera& camera, const sf
 		return;
 	}
 
-	if (m_factions[static_cast<int>(eFactionController::Player)])
-	{
-		static_cast<FactionPlayer&>(*m_factions[static_cast<int>(eFactionController::Player)]).handleInput(
-			currentSFMLEvent, window, camera, map, m_factionHandler.getOpposingFactions(eFactionController::Player));
-	}
-
 	if (currentSFMLEvent.type == sf::Event::MouseButtonPressed &&
 		currentSFMLEvent.mouseButton.button == sf::Mouse::Left)
 	{
@@ -213,6 +207,12 @@ void Level::handleInput(const sf::Window& window, const Camera& camera, const sf
 		{
 			m_selectedTarget.reset();
 		}
+	}
+
+	if (m_factions[static_cast<int>(eFactionController::Player)])
+	{
+		static_cast<FactionPlayer&>(*m_factions[static_cast<int>(eFactionController::Player)]).handleInput(
+			currentSFMLEvent, window, camera, map, m_factionHandler.getOpposingFactions(eFactionController::Player), m_selectedTarget);
 	}
 }
 

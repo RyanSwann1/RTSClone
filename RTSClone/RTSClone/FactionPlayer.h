@@ -4,6 +4,7 @@
 #include "SelectionBox.h"
 #include <SFML/Graphics.hpp>
 
+class EntityTarget;
 struct Camera;
 class FactionPlayer : public Faction
 {
@@ -12,7 +13,7 @@ public:
 		const std::array<glm::vec3, Globals::MAX_MINERALS_PER_FACTION>& mineralPositions);
 
 	void handleInput(const sf::Event& currentSFMLEvent, const sf::Window& window, const Camera& camera, const Map& map, 
-		const std::vector<const Faction*>& opposingFactions);
+		const std::vector<const Faction*>& opposingFactions, EntityTarget& selectedTarget);
 	
 	void handleEvent(const GameEvent& gameEvent, const Map& map) override;
 	void update(float deltaTime, const Map& map, FactionHandler& factionHandler) override;
