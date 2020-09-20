@@ -5,6 +5,7 @@
 #include "GameMessages.h"
 #include "ModelManager.h"
 #include "Camera.h"
+#include <imgui/imgui.h>
 
 namespace
 {
@@ -122,7 +123,7 @@ bool Level::isComplete() const
 	return getActiveFactionCount(m_factions) == 1;
 }
 
-void Level::handleEvent(const GameEvent& gameEvent)
+void Level::handleEvent(const GameEvent& gameEvent, const Map& map)
 {
 	switch (gameEvent.type)
 	{
@@ -135,6 +136,12 @@ void Level::handleEvent(const GameEvent& gameEvent)
 		setAITargetFaction();
 	}	
 		break;
+	case eGameEventType::SpawnUnit:
+		if (m_factions[static_cast<int>(gameEvent.targetFaction)])
+		{
+			m_factions[static_cast<int>(gameEvent.targetFaction)]->handleEvent(gameEvent, map);
+		}
+		break;
 	default:
 		assert(false);
 	}
@@ -145,7 +152,8 @@ void Level::handleInput(const sf::Window& window, const Camera& camera, const sf
 	m_player.handleInput(currentSFMLEvent, window, camera, map, m_factionHandler.getOpposingFactions(eFactionController::Player));
 
 	if (currentSFMLEvent.type == sf::Event::MouseButtonPressed &&
-		currentSFMLEvent.mouseButton.button == sf::Mouse::Left)
+		currentSFMLEvent.mouseButton.button == sf::Mouse::Left &&
+		!ImGui::IsWindowHovered(ImGuiHoveredFlags_::ImGuiHoveredFlags_AnyWindow))
 	{
 		glm::vec3 mouseToGroundPosition = camera.getMouseToGroundPosition(window);
 		const Entity* targetEntity = nullptr;
