@@ -7,16 +7,8 @@
 #include "SupplyDepot.h"
 #include "Mineral.h"
 #include "FactionController.h"
+#include "PlannedBuilding.h"
 #include <list>
-
-struct PlannedBuilding
-{
-	PlannedBuilding(int workerID, const glm::vec3& spawnPosition, eEntityType entityType);
-
-	int workerID;
-	glm::vec3 spawnPosition;
-	eEntityType entityType;
-};
 
 struct GameEvent;
 class FactionHandler;
@@ -35,9 +27,9 @@ public:
 	const Entity* getEntity(int entityID) const;
 	const Entity* getEntity(const glm::vec3& position) const;
 
-	void handleEvent(const GameEvent& gameEvent, const Map& map);
+	virtual void handleEvent(const GameEvent& gameEvent, const Map& map);
 	virtual void update(float deltaTime, const Map& map, FactionHandler& factionHandler);
-	void render(ShaderHandler& shaderHandler) const;
+	virtual void render(ShaderHandler& shaderHandler) const;
 	void renderPlannedBuildings(ShaderHandler& shaderHandler) const;
 
 #ifdef RENDER_PATHING

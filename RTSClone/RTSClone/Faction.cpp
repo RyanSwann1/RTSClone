@@ -40,16 +40,6 @@ namespace
     };
 }
 
-//PlannedBuilding
-PlannedBuilding::PlannedBuilding(int workerID, const glm::vec3& spawnPosition, eEntityType entityType)
-    : workerID(workerID),
-    spawnPosition(Globals::convertToMiddleGridPosition(spawnPosition)),
-    entityType(entityType)
-{
-    assert(entityType == eEntityType::Barracks || entityType == eEntityType::SupplyDepot);
-}
-
-//Faction
 Faction::Faction(eFactionController factionController, const glm::vec3& hqStartingPosition, 
     const std::array<glm::vec3, Globals::MAX_MINERALS_PER_FACTION>& mineralPositions)
     : m_plannedBuildings(),
@@ -325,8 +315,6 @@ void Faction::handleEvent(const GameEvent& gameEvent, const Map& map)
         }
     }
         break;
-    default:
-        assert(false);
     }
 }
 
@@ -392,7 +380,8 @@ void Faction::renderPlannedBuildings(ShaderHandler& shaderHandler) const
 {
     for (const auto& plannedBuilding : m_plannedBuildings)
     {
-        ModelManager::getInstance().getModel(plannedBuilding.entityType).render(shaderHandler, plannedBuilding.spawnPosition);
+        plannedBuilding.render(shaderHandler);
+        //ModelManager::getInstance().getModel(plannedBuilding.entityType).render(shaderHandler, plannedBuilding.spawnPosition);
     }
 }
 
