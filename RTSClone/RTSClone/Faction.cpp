@@ -312,6 +312,19 @@ void Faction::handleEvent(const GameEvent& gameEvent, const Map& map)
     case eGameEventType::RevalidateMovementPaths:
         revalidateExistingUnitPaths(map);
         break;
+    case eGameEventType::SpawnUnit:
+    {
+        int targetEntityID = gameEvent.targetID;
+        auto entity = std::find_if(m_allEntities.begin(), m_allEntities.end(), [targetEntityID](const auto& entity)
+        {
+            return entity->getID() == targetEntityID;
+        });
+        if (entity != m_allEntities.end())
+        {
+            addUnitToSpawn(gameEvent.entityType, map, static_cast<UnitSpawnerBuilding&>(*(*entity)));
+        }
+    }
+        break;
     default:
         assert(false);
     }
