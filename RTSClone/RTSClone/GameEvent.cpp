@@ -9,9 +9,24 @@ GameEvent::GameEvent(eGameEventType gameEventType)
 	targetID(Globals::INVALID_ENTITY_ID),
 	damage(0),
 	startingPosition(),
-	endingPosition()
+	endingPosition(),
+	entityType()
 {
 	assert(gameEventType == eGameEventType::RevalidateMovementPaths);
+}
+
+GameEvent::GameEvent(eGameEventType gameEventType, eEntityType entityType, int targetID)
+	: type(gameEventType),
+	senderFaction(),
+	senderID(Globals::INVALID_ENTITY_ID),
+	targetFaction(),
+	targetID(targetID),
+	damage(0),
+	startingPosition(),
+	endingPosition(),
+	entityType(entityType)
+{
+	assert(gameEventType == eGameEventType::SpawnUnit);
 }
 
 GameEvent::GameEvent(eGameEventType gameEventType, eFactionController senderFaction)
@@ -22,7 +37,8 @@ GameEvent::GameEvent(eGameEventType gameEventType, eFactionController senderFact
 	targetID(Globals::INVALID_ENTITY_ID),
 	damage(0),
 	startingPosition(),
-	endingPosition()
+	endingPosition(),
+	entityType()
 {
 	assert(gameEventType == eGameEventType::FactionEliminated);
 }
@@ -35,7 +51,8 @@ GameEvent::GameEvent(eGameEventType gameEventType, eFactionController senderFact
 	targetID(Globals::INVALID_ENTITY_ID),
 	damage(0),
 	startingPosition(),
-	endingPosition()
+	endingPosition(),
+	entityType()
 {
 	assert(gameEventType == eGameEventType::RemoveAllWorkerPlannedBuildings ||
 		gameEventType == eGameEventType::AddResources);
@@ -50,7 +67,8 @@ GameEvent::GameEvent(eGameEventType gameEventType, eFactionController senderFact
 	targetID(targetID),
 	damage(damage),
 	startingPosition(),
-	endingPosition()
+	endingPosition(),
+	entityType()
 {
 	assert(gameEventType == eGameEventType::Attack);
 }
@@ -64,7 +82,8 @@ GameEvent::GameEvent(eGameEventType gameEventType, eFactionController senderFact
 	targetID(targetID),
 	damage(damage),
 	startingPosition(startingPosition),
-	endingPosition(endingPosition)
+	endingPosition(endingPosition),
+	entityType()
 {
 	assert(gameEventType == eGameEventType::SpawnProjectile);
 }
@@ -77,7 +96,8 @@ GameEvent::GameEvent(eGameEventType gameEventType, eFactionController senderFact
 	targetID(Globals::INVALID_ENTITY_ID),
 	damage(0),
 	startingPosition(position),
-	endingPosition()
+	endingPosition(),
+	entityType()
 {
 	assert(gameEventType == eGameEventType::RemovePlannedBuilding);
 }

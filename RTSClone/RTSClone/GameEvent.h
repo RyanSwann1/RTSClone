@@ -2,6 +2,10 @@
 
 #include "FactionController.h"
 #include "glm/glm.hpp"
+#include "EntityType.h"
+
+//you can create an std::variant of different event types, or just use a discriminated union
+//thing is you have to split different event types into structs
 
 enum class eGameEventType
 {
@@ -11,12 +15,14 @@ enum class eGameEventType
 	AddResources,
 	SpawnProjectile,
 	RevalidateMovementPaths,
-	FactionEliminated
+	FactionEliminated,
+	SpawnUnit
 };
 
 struct GameEvent
 {
 	GameEvent(eGameEventType gameEventType);
+	GameEvent(eGameEventType gameEventType, eEntityType entityType, int targetID);
 	GameEvent(eGameEventType gameEventType, eFactionController senderFaction);
 	GameEvent(eGameEventType gameEventType, eFactionController senderFaction, int senderID);
 	GameEvent(eGameEventType gameEventType, eFactionController senderFaction, int senderID, 
@@ -34,4 +40,5 @@ struct GameEvent
 	int damage;
 	glm::vec3 startingPosition;
 	glm::vec3 endingPosition;
+	eEntityType entityType;
 };
