@@ -8,7 +8,6 @@
 
 class FactionHandler : private NonCopyable, private NonMovable
 {
-	friend class GameEventHandler;
 public:
 	FactionHandler(const std::array<std::unique_ptr<Faction>, static_cast<size_t>(eFactionController::Max) + 1>& factions);
 
@@ -20,6 +19,4 @@ public:
 private:
 	const std::array<std::unique_ptr<Faction>, static_cast<size_t>(eFactionController::Max) + 1>& m_factions;
 	std::vector<const Faction*> m_opposingFactions;
-
-	Faction& fgetFaction(eFactionController factionController);
 };

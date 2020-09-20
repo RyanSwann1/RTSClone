@@ -49,11 +49,3 @@ const Faction& FactionHandler::getFaction(eFactionController factionController) 
 
 	return *m_factions[static_cast<int>(factionController)].get();
 }
-
-Faction& FactionHandler::fgetFaction(eFactionController factionController)
-{
-	assert(m_factions[static_cast<int>(factionController)] &&
-		m_factions[static_cast<int>(factionController)]->getController() == factionController);
-
-	return *m_factions[static_cast<int>(factionController)].get();
-}
