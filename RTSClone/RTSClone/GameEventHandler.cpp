@@ -48,7 +48,10 @@ void GameEventHandler::handleEvents(FactionHandler& factionHandler, ProjectileHa
 			}
 			break;
 		case eGameEventType::FactionEliminated:
-			level.handleEvent(gameEvent);
+			level.handleEvent(gameEvent, map);
+			break;
+		case eGameEventType::SpawnUnit:
+			level.handleEvent(gameEvent, map);
 			break;
 		default:
 			assert(false);

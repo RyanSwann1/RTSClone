@@ -82,6 +82,9 @@ namespace GameMessages
 
 	struct UIDisplayWinner : public BaseMessage<eGameMessageType::UIDisplayWinner>
 	{
+		UIDisplayWinner()
+			: winningFaction()
+		{}
 		UIDisplayWinner(eFactionController winningFaction)
 			: winningFaction(winningFaction)
 		{}

@@ -19,6 +19,7 @@
 #include "ProjectileHandler.h"
 #include "Level.h"
 #include "UIManager.h"
+#include "GameMessenger.h"
 
 //AI
 //https://www.youtube.com/watch?v=V3qASwCM-PE&list=PLdgLYFdStKu03Dv9GUsXBDQMdyJbkDb8i
@@ -38,6 +39,20 @@
 //https://www.youtube.com/watch?v=hQE8lQk9ikE
 //Game engine from scratch
 //https://www.gamasutra.com/blogs/MichaelKissner/20151027/257369/Writing_a_Game_Engine_from_Scratch__Part_1_Messaging.php
+
+bool loadLevel(std::unique_ptr<Level>& level, const std::string& levelName) 
+{
+	assert(!level);
+	level = Level::create(levelName); 
+	assert(level);
+	if (!level)
+	{
+		std::cout << "Unable to load " << levelName << "\n";
+	}
+
+	GameMessenger::getInstance().broadcast<GameMessages::BaseMessage<eGameMessageType::UIClearWinner>>({});
+	return level.get();
+}
 
 int main()
 {
@@ -74,22 +89,20 @@ int main()
 		return -1;
 	}
 
-	std::unique_ptr<Map> map = std::make_unique<Map>();
-	std::string levelName = "Level.txt";
-	std::unique_ptr<Level> level = Level::create("Level.txt");
-	assert(level);
-	if (!level)
-	{
-		std::cout << "Unable to load level.\n";
-		return -1;
-	}
 	sf::Clock gameClock;
 	Camera camera;
 	UIManager UIManager;
+	std::unique_ptr<Map> map = std::make_unique<Map>();
+	std::string levelName = "Level.txt";
+	std::unique_ptr<Level> level; 
+	if (!loadLevel(level, levelName))
+	{
+		return -1;
+	}
 
 	shaderHandler->switchToShader(eShaderType::SelectionBox);
-	shaderHandler->setUniformMat4f(eShaderType::SelectionBox, "uOrthographic", glm::ortho(0.0f, static_cast<float>(windowSize.x),
-		static_cast<float>(windowSize.y), 0.0f));
+	shaderHandler->setUniformMat4f(eShaderType::SelectionBox, "uOrthographic", 
+		glm::ortho(0.0f, static_cast<float>(windowSize.x), static_cast<float>(windowSize.y), 0.0f));
 
 	std::cout << glGetError() << "\n";
 	std::cout << glGetError() << "\n";
@@ -102,32 +115,38 @@ int main()
 		sf::Event currentSFMLEvent;
 		while (window.pollEvent(currentSFMLEvent))
 		{
-			if (currentSFMLEvent.type == sf::Event::Closed)
+			switch (currentSFMLEvent.type)
 			{
+			case sf::Event::Closed:
 				window.close();
-			}
-			else if (currentSFMLEvent.type == sf::Event::KeyPressed)
-			{
+				break;
+			case sf::Event::KeyPressed:
 				if (currentSFMLEvent.key.code == sf::Keyboard::Escape)
 				{
 					window.close();
 				}
+				else if (currentSFMLEvent.key.code == sf::Keyboard::Enter && !level)
+				{
+					if (!loadLevel(level, levelName))
+					{
+						return -1;
+					}
+				}
+				break;
 			}
 
-			level->handleInput(window, camera, currentSFMLEvent, *map);
+			if (level)
+			{
+				level->handleInput(window, camera, currentSFMLEvent, *map);
+			}
 		}
 
-		if (level->isComplete())
+		if (level && level->isComplete())
 		{
+			GameMessenger::getInstance().broadcast<GameMessages::UIDisplayWinner>(
+				{ level->getWinningFactionController() });
+			
 			level.release();
-
-			level = Level::create("Level.txt");
-			assert(level);
-			if (!level)
-			{
-				std::cout << "Unable to load level.\n";
-				return -1;
-			}
 		}
 
 		ImGui_SFML_OpenGL3::startFrame();
@@ -135,7 +154,10 @@ int main()
 		ImGui::ShowDemoWindow();
 
 		//Update
-		level->update(deltaTime, *map);
+		if (level)
+		{
+			level->update(deltaTime, *map);
+		}
 		camera.update(deltaTime);
 
 		//Render
@@ -151,29 +173,44 @@ int main()
 		shaderHandler->setUniformMat4f(eShaderType::Default, "uProjection", projection);
 		shaderHandler->setUniform1f(eShaderType::Default, "uOpacity", 1.0f);
 	
-		level->render(*shaderHandler);
+		if (level)
+		{
+			level->render(*shaderHandler);
+		}
 
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		glDisable(GL_DEPTH_TEST);
 
 		shaderHandler->setUniform1f(eShaderType::Default, "uOpacity", 0.5f);
-		level->renderPlannedBuildings(*shaderHandler);
+		if (level)
+		{
+			level->renderPlannedBuildings(*shaderHandler);
+		}
 
 		shaderHandler->switchToShader(eShaderType::Debug);
 		shaderHandler->setUniformMat4f(eShaderType::Debug, "uView", view);
 		shaderHandler->setUniformMat4f(eShaderType::Debug, "uProjection", projection);
 
 #ifdef RENDER_AABB
-		level->renderAABB(*shaderHandler);
+		if (level)
+		{
+			level->renderAABB(*shaderHandler);
+		}
 #endif // RENDER_AABB
 
 #ifdef RENDER_PATHING
-		level->renderPathing(*shaderHandler);
+		if (level)
+		{
+			level->renderPathing(*shaderHandler);
+		}
 #endif // RENDER_PATHING
 		
 		shaderHandler->switchToShader(eShaderType::SelectionBox);
-		level->renderSelectionBox(window);
+		if (level)
+		{
+			level->renderSelectionBox(window);
+		}
 		glDisable(GL_BLEND);
 		glEnable(GL_DEPTH_TEST);
 		ImGui_SFML_OpenGL3::endFrame();

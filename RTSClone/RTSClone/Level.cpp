@@ -149,11 +149,15 @@ void Level::handleEvent(const GameEvent& gameEvent, const Map& map)
 
 void Level::handleInput(const sf::Window& window, const Camera& camera, const sf::Event& currentSFMLEvent, const Map& map)
 {
+	if (ImGui::IsWindowHovered(ImGuiHoveredFlags_::ImGuiHoveredFlags_AnyWindow))
+	{
+		return;
+	}
+
 	m_player.handleInput(currentSFMLEvent, window, camera, map, m_factionHandler.getOpposingFactions(eFactionController::Player));
 
 	if (currentSFMLEvent.type == sf::Event::MouseButtonPressed &&
-		currentSFMLEvent.mouseButton.button == sf::Mouse::Left &&
-		!ImGui::IsWindowHovered(ImGuiHoveredFlags_::ImGuiHoveredFlags_AnyWindow))
+		currentSFMLEvent.mouseButton.button == sf::Mouse::Left)
 	{
 		glm::vec3 mouseToGroundPosition = camera.getMouseToGroundPosition(window);
 		const Entity* targetEntity = nullptr;

@@ -8,5 +8,6 @@ enum class eGameMessageType
 	UIDisplayEntity,
 	UIClearDisplayEntity,
 	UIDisplayWinner,
-	Max = UIDisplayWinner
+	UIClearWinner,
+	Max = UIClearWinner
 };

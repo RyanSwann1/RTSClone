@@ -20,7 +20,7 @@ FactionPlayer::FactionPlayer(eFactionController factionController, const glm::ve
     m_attackMoveSelected(false)
 {}
 
-void FactionPlayer::handleInput(const sf::Event& currentSFMLEvent, const sf::Window& window, const Camera& camera, const Map& map, 
+void FactionPlayer::handleInput(const sf::Event& currentSFMLEvent, const sf::Window& window, const Camera& camera, const Map& map,
     const std::vector<const Faction*>& opposingFactions)
 {
     switch (currentSFMLEvent.type)
