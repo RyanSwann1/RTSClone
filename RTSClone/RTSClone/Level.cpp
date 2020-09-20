@@ -31,7 +31,6 @@ Level::Level(std::vector<SceneryGameObject>&& scenery,
 	m_factions(std::move(factions)),
 	m_factionHandler(m_factions),
 	m_projectileHandler(),
-	m_player(static_cast<FactionPlayer&>(*m_factions[static_cast<int>(eFactionController::Player)])),
 	m_selectedTarget()
 {
 	setAITargetFaction();
@@ -132,7 +131,7 @@ void Level::handleEvent(const GameEvent& gameEvent, const Map& map)
 		assert(m_factions[static_cast<int>(gameEvent.senderFaction)] &&
 			m_factions[static_cast<int>(gameEvent.senderFaction)]->getController() == gameEvent.senderFaction);
 
-		m_factions[static_cast<int>(gameEvent.senderFaction)].release();
+		m_factions[static_cast<int>(gameEvent.senderFaction)].reset();
 		setAITargetFaction();
 	}	
 		break;
@@ -154,7 +153,11 @@ void Level::handleInput(const sf::Window& window, const Camera& camera, const sf
 		return;
 	}
 
-	m_player.handleInput(currentSFMLEvent, window, camera, map, m_factionHandler.getOpposingFactions(eFactionController::Player));
+	if (m_factions[static_cast<int>(eFactionController::Player)])
+	{
+		static_cast<FactionPlayer&>(*m_factions[static_cast<int>(eFactionController::Player)]).handleInput(
+			currentSFMLEvent, window, camera, map, m_factionHandler.getOpposingFactions(eFactionController::Player));
+	}
 
 	if (currentSFMLEvent.type == sf::Event::MouseButtonPressed &&
 		currentSFMLEvent.mouseButton.button == sf::Mouse::Left)
@@ -200,7 +203,10 @@ void Level::update(float deltaTime, const Map& map)
 
 void Level::renderSelectionBox(const sf::Window& window) const
 {
-	m_player.renderSelectionBox(window);
+	if (m_factions[static_cast<int>(eFactionController::Player)])
+	{
+		static_cast<FactionPlayer&>(*m_factions[static_cast<int>(eFactionController::Player)]).renderSelectionBox(window);
+	}
 }
 
 void Level::renderPlannedBuildings(ShaderHandler& shaderHandler) const

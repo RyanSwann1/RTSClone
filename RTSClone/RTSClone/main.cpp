@@ -146,7 +146,7 @@ int main()
 			GameMessenger::getInstance().broadcast<GameMessages::UIDisplayWinner>(
 				{ level->getWinningFactionController() });
 			
-			level.release();
+			level.reset();
 		}
 
 		ImGui_SFML_OpenGL3::startFrame();
@@ -217,7 +217,7 @@ int main()
 		window.display();
 	}
 
-	level.release();
+	level.reset();
 	ImGui_SFML_OpenGL3::shutdown();
 	return 0;
 }

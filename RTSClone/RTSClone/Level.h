@@ -47,7 +47,6 @@ private:
 	std::array<std::unique_ptr<Faction>, static_cast<size_t>(eFactionController::Max) + 1> m_factions;
 	FactionHandler m_factionHandler;
 	ProjectileHandler m_projectileHandler;
-	FactionPlayer& m_player;
 	EntityTarget m_selectedTarget;
 
 	void setAITargetFaction();
