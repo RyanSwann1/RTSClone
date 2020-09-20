@@ -2,6 +2,8 @@
 #include "GameMessages.h"
 #include "GameMessenger.h"
 #include "GameMessageType.h"
+#include "GameEvent.h"
+#include "GameEventHandler.h"
 #include "Globals.h"
 #include <imgui/imgui.h>
 #include <string>
@@ -68,16 +70,39 @@ void EntityWidget::render(const sf::Window& window)
 		if (!Globals::UNIT_SPAWNER_TYPES.isMatch(m_receivedMessage.entityType))
 		{
 			ImGui::Text(ENTITY_NAME_CONVERSIONS[static_cast<int>(m_receivedMessage.entityType)].c_str());
+			ImGui::Text("Health:");
 			ImGui::SameLine();
 			ImGui::Text(std::to_string(m_receivedMessage.health).c_str());
 		}
 		else
 		{
 			ImGui::Text(ENTITY_NAME_CONVERSIONS[static_cast<int>(m_receivedMessage.entityType)].c_str());
+			ImGui::Text("Health:");
+			ImGui::SameLine();
 			ImGui::Text(std::to_string(m_receivedMessage.health).c_str());
-			ImGui::Text("Queue");
+			ImGui::Text("Spawn Queue:");
 			ImGui::SameLine();
 			ImGui::Text(std::to_string(m_receivedMessage.queueSize).c_str());
+			if (m_receivedMessage.owningFaction == eFactionController::Player)
+			{
+				switch (m_receivedMessage.entityType)
+				{
+				case eEntityType::HQ:
+					if (ImGui::Button("Spawn Worker"))
+					{
+						GameEventHandler::getInstance().addEvent({ eGameEventType::SpawnUnit, eEntityType::Worker, m_receivedMessage.entityID });
+					}
+					break;
+				case eEntityType::Barracks:
+					if (ImGui::Button("Spawn Unit"))
+					{
+						GameEventHandler::getInstance().addEvent({ eGameEventType::SpawnUnit, eEntityType::Unit, m_receivedMessage.entityID });
+					}
+					break;
+				default:
+					assert(false);
+				}
+			}
 		}
 
 		ImGui::End();
@@ -99,8 +124,9 @@ void WinningFactionWidget::render(const sf::Window& window)
 	}
 }
 
+//UIManager
 UIManager::UIManager()
-	: m_playerDetailsWidget(),
+	: m_playerDetailsWidget(),	
 	m_entityWidget(),
 	m_winningFactionWidget()
 {
