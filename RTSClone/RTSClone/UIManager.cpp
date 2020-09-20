@@ -73,6 +73,15 @@ void EntityWidget::render(const sf::Window& window)
 			ImGui::Text("Health:");
 			ImGui::SameLine();
 			ImGui::Text(std::to_string(m_receivedMessage.health).c_str());
+			if (m_receivedMessage.owningFaction == eFactionController::Player &&
+				m_receivedMessage.entityType == eEntityType::Worker)
+			{
+				if (ImGui::Button("Barracks"))
+				{
+					GameEventHandler::getInstance().addEvent(
+						{ eGameEventType::ActivatePlayerPlannedBuilding, eEntityType::Barracks, m_receivedMessage.entityID });
+				}
+			}
 		}
 		else
 		{
