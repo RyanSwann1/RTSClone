@@ -9,6 +9,7 @@
 #include "GameMessenger.h"
 #include "GameMessages.h"
 #include "GameEvent.h"
+#include "GameEventHandler.h"
 #include <assert.h>
 #include <array>
 #include <algorithm>
@@ -35,6 +36,13 @@ void FactionPlayer::handleInput(const sf::Event& currentSFMLEvent, const sf::Win
             {
                 m_previousMouseToGroundPosition = mouseToGroundPosition;
                 selectAllUnits = false;
+            
+                if (m_plannedBuilding.active)
+                {
+                    m_plannedBuilding.active = false;
+                    instructWorkerToBuild(m_plannedBuilding.entityType, mouseToGroundPosition,
+                        map, m_plannedBuilding.workerID);
+                }
             }
             else
             {
@@ -54,6 +62,7 @@ void FactionPlayer::handleInput(const sf::Event& currentSFMLEvent, const sf::Win
         }
         else if (currentSFMLEvent.mouseButton.button == sf::Mouse::Right)
         {
+            m_plannedBuilding.active = false;
             glm::vec3 mouseToGroundPosition = camera.getMouseToGroundPosition(window);
             eFactionController targetEntityOwningFaction;
             const Entity* targetEntity = nullptr;
@@ -130,7 +139,11 @@ void FactionPlayer::handleInput(const sf::Event& currentSFMLEvent, const sf::Win
         }
         else if (m_plannedBuilding.active)
         {
-            m_plannedBuilding.spawnPosition = Globals::convertToNodePosition(camera.getMouseToGroundPosition(window));
+            glm::vec3 mouseToGroundPosition = camera.getMouseToGroundPosition(window);
+            if (Globals::isPositionInMapBounds(mouseToGroundPosition))
+            {
+                m_plannedBuilding.spawnPosition = Globals::convertToMiddleGridPosition(Globals::convertToNodePosition(mouseToGroundPosition));
+            }
         }
         break;
     case sf::Event::KeyPressed:
@@ -414,13 +427,20 @@ void FactionPlayer::instructUnitToAttack(Unit& unit, const Entity& targetEntity,
     }
 }
 
-bool FactionPlayer::instructWorkerToBuild(eEntityType entityType, const glm::vec3& position, const Map& map)
+bool FactionPlayer::instructWorkerToBuild(eEntityType entityType, const glm::vec3& position, const Map& map, int workerID)
 {
     if (Globals::isPositionInMapBounds(position) && !map.isPositionOccupied(position))
     {
-        auto selectedWorker = std::find_if(m_workers.begin(), m_workers.end(), [](const auto& worker)
+        auto selectedWorker = std::find_if(m_workers.begin(), m_workers.end(), [workerID](const auto& worker)
         {
-            return worker.isSelected();
+            if (workerID != Globals::INVALID_ENTITY_ID)
+            {
+                return worker.getID() == workerID && worker.isSelected();
+            }
+            else
+            {
+                return worker.isSelected();
+            }
         });
         if (selectedWorker != m_workers.end())
         {
