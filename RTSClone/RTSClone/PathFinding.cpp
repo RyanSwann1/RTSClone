@@ -216,6 +216,30 @@ bool PathFinding::isPositionAvailable(const glm::vec3& nodePosition, const Map& 
 	return false;
 }
 
+bool PathFinding::isTargetInLineOfSight(const glm::vec3& unitPosition, const Entity& targetEntity, const Map& map) const
+{
+	glm::vec3 direction = glm::normalize(targetEntity.getPosition() - unitPosition);
+	constexpr float step = 0.5f;
+	float distance = glm::distance(targetEntity.getPosition(), unitPosition);
+	bool targetEntityVisible = true;
+
+	for (int i = 0; i < std::ceil(distance / step); ++i)
+	{
+		glm::vec3 position = unitPosition + direction * static_cast<float>(i);
+		if (targetEntity.getAABB().contains(position))
+		{
+			break;
+		}
+		else if (map.isPositionOccupied(position))
+		{
+			targetEntityVisible = false;
+			break;
+		}
+	}
+
+	return targetEntityVisible;
+}
+
 const std::vector<glm::vec3>& PathFinding::getFormationPositions(const glm::vec3& startingPosition,
 	const std::vector<Unit*>& selectedUnits, const Map& map)
 {
@@ -331,9 +355,10 @@ glm::vec3 PathFinding::getClosestPositionOutsideAABB(const glm::vec3& entityPosi
 }
 
 glm::vec3 PathFinding::getClosestPositionFromUnitToTarget(const Unit& unit, const Entity& entityTarget, std::vector<glm::vec3>& pathToPosition, 
-	const AdjacentPositions& adjacentPositions)
+	const Map& map, const AdjacentPositions& adjacentPositions) const
 {
-	assert(adjacentPositions && pathToPosition.empty());
+	assert(adjacentPositions && pathToPosition.empty() &&
+		isTargetInLineOfSight(unit.getPosition(), entityTarget, map));
 
 	glm::ivec2 startingPositionOnGrid = Globals::convertToGridPosition(Globals::convertToNodePosition(unit.getPosition()));
 	glm::ivec2 destinationOnGrid = Globals::convertToGridPosition(entityTarget.getPosition());

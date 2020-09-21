@@ -56,30 +56,6 @@ namespace
 		mesh.attachToVAO();
 	};
 #endif // RENDER_PATHING
-
-	bool isTargetInLineOfSight(const glm::vec3& unitPosition, const Entity& targetEntity, const Map& map)
-	{
-		glm::vec3 direction = glm::normalize(targetEntity.getPosition() - unitPosition);
-		constexpr float step = 0.5f;
-		float distance = glm::distance(targetEntity.getPosition(), unitPosition);
-		bool targetEntityVisible = true;
-
-		for (int i = 0; i < std::ceil(distance / step); ++i)
-		{
-			glm::vec3 position = unitPosition + direction * static_cast<float>(i);
-			if (targetEntity.getAABB().contains(position))
-			{
-				break;
-			}
-			else if (map.isPositionOccupied(position))
-			{
-				targetEntityVisible = false;
-				break;
-			}
-		}
-
-		return targetEntityVisible;
-	}
 }
 
 Unit::Unit(const Faction& owningFaction, const glm::vec3& startingPosition, eEntityType entityType, int health)
@@ -192,7 +168,7 @@ void Unit::update(float deltaTime, FactionHandler& factionHandler, const Map& ma
 				const Entity* targetEntity = opposingFaction->getEntity(m_position, UNIT_ATTACK_RANGE);
 				if (targetEntity)
 				{
-					if (isTargetInLineOfSight(m_position, *targetEntity, map))
+					if (PathFinding::getInstance().isTargetInLineOfSight(m_position, *targetEntity, map))// isTargetInLineOfSight(m_position, *targetEntity, map))
 					{
 						switchToState(eUnitState::AttackingTarget, map);
 					}
@@ -220,7 +196,7 @@ void Unit::update(float deltaTime, FactionHandler& factionHandler, const Map& ma
 			{
 				if(Globals::getSqrDistance(targetEntity->getPosition(), m_position) <= UNIT_ATTACK_RANGE * UNIT_ATTACK_RANGE)
 				{
-					if (!isTargetInLineOfSight(m_position, *targetEntity, map))
+					if (!PathFinding::getInstance().isTargetInLineOfSight(m_position, *targetEntity, map))
 					{
 						moveTo(targetEntity->getPosition(), map, [&](const glm::ivec2& position)
 							{ return getAdjacentPositions(position, map, m_owningFaction.getUnits(), *this); }, eUnitState::Moving);
@@ -247,7 +223,7 @@ void Unit::update(float deltaTime, FactionHandler& factionHandler, const Map& ma
 			for (const auto& opposingFaction : factionHandler.getOpposingFactions(m_owningFaction.getController()))
 			{
 				const Entity* targetEntity = opposingFaction->getEntity(m_position, UNIT_ATTACK_RANGE);
-				if (targetEntity && isTargetInLineOfSight(m_position, *targetEntity, map))
+				if (targetEntity && PathFinding::getInstance().isTargetInLineOfSight(m_position, *targetEntity, map))
 				{
 					m_target.set(opposingFaction->getController(), targetEntity->getID());
 					switchToState(eUnitState::AttackingTarget, map, targetEntity);
@@ -283,7 +259,7 @@ void Unit::update(float deltaTime, FactionHandler& factionHandler, const Map& ma
 				if (targetEntity)
 				{
 					if ((Globals::getSqrDistance(targetEntity->getPosition(), m_position) > UNIT_ATTACK_RANGE * UNIT_ATTACK_RANGE) ||
-						!isTargetInLineOfSight(m_position, *targetEntity, map))
+						!PathFinding::getInstance().isTargetInLineOfSight(m_position, *targetEntity, map))
 					{
 						moveTo(targetEntity->getPosition(), map, [&](const glm::ivec2& position)
 							{ return getAdjacentPositions(position, map, m_owningFaction.getUnits(), *this); });
@@ -332,7 +308,7 @@ void Unit::switchToState(eUnitState newState, const Map& map, const Entity* targ
 			assert(targetEntity);
 			m_pathToPosition.clear();
 			m_pathToPosition.emplace_back(PathFinding::getInstance().getClosestPositionFromUnitToTarget(*this, *targetEntity, m_pathToPosition,
-				[&](const glm::ivec2& position) { return getAdjacentPositions(position, map, m_owningFaction.getUnits(), *this); }));
+				map, [&](const glm::ivec2& position) { return getAdjacentPositions(position, map, m_owningFaction.getUnits(), *this); }));
 		}
 		break;
 	case eUnitState::AttackMoving:
