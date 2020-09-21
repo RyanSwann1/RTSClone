@@ -330,10 +330,36 @@ glm::vec3 PathFinding::getClosestPositionOutsideAABB(const glm::vec3& entityPosi
 	return closestPosition;
 }
 
-void PathFinding::getPathToPosition(const Unit& unit, const glm::vec3& destination, std::vector<glm::vec3>& pathToPosition, 
-	const AdjacentPositions& getAdjacentPositions, const std::list<Unit>& units, const Map& map)
+glm::vec3 PathFinding::getClosestPositionFromUnitToTarget(const Unit& unit, const Entity& entityTarget, std::vector<glm::vec3>& pathToPosition, 
+	const AdjacentPositions& adjacentPositions)
 {
-	assert(getAdjacentPositions && pathToPosition.empty());
+	assert(adjacentPositions && pathToPosition.empty());
+
+	glm::ivec2 startingPositionOnGrid = Globals::convertToGridPosition(Globals::convertToNodePosition(unit.getPosition()));
+	glm::ivec2 destinationOnGrid = Globals::convertToGridPosition(entityTarget.getPosition());
+	float shortestDistance = std::numeric_limits<float>::max();
+	glm::vec3 destination = unit.getPosition();
+	
+	for (const auto& adjacentPosition : adjacentPositions(startingPositionOnGrid))
+	{
+		if (adjacentPosition.valid)
+		{
+			float sqrDistance = Globals::getSqrDistance(glm::vec2(destinationOnGrid), glm::vec2(adjacentPosition.position));
+			if (sqrDistance < shortestDistance)
+			{
+				destination = Globals::convertToWorldPosition(adjacentPosition.position);
+				shortestDistance = sqrDistance;
+			}
+		}
+	}
+
+	return destination;
+}
+
+void PathFinding::getPathToPosition(const Unit& unit, const glm::vec3& destination, std::vector<glm::vec3>& pathToPosition, 
+	const AdjacentPositions& adjacentPositions, const std::list<Unit>& units, const Map& map)
+{
+	assert(adjacentPositions && pathToPosition.empty());
 
 	if (unit.getPosition() == destination)
 	{
@@ -374,8 +400,7 @@ void PathFinding::getPathToPosition(const Unit& unit, const glm::vec3& destinati
 		}
 		else
 		{
-			std::array<AdjacentPosition, ALL_DIRECTIONS_ON_GRID.size()> adjacentPositions = getAdjacentPositions(currentNode.position);
-			for (const auto& adjacentPosition : adjacentPositions)
+			for (const auto& adjacentPosition : adjacentPositions(currentNode.position))
 			{
 				if (!adjacentPosition.valid || m_closedQueue.contains(adjacentPosition.position))
 				{
@@ -408,7 +433,8 @@ void PathFinding::getPathToPosition(const Unit& unit, const glm::vec3& destinati
 
 		m_closedQueue.add(currentNode);
 
-		assert(isPriorityQueueWithinSizeLimit(m_openQueue) && isPriorityQueueWithinSizeLimit(m_closedQueue));
+		assert(isPriorityQueueWithinSizeLimit(m_openQueue) && 
+			isPriorityQueueWithinSizeLimit(m_closedQueue));
 	}
 
 	if (pathToPosition.empty())

@@ -88,8 +88,11 @@ public:
 	glm::vec3 getClosestPositionOutsideAABB(const glm::vec3& entityPosition, const AABB& AABB, const glm::vec3& centrePositionAABB,
 		const Map& map);
 
+	glm::vec3 getClosestPositionFromUnitToTarget(const Unit& unit, const Entity& entityTarget, std::vector<glm::vec3>& pathToPosition,
+		const AdjacentPositions& adjacentPositions);
+
 	void getPathToPosition(const Unit& unit, const glm::vec3& destination, std::vector<glm::vec3>& pathToPosition, 
-		const AdjacentPositions& getAdjacentPositions, const std::list<Unit>& units, const Map& map);
+		const AdjacentPositions& adjacentPositions, const std::list<Unit>& units, const Map& map);
 
 private:
 	PathFinding();
