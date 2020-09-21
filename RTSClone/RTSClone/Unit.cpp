@@ -57,18 +57,17 @@ namespace
 	};
 #endif // RENDER_PATHING
 
-	bool isTargetInLineOfSight(const glm::vec3& unitPosition, const Entity* targetEntity, const Map& map)
+	bool isTargetInLineOfSight(const glm::vec3& unitPosition, const Entity& targetEntity, const Map& map)
 	{
-		assert(targetEntity);
-		glm::vec3 direction = glm::normalize(targetEntity->getPosition() - unitPosition);
+		glm::vec3 direction = glm::normalize(targetEntity.getPosition() - unitPosition);
 		constexpr float step = 0.5f;
-		float distance = glm::distance(targetEntity->getPosition(), unitPosition);
+		float distance = glm::distance(targetEntity.getPosition(), unitPosition);
 		bool targetEntityVisible = true;
 
 		for (int i = 0; i < std::ceil(distance / step); ++i)
 		{
 			glm::vec3 position = unitPosition + direction * static_cast<float>(i);
-			if (targetEntity->getAABB().contains(position))
+			if (targetEntity.getAABB().contains(position))
 			{
 				break;
 			}
@@ -193,7 +192,7 @@ void Unit::update(float deltaTime, FactionHandler& factionHandler, const Map& ma
 				const Entity* targetEntity = opposingFaction->getEntity(m_position, UNIT_ATTACK_RANGE);
 				if (targetEntity)
 				{
-					if (isTargetInLineOfSight(m_position, targetEntity, map))
+					if (isTargetInLineOfSight(m_position, *targetEntity, map))
 					{
 						switchToState(eUnitState::AttackingTarget);
 					}
@@ -221,15 +220,20 @@ void Unit::update(float deltaTime, FactionHandler& factionHandler, const Map& ma
 			{
 				if(Globals::getSqrDistance(targetEntity->getPosition(), m_position) <= UNIT_ATTACK_RANGE * UNIT_ATTACK_RANGE)
 				{
-					if (!isTargetInLineOfSight(m_position, targetEntity, map))
+					if (!isTargetInLineOfSight(m_position, *targetEntity, map))
 					{
 						moveTo(targetEntity->getPosition(), map, [&](const glm::ivec2& position)
-						{ return getAdjacentPositions(position, map, m_owningFaction.getUnits(), *this); }, eUnitState::Moving);
+							{ return getAdjacentPositions(position, map, m_owningFaction.getUnits(), *this); }, eUnitState::Moving);
 					}
 					else
 					{
 						switchToState(eUnitState::AttackingTarget);
-						m_pathToPosition.clear();
+						if (!Globals::isOnMiddlePosition(m_position))
+						{
+							m_pathToPosition.clear();
+							m_pathToPosition.emplace_back(PathFinding::getInstance().getClosestPositionFromUnitToTarget(*this, *targetEntity, m_pathToPosition,
+								[&](const glm::ivec2& position) { return getAdjacentPositions(position, map, m_owningFaction.getUnits(), *this); }));
+						}
 					}	
 				}
 			}
@@ -249,12 +253,16 @@ void Unit::update(float deltaTime, FactionHandler& factionHandler, const Map& ma
 			for (const auto& opposingFaction : factionHandler.getOpposingFactions(m_owningFaction.getController()))
 			{
 				const Entity* targetEntity = opposingFaction->getEntity(m_position, UNIT_ATTACK_RANGE);
-				if (targetEntity)
+				if (targetEntity && isTargetInLineOfSight(m_position, *targetEntity, map))
 				{
 					m_target.set(opposingFaction->getController(), targetEntity->getID());
 					switchToState(eUnitState::AttackingTarget);
-
-					m_pathToPosition.clear();
+					if (!Globals::isOnMiddlePosition(m_position))
+					{
+						m_pathToPosition.clear();
+						m_pathToPosition.emplace_back(PathFinding::getInstance().getClosestPositionFromUnitToTarget(*this, *targetEntity, m_pathToPosition,
+							[&](const glm::ivec2& position) { return getAdjacentPositions(position, map, m_owningFaction.getUnits(), *this); }));
+					}
 				}
 			}
 		}
@@ -287,7 +295,7 @@ void Unit::update(float deltaTime, FactionHandler& factionHandler, const Map& ma
 				if (targetEntity)
 				{
 					if ((Globals::getSqrDistance(targetEntity->getPosition(), m_position) > UNIT_ATTACK_RANGE * UNIT_ATTACK_RANGE) ||
-						!isTargetInLineOfSight(m_position, targetEntity, map))
+						!isTargetInLineOfSight(m_position, *targetEntity, map))
 					{
 						moveTo(targetEntity->getPosition(), map, [&](const glm::ivec2& position)
 							{ return getAdjacentPositions(position, map, m_owningFaction.getUnits(), *this); });
