@@ -14,7 +14,7 @@ namespace
 	constexpr float MOVEMENT_SPEED = 7.5f;
 	constexpr float UNIT_ATTACK_RANGE = 5.0f * Globals::NODE_SIZE;
 	constexpr float TIME_BETWEEN_ATTACK = 1.0f;
-	constexpr float TIME_BETWEEN_LINE_OF_SIGHT = 0.25f;
+	constexpr float TIME_BETWEEN_MOVEMENT_STATE = 0.5f;
 	constexpr int DAMAGE = 1;
 
 #ifdef RENDER_PATHING
@@ -90,8 +90,8 @@ Unit::Unit(const Faction& owningFaction, const glm::vec3& startingPosition, eEnt
 	m_front(),
 	m_pathToPosition(),
 	m_attackTimer(TIME_BETWEEN_ATTACK, true),
-	m_target(),
-	m_lineOfSightTimer(TIME_BETWEEN_LINE_OF_SIGHT, true)
+	m_movementStateTimer(TIME_BETWEEN_MOVEMENT_STATE, true),
+	m_target()
 {}
 
 Unit::Unit(const Faction& owningFaction, const glm::vec3 & startingPosition, const glm::vec3 & destinationPosition, 
@@ -102,8 +102,8 @@ Unit::Unit(const Faction& owningFaction, const glm::vec3 & startingPosition, con
 	m_front(),
 	m_pathToPosition(),
 	m_attackTimer(TIME_BETWEEN_ATTACK, true),
-	m_target(),
-	m_lineOfSightTimer(TIME_BETWEEN_LINE_OF_SIGHT, true)
+	m_movementStateTimer(TIME_BETWEEN_MOVEMENT_STATE, true),
+	m_target()
 {
 	moveTo(destinationPosition, map, [&](const glm::ivec2& position) { return getAdjacentPositions(position, map); });
 }
@@ -167,7 +167,7 @@ void Unit::moveTo(const glm::vec3& destinationPosition, const Map& map, const Ad
 void Unit::update(float deltaTime, FactionHandler& factionHandler, const Map& map)
 {
 	m_attackTimer.update(deltaTime);
-	m_lineOfSightTimer.update(deltaTime);
+	m_movementStateTimer.update(deltaTime);
 
 	if (!m_pathToPosition.empty())
 	{
@@ -210,7 +210,7 @@ void Unit::update(float deltaTime, FactionHandler& factionHandler, const Map& ma
 		}
 		break;
 	case eUnitState::Moving:
-		if (Globals::isEntityIDValid(m_target.getID()))
+		if (m_movementStateTimer.isExpired() && Globals::isEntityIDValid(m_target.getID()))
 		{
 			const Entity* targetEntity = nullptr;
 			if (factionHandler.isFactionActive(m_target.getFactionController()))
@@ -221,19 +221,16 @@ void Unit::update(float deltaTime, FactionHandler& factionHandler, const Map& ma
 			{
 				if(Globals::getSqrDistance(targetEntity->getPosition(), m_position) <= UNIT_ATTACK_RANGE * UNIT_ATTACK_RANGE)
 				{
-					if (m_lineOfSightTimer.isExpired())
+					if (!isTargetInLineOfSight(m_position, targetEntity, map))
 					{
-						if (!isTargetInLineOfSight(m_position, targetEntity, map))
-						{
-							moveTo(targetEntity->getPosition(), map, [&](const glm::ivec2& position)
-							{ return getAdjacentPositions(position, map, m_owningFaction.getUnits(), *this); }, eUnitState::Moving);
-						}
-						else
-						{
-							switchToState(eUnitState::AttackingTarget);
-							m_pathToPosition.clear();
-						}
+						moveTo(targetEntity->getPosition(), map, [&](const glm::ivec2& position)
+						{ return getAdjacentPositions(position, map, m_owningFaction.getUnits(), *this); }, eUnitState::Moving);
 					}
+					else
+					{
+						switchToState(eUnitState::AttackingTarget);
+						m_pathToPosition.clear();
+					}	
 				}
 			}
 			else
@@ -247,7 +244,7 @@ void Unit::update(float deltaTime, FactionHandler& factionHandler, const Map& ma
 		}
 		break;
 	case eUnitState::AttackMoving:
-		if (m_attackTimer.isExpired())
+		if (m_movementStateTimer.isExpired())
 		{
 			for (const auto& opposingFaction : factionHandler.getOpposingFactions(m_owningFaction.getController()))
 			{
@@ -261,7 +258,7 @@ void Unit::update(float deltaTime, FactionHandler& factionHandler, const Map& ma
 				}
 			}
 		}
-		if (m_pathToPosition.empty())
+		else if (m_pathToPosition.empty())
 		{
 			switchToState(eUnitState::Idle);
 		}
@@ -315,6 +312,11 @@ void Unit::update(float deltaTime, FactionHandler& factionHandler, const Map& ma
 	if (m_attackTimer.isExpired())
 	{
 		m_attackTimer.resetElaspedTime();
+	}
+
+	if (m_movementStateTimer.isExpired())
+	{
+		m_movementStateTimer.resetElaspedTime();
 	}
 }
 

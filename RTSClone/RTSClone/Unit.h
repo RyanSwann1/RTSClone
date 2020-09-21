@@ -60,7 +60,7 @@ protected:
 
 private:
 	Timer m_attackTimer;
-	Timer m_lineOfSightTimer;
+	Timer m_movementStateTimer;
 	EntityTarget m_target;
 #ifdef RENDER_PATHING
 	Mesh m_renderPathMesh;
