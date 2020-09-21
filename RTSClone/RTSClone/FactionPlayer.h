@@ -41,7 +41,7 @@ private:
 		{
 			return entity.getAABB().contains(mouseToGroundPosition);
 		});
-		if (selectedEntity != entities.cend())
+		if (selectedEntity != entities.end())
 		{
 			if (selectAllUnits)
 			{
@@ -52,10 +52,7 @@ private:
 			}
 			else
 			{
-				for (auto& entity : entities)
-				{
-					entity.setSelected(entity.getAABB().contains(mouseToGroundPosition));
-				}
+				selectedEntity->setSelected(true);
 			}
 		}
 		else
