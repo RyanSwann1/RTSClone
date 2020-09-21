@@ -14,6 +14,55 @@
 #include <array>
 #include <algorithm>
 
+namespace
+{
+    bool isOneUnitSelected(const std::list<Unit>& units, const std::list<Worker>& workers, const Entity** selectedEntity = nullptr)
+    {
+        int unitSelectedCount = 0;
+
+        for (const auto& unit : units)
+        {
+            if (unit.isSelected())
+            {
+                if (selectedEntity)
+                {
+                    *selectedEntity = &unit;
+                }
+               
+                ++unitSelectedCount;
+                if (unitSelectedCount > 1)
+                {
+                    return false;
+                }
+            }
+        }
+
+        for (const auto& worker : workers)
+        {
+            if (worker.isSelected())
+            {
+                if (selectedEntity)
+                {
+                    *selectedEntity = &worker;
+                }
+               
+                ++unitSelectedCount;
+                if (unitSelectedCount > 1)
+                {
+                    return false;
+                }
+            }
+        }
+
+        return unitSelectedCount == 1;
+    }
+
+    bool isDoubleClick(const glm::vec3& mouseToGroundPosition, const glm::vec3& previousMousePosition)
+    {
+        return mouseToGroundPosition == previousMousePosition;
+    }
+}
+
 FactionPlayer::FactionPlayer(eFactionController factionController, const glm::vec3& hqStartingPosition, 
     const std::array<glm::vec3, Globals::MAX_MINERALS_PER_FACTION>& mineralPositions)
     : Faction(factionController, hqStartingPosition, mineralPositions),
@@ -30,90 +79,11 @@ void FactionPlayer::handleInput(const sf::Event& currentSFMLEvent, const sf::Win
     case sf::Event::MouseButtonPressed:
         if (currentSFMLEvent.mouseButton.button == sf::Mouse::Left)
         {
-            bool selectAllUnits = false;
-            glm::vec3 mouseToGroundPosition = camera.getMouseToGroundPosition(window);
-            if (mouseToGroundPosition != m_previousMouseToGroundPosition)
-            {
-                m_previousMouseToGroundPosition = mouseToGroundPosition;
-                selectAllUnits = false;
-            
-                if (m_plannedBuilding.active)
-                {
-                    m_plannedBuilding.active = false;
-                    instructWorkerToBuild(m_plannedBuilding.entityType, mouseToGroundPosition,
-                        map, m_plannedBuilding.workerID);
-                }
-            }
-            else
-            {
-                selectAllUnits = true;
-                selectedTargetGUI.reset();
-            }
-
-            selectUnit<Unit>(m_units, mouseToGroundPosition, selectAllUnits);
-            selectUnit<Worker>(m_workers, mouseToGroundPosition, selectAllUnits);
-
-            m_selectionBox.setStartingPosition(window, mouseToGroundPosition);
-            
-            m_HQ.setSelected(m_HQ.getAABB().contains(mouseToGroundPosition));
-            for (auto& barracks : m_barracks)
-            {
-                barracks.setSelected(barracks.getAABB().contains(mouseToGroundPosition));
-            }
+            onLeftClick(window, camera, map, selectedTargetGUI);
         }
         else if (currentSFMLEvent.mouseButton.button == sf::Mouse::Right)
         {
-            m_plannedBuilding.active = false;
-            glm::vec3 mouseToGroundPosition = camera.getMouseToGroundPosition(window);
-            eFactionController targetEntityOwningFaction;
-            const Entity* targetEntity = nullptr;
-            for (const auto& faction : opposingFactions)
-            {
-                targetEntity = faction->getEntity(mouseToGroundPosition);
-                if (targetEntity)
-                {
-                    targetEntity;
-                    targetEntityOwningFaction = faction->getController();
-                    break;
-                }
-            }
-            if (targetEntity)
-            {
-                for (auto& unit : m_units)
-                {
-                    if (unit.isSelected())
-                    {
-                        instructUnitToAttack(unit, *targetEntity, targetEntityOwningFaction, map);
-                    }
-                }
-            }
-            else if (m_HQ.isSelected())
-            {
-                m_HQ.setWaypointPosition(mouseToGroundPosition);
-            }
-            else if (m_HQ.getAABB().contains(mouseToGroundPosition))
-            {
-                instructWorkerReturnMinerals(map);
-            }
-            else
-            {
-                for (auto& barracks : m_barracks)
-                {
-                    if (barracks.isSelected())
-                    {
-                        barracks.setWaypointPosition(mouseToGroundPosition);
-                    }
-                }
-
-                if (isOneUnitSelected())
-                {
-                    moveSingularSelectedUnit(mouseToGroundPosition, map);
-                }
-                else
-                {
-                    moveMultipleSelectedUnits(mouseToGroundPosition, map);
-                }
-            }
+            onRightClick(window, camera, opposingFactions, map);
         }
         break;
     case sf::Event::MouseButtonReleased:
@@ -124,50 +94,7 @@ void FactionPlayer::handleInput(const sf::Event& currentSFMLEvent, const sf::Win
         }
         break;
     case sf::Event::MouseMoved:
-        if (m_selectionBox.active)
-        {
-            m_selectionBox.setSize(camera.getMouseToGroundPosition(window));
-            const Entity* selectedEntity = nullptr;
-            int entitiesSelected = 0;
-
-            for (auto& unit : m_units)
-            {
-                unit.setSelected(m_selectionBox.AABB.contains(unit.getAABB()));
-                if (unit.isSelected())
-                {
-                    ++entitiesSelected;
-                    selectedEntity = &unit;
-                }
-            }
-
-            for (auto& worker : m_workers)
-            {
-                worker.setSelected(m_selectionBox.AABB.contains(worker.getAABB()));
-                if (worker.isSelected())
-                {
-                    ++entitiesSelected;
-                    selectedEntity = &worker;
-                }
-            }
-
-            if (entitiesSelected == 1)
-            {
-                assert(selectedEntity);
-                selectedTargetGUI.set(getController(), selectedEntity->getID());
-            }
-            else if(entitiesSelected > 1)
-            {
-                selectedTargetGUI.reset();
-            }
-        }
-        else if (m_plannedBuilding.active)
-        {
-            glm::vec3 mouseToGroundPosition = camera.getMouseToGroundPosition(window);
-            if (Globals::isPositionInMapBounds(mouseToGroundPosition))
-            {
-                m_plannedBuilding.spawnPosition = Globals::convertToMiddleGridPosition(Globals::convertToNodePosition(mouseToGroundPosition));
-            }
-        }
+        onMouseMove(window, camera, selectedTargetGUI, map);
         break;
     case sf::Event::KeyPressed:
         switch (currentSFMLEvent.key.code)
@@ -187,10 +114,7 @@ void FactionPlayer::handleEvent(const GameEvent& gameEvent, const Map& map)
     switch (gameEvent.type)
     {
     case eGameEventType::ActivatePlayerPlannedBuilding:
-        assert(gameEvent.entityType == eEntityType::Barracks || gameEvent.entityType == eEntityType::SupplyDepot);
-        m_plannedBuilding.active = true;
-        m_plannedBuilding.entityType = gameEvent.entityType;
-        m_plannedBuilding.workerID = gameEvent.targetID;
+        m_plannedBuilding.set(gameEvent);
         break;
     }
 }
@@ -215,40 +139,9 @@ void FactionPlayer::renderSelectionBox(const sf::Window& window) const
     m_selectionBox.render(window);
 }
 
-bool FactionPlayer::isOneUnitSelected() const
-{
-    int unitSelectedCount = 0;
-
-    for (const auto& unit : m_units)
-    {
-        if (unit.isSelected())
-        {
-            ++unitSelectedCount;
-            if (unitSelectedCount > 1)
-            {
-                return false;
-            }
-        }
-    }
-
-    for (const auto& worker : m_workers)
-    {
-        if (worker.isSelected())
-        {
-            ++unitSelectedCount;
-            if (unitSelectedCount > 1)
-            {
-                return false;
-            }
-        }
-    }
-
-    return unitSelectedCount == 1;
-}
-
 void FactionPlayer::moveSingularSelectedUnit(const glm::vec3& mouseToGroundPosition, const Map& map)
 {
-    assert(isOneUnitSelected());
+    assert(isOneUnitSelected(m_units, m_workers));
 
     auto selectedUnit = std::find_if(m_units.begin(), m_units.end(), [](const auto& unit) {
         return unit.isSelected() == true;
@@ -315,7 +208,7 @@ void FactionPlayer::moveMultipleSelectedUnits(const glm::vec3& mouseToGroundPosi
     
     if (!selectedUnits.empty())
     {
-        assert(!isOneUnitSelected());
+        assert(!isOneUnitSelected(m_units, m_workers));
         AABB selectionBoxAABB(selectedUnits);
         if (selectionBoxAABB.contains(mouseToGroundPosition))
         {
@@ -448,4 +341,117 @@ bool FactionPlayer::instructWorkerToBuild(eEntityType entityType, const glm::vec
     }
 
     return false;
+}
+
+void FactionPlayer::onLeftClick(const sf::Window& window, const Camera& camera, const Map& map, EntityTarget& selectedTargetGUI)
+{
+    bool selectAllUnits = false;
+    glm::vec3 mouseToGroundPosition = camera.getMouseToGroundPosition(window);
+    if (!isDoubleClick(mouseToGroundPosition, m_previousMouseToGroundPosition))
+    {
+        m_previousMouseToGroundPosition = mouseToGroundPosition;
+
+        if (m_plannedBuilding.active)
+        {
+            m_plannedBuilding.active = false;
+            instructWorkerToBuild(m_plannedBuilding.entityType, mouseToGroundPosition,
+                map, m_plannedBuilding.workerID);
+        }
+    }
+    else
+    {
+        selectAllUnits = true;
+        selectedTargetGUI.reset();
+    }
+
+    m_selectionBox.setStartingPosition(window, mouseToGroundPosition);
+
+    selectEntity<Unit>(m_units, mouseToGroundPosition, selectAllUnits);
+    selectEntity<Worker>(m_workers, mouseToGroundPosition, selectAllUnits);
+    selectEntity<Barracks>(m_barracks, mouseToGroundPosition);
+    m_HQ.setSelected(m_HQ.getAABB().contains(mouseToGroundPosition));
+}
+
+void FactionPlayer::onRightClick(const sf::Window& window, const Camera& camera, 
+    const std::vector<const Faction*>& opposingFactions, const Map& map)
+{
+    m_plannedBuilding.active = false;
+    glm::vec3 mouseToGroundPosition = camera.getMouseToGroundPosition(window);
+    eFactionController targetEntityOwningFaction;
+    const Entity* targetEntity = nullptr;
+    for (const auto& faction : opposingFactions)
+    {
+        targetEntity = faction->getEntity(mouseToGroundPosition);
+        if (targetEntity)
+        {
+            targetEntityOwningFaction = faction->getController();
+            break;
+        }
+    }
+    if (targetEntity)
+    {
+        for (auto& unit : m_units)
+        {
+            if (unit.isSelected())
+            {
+                instructUnitToAttack(unit, *targetEntity, targetEntityOwningFaction, map);
+            }
+        }
+    }
+    else if (m_HQ.isSelected())
+    {
+        m_HQ.setWaypointPosition(mouseToGroundPosition);
+    }
+    else if (m_HQ.getAABB().contains(mouseToGroundPosition))
+    {
+        instructWorkerReturnMinerals(map);
+    }
+    else
+    {
+        for (auto& barracks : m_barracks)
+        {
+            if (barracks.isSelected())
+            {
+                barracks.setWaypointPosition(mouseToGroundPosition);
+            }
+        }
+
+        if (isOneUnitSelected(m_units, m_workers))
+        {
+            moveSingularSelectedUnit(mouseToGroundPosition, map);
+        }
+        else
+        {
+            moveMultipleSelectedUnits(mouseToGroundPosition, map);
+        }
+    }
+}
+
+void FactionPlayer::onMouseMove(const sf::Window& window, const Camera& camera, EntityTarget& selectedTargetGUI, const Map& map)
+{
+    if (m_selectionBox.active)
+    {
+        m_selectionBox.setSize(camera.getMouseToGroundPosition(window));
+        selectUnits<Unit>(m_units, m_selectionBox);
+        selectUnits<Worker>(m_workers, m_selectionBox);
+
+        const Entity* selectedEntity = nullptr;
+        if (isOneUnitSelected(m_units, m_workers, &selectedEntity))
+        {
+            assert(selectedEntity);
+            selectedTargetGUI.set(getController(), selectedEntity->getID());
+        }
+        else
+        {
+            selectedTargetGUI.reset();
+        }
+    }
+    else if (m_plannedBuilding.active)
+    {
+        glm::vec3 mouseToGroundPosition = camera.getMouseToGroundPosition(window);
+        if (Globals::isPositionInMapBounds(mouseToGroundPosition) && !map.isPositionOccupied(mouseToGroundPosition))
+        {
+            m_plannedBuilding.spawnPosition = Globals::convertToMiddleGridPosition(Globals::convertToNodePosition(mouseToGroundPosition));
+        }
+    }
 }

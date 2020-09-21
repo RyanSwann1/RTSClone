@@ -25,8 +25,6 @@ private:
 	SelectionBox m_selectionBox;
 	glm::vec3 m_previousMouseToGroundPosition;
 	bool m_attackMoveSelected;
-
-	bool isOneUnitSelected() const;
 	
 	void moveSingularSelectedUnit(const glm::vec3& mouseToGroundPosition, const Map& map);
 	void moveMultipleSelectedUnits(const glm::vec3& mouseToGroundPosition, const Map& map);
@@ -34,8 +32,14 @@ private:
 	void instructUnitToAttack(Unit& Unit, const Entity& targetEntity, eFactionController targetEntityOwningFaction, const Map& map);
 	bool instructWorkerToBuild(eEntityType entityType, const glm::vec3& position, const Map& map, int workerID = Globals::INVALID_ENTITY_ID);
 
+	void onLeftClick(const sf::Window& window, const Camera& camera, const Map& map, EntityTarget& selectedTargetGUI);
+	void onRightClick(const sf::Window& window, const Camera& camera,
+		const std::vector<const Faction*>& opposingFactions, const Map& map);
+	void onMouseMove(const sf::Window& window, const Camera& camera, EntityTarget& selectedTargetGUI,
+		const Map& map);
+
 	template <class Entity>
-	void selectUnit(std::list<Entity>& entities, const glm::vec3& mouseToGroundPosition, bool selectAllUnits)
+	void selectEntity(std::list<Entity>& entities, const glm::vec3& mouseToGroundPosition, bool selectAllEntities = false)
 	{
 		auto selectedEntity = std::find_if(entities.begin(), entities.end(), [&mouseToGroundPosition](const auto& entity)
 		{
@@ -43,7 +47,7 @@ private:
 		});
 		if (selectedEntity != entities.end())
 		{
-			if (selectAllUnits)
+			if (selectAllEntities)
 			{
 				for (auto& entity : entities)
 				{
@@ -52,7 +56,10 @@ private:
 			}
 			else
 			{
-				selectedEntity->setSelected(true);
+				for (auto& entity : entities)
+				{
+					entity.setSelected(entity.getAABB().contains(mouseToGroundPosition));
+				}
 			}
 		}
 		else
@@ -61,6 +68,15 @@ private:
 			{
 				entity.setSelected(false);
 			}
+		}
+	}
+
+	template <class Entity>
+	void selectUnits(std::list<Entity>& units, const SelectionBox& selectionBox)
+	{
+		for (auto& unit : units)
+		{
+			unit.setSelected(m_selectionBox.AABB.contains(unit.getAABB()));
 		}
 	}
 };
