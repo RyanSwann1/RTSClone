@@ -266,7 +266,7 @@ void Faction::handleEvent(const GameEvent& gameEvent, const Map& map)
         const glm::vec3& buildingPosition = gameEvent.startingPosition;
         auto buildingToSpawn = std::find_if(m_plannedBuildings.begin(), m_plannedBuildings.end(), [&buildingPosition](const auto& buildingToSpawn)
         {
-            return buildingToSpawn.position == buildingPosition;
+            return buildingToSpawn.getPosition() == buildingPosition;
         });
 
         assert(buildingToSpawn != m_plannedBuildings.end());
@@ -276,7 +276,7 @@ void Faction::handleEvent(const GameEvent& gameEvent, const Map& map)
     case eGameEventType::RemoveAllWorkerPlannedBuildings:
         for (auto plannedBuilding = m_plannedBuildings.begin(); plannedBuilding != m_plannedBuildings.end();)
         {
-            if (plannedBuilding->workerID == gameEvent.senderID)
+            if (plannedBuilding->getWorkerID() == gameEvent.senderID)
             {
                 plannedBuilding = m_plannedBuildings.erase(plannedBuilding);
             }
@@ -618,7 +618,7 @@ bool Faction::instructWorkerToBuild(eEntityType entityType, const glm::vec3& pos
         glm::vec3 buildPosition = Globals::convertToNodePosition(position);
         auto plannedBuilding = std::find_if(m_plannedBuildings.cbegin(), m_plannedBuildings.cend(), [&buildPosition](const auto& plannedBuilding)
         {
-            return plannedBuilding.position == Globals::convertToMiddleGridPosition(buildPosition);
+            return plannedBuilding.getPosition() == Globals::convertToMiddleGridPosition(buildPosition);
         });
 
         if (plannedBuilding == m_plannedBuildings.cend())

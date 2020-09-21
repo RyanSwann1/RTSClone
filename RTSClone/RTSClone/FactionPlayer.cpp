@@ -298,10 +298,12 @@ void FactionPlayer::instructUnitToAttack(Unit& unit, const Entity& targetEntity,
     }
 }
 
-bool FactionPlayer::instructWorkerToBuild(eEntityType entityType, const glm::vec3& position, const Map& map, int workerID)
+bool FactionPlayer::instructWorkerToBuild(const Map& map)
 {
-    if (Globals::isPositionInMapBounds(position) && !map.isPositionOccupied(position))
+    if (Globals::isPositionInMapBounds(m_plannedBuilding.getPosition()) && !map.isPositionOccupied(m_plannedBuilding.getPosition()))
     {
+        int workerID = m_plannedBuilding.getWorkerID();
+        assert(workerID != Globals::INVALID_ENTITY_ID);
         auto selectedWorker = std::find_if(m_workers.begin(), m_workers.end(), [workerID](const auto& worker)
         {
             if (workerID != Globals::INVALID_ENTITY_ID)
@@ -315,7 +317,7 @@ bool FactionPlayer::instructWorkerToBuild(eEntityType entityType, const glm::vec
         });
         if (selectedWorker != m_workers.end())
         {
-            return Faction::instructWorkerToBuild(entityType, position, map, *selectedWorker);
+            return Faction::instructWorkerToBuild(m_plannedBuilding.getEntityType(), m_plannedBuilding.getPosition(), map, *selectedWorker);
         }
     }
 
@@ -330,11 +332,13 @@ void FactionPlayer::onLeftClick(const sf::Window& window, const Camera& camera, 
     {
         m_previousMouseToGroundPosition = mouseToGroundPosition;
 
-        if (m_plannedBuilding.active)
+        if (m_plannedBuilding.isActive())
         {
-            m_plannedBuilding.active = false;
-            instructWorkerToBuild(m_plannedBuilding.entityType, mouseToGroundPosition,
-                map, m_plannedBuilding.workerID);
+            if (instructWorkerToBuild(map))
+            {
+                m_plannedBuilding.setActive(false);
+                //m_plannedBuilding.active = false;
+            }
         }
     }
     else
@@ -354,7 +358,8 @@ void FactionPlayer::onLeftClick(const sf::Window& window, const Camera& camera, 
 void FactionPlayer::onRightClick(const sf::Window& window, const Camera& camera, 
     const std::vector<const Faction*>& opposingFactions, const Map& map)
 {
-    m_plannedBuilding.active = false;
+    m_plannedBuilding.setActive(false);
+    //m_plannedBuilding.active = false;
     glm::vec3 mouseToGroundPosition = camera.getMouseToGroundPosition(window);
     eFactionController targetEntityOwningFaction;
     const Entity* targetEntity = nullptr;
@@ -425,12 +430,8 @@ void FactionPlayer::onMouseMove(const sf::Window& window, const Camera& camera, 
             selectedTargetGUI.reset();
         }
     }
-    else if (m_plannedBuilding.active)
+    else if (m_plannedBuilding.isActive())
     {
-        glm::vec3 mouseToGroundPosition = camera.getMouseToGroundPosition(window);
-        if (Globals::isPositionInMapBounds(mouseToGroundPosition) && !map.isPositionOccupied(mouseToGroundPosition))
-        {
-            m_plannedBuilding.position = Globals::convertToMiddleGridPosition(Globals::convertToNodePosition(mouseToGroundPosition));
-        }
+        m_plannedBuilding.setPosition(camera.getMouseToGroundPosition(window), map);
     }
 }
