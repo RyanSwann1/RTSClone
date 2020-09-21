@@ -52,23 +52,27 @@ namespace GameMessages
 			entityID(Globals::INVALID_ENTITY_ID),
 			entityType(),
 			health(0),
-			queueSize(0)
+			queueSize(0),
+			spawnTime(0.0f)
 		{}
 		UIDisplayEntity(eFactionController owningFaction, int entityID, eEntityType entityType, int health)
 			: owningFaction(owningFaction),
 			entityID(entityID),
 			entityType(entityType),
 			health(health),
-			queueSize(0)
+			queueSize(0),
+			spawnTime(0.0f)
 		{
 			assert(!Globals::UNIT_SPAWNER_TYPES.isMatch(entityType));
 		}
-		UIDisplayEntity(eFactionController owningFaction, int entityID, eEntityType entityType, int health, int queueSize)
+		UIDisplayEntity(eFactionController owningFaction, int entityID, eEntityType entityType, int health, 
+			int queueSize, float spawnTime)
 			: owningFaction(owningFaction),
 			entityID(entityID),
 			entityType(entityType),
 			health(health),
-			queueSize(queueSize)
+			queueSize(queueSize),
+			spawnTime(spawnTime)
 		{
 			assert(Globals::UNIT_SPAWNER_TYPES.isMatch(entityType));
 		}
@@ -78,6 +82,7 @@ namespace GameMessages
 		eEntityType entityType;
 		int health;
 		int queueSize;
+		float spawnTime;
 	};
 
 	struct UIDisplayWinner : public BaseMessage<eGameMessageType::UIDisplayWinner>

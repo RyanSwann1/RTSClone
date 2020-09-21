@@ -7,6 +7,8 @@
 #include "Globals.h"
 #include <imgui/imgui.h>
 #include <string>
+#include <sstream>
+#include <iomanip>
 
 namespace 
 {
@@ -70,28 +72,7 @@ void EntityWidget::render(const sf::Window& window)
 		ImGui::SetNextWindowSize(ImVec2(300, 300));
 		ImGui::Begin(ENTITY_NAME_CONVERSIONS[static_cast<int>(m_receivedMessage.entityType)].c_str(), nullptr, 
 			ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse);
-		if (!Globals::UNIT_SPAWNER_TYPES.isMatch(m_receivedMessage.entityType))
-		{
-			ImGui::Text("Health:");
-			ImGui::SameLine();
-			ImGui::Text(std::to_string(m_receivedMessage.health).c_str());
-			if (m_receivedMessage.owningFaction == eFactionController::Player &&
-				m_receivedMessage.entityType == eEntityType::Worker)
-			{
-				if (ImGui::Button("Barracks"))
-				{
-					GameEventHandler::getInstance().addEvent(
-						{ eGameEventType::ActivatePlayerPlannedBuilding, eEntityType::Barracks, m_receivedMessage.entityID });
-				}
-
-				if (ImGui::Button("Supply Depot"))
-				{
-					GameEventHandler::getInstance().addEvent(
-						{ eGameEventType::ActivatePlayerPlannedBuilding, eEntityType::SupplyDepot, m_receivedMessage.entityID });
-				}
-			}
-		}
-		else
+		if (Globals::UNIT_SPAWNER_TYPES.isMatch(m_receivedMessage.entityType))
 		{
 			ImGui::Text("Health:");
 			ImGui::SameLine();
@@ -99,6 +80,11 @@ void EntityWidget::render(const sf::Window& window)
 			ImGui::Text("Spawn Queue:");
 			ImGui::SameLine();
 			ImGui::Text(std::to_string(m_receivedMessage.queueSize).c_str());
+			ImGui::Text("Spawn Time:");
+			ImGui::SameLine();
+			std::stringstream spawnTimeStream;
+			spawnTimeStream << std::fixed << std::setprecision(2) << m_receivedMessage.spawnTime;
+			ImGui::Text(spawnTimeStream.str().c_str());
 			if (m_receivedMessage.owningFaction == eFactionController::Player)
 			{
 				switch (m_receivedMessage.entityType)
@@ -117,6 +103,27 @@ void EntityWidget::render(const sf::Window& window)
 					break;
 				default:
 					assert(false);
+				}
+			}
+		}
+		else
+		{
+			ImGui::Text("Health:");
+			ImGui::SameLine();
+			ImGui::Text(std::to_string(m_receivedMessage.health).c_str());
+			if (m_receivedMessage.owningFaction == eFactionController::Player &&
+				m_receivedMessage.entityType == eEntityType::Worker)
+			{
+				if (ImGui::Button("Barracks"))
+				{
+					GameEventHandler::getInstance().addEvent(
+						{ eGameEventType::ActivatePlayerPlannedBuilding, eEntityType::Barracks, m_receivedMessage.entityID });
+				}
+
+				if (ImGui::Button("Supply Depot"))
+				{
+					GameEventHandler::getInstance().addEvent(
+						{ eGameEventType::ActivatePlayerPlannedBuilding, eEntityType::SupplyDepot, m_receivedMessage.entityID });
 				}
 			}
 		}
