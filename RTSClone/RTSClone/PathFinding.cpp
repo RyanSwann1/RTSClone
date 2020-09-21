@@ -357,9 +357,9 @@ glm::vec3 PathFinding::getClosestPositionOutsideAABB(const glm::vec3& entityPosi
 glm::vec3 PathFinding::getClosestPositionFromUnitToTarget(const Unit& unit, const Entity& entityTarget, std::vector<glm::vec3>& pathToPosition, 
 	const Map& map, const AdjacentPositions& adjacentPositions) const
 {
-	assert(adjacentPositions && pathToPosition.empty() &&
-		isTargetInLineOfSight(unit.getPosition(), entityTarget, map));
-
+	assert(adjacentPositions && isTargetInLineOfSight(unit.getPosition(), entityTarget, map));
+	
+	pathToPosition.clear();
 	glm::ivec2 startingPositionOnGrid = Globals::convertToGridPosition(Globals::convertToNodePosition(unit.getPosition()));
 	glm::ivec2 destinationOnGrid = Globals::convertToGridPosition(entityTarget.getPosition());
 	float shortestDistance = std::numeric_limits<float>::max();
@@ -384,8 +384,9 @@ glm::vec3 PathFinding::getClosestPositionFromUnitToTarget(const Unit& unit, cons
 void PathFinding::getPathToPosition(const Unit& unit, const glm::vec3& destination, std::vector<glm::vec3>& pathToPosition, 
 	const AdjacentPositions& adjacentPositions, const std::list<Unit>& units, const Map& map)
 {
-	assert(adjacentPositions && pathToPosition.empty());
+	assert(adjacentPositions);
 
+	pathToPosition.clear();
 	if (unit.getPosition() == destination)
 	{
 		return;
