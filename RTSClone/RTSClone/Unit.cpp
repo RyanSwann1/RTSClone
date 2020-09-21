@@ -160,7 +160,6 @@ void Unit::update(float deltaTime, FactionHandler& factionHandler, const Map& ma
 	switch (m_currentState)
 	{
 	case eUnitState::Idle:
-		assert(m_target.getID() == Globals::INVALID_ENTITY_ID);
 		if (m_attackTimer.isExpired() && getEntityType() == eEntityType::Unit)
 		{
 			for (const auto& opposingFaction : factionHandler.getOpposingFactions(m_owningFaction.getController()))
@@ -172,7 +171,7 @@ void Unit::update(float deltaTime, FactionHandler& factionHandler, const Map& ma
 					{
 						switchToState(eUnitState::AttackingTarget, map);
 					}
-					else
+					else if(!Globals::UNIT_TYPES.isMatch(targetEntity->getEntityType()))
 					{
 						moveTo(targetEntity->getPosition(), map, [&](const glm::ivec2& position)
 							{ return getAdjacentPositions(position, map, m_owningFaction.getUnits(), *this); });
@@ -180,6 +179,10 @@ void Unit::update(float deltaTime, FactionHandler& factionHandler, const Map& ma
 
 					m_target.set(opposingFaction->getController(), targetEntity->getID());
 					break;
+				}
+				else
+				{
+					m_target.reset();
 				}
 			}
 		}
