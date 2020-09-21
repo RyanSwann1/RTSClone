@@ -327,6 +327,7 @@ bool FactionPlayer::instructWorkerToBuild(const Map& map)
 void FactionPlayer::onLeftClick(const sf::Window& window, const Camera& camera, const Map& map, EntityTarget& selectedTargetGUI)
 {
     bool selectAllUnits = false;
+    int keepEntityIDSelected = Globals::INVALID_ENTITY_ID;
     glm::vec3 mouseToGroundPosition = camera.getMouseToGroundPosition(window);
     if (!isDoubleClick(mouseToGroundPosition, m_previousMouseToGroundPosition))
     {
@@ -336,6 +337,7 @@ void FactionPlayer::onLeftClick(const sf::Window& window, const Camera& camera, 
         {
             if (instructWorkerToBuild(map))
             {
+                keepEntityIDSelected = m_plannedBuilding.getWorkerID();
                 m_plannedBuilding.setActive(false);
             }
         }
@@ -345,10 +347,15 @@ void FactionPlayer::onLeftClick(const sf::Window& window, const Camera& camera, 
         selectAllUnits = true;
     }
 
+    if (keepEntityIDSelected != Globals::INVALID_ENTITY_ID)
+    {
+        selectedTargetGUI.set(getController(), keepEntityIDSelected);
+    }
+    
     m_selectionBox.setStartingPosition(window, mouseToGroundPosition);
 
     selectEntity<Unit>(m_units, mouseToGroundPosition, selectAllUnits);
-    selectEntity<Worker>(m_workers, mouseToGroundPosition, selectAllUnits);
+    selectEntity<Worker>(m_workers, mouseToGroundPosition, selectAllUnits, keepEntityIDSelected);
     selectEntity<Barracks>(m_barracks, mouseToGroundPosition);
     m_HQ.setSelected(m_HQ.getAABB().contains(mouseToGroundPosition));
 }

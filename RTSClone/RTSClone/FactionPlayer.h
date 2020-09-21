@@ -40,7 +40,8 @@ private:
 		const Map& map);
 
 	template <class Entity>
-	void selectEntity(std::list<Entity>& entities, const glm::vec3& mouseToGroundPosition, bool selectAllEntities = false)
+	void selectEntity(std::list<Entity>& entities, const glm::vec3& mouseToGroundPosition, bool selectAllEntities = false,
+		int keepEntityIDSelected = Globals::INVALID_ENTITY_ID)
 	{
 		auto selectedEntity = std::find_if(entities.begin(), entities.end(), [&mouseToGroundPosition](const auto& entity)
 		{
@@ -67,7 +68,14 @@ private:
 		{
 			for (auto& entity : entities)
 			{
-				entity.setSelected(false);
+				if (keepEntityIDSelected == entity.getID())
+				{
+					entity.setSelected(true);
+				}
+				else
+				{
+					entity.setSelected(false);
+				}
 			}
 		}
 	}

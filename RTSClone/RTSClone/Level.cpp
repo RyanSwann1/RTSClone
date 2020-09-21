@@ -220,8 +220,6 @@ void Level::handleInput(const sf::Window& window, const Camera& camera, const sf
 
 void Level::update(float deltaTime, const Map& map)
 {
-	m_projectileHandler.update(deltaTime, m_factionHandler);
-	
 	for (auto& faction : m_factions)
 	{
 		if (faction)
@@ -230,8 +228,8 @@ void Level::update(float deltaTime, const Map& map)
 		}
 	}
 	
+	m_projectileHandler.update(deltaTime, m_factionHandler);
 	GameEventHandler::getInstance().handleEvents(*this, map);
-
 	handleGUI();
 }
 
