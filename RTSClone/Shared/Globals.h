@@ -42,6 +42,7 @@ namespace Globals
 	constexpr int POPULATION_INCREMENT = 5;
 
 	const TypeComparison<eEntityType> UNIT_SPAWNER_TYPES({ eEntityType::HQ, eEntityType::Barracks });
+	const TypeComparison<eEntityType> UNIT_TYPES({ eEntityType::Unit, eEntityType::Barracks });
 
 	constexpr int CUBE_FACE_INDICIE_COUNT = 4;
 	constexpr std::array<unsigned int, 6> CUBE_FACE_INDICIES =
