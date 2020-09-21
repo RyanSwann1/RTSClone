@@ -59,12 +59,12 @@ void PlayerDetailsWidget::render(const sf::Window& window)
 	}
 }
 
-//EntityWidget
-EntityWidget::EntityWidget()
+//SelectedEntityWidget
+SelectedEntityWidget::SelectedEntityWidget()
 	: Widget()
 {}
 
-void EntityWidget::render(const sf::Window& window)
+void SelectedEntityWidget::render(const sf::Window& window)
 {
 	if (m_active)
 	{
@@ -150,20 +150,20 @@ void WinningFactionWidget::render(const sf::Window& window)
 //UIManager
 UIManager::UIManager()
 	: m_playerDetailsWidget(),	
-	m_entityWidget(),
+	m_selectedEntityWidget(),
 	m_winningFactionWidget()
 {
 	GameMessenger::getInstance().subscribe<GameMessages::UIDisplayPlayerDetails>([this](const GameMessages::UIDisplayPlayerDetails& gameMessage)
 		{ return onDisplayPlayerDetails(gameMessage); }, this);
 
-	GameMessenger::getInstance().subscribe<GameMessages::UIDisplayEntity>([this](const GameMessages::UIDisplayEntity& gameMessage)
+	GameMessenger::getInstance().subscribe<GameMessages::UIDisplaySelectedEntity>([this](const GameMessages::UIDisplaySelectedEntity& gameMessage)
 		{ return onDisplayEntity(gameMessage); }, this);
 
 	GameMessenger::getInstance().subscribe<GameMessages::UIDisplayWinner>([this](const GameMessages::UIDisplayWinner& gameMessage)
 		{ return onDisplayWinningFaction(gameMessage); }, this);
 	
-	GameMessenger::getInstance().subscribe<GameMessages::BaseMessage<eGameMessageType::UIClearDisplayEntity>>([this](
-		const GameMessages::BaseMessage<eGameMessageType::UIClearDisplayEntity>& gameMessage)
+	GameMessenger::getInstance().subscribe<GameMessages::BaseMessage<eGameMessageType::UIClearDisplaySelectedEntity>>([this](
+		const GameMessages::BaseMessage<eGameMessageType::UIClearDisplaySelectedEntity>& gameMessage)
 	{ return onClearDisplayEntity(gameMessage); }, this);
 
 	GameMessenger::getInstance().subscribe<GameMessages::BaseMessage<eGameMessageType::UIClearWinner>>([this](
@@ -174,16 +174,16 @@ UIManager::UIManager()
 UIManager::~UIManager()
 {
 	GameMessenger::getInstance().unsubscribe<GameMessages::UIDisplayPlayerDetails>(this);
-	GameMessenger::getInstance().unsubscribe<GameMessages::UIDisplayEntity>(this);
+	GameMessenger::getInstance().unsubscribe<GameMessages::UIDisplaySelectedEntity>(this);
 	GameMessenger::getInstance().unsubscribe<GameMessages::UIDisplayWinner>(this);
-	GameMessenger::getInstance().unsubscribe<GameMessages::BaseMessage<eGameMessageType::UIClearDisplayEntity>>(this);
+	GameMessenger::getInstance().unsubscribe<GameMessages::BaseMessage<eGameMessageType::UIClearDisplaySelectedEntity>>(this);
 	GameMessenger::getInstance().unsubscribe<GameMessages::BaseMessage<eGameMessageType::UIClearWinner>>(this);
 }
 
 void UIManager::render(const sf::Window& window)
 {
 	m_playerDetailsWidget.render(window);
-	m_entityWidget.render(window);	
+	m_selectedEntityWidget.render(window);	
 	m_winningFactionWidget.render(window);
 }
 
@@ -192,14 +192,14 @@ void UIManager::onDisplayPlayerDetails(const GameMessages::UIDisplayPlayerDetail
 	m_playerDetailsWidget.set(gameMessage);
 }
 
-void UIManager::onDisplayEntity(const GameMessages::UIDisplayEntity& gameMessage)
+void UIManager::onDisplayEntity(const GameMessages::UIDisplaySelectedEntity& gameMessage)
 {
-	m_entityWidget.set(gameMessage);
+	m_selectedEntityWidget.set(gameMessage);
 }
 
-void UIManager::onClearDisplayEntity(const GameMessages::BaseMessage<eGameMessageType::UIClearDisplayEntity>& gameMessage)
+void UIManager::onClearDisplayEntity(const GameMessages::BaseMessage<eGameMessageType::UIClearDisplaySelectedEntity>& gameMessage)
 {
-	m_entityWidget.deactivate();
+	m_selectedEntityWidget.deactivate();
 }
 
 void UIManager::onClearDisplayWinner(const GameMessages::BaseMessage<eGameMessageType::UIClearWinner>& gameMessage)

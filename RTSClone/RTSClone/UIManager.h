@@ -37,9 +37,9 @@ struct PlayerDetailsWidget : public Widget<GameMessages::UIDisplayPlayerDetails>
 	void render(const sf::Window& window);
 };
 
-struct EntityWidget : public Widget<GameMessages::UIDisplayEntity>
+struct SelectedEntityWidget : public Widget<GameMessages::UIDisplaySelectedEntity>
 {
-	EntityWidget();
+	SelectedEntityWidget();
 	void render(const sf::Window& window);
 };
 
@@ -59,12 +59,12 @@ public:
 
 private:
 	PlayerDetailsWidget m_playerDetailsWidget;
-	EntityWidget m_entityWidget;
+	SelectedEntityWidget m_selectedEntityWidget;
 	WinningFactionWidget m_winningFactionWidget;
 
 	void onDisplayPlayerDetails(const GameMessages::UIDisplayPlayerDetails& gameMessage);
-	void onDisplayEntity(const GameMessages::UIDisplayEntity& gameMessage);
+	void onDisplayEntity(const GameMessages::UIDisplaySelectedEntity& gameMessage);
 	void onDisplayWinningFaction(const GameMessages::UIDisplayWinner& gameMessage);
-	void onClearDisplayEntity(const GameMessages::BaseMessage<eGameMessageType::UIClearDisplayEntity>& gameMessage);
+	void onClearDisplayEntity(const GameMessages::BaseMessage<eGameMessageType::UIClearDisplaySelectedEntity>& gameMessage);
 	void onClearDisplayWinner(const GameMessages::BaseMessage<eGameMessageType::UIClearWinner>& gameMessage);
 };

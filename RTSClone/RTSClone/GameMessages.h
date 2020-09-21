@@ -45,9 +45,9 @@ namespace GameMessages
 		int maximumPopulationAmount;
 	};
 
-	struct UIDisplayEntity : public BaseMessage<eGameMessageType::UIDisplayEntity>
+	struct UIDisplaySelectedEntity : public BaseMessage<eGameMessageType::UIDisplaySelectedEntity>
 	{
-		UIDisplayEntity()
+		UIDisplaySelectedEntity()
 			: owningFaction(),
 			entityID(Globals::INVALID_ENTITY_ID),
 			entityType(),
@@ -55,7 +55,7 @@ namespace GameMessages
 			queueSize(0),
 			spawnTime(0.0f)
 		{}
-		UIDisplayEntity(eFactionController owningFaction, int entityID, eEntityType entityType, int health)
+		UIDisplaySelectedEntity(eFactionController owningFaction, int entityID, eEntityType entityType, int health)
 			: owningFaction(owningFaction),
 			entityID(entityID),
 			entityType(entityType),
@@ -65,7 +65,7 @@ namespace GameMessages
 		{
 			assert(!Globals::UNIT_SPAWNER_TYPES.isMatch(entityType));
 		}
-		UIDisplayEntity(eFactionController owningFaction, int entityID, eEntityType entityType, int health, 
+		UIDisplaySelectedEntity(eFactionController owningFaction, int entityID, eEntityType entityType, int health, 
 			int queueSize, float spawnTime)
 			: owningFaction(owningFaction),
 			entityID(entityID),

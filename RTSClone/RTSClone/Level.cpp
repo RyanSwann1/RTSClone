@@ -57,13 +57,13 @@ void Level::handleGUI()
 		if (!targetEntity)
 		{
 			m_selectedTargetGUI.reset();
-			GameMessenger::getInstance().broadcast<GameMessages::BaseMessage<eGameMessageType::UIClearDisplayEntity>>({});
+			GameMessenger::getInstance().broadcast<GameMessages::BaseMessage<eGameMessageType::UIClearDisplaySelectedEntity>>({});
 		}
 		else
 		{
 			if (!Globals::UNIT_SPAWNER_TYPES.isMatch(targetEntity->getEntityType()))
 			{
-				GameMessenger::getInstance().broadcast<GameMessages::UIDisplayEntity>(
+				GameMessenger::getInstance().broadcast<GameMessages::UIDisplaySelectedEntity>(
 					{ m_selectedTargetGUI.getFactionController(), m_selectedTargetGUI.getID(), targetEntity->getEntityType(),
 					targetEntity->getHealth() });
 			}
@@ -71,7 +71,7 @@ void Level::handleGUI()
 			{
 				const UnitSpawnerBuilding& unitSpawnerBuilding = static_cast<const UnitSpawnerBuilding&>(*targetEntity);
 
-				GameMessenger::getInstance().broadcast<GameMessages::UIDisplayEntity>(
+				GameMessenger::getInstance().broadcast<GameMessages::UIDisplaySelectedEntity>(
 					{ m_selectedTargetGUI.getFactionController(), m_selectedTargetGUI.getID(), targetEntity->getEntityType(),
 					unitSpawnerBuilding.getHealth(), unitSpawnerBuilding.getCurrentSpawnCount(), 
 					unitSpawnerBuilding.getSpawnTimer().getExpiredTime() - unitSpawnerBuilding.getSpawnTimer().getElaspedTime() });
@@ -81,7 +81,7 @@ void Level::handleGUI()
 	else
 	{
 		m_selectedTargetGUI.reset();
-		GameMessenger::getInstance().broadcast<GameMessages::BaseMessage<eGameMessageType::UIClearDisplayEntity>>({});
+		GameMessenger::getInstance().broadcast<GameMessages::BaseMessage<eGameMessageType::UIClearDisplaySelectedEntity>>({});
 	}
 }
 
@@ -99,7 +99,7 @@ std::unique_ptr<Level> Level::create(const std::string& levelName)
 
 Level::~Level()
 {
-	GameMessenger::getInstance().broadcast<GameMessages::BaseMessage<eGameMessageType::UIClearDisplayEntity>>({});
+	GameMessenger::getInstance().broadcast<GameMessages::BaseMessage<eGameMessageType::UIClearDisplaySelectedEntity>>({});
 }
 
 eFactionController Level::getWinningFactionController() const
