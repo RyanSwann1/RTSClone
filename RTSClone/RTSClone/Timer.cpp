@@ -6,6 +6,16 @@ Timer::Timer(float expirationTime, bool active)
 	m_active(active)
 {}
 
+float Timer::getExpiredTime() const
+{
+	return m_expirationTime;
+}
+
+float Timer::getElaspedTime() const
+{
+	return m_elaspedTime;
+}
+
 bool Timer::isExpired() const
 {
 	return m_elaspedTime >= m_expirationTime;

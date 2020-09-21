@@ -337,14 +337,12 @@ void FactionPlayer::onLeftClick(const sf::Window& window, const Camera& camera, 
             if (instructWorkerToBuild(map))
             {
                 m_plannedBuilding.setActive(false);
-                //m_plannedBuilding.active = false;
             }
         }
     }
     else
     {
         selectAllUnits = true;
-        selectedTargetGUI.reset();
     }
 
     m_selectionBox.setStartingPosition(window, mouseToGroundPosition);
@@ -359,7 +357,6 @@ void FactionPlayer::onRightClick(const sf::Window& window, const Camera& camera,
     const std::vector<const Faction*>& opposingFactions, const Map& map)
 {
     m_plannedBuilding.setActive(false);
-    //m_plannedBuilding.active = false;
     glm::vec3 mouseToGroundPosition = camera.getMouseToGroundPosition(window);
     eFactionController targetEntityOwningFaction;
     const Entity* targetEntity = nullptr;

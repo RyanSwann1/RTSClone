@@ -41,6 +41,11 @@ UnitSpawnerBuilding::~UnitSpawnerBuilding()
 	GameMessenger::getInstance().broadcast<GameMessages::MapModification<eGameMessageType::RemoveEntityFromMap>>({ m_AABB });
 }
 
+const Timer& UnitSpawnerBuilding::getSpawnTimer() const
+{
+	return m_spawnTimer;
+}
+
 int UnitSpawnerBuilding::getCurrentSpawnCount() const
 {
 	return static_cast<int>(m_unitsToSpawn.size());

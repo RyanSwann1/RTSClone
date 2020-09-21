@@ -69,10 +69,12 @@ void Level::handleGUI()
 			}
 			else
 			{
+				const UnitSpawnerBuilding& unitSpawnerBuilding = static_cast<const UnitSpawnerBuilding&>(*targetEntity);
+
 				GameMessenger::getInstance().broadcast<GameMessages::UIDisplayEntity>(
 					{ m_selectedTargetGUI.getFactionController(), m_selectedTargetGUI.getID(), targetEntity->getEntityType(),
-					targetEntity->getHealth(),
-					static_cast<const UnitSpawnerBuilding&>(*targetEntity).getCurrentSpawnCount() });
+					unitSpawnerBuilding.getHealth(), unitSpawnerBuilding.getCurrentSpawnCount(), 
+					unitSpawnerBuilding.getSpawnTimer().getExpiredTime() - unitSpawnerBuilding.getSpawnTimer().getElaspedTime() });
 			}
 		}
 	}
