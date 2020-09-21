@@ -18,9 +18,12 @@ void ProjectileHandler::update(float deltaTime, const FactionHandler& factionHan
 	{	
 		projectile->update(deltaTime);
 
-		const Faction& targetFaction = factionHandler.getFaction(projectile->getSenderEvent().targetFaction);
 		bool projectileCollision = false;
-		projectileCollision = targetFaction.getEntity(projectile->getAABB(), projectile->getSenderEvent().targetID);
+		if (factionHandler.isFactionActive(projectile->getSenderEvent().targetFaction))
+		{
+			const Faction& targetFaction = factionHandler.getFaction(projectile->getSenderEvent().targetFaction);
+			projectileCollision = targetFaction.getEntity(projectile->getAABB(), projectile->getSenderEvent().targetID);
+		}
 
 		if (projectileCollision || projectile->isReachedDestination())
 		{
