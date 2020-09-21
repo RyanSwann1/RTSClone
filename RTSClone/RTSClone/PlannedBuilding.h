@@ -3,16 +3,28 @@
 #include "EntityType.h"
 #include "glm/glm.hpp"
 
+class Map;
+struct GameEvent;
 class ShaderHandler;
-struct PlannedBuilding
+class PlannedBuilding
 {
+public:
 	PlannedBuilding();
-	PlannedBuilding(int workerID, const glm::vec3& spawnPosition, eEntityType entityType);
+	PlannedBuilding(int workerID, const glm::vec3& position, eEntityType entityType);
 
+	const glm::vec3& getPosition() const;
+	int getWorkerID() const;
+	eEntityType getEntityType() const;
+	bool isActive() const;
+
+	void setActive(bool active);
+	void setPosition(const glm::vec3& newPosition, const Map& map);
+	void set(const GameEvent& gameEvent);
 	void render(ShaderHandler& shaderHandler) const;
 
-	bool active;
-	int workerID;
-	glm::vec3 spawnPosition;
-	eEntityType entityType;
+private:
+	bool m_active;
+	int m_workerID;
+	glm::vec3 m_position;
+	eEntityType m_entityType;
 };
