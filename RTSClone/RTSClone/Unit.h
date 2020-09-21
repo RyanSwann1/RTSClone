@@ -56,7 +56,7 @@ protected:
 	glm::vec3 m_front;
 	std::vector<glm::vec3> m_pathToPosition;
 
-	void switchToState(eUnitState newState);
+	void switchToState(eUnitState newState, const Map& map, const Entity* targetEntity = nullptr);
 
 private:
 	Timer m_attackTimer;

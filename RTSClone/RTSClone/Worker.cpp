@@ -92,7 +92,7 @@ void Worker::update(float deltaTime, const UnitSpawnerBuilding& HQ, const Map& m
 	case eUnitState::MovingToMinerals:
 		if (m_pathToPosition.empty())
 		{
-			switchToState(eUnitState::Harvesting);
+			switchToState(eUnitState::Harvesting, map);
 		}
 		break;
 	case eUnitState::ReturningMineralsToHQ:
@@ -110,7 +110,7 @@ void Worker::update(float deltaTime, const UnitSpawnerBuilding& HQ, const Map& m
 			}
 			else
 			{
-				switchToState(eUnitState::Idle);
+				switchToState(eUnitState::Idle, map);
 			}
 		}
 		break;
@@ -142,7 +142,7 @@ void Worker::update(float deltaTime, const UnitSpawnerBuilding& HQ, const Map& m
 		assert(!m_buildingCommands.empty());
 		if (m_pathToPosition.empty())
 		{
-			switchToState(eUnitState::Building);
+			switchToState(eUnitState::Building, map);
 		}
 		break;
 	case eUnitState::Building:
@@ -184,7 +184,7 @@ void Worker::update(float deltaTime, const UnitSpawnerBuilding& HQ, const Map& m
 			}
 			else
 			{
-				switchToState(eUnitState::Idle);
+				switchToState(eUnitState::Idle, map);
 			}
 		}
 

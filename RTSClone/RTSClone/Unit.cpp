@@ -147,18 +147,18 @@ void Unit::moveTo(const glm::vec3& destinationPosition, const Map& map, const Ad
 		m_owningFaction.getUnits(), map);
 	if (!m_pathToPosition.empty())
 	{
-		switchToState(state);
+		switchToState(state, map);
 	}
 	else
 	{
 		if (closestDestination != m_position)
 		{
 			m_pathToPosition.push_back(closestDestination);
-			switchToState(state);
+			switchToState(state, map);
 		}
 		else
 		{
-			switchToState(eUnitState::Idle);
+			switchToState(eUnitState::Idle, map);
 		}
 	}
 }
@@ -194,7 +194,7 @@ void Unit::update(float deltaTime, FactionHandler& factionHandler, const Map& ma
 				{
 					if (isTargetInLineOfSight(m_position, *targetEntity, map))
 					{
-						switchToState(eUnitState::AttackingTarget);
+						switchToState(eUnitState::AttackingTarget, map);
 					}
 					else
 					{
@@ -227,24 +227,18 @@ void Unit::update(float deltaTime, FactionHandler& factionHandler, const Map& ma
 					}
 					else
 					{
-						switchToState(eUnitState::AttackingTarget);
-						if (!Globals::isOnMiddlePosition(m_position))
-						{
-							m_pathToPosition.clear();
-							m_pathToPosition.emplace_back(PathFinding::getInstance().getClosestPositionFromUnitToTarget(*this, *targetEntity, m_pathToPosition,
-								[&](const glm::ivec2& position) { return getAdjacentPositions(position, map, m_owningFaction.getUnits(), *this); }));
-						}
+						switchToState(eUnitState::AttackingTarget, map, targetEntity);
 					}	
 				}
 			}
 			else
 			{
-				switchToState(eUnitState::Idle);
+				switchToState(eUnitState::Idle, map);
 			}
 		}
 		else if (m_pathToPosition.empty())
 		{
-			switchToState(eUnitState::Idle);
+			switchToState(eUnitState::Idle, map);
 		}
 		break;
 	case eUnitState::AttackMoving:
@@ -256,19 +250,13 @@ void Unit::update(float deltaTime, FactionHandler& factionHandler, const Map& ma
 				if (targetEntity && isTargetInLineOfSight(m_position, *targetEntity, map))
 				{
 					m_target.set(opposingFaction->getController(), targetEntity->getID());
-					switchToState(eUnitState::AttackingTarget);
-					if (!Globals::isOnMiddlePosition(m_position))
-					{
-						m_pathToPosition.clear();
-						m_pathToPosition.emplace_back(PathFinding::getInstance().getClosestPositionFromUnitToTarget(*this, *targetEntity, m_pathToPosition,
-							[&](const glm::ivec2& position) { return getAdjacentPositions(position, map, m_owningFaction.getUnits(), *this); }));
-					}
+					switchToState(eUnitState::AttackingTarget, map, targetEntity);
 				}
 			}
 		}
 		else if (m_pathToPosition.empty())
 		{
-			switchToState(eUnitState::Idle);
+			switchToState(eUnitState::Idle, map);
 		}
 		break;
 	case eUnitState::AttackingTarget:
@@ -284,7 +272,7 @@ void Unit::update(float deltaTime, FactionHandler& factionHandler, const Map& ma
 					targetEntity = opposingFaction.getEntity(m_position, UNIT_ATTACK_RANGE);
 					if (!targetEntity)
 					{
-						switchToState(eUnitState::Idle);
+						switchToState(eUnitState::Idle, map);
 					}
 					else
 					{
@@ -309,7 +297,7 @@ void Unit::update(float deltaTime, FactionHandler& factionHandler, const Map& ma
 			}
 			else
 			{
-				switchToState(eUnitState::Idle);
+				switchToState(eUnitState::Idle, map);
 			}
 		}
 	
@@ -327,7 +315,7 @@ void Unit::update(float deltaTime, FactionHandler& factionHandler, const Map& ma
 	}
 }
 
-void Unit::switchToState(eUnitState newState)
+void Unit::switchToState(eUnitState newState, const Map& map, const Entity* targetEntity)
 {
 	switch (newState)
 	{
@@ -338,10 +326,18 @@ void Unit::switchToState(eUnitState newState)
 	case eUnitState::Building:
 		m_target.reset();
 		break;
-	case eUnitState::Moving:
-	case eUnitState::AttackMoving:
-	case eUnitState::Harvesting:
 	case eUnitState::AttackingTarget:
+		if (!Globals::isOnMiddlePosition(m_position))
+		{
+			assert(targetEntity);
+			m_pathToPosition.clear();
+			m_pathToPosition.emplace_back(PathFinding::getInstance().getClosestPositionFromUnitToTarget(*this, *targetEntity, m_pathToPosition,
+				[&](const glm::ivec2& position) { return getAdjacentPositions(position, map, m_owningFaction.getUnits(), *this); }));
+		}
+		break;
+	case eUnitState::AttackMoving:
+	case eUnitState::Moving:
+	case eUnitState::Harvesting:
 		break;
 	default:
 		assert(false);
