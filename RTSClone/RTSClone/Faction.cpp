@@ -266,7 +266,7 @@ void Faction::handleEvent(const GameEvent& gameEvent, const Map& map)
         const glm::vec3& buildingPosition = gameEvent.startingPosition;
         auto buildingToSpawn = std::find_if(m_plannedBuildings.begin(), m_plannedBuildings.end(), [&buildingPosition](const auto& buildingToSpawn)
         {
-            return buildingToSpawn.spawnPosition == buildingPosition;
+            return buildingToSpawn.position == buildingPosition;
         });
 
         assert(buildingToSpawn != m_plannedBuildings.end());
@@ -464,9 +464,9 @@ bool Faction::isEntityAffordable(eEntityType entityType) const
     }
 }
 
-const Entity* Faction::addBuilding(Worker& worker, const Map& map, glm::vec3 spawnPosition, eEntityType entityType)
+const Entity* Faction::addBuilding(Worker& worker, const Map& map, glm::vec3 position, eEntityType entityType)
 {
-    if (isEntityAffordable(entityType) && !map.isPositionOccupied(spawnPosition))
+    if (isEntityAffordable(entityType) && !map.isPositionOccupied(position))
     {
         Entity* addedBuilding = nullptr;
         switch (entityType)
@@ -474,13 +474,13 @@ const Entity* Faction::addBuilding(Worker& worker, const Map& map, glm::vec3 spa
         case eEntityType::SupplyDepot:
             if (m_currentPopulationLimit + Globals::POPULATION_INCREMENT <= Globals::MAX_POPULATION)
             {
-                m_supplyDepots.emplace_back(spawnPosition);
+                m_supplyDepots.emplace_back(position);
                 addedBuilding = &m_supplyDepots.back();
                 increasePopulationLimit();
             }
             break;
         case eEntityType::Barracks:
-            m_barracks.emplace_back(spawnPosition);
+            m_barracks.emplace_back(position);
             addedBuilding = &m_barracks.back();
             break;
         default:
@@ -618,7 +618,7 @@ bool Faction::instructWorkerToBuild(eEntityType entityType, const glm::vec3& pos
         glm::vec3 buildPosition = Globals::convertToNodePosition(position);
         auto plannedBuilding = std::find_if(m_plannedBuildings.cbegin(), m_plannedBuildings.cend(), [&buildPosition](const auto& plannedBuilding)
         {
-            return plannedBuilding.spawnPosition == Globals::convertToMiddleGridPosition(buildPosition);
+            return plannedBuilding.position == Globals::convertToMiddleGridPosition(buildPosition);
         });
 
         if (plannedBuilding == m_plannedBuildings.cend())

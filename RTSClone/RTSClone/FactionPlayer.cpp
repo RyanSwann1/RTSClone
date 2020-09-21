@@ -430,7 +430,7 @@ void FactionPlayer::onMouseMove(const sf::Window& window, const Camera& camera, 
         glm::vec3 mouseToGroundPosition = camera.getMouseToGroundPosition(window);
         if (Globals::isPositionInMapBounds(mouseToGroundPosition) && !map.isPositionOccupied(mouseToGroundPosition))
         {
-            m_plannedBuilding.spawnPosition = Globals::convertToMiddleGridPosition(Globals::convertToNodePosition(mouseToGroundPosition));
+            m_plannedBuilding.position = Globals::convertToMiddleGridPosition(Globals::convertToNodePosition(mouseToGroundPosition));
         }
     }
 }
