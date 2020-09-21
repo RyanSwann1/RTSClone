@@ -25,6 +25,7 @@ private:
 	SelectionBox m_selectionBox;
 	glm::vec3 m_previousMouseToGroundPosition;
 	bool m_attackMoveSelected;
+	std::vector<Unit*> m_selectedUnits;
 	
 	void moveSingularSelectedUnit(const glm::vec3& mouseToGroundPosition, const Map& map);
 	void moveMultipleSelectedUnits(const glm::vec3& mouseToGroundPosition, const Map& map);
