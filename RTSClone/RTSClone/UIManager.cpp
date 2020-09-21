@@ -80,13 +80,14 @@ void SelectedEntityWidget::render(const sf::Window& window)
 			ImGui::Text("Spawn Queue:");
 			ImGui::SameLine();
 			ImGui::Text(std::to_string(m_receivedMessage.queueSize).c_str());
-			ImGui::Text("Spawn Time:");
-			ImGui::SameLine();
-			std::stringstream spawnTimeStream;
-			spawnTimeStream << std::fixed << std::setprecision(2) << m_receivedMessage.spawnTime;
-			ImGui::Text(spawnTimeStream.str().c_str());
 			if (m_receivedMessage.owningFaction == eFactionController::Player)
 			{
+				ImGui::Text("Spawn Time:");
+				ImGui::SameLine();
+				std::stringstream spawnTimeStream;
+				spawnTimeStream << std::fixed << std::setprecision(2) << m_receivedMessage.spawnTime;
+				ImGui::Text(spawnTimeStream.str().c_str());
+
 				switch (m_receivedMessage.entityType)
 				{
 				case eEntityType::HQ:

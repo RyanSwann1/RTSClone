@@ -88,7 +88,7 @@ public:
 		const Map& map);
 
 	void getPathToPosition(const Unit& unit, const glm::vec3& destination, std::vector<glm::vec3>& pathToPosition, 
-		const GetAllAdjacentPositions& getAdjacentPositions);
+		const AdjacentPositions& getAdjacentPositions);
 
 	void convertPathToWaypoints(std::vector<glm::vec3>& pathToPosition, const Unit& unit, const std::list<Unit>& units, 
 		const Map& map);

@@ -132,7 +132,7 @@ private:
 				if (map.isPositionOccupied(entity.getPosition()))
 				{
 					entity.moveTo(PathFinding::getInstance().getClosestAvailablePosition<Entity>(entity, entities, map), map,
-						[&](const glm::ivec2& position) { return getAllAdjacentPositions(position, map); });
+						[&](const glm::ivec2& position) { return getAdjacentPositions(position, map); });
 				}
 				else
 				{
@@ -144,7 +144,7 @@ private:
 							entity.getAABB().contains(otherEntity.getAABB()))
 						{
 							entity.moveTo(PathFinding::getInstance().getClosestAvailablePosition<Entity>(entity, entities, map), map,
-								[&](const glm::ivec2& position) { return getAllAdjacentPositions(position, map); });
+								[&](const glm::ivec2& position) { return getAdjacentPositions(position, map); });
 							break;
 						}
 					}

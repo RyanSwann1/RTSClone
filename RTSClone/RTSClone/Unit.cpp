@@ -105,7 +105,7 @@ Unit::Unit(const Faction& owningFaction, const glm::vec3 & startingPosition, con
 	m_target(),
 	m_lineOfSightTimer(TIME_BETWEEN_LINE_OF_SIGHT, true)
 {
-	moveTo(destinationPosition, map, [&](const glm::ivec2& position) { return getAllAdjacentPositions(position, map); });
+	moveTo(destinationPosition, map, [&](const glm::ivec2& position) { return getAdjacentPositions(position, map); });
 }
 
 bool Unit::isPathEmpty() const
@@ -134,7 +134,7 @@ void Unit::setTarget(eFactionController targetFaction, int targetID)
 	m_target.set(targetFaction, targetID);
 }
 
-void Unit::moveTo(const glm::vec3& destinationPosition, const Map& map, const GetAllAdjacentPositions& getAdjacentPositions, 
+void Unit::moveTo(const glm::vec3& destinationPosition, const Map& map, const AdjacentPositions& adjacentPositions, 
 	eUnitState state)
 {
 	glm::vec3 closestDestination = m_position;
@@ -144,7 +144,7 @@ void Unit::moveTo(const glm::vec3& destinationPosition, const Map& map, const Ge
 	}
 
 	m_pathToPosition.clear();
-	PathFinding::getInstance().getPathToPosition(*this, destinationPosition, m_pathToPosition, getAdjacentPositions);
+	PathFinding::getInstance().getPathToPosition(*this, destinationPosition, m_pathToPosition, adjacentPositions);
 	PathFinding::getInstance().convertPathToWaypoints(m_pathToPosition, *this, m_owningFaction.getUnits(), map);
 	if (!m_pathToPosition.empty())
 	{
@@ -200,7 +200,7 @@ void Unit::update(float deltaTime, FactionHandler& factionHandler, const Map& ma
 					else
 					{
 						moveTo(targetEntity->getPosition(), map, [&](const glm::ivec2& position)
-							{ return getAllAdjacentPositions(position, map, m_owningFaction.getUnits(), *this); });
+							{ return getAdjacentPositions(position, map, m_owningFaction.getUnits(), *this); });
 					}
 
 					m_target.set(opposingFaction->getController(), targetEntity->getID());
@@ -226,7 +226,7 @@ void Unit::update(float deltaTime, FactionHandler& factionHandler, const Map& ma
 						if (!isTargetInLineOfSight(m_position, targetEntity, map))
 						{
 							moveTo(targetEntity->getPosition(), map, [&](const glm::ivec2& position)
-							{ return getAllAdjacentPositions(position, map, m_owningFaction.getUnits(), *this); }, eUnitState::Moving);
+							{ return getAdjacentPositions(position, map, m_owningFaction.getUnits(), *this); }, eUnitState::Moving);
 						}
 						else
 						{
@@ -294,7 +294,7 @@ void Unit::update(float deltaTime, FactionHandler& factionHandler, const Map& ma
 						!isTargetInLineOfSight(m_position, targetEntity, map))
 					{
 						moveTo(targetEntity->getPosition(), map, [&](const glm::ivec2& position)
-							{ return getAllAdjacentPositions(position, map, m_owningFaction.getUnits(), *this); });
+							{ return getAdjacentPositions(position, map, m_owningFaction.getUnits(), *this); });
 					}
 					else if (Globals::getSqrDistance(targetEntity->getPosition(), m_position) <= UNIT_ATTACK_RANGE * UNIT_ATTACK_RANGE)
 					{

@@ -36,7 +36,7 @@ namespace
                         mineralToHarvest->getAABB(), mineralToHarvest->getPosition(), map);
 
                     static_cast<Worker*>(selectedUnit)->moveTo(destination, map,
-                        [&](const glm::ivec2& position) { return getAllAdjacentPositions(position, map); },
+                        [&](const glm::ivec2& position) { return getAdjacentPositions(position, map); },
                         eUnitState::MovingToMinerals, &(*mineralToHarvest));
                 }
             }
@@ -67,13 +67,13 @@ namespace
 
                     selectedUnit->moveTo(Globals::convertToNodePosition(mouseToGroundPosition - (averagePosition - selectedUnit->getPosition())), map,
                         [&](const glm::ivec2& position)
-                    { return getAllAdjacentPositions(position, map, units, *selectedUnit, selectedUnits); }, state);
+                    { return getAdjacentPositions(position, map, units, *selectedUnit, selectedUnits); }, state);
                 }
                 break;
                 case eEntityType::Worker:
                     selectedUnit->resetTarget();
                     static_cast<Worker*>(selectedUnit)->moveTo(mouseToGroundPosition - (averagePosition - selectedUnit->getPosition()), map,
-                        [&](const glm::ivec2& position) { return getAllAdjacentPositions(position, map); });
+                        [&](const glm::ivec2& position) { return getAdjacentPositions(position, map); });
                     break;
                 default:
                     assert(false);
@@ -217,7 +217,7 @@ void FactionPlayer::moveSingularSelectedUnit(const glm::vec3& mouseToGroundPosit
         selectedUnit->resetTarget();
        
         selectedUnit->moveTo(Globals::convertToNodePosition(mouseToGroundPosition), map,
-            [&](const glm::ivec2& position) { return getAllAdjacentPositions(position, map, m_units, *selectedUnit); }, 
+            [&](const glm::ivec2& position) { return getAdjacentPositions(position, map, m_units, *selectedUnit); }, 
             (m_attackMoveSelected ? eUnitState::AttackMoving : eUnitState::Moving));
     }
     else
@@ -237,12 +237,12 @@ void FactionPlayer::moveSingularSelectedUnit(const glm::vec3& mouseToGroundPosit
         {
             selectedWorker->moveTo(PathFinding::getInstance().getClosestPositionOutsideAABB(selectedWorker->getPosition(),
                 mineralToHarvest->getAABB(), mineralToHarvest->getPosition(), map), 
-                map, [&](const glm::ivec2& position) { return getAllAdjacentPositions(position, map); },
+                map, [&](const glm::ivec2& position) { return getAdjacentPositions(position, map); },
                 eUnitState::MovingToMinerals, &(*mineralToHarvest));
         }
         else
         {
-            selectedWorker->moveTo(mouseToGroundPosition, map, [&](const glm::ivec2& position) { return getAllAdjacentPositions(position, map); });
+            selectedWorker->moveTo(mouseToGroundPosition, map, [&](const glm::ivec2& position) { return getAdjacentPositions(position, map); });
         }
     }
 }
@@ -282,7 +282,7 @@ void FactionPlayer::instructWorkerReturnMinerals(const Map& map)
         if (worker.isSelected() && worker.isHoldingResources())
         {
             glm::vec3 destination = PathFinding::getInstance().getClosestPositionOutsideAABB(worker.getPosition(), m_HQ.getAABB(), m_HQ.getPosition(), map);
-            worker.moveTo(destination, map, [&](const glm::ivec2& position) { return getAllAdjacentPositions(position, map); },
+            worker.moveTo(destination, map, [&](const glm::ivec2& position) { return getAdjacentPositions(position, map); },
                 eUnitState::ReturningMineralsToHQ);
         }
     }
@@ -294,7 +294,7 @@ void FactionPlayer::instructUnitToAttack(Unit& unit, const Entity& targetEntity,
     if (unit.getCurrentState() != eUnitState::AttackingTarget)
     {
         unit.moveTo(targetEntity.getPosition(), map,
-            [&](const glm::ivec2& position) { return getAllAdjacentPositions(position, map, m_units, unit); });
+            [&](const glm::ivec2& position) { return getAdjacentPositions(position, map, m_units, unit); });
     }
 }
 

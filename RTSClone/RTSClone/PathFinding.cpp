@@ -165,7 +165,7 @@ const std::vector<glm::vec3>& PathFinding::getFormationPositions(const glm::vec3
 		glm::ivec2 position = m_frontier.front();
 		m_frontier.pop();
 
-		std::array<AdjacentPosition, ALL_DIRECTIONS_ON_GRID.size()> adjacentPositions = getAllAdjacentPositions(position, map);
+		std::array<AdjacentPosition, ALL_DIRECTIONS_ON_GRID.size()> adjacentPositions = getAdjacentPositions(position, map);
 		for (const auto& adjacentPosition : adjacentPositions)
 		{
 			if (adjacentPosition.valid)
@@ -209,7 +209,7 @@ glm::vec3 PathFinding::getClosestAvailablePosition(const glm::vec3& startingPosi
 		glm::ivec2 position = m_frontier.front();
 		m_frontier.pop();
 
-		std::array<AdjacentPosition, ALL_DIRECTIONS_ON_GRID.size()> adjacentPositions = getAllAdjacentPositions(position, map, units, workers);
+		std::array<AdjacentPosition, ALL_DIRECTIONS_ON_GRID.size()> adjacentPositions = getAdjacentPositions(position, map, units, workers);
 		for (const auto& adjacentPosition : adjacentPositions)
 		{
 			if (adjacentPosition.valid)
@@ -264,7 +264,7 @@ glm::vec3 PathFinding::getClosestPositionOutsideAABB(const glm::vec3& entityPosi
 }
 
 void PathFinding::getPathToPosition(const Unit& unit, const glm::vec3& destination, std::vector<glm::vec3>& pathToPosition, 
-	const GetAllAdjacentPositions& getAdjacentPositions)
+	const AdjacentPositions& getAdjacentPositions)
 {
 	assert(getAdjacentPositions && pathToPosition.empty());
 

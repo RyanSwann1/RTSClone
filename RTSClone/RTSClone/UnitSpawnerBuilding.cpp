@@ -58,6 +58,7 @@ bool UnitSpawnerBuilding::isWaypointActive() const
 
 const glm::vec3& UnitSpawnerBuilding::getWaypointPosition() const
 {
+	assert(isWaypointActive());
 	return m_waypointPosition;
 }
 

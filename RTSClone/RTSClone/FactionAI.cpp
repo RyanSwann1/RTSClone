@@ -151,7 +151,7 @@ void FactionAI::update(float deltaTime, const Map & map, FactionHandler& faction
 				glm::vec3 destination = PathFinding::getInstance().getClosestPositionOutsideAABB(worker.getPosition(),
 					mineralToHarvest.getAABB(), mineralToHarvest.getPosition(), map);
 
-				worker.moveTo(destination, map, [&](const glm::ivec2& position) { return getAllAdjacentPositions(position, map); },
+				worker.moveTo(destination, map, [&](const glm::ivec2& position) { return getAdjacentPositions(position, map); },
 					eUnitState::MovingToMinerals, &mineralToHarvest);
 			}
 		}
@@ -163,7 +163,7 @@ void FactionAI::update(float deltaTime, const Map & map, FactionHandler& faction
 				if (unit.getCurrentState() == eUnitState::Idle)
 				{
 					unit.moveTo(m_targetFaction->getHQPosition(), map, [&](const glm::ivec2& position)
-					{ return getAllAdjacentPositions(position, map, m_units, unit); }, eUnitState::AttackMoving);
+					{ return getAdjacentPositions(position, map, m_units, unit); }, eUnitState::AttackMoving);
 				}
 			}
 		}
@@ -243,7 +243,7 @@ bool FactionAI::isBuildingSpawnAvailable(const glm::vec3& startingPosition, eEnt
 		glm::ivec2 position = m_frontier.front();
 		m_frontier.pop();
 
-		std::array<AdjacentPosition, ALL_DIRECTIONS_ON_GRID.size()> adjacentPositions = getAllAdjacentPositions(position, map);
+		std::array<AdjacentPosition, ALL_DIRECTIONS_ON_GRID.size()> adjacentPositions = getAdjacentPositions(position, map);
 		for (const auto& adjacentPosition : adjacentPositions)
 		{
 			if (adjacentPosition.valid)
