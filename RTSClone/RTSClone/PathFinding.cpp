@@ -89,6 +89,73 @@ namespace
 			assert(isPathWithinSizeLimit(pathToPosition));
 		}
 	}
+
+	void convertPathToWaypoints(std::vector<glm::vec3>& pathToPosition, const Unit& unit, const std::list<Unit>& units,
+		const Map& map)
+	{
+		if (pathToPosition.size() <= size_t(1))
+		{
+			return;
+		}
+
+		std::queue<glm::vec3> positionsToKeep;
+		int positionIndex = 0;
+		glm::vec3 startingPosition = unit.getPosition();
+		while (startingPosition != pathToPosition.front() && positionIndex < pathToPosition.size())
+		{
+			glm::vec3 targetPosition = pathToPosition[positionIndex];
+			glm::vec3 position = startingPosition;
+			float distance = glm::distance(targetPosition, startingPosition);
+			constexpr float step = 0.1f;
+			bool collision = false;
+
+			for (int ray = 0; ray <= std::ceil(distance / step); ++ray)
+			{
+				position = position + glm::normalize(targetPosition - startingPosition) * step;
+
+				auto cIter = std::find_if(units.cbegin(), units.cend(), [&position, &unit](const auto& otherUnit)
+				{
+					return unit.getID() != otherUnit.getID() && otherUnit.getAABB().contains(position);
+				});
+
+				if (cIter != units.cend() || map.isPositionOccupied(position))
+				{
+					collision = true;
+					break;
+				}
+			}
+
+			if (!collision)
+			{
+				positionsToKeep.push(pathToPosition[positionIndex]);
+				startingPosition = pathToPosition[positionIndex];
+				positionIndex = 0;
+
+				//TODO: Due to duplications - need to investigate
+				if (positionsToKeep.size() > pathToPosition.size())
+				{
+					return;
+				}
+			}
+			else
+			{
+				++positionIndex;
+			}
+		}
+
+		if (!positionsToKeep.empty())
+		{
+			pathToPosition.clear();
+			while (!positionsToKeep.empty())
+			{
+				const glm::vec3& positionToKeep = positionsToKeep.front();
+				pathToPosition.push_back(positionToKeep);
+				positionsToKeep.pop();
+			}
+
+			std::reverse(pathToPosition.begin(), pathToPosition.end());
+		}
+	}
 }
 
 PathFinding::PathFinding()
@@ -264,7 +331,7 @@ glm::vec3 PathFinding::getClosestPositionOutsideAABB(const glm::vec3& entityPosi
 }
 
 void PathFinding::getPathToPosition(const Unit& unit, const glm::vec3& destination, std::vector<glm::vec3>& pathToPosition, 
-	const AdjacentPositions& getAdjacentPositions)
+	const AdjacentPositions& getAdjacentPositions, const std::list<Unit>& units, const Map& map)
 {
 	assert(getAdjacentPositions && pathToPosition.empty());
 
@@ -348,71 +415,6 @@ void PathFinding::getPathToPosition(const Unit& unit, const glm::vec3& destinati
 	{	
 		getPathFromClosedQueue(pathToPosition, startingPositionOnGrid, closestAvailablePosition, m_closedQueue);
 	}
-}
 
-void PathFinding::convertPathToWaypoints(std::vector<glm::vec3>& pathToPosition, const Unit& unit, const std::list<Unit>& units,
-	const Map& map)
-{
-	if (pathToPosition.size() <= size_t(1))
-	{
-		return;
-	}
-
-	std::queue<glm::vec3> positionsToKeep;
-	int positionIndex = 0;
-	glm::vec3 startingPosition = unit.getPosition();
-	while (startingPosition != pathToPosition.front() && positionIndex < pathToPosition.size()) 
-	{
-		glm::vec3 targetPosition = pathToPosition[positionIndex];
-		glm::vec3 position = startingPosition;
-		float distance = glm::distance(targetPosition, startingPosition);
-		constexpr float step = 0.1f;
-		bool collision = false;
-
-		for (int ray = 0; ray <= std::ceil(distance / step); ++ray)
-		{
-			position = position + glm::normalize(targetPosition - startingPosition) * step;
-
-			auto cIter = std::find_if(units.cbegin(), units.cend(), [&position, &unit](const auto& otherUnit)
-			{
-				return unit.getID() != otherUnit.getID() && otherUnit.getAABB().contains(position);
-			});
-
-			if (cIter != units.cend() || map.isPositionOccupied(position))
-			{
-				collision = true;
-				break;
-			}
-		}
-
-		if (!collision)
-		{
-			positionsToKeep.push(pathToPosition[positionIndex]);
-			startingPosition = pathToPosition[positionIndex];
-			positionIndex = 0;
-
-			//TODO: Due to duplications - need to investigate
-			if (positionsToKeep.size() > pathToPosition.size())
-			{
-				return;
-			}
-		}
-		else
-		{
-			++positionIndex;
-		}
-	}
-
-	if (!positionsToKeep.empty())
-	{
-		pathToPosition.clear();
-		while (!positionsToKeep.empty())
-		{
-			const glm::vec3& positionToKeep = positionsToKeep.front();
-			pathToPosition.push_back(positionToKeep);
-			positionsToKeep.pop();
-		}
-
-		std::reverse(pathToPosition.begin(), pathToPosition.end());
-	}
+	convertPathToWaypoints(pathToPosition, unit, units, map);
 }

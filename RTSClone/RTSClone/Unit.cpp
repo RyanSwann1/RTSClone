@@ -144,8 +144,8 @@ void Unit::moveTo(const glm::vec3& destinationPosition, const Map& map, const Ad
 	}
 
 	m_pathToPosition.clear();
-	PathFinding::getInstance().getPathToPosition(*this, destinationPosition, m_pathToPosition, adjacentPositions);
-	PathFinding::getInstance().convertPathToWaypoints(m_pathToPosition, *this, m_owningFaction.getUnits(), map);
+	PathFinding::getInstance().getPathToPosition(*this, destinationPosition, m_pathToPosition, adjacentPositions, 
+		m_owningFaction.getUnits(), map);
 	if (!m_pathToPosition.empty())
 	{
 		switchToState(state);
@@ -265,7 +265,6 @@ void Unit::update(float deltaTime, FactionHandler& factionHandler, const Map& ma
 		break;
 	case eUnitState::AttackingTarget:
 		assert(m_target.getID() != Globals::INVALID_ENTITY_ID);
-
 		if (m_attackTimer.isExpired())
 		{
 			if (factionHandler.isFactionActive(m_target.getFactionController()))

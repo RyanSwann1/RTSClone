@@ -14,6 +14,7 @@
 #include <functional>
 #include <list>
 
+class Entity;
 class Worker;
 class Unit;
 class Map;
@@ -88,10 +89,7 @@ public:
 		const Map& map);
 
 	void getPathToPosition(const Unit& unit, const glm::vec3& destination, std::vector<glm::vec3>& pathToPosition, 
-		const AdjacentPositions& getAdjacentPositions);
-
-	void convertPathToWaypoints(std::vector<glm::vec3>& pathToPosition, const Unit& unit, const std::list<Unit>& units, 
-		const Map& map);
+		const AdjacentPositions& getAdjacentPositions, const std::list<Unit>& units, const Map& map);
 
 private:
 	PathFinding();
