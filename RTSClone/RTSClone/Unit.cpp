@@ -118,7 +118,6 @@ void Unit::moveTo(const glm::vec3& destinationPosition, const Map& map, const Ad
 		closestDestination = m_pathToPosition.back();
 	}
 
-	m_pathToPosition.clear();
 	PathFinding::getInstance().getPathToPosition(*this, destinationPosition, m_pathToPosition, adjacentPositions, 
 		m_owningFaction.getUnits(), map);
 	if (!m_pathToPosition.empty())
@@ -306,10 +305,8 @@ void Unit::switchToState(eUnitState newState, const Map& map, const Entity* targ
 		m_target.reset();
 		break;
 	case eUnitState::AttackingTarget:
-		if (!Globals::isOnMiddlePosition(m_position))
+		if (!Globals::isOnMiddlePosition(m_position) && targetEntity)
 		{
-			assert(targetEntity);
-			m_pathToPosition.clear();
 			m_pathToPosition.emplace_back(PathFinding::getInstance().getClosestPositionFromUnitToTarget(*this, *targetEntity, m_pathToPosition,
 				map, [&](const glm::ivec2& position) { return getAdjacentPositions(position, map, m_owningFaction.getUnits(), *this); }));
 		}
