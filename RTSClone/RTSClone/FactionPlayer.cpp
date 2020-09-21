@@ -16,6 +16,72 @@
 
 namespace
 {
+    void handleSelectedUnits(std::vector<Unit*>& selectedUnits, const glm::vec3& mouseToGroundPosition, const Map& map,
+        const std::array<Mineral, Globals::MAX_MINERALS_PER_FACTION>& minerals, bool attackMoveSelected, const std::list<Unit>& units)
+    {
+        assert(!selectedUnits.empty());
+
+        auto mineralToHarvest = std::find_if(minerals.cbegin(), minerals.cend(), [&mouseToGroundPosition](const auto& mineral)
+        {
+            return mineral.getAABB().contains(mouseToGroundPosition);
+        });
+
+        if (mineralToHarvest != minerals.cend())
+        {
+            for (auto& selectedUnit : selectedUnits)
+            {
+                if (selectedUnit->getEntityType() == eEntityType::Worker)
+                {
+                    glm::vec3 destination = PathFinding::getInstance().getClosestPositionOutsideAABB(selectedUnit->getPosition(),
+                        mineralToHarvest->getAABB(), mineralToHarvest->getPosition(), map);
+
+                    static_cast<Worker*>(selectedUnit)->moveTo(destination, map,
+                        [&](const glm::ivec2& position) { return getAllAdjacentPositions(position, map); },
+                        eUnitState::MovingToMinerals, &(*mineralToHarvest));
+                }
+            }
+        }
+        else
+        {
+            std::sort(selectedUnits.begin(), selectedUnits.end(), [](const auto& unitA, const auto& unitB)
+            {
+                return glm::all(glm::lessThan(unitA->getPosition(), unitB->getPosition()));
+            });
+
+            glm::vec3 total(0.0f, 0.0f, 0.0f);
+            for (const auto& selectedUnit : selectedUnits)
+            {
+                total += selectedUnit->getPosition();
+            }
+
+            glm::vec3 averagePosition = { total.x / selectedUnits.size(), total.y / selectedUnits.size(), total.z / selectedUnits.size() };
+
+            for (auto& selectedUnit : selectedUnits)
+            {
+                switch (selectedUnit->getEntityType())
+                {
+                case eEntityType::Unit:
+                {
+                    selectedUnit->resetTarget();
+                    eUnitState state = (attackMoveSelected ? eUnitState::AttackMoving : eUnitState::Moving);
+
+                    selectedUnit->moveTo(Globals::convertToNodePosition(mouseToGroundPosition - (averagePosition - selectedUnit->getPosition())), map,
+                        [&](const glm::ivec2& position)
+                    { return getAllAdjacentPositions(position, map, units, *selectedUnit, selectedUnits); }, state);
+                }
+                break;
+                case eEntityType::Worker:
+                    selectedUnit->resetTarget();
+                    static_cast<Worker*>(selectedUnit)->moveTo(mouseToGroundPosition - (averagePosition - selectedUnit->getPosition()), map,
+                        [&](const glm::ivec2& position) { return getAllAdjacentPositions(position, map); });
+                    break;
+                default:
+                    assert(false);
+                }
+            }
+        }
+    }
+
     bool isOneUnitSelected(const std::list<Unit>& units, const std::list<Worker>& workers, const Entity** selectedEntity = nullptr)
     {
         int unitSelectedCount = 0;
@@ -149,9 +215,10 @@ void FactionPlayer::moveSingularSelectedUnit(const glm::vec3& mouseToGroundPosit
     if (selectedUnit != m_units.end())
     {
         selectedUnit->resetTarget();
-        eUnitState state = (m_attackMoveSelected ? eUnitState::AttackMoving : eUnitState::Moving);
+       
         selectedUnit->moveTo(Globals::convertToNodePosition(mouseToGroundPosition), map,
-            [&](const glm::ivec2& position) { return getAllAdjacentPositions(position, map, m_units, *selectedUnit); }, state);
+            [&](const glm::ivec2& position) { return getAllAdjacentPositions(position, map, m_units, *selectedUnit); }, 
+            (m_attackMoveSelected ? eUnitState::AttackMoving : eUnitState::Moving));
     }
     else
     {
@@ -161,23 +228,17 @@ void FactionPlayer::moveSingularSelectedUnit(const glm::vec3& mouseToGroundPosit
         assert(selectedWorker != m_workers.end());
         selectedWorker->resetTarget();
 
-        const Mineral* mineralToHarvest = nullptr;
-        for (const auto& mineral : m_minerals)
+        auto mineralToHarvest = std::find_if(m_minerals.cbegin(), m_minerals.cend(), [&mouseToGroundPosition](const auto& mineral)
         {
-            if (mineral.getAABB().contains(mouseToGroundPosition))
-            {
-                mineralToHarvest = &mineral;
-                break;
-            }
-        }
+            return mineral.getAABB().contains(mouseToGroundPosition);
+        });
 
-        if (mineralToHarvest)
+        if (mineralToHarvest != m_minerals.cend())
         {
-            glm::vec3 destination = PathFinding::getInstance().getClosestPositionOutsideAABB(selectedWorker->getPosition(),
-                mineralToHarvest->getAABB(), mineralToHarvest->getPosition(), map);
-            
-            selectedWorker->moveTo(destination, map, [&](const glm::ivec2& position) { return getAllAdjacentPositions(position, map); },
-                eUnitState::MovingToMinerals, mineralToHarvest);
+            selectedWorker->moveTo(PathFinding::getInstance().getClosestPositionOutsideAABB(selectedWorker->getPosition(),
+                mineralToHarvest->getAABB(), mineralToHarvest->getPosition(), map), 
+                map, [&](const glm::ivec2& position) { return getAllAdjacentPositions(position, map); },
+                eUnitState::MovingToMinerals, &(*mineralToHarvest));
         }
         else
         {
@@ -208,84 +269,7 @@ void FactionPlayer::moveMultipleSelectedUnits(const glm::vec3& mouseToGroundPosi
     
     if (!m_selectedUnits.empty())
     {
-        assert(!isOneUnitSelected(m_units, m_workers));
-        AABB selectionBoxAABB(m_selectedUnits);
-        if (selectionBoxAABB.contains(mouseToGroundPosition))
-        {
-            std::vector<glm::vec3> unitFormationPositions = PathFinding::getInstance().getFormationPositions(mouseToGroundPosition,
-                m_selectedUnits, map);
-
-            if (unitFormationPositions.size() == m_selectedUnits.size())
-            {
-                for (int i = 0; i < unitFormationPositions.size(); ++i)
-                {
-                    m_selectedUnits[i]->moveTo(unitFormationPositions[i], map,
-                        [&](const glm::ivec2& position) { return getAllAdjacentPositions(position, map); });
-                }
-            }
-        }
-        else
-        {
-            auto mineralToHarvest = std::find_if(m_minerals.cbegin(), m_minerals.cend(), [&mouseToGroundPosition](const auto& mineral)
-            {
-                return mineral.getAABB().contains(mouseToGroundPosition);
-            });
-
-            if (mineralToHarvest != m_minerals.cend())
-            {
-                for(auto& selectedUnit : m_selectedUnits)
-                {
-                    if (selectedUnit->getEntityType() == eEntityType::Worker)
-                    {
-                        glm::vec3 destination = PathFinding::getInstance().getClosestPositionOutsideAABB(selectedUnit->getPosition(),
-                            mineralToHarvest->getAABB(), mineralToHarvest->getPosition(), map);
-
-                        static_cast<Worker*>(selectedUnit)->moveTo(destination, map, 
-                            [&](const glm::ivec2& position) { return getAllAdjacentPositions(position, map); },
-                            eUnitState::MovingToMinerals, &(*mineralToHarvest));
-                    }
-                }
-            }
-            else
-            {
-                std::sort(m_selectedUnits.begin(), m_selectedUnits.end(), [](const auto& unitA, const auto& unitB)
-                {
-                    return glm::all(glm::lessThan(unitA->getPosition(), unitB->getPosition()));
-                });
-
-                glm::vec3 total(0.0f, 0.0f, 0.0f);
-                for (const auto& selectedUnit : m_selectedUnits)
-                {
-                    total += selectedUnit->getPosition();
-                }
-
-                glm::vec3 averagePosition = { total.x / m_selectedUnits.size(), total.y / m_selectedUnits.size(), total.z / m_selectedUnits.size() };
-
-                for (auto& selectedUnit : m_selectedUnits)
-                {
-                    switch (selectedUnit->getEntityType())
-                    {
-                    case eEntityType::Unit:
-                    {
-                        selectedUnit->resetTarget();
-                        eUnitState state = (m_attackMoveSelected ? eUnitState::AttackMoving : eUnitState::Moving);
-
-                        selectedUnit->moveTo(Globals::convertToNodePosition(mouseToGroundPosition - (averagePosition - selectedUnit->getPosition())), map,
-                            [&](const glm::ivec2& position)
-                        { return getAllAdjacentPositions(position, map, m_units, *selectedUnit, m_selectedUnits); }, state);
-                    }
-                        break;
-                    case eEntityType::Worker:
-                        selectedUnit->resetTarget();
-                        static_cast<Worker*>(selectedUnit)->moveTo(mouseToGroundPosition - (averagePosition - selectedUnit->getPosition()), map,
-                            [&](const glm::ivec2& position) { return getAllAdjacentPositions(position, map); });
-                        break;
-                    default:
-                        assert(false);
-                    }
-                }
-            }
-        }
+        handleSelectedUnits(m_selectedUnits, mouseToGroundPosition, map, m_minerals, m_attackMoveSelected, m_units);
     }
 
     m_selectedUnits.clear();
