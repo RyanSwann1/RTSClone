@@ -17,6 +17,7 @@ public:
 	
 	void handleEvent(const GameEvent& gameEvent, const Map& map) override;
 	void update(float deltaTime, const Map& map, FactionHandler& factionHandler) override;
+	void updateSelectionBox(EntityTarget& selectedTargetGUI);
 	void render(ShaderHandler& shaderHandler) const override;
 	void renderSelectionBox(const sf::Window& window) const;
 

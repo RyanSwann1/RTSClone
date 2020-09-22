@@ -193,6 +193,26 @@ void FactionPlayer::update(float deltaTime, const Map& map, FactionHandler& fact
         { getCurrentResourceAmount(), getCurrentPopulationAmount(), getMaximumPopulationAmount() });
 }
 
+void FactionPlayer::updateSelectionBox(EntityTarget& selectedTargetGUI)
+{
+    if (m_selectionBox.active && m_selectionBox.isMinimumSize())
+    {
+        selectUnits<Unit>(m_units, m_selectionBox);
+        selectUnits<Worker>(m_workers, m_selectionBox);
+
+        const Entity* selectedEntity = nullptr;
+        if (isOneUnitSelected(m_units, m_workers, &selectedEntity))
+        {
+            assert(selectedEntity);
+            selectedTargetGUI.set(getController(), selectedEntity->getID());
+        }
+        else
+        {
+            selectedTargetGUI.reset();
+        }
+    }
+}
+
 void FactionPlayer::render(ShaderHandler& shaderHandler) const
 {
     Faction::render(shaderHandler);
@@ -420,19 +440,7 @@ void FactionPlayer::onMouseMove(const sf::Window& window, const Camera& camera, 
     if (m_selectionBox.active)
     {
         m_selectionBox.setSize(camera.getMouseToGroundPosition(window));
-        selectUnits<Unit>(m_units, m_selectionBox);
-        selectUnits<Worker>(m_workers, m_selectionBox);
 
-        const Entity* selectedEntity = nullptr;
-        if (isOneUnitSelected(m_units, m_workers, &selectedEntity))
-        {
-            assert(selectedEntity);
-            selectedTargetGUI.set(getController(), selectedEntity->getID());
-        }
-        else if(m_selectionBox.isMinimumSize())
-        {
-            selectedTargetGUI.reset();
-        }
     }
     else if (m_plannedBuilding.isActive())
     {

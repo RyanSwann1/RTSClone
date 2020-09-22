@@ -228,6 +228,11 @@ void Level::update(float deltaTime, const Map& map)
 		}
 	}
 	
+	if (m_factionHandler.isFactionActive(eFactionController::Player))
+	{
+		static_cast<FactionPlayer&>(*m_factions[static_cast<int>(eFactionController::Player)]).updateSelectionBox(m_selectedTargetGUI);
+	}
+
 	m_projectileHandler.update(deltaTime, m_factionHandler);
 	GameEventHandler::getInstance().handleEvents(*this, map);
 	handleGUI();
