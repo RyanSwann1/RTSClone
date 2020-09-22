@@ -10,6 +10,7 @@ Entity::Entity(const glm::vec3& startingPosition, eEntityType entityType, int he
 	: m_position(0.0f, 0.0f, 0.0f),
 	m_AABB(),
 	m_ID(UniqueEntityIDDistributer::getInstance().getUniqueEntityID()),
+	m_maximumHealth(health),
 	m_health(health),
 	m_type(entityType),
 	m_selected(false)
@@ -86,6 +87,7 @@ Entity::Entity(Entity&& orig) noexcept
 	m_selected(orig.m_selected)
 {
 #ifdef GAME
+	m_maximumHealth = orig.m_maximumHealth;
 	m_health = orig.m_health;
 	m_type = orig.m_type;
 #endif // GAME
@@ -102,6 +104,7 @@ Entity& Entity::operator=(Entity&& orig) noexcept
 	m_AABB = std::move(orig.m_AABB);
 	m_ID = orig.m_ID;
 #ifdef GAME
+	m_maximumHealth = orig.m_maximumHealth;
 	m_health = orig.m_health;
 	m_type = orig.m_type;
 #endif // GAME
@@ -123,6 +126,11 @@ int Entity::getID() const
 eEntityType Entity::getEntityType() const
 {
 	return m_type;
+}
+
+int Entity::getMaximumHealth() const
+{
+	return m_maximumHealth;
 }
 
 int Entity::getHealth() const

@@ -31,6 +31,7 @@ public:
 #endif // LEVEL_EDITOR
 #ifdef GAME
 	eEntityType getEntityType() const;
+	int getMaximumHealth() const;
 	int getHealth() const;
 	void reduceHealth(int damage);
 	bool isDead() const;
@@ -56,6 +57,7 @@ protected:
 private:
 	int m_ID;
 #ifdef GAME
+	int m_maximumHealth;
 	int m_health;
 	eEntityType m_type;
 #endif // GAME
