@@ -17,13 +17,12 @@ namespace
         };
     };
 
-    constexpr float MINIMUM_SIZE = 5.0f;
+    constexpr float MINIMUM_SIZE = 1.5f;
 };
 
 SelectionBox::SelectionBox()
     : AABB(),
     active(false),
-    mouseToGroundPosition(),
     startingPositionScreenPosition(),
     startingPositionWorldPosition(),
     vaoID(Globals::INVALID_OPENGL_ID),
@@ -44,19 +43,19 @@ SelectionBox::~SelectionBox()
 
 bool SelectionBox::isMinimumSize() const
 {
-    return Globals::getSqrDistance(mouseToGroundPosition, startingPositionWorldPosition) >= MINIMUM_SIZE;
+    return (AABB.getRight() - AABB.getLeft() >= MINIMUM_SIZE) || 
+        (AABB.getForward() - AABB.getBack() >= MINIMUM_SIZE);
 }
 
-void SelectionBox::setStartingPosition(const sf::Window& window, const glm::vec3& position)
+void SelectionBox::setStartingPosition(const sf::Window& window, const glm::vec3& mouseToGroundPosition)
 {
-    startingPositionWorldPosition = position;
+    startingPositionWorldPosition = mouseToGroundPosition;
     startingPositionScreenPosition = { sf::Mouse::getPosition(window).x, sf::Mouse::getPosition(window).y };
     active = true;
 }
 
-void SelectionBox::setSize(const glm::vec3& position)
+void SelectionBox::setSize(const glm::vec3& mouseToGroundPosition)
 {
-    mouseToGroundPosition = position;
     AABB.reset(startingPositionWorldPosition, mouseToGroundPosition - startingPositionWorldPosition);
 }
 
