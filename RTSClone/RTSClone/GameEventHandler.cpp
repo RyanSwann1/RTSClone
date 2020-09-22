@@ -25,6 +25,7 @@ void GameEventHandler::handleEvents(Level & level, const Map & map)
 		case eGameEventType::FactionEliminated:
 		case eGameEventType::SpawnUnit:
 		case eGameEventType::ActivatePlayerPlannedBuilding:
+		case eGameEventType::RepairEntity:
 			level.handleEvent(gameEvent, map);
 			break;
 		default:

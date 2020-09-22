@@ -138,6 +138,7 @@ void Level::handleEvent(const GameEvent& gameEvent, const Map& map)
 	case eGameEventType::RemovePlannedBuilding:
 	case eGameEventType::RemoveAllWorkerPlannedBuildings:
 	case eGameEventType::AddResources:
+	case eGameEventType::RepairEntity:
 		if (m_factionHandler.isFactionActive(gameEvent.senderFaction))
 		{
 			m_factions[static_cast<int>(gameEvent.senderFaction)]->handleEvent(gameEvent, map);

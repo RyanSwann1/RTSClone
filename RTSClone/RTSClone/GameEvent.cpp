@@ -56,7 +56,7 @@ GameEvent::GameEvent(eGameEventType gameEventType, eFactionController senderFact
 	entityType()
 {
 	assert(gameEventType == eGameEventType::RemoveAllWorkerPlannedBuildings ||
-		gameEventType == eGameEventType::AddResources);
+		gameEventType == eGameEventType::AddResources || gameEventType == eGameEventType::RepairEntity);
 }
 
 GameEvent::GameEvent(eGameEventType gameEventType, eFactionController senderFaction, int senderID, 

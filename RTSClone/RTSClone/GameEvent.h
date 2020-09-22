@@ -17,7 +17,8 @@ enum class eGameEventType
 	RevalidateMovementPaths,
 	FactionEliminated,
 	SpawnUnit,
-	ActivatePlayerPlannedBuilding
+	ActivatePlayerPlannedBuilding,
+	RepairEntity
 };
 
 struct GameEvent
