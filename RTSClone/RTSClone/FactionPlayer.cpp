@@ -17,7 +17,8 @@
 namespace
 {
     void handleSelectedUnits(std::vector<Unit*>& selectedUnits, const glm::vec3& mouseToGroundPosition, const Map& map,
-        const std::array<Mineral, Globals::MAX_MINERALS_PER_FACTION>& minerals, bool attackMoveSelected, const std::list<Unit>& units)
+        const std::array<Mineral, Globals::MAX_MINERALS_PER_FACTION>& minerals, bool attackMoveSelected, const std::list<Unit>& units,
+        const std::vector<Entity*>& entities)
     {
         assert(!selectedUnits.empty());
 
@@ -35,9 +36,34 @@ namespace
                     glm::vec3 destination = PathFinding::getInstance().getClosestPositionOutsideAABB(selectedUnit->getPosition(),
                         mineralToHarvest->getAABB(), mineralToHarvest->getPosition(), map);
 
-                    static_cast<Worker*>(selectedUnit)->moveTo(destination, map,
+                    static_cast<Worker&>(*selectedUnit).moveTo(destination, map,
                         [&](const glm::ivec2& position) { return getAdjacentPositions(position, map); },
                         eUnitState::MovingToMinerals, &(*mineralToHarvest));
+                }
+            }
+
+            return;
+        }
+        
+        auto selectedEntity = std::find_if(entities.cbegin(), entities.cend(), [&mouseToGroundPosition](const auto& entity)
+        {
+            return entity->getAABB().contains(mouseToGroundPosition);
+        });
+
+        if (selectedEntity != entities.cend())
+        {
+            for (auto& selectedUnit : selectedUnits)
+            {
+                if (selectedUnit->getEntityType() == eEntityType::Worker && 
+                    (*selectedEntity)->getID() != selectedUnit->getID() &&
+                    (*selectedEntity)->getHealth() < (*selectedEntity)->getMaximumHealth())
+                {
+                    glm::vec3 destination = PathFinding::getInstance().getClosestPositionOutsideAABB(selectedUnit->getPosition(),
+                        (*selectedEntity)->getAABB(), (*selectedEntity)->getPosition(), map);
+
+                    static_cast<Worker&>(*selectedUnit).moveTo(destination, map, 
+                        [&](const glm::ivec2& position) { return getAdjacentPositions(position, map); },
+                        eUnitState::MovingToRepairPosition);
                 }
             }
         }
@@ -270,13 +296,28 @@ void FactionPlayer::moveSingularSelectedUnit(const glm::vec3& mouseToGroundPosit
         {
             return mineral.getAABB().contains(mouseToGroundPosition);
         });
-
         if (mineralToHarvest != m_minerals.cend())
         {
             selectedWorker->moveTo(PathFinding::getInstance().getClosestPositionOutsideAABB(selectedWorker->getPosition(),
                 mineralToHarvest->getAABB(), mineralToHarvest->getPosition(), map), 
                 map, [&](const glm::ivec2& position) { return getAdjacentPositions(position, map); },
                 eUnitState::MovingToMinerals, &(*mineralToHarvest));
+            
+            return;
+        }
+
+        int selectedWorkerID = selectedWorker->getID();
+        auto selectedEntity = std::find_if(m_allEntities.cbegin(), m_allEntities.cend(), [&mouseToGroundPosition, selectedWorkerID](const auto& entity)
+        {
+            return entity->getAABB().contains(mouseToGroundPosition) && entity->getID() != selectedWorkerID;
+        });
+        if (selectedEntity != m_allEntities.cend() &&
+            (*selectedEntity)->getHealth() < (*selectedEntity)->getMaximumHealth())
+        {
+            selectedWorker->moveTo(PathFinding::getInstance().getClosestPositionOutsideAABB(selectedWorker->getPosition(),
+                (*selectedEntity)->getAABB(), (*selectedEntity)->getPosition(), map),
+                map, [&](const glm::ivec2& position) { return getAdjacentPositions(position, map); },
+                eUnitState::MovingToRepairPosition);
         }
         else
         {
@@ -307,7 +348,7 @@ void FactionPlayer::moveMultipleSelectedUnits(const glm::vec3& mouseToGroundPosi
     
     if (!m_selectedUnits.empty())
     {
-        handleSelectedUnits(m_selectedUnits, mouseToGroundPosition, map, m_minerals, m_attackMoveSelected, m_units);
+        handleSelectedUnits(m_selectedUnits, mouseToGroundPosition, map, m_minerals, m_attackMoveSelected, m_units, m_allEntities);
     }
 
     m_selectedUnits.clear();
@@ -428,10 +469,6 @@ void FactionPlayer::onRightClick(const sf::Window& window, const Camera& camera,
     {
         m_HQ.setWaypointPosition(mouseToGroundPosition);
     }
-    else if (m_HQ.getAABB().contains(mouseToGroundPosition))
-    {
-        instructWorkerReturnMinerals(map);
-    }
     else
     {
         for (auto& barracks : m_barracks)
@@ -449,6 +486,11 @@ void FactionPlayer::onRightClick(const sf::Window& window, const Camera& camera,
         else
         {
             moveMultipleSelectedUnits(mouseToGroundPosition, map);
+        }
+
+        if (m_HQ.getAABB().contains(mouseToGroundPosition))
+        {
+            instructWorkerReturnMinerals(map);
         }
     }
 }
