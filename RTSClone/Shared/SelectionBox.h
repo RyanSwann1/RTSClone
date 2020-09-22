@@ -5,11 +5,14 @@
 #include "AABB.h"
 #include <SFML/Graphics.hpp>
 
-struct SelectionBox : private NonCopyable, private NonMovable
+class SelectionBox : private NonCopyable, private NonMovable
 {
+public:
 	SelectionBox();
 	~SelectionBox();
 
+	const AABB& getAABB() const;
+	bool isActive() const;
 	bool isMinimumSize() const;
 
 	void setStartingPosition(const sf::Window& window, const glm::vec3& mouseToGroundPosition);
@@ -17,12 +20,11 @@ struct SelectionBox : private NonCopyable, private NonMovable
 	void reset();
 	void render(const sf::Window& window) const;
 
-	AABB AABB;
-	bool active;
-	glm::vec2 startingPositionScreenPosition;
-	glm::vec3 startingPositionWorldPosition;
-
 private:
-	unsigned int vaoID;
-	unsigned int vboID;
+	AABB m_AABB;
+	bool m_active;
+	glm::vec2 m_startingPositionScreenPosition;
+	glm::vec3 m_startingPositionWorldPosition;
+	unsigned int m_vaoID;
+	unsigned int m_vboID;
 };

@@ -195,7 +195,7 @@ void FactionPlayer::update(float deltaTime, const Map& map, FactionHandler& fact
 
 void FactionPlayer::updateSelectionBox(EntityTarget& selectedTargetGUI)
 {
-    if (m_selectionBox.active && m_selectionBox.isMinimumSize())
+    if (m_selectionBox.isActive() && m_selectionBox.isMinimumSize())
     {
         selectUnits<Unit>(m_units, m_selectionBox);
         selectUnits<Worker>(m_workers, m_selectionBox);
@@ -437,7 +437,7 @@ void FactionPlayer::onRightClick(const sf::Window& window, const Camera& camera,
 
 void FactionPlayer::onMouseMove(const sf::Window& window, const Camera& camera, const Map& map)
 {
-    if (m_selectionBox.active)
+    if (m_selectionBox.isActive())
     {
         m_selectionBox.setSize(camera.getMouseToGroundPosition(window));
 

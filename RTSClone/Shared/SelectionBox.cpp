@@ -21,60 +21,70 @@ namespace
 };
 
 SelectionBox::SelectionBox()
-    : AABB(),
-    active(false),
-    startingPositionScreenPosition(),
-    startingPositionWorldPosition(),
-    vaoID(Globals::INVALID_OPENGL_ID),
-    vboID(Globals::INVALID_OPENGL_ID)
+    : m_AABB(),
+    m_active(false),
+    m_startingPositionScreenPosition(),
+    m_startingPositionWorldPosition(),
+    m_vaoID(Globals::INVALID_OPENGL_ID),
+    m_vboID(Globals::INVALID_OPENGL_ID)
 {
-    glGenVertexArrays(1, &vaoID);
-    glGenBuffers(1, &vboID);
+    glGenVertexArrays(1, &m_vaoID);
+    glGenBuffers(1, &m_vboID);
 }
 
 SelectionBox::~SelectionBox()
 {
-    assert(vaoID != Globals::INVALID_OPENGL_ID);
-    glDeleteVertexArrays(1, &vaoID);
+    assert(m_vaoID != Globals::INVALID_OPENGL_ID);
+    glDeleteVertexArrays(1, &m_vaoID);
 
-    assert(vboID != Globals::INVALID_OPENGL_ID);
-    glDeleteBuffers(1, &vboID);
+    assert(m_vboID != Globals::INVALID_OPENGL_ID);
+    glDeleteBuffers(1, &m_vboID);
+}
+
+const AABB& SelectionBox::getAABB() const
+{
+    return m_AABB;
+}
+
+bool SelectionBox::isActive() const
+{
+    return m_active;
 }
 
 bool SelectionBox::isMinimumSize() const
 {
-    return (AABB.getRight() - AABB.getLeft() >= MINIMUM_SIZE) || 
-        (AABB.getForward() - AABB.getBack() >= MINIMUM_SIZE);
+    return (m_AABB.getRight() - m_AABB.getLeft() >= MINIMUM_SIZE) || 
+        (m_AABB.getForward() - m_AABB.getBack() >= MINIMUM_SIZE);
 }
 
 void SelectionBox::setStartingPosition(const sf::Window& window, const glm::vec3& mouseToGroundPosition)
 {
-    startingPositionWorldPosition = mouseToGroundPosition;
-    startingPositionScreenPosition = { sf::Mouse::getPosition(window).x, sf::Mouse::getPosition(window).y };
-    active = true;
+    m_startingPositionWorldPosition = mouseToGroundPosition;
+    m_startingPositionScreenPosition = { sf::Mouse::getPosition(window).x, sf::Mouse::getPosition(window).y };
+    m_active = true;
 }
 
 void SelectionBox::setSize(const glm::vec3& mouseToGroundPosition)
 {
-    AABB.reset(startingPositionWorldPosition, mouseToGroundPosition - startingPositionWorldPosition);
+    m_AABB.reset(m_startingPositionWorldPosition, mouseToGroundPosition - m_startingPositionWorldPosition);
 }
 
 void SelectionBox::reset()
 {
-    active = false;
-    AABB.reset();
+    m_active = false;
+    m_AABB.reset();
 }
 
 void SelectionBox::render(const sf::Window& window) const
 {
-    if (active && isMinimumSize())
+    if (m_active && isMinimumSize())
     {
         glm::vec2 endingPosition = { sf::Mouse::getPosition(window).x, sf::Mouse::getPosition(window).y };
-        std::array<glm::ivec2, 6> quadCoords = getSelectionBoxQuadCoords(startingPositionScreenPosition,
-            endingPosition - startingPositionScreenPosition);
+        std::array<glm::ivec2, 6> quadCoords = getSelectionBoxQuadCoords(m_startingPositionScreenPosition,
+            endingPosition - m_startingPositionScreenPosition);
 
-        glBindVertexArray(vaoID);
-        glBindBuffer(GL_ARRAY_BUFFER, vboID);
+        glBindVertexArray(m_vaoID);
+        glBindBuffer(GL_ARRAY_BUFFER, m_vboID);
         glBufferData(GL_ARRAY_BUFFER, quadCoords.size() * sizeof(glm::ivec2), quadCoords.data(), GL_STATIC_DRAW);
 
         glEnableVertexAttribArray(0);

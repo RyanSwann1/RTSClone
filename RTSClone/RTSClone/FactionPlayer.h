@@ -85,7 +85,7 @@ private:
 	{
 		for (auto& unit : units)
 		{
-			unit.setSelected(m_selectionBox.AABB.contains(unit.getAABB()));
+			unit.setSelected(m_selectionBox.getAABB().contains(unit.getAABB()));
 		}
 	}
 };
