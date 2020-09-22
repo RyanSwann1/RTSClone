@@ -160,7 +160,7 @@ void FactionPlayer::handleInput(const sf::Event& currentSFMLEvent, const sf::Win
         }
         break;
     case sf::Event::MouseMoved:
-        onMouseMove(window, camera, selectedTargetGUI, map);
+        onMouseMove(window, camera, map);
         break;
     case sf::Event::KeyPressed:
         switch (currentSFMLEvent.key.code)
@@ -435,7 +435,7 @@ void FactionPlayer::onRightClick(const sf::Window& window, const Camera& camera,
     }
 }
 
-void FactionPlayer::onMouseMove(const sf::Window& window, const Camera& camera, EntityTarget& selectedTargetGUI, const Map& map)
+void FactionPlayer::onMouseMove(const sf::Window& window, const Camera& camera, const Map& map)
 {
     if (m_selectionBox.active)
     {

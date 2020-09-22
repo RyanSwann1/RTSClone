@@ -37,8 +37,7 @@ private:
 	void onLeftClick(const sf::Window& window, const Camera& camera, const Map& map, EntityTarget& selectedTargetGUI);
 	void onRightClick(const sf::Window& window, const Camera& camera,
 		const std::vector<const Faction*>& opposingFactions, const Map& map);
-	void onMouseMove(const sf::Window& window, const Camera& camera, EntityTarget& selectedTargetGUI,
-		const Map& map);
+	void onMouseMove(const sf::Window& window, const Camera& camera, const Map& map);
 
 	template <class Entity>
 	void selectEntity(std::list<Entity>& entities, const glm::vec3& mouseToGroundPosition, bool selectAllEntities = false,
