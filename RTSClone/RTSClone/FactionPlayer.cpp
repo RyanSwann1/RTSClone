@@ -61,6 +61,9 @@ namespace
                     glm::vec3 destination = PathFinding::getInstance().getClosestPositionOutsideAABB(selectedUnit->getPosition(),
                         (*selectedEntity)->getAABB(), (*selectedEntity)->getPosition(), map);
 
+                    Worker& selectedWorker = static_cast<Worker&>(*selectedUnit);
+                    selectedWorker.setRepairTargetEntity((*selectedEntity)->getID());
+
                     static_cast<Worker&>(*selectedUnit).moveTo(destination, map, 
                         [&](const glm::ivec2& position) { return getAdjacentPositions(position, map); },
                         eUnitState::MovingToRepairPosition);
@@ -314,6 +317,7 @@ void FactionPlayer::moveSingularSelectedUnit(const glm::vec3& mouseToGroundPosit
         if (selectedEntity != m_allEntities.cend() &&
             (*selectedEntity)->getHealth() < (*selectedEntity)->getMaximumHealth())
         {
+            selectedWorker->setRepairTargetEntity((*selectedEntity)->getID());
             selectedWorker->moveTo(PathFinding::getInstance().getClosestPositionOutsideAABB(selectedWorker->getPosition(),
                 (*selectedEntity)->getAABB(), (*selectedEntity)->getPosition(), map),
                 map, [&](const glm::ivec2& position) { return getAdjacentPositions(position, map); },

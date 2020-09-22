@@ -314,6 +314,19 @@ void Faction::handleEvent(const GameEvent& gameEvent, const Map& map)
             addUnitToSpawn(gameEvent.entityType, map, static_cast<UnitSpawnerBuilding&>(*(*entity)));
         }
     }
+    break;
+    case eGameEventType::RepairEntity:
+    {
+        int entityID = gameEvent.senderID;
+        auto entity = std::find_if(m_allEntities.begin(), m_allEntities.end(), [entityID](const auto& entity)
+        {
+            return entity->getID() == entityID;
+        });
+        if (entity != m_allEntities.end())
+        {
+            (*entity)->repair();
+        }
+    }
         break;
     }
 }

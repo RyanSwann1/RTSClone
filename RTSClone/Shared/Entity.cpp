@@ -145,7 +145,15 @@ void Entity::reduceHealth(int damage)
 
 bool Entity::isDead() const
 {
-	return m_health == 0;
+	return m_health <= 0;
+}
+
+void Entity::repair()
+{
+	if (m_health < m_maximumHealth)
+	{
+		++m_health;
+	}
 }
 #endif // GAME
 

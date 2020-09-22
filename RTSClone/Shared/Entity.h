@@ -35,6 +35,7 @@ public:
 	int getHealth() const;
 	void reduceHealth(int damage);
 	bool isDead() const;
+	void repair();
 #endif // GAME
 	int getID() const;
 	const glm::vec3& getPosition() const;
