@@ -146,6 +146,7 @@ void Worker::update(float deltaTime, const UnitSpawnerBuilding& HQ, const Map& m
 		}
 		break;
 	case eUnitState::Building:
+	{
 		assert(m_pathToPosition.empty() && !m_buildingCommands.empty());
 		m_buildTimer.update(deltaTime);
 		m_buildTimer.setActive(true);
@@ -167,10 +168,10 @@ void Worker::update(float deltaTime, const UnitSpawnerBuilding& HQ, const Map& m
 			GameEventHandler::getInstance().addEvent({ eGameEventType::RemoveAllWorkerPlannedBuildings, m_owningFaction.getController(), getID() });
 			clearBuildingCommands();
 		}
-		
+
 		if (!m_buildingCommands.empty())
 		{
-			moveTo(m_buildingCommands.front().buildPosition, map, 
+			moveTo(m_buildingCommands.front().buildPosition, map,
 				[&](const glm::ivec2& position) { return getAdjacentPositions(position, map); }, eUnitState::MovingToBuildingPosition);
 		}
 		else
@@ -187,7 +188,15 @@ void Worker::update(float deltaTime, const UnitSpawnerBuilding& HQ, const Map& m
 				switchToState(eUnitState::Idle, map);
 			}
 		}
+	}
 
+		break;
+	case eUnitState::MovingToRepairPosition:
+		if (m_pathToPosition.empty())
+		{
+			std::cout << "Now Repairing\n";
+			switchToState(eUnitState::Idle, map);
+		}
 		break;
 	}
 }
@@ -196,7 +205,8 @@ void Worker::moveTo(const glm::vec3& destinationPosition, const Map& map, const 
 	eUnitState state, const Mineral* mineralToHarvest)
 {
 	assert(state == eUnitState::Moving || state == eUnitState::MovingToBuildingPosition || 
-		state == eUnitState::MovingToMinerals || state == eUnitState::ReturningMineralsToHQ);
+		state == eUnitState::MovingToMinerals || state == eUnitState::ReturningMineralsToHQ || 
+		state == eUnitState::MovingToRepairPosition);
 
 	if (state != eUnitState::MovingToBuildingPosition && !m_buildingCommands.empty())
 	{

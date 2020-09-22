@@ -22,7 +22,8 @@ enum class eUnitState
 	Harvesting,
 	MovingToBuildingPosition,
 	AttackingTarget,
-	Building
+	Building,
+	MovingToRepairPosition
 };
 
 class Faction;

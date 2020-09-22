@@ -301,6 +301,7 @@ void Unit::switchToState(eUnitState newState, const Map& map, const Entity* targ
 	case eUnitState::MovingToMinerals:
 	case eUnitState::ReturningMineralsToHQ:
 	case eUnitState::MovingToBuildingPosition:
+	case eUnitState::MovingToRepairPosition:
 	case eUnitState::Building:
 		m_target.reset();
 		break;
