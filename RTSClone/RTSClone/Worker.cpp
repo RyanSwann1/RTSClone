@@ -8,10 +8,12 @@
 #include "SupplyDepot.h"
 #include "GameEventHandler.h"
 #include "GameEvent.h"
+#include "FactionHandler.h"
 
 namespace
 {
 	constexpr float HARVEST_TIME = 2.0f;
+	constexpr float REPAIR_TIME = 3.5f;
 	constexpr float BUILD_TIME = 2.0f;
 	constexpr float MOVEMENT_SPEED = 7.5f;
 	constexpr int RESOURCE_CAPACITY = 30;
@@ -33,6 +35,7 @@ Worker::Worker(const Faction& owningFaction, const glm::vec3& startingPosition)
 	m_currentResourceAmount(0),
 	m_harvestTimer(HARVEST_TIME, false),
 	m_buildTimer(BUILD_TIME, false),
+	m_repairTimer(REPAIR_TIME, false),
 	m_mineralToHarvest(nullptr)
 {}
 
@@ -42,6 +45,7 @@ Worker::Worker(const Faction& owningFaction, const glm::vec3 & startingPosition,
 	m_currentResourceAmount(0),
 	m_harvestTimer(HARVEST_TIME, false),
 	m_buildTimer(BUILD_TIME, false),
+	m_repairTimer(REPAIR_TIME, false),
 	m_mineralToHarvest(nullptr)
 {
 	moveTo(destinationPosition, map,
@@ -64,6 +68,12 @@ int Worker::extractResources()
 	int resources = m_currentResourceAmount;
 	m_currentResourceAmount = 0;
 	return resources;
+}
+
+void Worker::setRepairTargetEntity(int entityID)
+{
+	assert(entityID != Globals::INVALID_ENTITY_ID);
+	m_repairTargetEntityID = entityID;
 }
 
 bool Worker::build(const std::function<const Entity*(Worker&)>& buildingCommand, const glm::vec3& buildPosition, const Map& map)
@@ -194,8 +204,30 @@ void Worker::update(float deltaTime, const UnitSpawnerBuilding& HQ, const Map& m
 	case eUnitState::MovingToRepairPosition:
 		if (m_pathToPosition.empty())
 		{
-			std::cout << "Now Repairing\n";
-			switchToState(eUnitState::Idle, map);
+			switchToState(eUnitState::Repairing, map);
+		}
+		break;
+	case eUnitState::Repairing:
+		assert(m_pathToPosition.empty() && m_repairTargetEntityID != Globals::INVALID_ENTITY_ID);
+		m_repairTimer.setActive(true);
+		m_repairTimer.update(deltaTime);
+		if (m_repairTimer.isExpired())
+		{	
+			m_repairTimer.resetElaspedTime();
+
+			assert(factionHandler.isFactionActive(m_owningFaction.getController()));
+			const Entity* targetEntity = factionHandler.getFaction(m_owningFaction.getController()).getEntity(m_repairTargetEntityID);
+			if (targetEntity && targetEntity->getHealth() < targetEntity->getMaximumHealth())
+			{
+				GameEventHandler::getInstance().addEvent(
+					{ eGameEventType::RepairEntity, m_owningFaction.getController(), m_repairTargetEntityID });
+			}
+			else
+			{
+				m_repairTimer.setActive(false);
+				switchToState(eUnitState::Idle, map);
+				m_repairTargetEntityID = Globals::INVALID_ENTITY_ID;
+			}
 		}
 		break;
 	}

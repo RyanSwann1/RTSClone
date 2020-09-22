@@ -28,6 +28,7 @@ public:
 	bool isHoldingResources() const;
 	int extractResources();	
 
+	void setRepairTargetEntity(int entityID);
 	bool build(const std::function<const Entity*(Worker&)>& buildingCommand, const glm::vec3& buildPosition, const Map& map);
 	void update(float deltaTime, const UnitSpawnerBuilding& HQ, const Map& map, FactionHandler& factionHandler);
 	void moveTo(const glm::vec3& destinationPosition, const Map& map, const AdjacentPositions& adjacentPositions,
@@ -36,9 +37,11 @@ public:
 
 private:
 	std::queue<BuildingCommand> m_buildingCommands;
+	int m_repairTargetEntityID;
 	int m_currentResourceAmount;
 	Timer m_harvestTimer;
 	Timer m_buildTimer;
+	Timer m_repairTimer;
 	const Mineral* m_mineralToHarvest;
 
 	void clearBuildingCommands();
