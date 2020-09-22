@@ -7,19 +7,6 @@
 
 namespace
 {
-    const TypeComparison<eEntityType> BUILDING_TYPES =
-    {
-        {eEntityType::HQ,
-        eEntityType::SupplyDepot,
-        eEntityType::Barracks}
-    }; 
-
-    const TypeComparison<eEntityType> UNIT_TYPES =
-    {
-        {eEntityType::Unit,
-        eEntityType::Worker}
-    };
-
     std::array<Mineral, Globals::MAX_MINERALS_PER_FACTION> getMinerals(
         const std::array<glm::vec3, Globals::MAX_MINERALS_PER_FACTION>& mineralPositions)
     {
@@ -103,8 +90,8 @@ const Entity* Faction::getEntity(const glm::vec3& position, float maxDistance, b
                 closestEntity = entity;
                 closestEntityDistance = distance;
             }
-            else if (closestEntity && BUILDING_TYPES.isMatch(closestEntity->getEntityType()) && 
-                UNIT_TYPES.isMatch(entity->getEntityType()) &&
+            else if (closestEntity && Globals::BUILDING_TYPES.isMatch(closestEntity->getEntityType()) && 
+                Globals::UNIT_TYPES.isMatch(entity->getEntityType()) &&
                 Globals::getSqrDistance(entity->getPosition(), position) < maxDistance * maxDistance)
             {
                 closestEntity = entity;

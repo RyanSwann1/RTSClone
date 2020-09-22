@@ -16,6 +16,7 @@ void GameEventHandler::handleEvents(Level & level, const Map & map)
 		const GameEvent& gameEvent = m_gameEvents.front();
 		switch (gameEvent.type)
 		{
+		default:
 		case eGameEventType::Attack:
 		case eGameEventType::RemovePlannedBuilding:
 		case eGameEventType::RemoveAllWorkerPlannedBuildings:
@@ -27,9 +28,6 @@ void GameEventHandler::handleEvents(Level & level, const Map & map)
 		case eGameEventType::PlayerActivatePlannedBuilding:
 		case eGameEventType::RepairEntity:
 			level.handleEvent(gameEvent, map);
-			break;
-		default:
-			assert(false); 
 		}
 
 		m_gameEvents.pop();
