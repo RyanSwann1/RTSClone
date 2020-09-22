@@ -82,6 +82,24 @@ namespace
         }
     }
 
+    bool isOnlyOneEntitySelected(const std::vector<Entity*>& entities)
+    {
+        int entitySelectedCount = 0;
+        for (const auto& entity : entities)
+        {
+            if (entity->isSelected())
+            {
+                ++entitySelectedCount;
+                if (entitySelectedCount > 1)
+                {
+                    return false;
+                }
+            }
+        }
+
+        return entitySelectedCount == 1;
+    }
+
     bool isOneUnitSelected(const std::list<Unit>& units, const std::list<Worker>& workers, const Entity** selectedEntity = nullptr)
     {
         int unitSelectedCount = 0;
@@ -206,7 +224,7 @@ void FactionPlayer::updateSelectionBox(EntityTarget& selectedTargetGUI)
             assert(selectedEntity);
             selectedTargetGUI.set(getController(), selectedEntity->getID());
         }
-        else
+        else if(!isOnlyOneEntitySelected(m_allEntities))
         {
             selectedTargetGUI.reset();
         }
