@@ -129,7 +129,8 @@ void Level::handleEvent(const GameEvent& gameEvent, const Map& map)
 	switch (gameEvent.type)
 	{
 	case eGameEventType::Attack:
-		if (m_factions[static_cast<int>(gameEvent.targetFaction)])
+	case eGameEventType::SpawnUnit:
+		if (m_factionHandler.isFactionActive(gameEvent.targetFaction))
 		{
 			m_factions[static_cast<int>(gameEvent.targetFaction)]->handleEvent(gameEvent, map);
 		}
@@ -137,7 +138,7 @@ void Level::handleEvent(const GameEvent& gameEvent, const Map& map)
 	case eGameEventType::RemovePlannedBuilding:
 	case eGameEventType::RemoveAllWorkerPlannedBuildings:
 	case eGameEventType::AddResources:
-		if (m_factions[static_cast<int>(gameEvent.senderFaction)])
+		if (m_factionHandler.isFactionActive(gameEvent.senderFaction))
 		{
 			m_factions[static_cast<int>(gameEvent.senderFaction)]->handleEvent(gameEvent, map);
 		}
@@ -156,23 +157,17 @@ void Level::handleEvent(const GameEvent& gameEvent, const Map& map)
 		break;
 	case eGameEventType::FactionEliminated:
 	{
-		assert(m_factions[static_cast<int>(gameEvent.senderFaction)] &&
+		assert(m_factionHandler.isFactionActive(gameEvent.senderFaction) &&
 			m_factions[static_cast<int>(gameEvent.senderFaction)]->getController() == gameEvent.senderFaction);
 
 		m_factions[static_cast<int>(gameEvent.senderFaction)].reset();
 		setAITargetFaction();
 	}	
 		break;
-	case eGameEventType::SpawnUnit:
-		if (m_factions[static_cast<int>(gameEvent.targetFaction)])
-		{
-			m_factions[static_cast<int>(gameEvent.targetFaction)]->handleEvent(gameEvent, map);
-		}
-		break;
 	case eGameEventType::ActivatePlayerPlannedBuilding:
-		if (m_factions[static_cast<int>(gameEvent.targetFaction)])
+		if (m_factionHandler.isFactionActive(eFactionController::Player))
 		{
-			m_factions[static_cast<int>(gameEvent.targetFaction)]->handleEvent(gameEvent, map);
+			m_factions[static_cast<int>(eFactionController::Player)]->handleEvent(gameEvent, map);
 		}
 		break;
 	default:
@@ -211,7 +206,7 @@ void Level::handleInput(const sf::Window& window, const Camera& camera, const sf
 		}
 	}
 
-	if (m_factions[static_cast<int>(eFactionController::Player)])
+	if (m_factionHandler.isFactionActive(eFactionController::Player))
 	{
 		static_cast<FactionPlayer&>(*m_factions[static_cast<int>(eFactionController::Player)]).handleInput(
 			currentSFMLEvent, window, camera, map, m_factionHandler.getOpposingFactions(eFactionController::Player), m_selectedTargetGUI);
@@ -240,7 +235,7 @@ void Level::update(float deltaTime, const Map& map)
 
 void Level::renderSelectionBox(const sf::Window& window) const
 {
-	if (m_factions[static_cast<int>(eFactionController::Player)])
+	if (m_factionHandler.isFactionActive(eFactionController::Player))
 	{
 		static_cast<FactionPlayer&>(*m_factions[static_cast<int>(eFactionController::Player)]).renderSelectionBox(window);
 	}
