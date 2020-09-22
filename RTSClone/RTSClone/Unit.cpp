@@ -315,6 +315,7 @@ void Unit::switchToState(eUnitState newState, const Map& map, const Entity* targ
 	case eUnitState::AttackMoving:
 	case eUnitState::Moving:
 	case eUnitState::Harvesting:
+	case eUnitState::Repairing:
 		break;
 	default:
 		assert(false);

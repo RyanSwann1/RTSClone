@@ -23,7 +23,8 @@ enum class eUnitState
 	MovingToBuildingPosition,
 	AttackingTarget,
 	Building,
-	MovingToRepairPosition
+	MovingToRepairPosition,
+	Repairing
 };
 
 class Faction;
