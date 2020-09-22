@@ -429,7 +429,7 @@ void FactionPlayer::onMouseMove(const sf::Window& window, const Camera& camera, 
             assert(selectedEntity);
             selectedTargetGUI.set(getController(), selectedEntity->getID());
         }
-        else
+        else if(m_selectionBox.isMinimumSize())
         {
             selectedTargetGUI.reset();
         }
