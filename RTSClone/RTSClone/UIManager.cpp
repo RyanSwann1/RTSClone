@@ -93,13 +93,13 @@ void SelectedEntityWidget::render(const sf::Window& window)
 				case eEntityType::HQ:
 					if (ImGui::Button("Spawn Worker"))
 					{
-						GameEventHandler::getInstance().addEvent({ eGameEventType::SpawnUnit, eEntityType::Worker, m_receivedMessage.entityID });
+						GameEventHandler::getInstance().addEvent({ eGameEventType::PlayerSpawnUnit, eEntityType::Worker, m_receivedMessage.entityID });
 					}
 					break;
 				case eEntityType::Barracks:
 					if (ImGui::Button("Spawn Unit"))
 					{
-						GameEventHandler::getInstance().addEvent({ eGameEventType::SpawnUnit, eEntityType::Unit, m_receivedMessage.entityID });
+						GameEventHandler::getInstance().addEvent({ eGameEventType::PlayerSpawnUnit, eEntityType::Unit, m_receivedMessage.entityID });
 					}
 					break;
 				default:
@@ -118,13 +118,13 @@ void SelectedEntityWidget::render(const sf::Window& window)
 				if (ImGui::Button("Barracks"))
 				{
 					GameEventHandler::getInstance().addEvent(
-						{ eGameEventType::ActivatePlayerPlannedBuilding, eEntityType::Barracks, m_receivedMessage.entityID });
+						{ eGameEventType::PlayerActivatePlannedBuilding, eEntityType::Barracks, m_receivedMessage.entityID });
 				}
 
 				if (ImGui::Button("Supply Depot"))
 				{
 					GameEventHandler::getInstance().addEvent(
-						{ eGameEventType::ActivatePlayerPlannedBuilding, eEntityType::SupplyDepot, m_receivedMessage.entityID });
+						{ eGameEventType::PlayerActivatePlannedBuilding, eEntityType::SupplyDepot, m_receivedMessage.entityID });
 				}
 			}
 		}

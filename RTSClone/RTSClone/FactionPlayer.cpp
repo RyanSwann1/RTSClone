@@ -319,7 +319,7 @@ void FactionPlayer::handleEvent(const GameEvent& gameEvent, const Map& map)
 
     switch (gameEvent.type)
     {
-    case eGameEventType::ActivatePlayerPlannedBuilding:
+    case eGameEventType::PlayerActivatePlannedBuilding:
         m_plannedBuilding.set(gameEvent);
         break;
     }

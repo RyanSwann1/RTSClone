@@ -23,8 +23,8 @@ void GameEventHandler::handleEvents(Level & level, const Map & map)
 		case eGameEventType::SpawnProjectile:
 		case eGameEventType::RevalidateMovementPaths:
 		case eGameEventType::FactionEliminated:
-		case eGameEventType::SpawnUnit:
-		case eGameEventType::ActivatePlayerPlannedBuilding:
+		case eGameEventType::PlayerSpawnUnit:
+		case eGameEventType::PlayerActivatePlannedBuilding:
 		case eGameEventType::RepairEntity:
 			level.handleEvent(gameEvent, map);
 			break;

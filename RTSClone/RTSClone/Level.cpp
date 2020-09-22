@@ -129,7 +129,6 @@ void Level::handleEvent(const GameEvent& gameEvent, const Map& map)
 	switch (gameEvent.type)
 	{
 	case eGameEventType::Attack:
-	case eGameEventType::SpawnUnit:
 		if (m_factionHandler.isFactionActive(gameEvent.targetFaction))
 		{
 			m_factions[static_cast<int>(gameEvent.targetFaction)]->handleEvent(gameEvent, map);
@@ -165,7 +164,8 @@ void Level::handleEvent(const GameEvent& gameEvent, const Map& map)
 		setAITargetFaction();
 	}	
 		break;
-	case eGameEventType::ActivatePlayerPlannedBuilding:
+	case eGameEventType::PlayerActivatePlannedBuilding:
+	case eGameEventType::PlayerSpawnUnit:
 		if (m_factionHandler.isFactionActive(eFactionController::Player))
 		{
 			m_factions[static_cast<int>(eFactionController::Player)]->handleEvent(gameEvent, map);

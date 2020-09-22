@@ -302,7 +302,7 @@ void Faction::handleEvent(const GameEvent& gameEvent, const Map& map)
     case eGameEventType::RevalidateMovementPaths:
         revalidateExistingUnitPaths(map);
         break;
-    case eGameEventType::SpawnUnit:
+    case eGameEventType::PlayerSpawnUnit:
     {
         int targetEntityID = gameEvent.targetID;
         auto entity = std::find_if(m_allEntities.begin(), m_allEntities.end(), [targetEntityID](const auto& entity)

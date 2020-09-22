@@ -16,8 +16,8 @@ enum class eGameEventType
 	SpawnProjectile,
 	RevalidateMovementPaths,
 	FactionEliminated,
-	SpawnUnit,
-	ActivatePlayerPlannedBuilding,
+	PlayerSpawnUnit,
+	PlayerActivatePlannedBuilding,
 	RepairEntity
 };
 
