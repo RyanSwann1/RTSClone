@@ -5,6 +5,7 @@
 #include "Model.h"
 #include "Globals.h"
 #include "ModelManager.h"
+#include "Faction.h"
 
 namespace
 {
@@ -21,20 +22,38 @@ namespace
 		return position;
 	}
 
+	bool isEntityAffordable(const Faction& owningFaction, int resourceCost, int populationCost)
+	{
+		return owningFaction.getCurrentResourceAmount() >= resourceCost &&
+			owningFaction.getCurrentPopulationAmount() + populationCost <= owningFaction.getMaximumPopulationAmount();
+	}
+
 	constexpr float TIME_BETWEEN_WORKER_SPAWN = 2.0f;
 	constexpr float TIME_BETWEEN_UNIT_SPAWN = 3.0f;
 	constexpr int MAX_UNITS_SPAWNABLE = 5;
 }
 
 //Barracks
-Barracks::Barracks(const glm::vec3& startingPosition)
-	: UnitSpawnerBuilding(startingPosition, eEntityType::Barracks, TIME_BETWEEN_UNIT_SPAWN, Globals::BARRACKS_STARTING_HEALTH)
+Barracks::Barracks(const glm::vec3& startingPosition, const Faction& owningFaction)
+	: UnitSpawnerBuilding(startingPosition, eEntityType::Barracks, TIME_BETWEEN_UNIT_SPAWN, 
+		Globals::BARRACKS_STARTING_HEALTH, owningFaction)
 {}
 
+void Barracks::update(float deltaTime)
+{
+	UnitSpawnerBuilding::update(deltaTime, Globals::UNIT_RESOURCE_COST, Globals::UNIT_POPULATION_COST);
+}
+
 //HQ
-HQ::HQ(const glm::vec3& startingPosition)
-	: UnitSpawnerBuilding(startingPosition, eEntityType::HQ, TIME_BETWEEN_WORKER_SPAWN, Globals::HQ_STARTING_HEALTH)
+HQ::HQ(const glm::vec3& startingPosition, const Faction& owningFaction)
+	: UnitSpawnerBuilding(startingPosition, eEntityType::HQ, TIME_BETWEEN_WORKER_SPAWN, 
+		Globals::HQ_STARTING_HEALTH, owningFaction)
 {}
+
+void HQ::update(float deltaTime)
+{
+	UnitSpawnerBuilding::update(deltaTime, Globals::WORKER_RESOURCE_COST, Globals::WORKER_POPULATION_COST);
+}
 
 UnitSpawnerBuilding::~UnitSpawnerBuilding()
 {
@@ -100,7 +119,7 @@ void UnitSpawnerBuilding::setWaypointPosition(const glm::vec3& position)
 	}
 }
 
-void UnitSpawnerBuilding::update(float deltaTime)
+void UnitSpawnerBuilding::update(float deltaTime, int resourceCost, int populationCost)
 {
 	m_spawnTimer.update(deltaTime);
 	if (m_spawnTimer.isExpired() && !m_unitsToSpawn.empty())
@@ -117,7 +136,13 @@ void UnitSpawnerBuilding::update(float deltaTime)
 		{
 			m_unitsToSpawn.pop_back();
 
-			if (m_unitsToSpawn.empty())
+			if (!m_unitsToSpawn.empty() && 
+				!isEntityAffordable(m_owningFaction, resourceCost, populationCost))
+			{
+				m_unitsToSpawn.clear();
+				m_spawnTimer.setActive(false);
+			}
+			else if (m_unitsToSpawn.empty())
 			{
 				m_spawnTimer.setActive(false);
 			}
@@ -135,11 +160,13 @@ void UnitSpawnerBuilding::render(ShaderHandler& shaderHandler) const
 	Entity::render(shaderHandler);
 }
 
-UnitSpawnerBuilding::UnitSpawnerBuilding(const glm::vec3& startingPosition, eEntityType entityType, float spawnTimerExpirationTime, int health)
+UnitSpawnerBuilding::UnitSpawnerBuilding(const glm::vec3& startingPosition, eEntityType entityType, 
+	float spawnTimerExpirationTime, int health, const Faction& owningFaction)
 	: Entity(startingPosition, entityType, health),
+	m_owningFaction(owningFaction),
+	m_unitsToSpawn(),
 	m_spawnTimer(spawnTimerExpirationTime, false),
-	m_waypointPosition(m_position),
-	m_unitsToSpawn()
+	m_waypointPosition(m_position)
 {
 	m_unitsToSpawn.reserve(static_cast<size_t>(MAX_UNITS_SPAWNABLE));
 	GameMessenger::getInstance().broadcast<GameMessages::MapModification<eGameMessageType::AddEntityToMap>>({ m_AABB });
