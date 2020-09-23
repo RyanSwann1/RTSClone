@@ -32,6 +32,7 @@ BuildingCommand::BuildingCommand(const std::function<const Entity* (Worker&)>& c
 Worker::Worker(const Faction& owningFaction, const glm::vec3& startingPosition)
 	: Unit(owningFaction, startingPosition, eEntityType::Worker, Globals::WORKER_STARTING_HEALTH),
 	m_buildingCommands(),
+	m_repairTargetEntityID(Globals::INVALID_ENTITY_ID),
 	m_currentResourceAmount(0),
 	m_harvestTimer(HARVEST_TIME, false),
 	m_buildTimer(BUILD_TIME, false),
@@ -42,6 +43,7 @@ Worker::Worker(const Faction& owningFaction, const glm::vec3& startingPosition)
 Worker::Worker(const Faction& owningFaction, const glm::vec3 & startingPosition, const glm::vec3 & destinationPosition, const Map & map)
 	: Unit(owningFaction, startingPosition, eEntityType::Worker, Globals::WORKER_STARTING_HEALTH),
 	m_buildingCommands(),
+	m_repairTargetEntityID(Globals::INVALID_ENTITY_ID),
 	m_currentResourceAmount(0),
 	m_harvestTimer(HARVEST_TIME, false),
 	m_buildTimer(BUILD_TIME, false),

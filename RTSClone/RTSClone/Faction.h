@@ -19,6 +19,9 @@ class Faction : private NonMovable, private NonCopyable
 public:
 	virtual ~Faction() {}
 
+	int getCurrentPopulationAmount() const;
+	int getMaximumPopulationAmount() const;
+	int getCurrentResourceAmount() const;
 	const glm::vec3& getHQPosition() const;
 	eFactionController getController() const;
 	const std::list<Unit>& getUnits() const;
@@ -52,9 +55,6 @@ protected:
 	std::list<Barracks> m_barracks;
 	HQ m_HQ;
 
-	int getCurrentPopulationAmount() const;
-	int getMaximumPopulationAmount() const;
-	int getCurrentResourceAmount() const;
 	bool isEntityAffordable(eEntityType entityType) const;
 
 	const Entity* addBuilding(Worker& worker, const Map& map, glm::vec3 position, eEntityType entityType);

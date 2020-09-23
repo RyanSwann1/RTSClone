@@ -8,6 +8,8 @@
 #include "GameMessages.h"
 #include <SFML/Graphics.hpp>
 
+//https://eliasdaler.github.io/using-imgui-with-sfml-pt2/#getting-back-to-the-context-of-the-window-tree-etc
+
 template <class MessageType>
 class Widget : private NonCopyable, private NonMovable
 {

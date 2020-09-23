@@ -36,7 +36,7 @@ Faction::Faction(eFactionController factionController, const glm::vec3& hqStarti
     m_workers(),
     m_supplyDepots(),
     m_barracks(),
-    m_HQ(Globals::convertToNodePosition(hqStartingPosition)),
+    m_HQ(Globals::convertToNodePosition(hqStartingPosition), *this),
     m_controller(factionController),
     m_currentResourceAmount(Globals::STARTING_RESOURCES),
     m_currentPopulationAmount(0),
@@ -479,7 +479,7 @@ const Entity* Faction::addBuilding(Worker& worker, const Map& map, glm::vec3 pos
             }
             break;
         case eEntityType::Barracks:
-            m_barracks.emplace_back(position);
+            m_barracks.emplace_back(position, *this);
             addedBuilding = &m_barracks.back();
             break;
         default:
