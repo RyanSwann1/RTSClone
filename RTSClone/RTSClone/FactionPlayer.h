@@ -28,7 +28,7 @@ private:
 	bool m_attackMoveSelected;
 	std::vector<Unit*> m_selectedUnits;
 	
-	void handleSelectedUnits(const glm::vec3& mouseToGroundPosition, const Map& map);
+	void assignSelectedUnits();
 	void instructWorkerReturnMinerals(const Map& map);
 	void instructUnitToAttack(Unit& Unit, const Entity& targetEntity, eFactionController targetEntityOwningFaction, const Map& map);
 	bool instructWorkerToBuild(const Map& map);

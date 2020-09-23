@@ -365,34 +365,6 @@ void FactionPlayer::renderSelectionBox(const sf::Window& window) const
     m_selectionBox.render(window);
 }
 
-void FactionPlayer::handleSelectedUnits(const glm::vec3& mouseToGroundPosition, const Map& map)
-{
-    assert(m_selectedUnits.empty());
-
-    for (auto& unit : m_units)
-    {
-        if (unit.isSelected())
-        {
-            m_selectedUnits.push_back(&unit);
-        }
-    }
-
-    for (auto& worker : m_workers)
-    {
-        if (worker.isSelected())
-        {
-            m_selectedUnits.push_back(&worker);
-        }
-    }   
-    
-    if (!m_selectedUnits.empty())
-    {
-        moveSelectedUnits(m_selectedUnits, mouseToGroundPosition, map, m_minerals, m_attackMoveSelected, m_units, m_allEntities);
-    }
-
-    m_selectedUnits.clear();
-}
-
 void FactionPlayer::instructWorkerReturnMinerals(const Map& map)
 {
     for (auto& worker : m_workers)
@@ -526,7 +498,11 @@ void FactionPlayer::onRightClick(const sf::Window& window, const Camera& camera,
         }
         else
         {
-            handleSelectedUnits(mouseToGroundPosition, map);
+            assignSelectedUnits();
+            if (!m_selectedUnits.empty())
+            {
+                moveSelectedUnits(m_selectedUnits, mouseToGroundPosition, map, m_minerals, m_attackMoveSelected, m_units, m_allEntities);
+            }
         }
 
         if (m_HQ.getAABB().contains(mouseToGroundPosition))
@@ -546,5 +522,26 @@ void FactionPlayer::onMouseMove(const sf::Window& window, const Camera& camera, 
     else if (m_plannedBuilding.isActive())
     {
         m_plannedBuilding.setPosition(camera.getMouseToGroundPosition(window), map);
+    }
+}
+
+void FactionPlayer::assignSelectedUnits()
+{
+    m_selectedUnits.clear();
+
+    for (auto& unit : m_units)
+    {
+        if (unit.isSelected())
+        {
+            m_selectedUnits.push_back(&unit);
+        }
+    }
+
+    for (auto& worker : m_workers)
+    {
+        if (worker.isSelected())
+        {
+            m_selectedUnits.push_back(&worker);
+        }
     }
 }
