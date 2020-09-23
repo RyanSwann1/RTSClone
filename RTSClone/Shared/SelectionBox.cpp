@@ -23,8 +23,8 @@ namespace
 SelectionBox::SelectionBox()
     : m_AABB(),
     m_active(false),
-    m_startingPositionScreenPosition(),
-    m_startingPositionWorldPosition(),
+    m_screenStartingPosition(),
+    m_worldStartingPosition(),
     m_vaoID(Globals::INVALID_OPENGL_ID),
     m_vboID(Globals::INVALID_OPENGL_ID)
 {
@@ -59,14 +59,14 @@ bool SelectionBox::isMinimumSize() const
 
 void SelectionBox::setStartingPosition(const sf::Window& window, const glm::vec3& mouseToGroundPosition)
 {
-    m_startingPositionWorldPosition = mouseToGroundPosition;
-    m_startingPositionScreenPosition = { sf::Mouse::getPosition(window).x, sf::Mouse::getPosition(window).y };
+    m_worldStartingPosition = mouseToGroundPosition;
+    m_screenStartingPosition = { sf::Mouse::getPosition(window).x, sf::Mouse::getPosition(window).y };
     m_active = true;
 }
 
 void SelectionBox::setSize(const glm::vec3& mouseToGroundPosition)
 {
-    m_AABB.reset(m_startingPositionWorldPosition, mouseToGroundPosition - m_startingPositionWorldPosition);
+    m_AABB.reset(m_worldStartingPosition, mouseToGroundPosition - m_worldStartingPosition);
 }
 
 void SelectionBox::reset()
@@ -80,8 +80,8 @@ void SelectionBox::render(const sf::Window& window) const
     if (m_active && isMinimumSize())
     {
         glm::vec2 endingPosition = { sf::Mouse::getPosition(window).x, sf::Mouse::getPosition(window).y };
-        std::array<glm::ivec2, 6> quadCoords = getSelectionBoxQuadCoords(m_startingPositionScreenPosition,
-            endingPosition - m_startingPositionScreenPosition);
+        std::array<glm::ivec2, 6> quadCoords = getSelectionBoxQuadCoords(m_screenStartingPosition,
+            endingPosition - m_screenStartingPosition);
 
         glBindVertexArray(m_vaoID);
         glBindBuffer(GL_ARRAY_BUFFER, m_vboID);

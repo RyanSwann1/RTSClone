@@ -23,8 +23,8 @@ public:
 private:
 	AABB m_AABB;
 	bool m_active;
-	glm::vec2 m_startingPositionScreenPosition;
-	glm::vec3 m_startingPositionWorldPosition;
+	glm::vec2 m_screenStartingPosition;
+	glm::vec3 m_worldStartingPosition;
 	unsigned int m_vaoID;
 	unsigned int m_vboID;
 };
