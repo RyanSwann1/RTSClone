@@ -245,6 +245,24 @@ namespace
         }
     }
 
+    void moveSelectedUnitsToAttackPosition(std::vector<Unit*>& selectedUnits, const Entity& targetEntity, 
+        eFactionController targetFaction, const Map& map)
+    {
+        assert(!selectedUnits.empty());
+
+        std::sort(selectedUnits.begin(), selectedUnits.end(), [&](const auto& selectedUnitA, const auto& selectedUnitB)
+        {
+            return Globals::getSqrDistance(targetEntity.getPosition(), selectedUnitA->getPosition()) <
+                Globals::getSqrDistance(targetEntity.getPosition(), selectedUnitB->getPosition());
+        });
+        
+        PathFinding::getInstance().clearAttackPositions();
+        for (auto& selectedUnit : selectedUnits)
+        {
+            selectedUnit->moveToAttackPosition(targetEntity, targetFaction, map);
+        }
+    }
+
     bool isOnlyOneEntitySelected(const std::vector<Entity*>& entities)
     {
         int entitySelectedCount = 0;
@@ -455,24 +473,35 @@ void FactionPlayer::onRightClick(const sf::Window& window, const Camera& camera,
 {
     m_plannedBuilding.setActive(false);
     glm::vec3 mouseToGroundPosition = camera.getMouseToGroundPosition(window);
-    eFactionController targetEntityOwningFaction;
+    eFactionController targetEntityFaction;
     const Entity* targetEntity = nullptr;
     for (const auto& faction : opposingFactions)
     {
         targetEntity = faction->getEntity(mouseToGroundPosition);
         if (targetEntity)
         {
-            targetEntityOwningFaction = faction->getController();
+            targetEntityFaction = faction->getController();
             break;
         }
     }
     if (targetEntity)
     {
-        for (auto& unit : m_units)
+        if (!isOneUnitSelected(m_units, m_workers))
         {
-            if (unit.isSelected())
+            assignSelectedUnits();
+            if (!m_selectedUnits.empty())
             {
-                instructUnitToAttack(unit, *targetEntity, targetEntityOwningFaction, map);
+                moveSelectedUnitsToAttackPosition(m_selectedUnits, *targetEntity, targetEntityFaction, map);
+            }
+        }
+        else
+        {
+            for (auto& unit : m_units)
+            {
+                if (unit.isSelected())
+                {
+                    instructUnitToAttack(unit, *targetEntity, targetEntityFaction, map);
+                }
             }
         }
     }
