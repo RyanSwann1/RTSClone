@@ -166,7 +166,12 @@ PathFinding::PathFinding()
 	m_closedQueue(static_cast<size_t>(Globals::MAP_SIZE * Globals::MAP_SIZE))
 {}
 
-bool PathFinding::isPositionAvailable(const glm::vec3& nodePosition, const Map& map, const std::list<Unit>& units, const std::list<Worker>& workers, 
+void PathFinding::clearAttackPositions()
+{
+	m_attackPositions.clear();
+}
+
+bool PathFinding::isPositionAvailable(const glm::vec3& nodePosition, const Map& map, const std::list<Unit>& units, const std::list<Worker>& workers,
 	int senderID) const
 {
 	assert(nodePosition == Globals::convertToNodePosition(nodePosition));
@@ -379,6 +384,69 @@ glm::vec3 PathFinding::getClosestPositionFromUnitToTarget(const Unit& unit, cons
 	}
 
 	return destination;
+}
+
+void PathFinding::setUnitAttackPosition(const Unit& unit, const Entity& targetEntity, std::vector<glm::vec3>& pathToPosition,
+	const Map& map, const std::list<Unit>& units)
+{
+	assert(unit.getID() != targetEntity.getID());
+	
+	pathToPosition.clear();
+	m_openQueue.clear();
+	m_closedQueue.clear();
+
+	glm::ivec2 startingPositionOnGrid = Globals::convertToGridPosition(unit.getPosition());
+	glm::ivec2 targetPositionOnGrid = Globals::convertToGridPosition(targetEntity.getPosition());
+	bool positionFound = false;
+	m_openQueue.add({ startingPositionOnGrid, startingPositionOnGrid, 0.0f,
+	Globals::getSqrDistance(glm::vec2(targetPositionOnGrid), glm::vec2(startingPositionOnGrid)) });
+
+	while (!positionFound && !m_openQueue.isEmpty())
+	{
+		PriorityQueueNode currentNode = m_openQueue.getTop();
+		m_openQueue.popTop();
+
+		if (glm::distance(glm::vec2(targetPositionOnGrid), glm::vec2(currentNode.position)) <
+			unit.getGridAttackRange())
+		{
+			positionFound = true;
+			m_attackPositions.push_back(Globals::convertToWorldPosition(currentNode.position));
+			getPathFromClosedQueue(pathToPosition, startingPositionOnGrid, currentNode, m_closedQueue);
+		}
+		else
+		{
+			for (const auto& adjacentPosition : getAdjacentPositions(currentNode.position, map, m_attackPositions))
+			{
+				if (!adjacentPosition.valid || m_closedQueue.contains(adjacentPosition.position))
+				{
+					continue;
+				}
+				else
+				{
+					float sqrDistance = Globals::getSqrDistance(glm::vec2(targetPositionOnGrid), glm::vec2(adjacentPosition.position));
+					PriorityQueueNode adjacentNode(adjacentPosition.position, currentNode.position,
+						currentNode.g + Globals::getSqrDistance(glm::vec2(adjacentPosition.position), glm::vec2(currentNode.position)),
+						sqrDistance);
+
+					if (m_openQueue.isSuccessorNodeValid(adjacentNode))
+					{
+						m_openQueue.changeNode(adjacentNode);
+					}
+					else if (!m_openQueue.contains(adjacentPosition.position))
+					{
+						m_openQueue.add(adjacentNode);
+					}
+				}
+			}
+		}
+
+		m_closedQueue.add(currentNode);
+
+		assert(isPriorityQueueWithinSizeLimit(m_openQueue) &&
+			isPriorityQueueWithinSizeLimit(m_closedQueue));
+	}
+
+	convertPathToWaypoints(pathToPosition, unit, units, map);
 }
 
 void PathFinding::getPathToPosition(const Unit& unit, const glm::vec3& destination, std::vector<glm::vec3>& pathToPosition, 

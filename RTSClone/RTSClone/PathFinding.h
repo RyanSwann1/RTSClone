@@ -76,6 +76,8 @@ public:
 		return shortestDistancePosition;
 	}
 
+	void clearAttackPositions();
+
 	bool isPositionAvailable(const glm::vec3& nodePosition, const Map& map, const std::list<Unit>& units, const std::list<Worker>& workers, 
 		int senderID = Globals::INVALID_ENTITY_ID) const;
 
@@ -93,6 +95,9 @@ public:
 	glm::vec3 getClosestPositionFromUnitToTarget(const Unit& unit, const Entity& entityTarget, std::vector<glm::vec3>& pathToPosition,
 		const Map& map, const AdjacentPositions& adjacentPositions) const;
 
+	void setUnitAttackPosition(const Unit& unit, const Entity& targetEntity, std::vector<glm::vec3>& pathToPosition,
+		const Map& map, const std::list<Unit>& units);
+
 	void getPathToPosition(const Unit& unit, const glm::vec3& destination, std::vector<glm::vec3>& pathToPosition, 
 		const AdjacentPositions& adjacentPositions, const std::list<Unit>& units, const Map& map);
 
@@ -100,6 +105,7 @@ private:
 	PathFinding();
 
 	std::vector<glm::vec3> m_unitFormationPositions;
+	std::vector<glm::vec3> m_attackPositions;
 	//BFS
 	Graph m_graph;
 	std::queue<glm::ivec2> m_frontier;
