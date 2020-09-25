@@ -170,6 +170,7 @@
     <ClCompile Include="FactionPlayer.cpp" />
     <ClCompile Include="GameEvent.cpp" />
     <ClCompile Include="GameEventHandler.cpp" />
+    <ClCompile Include="GameMessages.cpp" />
     <ClCompile Include="GameMessenger.cpp" />
     <ClCompile Include="Graph.cpp" />
     <ClCompile Include="Level.cpp" />

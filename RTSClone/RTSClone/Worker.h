@@ -25,6 +25,7 @@ public:
 	Worker(const Faction& owningFaction, const glm::vec3& startingPosition, const glm::vec3& destinationPosition, const Map& map);
 	~Worker();
 	
+	const Timer& getBuildTimer() const;
 	bool isHoldingResources() const;
 	int extractResources();	
 

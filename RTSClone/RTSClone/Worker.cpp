@@ -59,6 +59,11 @@ Worker::~Worker()
 	GameEventHandler::getInstance().addEvent({ eGameEventType::RemoveAllWorkerPlannedBuildings, m_owningFaction.getController(), getID() });
 }
 
+const Timer& Worker::getBuildTimer() const
+{
+	return m_buildTimer;
+}
+
 bool Worker::isHoldingResources() const
 {
 	return m_currentResourceAmount > 0;
@@ -99,7 +104,7 @@ void Worker::update(float deltaTime, const UnitSpawnerBuilding& HQ, const Map& m
 {
 	Unit::update(deltaTime, factionHandler, map);
 
-	switch (m_currentState)
+	switch (getCurrentState())
 	{
 	case eUnitState::MovingToMinerals:
 		if (m_pathToPosition.empty())
@@ -263,7 +268,7 @@ void Worker::moveTo(const glm::vec3& destinationPosition, const Map& map, const 
 
 void Worker::render(ShaderHandler& shaderHandler) const
 {
-	if (m_currentResourceAmount > 0 && m_currentState != eUnitState::Harvesting)
+	if (m_currentResourceAmount > 0 && getCurrentState() != eUnitState::Harvesting)
 	{
 		ModelManager::getInstance().getModel(eModelName::WorkerMineral).render(
 			shaderHandler, { m_position.x - 0.5f, m_position.y, m_position.z - 0.5f });

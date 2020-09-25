@@ -63,9 +63,25 @@ void Level::handleGUI()
 		{
 			if (!Globals::UNIT_SPAWNER_TYPES.isMatch(targetEntity->getEntityType()))
 			{
-				GameMessenger::getInstance().broadcast<GameMessages::UIDisplaySelectedEntity>(
-					{ m_selectedTargetGUI.getFactionController(), m_selectedTargetGUI.getID(), targetEntity->getEntityType(),
-					targetEntity->getHealth() });
+				switch (targetEntity->getEntityType())
+				{
+				case eEntityType::Unit:
+					GameMessenger::getInstance().broadcast<GameMessages::UIDisplaySelectedEntity>(
+						{ m_selectedTargetGUI.getFactionController(), m_selectedTargetGUI.getID(), targetEntity->getEntityType(),
+						targetEntity->getHealth() });
+					break;
+				case eEntityType::Worker:
+				{
+					const Timer& buildTimer = static_cast<const Worker&>(*targetEntity).getBuildTimer();
+					GameMessenger::getInstance().broadcast<GameMessages::UIDisplaySelectedEntity>(
+						{ m_selectedTargetGUI.getFactionController(), m_selectedTargetGUI.getID(), targetEntity->getEntityType(),
+						targetEntity->getHealth(), buildTimer.getExpiredTime() - buildTimer.getElaspedTime() });		
+				}
+					break;
+				default:
+					assert(false);
+				}
+
 			}
 			else
 			{
