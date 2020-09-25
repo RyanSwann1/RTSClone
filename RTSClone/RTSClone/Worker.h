@@ -9,9 +9,9 @@
 
 struct BuildingCommand
 {
-	BuildingCommand(const std::function<const Entity*(Worker&)>& command, const glm::vec3& buildPosition);
+	BuildingCommand(const std::function<const Entity*()>& command, const glm::vec3& buildPosition);
 
-	std::function<const Entity*(Worker&)> command;
+	std::function<const Entity*()> command;
 	glm::vec3 buildPosition;
 };
 
@@ -30,7 +30,7 @@ public:
 	int extractResources();	
 
 	void setRepairTargetEntity(int entityID);
-	bool build(const std::function<const Entity*(Worker&)>& buildingCommand, const glm::vec3& buildPosition, const Map& map);
+	bool build(const std::function<const Entity*()>& buildingCommand, const glm::vec3& buildPosition, const Map& map);
 	void update(float deltaTime, const UnitSpawnerBuilding& HQ, const Map& map, FactionHandler& factionHandler);
 	void moveTo(const glm::vec3& destinationPosition, const Map& map, const AdjacentPositions& adjacentPositions,
 		eUnitState state = eUnitState::Moving, const Mineral* mineralToHarvest = nullptr);

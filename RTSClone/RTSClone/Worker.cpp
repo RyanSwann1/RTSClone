@@ -21,7 +21,7 @@ namespace
 }
 
 //BuildingCommand
-BuildingCommand::BuildingCommand(const std::function<const Entity* (Worker&)>& command, const glm::vec3& buildPosition)
+BuildingCommand::BuildingCommand(const std::function<const Entity*()>& command, const glm::vec3& buildPosition)
 	: command(command),
 	buildPosition(buildPosition)
 {
@@ -83,7 +83,7 @@ void Worker::setRepairTargetEntity(int entityID)
 	m_repairTargetEntityID = entityID;
 }
 
-bool Worker::build(const std::function<const Entity*(Worker&)>& buildingCommand, const glm::vec3& buildPosition, const Map& map)
+bool Worker::build(const std::function<const Entity*()>& buildingCommand, const glm::vec3& buildPosition, const Map& map)
 {
 	if (!map.isPositionOccupied(buildPosition))
 	{
@@ -174,7 +174,7 @@ void Worker::update(float deltaTime, const UnitSpawnerBuilding& HQ, const Map& m
 
 		m_buildTimer.resetElaspedTime();
 		m_buildTimer.setActive(false);
-		const Entity* newBuilding = m_buildingCommands.front().command(*this);
+		const Entity* newBuilding = m_buildingCommands.front().command();
 		m_buildingCommands.pop();
 		if (newBuilding)
 		{
