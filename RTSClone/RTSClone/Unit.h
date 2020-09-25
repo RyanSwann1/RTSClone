@@ -37,13 +37,16 @@ public:
 	Unit(const Faction& owningFaction, const glm::vec3& startingPosition, eEntityType entityType = eEntityType::Unit, int health = Globals::UNIT_STARTING_HEALTH);
 	Unit(const Faction& owningFaction, const glm::vec3& startingPosition, const glm::vec3& destinationPosition, 
 		const Map& map, eEntityType entityType = eEntityType::Unit, int health = Globals::UNIT_STARTING_HEALTH);
-		 
+
+	float getGridAttackRange() const;
+	float getAttackRange() const;
 	bool isPathEmpty() const;
 	const glm::vec3& getDestination() const;
 	eUnitState getCurrentState() const;
 
 	void resetTarget();
 	void setTarget(eFactionController targetFaction, int targetID);
+	void moveToAttackPosition(const Entity& targetEntity, eFactionController targetFaction, const Map& map);
 	void moveTo(const glm::vec3& destinationPosition, const Map& map, const AdjacentPositions& adjacentPositions, 
 		eUnitState state = eUnitState::Moving);
 	void update(float deltaTime, FactionHandler& factionHandler, const Map& map);

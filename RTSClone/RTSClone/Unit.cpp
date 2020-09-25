@@ -12,7 +12,8 @@
 namespace
 {
 	constexpr float MOVEMENT_SPEED = 7.5f;
-	constexpr float UNIT_ATTACK_RANGE = 5.0f * Globals::NODE_SIZE;
+	constexpr float UNIT_GRID_ATTACK_RANGE = 5.0f;
+	constexpr float UNIT_ATTACK_RANGE = UNIT_GRID_ATTACK_RANGE * Globals::NODE_SIZE;
 	constexpr float TIME_BETWEEN_ATTACK = 1.0f;
 	constexpr float TIME_BETWEEN_STATE = 0.25f;
 	constexpr int DAMAGE = 1;
@@ -83,6 +84,16 @@ Unit::Unit(const Faction& owningFaction, const glm::vec3 & startingPosition, con
 	moveTo(destinationPosition, map, [&](const glm::ivec2& position) { return getAdjacentPositions(position, map); });
 }
 
+float Unit::getGridAttackRange() const
+{
+	return UNIT_GRID_ATTACK_RANGE;
+}
+
+float Unit::getAttackRange() const
+{
+	return UNIT_ATTACK_RANGE;
+}
+
 bool Unit::isPathEmpty() const
 {
 	return m_pathToPosition.empty();
@@ -107,6 +118,35 @@ void Unit::resetTarget()
 void Unit::setTarget(eFactionController targetFaction, int targetID)
 {
 	m_target.set(targetFaction, targetID);
+}
+
+void Unit::moveToAttackPosition(const Entity& targetEntity, eFactionController targetFaction, const Map& map)
+{
+	//TODO: Rename: closest next position
+	glm::vec3 closestDestination = m_position;
+	if (!m_pathToPosition.empty())
+	{
+		closestDestination = m_pathToPosition.back();
+	}
+
+	PathFinding::getInstance().setUnitAttackPosition(*this, targetEntity, m_pathToPosition, map, m_owningFaction.getUnits());
+	if (!m_pathToPosition.empty())
+	{
+		m_target.set(targetFaction, targetEntity.getID());
+		switchToState(eUnitState::Moving, map);
+	}
+	else
+	{
+		if (closestDestination != m_position)
+		{
+			m_pathToPosition.push_back(closestDestination);
+			switchToState(eUnitState::Moving, map);
+		}
+		else
+		{
+			switchToState(eUnitState::Idle, map);
+		}
+	}
 }
 
 void Unit::moveTo(const glm::vec3& destinationPosition, const Map& map, const AdjacentPositions& adjacentPositions, 
