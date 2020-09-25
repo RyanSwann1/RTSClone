@@ -62,9 +62,9 @@ namespace
 Unit::Unit(const Faction& owningFaction, const glm::vec3& startingPosition, eEntityType entityType, int health)
 	: Entity(startingPosition, entityType, health),
 	m_owningFaction(owningFaction),
-	m_currentState(eUnitState::Idle),
-	m_front(),
 	m_pathToPosition(),
+	m_front(),
+	m_currentState(eUnitState::Idle),
 	m_attackTimer(TIME_BETWEEN_ATTACK, true),
 	m_stateHandlerTimer(TIME_BETWEEN_STATE, true),
 	m_target()
@@ -74,9 +74,9 @@ Unit::Unit(const Faction& owningFaction, const glm::vec3 & startingPosition, con
 	const Map & map, eEntityType entityType, int health)
 	: Entity(startingPosition, entityType, health),
 	m_owningFaction(owningFaction),
-	m_currentState(eUnitState::Idle),
-	m_front(),
 	m_pathToPosition(),
+	m_front(),
+	m_currentState(eUnitState::Idle),
 	m_attackTimer(TIME_BETWEEN_ATTACK, true),
 	m_stateHandlerTimer(TIME_BETWEEN_STATE, true),
 	m_target()

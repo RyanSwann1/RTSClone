@@ -25,7 +25,8 @@ enum class eUnitState
 	AttackingTarget,
 	Building,
 	MovingToRepairPosition,
-	Repairing
+	Repairing,
+	Max = Repairing
 };
 
 class Faction;
@@ -58,13 +59,13 @@ public:
 
 protected:
 	const Faction& m_owningFaction;
-	eUnitState m_currentState;
-	glm::vec3 m_front;
 	std::vector<glm::vec3> m_pathToPosition;
 
 	void switchToState(eUnitState newState, const Map& map, const Entity* targetEntity = nullptr);
 
 private:
+	glm::vec3 m_front;
+	eUnitState m_currentState;
 	Timer m_attackTimer;
 	Timer m_stateHandlerTimer;
 	EntityTarget m_target;
