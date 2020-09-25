@@ -225,7 +225,7 @@ void Faction::handleEvent(const GameEvent& gameEvent, const Map& map)
                 }
                 break;
                 case eEntityType::HQ:
-                    GameEventHandler::getInstance().addEvent({ eGameEventType::FactionEliminated, m_controller });
+                    GameEventHandler::getInstance().addEvent({ eGameEventType::EliminateFaction, m_controller });
                     break;
                 case eEntityType::Unit:
                 {

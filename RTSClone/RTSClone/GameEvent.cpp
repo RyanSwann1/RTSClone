@@ -41,7 +41,7 @@ GameEvent::GameEvent(eGameEventType gameEventType, eFactionController senderFact
 	endingPosition(),
 	entityType()
 {
-	assert(gameEventType == eGameEventType::FactionEliminated);
+	assert(gameEventType == eGameEventType::EliminateFaction);
 }
 
 GameEvent::GameEvent(eGameEventType gameEventType, eFactionController senderFaction, int senderID)

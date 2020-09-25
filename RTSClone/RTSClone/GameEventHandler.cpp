@@ -23,7 +23,7 @@ void GameEventHandler::handleEvents(Level & level, const Map & map)
 		case eGameEventType::AddResources:
 		case eGameEventType::SpawnProjectile:
 		case eGameEventType::RevalidateMovementPaths:
-		case eGameEventType::FactionEliminated:
+		case eGameEventType::EliminateFaction:
 		case eGameEventType::PlayerSpawnUnit:
 		case eGameEventType::PlayerActivatePlannedBuilding:
 		case eGameEventType::RepairEntity:

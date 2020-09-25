@@ -155,14 +155,13 @@ void Level::handleEvent(const GameEvent& gameEvent, const Map& map)
 			}
 		}
 		break;
-	case eGameEventType::FactionEliminated:
-	{
-		assert(m_factionHandler.isFactionActive(gameEvent.senderFaction) &&
-			m_factions[static_cast<int>(gameEvent.senderFaction)]->getController() == gameEvent.senderFaction);
-
-		m_factions[static_cast<int>(gameEvent.senderFaction)].reset();
-		setAITargetFaction();
-	}	
+	case eGameEventType::EliminateFaction:
+		if (m_factionHandler.isFactionActive(gameEvent.senderFaction))
+		{
+			assert(m_factions[static_cast<int>(gameEvent.senderFaction)]->getController() == gameEvent.senderFaction);
+			m_factions[static_cast<int>(gameEvent.senderFaction)].reset();
+			setAITargetFaction();
+		}
 		break;
 	case eGameEventType::PlayerActivatePlannedBuilding:
 	case eGameEventType::PlayerSpawnUnit:
