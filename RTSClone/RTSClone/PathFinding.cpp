@@ -156,6 +156,31 @@ namespace
 			std::reverse(pathToPosition.begin(), pathToPosition.end());
 		}
 	}
+
+	bool isPositionInLineOfSight(const glm::ivec2& nodePosition, const Entity& targetEntity, const Map& map)
+	{
+		glm::ivec2 targetPositionOnGrid = Globals::convertToGridPosition(targetEntity.getPosition());
+		glm::vec2 direction = glm::normalize(glm::vec2(targetPositionOnGrid) - glm::vec2(nodePosition));
+		constexpr float step = 0.5f;
+		float distance = glm::distance(glm::vec2(targetPositionOnGrid), glm::vec2(nodePosition));
+		bool targetEntityVisible = true;
+
+		for (int i = 0; i < std::ceil(distance / step); ++i)
+		{
+			glm::vec2 position = glm::vec2(nodePosition) + direction * static_cast<float>(i);
+			if (targetEntity.getAABB().contains(Globals::convertToWorldPosition(position)))
+			{
+				break;
+			}
+			else if (map.isPositionOccupied(position))
+			{
+				targetEntityVisible = false;
+				break;
+			}
+		}
+
+		return targetEntityVisible;
+	}
 }
 
 PathFinding::PathFinding()
@@ -407,7 +432,7 @@ void PathFinding::setUnitAttackPosition(const Unit& unit, const Entity& targetEn
 		m_openQueue.popTop();
 
 		if (glm::distance(glm::vec2(targetPositionOnGrid), glm::vec2(currentNode.position)) <
-			unit.getGridAttackRange())
+			unit.getGridAttackRange() && isPositionInLineOfSight(currentNode.position, targetEntity, map))
 		{
 			positionFound = true;
 			m_attackPositions.push_back(Globals::convertToWorldPosition(currentNode.position));

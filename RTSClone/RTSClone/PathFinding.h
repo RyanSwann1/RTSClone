@@ -72,11 +72,11 @@ public:
 			}
 		}
 
-		assert(distance < std::numeric_limits<float>::max() && shortestDistancePosition != currentEntity.getPosition());
+		assert(distance < std::numeric_limits<float>::max() && 
+			shortestDistancePosition != currentEntity.getPosition());
+
 		return shortestDistancePosition;
 	}
-
-	void clearAttackPositions();
 
 	bool isPositionAvailable(const glm::vec3& nodePosition, const Map& map, const std::list<Unit>& units, const std::list<Worker>& workers, 
 		int senderID = Globals::INVALID_ENTITY_ID) const;
@@ -100,6 +100,8 @@ public:
 
 	void getPathToPosition(const Unit& unit, const glm::vec3& destination, std::vector<glm::vec3>& pathToPosition, 
 		const AdjacentPositions& adjacentPositions, const std::list<Unit>& units, const Map& map);
+
+	void clearAttackPositions();
 
 private:
 	PathFinding();
