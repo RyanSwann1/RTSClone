@@ -133,7 +133,7 @@ void Unit::moveToAttackPosition(const Entity& targetEntity, eFactionController t
 	if (!m_pathToPosition.empty())
 	{
 		m_target.set(targetFaction, targetEntity.getID());
-		switchToState(eUnitState::Moving, map);
+		switchToState(eUnitState::MovingToAttackPosition, map);
 	}
 	else
 	{
@@ -259,6 +259,24 @@ void Unit::update(float deltaTime, FactionHandler& factionHandler, const Map& ma
 			switchToState(eUnitState::Idle, map);
 		}
 		break;
+	case eUnitState::MovingToAttackPosition:
+		if (m_stateHandlerTimer.isExpired())
+		{
+			const Entity* targetEntity = nullptr;
+			if (factionHandler.isFactionActive(m_target.getFactionController()))
+			{
+				targetEntity = factionHandler.getFaction(m_target.getFactionController()).getEntity(m_target.getID());
+			}
+			if (targetEntity && m_pathToPosition.empty())
+			{
+				switchToState(eUnitState::AttackingTarget, map);
+			}
+			else if(!targetEntity)
+			{
+				switchToState(eUnitState::Moving, map);
+			}
+		}
+		break;
 	case eUnitState::AttackMoving:
 		if (m_stateHandlerTimer.isExpired())
 		{
@@ -303,8 +321,8 @@ void Unit::update(float deltaTime, FactionHandler& factionHandler, const Map& ma
 					if ((Globals::getSqrDistance(targetEntity->getPosition(), m_position) > UNIT_ATTACK_RANGE * UNIT_ATTACK_RANGE) ||
 						!PathFinding::getInstance().isTargetInLineOfSight(m_position, *targetEntity, map))
 					{
-						moveTo(targetEntity->getPosition(), map, [&](const glm::ivec2& position)
-							{ return getAdjacentPositions(position, map, m_owningFaction.getUnits(), *this); });
+						/*moveTo(targetEntity->getPosition(), map, [&](const glm::ivec2& position)
+							{ return getAdjacentPositions(position, map, m_owningFaction.getUnits(), *this); });*/
 					}
 					else if (Globals::getSqrDistance(targetEntity->getPosition(), m_position) <= UNIT_ATTACK_RANGE * UNIT_ATTACK_RANGE)
 					{
@@ -356,6 +374,7 @@ void Unit::switchToState(eUnitState newState, const Map& map, const Entity* targ
 	case eUnitState::Moving:
 	case eUnitState::Harvesting:
 	case eUnitState::Repairing:
+	case eUnitState::MovingToAttackPosition:
 		break;
 	default:
 		assert(false);

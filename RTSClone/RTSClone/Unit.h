@@ -17,6 +17,7 @@ enum class eUnitState
 	Idle = 0,
 	Moving,
 	AttackMoving,
+	MovingToAttackPosition,
 	MovingToMinerals,
 	ReturningMineralsToHQ,
 	Harvesting,
