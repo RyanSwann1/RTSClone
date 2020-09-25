@@ -1,5 +1,9 @@
 #pragma once
 
+#ifdef GAME
+#include "EntityType.h"
+#endif // GAME
+
 #include "glm/glm.hpp"
 #include "AABB.h"
 #include "FactionController.h"
@@ -41,9 +45,11 @@ namespace Globals
 	constexpr int UNIT_POPULATION_COST = 2;
 	constexpr int POPULATION_INCREMENT = 5;
 
+#ifdef GAME
 	const TypeComparison<eEntityType> UNIT_SPAWNER_TYPES({ eEntityType::HQ, eEntityType::Barracks });
 	const TypeComparison<eEntityType> BUILDING_TYPES({ eEntityType::HQ, eEntityType::Barracks, eEntityType::SupplyDepot });
 	const TypeComparison<eEntityType> UNIT_TYPES({ eEntityType::Unit, eEntityType::Worker });
+#endif // GAME
 
 	constexpr int CUBE_FACE_INDICIE_COUNT = 4;
 	constexpr std::array<unsigned int, 6> CUBE_FACE_INDICIES =

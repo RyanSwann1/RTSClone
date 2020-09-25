@@ -209,7 +209,7 @@ int main()
 				if (!ImGui::IsWindowHovered(ImGuiHoveredFlags_::ImGuiHoveredFlags_AnyWindow))
 				{
 					glm::vec3 mouseToGroundPosition = camera.getMouseToGroundPosition(window);
-					if (selectionBox.active)
+					if (selectionBox.isActive())
 					{
 						selectionBox.setSize(mouseToGroundPosition);
 

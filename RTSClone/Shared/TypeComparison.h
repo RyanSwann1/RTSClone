@@ -1,6 +1,5 @@
 #pragma once
 
-#include "EntityType.h"
 #include "NonCopyable.h"
 #include "NonMovable.h"
 #include <bitset>

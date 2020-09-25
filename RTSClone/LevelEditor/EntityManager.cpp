@@ -98,7 +98,7 @@ void EntityManager::selectEntities(const SelectionBox& selectionBox)
 	{
 		if (entity.getModelName() != eModelName::Terrain)
 		{
-			entity.setSelected(selectionBox.AABB.contains(entity.getAABB()));
+			entity.setSelected(selectionBox.getAABB().contains(entity.getAABB()));
 			if (entity.isSelected())
 			{
 				++selectedEntityCount;
