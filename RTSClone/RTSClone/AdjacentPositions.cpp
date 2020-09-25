@@ -4,6 +4,11 @@
 #include "Unit.h"
 #include "Worker.h"
 
+namespace
+{
+	const TypeComparison<eUnitState> COLLIDABLE_UNIT_STATES ({ eUnitState::Idle, eUnitState::AttackingTarget });
+}
+
 AdjacentPosition::AdjacentPosition()
 	: valid(false),
 	unitCollision(false),
@@ -80,7 +85,7 @@ std::array<AdjacentPosition, ALL_DIRECTIONS_ON_GRID.size()> getAdjacentPositions
 			bool unitCollision = false;
 			for (const auto& otherUnit : units)
 			{
-				if (&otherUnit != &unit && otherUnit.getCurrentState() == eUnitState::Idle)
+				if (&otherUnit != &unit && COLLIDABLE_UNIT_STATES.isMatch(otherUnit.getCurrentState()))// == eUnitState::Idle)
 				{
 					if (otherUnit.getAABB().contains(Globals::convertToWorldPosition(adjacentPosition)))
 					{
@@ -114,7 +119,7 @@ std::array<AdjacentPosition, ALL_DIRECTIONS_ON_GRID.size()> getAdjacentPositions
 			{
 				if (&otherUnit != &unit &&
 					std::find(selectedUnits.cbegin(), selectedUnits.cend(), &otherUnit) == selectedUnits.cend() &&
-					otherUnit.getCurrentState() == eUnitState::Idle)
+					COLLIDABLE_UNIT_STATES.isMatch(otherUnit.getCurrentState()))// == eUnitState::Idle)
 				{
 					if (otherUnit.getAABB().contains(Globals::convertToWorldPosition(adjacentPosition)))
 					{
