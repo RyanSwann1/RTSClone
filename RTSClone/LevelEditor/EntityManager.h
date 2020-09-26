@@ -32,6 +32,7 @@ public:
 #endif // RENDER_AABB
 
 private:
+	const Entity m_terrain;
 	std::vector<Entity> m_entities;
 	int m_selectedEntityID;
 };

@@ -9,7 +9,8 @@
 #include <sstream>
 
 EntityManager::EntityManager()
-	: m_entities(),
+	: m_terrain(eModelName::Terrain, Globals::TERRAIN_STARTING_POSITION),
+	m_entities(),
 	m_selectedEntityID(Globals::INVALID_ENTITY_ID)
 {}
 
@@ -37,11 +38,6 @@ const std::vector<Entity>& EntityManager::getEntities() const
 
 void EntityManager::addEntity(eModelName modelName, const glm::vec3& position)
 {
-	if (modelName != eModelName::Terrain)
-	{
-		assert(Globals::isOnNodePosition(position));
-	}
-
 	auto entity = std::find_if(m_entities.cbegin(), m_entities.cend(), [&position](const auto& gameObject)
 	{
 		return gameObject.getPosition() == position;
@@ -96,15 +92,12 @@ void EntityManager::selectEntities(const SelectionBox& selectionBox)
 	int selectedEntityCount = 0;
 	for (auto& entity : m_entities)
 	{
-		if (entity.getModelName() != eModelName::Terrain)
+		entity.setSelected(selectionBox.getAABB().contains(entity.getAABB()));
+		if (entity.isSelected())
 		{
-			entity.setSelected(selectionBox.getAABB().contains(entity.getAABB()));
-			if (entity.isSelected())
-			{
-				++selectedEntityCount;
-				m_selectedEntityID = entity.getID();
-			}
-		}
+			++selectedEntityCount;
+			m_selectedEntityID = entity.getID();
+		}	
 	}
 
 	if (selectedEntityCount > 1)
@@ -119,6 +112,8 @@ void EntityManager::render(ShaderHandler& shaderHandler) const
 	{
 		entity.render(shaderHandler);
 	}
+
+	m_terrain.render(shaderHandler);
 }
 
 #ifdef RENDER_AABB
