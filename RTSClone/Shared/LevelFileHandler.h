@@ -1,7 +1,7 @@
 #pragma once
 
 #include "FactionController.h"
-
+#include "glm/glm.hpp"
 #include <string>
 #include <vector>
 #include <memory>
@@ -22,7 +22,7 @@ namespace LevelFileHandler
 
 #ifdef LEVEL_EDITOR
 	bool saveLevelToFile(const std::string& fileName, const EntityManager& entityManager, 
-		const std::vector<Player>& players);
+		const std::vector<Player>& players, const glm::ivec2& mapSize);
 	bool loadLevelFromFile(const std::string& fileName, EntityManager& entityManager,
 		std::vector<Player>& players);
 #endif // LEVEL_EDITOR
