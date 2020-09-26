@@ -21,14 +21,14 @@ namespace LevelFileHandler
 		const std::function<bool(const std::string&)>& conditional);
 
 #ifdef LEVEL_EDITOR
-	bool saveLevelToFile(const std::string& fileName, const EntityManager& entityManager, 
+	bool saveLevelToFile(const std::string& fileName, const EntityManager& entityManager,
 		const std::vector<Player>& players, const glm::ivec2& mapSize);
 	bool loadLevelFromFile(const std::string& fileName, EntityManager& entityManager,
-		std::vector<Player>& players);
+		std::vector<Player>& players, glm::ivec2& mapSize);
 #endif // LEVEL_EDITOR
 
 #ifdef GAME
 	bool loadLevelFromFile(const std::string& fileName, std::vector<SceneryGameObject>& scenery,
 		std::array<std::unique_ptr<Faction>, static_cast<size_t>(eFactionController::Max) + 1>& factions);
 #endif // GAME
-}
+};
