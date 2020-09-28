@@ -73,6 +73,16 @@ constexpr std::array<glm::vec3, static_cast<size_t>(eFactionController::Max) + 1
 	glm::vec3(170.0f, Globals::GROUND_HEIGHT, Globals::NODE_SIZE)
 };
 
+enum class eWindowState
+{
+	None,
+	PlayerDetails,
+	MapDetails
+};
+
+constexpr int MAX_MAP_SIZE = 60 * Globals::NODE_SIZE;
+constexpr glm::ivec2 DEFAULT_MAP_SIZE = { 30, 30 };
+
 int main()
 {
 	sf::ContextSettings settings;
@@ -124,14 +134,15 @@ int main()
 	
 	glm::vec3 previousMousePosition = { 0.0f, Globals::GROUND_HEIGHT, 0.0f };
 	bool plannedEntityActive = false;
-	bool showPlayerMenu = false;
+	bool showDetailsWindow = false;
+	eWindowState currentWindowState = eWindowState::None;
+	glm::ivec2 mapSize = DEFAULT_MAP_SIZE;
 	Entity plannedEntity(eModelName::RocksTall, { 0.0f, 0.0f, 0.0f });
 	int selected = 0;	
 
-	if (!LevelFileHandler::loadLevelFromFile(levelName, entityManager, players))
+	if (!LevelFileHandler::loadLevelFromFile(levelName, entityManager, players, mapSize))
 	{
 		std::cout << "Failed to load level: " << levelName << "\n";
-		entityManager.addEntity(eModelName::Terrain, TERRAIN_STARTING_POSITION);
 		
 		players.emplace_back(eFactionController::Player, PLAYER_HQ_STARTING_POSITIONS[static_cast<int>(eFactionController::Player)], 
 			PLAYER_MINERAL_STARTING_POSITIONS[static_cast<int>(eFactionController::Player)]);
@@ -139,6 +150,8 @@ int main()
 		players.emplace_back(eFactionController::AI_1, PLAYER_HQ_STARTING_POSITIONS[static_cast<int>(eFactionController::AI_1)],
 			PLAYER_MINERAL_STARTING_POSITIONS[static_cast<int>(eFactionController::AI_1)]);
 	}
+
+	playableAreaDisplay.setSize(mapSize);
 
 	int totalPlayers = static_cast<int>(players.size());
 
@@ -243,11 +256,17 @@ int main()
 				{
 					if (ImGui::MenuItem("Player Details"))
 					{
-						showPlayerMenu = true;
+						showDetailsWindow = true;
+						currentWindowState = eWindowState::PlayerDetails;
+					}
+					if (ImGui::MenuItem("Map Details"))
+					{
+						showDetailsWindow = true;
+						currentWindowState = eWindowState::MapDetails;
 					}
 					if (ImGui::MenuItem("Save"))
 					{
-						if (!LevelFileHandler::saveLevelToFile(levelName, entityManager, players))
+						if (!LevelFileHandler::saveLevelToFile(levelName, entityManager, players, mapSize))
 						{
 							std::cout << "Unable to save file " + levelName << "\n";
 						}
@@ -294,56 +313,79 @@ int main()
 		}
 		ImGui::End();
 
-		if (showPlayerMenu)
+		if (showDetailsWindow)
 		{
-			ImGui::SetNextWindowPos(ImVec2(700, 700), ImGuiCond_FirstUseEver);
-			ImGui::Begin("Players", &showPlayerMenu, ImGuiWindowFlags_None);
-			ImGui::BeginChild("Players One");
-			int newPlayerTotal = totalPlayers;
-			if (ImGui::InputInt("Player Amount", &newPlayerTotal, 1, ImGuiInputTextFlags_ReadOnly))
+			switch (currentWindowState)
 			{
-				if (newPlayerTotal >= Globals::MIN_FACTIONS && newPlayerTotal <= Globals::MAX_FACTIONS)
+			case eWindowState::None:
+				break;
+			case eWindowState::PlayerDetails:
+			{
+				ImGui::SetNextWindowPos(ImVec2(700, 700), ImGuiCond_FirstUseEver);
+				ImGui::Begin("Players", &showDetailsWindow, ImGuiWindowFlags_None);
+				ImGui::BeginChild("Players One");
+				int newPlayerTotal = totalPlayers;
+				if (ImGui::InputInt("Player Amount", &newPlayerTotal, 1, ImGuiInputTextFlags_ReadOnly))
 				{
-					totalPlayers = newPlayerTotal;
-					if (totalPlayers > static_cast<int>(players.size()))
+					if (newPlayerTotal >= Globals::MIN_FACTIONS && newPlayerTotal <= Globals::MAX_FACTIONS)
 					{
-						eFactionController factionController;
-						switch (totalPlayers)
+						totalPlayers = newPlayerTotal;
+						if (totalPlayers > static_cast<int>(players.size()))
 						{
-						case Globals::MAX_FACTIONS - Globals::MIN_FACTIONS / 2:
-							factionController = eFactionController::AI_2;
-							break;
-						case Globals::MAX_FACTIONS:
-							factionController = eFactionController::AI_3;
-							break;
-						default:
-							assert(false);
+							eFactionController factionController;
+							switch (totalPlayers)
+							{
+							case Globals::MAX_FACTIONS - Globals::MIN_FACTIONS / 2:
+								factionController = eFactionController::AI_2;
+								break;
+							case Globals::MAX_FACTIONS:
+								factionController = eFactionController::AI_3;
+								break;
+							default:
+								assert(false);
+							}
+
+							players.emplace_back(factionController, PLAYER_HQ_STARTING_POSITIONS[totalPlayers - 1],
+								PLAYER_MINERAL_STARTING_POSITIONS[totalPlayers - 1]);
 						}
-
-						players.emplace_back(factionController, PLAYER_HQ_STARTING_POSITIONS[totalPlayers - 1],
-							PLAYER_MINERAL_STARTING_POSITIONS[totalPlayers - 1]);
+						else if (totalPlayers < static_cast<int>(players.size()))
+						{
+							players.pop_back();
+						}
 					}
-					else if (totalPlayers < static_cast<int>(players.size()))
+				};
+				for (int i = 0; i < totalPlayers; ++i)
+				{
+					if (i == 0)
 					{
-						players.pop_back();
+						showPlayerDetails(players[i], "Player", "Human", i);
+
+					}
+					else
+					{
+						showPlayerDetails(players[i], "Player", "AI", i);
 					}
 				}
-			};
-			for (int i = 0; i < totalPlayers; ++i)
-			{
-				if (i == 0)
-				{
-					showPlayerDetails(players[i], "Player", "Human", i);
-					
-				}
-				else
-				{
-					showPlayerDetails(players[i], "Player", "AI", i);
-				}
-			}
 
-			ImGui::EndChild();
-			ImGui::End();
+				ImGui::EndChild();
+				ImGui::End();
+			}
+				break;
+			case eWindowState::MapDetails:
+				ImGui::Begin("Map Details", &showDetailsWindow, ImGuiWindowFlags_None);
+				if (ImGui::InputInt("x", &mapSize.x, 1) ||
+					ImGui::InputInt("z", &mapSize.y, 1))
+				{
+					mapSize.x = glm::clamp(mapSize.x, 0, MAX_MAP_SIZE);
+					mapSize.y = glm::clamp(mapSize.y, 0, MAX_MAP_SIZE);
+					
+					playableAreaDisplay.setSize(mapSize);
+				}
+				ImGui::End();
+				break;
+			default:
+				assert(false);
+			}
 		}
 
 		//Demo
@@ -369,9 +411,6 @@ int main()
 		{
 			player.render(*shaderHandler);
 		}
-		//player.render(*shaderHandler);
-		//playerAI1.render(*shaderHandler);
-		//playerAI2.render(*shaderHandler);
 
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
