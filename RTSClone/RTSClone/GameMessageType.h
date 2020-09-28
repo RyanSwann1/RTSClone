@@ -4,6 +4,7 @@ enum class eGameMessageType
 {
 	AddEntityToMap = 0,
 	RemoveEntityFromMap,
+	NewMapSize,
 	UIDisplayPlayerDetails,
 	UIDisplaySelectedEntity,
 	UIClearDisplaySelectedEntity,

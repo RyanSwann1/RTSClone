@@ -26,6 +26,15 @@ namespace GameMessages
 		const AABB& entityAABB;
 	};
 
+	struct NewMapSize : public BaseMessage<eGameMessageType::NewMapSize>
+	{
+		NewMapSize(const glm::ivec2& mapSize)
+			: mapSize(mapSize)
+		{}
+
+		const glm::ivec2 mapSize;
+	};
+
 	struct UIDisplayPlayerDetails : public BaseMessage<eGameMessageType::UIDisplayPlayerDetails>
 	{
 		UIDisplayPlayerDetails();
