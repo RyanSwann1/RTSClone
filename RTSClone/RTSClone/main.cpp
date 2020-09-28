@@ -20,6 +20,8 @@
 #include "Level.h"
 #include "UIManager.h"
 #include "GameMessenger.h"
+#include "PathFinding.h"
+#include "PathFindingLocator.h"
 
 //AI
 //https://www.youtube.com/watch?v=V3qASwCM-PE&list=PLdgLYFdStKu03Dv9GUsXBDQMdyJbkDb8i
@@ -90,9 +92,11 @@ int main()
 	}
 
 	sf::Clock gameClock;
+	PathFinding pathFinding;
+	PathFindingLocator::provide(pathFinding);
 	Camera camera;
 	UIManager UIManager;
-	std::unique_ptr<Map> map = std::make_unique<Map>();
+	Map map;
 	std::string levelName = "Level.txt";
 	std::unique_ptr<Level> level; 
 	if (!loadLevel(level, levelName))
@@ -137,7 +141,7 @@ int main()
 
 			if (level)
 			{
-				level->handleInput(window, camera, currentSFMLEvent, *map);
+				level->handleInput(window, camera, currentSFMLEvent, map);
 			}
 		}
 
@@ -156,7 +160,7 @@ int main()
 		//Update
 		if (level)
 		{
-			level->update(deltaTime, *map);
+			level->update(deltaTime, map);
 		}
 		camera.update(deltaTime);
 

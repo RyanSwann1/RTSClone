@@ -4,6 +4,7 @@
 #include "UnitSpawnerBuilding.h"
 #include "Worker.h"
 #include "PathFinding.h"
+#include "PathFindingLocator.h"
 #include "SupplyDepot.h"
 #include "Mineral.h"
 #include "FactionController.h"
@@ -71,24 +72,24 @@ protected:
 			case eEntityType::Unit:
 				if (building.isWaypointActive())
 				{
-					units.emplace_back(*this, Globals::convertToNodePosition(building.getUnitSpawnPosition()), PathFinding::getInstance().getClosestAvailablePosition(
+					units.emplace_back(*this, Globals::convertToNodePosition(building.getUnitSpawnPosition()), PathFindingLocator::get().getClosestAvailablePosition(
 						building.getWaypointPosition(), m_units, m_workers, map), map);
 				}
 				else
 				{
-					units.emplace_back(*this, Globals::convertToNodePosition(PathFinding::getInstance().getClosestAvailablePosition(building.getUnitSpawnPosition(),
+					units.emplace_back(*this, Globals::convertToNodePosition(PathFindingLocator::get().getClosestAvailablePosition(building.getUnitSpawnPosition(),
 						m_units, m_workers, map)));
 				}
 				break;
 			case eEntityType::Worker:
 				if (building.isWaypointActive())
 				{
-					units.emplace_back(*this, building.getUnitSpawnPosition(), PathFinding::getInstance().getClosestAvailablePosition(
+					units.emplace_back(*this, building.getUnitSpawnPosition(), PathFindingLocator::get().getClosestAvailablePosition(
 						building.getWaypointPosition(), m_units, m_workers, map), map);
 				}
 				else
 				{
-					units.emplace_back(*this, PathFinding::getInstance().getClosestAvailablePosition(
+					units.emplace_back(*this, PathFindingLocator::get().getClosestAvailablePosition(
 						building.getUnitSpawnPosition(), m_units, m_workers, map));
 				}
 				break;
@@ -131,7 +132,7 @@ private:
 			{	
 				if (map.isPositionOccupied(entity.getPosition()))
 				{
-					entity.moveTo(PathFinding::getInstance().getClosestAvailablePosition<Entity>(entity, entities, map), map,
+					entity.moveTo(PathFindingLocator::get().getClosestAvailablePosition<Entity>(entity, entities, map), map,
 						[&](const glm::ivec2& position) { return getAdjacentPositions(position, map); });
 				}
 				else
@@ -143,7 +144,7 @@ private:
 							otherEntity.getCurrentState() == eUnitState::Idle &&
 							entity.getAABB().contains(otherEntity.getAABB()))
 						{
-							entity.moveTo(PathFinding::getInstance().getClosestAvailablePosition<Entity>(entity, entities, map), map,
+							entity.moveTo(PathFindingLocator::get().getClosestAvailablePosition<Entity>(entity, entities, map), map,
 								[&](const glm::ivec2& position) { return getAdjacentPositions(position, map); });
 							break;
 						}

@@ -35,7 +35,7 @@ std::array<AdjacentPosition, ALL_DIRECTIONS_ON_GRID.size()> getAdjacentPositions
 	for (int i = 0; i < adjacentPositions.size(); ++i)
 	{
 		glm::ivec2 adjacentPosition = position + ALL_DIRECTIONS_ON_GRID[i];
-		if (Globals::isPositionInMapBounds(adjacentPosition) && !map.isPositionOccupied(adjacentPosition))
+		if (map.isWithinBounds(adjacentPosition) && !map.isPositionOccupied(adjacentPosition))
 		{
 			bool unitCollision = false;
 			for (const auto& unit : units)
@@ -80,7 +80,7 @@ std::array<AdjacentPosition, ALL_DIRECTIONS_ON_GRID.size()> getAdjacentPositions
 	for (int i = 0; i < adjacentPositions.size(); ++i)
 	{
 		glm::ivec2 adjacentPosition = position + ALL_DIRECTIONS_ON_GRID[i];
-		if (Globals::isPositionInMapBounds(adjacentPosition) && !map.isPositionOccupied(adjacentPosition))
+		if (map.isWithinBounds(adjacentPosition) && !map.isPositionOccupied(adjacentPosition))
 		{
 			bool unitCollision = false;
 			for (const auto& otherUnit : units)
@@ -112,7 +112,7 @@ std::array<AdjacentPosition, ALL_DIRECTIONS_ON_GRID.size()> getAdjacentPositions
 	for (int i = 0; i < adjacentPositions.size(); ++i)
 	{
 		glm::ivec2 adjacentPosition = position + ALL_DIRECTIONS_ON_GRID[i];
-		if (Globals::isPositionInMapBounds(adjacentPosition) && !map.isPositionOccupied(adjacentPosition))
+		if (map.isWithinBounds(adjacentPosition) && !map.isPositionOccupied(adjacentPosition))
 		{
 			bool unitCollision = false;
 			for (const auto& otherUnit : units)
@@ -145,7 +145,7 @@ std::array<AdjacentPosition, ALL_DIRECTIONS_ON_GRID.size()> getAdjacentPositions
 	for (int i = 0; i < adjacentPositions.size(); ++i)
 	{
 		glm::ivec2 adjacentPosition = position + ALL_DIRECTIONS_ON_GRID[i];
-		if (Globals::isPositionInMapBounds(adjacentPosition) && !map.isPositionOccupied(adjacentPosition))
+		if (map.isWithinBounds(adjacentPosition) && !map.isPositionOccupied(adjacentPosition))
 		{
 			adjacentPositions[i] = AdjacentPosition(adjacentPosition);
 		}
@@ -161,7 +161,7 @@ std::array<AdjacentPosition, ALL_DIRECTIONS_ON_GRID.size()> getAdjacentPositions
 	for (int i = 0; i < static_cast<int>(ALL_DIRECTIONS_ON_GRID.size()); ++i)
 	{
 		glm::ivec2 adjacentPosition = position + ALL_DIRECTIONS_ON_GRID[i];
-		if (Globals::isPositionInMapBounds(adjacentPosition) && !map.isPositionOccupied(adjacentPosition))
+		if (map.isWithinBounds(adjacentPosition) && !map.isPositionOccupied(adjacentPosition))
 		{
 			auto previousAssignedPosition =
 				std::find_if(previousAssignedPositions.cbegin(), previousAssignedPositions.cend(), [&](const auto& position)

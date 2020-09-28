@@ -607,8 +607,8 @@ void Faction::revalidateExistingUnitPaths(const Map& map)
 
 bool Faction::instructWorkerToBuild(eEntityType entityType, const glm::vec3& position, const Map& map, Worker& worker)
 {
-    assert(Globals::isPositionInMapBounds(position) && !map.isPositionOccupied(position));
-    
+    assert(map.isWithinBounds(position) && !map.isPositionOccupied(position));
+
     switch (entityType)
     {
     case eEntityType::Barracks:
