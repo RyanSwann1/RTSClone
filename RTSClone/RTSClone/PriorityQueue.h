@@ -22,11 +22,16 @@ struct PriorityQueueNode
 	float h; 
 };
 
+namespace GameMessages
+{
+	struct NewMapSize;
+};
 const auto nodeCompare = [](const auto& a, const auto& b) -> bool { return b.getF() < a.getF(); };
 class PriorityQueue : private std::priority_queue<PriorityQueueNode, std::vector<PriorityQueueNode>, decltype(nodeCompare)>
 {
 public:
-	PriorityQueue(size_t maxSize);
+	PriorityQueue();
+	~PriorityQueue();
 
 	size_t getSize() const;
 	bool isEmpty() const;
@@ -41,8 +46,9 @@ public:
 	void clear();
 
 private:
-	const size_t m_maxSize;
+	size_t m_maxSize;
 	std::unordered_set<glm::ivec2> m_addedNodePositions;
 
 	void eraseNode(const glm::ivec2& position);
+	void onNewMapSize(const GameMessages::NewMapSize& gameMessage);
 };

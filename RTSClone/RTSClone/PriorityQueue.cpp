@@ -1,4 +1,6 @@
 #include "PriorityQueue.h"
+#include "GameMessages.h"
+#include "GameMessenger.h"
 #include <iostream>
 
 //PriorityQueueNode
@@ -15,12 +17,18 @@ float PriorityQueueNode::getF() const
 }
 
 //PriorityQueue
-PriorityQueue::PriorityQueue(size_t maxSize)
+PriorityQueue::PriorityQueue()
 	: priority_queue(nodeCompare),
-	m_maxSize(maxSize),
+	m_maxSize(),
 	m_addedNodePositions()
 {
-	c.reserve(maxSize);
+	GameMessenger::getInstance().subscribe<GameMessages::NewMapSize>(
+		[this](const GameMessages::NewMapSize& gameMessage) { return onNewMapSize(gameMessage); }, this);
+}
+
+PriorityQueue::~PriorityQueue()
+{
+	GameMessenger::getInstance().unsubscribe<GameMessages::NewMapSize>(this);
 }
 
 size_t PriorityQueue::getSize() const
@@ -45,6 +53,13 @@ void PriorityQueue::eraseNode(const glm::ivec2& position)
 
 	m_addedNodePositions.erase(position);
 	c.erase(node);
+}
+
+void PriorityQueue::onNewMapSize(const GameMessages::NewMapSize& gameMessage)
+{
+	m_maxSize = static_cast<size_t>(gameMessage.mapSize.x * gameMessage.mapSize.y);
+	clear();
+	c.reserve(m_maxSize);
 }
 
 bool PriorityQueue::isEmpty() const
