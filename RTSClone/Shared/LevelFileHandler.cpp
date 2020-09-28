@@ -8,6 +8,8 @@
 #include "FactionPlayer.h"
 #include "FactionAI.h"
 #include "SceneryGameObject.h"
+#include "GameMessages.h"
+#include "GameMessenger.h"
 #endif // GAME
 #include "Globals.h"
 #include "Entity.h"
@@ -23,9 +25,9 @@ void loadInScenery(std::ifstream& file, std::vector<SceneryGameObject>& scenery)
 
 #ifdef LEVEL_EDITOR
 void saveMapSizeToFile(std::ostream& os, const glm::ivec2& mapSize);
-glm::ivec2 loadMapSizeFromFile(std::ifstream& file);
 #endif // LEVEL_EDITOR
 
+glm::ivec2 loadMapSizeFromFile(std::ifstream& file);
 bool isPlayerActive(std::ifstream& file, eFactionController factionController);
 
 void LevelFileHandler::loadFromFile(std::ifstream& file, const std::function<void(const std::string&)>& data, 
@@ -129,6 +131,7 @@ void saveMapSizeToFile(std::ostream& os, const glm::ivec2& mapSize)
 	os << Globals::TEXT_HEADER_MAP_SIZE << "\n";
 	os << mapSize.x << " " << mapSize.y << "\n";
 }
+#endif // LEVEL_EDITOR
 
 glm::ivec2 loadMapSizeFromFile(std::ifstream& file)
 {
@@ -148,7 +151,6 @@ glm::ivec2 loadMapSizeFromFile(std::ifstream& file)
 
 	return mapSize;
 }
-#endif // LEVEL_EDITOR
 
 bool isPlayerActive(std::ifstream& file, eFactionController factionController)
 {
@@ -181,6 +183,8 @@ bool LevelFileHandler::loadLevelFromFile(const std::string& fileName, std::vecto
 	{
 		return false;
 	}
+
+	GameMessenger::getInstance().broadcast<GameMessages::NewMapSize>({ loadMapSizeFromFile(file) });
 
 	for (const auto& factionControllerDetails : FACTION_CONTROLLER_DETAILS)
 	{
