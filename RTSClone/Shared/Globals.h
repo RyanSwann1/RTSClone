@@ -19,6 +19,7 @@ namespace Globals
 	const std::string SHARED_FILE_DIRECTORY = "../Shared/";
 	const std::string TEXT_HEADER_BEGINNING = "#";
 	const std::string TEXT_HEADER_SCENERY = TEXT_HEADER_BEGINNING + "Scenery";
+	constexpr glm::vec3 TERRAIN_POSITION = { 0.0f, -0.01f, 0.0f };
 	constexpr unsigned int INVALID_OPENGL_ID = 0;
 	constexpr float GROUND_HEIGHT = 0.0f;
 	constexpr int MAP_SIZE = 30;

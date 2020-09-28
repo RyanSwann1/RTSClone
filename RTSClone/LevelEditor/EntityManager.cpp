@@ -9,7 +9,7 @@
 #include <sstream>
 
 EntityManager::EntityManager()
-	: m_terrain(eModelName::Terrain, Globals::TERRAIN_STARTING_POSITION),
+	: m_terrain(eModelName::Terrain, Globals::TERRAIN_POSITION),
 	m_entities(),
 	m_selectedEntityID(Globals::INVALID_ENTITY_ID)
 {}
