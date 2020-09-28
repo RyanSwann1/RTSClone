@@ -24,14 +24,12 @@ namespace
     };
 }
 
-PlayableAreaDisplay::PlayableAreaDisplay(const glm::ivec2& size)
+PlayableAreaDisplay::PlayableAreaDisplay()
     : m_vaoID(Globals::INVALID_OPENGL_ID),
     m_vboID(Globals::INVALID_OPENGL_ID)
 {
     glGenVertexArrays(1, &m_vaoID);
     glGenBuffers(1, &m_vboID);
-
-    setSize(size);
 }
 
 PlayableAreaDisplay::~PlayableAreaDisplay()

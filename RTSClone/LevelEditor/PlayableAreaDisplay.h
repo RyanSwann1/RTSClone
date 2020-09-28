@@ -8,7 +8,7 @@ class ShaderHandler;
 class PlayableAreaDisplay : private NonMovable, private NonCopyable
 {
 public:
-	PlayableAreaDisplay(const glm::ivec2& size);
+	PlayableAreaDisplay();
 	~PlayableAreaDisplay();
 
 	void setSize(const glm::ivec2& size);

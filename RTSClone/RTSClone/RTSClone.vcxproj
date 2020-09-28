@@ -266,6 +266,7 @@
     <ClInclude Include="Level.h" />
     <ClInclude Include="UIManager.h" />
     <ClInclude Include="EntityTarget.h" />
+    <ClInclude Include="TypeComparison.h" />
     <ClInclude Include="Faction.h" />
     <ClInclude Include="FactionAI.h" />
     <ClInclude Include="FactionPlayer.h" />

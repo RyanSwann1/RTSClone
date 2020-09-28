@@ -102,7 +102,6 @@ public:
 		const AdjacentPositions& adjacentPositions, const std::list<Unit>& units, const Map& map);
 
 	void clearAttackPositions();
-	void setMapSize(const glm::ivec2& mapSize);
 
 private:
 	PathFinding();

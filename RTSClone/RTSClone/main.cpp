@@ -40,10 +40,10 @@
 //Game engine from scratch
 //https://www.gamasutra.com/blogs/MichaelKissner/20151027/257369/Writing_a_Game_Engine_from_Scratch__Part_1_Messaging.php
 
-bool loadLevel(std::unique_ptr<Level>& level, const std::string& levelName, Map& map) 
+bool loadLevel(std::unique_ptr<Level>& level, const std::string& levelName) 
 {
 	assert(!level);
-	level = Level::create(levelName, map); 
+	level = Level::create(levelName); 
 	assert(level);
 	if (!level)
 	{
@@ -92,10 +92,10 @@ int main()
 	sf::Clock gameClock;
 	Camera camera;
 	UIManager UIManager;
-	Map map;
+	std::unique_ptr<Map> map = std::make_unique<Map>();
 	std::string levelName = "Level.txt";
 	std::unique_ptr<Level> level; 
-	if (!loadLevel(level, levelName, map))
+	if (!loadLevel(level, levelName))
 	{
 		return -1;
 	}
@@ -127,7 +127,7 @@ int main()
 				}
 				else if (currentSFMLEvent.key.code == sf::Keyboard::Enter && !level)
 				{
-					if (!loadLevel(level, levelName, map))
+					if (!loadLevel(level, levelName))
 					{
 						return -1;
 					}
@@ -137,7 +137,7 @@ int main()
 
 			if (level)
 			{
-				level->handleInput(window, camera, currentSFMLEvent, map);
+				level->handleInput(window, camera, currentSFMLEvent, *map);
 			}
 		}
 
@@ -156,7 +156,7 @@ int main()
 		//Update
 		if (level)
 		{
-			level->update(deltaTime, map);
+			level->update(deltaTime, *map);
 		}
 		camera.update(deltaTime);
 

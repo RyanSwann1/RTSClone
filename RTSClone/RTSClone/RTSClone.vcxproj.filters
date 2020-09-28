@@ -341,6 +341,9 @@
     <ClInclude Include="ProjectileHandler.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="TypeComparison.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="..\Shared\AABB.h">
       <Filter>Header Files</Filter>
     </ClInclude>

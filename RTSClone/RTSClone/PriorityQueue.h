@@ -26,7 +26,7 @@ const auto nodeCompare = [](const auto& a, const auto& b) -> bool { return b.get
 class PriorityQueue : private std::priority_queue<PriorityQueueNode, std::vector<PriorityQueueNode>, decltype(nodeCompare)>
 {
 public:
-	PriorityQueue();
+	PriorityQueue(size_t maxSize);
 
 	size_t getSize() const;
 	bool isEmpty() const;
@@ -35,14 +35,13 @@ public:
 	const PriorityQueueNode& getNode(const glm::ivec2& position) const;
 	bool isSuccessorNodeValid(const PriorityQueueNode& successorNode) const;
 
-	void setSize(const glm::ivec2& mapSize);
 	void changeNode(const PriorityQueueNode& newNode);
 	void add(const PriorityQueueNode& node);
 	void popTop();
 	void clear();
 
 private:
-	size_t m_maxSize;
+	const size_t m_maxSize;
 	std::unordered_set<glm::ivec2> m_addedNodePositions;
 
 	void eraseNode(const glm::ivec2& position);

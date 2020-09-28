@@ -19,7 +19,7 @@ class ShaderHandler;
 class Level : private NonCopyable, private NonMovable
 {
 public:
-	static std::unique_ptr<Level> create(const std::string& levelName, Map& map);
+	static std::unique_ptr<Level> create(const std::string& levelName);
 	~Level();
 
 	eFactionController getWinningFactionController() const;

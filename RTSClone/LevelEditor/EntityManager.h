@@ -7,7 +7,7 @@
 #include <memory>
 #include <ostream>
 
-class SelectionBox;
+struct SelectionBox;
 class ShaderHandler;
 enum class eModelName;
 class EntityManager : private NonCopyable, private NonMovable
