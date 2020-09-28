@@ -18,6 +18,7 @@
 #include <sstream>
 
 #ifdef GAME
+void loadInPlayers(std::ifstream& file, std::array<std::unique_ptr<Faction>, static_cast<size_t>(eFactionController::Max) + 1>& factions);
 void loadInPlayer(std::ifstream& file, std::array<std::unique_ptr<Faction>, static_cast<size_t>(eFactionController::Max) + 1>& factions,
 	const FactionControllerDetails& factionControllerDetails);
 void loadInScenery(std::ifstream& file, std::vector<SceneryGameObject>& scenery);
@@ -185,7 +186,14 @@ bool LevelFileHandler::loadLevelFromFile(const std::string& fileName, std::vecto
 	}
 
 	GameMessenger::getInstance().broadcast<GameMessages::NewMapSize>({ loadMapSizeFromFile(file) });
+	loadInPlayers(file, factions);
+	loadInScenery(file, scenery);
 
+	return true;
+}
+
+void loadInPlayers(std::ifstream& file, std::array<std::unique_ptr<Faction>, static_cast<size_t>(eFactionController::Max) + 1>& factions)
+{
 	for (const auto& factionControllerDetails : FACTION_CONTROLLER_DETAILS)
 	{
 		switch (factionControllerDetails.controller)
@@ -206,10 +214,6 @@ bool LevelFileHandler::loadLevelFromFile(const std::string& fileName, std::vecto
 			assert(false);
 		}
 	}
-
-	loadInScenery(file, scenery);
-
-	return true;
 }
 
 void loadInPlayer(std::ifstream& file, std::array<std::unique_ptr<Faction>, static_cast<size_t>(eFactionController::Max) + 1>& factions,
