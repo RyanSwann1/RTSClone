@@ -21,12 +21,16 @@ void loadInPlayer(std::ifstream& file, std::array<std::unique_ptr<Faction>, stat
 void loadInScenery(std::ifstream& file, std::vector<SceneryGameObject>& scenery);
 #endif // GAME
 
+#ifdef LEVEL_EDITOR
+void saveMapSizeToFile(std::ostream& os, const glm::ivec2& mapSize);
+glm::ivec2 loadMapSizeFromFile(std::ifstream& file);
+#endif // LEVEL_EDITOR
+
 bool isPlayerActive(std::ifstream& file, eFactionController factionController);
 
 void LevelFileHandler::loadFromFile(std::ifstream& file, const std::function<void(const std::string&)>& data, 
 	const std::function<bool(const std::string&)>& conditional)
 {
-	//TODO: Add error check on functionpointers
 	assert(file.is_open() && data && conditional);
 	bool beginReadingFromFile = false;
 	std::string line;
@@ -55,7 +59,7 @@ void LevelFileHandler::loadFromFile(std::ifstream& file, const std::function<voi
 
 #ifdef LEVEL_EDITOR
 bool LevelFileHandler::saveLevelToFile(const std::string& fileName, const EntityManager& entityManager,
-	const std::vector<Player>& players)
+	const std::vector<Player>& players, const glm::ivec2& mapSize)
 {
 	std::ofstream file(Globals::SHARED_FILE_DIRECTORY + fileName);
 	assert(file.is_open());
@@ -68,6 +72,8 @@ bool LevelFileHandler::saveLevelToFile(const std::string& fileName, const Entity
 	{
 		file << player;
 	}
+	
+	saveMapSizeToFile(file, mapSize);
 
 	file << entityManager;
 	file.close();
@@ -75,7 +81,8 @@ bool LevelFileHandler::saveLevelToFile(const std::string& fileName, const Entity
 	return true;
 }
 
-bool LevelFileHandler::loadLevelFromFile(const std::string& fileName, EntityManager& entityManager, std::vector<Player>& players)
+bool LevelFileHandler::loadLevelFromFile(const std::string& fileName, EntityManager& entityManager, std::vector<Player>& players, 
+	glm::ivec2& mapSize)
 {
 	std::ifstream file(Globals::SHARED_FILE_DIRECTORY + fileName);
 	if (!file.is_open())
@@ -104,6 +111,8 @@ bool LevelFileHandler::loadLevelFromFile(const std::string& fileName, EntityMana
 		}
 	}
 
+	mapSize = loadMapSizeFromFile(file);
+
 	for (auto& player : players)
 	{
 		file >> player;
@@ -113,6 +122,31 @@ bool LevelFileHandler::loadLevelFromFile(const std::string& fileName, EntityMana
 	file.close();
 
 	return true;
+}
+
+void saveMapSizeToFile(std::ostream& os, const glm::ivec2& mapSize)
+{
+	os << Globals::TEXT_HEADER_MAP_SIZE << "\n";
+	os << mapSize.x << " " << mapSize.y << "\n";
+}
+
+glm::ivec2 loadMapSizeFromFile(std::ifstream& file)
+{
+	glm::ivec2 mapSize = { 0, 0 };
+	auto data = [&mapSize](const std::string& line)
+	{
+		std::stringstream stream{ line };
+		stream >> mapSize.x >> mapSize.y;
+	};
+
+	auto conditional = [](const std::string& line)
+	{
+		return line == Globals::TEXT_HEADER_MAP_SIZE;
+	};
+
+	LevelFileHandler::loadFromFile(file, data, conditional);
+
+	return mapSize;
 }
 #endif // LEVEL_EDITOR
 
