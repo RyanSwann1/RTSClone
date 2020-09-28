@@ -49,7 +49,7 @@ void PlannedBuilding::setPosition(const glm::vec3& newPosition, const Map& map)
 {
     assert(m_workerID != Globals::INVALID_ENTITY_ID);
 
-    if (Globals::isPositionInMapBounds(newPosition) && !map.isPositionOccupied(newPosition))
+    if (map.isWithinBounds(newPosition) && !map.isPositionOccupied(newPosition))
     {
         m_position = Globals::convertToMiddleGridPosition(Globals::convertToNodePosition(newPosition));
     }

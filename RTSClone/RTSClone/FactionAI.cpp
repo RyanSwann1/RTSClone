@@ -20,7 +20,7 @@
 
 namespace
 {
-	constexpr float DELAY_TIME = 15.0f;
+	constexpr float DELAY_TIME = 3.0f;
 	constexpr int STARTING_WORKER_COUNT = 4;
 	constexpr int STARTING_UNIT_COUNT = 1;
 }
@@ -148,7 +148,7 @@ void FactionAI::update(float deltaTime, const Map & map, FactionHandler& faction
 			if (worker.getCurrentState() == eUnitState::Idle)
 			{
 				const Mineral& mineralToHarvest = getRandomMineral();
-				glm::vec3 destination = PathFinding::getInstance().getClosestPositionOutsideAABB(worker.getPosition(),
+				glm::vec3 destination = PathFindingLocator::get().getClosestPositionOutsideAABB(worker.getPosition(),
 					mineralToHarvest.getAABB(), mineralToHarvest.getPosition(), map);
 
 				worker.moveTo(destination, map, [&](const glm::ivec2& position) { return getAdjacentPositions(position, map); },
@@ -172,7 +172,7 @@ void FactionAI::update(float deltaTime, const Map & map, FactionHandler& faction
 
 bool FactionAI::instructWorkerToBuild(eEntityType entityType, const glm::vec3& position, const Map& map, Worker& worker)
 {
-	if (Globals::isPositionInMapBounds(position) && !map.isPositionOccupied(position) && !m_workers.empty())
+	if (map.isWithinBounds(position) && !map.isPositionOccupied(position) && !m_workers.empty())
 	{
 		return Faction::instructWorkerToBuild(entityType, position, map, worker);
 	}
@@ -236,7 +236,7 @@ bool FactionAI::isBuildingSpawnAvailable(const glm::vec3& startingPosition, eEnt
 
 	m_frontier.push(Globals::convertToGridPosition(startingPosition));
 	bool foundBuildPosition = false;
-	glm::ivec2 buildPositionOnGrid = { 0.0f, 0.0f };
+	glm::ivec2 buildPositionOnGrid = { 0, 0 };
 
 	while (!foundBuildPosition && !m_frontier.empty())
 	{
@@ -257,15 +257,15 @@ bool FactionAI::isBuildingSpawnAvailable(const glm::vec3& startingPosition, eEnt
 					buildPositionOnGrid = adjacentPosition.position;
 					break;
 				}
-				else if(!m_graph.isPositionVisited(adjacentPosition.position))
+				else if(!m_graph.isPositionVisited(adjacentPosition.position, map))
 				{
-					m_graph.addToGraph(adjacentPosition.position, position);
+					m_graph.addToGraph(adjacentPosition.position, position, map);
 					m_frontier.push(adjacentPosition.position);
 				}
 			}
 		}
 
-		assert(m_frontier.size() <= Globals::MAP_SIZE * Globals::MAP_SIZE);
+		assert(m_frontier.size() <= map.getSize().x * map.getSize().y);// Globals::MAP_SIZE* Globals::MAP_SIZE);
 	}
 
 	buildPosition = Globals::convertToWorldPosition(buildPositionOnGrid);

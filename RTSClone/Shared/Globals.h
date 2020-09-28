@@ -60,32 +60,6 @@ namespace Globals
 		2, 3, 0
 	};
 
-	inline bool isWithinMapBounds(const AABB& AABB)
-	{
-		return AABB.getLeft() >= 0 &&
-			AABB.getRight() < Globals::MAP_SIZE * Globals::NODE_SIZE&&
-			AABB.getBack() >= 0 &&
-			AABB.getForward() < Globals::MAP_SIZE * Globals::NODE_SIZE;
-	}
-
-	inline bool isPositionInMapBounds(const glm::ivec2& position)
-	{
-		return position.x >= 0 &&
-			position.x < Globals::MAP_SIZE &&
-			position.y >= 0 &&
-			position.y < Globals::MAP_SIZE;
-	}
-
-	inline bool isPositionInMapBounds(const glm::vec3& position)
-	{
-		return position.x >= 0 &&
-			position.x < Globals::MAP_SIZE * Globals::NODE_SIZE &&
-			position.y >= 0 &&
-			position.y < Globals::MAP_SIZE * Globals::NODE_SIZE &&
-			position.z >= 0 &&
-			position.z < Globals::MAP_SIZE * Globals::NODE_SIZE;
-	}
-
 	inline void print(const std::string& text)
 	{
 		static sf::Clock clock;
@@ -187,9 +161,10 @@ namespace Globals
 		return { position.x / Globals::NODE_SIZE, position.z / Globals::NODE_SIZE };
 	}
 
-	inline int convertTo1D(const glm::ivec2& position)
+	inline int convertTo1D(const glm::ivec2& position, const glm::ivec2& mapSize)
 	{
-		return position.x * Globals::MAP_SIZE + position.y;
+		return position.x * mapSize.x + position.y;
+		//return position.x * Globals::MAP_SIZE + position.y;
 	}
 
 	inline glm::vec3 moveTowards(const glm::vec3& currentPosition, const glm::vec3& targetPosition, float maxDistanceDelta)

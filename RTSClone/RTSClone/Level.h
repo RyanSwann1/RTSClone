@@ -13,7 +13,6 @@
 #include <memory>
 #include <SFML/Graphics.hpp>
 
-class Map;
 struct Camera;
 class ShaderHandler;
 class Level : private NonCopyable, private NonMovable
@@ -42,7 +41,7 @@ public:
 private:
 	Level(std::vector<SceneryGameObject>&& scenery, 
 		std::array<std::unique_ptr<Faction>, static_cast<size_t>(eFactionController::Max) + 1>&& factions);
-	
+
 	std::vector<SceneryGameObject> m_scenery;
 	std::array<std::unique_ptr<Faction>, static_cast<size_t>(eFactionController::Max) + 1> m_factions;
 	FactionHandler m_factionHandler;

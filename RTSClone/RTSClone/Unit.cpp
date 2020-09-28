@@ -8,6 +8,8 @@
 #include "GameEventHandler.h"
 #include "GameEvent.h"
 #include "FactionHandler.h"
+#include "PathFindingLocator.h"
+#include "PathFinding.h"
 
 namespace
 {
@@ -129,7 +131,7 @@ void Unit::moveToAttackPosition(const Entity& targetEntity, eFactionController t
 		closestDestination = m_pathToPosition.back();
 	}
 
-	PathFinding::getInstance().setUnitAttackPosition(*this, targetEntity, m_pathToPosition, map, m_owningFaction.getUnits());
+	PathFindingLocator::get().setUnitAttackPosition(*this, targetEntity, m_pathToPosition, map, m_owningFaction.getUnits());
 	if (!m_pathToPosition.empty())
 	{
 		m_target.set(targetFaction, targetEntity.getID());
@@ -158,7 +160,7 @@ void Unit::moveTo(const glm::vec3& destinationPosition, const Map& map, const Ad
 		closestDestination = m_pathToPosition.back();
 	}
 
-	PathFinding::getInstance().getPathToPosition(*this, destinationPosition, m_pathToPosition, adjacentPositions, 
+	PathFindingLocator::get().getPathToPosition(*this, destinationPosition, m_pathToPosition, adjacentPositions,
 		m_owningFaction.getUnits(), map);
 	if (!m_pathToPosition.empty())
 	{
@@ -206,7 +208,7 @@ void Unit::update(float deltaTime, FactionHandler& factionHandler, const Map& ma
 				const Entity* targetEntity = opposingFaction->getEntity(m_position, UNIT_ATTACK_RANGE);
 				if (targetEntity)
 				{
-					if (PathFinding::getInstance().isTargetInLineOfSight(m_position, *targetEntity, map))
+					if (PathFindingLocator::get().isTargetInLineOfSight(m_position, *targetEntity, map))
 					{
 						switchToState(eUnitState::AttackingTarget, map);
 					}
@@ -238,7 +240,7 @@ void Unit::update(float deltaTime, FactionHandler& factionHandler, const Map& ma
 			{
 				if(Globals::getSqrDistance(targetEntity->getPosition(), m_position) <= UNIT_ATTACK_RANGE * UNIT_ATTACK_RANGE)
 				{
-					if (!PathFinding::getInstance().isTargetInLineOfSight(m_position, *targetEntity, map))
+					if (!PathFindingLocator::get().isTargetInLineOfSight(m_position, *targetEntity, map))
 					{
 						moveTo(targetEntity->getPosition(), map, [&](const glm::ivec2& position)
 							{ return getAdjacentPositions(position, map, m_owningFaction.getUnits(), *this); }, eUnitState::Moving);
@@ -283,7 +285,7 @@ void Unit::update(float deltaTime, FactionHandler& factionHandler, const Map& ma
 			for (const auto& opposingFaction : factionHandler.getOpposingFactions(m_owningFaction.getController()))
 			{
 				const Entity* targetEntity = opposingFaction->getEntity(m_position, UNIT_ATTACK_RANGE);
-				if (targetEntity && PathFinding::getInstance().isTargetInLineOfSight(m_position, *targetEntity, map))
+				if (targetEntity && PathFindingLocator::get().isTargetInLineOfSight(m_position, *targetEntity, map))
 				{
 					m_target.set(opposingFaction->getController(), targetEntity->getID());
 					switchToState(eUnitState::AttackingTarget, map, targetEntity);
@@ -319,8 +321,9 @@ void Unit::update(float deltaTime, FactionHandler& factionHandler, const Map& ma
 				if (targetEntity)
 				{
 					if ((Globals::getSqrDistance(targetEntity->getPosition(), m_position) > UNIT_ATTACK_RANGE * UNIT_ATTACK_RANGE) ||
-						!PathFinding::getInstance().isTargetInLineOfSight(m_position, *targetEntity, map))
+						!PathFindingLocator::get().isTargetInLineOfSight(m_position, *targetEntity, map))
 					{
+						//TODO: ??
 						/*moveTo(targetEntity->getPosition(), map, [&](const glm::ivec2& position)
 							{ return getAdjacentPositions(position, map, m_owningFaction.getUnits(), *this); });*/
 					}
@@ -366,7 +369,7 @@ void Unit::switchToState(eUnitState newState, const Map& map, const Entity* targ
 	case eUnitState::AttackingTarget:
 		if (!Globals::isOnMiddlePosition(m_position) && targetEntity)
 		{
-			m_pathToPosition.emplace_back(PathFinding::getInstance().getClosestPositionFromUnitToTarget(*this, *targetEntity, m_pathToPosition,
+			m_pathToPosition.emplace_back(PathFindingLocator::get().getClosestPositionFromUnitToTarget(*this, *targetEntity, m_pathToPosition,
 				map, [&](const glm::ivec2& position) { return getAdjacentPositions(position, map, m_owningFaction.getUnits(), *this); }));
 		}
 		break;

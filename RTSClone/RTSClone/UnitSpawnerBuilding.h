@@ -4,6 +4,7 @@
 #include "Timer.h"
 #include <functional>
 
+class Map;
 class Faction;
 class UnitSpawnerBuilding : public Entity, private NonMovable
 {
@@ -17,7 +18,7 @@ public:
 	const glm::vec3& getWaypointPosition() const;
 	glm::vec3 getUnitSpawnPosition() const;
 
-	void setWaypointPosition(const glm::vec3& position);
+	void setWaypointPosition(const glm::vec3& position, const Map& map);
 	void render(ShaderHandler& shaderHandler) const;
 
 protected:

@@ -9,6 +9,7 @@
 #include "GameEventHandler.h"
 #include "GameEvent.h"
 #include "FactionHandler.h"
+#include "PathFindingLocator.h"
 
 namespace
 {
@@ -119,7 +120,7 @@ void Worker::update(float deltaTime, const UnitSpawnerBuilding& HQ, const Map& m
 			GameEventHandler::getInstance().addEvent({ eGameEventType::AddResources, m_owningFaction.getController(), getID() });
 			if (m_mineralToHarvest)
 			{
-				glm::vec3 destination = PathFinding::getInstance().getClosestPositionOutsideAABB(m_position,
+				glm::vec3 destination = PathFindingLocator::get().getClosestPositionOutsideAABB(m_position,
 					m_mineralToHarvest->getAABB(), m_mineralToHarvest->getPosition(), map);
 
 				moveTo(destination, map, [&](const glm::ivec2& position) { return getAdjacentPositions(position, map); },
@@ -150,7 +151,7 @@ void Worker::update(float deltaTime, const UnitSpawnerBuilding& HQ, const Map& m
 			m_harvestTimer.setActive(false);
 			m_pathToPosition.clear();
 
-			glm::vec3 destination = PathFinding::getInstance().getClosestPositionOutsideAABB(m_position,
+			glm::vec3 destination = PathFindingLocator::get().getClosestPositionOutsideAABB(m_position,
 				HQ.getAABB(), HQ.getPosition(), map);
 			moveTo(destination, map, [&](const glm::ivec2& position) { return getAdjacentPositions(position, map); }, eUnitState::ReturningMineralsToHQ);
 		}
@@ -195,7 +196,7 @@ void Worker::update(float deltaTime, const UnitSpawnerBuilding& HQ, const Map& m
 		{
 			if (newBuilding)
 			{
-				glm::vec3 destination = PathFinding::getInstance().getClosestPositionOutsideAABB(m_position,
+				glm::vec3 destination = PathFindingLocator::get().getClosestPositionOutsideAABB(m_position,
 					newBuilding->getAABB(), newBuilding->getPosition(), map);
 				moveTo(destination, map, [&](const glm::ivec2& position) { return getAdjacentPositions(position, map); });
 				assert(!m_pathToPosition.empty());

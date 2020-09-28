@@ -10,41 +10,41 @@
 
 namespace
 {
-	bool isPriorityQueueWithinSizeLimit(const PriorityQueue& priorityQueue)
+	bool isPriorityQueueWithinSizeLimit(const PriorityQueue& priorityQueue, const glm::ivec2& mapSize)
 	{
-		return static_cast<int>(priorityQueue.getSize()) <= Globals::MAP_SIZE * Globals::MAP_SIZE;
+		return static_cast<int>(priorityQueue.getSize()) <= mapSize.x * mapSize.y;// Globals::MAP_SIZE* Globals::MAP_SIZE;
 	}
 
-	bool isFrontierWithinSizeLimit(const std::queue<glm::ivec2>& frontier)
+	bool isFrontierWithinSizeLimit(const std::queue<glm::ivec2>& frontier, const glm::ivec2& mapSize)
 	{
-		return static_cast<int>(frontier.size()) <= Globals::MAP_SIZE * Globals::MAP_SIZE;
+		return static_cast<int>(frontier.size()) <= mapSize.x * mapSize.y;// Globals::MAP_SIZE* Globals::MAP_SIZE;
 	}
 
-	bool isPathWithinSizeLimit(const std::vector<glm::vec3>& pathToPosition)
+	bool isPathWithinSizeLimit(const std::vector<glm::vec3>& pathToPosition, const glm::ivec2& mapSize)
 	{
-		return static_cast<int>(pathToPosition.size()) <= Globals::MAP_SIZE * Globals::MAP_SIZE;
+		return static_cast<int>(pathToPosition.size()) <= mapSize.x * mapSize.y;// Globals::MAP_SIZE* Globals::MAP_SIZE;
 	}
 
 	void getPathFromVisitedNodes(const glm::ivec2& startingPosition, const glm::ivec2& destinationPositionOnGrid, 
-		std::vector<glm::vec3>& pathToPosition, Graph& graph)
+		std::vector<glm::vec3>& pathToPosition, Graph& graph, const Map& map)
 	{
 		pathToPosition.push_back(Globals::convertToWorldPosition(destinationPositionOnGrid));
-		glm::ivec2 position = graph.getPreviousPosition(destinationPositionOnGrid);
+		glm::ivec2 position = graph.getPreviousPosition(destinationPositionOnGrid, map);
 
 		while (position != startingPosition)
 		{
 			pathToPosition.push_back(Globals::convertToWorldPosition(position));
-			position = graph.getPreviousPosition(position);
+			position = graph.getPreviousPosition(position, map);
 
-			assert(isPathWithinSizeLimit(pathToPosition));
+			assert(isPathWithinSizeLimit(pathToPosition, map.getSize()));
 		}
 	}
 
 	void getPathFromVisitedNodes(const glm::ivec2& startingPosition, const glm::ivec2& destinationPositionOnGrid, const glm::vec3& destinationPosition, 
-		std::vector<glm::vec3>& pathToPosition, Graph& graph)
+		std::vector<glm::vec3>& pathToPosition, Graph& graph, const Map& map)
 	{
 		pathToPosition.push_back(destinationPosition);
-		glm::ivec2 positionOnGrid = graph.getPreviousPosition(destinationPositionOnGrid);
+		glm::ivec2 positionOnGrid = graph.getPreviousPosition(destinationPositionOnGrid, map);
 
 		while (positionOnGrid != startingPosition)
 		{
@@ -52,14 +52,14 @@ namespace
 			position.x += static_cast<float>(Globals::NODE_SIZE) / 2.0f;
 			position.z -= static_cast<float>(Globals::NODE_SIZE) / 2.0f;
 			pathToPosition.push_back(Globals::convertToWorldPosition(positionOnGrid));
-			positionOnGrid = graph.getPreviousPosition(positionOnGrid);
+			positionOnGrid = graph.getPreviousPosition(positionOnGrid, map);
 
-			assert(isPathWithinSizeLimit(pathToPosition));
+			assert(isPathWithinSizeLimit(pathToPosition, map.getSize()));
 		}
 	}
 
 	void getPathFromClosedQueue(std::vector<glm::vec3>& pathToPosition, const glm::ivec2& startingPositionOnGrid,
-		const PriorityQueueNode& initialNode, const PriorityQueue& closedQueue)
+		const PriorityQueueNode& initialNode, const PriorityQueue& closedQueue, const Map& map)
 	{
 		pathToPosition.push_back(Globals::convertToWorldPosition(initialNode.position));
 		glm::ivec2 parentPosition = initialNode.parentPosition;
@@ -70,12 +70,12 @@ namespace
 			parentPosition = parentNode.parentPosition;
 
 			pathToPosition.push_back(Globals::convertToWorldPosition(parentNode.position));
-			assert(isPathWithinSizeLimit(pathToPosition));
+			assert(isPathWithinSizeLimit(pathToPosition, map.getSize()));
 		}
 	}
 
 	void getPathFromClosedQueue(std::vector<glm::vec3>& pathToPosition, const glm::ivec2& startingPositionOnGrid,
-		const glm::ivec2& initialPathPosition, const PriorityQueue& closedQueue)
+		const glm::ivec2& initialPathPosition, const PriorityQueue& closedQueue, const Map& map)
 	{
 		pathToPosition.push_back(Globals::convertToWorldPosition(initialPathPosition));
 		glm::ivec2 parentPosition = closedQueue.getNode(initialPathPosition).parentPosition;
@@ -86,7 +86,7 @@ namespace
 			parentPosition = parentNode.parentPosition;
 
 			pathToPosition.push_back(Globals::convertToWorldPosition(parentNode.position));
-			assert(isPathWithinSizeLimit(pathToPosition));
+			assert(isPathWithinSizeLimit(pathToPosition, map.getSize()));
 		}
 	}
 
@@ -187,8 +187,8 @@ PathFinding::PathFinding()
 	: m_unitFormationPositions(),
 	m_graph(),
 	m_frontier(),
-	m_openQueue(static_cast<size_t>(Globals::MAP_SIZE * Globals::MAP_SIZE)),
-	m_closedQueue(static_cast<size_t>(Globals::MAP_SIZE * Globals::MAP_SIZE))
+	m_openQueue(),
+	m_closedQueue()
 {}
 
 void PathFinding::clearAttackPositions()
@@ -291,9 +291,9 @@ const std::vector<glm::vec3>& PathFinding::getFormationPositions(const glm::vec3
 		{
 			if (adjacentPosition.valid)
 			{
-				if (!m_graph.isPositionVisited(adjacentPosition.position))
+				if (!m_graph.isPositionVisited(adjacentPosition.position, map))
 				{
-					m_graph.addToGraph(adjacentPosition.position, position);
+					m_graph.addToGraph(adjacentPosition.position, position, map);
 					m_frontier.push(adjacentPosition.position);
 
 					assert(selectedUnitIndex < selectedUnits.size());
@@ -341,15 +341,15 @@ glm::vec3 PathFinding::getClosestAvailablePosition(const glm::vec3& startingPosi
 					availablePositionFound = true;
 					break;
 				}
-				else if (!m_graph.isPositionVisited(adjacentPosition.position))
+				else if (!m_graph.isPositionVisited(adjacentPosition.position, map))
 				{
-					m_graph.addToGraph(adjacentPosition.position, position);
+					m_graph.addToGraph(adjacentPosition.position, position, map);
 					m_frontier.push(adjacentPosition.position);
 				}
 			}
 		}
 
-		assert(isFrontierWithinSizeLimit(m_frontier));
+		assert(isFrontierWithinSizeLimit(m_frontier, map.getSize()));
 	}
 
 	return Globals::convertToWorldPosition(availablePositionOnGrid);
@@ -373,7 +373,7 @@ glm::vec3 PathFinding::getClosestPositionOutsideAABB(const glm::vec3& entityPosi
 	for (float ray = 1.0f; ray <= Globals::NODE_SIZE * 7.0f; ++ray)
 	{
 		position = position + direction * 1.0f;
-		if (!AABB.contains(position) && !map.isPositionOccupied(position) && Globals::isPositionInMapBounds(position))
+		if (!AABB.contains(position) && !map.isPositionOccupied(position) && map.isWithinBounds(position))// Globals::isPositionInMapBounds(position))
 		{
 			closestPosition = position;
 			break;
@@ -436,7 +436,7 @@ void PathFinding::setUnitAttackPosition(const Unit& unit, const Entity& targetEn
 		{
 			positionFound = true;
 			m_attackPositions.push_back(Globals::convertToWorldPosition(currentNode.position));
-			getPathFromClosedQueue(pathToPosition, startingPositionOnGrid, currentNode, m_closedQueue);
+			getPathFromClosedQueue(pathToPosition, startingPositionOnGrid, currentNode, m_closedQueue, map);
 		}
 		else
 		{
@@ -467,8 +467,8 @@ void PathFinding::setUnitAttackPosition(const Unit& unit, const Entity& targetEn
 
 		m_closedQueue.add(currentNode);
 
-		assert(isPriorityQueueWithinSizeLimit(m_openQueue) &&
-			isPriorityQueueWithinSizeLimit(m_closedQueue));
+		assert(isPriorityQueueWithinSizeLimit(m_openQueue, map.getSize()) &&
+			isPriorityQueueWithinSizeLimit(m_closedQueue, map.getSize()));
 	}
 
 	convertPathToWaypoints(pathToPosition, unit, units, map);
@@ -514,7 +514,7 @@ void PathFinding::getPathToPosition(const Unit& unit, const glm::vec3& destinati
 				assert(false);
 			}
 
-			getPathFromClosedQueue(pathToPosition, startingPositionOnGrid, currentNode, m_closedQueue);
+			getPathFromClosedQueue(pathToPosition, startingPositionOnGrid, currentNode, m_closedQueue, map);
 			destinationReached = true;
 		}
 		else
@@ -552,13 +552,13 @@ void PathFinding::getPathToPosition(const Unit& unit, const glm::vec3& destinati
 
 		m_closedQueue.add(currentNode);
 
-		assert(isPriorityQueueWithinSizeLimit(m_openQueue) && 
-			isPriorityQueueWithinSizeLimit(m_closedQueue));
+		assert(isPriorityQueueWithinSizeLimit(m_openQueue, map.getSize()) && 
+			isPriorityQueueWithinSizeLimit(m_closedQueue, map.getSize()));
 	}
 
 	if (pathToPosition.empty())
 	{	
-		getPathFromClosedQueue(pathToPosition, startingPositionOnGrid, closestAvailablePosition, m_closedQueue);
+		getPathFromClosedQueue(pathToPosition, startingPositionOnGrid, closestAvailablePosition, m_closedQueue, map);
 	}
 
 	convertPathToWaypoints(pathToPosition, unit, units, map);

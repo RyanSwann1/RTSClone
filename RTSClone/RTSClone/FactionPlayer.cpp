@@ -5,6 +5,7 @@
 #include "Map.h"
 #include "ModelManager.h"
 #include "PathFinding.h"
+#include "PathFindingLocator.h"
 #include "Mineral.h"
 #include "GameMessenger.h"
 #include "GameMessages.h"
@@ -121,7 +122,7 @@ namespace
             });
             if (mineralToHarvest != minerals.cend())
             {
-                selectedWorker.moveTo(PathFinding::getInstance().getClosestPositionOutsideAABB(selectedWorker.getPosition(),
+                selectedWorker.moveTo(PathFindingLocator::get().getClosestPositionOutsideAABB(selectedWorker.getPosition(),
                     mineralToHarvest->getAABB(), mineralToHarvest->getPosition(), map),
                     map, [&](const glm::ivec2& position) { return getAdjacentPositions(position, map); },
                     eUnitState::MovingToMinerals, &(*mineralToHarvest));
@@ -138,7 +139,7 @@ namespace
                 (*selectedEntity)->getHealth() < (*selectedEntity)->getMaximumHealth())
             {
                 selectedWorker.setRepairTargetEntity((*selectedEntity)->getID());
-                selectedWorker.moveTo(PathFinding::getInstance().getClosestPositionOutsideAABB(selectedWorker.getPosition(),
+                selectedWorker.moveTo(PathFindingLocator::get().getClosestPositionOutsideAABB(selectedWorker.getPosition(),
                     (*selectedEntity)->getAABB(), (*selectedEntity)->getPosition(), map),
                     map, [&](const glm::ivec2& position) { return getAdjacentPositions(position, map); },
                     eUnitState::MovingToRepairPosition);
@@ -167,7 +168,7 @@ namespace
             {
                 if (selectedUnit->getEntityType() == eEntityType::Worker)
                 {
-                    glm::vec3 destination = PathFinding::getInstance().getClosestPositionOutsideAABB(selectedUnit->getPosition(),
+                    glm::vec3 destination = PathFindingLocator::get().getClosestPositionOutsideAABB(selectedUnit->getPosition(),
                         mineralToHarvest->getAABB(), mineralToHarvest->getPosition(), map);
 
                     static_cast<Worker&>(*selectedUnit).moveTo(destination, map,
@@ -192,7 +193,7 @@ namespace
                     (*selectedEntity)->getID() != selectedUnit->getID() &&
                     (*selectedEntity)->getHealth() < (*selectedEntity)->getMaximumHealth())
                 {
-                    glm::vec3 destination = PathFinding::getInstance().getClosestPositionOutsideAABB(selectedUnit->getPosition(),
+                    glm::vec3 destination = PathFindingLocator::get().getClosestPositionOutsideAABB(selectedUnit->getPosition(),
                         (*selectedEntity)->getAABB(), (*selectedEntity)->getPosition(), map);
 
                     Worker& selectedWorker = static_cast<Worker&>(*selectedUnit);
@@ -256,7 +257,7 @@ namespace
                 Globals::getSqrDistance(targetEntity.getPosition(), selectedUnitB->getPosition());
         });
         
-        PathFinding::getInstance().clearAttackPositions();
+        PathFindingLocator::get().clearAttackPositions();
         for (auto& selectedUnit : selectedUnits)
         {
             selectedUnit->moveToAttackPosition(targetEntity, targetFaction, map);
@@ -389,7 +390,7 @@ void FactionPlayer::instructWorkerReturnMinerals(const Map& map)
     {
         if (worker.isSelected() && worker.isHoldingResources())
         {
-            glm::vec3 destination = PathFinding::getInstance().getClosestPositionOutsideAABB(worker.getPosition(), m_HQ.getAABB(), m_HQ.getPosition(), map);
+            glm::vec3 destination = PathFindingLocator::get().getClosestPositionOutsideAABB(worker.getPosition(), m_HQ.getAABB(), m_HQ.getPosition(), map);
             worker.moveTo(destination, map, [&](const glm::ivec2& position) { return getAdjacentPositions(position, map); },
                 eUnitState::ReturningMineralsToHQ);
         }
@@ -408,7 +409,7 @@ void FactionPlayer::instructUnitToAttack(Unit& unit, const Entity& targetEntity,
 
 bool FactionPlayer::instructWorkerToBuild(const Map& map)
 {
-    if (Globals::isPositionInMapBounds(m_plannedBuilding.getPosition()) && !map.isPositionOccupied(m_plannedBuilding.getPosition()))
+    if (map.isWithinBounds(m_plannedBuilding.getPosition()) && !map.isPositionOccupied(m_plannedBuilding.getPosition()))
     {
         int workerID = m_plannedBuilding.getWorkerID();
         assert(workerID != Globals::INVALID_ENTITY_ID);
@@ -507,7 +508,7 @@ void FactionPlayer::onRightClick(const sf::Window& window, const Camera& camera,
     }
     else if (m_HQ.isSelected())
     {
-        m_HQ.setWaypointPosition(mouseToGroundPosition);
+        m_HQ.setWaypointPosition(mouseToGroundPosition, map);
     }
     else
     {
@@ -515,7 +516,7 @@ void FactionPlayer::onRightClick(const sf::Window& window, const Camera& camera,
         {
             if (barracks.isSelected())
             {
-                barracks.setWaypointPosition(mouseToGroundPosition);
+                barracks.setWaypointPosition(mouseToGroundPosition, map);
             }
         }
 

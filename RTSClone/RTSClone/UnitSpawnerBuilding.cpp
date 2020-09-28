@@ -6,6 +6,7 @@
 #include "Globals.h"
 #include "ModelManager.h"
 #include "Faction.h"
+#include "Map.h"
 
 namespace
 {
@@ -104,9 +105,9 @@ void UnitSpawnerBuilding::addUnitToSpawn(const std::function<Entity* (const Unit
 	}
 }
 
-void UnitSpawnerBuilding::setWaypointPosition(const glm::vec3& position)
+void UnitSpawnerBuilding::setWaypointPosition(const glm::vec3& position, const Map& map)
 {
-	if (Globals::isPositionInMapBounds(position))
+	if (map.isWithinBounds(position))
 	{
 		if (m_AABB.contains(position))
 		{
