@@ -1,4 +1,5 @@
 #include "ModelManager.h"
+#include "Globals.h"
 #ifdef GAME
 #include "EntityType.h"
 #endif // GAME
@@ -71,7 +72,8 @@ namespace
 	std::array<std::unique_ptr<Model>, static_cast<size_t>(eModelName::Max) + 1> loadModels(bool& loadedAllModels)
 	{
 		std::array<std::unique_ptr<Model>, static_cast<size_t>(eModelName::Max) + 1> models;
-		loadModel("terrain.obj", false, { 0.0f, 0.0f, 0.0f }, eModelName::Terrain, { 500.0f, 1.0f, 500.0f },
+
+		loadModel("terrain.obj", false, { 0.0f, 0.0f, 0.0f }, eModelName::Terrain, { Globals::TERRAIN_SIZE.x, 1.0f, Globals::TERRAIN_SIZE.y },
 			models, loadedAllModels);
 
 		loadModel("meteorFull.obj", false, { 5.0f, 1.0f, 5.0f }, eModelName::Meteor, { 1.0f, 1.0f, 1.0f },

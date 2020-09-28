@@ -26,6 +26,12 @@ Graph::Graph()
 	: m_graph()
 {}
 
+void Graph::setSize(const glm::ivec2& mapSize)
+{
+	m_graph.clear();
+	m_graph.resize(static_cast<size_t>(mapSize.x * mapSize.y), GraphNode());
+}
+
 void Graph::reset(std::queue<glm::ivec2>& frontier)
 {
 	for (auto& i : m_graph)

@@ -57,7 +57,7 @@ void showPlayerDetails(Player& player, const std::string& playerName, const std:
 	ImGui::PopID();
 }
 
-constexpr glm::vec3 TERRAIN_STARTING_POSITION = { 0.0f, Globals::GROUND_HEIGHT - 0.01f, 0.0f };
+
 constexpr std::array<glm::vec3, static_cast<size_t>(eFactionController::Max) + 1> PLAYER_HQ_STARTING_POSITIONS =
 {
 	glm::vec3(35.0f, Globals::GROUND_HEIGHT, 15.0f),
@@ -114,7 +114,8 @@ int main()
 		static_cast<float>(windowSize.y), 0.0f));
 
 	const std::string levelName = "Level.txt";
-	PlayableAreaDisplay playableAreaDisplay;
+	glm::ivec2 mapSize = { 0, 0 };
+	PlayableAreaDisplay playableAreaDisplay(mapSize);
 	SelectionBox selectionBox;
 	EntityManager entityManager;
 	sf::Clock gameClock;
@@ -125,19 +126,26 @@ int main()
 	glm::vec3 previousMousePosition = { 0.0f, Globals::GROUND_HEIGHT, 0.0f };
 	bool plannedEntityActive = false;
 	bool showPlayerMenu = false;
-	Entity plannedEntity(eModelName::RocksTall, { 0.0f, 0.0f, 0.0f });
+	bool showMapDetails = false;
+	Entity plannedEntity({}, { 0.0f, 0.0f, 0.0f });
 	int selected = 0;	
 
-	if (!LevelFileHandler::loadLevelFromFile(levelName, entityManager, players))
+	if (!LevelFileHandler::loadLevelFromFile(levelName, entityManager, players, mapSize))
 	{
 		std::cout << "Failed to load level: " << levelName << "\n";
-		entityManager.addEntity(eModelName::Terrain, TERRAIN_STARTING_POSITION);
-		
+
+		mapSize = { 30, 30 };
+		playableAreaDisplay.setSize(mapSize);
+
 		players.emplace_back(eFactionController::Player, PLAYER_HQ_STARTING_POSITIONS[static_cast<int>(eFactionController::Player)], 
 			PLAYER_MINERAL_STARTING_POSITIONS[static_cast<int>(eFactionController::Player)]);
 
 		players.emplace_back(eFactionController::AI_1, PLAYER_HQ_STARTING_POSITIONS[static_cast<int>(eFactionController::AI_1)],
 			PLAYER_MINERAL_STARTING_POSITIONS[static_cast<int>(eFactionController::AI_1)]);
+	}
+	else
+	{
+		playableAreaDisplay.setSize(mapSize);
 	}
 
 	int totalPlayers = static_cast<int>(players.size());
@@ -244,10 +252,16 @@ int main()
 					if (ImGui::MenuItem("Player Details"))
 					{
 						showPlayerMenu = true;
+						showMapDetails = false;
+					}
+					if (ImGui::MenuItem("Map Details"))
+					{
+						showMapDetails = true;
+						showPlayerMenu = false;
 					}
 					if (ImGui::MenuItem("Save"))
 					{
-						if (!LevelFileHandler::saveLevelToFile(levelName, entityManager, players))
+						if (!LevelFileHandler::saveLevelToFile(levelName, entityManager, players, mapSize))
 						{
 							std::cout << "Unable to save file " + levelName << "\n";
 						}
@@ -293,6 +307,7 @@ int main()
 
 		}
 		ImGui::End();
+
 
 		if (showPlayerMenu)
 		{
@@ -345,9 +360,19 @@ int main()
 			ImGui::EndChild();
 			ImGui::End();
 		}
+		else if (showMapDetails)
+		{
+			ImGui::Begin("Map");
+			if (ImGui::InputInt("x", &mapSize.x, 1) ||
+				ImGui::InputInt("z", &mapSize.y, 1))
+			{
+				playableAreaDisplay.setSize(mapSize);
+			}
+			ImGui::End();
+		}
 
 		//Demo
-		ImGui::ShowDemoWindow();
+		//ImGui::ShowDemoWindow();
 
 		//Render
 		glm::mat4 view = camera.getView();
@@ -369,9 +394,6 @@ int main()
 		{
 			player.render(*shaderHandler);
 		}
-		//player.render(*shaderHandler);
-		//playerAI1.render(*shaderHandler);
-		//playerAI2.render(*shaderHandler);
 
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);

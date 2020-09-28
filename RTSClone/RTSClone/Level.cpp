@@ -101,11 +101,11 @@ void Level::handleGUI()
 	}
 }
 
-std::unique_ptr<Level> Level::create(const std::string& levelName)
+std::unique_ptr<Level> Level::create(const std::string& levelName, Map& map)
 {
 	std::vector<SceneryGameObject> scenery;
 	std::array<std::unique_ptr<Faction>, static_cast<size_t>(eFactionController::Max) + 1> factions;
-	if (!LevelFileHandler::loadLevelFromFile(levelName, scenery, factions))
+	if (!LevelFileHandler::loadLevelFromFile(levelName, scenery, factions, map))
 	{
 		return std::unique_ptr<Level>();
 	}
@@ -284,6 +284,7 @@ void Level::render(ShaderHandler& shaderHandler) const
 	}
 
 	m_projectileHandler.render(shaderHandler);
+	ModelManager::getInstance().getModel(eModelName::Terrain).render(shaderHandler, Globals::TERRAIN_POSITION);
 }
 
 #ifdef RENDER_AABB

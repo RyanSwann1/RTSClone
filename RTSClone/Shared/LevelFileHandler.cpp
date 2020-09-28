@@ -8,6 +8,7 @@
 #include "FactionPlayer.h"
 #include "FactionAI.h"
 #include "SceneryGameObject.h"
+#include "Map.h"
 #endif // GAME
 #include "Globals.h"
 #include "Entity.h"
@@ -19,11 +20,12 @@
 void loadInPlayer(std::ifstream& file, std::array<std::unique_ptr<Faction>, static_cast<size_t>(eFactionController::Max) + 1>& factions,
 	const FactionControllerDetails& factionControllerDetails);
 void loadInScenery(std::ifstream& file, std::vector<SceneryGameObject>& scenery);
+glm::ivec2 loadInMapSize(std::ifstream& file);
 #endif // GAME
 
 #ifdef LEVEL_EDITOR
 void saveMapSizeToFile(std::ostream& file, const glm::ivec2& mapSize);
-void loadInMapSize(std::ifstream& file, glm::ivec2& mapSize);
+void loadInMapSizeFromFile(std::ifstream& file, glm::ivec2& mapSize);
 #endif // LEVEL_EDITOR
 
 bool isPlayerActive(std::ifstream& file, eFactionController factionController);
@@ -31,7 +33,6 @@ bool isPlayerActive(std::ifstream& file, eFactionController factionController);
 void LevelFileHandler::loadFromFile(std::ifstream& file, const std::function<void(const std::string&)>& data, 
 	const std::function<bool(const std::string&)>& conditional)
 {
-	//TODO: Add error check on functionpointers
 	assert(file.is_open() && data && conditional);
 	bool beginReadingFromFile = false;
 	std::string line;
@@ -112,7 +113,7 @@ bool LevelFileHandler::loadLevelFromFile(const std::string& fileName, EntityMana
 		}
 	}
 
-	loadInMapSize(file, mapSize);
+	loadInMapSizeFromFile(file, mapSize);
 
 	for (auto& player : players)
 	{
@@ -131,7 +132,7 @@ void saveMapSizeToFile(std::ostream& os, const glm::ivec2& mapSize)
 	os << mapSize.x << " " << mapSize.y << "\n";
 }
 
-void loadInMapSize(std::ifstream& file, glm::ivec2& mapSize)
+void loadInMapSizeFromFile(std::ifstream& file, glm::ivec2& mapSize)
 {
 	assert(file.is_open());
 
@@ -172,7 +173,8 @@ bool isPlayerActive(std::ifstream& file, eFactionController factionController)
 
 #ifdef GAME
 bool LevelFileHandler::loadLevelFromFile(const std::string& fileName, std::vector<SceneryGameObject>& scenery, 
-	std::array<std::unique_ptr<Faction>, static_cast<size_t>(eFactionController::Max) + 1>& factions)
+	std::array<std::unique_ptr<Faction>, static_cast<size_t>(eFactionController::Max) + 1>& factions, 
+	Map& map)
 {
 	assert(scenery.empty());
 
@@ -203,6 +205,7 @@ bool LevelFileHandler::loadLevelFromFile(const std::string& fileName, std::vecto
 		}
 	}
 
+	map.setSize(loadInMapSize(file));
 	loadInScenery(file, scenery);
 
 	return true;
@@ -283,5 +286,26 @@ void loadInScenery(std::ifstream& file, std::vector<SceneryGameObject>& scenery)
 	};
 
 	LevelFileHandler::loadFromFile(file, data, conditional);
+}
+
+glm::ivec2 loadInMapSize(std::ifstream& file)
+{
+	assert(file.is_open());
+
+	glm::ivec2 mapSize = { 0, 0 };
+	auto data = [&mapSize](const std::string& line)
+	{
+		std::stringstream stream{ line };
+		stream >> mapSize.x >> mapSize.y;
+	};
+
+	auto conditional = [](const std::string& line)
+	{
+		return line == Globals::TEXT_MAP_SIZE;
+	};
+
+	LevelFileHandler::loadFromFile(file, data, conditional);
+
+	return mapSize;
 }
 #endif // GAME

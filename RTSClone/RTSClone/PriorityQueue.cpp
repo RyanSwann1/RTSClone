@@ -15,13 +15,11 @@ float PriorityQueueNode::getF() const
 }
 
 //PriorityQueue
-PriorityQueue::PriorityQueue(size_t maxSize)
+PriorityQueue::PriorityQueue()
 	: priority_queue(nodeCompare),
-	m_maxSize(maxSize),
+	m_maxSize(),
 	m_addedNodePositions()
-{
-	c.reserve(maxSize);
-}
+{}
 
 size_t PriorityQueue::getSize() const
 {
@@ -51,6 +49,13 @@ bool PriorityQueue::isEmpty() const
 {
 	assert(c.empty() && m_addedNodePositions.empty() || !c.empty() && !m_addedNodePositions.empty());
 	return c.empty();
+}
+
+void PriorityQueue::setSize(const glm::ivec2& mapSize)
+{
+	clear();
+	m_maxSize = static_cast<size_t>(mapSize.x * mapSize.y);
+	c.reserve(m_maxSize);
 }
 
 void PriorityQueue::changeNode(const PriorityQueueNode& newNode)

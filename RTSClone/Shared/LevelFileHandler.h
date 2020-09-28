@@ -12,6 +12,7 @@ class SceneryGameObject;
 class Faction;
 struct Player;
 class Entity;
+class Map;
 #ifdef LEVEL_EDITOR
 class EntityManager;
 #endif // LEVEL_EDITOR
@@ -29,6 +30,7 @@ namespace LevelFileHandler
 
 #ifdef GAME
 	bool loadLevelFromFile(const std::string& fileName, std::vector<SceneryGameObject>& scenery,
-		std::array<std::unique_ptr<Faction>, static_cast<size_t>(eFactionController::Max) + 1>& factions);
+		std::array<std::unique_ptr<Faction>, static_cast<size_t>(eFactionController::Max) + 1>& factions, 
+		Map& map);
 #endif // GAME
 };

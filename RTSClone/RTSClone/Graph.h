@@ -30,9 +30,11 @@ public:
 	const glm::ivec2& getPreviousPosition(const glm::ivec2& position) const;
 	bool isPositionVisited(const glm::ivec2& position) const;
 
+	void setSize(const glm::ivec2& mapSize);
 	void reset(std::queue<glm::ivec2>& frontier);
 	void addToGraph(const glm::ivec2& position, const glm::ivec2& cameFromPosition);
 
 private:
-	std::array<GraphNode, static_cast<size_t>(Globals::MAP_SIZE* Globals::MAP_SIZE)> m_graph;
+	std::vector<GraphNode> m_graph;
+	//std::array<GraphNode, static_cast<size_t>(Globals::MAP_SIZE* Globals::MAP_SIZE)> m_graph;
 };

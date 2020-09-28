@@ -19,9 +19,12 @@ namespace Globals
 	const std::string SHARED_FILE_DIRECTORY = "../Shared/";
 	const std::string TEXT_HEADER_BEGINNING = "#";
 	const std::string TEXT_HEADER_SCENERY = TEXT_HEADER_BEGINNING + "Scenery";
+	const std::string TEXT_MAP_SIZE = TEXT_HEADER_BEGINNING + "MapSize";
+	constexpr glm::ivec2 TERRAIN_SIZE = { 2000.0f, 2000.0f };
+	constexpr glm::vec3 TERRAIN_POSITION = { 0.0f, -0.01f, 0.0f };
 	constexpr unsigned int INVALID_OPENGL_ID = 0;
 	constexpr float GROUND_HEIGHT = 0.0f;
-	constexpr int MAP_SIZE = 30;
+	//constexpr int MAP_SIZE = 30;
 	constexpr int NODE_SIZE = 6;
 	constexpr int INVALID_ENTITY_ID = -1;
 	constexpr size_t MAX_MINERALS_PER_FACTION = 5;
@@ -57,32 +60,6 @@ namespace Globals
 		0, 1, 2,
 		2, 3, 0
 	};
-
-	inline bool isWithinMapBounds(const AABB& AABB)
-	{
-		return AABB.getLeft() >= 0 &&
-			AABB.getRight() < Globals::MAP_SIZE * Globals::NODE_SIZE&&
-			AABB.getBack() >= 0 &&
-			AABB.getForward() < Globals::MAP_SIZE * Globals::NODE_SIZE;
-	}
-
-	inline bool isPositionInMapBounds(const glm::ivec2& position)
-	{
-		return position.x >= 0 &&
-			position.x < Globals::MAP_SIZE &&
-			position.y >= 0 &&
-			position.y < Globals::MAP_SIZE;
-	}
-
-	inline bool isPositionInMapBounds(const glm::vec3& position)
-	{
-		return position.x >= 0 &&
-			position.x < Globals::MAP_SIZE * Globals::NODE_SIZE &&
-			position.y >= 0 &&
-			position.y < Globals::MAP_SIZE * Globals::NODE_SIZE &&
-			position.z >= 0 &&
-			position.z < Globals::MAP_SIZE * Globals::NODE_SIZE;
-	}
 
 	inline void print(const std::string& text)
 	{
@@ -185,9 +162,9 @@ namespace Globals
 		return { position.x / Globals::NODE_SIZE, position.z / Globals::NODE_SIZE };
 	}
 
-	inline int convertTo1D(const glm::ivec2& position)
+	inline int convertTo1D(const glm::ivec2& position, const glm::ivec2& mapSize)
 	{
-		return position.x * Globals::MAP_SIZE + position.y;
+		return position.x * mapSize.x + position.y;
 	}
 
 	inline glm::vec3 moveTowards(const glm::vec3& currentPosition, const glm::vec3& targetPosition, float maxDistanceDelta)
