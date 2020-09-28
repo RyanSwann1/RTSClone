@@ -1,11 +1,9 @@
 #include "Graph.h"
+#include "GameMessages.h"
+#include "GameMessenger.h"
+#include "Map.h"
 
-//Graph Node
-GraphNode::GraphNode()
-	: cameFrom(),
-	visited(false)
-{}
-
+//GraphNode
 GraphNode::GraphNode(const glm::ivec2& cameFrom)
 	: cameFrom(cameFrom),
 	visited(true)
@@ -24,26 +22,36 @@ bool GraphNode::isVisited() const
 //Graph
 Graph::Graph()
 	: m_graph()
-{}
+{
+	GameMessenger::getInstance().subscribe<GameMessages::NewMapSize>(
+		[this](const GameMessages::NewMapSize& gameMessage) { return onNewMapSize(gameMessage); }, this);
+}
+
+Graph::~Graph()
+{
+	GameMessenger::getInstance().unsubscribe<GameMessages::NewMapSize>(this);
+}
 
 void Graph::reset(std::queue<glm::ivec2>& frontier)
 {
-	for (auto& i : m_graph)
-	{
-		i = GraphNode();
-	}
-
+	m_graph.clear();
 	std::queue<glm::ivec2> empty;
 	frontier.swap(empty);
 }
 
-void Graph::addToGraph(const glm::ivec2& position, const glm::ivec2& cameFromPosition)
+void Graph::addToGraph(const glm::ivec2& position, const glm::ivec2& cameFromPosition, const Map& map)
 {
-	assert(Globals::isPositionInMapBounds(position) && !m_graph[Globals::convertTo1D(position)].isVisited());
-	if (Globals::isPositionInMapBounds(position) && !m_graph[Globals::convertTo1D(position)].isVisited())
+	assert(map.isWithinBounds(position) && !m_graph[Globals::convertTo1D(position, map.getSize())].isVisited());
+	if (map.isWithinBounds(position) && !m_graph[Globals::convertTo1D(position, map.getSize())].isVisited())
 	{
-		m_graph[Globals::convertTo1D(position)] = GraphNode(cameFromPosition);
+		m_graph[Globals::convertTo1D(position, map.getSize())] = GraphNode(cameFromPosition);
 	}
+}
+
+void Graph::onNewMapSize(const GameMessages::NewMapSize& gameMessage)
+{
+	m_graph.clear();
+	m_graph.reserve(static_cast<size_t>(gameMessage.mapSize.x * gameMessage.mapSize.y));
 }
 
 bool Graph::isEmpty() const
@@ -51,20 +59,20 @@ bool Graph::isEmpty() const
 	return m_graph.empty();
 }
 
-const glm::ivec2& Graph::getPreviousPosition(const glm::ivec2& position) const
+const glm::ivec2& Graph::getPreviousPosition(const glm::ivec2& position, const Map& map) const
 {
-	assert(Globals::isPositionInMapBounds(position) && m_graph[Globals::convertTo1D(position)].isVisited());
-	if (Globals::isPositionInMapBounds(position) && m_graph[Globals::convertTo1D(position)].isVisited())
+	assert(map.isWithinBounds(position) && m_graph[Globals::convertTo1D(position, map.getSize())].isVisited());
+	if (map.isWithinBounds(position) && m_graph[Globals::convertTo1D(position, map.getSize())].isVisited())
 	{
-		return m_graph[Globals::convertTo1D(position)].getCameFrom();
+		return m_graph[Globals::convertTo1D(position, map.getSize())].getCameFrom();
 	}
 }
 
-bool Graph::isPositionVisited(const glm::ivec2& position) const
+bool Graph::isPositionVisited(const glm::ivec2& position, const Map& map) const
 {
-	assert(Globals::isPositionInMapBounds(position));
-	if (Globals::isPositionInMapBounds(position))
+	assert(map.isWithinBounds(position));
+	if (map.isWithinBounds(position))
 	{
-		return m_graph[Globals::convertTo1D(position)].isVisited();
+		return m_graph[Globals::convertTo1D(position, map.getSize())].isVisited();
 	}
 }
