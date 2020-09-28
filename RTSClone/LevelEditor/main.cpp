@@ -234,7 +234,7 @@ int main()
 
 					glm::vec3 newPosition = Globals::convertToNodePosition(mouseToGroundPosition);
 					AABB AABB(newPosition, ModelManager::getInstance().getModel(plannedEntity.getModelName()));
-					if (Globals::isWithinMapBounds(AABB))
+					if (Globals::isWithinMapBounds(AABB, mapSize))
 					{
 						plannedEntity.setPosition(newPosition);
 					}

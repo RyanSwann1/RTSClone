@@ -91,6 +91,14 @@ namespace Globals
 		}
 	}
 	
+	inline bool isWithinMapBounds(const AABB& AABB, const glm::ivec2& mapSize)
+	{
+		return AABB.getLeft() >= 0 &&
+			AABB.getRight() < mapSize.x * Globals::NODE_SIZE &&
+			AABB.getBack() >= 0 &&
+			AABB.getForward() < mapSize.y * Globals::NODE_SIZE;
+	}
+
 	inline float getSqrDistance(const glm::vec2& positionB, const glm::vec2& positionA)
 	{
 		float x = glm::pow(positionB.x - positionA.x, 2);
