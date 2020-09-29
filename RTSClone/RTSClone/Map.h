@@ -30,7 +30,6 @@ public:
 private:
 	glm::ivec2 m_size;
 	std::vector<bool> m_map;
-	//std::array<bool, static_cast<size_t>(Globals::MAP_SIZE * Globals::MAP_SIZE)> m_map;
 	
 	void addEntityToMap(const GameMessages::MapModification<eGameMessageType::AddEntityToMap>& gameMessage);
 	void removeEntityFromMap(const GameMessages::MapModification<eGameMessageType::RemoveEntityFromMap>& gameMessage);

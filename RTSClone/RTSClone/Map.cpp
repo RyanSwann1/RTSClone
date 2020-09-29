@@ -62,12 +62,7 @@ bool Map::isAABBOccupied(const AABB& AABB) const
 		for (int y = static_cast<int>(AABB.getBack()); y <= static_cast<int>(AABB.getForward()); ++y)
 		{
 			glm::ivec2 positionOnGrid = Globals::convertToGridPosition({ x, Globals::GROUND_HEIGHT, y });
-			//TODO: Potential error
 			return m_map[Globals::convertTo1D(positionOnGrid, m_size)];
-			//if (m_map[Globals::convertTo1D(positionOnGrid, m_size)])
-			//{
-			//	return false;
-			//}
 		}
 	}
 
@@ -76,7 +71,7 @@ bool Map::isAABBOccupied(const AABB& AABB) const
 
 bool Map::isPositionOccupied(const glm::vec3& position) const
 {
-	if (isWithinBounds(position))// Globals::isPositionInMapBounds(position))
+	if (isWithinBounds(position))
 	{
 		glm::ivec2 positionOnGrid = Globals::convertToGridPosition(position);
 		return m_map[Globals::convertTo1D(positionOnGrid, m_size)];
@@ -87,7 +82,7 @@ bool Map::isPositionOccupied(const glm::vec3& position) const
 
 bool Map::isPositionOccupied(const glm::ivec2& position) const
 {
-	if (isWithinBounds(position))// Globals::isPositionInMapBounds(position))
+	if (isWithinBounds(position))
 	{
 		return m_map[Globals::convertTo1D(position, m_size)];
 	}
@@ -103,7 +98,6 @@ void Map::addEntityToMap(const GameMessages::MapModification<eGameMessageType::A
 		{
 			glm::ivec2 positionOnGrid = Globals::convertToGridPosition({ x, Globals::GROUND_HEIGHT, y });
 			assert(isWithinBounds(positionOnGrid));
-			//assert(Globals::isPositionInMapBounds(positionOnGrid));
 			m_map[Globals::convertTo1D(positionOnGrid, m_size)] = true;
 		}
 	}
@@ -117,7 +111,6 @@ void Map::removeEntityFromMap(const GameMessages::MapModification<eGameMessageTy
 		{
 			glm::ivec2 positionOnGrid = Globals::convertToGridPosition({ x, Globals::GROUND_HEIGHT, y });
 			assert(isWithinBounds(positionOnGrid));
-			//assert(Globals::isPositionInMapBounds(positionOnGrid));
 			m_map[Globals::convertTo1D(positionOnGrid, m_size)] = false;
 		}
 	}
