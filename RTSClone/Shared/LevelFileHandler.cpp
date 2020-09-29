@@ -26,6 +26,8 @@ void loadInScenery(std::ifstream& file, std::vector<SceneryGameObject>& scenery)
 
 #ifdef LEVEL_EDITOR
 void saveMapSizeToFile(std::ostream& os, const glm::ivec2& mapSize);
+void saveFactionStartingResources(std::ostream& os, int factionStartingResources);
+void saveFactionStartingPopulation(std::ostream& os, int factionStartingPopulation);
 #endif // LEVEL_EDITOR
 
 glm::ivec2 loadMapSizeFromFile(std::ifstream& file);
@@ -62,7 +64,8 @@ void LevelFileHandler::loadFromFile(std::ifstream& file, const std::function<voi
 
 #ifdef LEVEL_EDITOR
 bool LevelFileHandler::saveLevelToFile(const std::string& fileName, const EntityManager& entityManager,
-	const std::vector<Player>& players, const glm::ivec2& mapSize)
+	const std::vector<Player>& players, const glm::ivec2& mapSize, int factionStartingResources, 
+	int factionStartingPopulation)
 {
 	std::ofstream file(Globals::SHARED_FILE_DIRECTORY + fileName);
 	assert(file.is_open());
@@ -76,6 +79,8 @@ bool LevelFileHandler::saveLevelToFile(const std::string& fileName, const Entity
 		file << player;
 	}
 	
+	saveFactionStartingPopulation(file, factionStartingPopulation);
+	saveFactionStartingResources(file, factionStartingResources);
 	saveMapSizeToFile(file, mapSize);
 
 	file << entityManager;
@@ -131,6 +136,18 @@ void saveMapSizeToFile(std::ostream& os, const glm::ivec2& mapSize)
 {
 	os << Globals::TEXT_HEADER_MAP_SIZE << "\n";
 	os << mapSize.x << " " << mapSize.y << "\n";
+}
+
+void saveFactionStartingResources(std::ostream& os, int factionStartingResources)
+{
+	os << Globals::TEXT_HEADER_FACTION_STARTING_RESOURCE << "\n";
+	os << factionStartingResources << "\n";
+}
+
+void saveFactionStartingPopulation(std::ostream& os, int factionStartingPopulation)
+{
+	os << Globals::TEXT_HEADER_FACTION_STARTING_POPULATION << "\n";
+	os << factionStartingPopulation << "\n";
 }
 #endif // LEVEL_EDITOR
 

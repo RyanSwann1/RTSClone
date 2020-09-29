@@ -20,6 +20,8 @@ namespace Globals
 	const std::string TEXT_HEADER_BEGINNING = "#";
 	const std::string TEXT_HEADER_SCENERY = TEXT_HEADER_BEGINNING + "Scenery";
 	const std::string TEXT_HEADER_MAP_SIZE = TEXT_HEADER_BEGINNING + "Map Size";
+	const std::string TEXT_HEADER_FACTION_STARTING_RESOURCE = TEXT_HEADER_BEGINNING + "Faction Starting Resources";
+	const std::string TEXT_HEADER_FACTION_STARTING_POPULATION = TEXT_HEADER_BEGINNING + "Faction Starting Population";
 	constexpr glm::vec3 TERRAIN_POSITION = { 0.0f, -0.01f, 0.0f };
 	constexpr unsigned int INVALID_OPENGL_ID = 0;
 	constexpr float GROUND_HEIGHT = 0.0f;
