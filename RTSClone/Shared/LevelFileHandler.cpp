@@ -30,6 +30,8 @@ void saveFactionStartingResources(std::ostream& os, int factionStartingResources
 void saveFactionStartingPopulation(std::ostream& os, int factionStartingPopulation);
 #endif // LEVEL_EDITOR
 
+int loadFactionStartingResources(std::ifstream& file);
+int loadFactionStartingPopulation(std::ifstream& file);
 glm::ivec2 loadMapSizeFromFile(std::ifstream& file);
 bool isPlayerActive(std::ifstream& file, eFactionController factionController);
 
@@ -90,7 +92,7 @@ bool LevelFileHandler::saveLevelToFile(const std::string& fileName, const Entity
 }
 
 bool LevelFileHandler::loadLevelFromFile(const std::string& fileName, EntityManager& entityManager, std::vector<Player>& players, 
-	glm::ivec2& mapSize)
+	glm::ivec2& mapSize, int& factionStartingResources, int& factionStartingPopulation)
 {
 	std::ifstream file(Globals::SHARED_FILE_DIRECTORY + fileName);
 	if (!file.is_open())
@@ -120,6 +122,8 @@ bool LevelFileHandler::loadLevelFromFile(const std::string& fileName, EntityMana
 	}
 
 	mapSize = loadMapSizeFromFile(file);
+	factionStartingResources = loadFactionStartingResources(file);
+	factionStartingPopulation = loadFactionStartingPopulation(file);
 
 	for (auto& player : players)
 	{
@@ -150,6 +154,44 @@ void saveFactionStartingPopulation(std::ostream& os, int factionStartingPopulati
 	os << factionStartingPopulation << "\n";
 }
 #endif // LEVEL_EDITOR
+
+int loadFactionStartingResources(std::ifstream& file)
+{
+	int factionStartingResources = 0;
+	auto data = [&factionStartingResources](const std::string& line)
+	{
+		std::stringstream stream{ line };
+		stream >> factionStartingResources;
+	};
+
+	auto conditional = [](const std::string& line)
+	{
+		return line == Globals::TEXT_HEADER_FACTION_STARTING_RESOURCE;
+	};
+
+	LevelFileHandler::loadFromFile(file, data, conditional);
+
+	return factionStartingResources;
+}
+
+int loadFactionStartingPopulation(std::ifstream& file)
+{
+	int factionStartingPopulation = 0;
+	auto data = [&factionStartingPopulation](const std::string& line)
+	{
+		std::stringstream stream{ line };
+		stream >> factionStartingPopulation;
+	};
+
+	auto conditional = [](const std::string& line)
+	{
+		return line == Globals::TEXT_HEADER_FACTION_STARTING_POPULATION;
+	};
+
+	LevelFileHandler::loadFromFile(file, data, conditional);
+
+	return factionStartingPopulation;
+}
 
 glm::ivec2 loadMapSizeFromFile(std::ifstream& file)
 {

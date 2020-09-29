@@ -25,7 +25,8 @@ namespace LevelFileHandler
 		const std::vector<Player>& players, const glm::ivec2& mapSize, int factionStartingResources, 
 		int factionStartingPopulation);
 	bool loadLevelFromFile(const std::string& fileName, EntityManager& entityManager,
-		std::vector<Player>& players, glm::ivec2& mapSize);
+		std::vector<Player>& players, glm::ivec2& mapSize, int& factionStartingResources,
+		int& factionStartingPopulation);
 #endif // LEVEL_EDITOR
 
 #ifdef GAME
