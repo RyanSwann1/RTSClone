@@ -471,12 +471,9 @@ const Entity* Faction::addBuilding(const Map& map, glm::vec3 position, eEntityTy
         switch (entityType)
         {
         case eEntityType::SupplyDepot:
-            if (m_currentPopulationLimit + Globals::POPULATION_INCREMENT <= Globals::MAX_POPULATION)
-            {
-                m_supplyDepots.emplace_back(position);
-                addedBuilding = &m_supplyDepots.back();
-                increasePopulationLimit();
-            }
+            m_supplyDepots.emplace_back(position);
+            addedBuilding = &m_supplyDepots.back();
+            increasePopulationLimit();
             break;
         case eEntityType::Barracks:
             m_barracks.emplace_back(position, *this);
@@ -495,7 +492,7 @@ const Entity* Faction::addBuilding(const Map& map, glm::vec3 position, eEntityTy
             return addedBuilding;
         }
     }
-
+    
     return nullptr;
 }
 
@@ -579,7 +576,6 @@ void Faction::decreaseCurrentPopulationAmount(const Entity& entity)
 
 void Faction::increasePopulationLimit()
 {
-    assert(m_currentPopulationLimit + Globals::POPULATION_INCREMENT <= Globals::MAX_POPULATION);
     m_currentPopulationLimit += Globals::POPULATION_INCREMENT;
 }
 
