@@ -139,6 +139,21 @@ std::array<AdjacentPosition, ALL_DIRECTIONS_ON_GRID.size()> getAdjacentPositions
 	return adjacentPositions;
 }
 
+std::array<AdjacentPosition, ALL_DIRECTIONS_ON_GRID.size()> getAllAdjacentPositions(const glm::ivec2& position, const Map& map)
+{
+	std::array<AdjacentPosition, ALL_DIRECTIONS_ON_GRID.size()> adjacentPositions;
+	for (int i = 0; i < adjacentPositions.size(); ++i)
+	{
+		glm::ivec2 adjacentPosition = position + ALL_DIRECTIONS_ON_GRID[i];
+		if (map.isWithinBounds(adjacentPosition))
+		{
+			adjacentPositions[i] = AdjacentPosition(adjacentPosition);
+		}
+	}
+
+	return adjacentPositions;
+}
+
 std::array<AdjacentPosition, ALL_DIRECTIONS_ON_GRID.size()> getAdjacentPositions(const glm::ivec2& position, const Map& map)
 {
 	std::array<AdjacentPosition, ALL_DIRECTIONS_ON_GRID.size()> adjacentPositions;
