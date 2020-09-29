@@ -77,10 +77,12 @@ enum class eWindowState
 {
 	None,
 	PlayerDetails,
-	MapDetails
+	LevelDetails
 };
 
 constexpr int MAX_MAP_SIZE = 60 * Globals::NODE_SIZE;
+constexpr int DEFAULT_STARTING_RESOURCES = 100;
+constexpr int DEFAULT_STARTING_POPULATION = 5;
 constexpr glm::ivec2 DEFAULT_MAP_SIZE = { 30, 30 };
 
 int main()
@@ -137,10 +139,13 @@ int main()
 	bool showDetailsWindow = false;
 	eWindowState currentWindowState = eWindowState::None;
 	glm::ivec2 mapSize = DEFAULT_MAP_SIZE;
+	int factionStartingResources = DEFAULT_STARTING_RESOURCES;
+	int factionStartingPopulation = DEFAULT_STARTING_POPULATION;
 	Entity plannedEntity(eModelName::RocksTall, { 0.0f, 0.0f, 0.0f });
 	int selected = 0;	
 
-	if (!LevelFileHandler::loadLevelFromFile(levelName, entityManager, players, mapSize))
+	if (!LevelFileHandler::loadLevelFromFile(levelName, entityManager, players, mapSize,
+		factionStartingResources, factionStartingPopulation))
 	{
 		std::cout << "Failed to load level: " << levelName << "\n";
 		
@@ -259,14 +264,15 @@ int main()
 						showDetailsWindow = true;
 						currentWindowState = eWindowState::PlayerDetails;
 					}
-					if (ImGui::MenuItem("Map Details"))
+					if (ImGui::MenuItem("Level Details"))
 					{
 						showDetailsWindow = true;
-						currentWindowState = eWindowState::MapDetails;
+						currentWindowState = eWindowState::LevelDetails;
 					}
 					if (ImGui::MenuItem("Save"))
 					{
-						if (!LevelFileHandler::saveLevelToFile(levelName, entityManager, players, mapSize))
+						if (!LevelFileHandler::saveLevelToFile(levelName, entityManager, players, mapSize,
+							factionStartingResources, factionStartingPopulation))
 						{
 							std::cout << "Unable to save file " + levelName << "\n";
 						}
@@ -371,8 +377,8 @@ int main()
 				ImGui::End();
 			}
 				break;
-			case eWindowState::MapDetails:
-				ImGui::Begin("Map Details", &showDetailsWindow, ImGuiWindowFlags_None);
+			case eWindowState::LevelDetails:
+				ImGui::Begin("Level Details", &showDetailsWindow, ImGuiWindowFlags_None);
 				if (ImGui::InputInt("x", &mapSize.x, 1) ||
 					ImGui::InputInt("z", &mapSize.y, 1))
 				{
@@ -380,6 +386,22 @@ int main()
 					mapSize.y = glm::clamp(mapSize.y, 0, MAX_MAP_SIZE);
 					
 					playableAreaDisplay.setSize(mapSize);
+				}
+				ImGui::Text("Starting Resources");
+				if (ImGui::InputInt("Resources", &factionStartingResources, 5))
+				{
+					if (factionStartingResources < Globals::WORKER_RESOURCE_COST)
+					{
+						factionStartingResources = Globals::WORKER_RESOURCE_COST;
+					}
+				}
+				ImGui::Text("Starting Population");
+				if (ImGui::InputInt("Population", &factionStartingPopulation, 1))
+				{
+					if (factionStartingPopulation < Globals::WORKER_POPULATION_COST)
+					{
+						factionStartingPopulation = Globals::WORKER_POPULATION_COST;
+					}
 				}
 				ImGui::End();
 				break;
