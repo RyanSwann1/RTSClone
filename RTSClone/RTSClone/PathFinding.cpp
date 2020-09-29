@@ -196,6 +196,48 @@ void PathFinding::clearAttackPositions()
 	m_attackPositions.clear();
 }
 
+bool PathFinding::isBuildingSpawnAvailable(const glm::vec3& startingPosition, eEntityType entityTypeToBuild, const Map& map, glm::vec3& buildPosition)
+{
+	m_graph.reset(m_frontier);
+
+	m_frontier.push(Globals::convertToGridPosition(startingPosition));
+	bool foundBuildPosition = false;
+	glm::ivec2 buildPositionOnGrid = { 0, 0 };
+
+	while (!foundBuildPosition && !m_frontier.empty())
+	{
+		glm::ivec2 position = m_frontier.front();
+		m_frontier.pop();
+
+		std::array<AdjacentPosition, ALL_DIRECTIONS_ON_GRID.size()> adjacentPositions = getAdjacentPositions(position, map);
+		for (const auto& adjacentPosition : adjacentPositions)
+		{
+			if (adjacentPosition.valid)
+			{
+				AABB buildingAABB(Globals::convertToWorldPosition(adjacentPosition.position),
+					ModelManager::getInstance().getModel(entityTypeToBuild));
+
+				if (!map.isAABBOccupied(buildingAABB))
+				{
+					foundBuildPosition = true;
+					buildPositionOnGrid = adjacentPosition.position;
+					break;
+				}
+				else if (!m_graph.isPositionVisited(adjacentPosition.position, map))
+				{
+					m_graph.addToGraph(adjacentPosition.position, position, map);
+					m_frontier.push(adjacentPosition.position);
+				}
+			}
+		}
+
+		assert(m_frontier.size() <= map.getSize().x * map.getSize().y);// Globals::MAP_SIZE* Globals::MAP_SIZE);
+	}
+
+	buildPosition = Globals::convertToWorldPosition(buildPositionOnGrid);
+	return foundBuildPosition;
+}
+
 bool PathFinding::isPositionAvailable(const glm::vec3& nodePosition, const Map& map, const std::list<Unit>& units, const std::list<Worker>& workers,
 	int senderID) const
 {

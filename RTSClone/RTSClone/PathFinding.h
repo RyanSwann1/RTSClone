@@ -78,6 +78,9 @@ public:
 		return shortestDistancePosition;
 	}
 
+	bool isBuildingSpawnAvailable(const glm::vec3& startingPosition, eEntityType entityTypeToBuild, const Map& map,
+		glm::vec3& buildPosition);
+
 	bool isPositionAvailable(const glm::vec3& nodePosition, const Map& map, const std::list<Unit>& units, const std::list<Worker>& workers, 
 		int senderID = Globals::INVALID_ENTITY_ID) const;
 
