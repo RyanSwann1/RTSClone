@@ -11,6 +11,7 @@
 class GraphNode
 {
 public:
+	GraphNode();
 	GraphNode(const glm::ivec2& cameFrom);
 
 	const glm::ivec2& getCameFrom() const;
@@ -40,7 +41,9 @@ public:
 	void addToGraph(const glm::ivec2& position, const glm::ivec2& cameFromPosition, const Map& map);
 
 private:
+	glm::ivec2 m_size;
 	std::vector<GraphNode> m_graph;
 
 	void onNewMapSize(const GameMessages::NewMapSize& gameMessage);
+	void reset();
 };

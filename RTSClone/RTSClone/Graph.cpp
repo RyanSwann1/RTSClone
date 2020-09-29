@@ -4,6 +4,11 @@
 #include "Map.h"
 
 //GraphNode
+GraphNode::GraphNode()
+	: cameFrom(),
+	visited(false)
+{}
+
 GraphNode::GraphNode(const glm::ivec2& cameFrom)
 	: cameFrom(cameFrom),
 	visited(true)
@@ -21,7 +26,8 @@ bool GraphNode::isVisited() const
 
 //Graph
 Graph::Graph()
-	: m_graph()
+	: m_size(),
+	m_graph()
 {
 	GameMessenger::getInstance().subscribe<GameMessages::NewMapSize>(
 		[this](const GameMessages::NewMapSize& gameMessage) { return onNewMapSize(gameMessage); }, this);
@@ -34,7 +40,7 @@ Graph::~Graph()
 
 void Graph::reset(std::queue<glm::ivec2>& frontier)
 {
-	m_graph.clear();
+	reset();
 	std::queue<glm::ivec2> empty;
 	frontier.swap(empty);
 }
@@ -50,8 +56,14 @@ void Graph::addToGraph(const glm::ivec2& position, const glm::ivec2& cameFromPos
 
 void Graph::onNewMapSize(const GameMessages::NewMapSize& gameMessage)
 {
+	m_size = gameMessage.mapSize;
+	reset();
+}
+
+void Graph::reset()
+{
 	m_graph.clear();
-	m_graph.reserve(static_cast<size_t>(gameMessage.mapSize.x * gameMessage.mapSize.y));
+	m_graph.resize(static_cast<size_t>(m_size.x * m_size.y), {});
 }
 
 bool Graph::isEmpty() const
