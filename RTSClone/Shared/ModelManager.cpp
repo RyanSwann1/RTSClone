@@ -41,7 +41,7 @@ namespace
 	constexpr glm::vec3 WORKER_MINERAL_SCALE = { 0.2f, 0.2f, 0.2f };
 	constexpr glm::vec3 PROJECTILE_SCALE = { 0.75f, 0.75f, 0.75f };
 
-	constexpr glm::vec3 UNIT_AABB_SIZE_FROM_CENTER = { 3.0f, 1.0f, 3.0f };
+	constexpr glm::vec3 UNIT_AABB_SIZE_FROM_CENTER = { 2.9f, 1.0f, 2.9f };
 	constexpr glm::vec3 HQ_AABB_SIZE_FROM_CENTER = { 9.0f, 1.0f, 3.0f };
 	constexpr glm::vec3 MINERAL_AABB_SIZE_FROM_CENTER = { 3.0f, 1.0f, 3.0f };
 	constexpr glm::vec3 WORKER_MINERAL_AABB_SIZE_FROM_CENTER = { 0.0f, 0.0f, 0.0f };
@@ -71,7 +71,7 @@ namespace
 	std::array<std::unique_ptr<Model>, static_cast<size_t>(eModelName::Max) + 1> loadModels(bool& loadedAllModels)
 	{
 		std::array<std::unique_ptr<Model>, static_cast<size_t>(eModelName::Max) + 1> models;
-		loadModel("terrain.obj", false, { 0.0f, 0.0f, 0.0f }, eModelName::Terrain, { 500.0f, 1.0f, 500.0f },
+		loadModel("terrain.obj", false, { 0.0f, 0.0f, 0.0f }, eModelName::Terrain, { 2000.0f, 1.0f, 2000.0f },
 			models, loadedAllModels);
 
 		loadModel("meteorFull.obj", false, { 5.0f, 1.0f, 5.0f }, eModelName::Meteor, { 1.0f, 1.0f, 1.0f },

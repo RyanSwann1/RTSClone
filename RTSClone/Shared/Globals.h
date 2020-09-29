@@ -36,13 +36,12 @@ namespace Globals
 	constexpr int UNIT_STARTING_HEALTH = 5;
 	constexpr int WORKER_STARTING_HEALTH = 2;
 
-	constexpr int STARTING_RESOURCES = 500;
+	constexpr int STARTING_RESOURCES = 1500;
+	constexpr int STARTING_POPULATION = 50;
 	constexpr int WORKER_RESOURCE_COST = 50;
 	constexpr int SUPPLY_DEPOT_RESOURCE_COST = 50;
 	constexpr int BARRACKS_RESOURCE_COST = 50;
 	constexpr int UNIT_RESOURCE_COST = 100;
-	constexpr int STARTING_POPULATION = 5;
-	constexpr int MAX_POPULATION = 20;
 	constexpr int WORKER_POPULATION_COST = 1;
 	constexpr int UNIT_POPULATION_COST = 2;
 	constexpr int POPULATION_INCREMENT = 5;

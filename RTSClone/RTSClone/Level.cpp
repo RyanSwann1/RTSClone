@@ -78,10 +78,9 @@ void Level::handleGUI()
 						targetEntity->getHealth(), buildTimer.getExpiredTime() - buildTimer.getElaspedTime() });		
 				}
 					break;
-				default:
-					assert(false);
+				case eEntityType::SupplyDepot:
+					break;
 				}
-
 			}
 			else
 			{

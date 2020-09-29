@@ -62,7 +62,6 @@ void Graph::onNewMapSize(const GameMessages::NewMapSize& gameMessage)
 
 void Graph::reset()
 {
-	m_graph.clear();
 	m_graph.resize(static_cast<size_t>(m_size.x * m_size.y), {});
 }
 

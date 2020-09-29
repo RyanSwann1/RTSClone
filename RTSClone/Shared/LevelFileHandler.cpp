@@ -188,7 +188,7 @@ bool LevelFileHandler::loadLevelFromFile(const std::string& fileName, std::vecto
 	GameMessenger::getInstance().broadcast<GameMessages::NewMapSize>({ loadMapSizeFromFile(file) });
 	loadInPlayers(file, factions);
 	loadInScenery(file, scenery);
-
+	
 	return true;
 }
 

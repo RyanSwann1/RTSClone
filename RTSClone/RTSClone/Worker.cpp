@@ -198,8 +198,8 @@ void Worker::update(float deltaTime, const UnitSpawnerBuilding& HQ, const Map& m
 			{
 				glm::vec3 destination = PathFindingLocator::get().getClosestPositionOutsideAABB(m_position,
 					newBuilding->getAABB(), newBuilding->getPosition(), map);
-				moveTo(destination, map, [&](const glm::ivec2& position) { return getAdjacentPositions(position, map); });
-				assert(!m_pathToPosition.empty());
+
+				moveTo(destination, map, [&](const glm::ivec2& position) { return getAllAdjacentPositions(position, map); });
 			}
 			else
 			{
