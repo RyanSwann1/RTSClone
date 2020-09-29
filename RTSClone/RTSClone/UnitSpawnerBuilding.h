@@ -8,7 +8,6 @@ class Map;
 class Faction;
 class UnitSpawnerBuilding : public Entity, private NonMovable
 {
-	friend class Faction;
 public:
 	~UnitSpawnerBuilding();
 
@@ -26,6 +25,7 @@ protected:
 		const Faction& owningFaction);
 	
 	void update(float deltaTime, int resourceCost, int populationCost);
+	void addUnitToSpawn(const std::function<Entity* (const UnitSpawnerBuilding&)>& unitToSpawn);
 
 	const Faction& m_owningFaction;
 	std::vector<std::function<Entity* (const UnitSpawnerBuilding&)>> m_unitsToSpawn;
@@ -33,20 +33,26 @@ protected:
 
 private:
 	glm::vec3 m_waypointPosition;
-	
-	void addUnitToSpawn(const std::function<Entity* (const UnitSpawnerBuilding&)>& unitToSpawn);
 };
 
 class Barracks : public UnitSpawnerBuilding
 {		
+	friend class Faction;
 public:
 	Barracks(const glm::vec3& startingPosition, const Faction& owningFaction);
 	void update(float deltaTime);
+	
+private:
+	void addUnitToSpawn(const std::function<Entity* (const UnitSpawnerBuilding&)>& unitToSpawn);
 };
 
 class HQ : public UnitSpawnerBuilding
 {
+	friend class Faction;
 public:
 	HQ(const glm::vec3& startingPosition, const Faction& owningFaction);
 	void update(float deltaTime);
+	
+private:
+	void addUnitToSpawn(const std::function<Entity* (const UnitSpawnerBuilding&)>& unitToSpawn);
 };
