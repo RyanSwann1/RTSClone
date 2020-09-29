@@ -28,7 +28,8 @@ namespace
 }
 
 Faction::Faction(eFactionController factionController, const glm::vec3& hqStartingPosition, 
-    const std::array<glm::vec3, Globals::MAX_MINERALS_PER_FACTION>& mineralPositions)
+    const std::array<glm::vec3, Globals::MAX_MINERALS_PER_FACTION>& mineralPositions, int startingResources,
+    int startingPopulation)
     : m_plannedBuildings(),
     m_minerals(getMinerals(mineralPositions)),
     m_allEntities(),
@@ -38,9 +39,9 @@ Faction::Faction(eFactionController factionController, const glm::vec3& hqStarti
     m_barracks(),
     m_HQ(Globals::convertToNodePosition(hqStartingPosition), *this),
     m_controller(factionController),
-    m_currentResourceAmount(Globals::STARTING_RESOURCES),
+    m_currentResourceAmount(startingResources),
     m_currentPopulationAmount(0),
-    m_currentPopulationLimit(Globals::STARTING_POPULATION)
+    m_currentPopulationLimit(startingPopulation)
 {
     m_allEntities.push_back(&m_HQ);
 }

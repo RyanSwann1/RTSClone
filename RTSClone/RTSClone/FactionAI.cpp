@@ -22,7 +22,7 @@
 
 namespace
 {
-	constexpr float DELAY_TIME = 3.5f;
+	constexpr float DELAY_TIME = 23.5f;
 	constexpr int STARTING_WORKER_COUNT = 4;
 	constexpr int STARTING_UNIT_COUNT = 1;
 }
@@ -40,8 +40,9 @@ AIAction::AIAction(eActionType actionType, const glm::vec3& position)
 
 //FactionAI
 FactionAI::FactionAI(eFactionController factionController, const glm::vec3& hqStartingPosition, 
-	const std::array<glm::vec3, Globals::MAX_MINERALS_PER_FACTION>& mineralPositions)
-	: Faction(factionController, hqStartingPosition, mineralPositions),
+	const std::array<glm::vec3, Globals::MAX_MINERALS_PER_FACTION>& mineralPositions, int startingResources,
+	int startingPopulation)
+	: Faction(factionController, hqStartingPosition, mineralPositions, startingResources, startingPopulation),
 	m_spawnQueue(),
 	m_actionQueue(),
 	m_delayTimer(DELAY_TIME, true),

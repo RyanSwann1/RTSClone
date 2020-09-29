@@ -18,9 +18,10 @@
 #include <sstream>
 
 #ifdef GAME
-void loadInPlayers(std::ifstream& file, std::array<std::unique_ptr<Faction>, static_cast<size_t>(eFactionController::Max) + 1>& factions);
+void loadInPlayers(std::ifstream& file, std::array<std::unique_ptr<Faction>, static_cast<size_t>(eFactionController::Max) + 1>& factions,
+	int startingResources, int startingPopulation);
 void loadInPlayer(std::ifstream& file, std::array<std::unique_ptr<Faction>, static_cast<size_t>(eFactionController::Max) + 1>& factions,
-	const FactionControllerDetails& factionControllerDetails);
+	const FactionControllerDetails& factionControllerDetails, int startingResources, int startingPopulation);
 void loadInScenery(std::ifstream& file, std::vector<SceneryGameObject>& scenery);
 #endif // GAME
 
@@ -244,14 +245,18 @@ bool LevelFileHandler::loadLevelFromFile(const std::string& fileName, std::vecto
 		return false;
 	}
 
-	GameMessenger::getInstance().broadcast<GameMessages::NewMapSize>({ loadMapSizeFromFile(file) });
-	loadInPlayers(file, factions);
+	glm::ivec2 mapSize = loadMapSizeFromFile(file);
+	GameMessenger::getInstance().broadcast<GameMessages::NewMapSize>({ mapSize });
+	int factionStartingResources = loadFactionStartingResources(file);
+	int factionStartingPopulation = loadFactionStartingPopulation(file);
+	loadInPlayers(file, factions, factionStartingResources, factionStartingPopulation);
 	loadInScenery(file, scenery);
 	
 	return true;
 }
 
-void loadInPlayers(std::ifstream& file, std::array<std::unique_ptr<Faction>, static_cast<size_t>(eFactionController::Max) + 1>& factions)
+void loadInPlayers(std::ifstream& file, std::array<std::unique_ptr<Faction>, static_cast<size_t>(eFactionController::Max) + 1>& factions,
+	int startingResources, int startingPopulation)
 {
 	for (const auto& factionControllerDetails : FACTION_CONTROLLER_DETAILS)
 	{
@@ -260,13 +265,13 @@ void loadInPlayers(std::ifstream& file, std::array<std::unique_ptr<Faction>, sta
 		case eFactionController::Player:
 		case eFactionController::AI_1:
 			assert(isPlayerActive(file, factionControllerDetails.controller));
-			loadInPlayer(file, factions, factionControllerDetails);
+			loadInPlayer(file, factions, factionControllerDetails, startingResources, startingPopulation);
 			break;
 		case eFactionController::AI_2:
 		case eFactionController::AI_3:
 			if (isPlayerActive(file, factionControllerDetails.controller))
 			{
-				loadInPlayer(file, factions, factionControllerDetails);
+				loadInPlayer(file, factions, factionControllerDetails, startingResources, startingPopulation);
 			}
 			break;
 		default:
@@ -276,7 +281,7 @@ void loadInPlayers(std::ifstream& file, std::array<std::unique_ptr<Faction>, sta
 }
 
 void loadInPlayer(std::ifstream& file, std::array<std::unique_ptr<Faction>, static_cast<size_t>(eFactionController::Max) + 1>& factions,
-	const FactionControllerDetails& factionControllerDetails)
+	const FactionControllerDetails& factionControllerDetails, int startingResources, int startingPopulation)
 {
 	assert(file.is_open());
 	glm::vec3 hqStartingPosition = { 0.0f, 0.0f, 0.0f };
@@ -317,13 +322,13 @@ void loadInPlayer(std::ifstream& file, std::array<std::unique_ptr<Faction>, stat
 	{
 	case eFactionController::Player:
 		factions[static_cast<int>(factionControllerDetails.controller)] = std::make_unique<FactionPlayer>(factionControllerDetails.controller,
-			hqStartingPosition, mineralPositions);
+			hqStartingPosition, mineralPositions, startingResources, startingPopulation);
 		break;
 	case eFactionController::AI_1:
 	case eFactionController::AI_2:
 	case eFactionController::AI_3:
 		factions[static_cast<int>(factionControllerDetails.controller)] = std::make_unique<FactionAI>(factionControllerDetails.controller,
-			hqStartingPosition, mineralPositions);
+			hqStartingPosition, mineralPositions, startingResources, startingPopulation);
 		break;
 	default:
 		assert(false);

@@ -10,7 +10,8 @@ class FactionPlayer : public Faction
 {
 public:
 	FactionPlayer(eFactionController factionController, const glm::vec3& hqStartingPosition, 
-		const std::array<glm::vec3, Globals::MAX_MINERALS_PER_FACTION>& mineralPositions);
+		const std::array<glm::vec3, Globals::MAX_MINERALS_PER_FACTION>& mineralPositions, int startingResources,
+		int startingPopulation);
 
 	void handleInput(const sf::Event& currentSFMLEvent, const sf::Window& window, const Camera& camera, const Map& map, 
 		const std::vector<const Faction*>& opposingFactions, EntityTarget& selectedTargetGUI);
