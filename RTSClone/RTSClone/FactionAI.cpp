@@ -1,6 +1,8 @@
 #include "FactionAI.h"
 #include "AdjacentPositions.h"
 #include "ModelManager.h"
+#include "PathFinding.h"
+#include "PathFindingLocator.h"
 #include <limits>
 
 //Levels
@@ -20,7 +22,7 @@
 
 namespace
 {
-	constexpr float DELAY_TIME = 3.0f;
+	constexpr float DELAY_TIME = 3.5f;
 	constexpr int STARTING_WORKER_COUNT = 4;
 	constexpr int STARTING_UNIT_COUNT = 1;
 }
@@ -43,8 +45,6 @@ FactionAI::FactionAI(eFactionController factionController, const glm::vec3& hqSt
 	m_spawnQueue(),
 	m_actionQueue(),
 	m_delayTimer(DELAY_TIME, true),
-	m_graph(),
-	m_frontier(),
 	m_targetFaction(nullptr)
 {
 	for (int i = 0; i < STARTING_WORKER_COUNT; ++i)
@@ -114,7 +114,7 @@ void FactionAI::update(float deltaTime, const Map & map, FactionHandler& faction
 			{
 				glm::vec3 buildPosition = { 0.0f, 0.0f, 0.0f };
 				if (isEntityAffordable(eEntityType::Barracks) && 
-					isBuildingSpawnAvailable(m_HQ.getPosition(), eEntityType::Barracks, map, buildPosition))
+					PathFindingLocator::get().isBuildingSpawnAvailable(m_HQ.getPosition(), eEntityType::Barracks, map, buildPosition))
 				{
 					Worker* availableWorker = getAvailableWorker(buildPosition);
 					if (availableWorker && instructWorkerToBuild(eEntityType::Barracks, buildPosition, map, *availableWorker))
@@ -128,7 +128,7 @@ void FactionAI::update(float deltaTime, const Map & map, FactionHandler& faction
 			{
 				glm::vec3 buildPosition = { 0.0f, 0.0f, 0.0f };
 				if (isEntityAffordable(eEntityType::SupplyDepot) && 
-					isBuildingSpawnAvailable(m_HQ.getPosition(), eEntityType::SupplyDepot, map, buildPosition))
+					PathFindingLocator::get().isBuildingSpawnAvailable(m_HQ.getPosition(), eEntityType::SupplyDepot, map, buildPosition))
 				{
 					Worker* availableWorker = getAvailableWorker(buildPosition);
 					if (availableWorker && instructWorkerToBuild(eEntityType::SupplyDepot, buildPosition, map, *availableWorker))
@@ -227,47 +227,4 @@ Worker* FactionAI::getAvailableWorker(const glm::vec3& position)
 	}
 
 	return selectedWorker;
-}
-
-bool FactionAI::isBuildingSpawnAvailable(const glm::vec3& startingPosition, eEntityType entityTypeToBuild, const Map& map, 
-	glm::vec3& buildPosition)
-{
-	m_graph.reset(m_frontier);
-
-	m_frontier.push(Globals::convertToGridPosition(startingPosition));
-	bool foundBuildPosition = false;
-	glm::ivec2 buildPositionOnGrid = { 0, 0 };
-
-	while (!foundBuildPosition && !m_frontier.empty())
-	{
-		glm::ivec2 position = m_frontier.front();
-		m_frontier.pop();
-
-		std::array<AdjacentPosition, ALL_DIRECTIONS_ON_GRID.size()> adjacentPositions = getAdjacentPositions(position, map);
-		for (const auto& adjacentPosition : adjacentPositions)
-		{
-			if (adjacentPosition.valid)
-			{
-				AABB buildingAABB(Globals::convertToWorldPosition(adjacentPosition.position), 
-					ModelManager::getInstance().getModel(entityTypeToBuild));
-
-				if (!map.isAABBOccupied(buildingAABB))
-				{
-					foundBuildPosition = true;
-					buildPositionOnGrid = adjacentPosition.position;
-					break;
-				}
-				else if(!m_graph.isPositionVisited(adjacentPosition.position, map))
-				{
-					m_graph.addToGraph(adjacentPosition.position, position, map);
-					m_frontier.push(adjacentPosition.position);
-				}
-			}
-		}
-
-		assert(m_frontier.size() <= map.getSize().x * map.getSize().y);// Globals::MAP_SIZE* Globals::MAP_SIZE);
-	}
-
-	buildPosition = Globals::convertToWorldPosition(buildPositionOnGrid);
-	return foundBuildPosition;
 }

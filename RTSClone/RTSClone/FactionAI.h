@@ -33,14 +33,9 @@ private:
 	std::queue<eEntityType> m_spawnQueue;
 	std::queue<AIAction> m_actionQueue;
 	Timer m_delayTimer;
-	Graph m_graph;
-	std::queue<glm::ivec2> m_frontier;
 	const Faction* m_targetFaction;
 
 	bool instructWorkerToBuild(eEntityType entityType, const glm::vec3& position, const Map& map, Worker& worker);
 	const Mineral& getRandomMineral() const;
 	Worker* getAvailableWorker(const glm::vec3& position);
-
-	bool isBuildingSpawnAvailable(const glm::vec3& startingPosition, eEntityType entityTypeToBuild, const Map& map, 
-		glm::vec3& buildPosition);
 };
