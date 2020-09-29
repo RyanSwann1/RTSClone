@@ -231,7 +231,7 @@ bool PathFinding::isBuildingSpawnAvailable(const glm::vec3& startingPosition, eE
 			}
 		}
 
-		assert(m_frontier.size() <= map.getSize().x * map.getSize().y);// Globals::MAP_SIZE* Globals::MAP_SIZE);
+		assert(m_frontier.size() <= map.getSize().x * map.getSize().y);
 	}
 
 	buildPosition = Globals::convertToWorldPosition(buildPositionOnGrid);
@@ -598,7 +598,7 @@ void PathFinding::getPathToPosition(const Unit& unit, const glm::vec3& destinati
 			isPriorityQueueWithinSizeLimit(m_closedQueue, map.getSize()));
 	}
 
-	if (pathToPosition.empty())
+	if (pathToPosition.empty() && shortestDistance != Globals::getSqrDistance(destination, unit.getPosition()))
 	{	
 		getPathFromClosedQueue(pathToPosition, startingPositionOnGrid, closestAvailablePosition, m_closedQueue, map);
 	}
