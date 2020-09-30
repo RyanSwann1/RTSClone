@@ -13,17 +13,17 @@ namespace
 {
 	bool isPriorityQueueWithinSizeLimit(const PriorityQueue& priorityQueue, const glm::ivec2& mapSize)
 	{
-		return static_cast<int>(priorityQueue.getSize()) <= mapSize.x * mapSize.y;// Globals::MAP_SIZE* Globals::MAP_SIZE;
+		return static_cast<int>(priorityQueue.getSize()) <= mapSize.x * mapSize.y;
 	}
 
 	bool isFrontierWithinSizeLimit(const std::queue<glm::ivec2>& frontier, const glm::ivec2& mapSize)
 	{
-		return static_cast<int>(frontier.size()) <= mapSize.x * mapSize.y;// Globals::MAP_SIZE* Globals::MAP_SIZE;
+		return static_cast<int>(frontier.size()) <= mapSize.x * mapSize.y;
 	}
 
 	bool isPathWithinSizeLimit(const std::vector<glm::vec3>& pathToPosition, const glm::ivec2& mapSize)
 	{
-		return static_cast<int>(pathToPosition.size()) <= mapSize.x * mapSize.y;// Globals::MAP_SIZE* Globals::MAP_SIZE;
+		return static_cast<int>(pathToPosition.size()) <= mapSize.x * mapSize.y;
 	}
 
 	void getPathFromVisitedNodes(const glm::ivec2& startingPosition, const glm::ivec2& destinationPositionOnGrid, 
@@ -197,8 +197,8 @@ void PathFinding::clearAttackPositions()
 	m_attackPositions.clear();
 }
 
-bool PathFinding::isBuildingSpawnAvailable(const glm::vec3& startingPosition, eEntityType entityTypeToBuild, const Map& map, glm::vec3& buildPosition,
-	float minDistanceFromHQ, float maxDistanceFromHQ, float distanceFromMinerals, const Faction& owningFaction)
+bool PathFinding::isBuildingSpawnAvailable(const glm::vec3& startingPosition, eEntityType entityTypeToBuild, const Map& map, 
+	glm::vec3& buildPosition, float minDistanceFromHQ, float maxDistanceFromHQ, float distanceFromMinerals, const Faction& owningFaction)
 {
 	m_graph.reset(m_frontier);
 
@@ -211,7 +211,7 @@ bool PathFinding::isBuildingSpawnAvailable(const glm::vec3& startingPosition, eE
 		glm::ivec2 position = m_frontier.front();
 		m_frontier.pop();
 
-		for (const auto& adjacentPosition : getAdjacentPositions(position, map))
+		for (const auto& adjacentPosition : getAllAdjacentPositions(position, map))
 		{
 			if (adjacentPosition.valid)
 			{
@@ -222,7 +222,8 @@ bool PathFinding::isBuildingSpawnAvailable(const glm::vec3& startingPosition, eE
 				{
 					const auto& owningFactionMinerals = owningFaction.getMinerals();
 					glm::vec3 adjacentWorldPosition = Globals::convertToWorldPosition(adjacentPosition.position);
-					auto mineral = std::find_if(owningFactionMinerals.cbegin(), owningFactionMinerals.cend(), [&adjacentWorldPosition, distanceFromMinerals](const auto& mineral)
+					auto mineral = std::find_if(owningFactionMinerals.cbegin(), owningFactionMinerals.cend(), 
+						[&adjacentWorldPosition, distanceFromMinerals](const auto& mineral)
 					{
 						return Globals::getSqrDistance(mineral.getPosition(), adjacentWorldPosition) < distanceFromMinerals * distanceFromMinerals;
 					});

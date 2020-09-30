@@ -22,9 +22,12 @@
 
 namespace
 {
-	constexpr float DELAY_TIME = 23.5f;
-	constexpr int STARTING_WORKER_COUNT = 4;
+	constexpr float DELAY_TIME = 3.0f;
+	constexpr int STARTING_WORKER_COUNT = 2;
 	constexpr int STARTING_UNIT_COUNT = 1;
+	constexpr float MAX_DISTANCE_FROM_HQ = static_cast<float>(Globals::NODE_SIZE) * 18.0f;
+	constexpr float MIN_DISTANCE_FROM_HQ = static_cast<float>(Globals::NODE_SIZE) * 3.0f;
+	constexpr float DISTANCE_FROM_MINERALS = static_cast<float>(Globals::NODE_SIZE) * 6.0f;
 }
 
 //AIAction
@@ -113,28 +116,38 @@ void FactionAI::update(float deltaTime, const Map & map, FactionHandler& faction
 			{
 			case eActionType::BuildBarracks:
 			{
-				glm::vec3 buildPosition = { 0.0f, 0.0f, 0.0f };
-				if (isEntityAffordable(eEntityType::Barracks) && 
-					PathFindingLocator::get().isBuildingSpawnAvailable(m_HQ.getPosition(), eEntityType::Barracks, map, buildPosition))
+				if (!m_workers.empty())
 				{
-					Worker* availableWorker = getAvailableWorker(buildPosition);
-					if (availableWorker && instructWorkerToBuild(eEntityType::Barracks, buildPosition, map, *availableWorker))
+					glm::vec3 buildPosition = { 0.0f, 0.0f, 0.0f };
+					if (isEntityAffordable(eEntityType::Barracks) &&
+						PathFindingLocator::get().isBuildingSpawnAvailable(m_HQ.getPosition(), eEntityType::Barracks, map, buildPosition,
+							MIN_DISTANCE_FROM_HQ, MAX_DISTANCE_FROM_HQ, DISTANCE_FROM_MINERALS, *this))
 					{
-						m_actionQueue.pop();
+						Worker* availableWorker = getAvailableWorker(buildPosition);
+						assert(availableWorker);
+						if (availableWorker && instructWorkerToBuild(eEntityType::Barracks, buildPosition, map, *availableWorker))
+						{
+							m_actionQueue.pop();
+						}
 					}
 				}
 			}
 				break;
 			case eActionType::BuildSupplyDepot:
 			{
-				glm::vec3 buildPosition = { 0.0f, 0.0f, 0.0f };
-				if (isEntityAffordable(eEntityType::SupplyDepot) && 
-					PathFindingLocator::get().isBuildingSpawnAvailable(m_HQ.getPosition(), eEntityType::SupplyDepot, map, buildPosition))
+				if (!m_workers.empty())
 				{
-					Worker* availableWorker = getAvailableWorker(buildPosition);
-					if (availableWorker && instructWorkerToBuild(eEntityType::SupplyDepot, buildPosition, map, *availableWorker))
+					glm::vec3 buildPosition = { 0.0f, 0.0f, 0.0f };
+					if (isEntityAffordable(eEntityType::SupplyDepot) &&
+						PathFindingLocator::get().isBuildingSpawnAvailable(m_HQ.getPosition(), eEntityType::SupplyDepot, map, buildPosition,
+							MIN_DISTANCE_FROM_HQ, MAX_DISTANCE_FROM_HQ, DISTANCE_FROM_MINERALS, *this))
 					{
-						m_actionQueue.pop();
+						Worker* availableWorker = getAvailableWorker(buildPosition);
+						assert(availableWorker);
+						if (availableWorker && instructWorkerToBuild(eEntityType::SupplyDepot, buildPosition, map, *availableWorker))
+						{
+							m_actionQueue.pop();
+						}
 					}
 				}
 			}
@@ -189,11 +202,6 @@ const Mineral& FactionAI::getRandomMineral() const
 
 Worker* FactionAI::getAvailableWorker(const glm::vec3& position)
 {
-	if (m_workers.empty())
-	{
-		return nullptr;
-	}
-	
 	Worker* selectedWorker = nullptr;
 	float closestDistance = std::numeric_limits<float>::max();
 	for (auto& availableWorker : m_workers)
@@ -203,6 +211,7 @@ Worker* FactionAI::getAvailableWorker(const glm::vec3& position)
 		if (!selectedWorker)
 		{
 			selectWorker = true;
+			selectedWorker = &availableWorker;
 		}
 		else if (availableWorker.getCurrentState() == eUnitState::Idle &&
 			selectedWorker->getCurrentState() != eUnitState::Idle)
