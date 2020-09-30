@@ -35,6 +35,7 @@ private:
 	std::queue<AIAction> m_actionQueue;
 	Timer m_delayTimer;
 	Timer m_idleTimer;
+	Timer m_spawnTimer;
 	const Faction* m_targetFaction;
 
 	bool instructWorkerToBuild(eEntityType entityType, const glm::vec3& position, const Map& map, Worker& worker);

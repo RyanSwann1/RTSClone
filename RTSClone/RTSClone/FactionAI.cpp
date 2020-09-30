@@ -24,6 +24,8 @@ namespace
 {
 	constexpr float DELAY_TIMER_EXPIRATION = 3.0f;
 	constexpr float IDLE_TIMER_EXPIRATION = 1.0f;
+	constexpr float MIN_SPAWN_TIMER_EXPIRATION = 7.5f;
+	constexpr float MAX_SPAWN_TIMER_EXPIRATION = 15.0f;
 	constexpr int STARTING_WORKER_COUNT = 2;
 	constexpr int STARTING_UNIT_COUNT = 1;
 	constexpr float MAX_DISTANCE_FROM_HQ = static_cast<float>(Globals::NODE_SIZE) * 18.0f;
@@ -43,7 +45,7 @@ AIAction::AIAction(eActionType actionType, const glm::vec3& position)
 {}
 
 //FactionAI
-FactionAI::FactionAI(eFactionController factionController, const glm::vec3& hqStartingPosition, 
+FactionAI::FactionAI(eFactionController factionController, const glm::vec3& hqStartingPosition,
 	const std::array<glm::vec3, Globals::MAX_MINERALS_PER_FACTION>& mineralPositions, int startingResources,
 	int startingPopulation)
 	: Faction(factionController, hqStartingPosition, mineralPositions, startingResources, startingPopulation),
@@ -51,14 +53,13 @@ FactionAI::FactionAI(eFactionController factionController, const glm::vec3& hqSt
 	m_actionQueue(),
 	m_delayTimer(DELAY_TIMER_EXPIRATION, true),
 	m_idleTimer(IDLE_TIMER_EXPIRATION, true),
+	m_spawnTimer(Globals::getRandomNumber(MIN_SPAWN_TIMER_EXPIRATION, MAX_SPAWN_TIMER_EXPIRATION), true),
 	m_targetFaction(nullptr)
 {
 	for (int i = 0; i < STARTING_WORKER_COUNT; ++i)
 	{
 		m_spawnQueue.push(eEntityType::Worker);
 	}
-
-	m_spawnQueue.push(eEntityType::Unit);
 
 	m_actionQueue.emplace(eActionType::BuildBarracks);
 	m_actionQueue.emplace(eActionType::BuildSupplyDepot);
@@ -83,8 +84,14 @@ void FactionAI::update(float deltaTime, const Map & map, FactionHandler& faction
 {
 	Faction::update(deltaTime, map, factionHandler);
 
-	m_delayTimer.update(deltaTime);
+	m_spawnTimer.update(deltaTime);
+	if (m_spawnTimer.isExpired())
+	{
+		m_spawnTimer.resetElaspedTime();
+		m_spawnQueue.push(eEntityType::Unit);
+	}
 
+	m_delayTimer.update(deltaTime);
 	if (m_delayTimer.isExpired())
 	{
 		m_delayTimer.resetElaspedTime();
