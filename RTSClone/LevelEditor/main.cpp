@@ -252,7 +252,7 @@ int main()
 		//Update
 		camera.update(deltaTime);
 		ImGui_SFML_OpenGL3::startFrame();
-		ImGui::SetNextWindowSize(ImVec2(175, windowSize.y), ImGuiCond_FirstUseEver);
+		ImGui::SetNextWindowSize(ImVec2(175, static_cast<float>(windowSize.y)), ImGuiCond_FirstUseEver);
 		if (ImGui::Begin("Models", nullptr, ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoMove))
 		{
 			if (ImGui::BeginMenuBar())

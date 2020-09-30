@@ -13,23 +13,21 @@ enum class eEntityType;
 class ModelManager : private NonMovable, private NonCopyable
 {
 public:
-#ifdef LEVEL_EDITOR
-	static const size_t TOTAL_MODELS = 6;
-	static const size_t TOTAL_MODEL_NAMES = 2;
-#endif // LEVEL_EDITOR
 	static ModelManager& getInstance() 
 	{
 		static ModelManager instance;
 		return instance;
 	}
 
+	const Model& getModel(eModelName modelName) const;
 	bool isAllModelsLoaded() const;
+
 #ifdef LEVEL_EDITOR
+	static const size_t TOTAL_MODELS = 6;
+	static const size_t TOTAL_MODEL_NAMES = 2;
 	const std::array<std::string, TOTAL_MODEL_NAMES> getModelNames() const;
 	eModelName getModelName(const std::string& modelName) const;
 #endif // LEVEL_EDITOR
-	
-	const Model& getModel(eModelName modelName) const;
 #ifdef GAME
 	const Model& getModel(eEntityType entityType) const;
 #endif // GAME

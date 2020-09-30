@@ -6,6 +6,26 @@
 
 namespace 
 {
+	constexpr glm::vec3 UNIT_SCALE{ 0.35f, 0.35f, 0.35f };
+	constexpr glm::vec3 HQ_SCALE{ 1.2f, 1.0f, 0.9f };
+	constexpr glm::vec3 MINERAL_SCALE{ 0.6f, 0.6f, 0.6f };
+	constexpr glm::vec3 WAYPOINT_SCALE{ 1.0f, 1.0f, 1.0f };
+	constexpr glm::vec3 WORKER_SCALE{ 0.8f, 0.8f, 0.8f };
+	constexpr glm::vec3 SUPPLY_DEPOT_SCALE{ 1.0f, 1.0f, 1.0f };
+	constexpr glm::vec3 BARRACKS_SCALE{ 0.5f, 0.5f, 0.5f };
+	constexpr glm::vec3 WORKER_MINERAL_SCALE = { 0.2f, 0.2f, 0.2f };
+	constexpr glm::vec3 PROJECTILE_SCALE = { 0.75f, 0.75f, 0.75f };
+
+	constexpr glm::vec3 UNIT_AABB_SIZE_FROM_CENTER = { 2.9f, 1.0f, 2.9f };
+	constexpr glm::vec3 HQ_AABB_SIZE_FROM_CENTER = { 9.0f, 1.0f, 3.0f };
+	constexpr glm::vec3 MINERAL_AABB_SIZE_FROM_CENTER = { 3.0f, 1.0f, 3.0f };
+	constexpr glm::vec3 WORKER_MINERAL_AABB_SIZE_FROM_CENTER = { 0.0f, 0.0f, 0.0f };
+	constexpr glm::vec3 WAYPOINT_AABB_SIZE_FROM_CENTER = { 2.0f, 1.0f, 2.0f };
+	constexpr glm::vec3 WORKER_AABB_SIZE_FROM_CENTER = { 1.5f, 1.0f, 1.5f };
+	constexpr glm::vec3 PROJECTILE_AABB_SIZE_FROM_CENTER = { 1.0f, 1.0f, 1.0f };
+	constexpr glm::vec3 SUPPLY_DEPOT_AABB_SIZE_FROM_CENTER = { 3.0f, 1.0f, 3.0f };
+	constexpr glm::vec3 BARRACKS_AABB_SIZE_FROM_CENTER = { 3.0f, 1.0f, 3.0f };
+
 #ifdef GAME
 	eModelName getModelName(eEntityType entityType)
 	{
@@ -29,29 +49,7 @@ namespace
 			assert(false);
 		}
 	}
-#endif // GAME
 
-	constexpr glm::vec3 UNIT_SCALE{ 0.35f, 0.35f, 0.35f };
-	constexpr glm::vec3 HQ_SCALE{ 1.2f, 1.0f, 0.9f };
-	constexpr glm::vec3 MINERAL_SCALE{ 0.6f, 0.6f, 0.6f };
-	constexpr glm::vec3 WAYPOINT_SCALE{ 1.0f, 1.0f, 1.0f };
-	constexpr glm::vec3 WORKER_SCALE{ 0.8f, 0.8f, 0.8f };
-	constexpr glm::vec3 SUPPLY_DEPOT_SCALE{ 1.0f, 1.0f, 1.0f };
-	constexpr glm::vec3 BARRACKS_SCALE{ 0.5f, 0.5f, 0.5f };
-	constexpr glm::vec3 WORKER_MINERAL_SCALE = { 0.2f, 0.2f, 0.2f };
-	constexpr glm::vec3 PROJECTILE_SCALE = { 0.75f, 0.75f, 0.75f };
-
-	constexpr glm::vec3 UNIT_AABB_SIZE_FROM_CENTER = { 2.9f, 1.0f, 2.9f };
-	constexpr glm::vec3 HQ_AABB_SIZE_FROM_CENTER = { 9.0f, 1.0f, 3.0f };
-	constexpr glm::vec3 MINERAL_AABB_SIZE_FROM_CENTER = { 3.0f, 1.0f, 3.0f };
-	constexpr glm::vec3 WORKER_MINERAL_AABB_SIZE_FROM_CENTER = { 0.0f, 0.0f, 0.0f };
-	constexpr glm::vec3 WAYPOINT_AABB_SIZE_FROM_CENTER = { 2.0f, 1.0f, 2.0f };
-	constexpr glm::vec3 WORKER_AABB_SIZE_FROM_CENTER = { 1.5f, 1.0f, 1.5f };
-	constexpr glm::vec3 PROJECTILE_AABB_SIZE_FROM_CENTER = { 1.0f, 1.0f, 1.0f };
-	constexpr glm::vec3 SUPPLY_DEPOT_AABB_SIZE_FROM_CENTER = { 3.0f, 1.0f, 3.0f };
-	constexpr glm::vec3 BARRACKS_AABB_SIZE_FROM_CENTER = { 3.0f, 1.0f, 3.0f };
-
-#ifdef GAME
 	void loadModel(const std::string& fileName, bool renderFromCenterPosition, const glm::vec3& AABBSizeFromCenter,
 		eModelName modelName, const glm::vec3& scale, std::array<std::unique_ptr<Model>, static_cast<size_t>(eModelName::Max) + 1>& models,
 		bool& loadedAllModels)
