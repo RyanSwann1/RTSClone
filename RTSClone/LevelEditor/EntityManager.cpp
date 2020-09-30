@@ -9,8 +9,7 @@
 #include <sstream>
 
 EntityManager::EntityManager()
-	: m_terrain(eModelName::Terrain, Globals::TERRAIN_POSITION),
-	m_entities(),
+	: m_entities(),
 	m_selectedEntityID(Globals::INVALID_ENTITY_ID)
 {}
 
@@ -113,7 +112,7 @@ void EntityManager::render(ShaderHandler& shaderHandler) const
 		entity.render(shaderHandler);
 	}
 
-	m_terrain.render(shaderHandler);
+	ModelManager::getInstance().getModel(eModelName::Terrain).render(shaderHandler, Globals::TERRAIN_POSITION);
 }
 
 #ifdef RENDER_AABB
