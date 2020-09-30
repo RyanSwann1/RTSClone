@@ -30,6 +30,7 @@ public:
 	const Entity* getEntity(const AABB& AABB, int entityID) const;
 	const Entity* getEntity(int entityID) const;
 	const Entity* getEntity(const glm::vec3& position) const;
+	const std::array<Mineral, Globals::MAX_MINERALS_PER_FACTION>& getMinerals() const;
 
 	virtual void handleEvent(const GameEvent& gameEvent, const Map& map);
 	virtual void update(float deltaTime, const Map& map, FactionHandler& factionHandler);

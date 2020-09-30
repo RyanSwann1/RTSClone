@@ -7,7 +7,7 @@
 
 namespace
 {
-    std::array<Mineral, Globals::MAX_MINERALS_PER_FACTION> getMinerals(
+    std::array<Mineral, Globals::MAX_MINERALS_PER_FACTION> initializeMinerals(
         const std::array<glm::vec3, Globals::MAX_MINERALS_PER_FACTION>& mineralPositions)
     {
         //Done in this way because of how the constructors/move constructors are setup
@@ -31,7 +31,7 @@ Faction::Faction(eFactionController factionController, const glm::vec3& hqStarti
     const std::array<glm::vec3, Globals::MAX_MINERALS_PER_FACTION>& mineralPositions, int startingResources,
     int startingPopulation)
     : m_plannedBuildings(),
-    m_minerals(getMinerals(mineralPositions)),
+    m_minerals(initializeMinerals(mineralPositions)),
     m_allEntities(),
     m_units(),
     m_workers(),
@@ -166,6 +166,11 @@ const Entity* Faction::getEntity(const glm::vec3& position) const
     {
         return nullptr;
     }
+}
+
+const std::array<Mineral, Globals::MAX_MINERALS_PER_FACTION>& Faction::getMinerals() const
+{
+    return m_minerals;
 }
 
 void Faction::handleEvent(const GameEvent& gameEvent, const Map& map)

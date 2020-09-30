@@ -410,7 +410,8 @@ void FactionPlayer::instructUnitToAttack(Unit& unit, const Entity& targetEntity,
 
 bool FactionPlayer::instructWorkerToBuild(const Map& map)
 {
-    if (map.isWithinBounds(m_plannedBuilding.getPosition()) && !map.isPositionOccupied(m_plannedBuilding.getPosition()))
+    if (map.isWithinBounds(m_plannedBuilding.getPosition()) && !map.isPositionOccupied(m_plannedBuilding.getPosition()) && 
+        isEntityAffordable(m_plannedBuilding.getEntityType()))
     {
         int workerID = m_plannedBuilding.getWorkerID();
         assert(workerID != Globals::INVALID_ENTITY_ID);
@@ -425,10 +426,15 @@ bool FactionPlayer::instructWorkerToBuild(const Map& map)
                 return worker.isSelected();
             }
         });
+
         if (selectedWorker != m_workers.end())
         {
             return Faction::instructWorkerToBuild(m_plannedBuilding.getEntityType(), m_plannedBuilding.getPosition(), map, *selectedWorker);
         }
+    }
+    else if (!isEntityAffordable(m_plannedBuilding.getEntityType()))
+    {
+        m_plannedBuilding.setActive(false);
     }
 
     return false;
