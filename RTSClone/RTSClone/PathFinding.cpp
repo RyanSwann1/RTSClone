@@ -411,7 +411,25 @@ glm::vec3 PathFinding::getClosestAvailablePosition(const glm::vec3& startingPosi
 	return Globals::convertToWorldPosition(availablePositionOnGrid);
 }
 
-glm::vec3 PathFinding::getClosestPositionOutsideAABB(const glm::vec3& entityPosition, const AABB& AABB, const glm::vec3& centrePositionAABB, 
+glm::vec3 PathFinding::getAvailablePositionOutsideAABB(const Entity& senderEntity, const Map& map)
+{
+	for (glm::vec2 direction : ALL_DIRECTIONS_ON_GRID)
+	{
+		glm::vec2 position = Globals::convertToGridPosition(senderEntity.getPosition());
+		for (int ray = 1; ray <= Globals::NODE_SIZE * 5; ++ray)
+		{
+			position = position + direction * static_cast<float>(1);
+			if (!map.isPositionOccupied(position) && map.isWithinBounds(position))
+			{
+				return Globals::convertToWorldPosition(position);
+			}
+		}
+	}
+
+	return senderEntity.getPosition();
+}
+
+glm::vec3 PathFinding::getClosestPositionOutsideAABB(const glm::vec3& entityPosition, const AABB& AABB, const glm::vec3& centrePositionAABB,
 	const Map& map)
 {
 	glm::vec3 closestPosition = centrePositionAABB;
@@ -429,7 +447,7 @@ glm::vec3 PathFinding::getClosestPositionOutsideAABB(const glm::vec3& entityPosi
 	for (float ray = 1.0f; ray <= Globals::NODE_SIZE * 7.0f; ++ray)
 	{
 		position = position + direction * 1.0f;
-		if (!AABB.contains(position) && !map.isPositionOccupied(position) && map.isWithinBounds(position))// Globals::isPositionInMapBounds(position))
+		if (!AABB.contains(position) && !map.isPositionOccupied(position) && map.isWithinBounds(position))
 		{
 			closestPosition = position;
 			break;
