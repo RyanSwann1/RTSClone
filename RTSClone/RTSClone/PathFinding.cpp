@@ -5,6 +5,7 @@
 #include "Worker.h"
 #include "ModelManager.h"
 #include "AdjacentPositions.h"
+#include "Faction.h"
 #include <limits>
 #include <queue>
 
@@ -196,7 +197,8 @@ void PathFinding::clearAttackPositions()
 	m_attackPositions.clear();
 }
 
-bool PathFinding::isBuildingSpawnAvailable(const glm::vec3& startingPosition, eEntityType entityTypeToBuild, const Map& map, glm::vec3& buildPosition)
+bool PathFinding::isBuildingSpawnAvailable(const glm::vec3& startingPosition, eEntityType entityTypeToBuild, const Map& map, glm::vec3& buildPosition,
+	float minDistanceFromHQ, float maxDistanceFromHQ, float distanceFromMinerals, const Faction& owningFaction)
 {
 	m_graph.reset(m_frontier);
 
@@ -209,8 +211,7 @@ bool PathFinding::isBuildingSpawnAvailable(const glm::vec3& startingPosition, eE
 		glm::ivec2 position = m_frontier.front();
 		m_frontier.pop();
 
-		std::array<AdjacentPosition, ALL_DIRECTIONS_ON_GRID.size()> adjacentPositions = getAdjacentPositions(position, map);
-		for (const auto& adjacentPosition : adjacentPositions)
+		for (const auto& adjacentPosition : getAdjacentPositions(position, map))
 		{
 			if (adjacentPosition.valid)
 			{
@@ -219,11 +220,23 @@ bool PathFinding::isBuildingSpawnAvailable(const glm::vec3& startingPosition, eE
 
 				if (!map.isAABBOccupied(buildingAABB))
 				{
-					foundBuildPosition = true;
-					buildPositionOnGrid = adjacentPosition.position;
-					break;
+					const auto& owningFactionMinerals = owningFaction.getMinerals();
+					glm::vec3 adjacentWorldPosition = Globals::convertToWorldPosition(adjacentPosition.position);
+					auto mineral = std::find_if(owningFactionMinerals.cbegin(), owningFactionMinerals.cend(), [&adjacentWorldPosition, distanceFromMinerals](const auto& mineral)
+					{
+						return Globals::getSqrDistance(mineral.getPosition(), adjacentWorldPosition) < distanceFromMinerals * distanceFromMinerals;
+					});
+
+					if (mineral == owningFactionMinerals.cend() &&
+						Globals::getSqrDistance(owningFaction.getHQPosition(), adjacentWorldPosition) >= minDistanceFromHQ * minDistanceFromHQ &&
+						Globals::getSqrDistance(owningFaction.getHQPosition(), adjacentWorldPosition) <= maxDistanceFromHQ * maxDistanceFromHQ)
+					{
+						foundBuildPosition = true;
+						buildPositionOnGrid = adjacentPosition.position;
+						break;
+					}
 				}
-				else if (!m_graph.isPositionVisited(adjacentPosition.position, map))
+				if (!m_graph.isPositionVisited(adjacentPosition.position, map))
 				{
 					m_graph.addToGraph(adjacentPosition.position, position, map);
 					m_frontier.push(adjacentPosition.position);
@@ -231,7 +244,7 @@ bool PathFinding::isBuildingSpawnAvailable(const glm::vec3& startingPosition, eE
 			}
 		}
 
-		assert(m_frontier.size() <= map.getSize().x * map.getSize().y);
+		assert(static_cast<int>(m_frontier.size()) <= map.getSize().x * map.getSize().y);
 	}
 
 	buildPosition = Globals::convertToWorldPosition(buildPositionOnGrid);

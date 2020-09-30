@@ -18,6 +18,7 @@ namespace GameMessages
 {
 	struct NewMapSize;
 };
+class Faction;
 class Entity;
 class Worker;
 class Unit;
@@ -79,7 +80,7 @@ public:
 	}
 
 	bool isBuildingSpawnAvailable(const glm::vec3& startingPosition, eEntityType entityTypeToBuild, const Map& map,
-		glm::vec3& buildPosition);
+		glm::vec3& buildPosition, float minDistanceFromHQ, float maxDistanceFromHQ, float distanceFromMinerals, const Faction& owningFaction);
 
 	bool isPositionAvailable(const glm::vec3& nodePosition, const Map& map, const std::list<Unit>& units, const std::list<Worker>& workers, 
 		int senderID = Globals::INVALID_ENTITY_ID) const;
