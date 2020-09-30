@@ -62,11 +62,14 @@ bool Map::isAABBOccupied(const AABB& AABB) const
 		for (int y = static_cast<int>(AABB.getBack()); y <= static_cast<int>(AABB.getForward()); ++y)
 		{
 			glm::ivec2 positionOnGrid = Globals::convertToGridPosition({ x, Globals::GROUND_HEIGHT, y });
-			return m_map[Globals::convertTo1D(positionOnGrid, m_size)];
+			if (m_map[Globals::convertTo1D(positionOnGrid, m_size)])
+			{
+				return true;
+			}
 		}
 	}
 
-	return true;
+	return false;
 }
 
 bool Map::isPositionOccupied(const glm::vec3& position) const
