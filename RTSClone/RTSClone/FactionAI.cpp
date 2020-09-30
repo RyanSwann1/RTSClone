@@ -22,7 +22,8 @@
 
 namespace
 {
-	constexpr float DELAY_TIME = 3.0f;
+	constexpr float DELAY_TIMER_EXPIRATION = 3.0f;
+	constexpr float IDLE_TIMER_EXPIRATION = 1.0f;
 	constexpr int STARTING_WORKER_COUNT = 2;
 	constexpr int STARTING_UNIT_COUNT = 1;
 	constexpr float MAX_DISTANCE_FROM_HQ = static_cast<float>(Globals::NODE_SIZE) * 18.0f;
@@ -48,7 +49,8 @@ FactionAI::FactionAI(eFactionController factionController, const glm::vec3& hqSt
 	: Faction(factionController, hqStartingPosition, mineralPositions, startingResources, startingPopulation),
 	m_spawnQueue(),
 	m_actionQueue(),
-	m_delayTimer(DELAY_TIME, true),
+	m_delayTimer(DELAY_TIMER_EXPIRATION, true),
+	m_idleTimer(IDLE_TIMER_EXPIRATION, true),
 	m_targetFaction(nullptr)
 {
 	for (int i = 0; i < STARTING_WORKER_COUNT; ++i)
@@ -87,7 +89,7 @@ void FactionAI::update(float deltaTime, const Map & map, FactionHandler& faction
 	{
 		m_delayTimer.resetElaspedTime();
 
-		if(!m_spawnQueue.empty())
+		if (!m_spawnQueue.empty())
 		{
 			eEntityType entityTypeToSpawn = m_spawnQueue.front();
 			switch (entityTypeToSpawn)
@@ -132,7 +134,7 @@ void FactionAI::update(float deltaTime, const Map & map, FactionHandler& faction
 					}
 				}
 			}
-				break;
+			break;
 			case eActionType::BuildSupplyDepot:
 			{
 				if (!m_workers.empty())
@@ -151,11 +153,17 @@ void FactionAI::update(float deltaTime, const Map & map, FactionHandler& faction
 					}
 				}
 			}
-				break;
+			break;
 			default:
 				assert(false);
 			}
 		}
+	}
+
+	m_idleTimer.update(deltaTime);
+	if (m_idleTimer.isExpired())
+	{
+		m_idleTimer.resetElaspedTime();
 
 		for (auto& worker : m_workers)
 		{
