@@ -297,6 +297,11 @@ void Level::renderAABB(ShaderHandler& shaderHandler)
 		}
 	}
 
+	for (auto& sceneryGameObject : m_scenery)
+	{
+		sceneryGameObject.renderAABB(shaderHandler);
+	}
+
 	m_projectileHandler.renderAABB(shaderHandler);
 }
 #endif // RENDER_AABB

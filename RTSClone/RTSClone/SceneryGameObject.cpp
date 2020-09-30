@@ -45,3 +45,11 @@ void SceneryGameObject::render(ShaderHandler& shaderHandler) const
 {
 	ModelManager::getInstance().getModel(m_modelName).render(shaderHandler, m_position);
 }
+
+#ifdef RENDER_AABB
+void SceneryGameObject::renderAABB(ShaderHandler& shaderHandler)
+{
+	AABB AABB(m_position, ModelManager::getInstance().getModel(m_modelName));
+	AABB.render(shaderHandler);
+}
+#endif // RENDER_AABB

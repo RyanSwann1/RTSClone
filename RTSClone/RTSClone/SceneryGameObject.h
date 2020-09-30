@@ -14,6 +14,9 @@ public:
 	~SceneryGameObject();
 
 	void render(ShaderHandler& shaderHandler) const;
+#ifdef RENDER_AABB
+	void renderAABB(ShaderHandler& shaderHandler);
+#endif // RENDER_AABB
 
 private:
 	eModelName m_modelName;
