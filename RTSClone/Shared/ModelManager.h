@@ -13,6 +13,10 @@ enum class eEntityType;
 class ModelManager : private NonMovable, private NonCopyable
 {
 public:
+#ifdef LEVEL_EDITOR
+	static const size_t TOTAL_MODELS = 6;
+	static const size_t TOTAL_MODEL_NAMES = 2;
+#endif // LEVEL_EDITOR
 	static ModelManager& getInstance() 
 	{
 		static ModelManager instance;
@@ -21,7 +25,7 @@ public:
 
 	bool isAllModelsLoaded() const;
 #ifdef LEVEL_EDITOR
-	const std::array<std::string, static_cast<size_t>(eModelName::Max) + 1> getModelNames() const;
+	const std::array<std::string, TOTAL_MODEL_NAMES> getModelNames() const;
 	eModelName getModelName(const std::string& modelName) const;
 #endif // LEVEL_EDITOR
 	
@@ -33,37 +37,20 @@ public:
 private:
 	ModelManager();
 	bool m_loadedAllModels;
+#ifdef GAME
 	const std::array<std::unique_ptr<Model>, static_cast<size_t>(eModelName::Max) + 1> m_models;
+#endif // GAME
 #ifdef LEVEL_EDITOR	
+	const std::array<std::unique_ptr<Model>, TOTAL_MODELS> m_models;
 	const std::unordered_map<std::string, eModelName> m_modelNameConversions
 	{
-		{"Terrain", eModelName::Terrain},
 		{"Meteor", eModelName::Meteor},
 		{"RocksTall", eModelName::RocksTall},
-		{"Unit", eModelName::Unit},
-		{"HQ", eModelName::HQ},
-		{"Mineral", eModelName::Mineral},
-		{"WorkerMineral", eModelName::WorkerMineral},
-		{"Waypoint", eModelName::Waypoint},
-		{"Worker", eModelName::Worker},
-		{"Projectile", eModelName::Projectile},
-		{"SupplyDepot", eModelName::SupplyDepot},
-		{"Barracks", eModelName::Barracks}
 	};
-	const std::array<std::string, static_cast<size_t>(eModelName::Max) + 1> m_modelNames
+	const std::array<std::string, TOTAL_MODEL_NAMES> m_modelNames
 	{
-		"Terrain",
 		"Meteor",
-		"RocksTall",
-		"Unit",
-		"HQ",
-		"Mineral",
-		"WorkerMineral",
-		"Waypoint",
-		"Worker",
-		"Projectile",
-		"SupplyDepot",
-		"Barracks"
+		"RocksTall"
 	};
 #endif // LEVEL_EDITOR
 };

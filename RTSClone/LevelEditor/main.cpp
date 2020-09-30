@@ -291,8 +291,7 @@ int main()
 			const auto& modelNames = ModelManager::getInstance().getModelNames();
 			for (int i = 0; i < modelNames.size(); i++)
 			{
-				std::string label = "Model: " + modelNames[i];
-				if (ImGui::Selectable(label.c_str(), selected == i))
+				if (ImGui::Selectable(modelNames[i].c_str(), selected == i))
 				{
 					selected = i;
 					plannedEntity.setModelName(ModelManager::getInstance().getModelName(modelNames[i]));
