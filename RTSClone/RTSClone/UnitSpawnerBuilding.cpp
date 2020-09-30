@@ -26,7 +26,18 @@ namespace
 	bool isEntityAffordable(const Faction& owningFaction, int resourceCost, int populationCost)
 	{
 		return owningFaction.getCurrentResourceAmount() >= resourceCost &&
-			owningFaction.getCurrentPopulationAmount() + populationCost <= owningFaction.getMaximumPopulationAmount();
+			owningFaction.getCurrentPopulationAmount() + populationCost > owningFaction.getMaximumPopulationAmount();
+	}
+
+	bool isUnitSpawnable(int unitToSpawnCount, int resourceCost, int populationCost, const Faction& owningFaction)
+	{
+		if (unitToSpawnCount * resourceCost + resourceCost <= owningFaction.getCurrentResourceAmount() &&
+			unitToSpawnCount * populationCost + populationCost <= owningFaction.getMaximumPopulationAmount())
+		{
+			return true;
+		}
+
+		return false;
 	}
 
 	constexpr float TIME_BETWEEN_WORKER_SPAWN = 2.0f;
@@ -47,8 +58,7 @@ void Barracks::update(float deltaTime)
 
 void Barracks::addUnitToSpawn(const std::function<Entity* (const UnitSpawnerBuilding&)>& unitToSpawn)
 {
-	if ((static_cast<int>(m_unitsToSpawn.size() * Globals::UNIT_RESOURCE_COST) + Globals::UNIT_RESOURCE_COST <= 
-		m_owningFaction.getCurrentResourceAmount()))
+	if (isUnitSpawnable(static_cast<int>(m_unitsToSpawn.size()), Globals::UNIT_RESOURCE_COST, Globals::UNIT_POPULATION_COST, m_owningFaction))
 	{
 		UnitSpawnerBuilding::addUnitToSpawn(unitToSpawn);
 	}
@@ -67,8 +77,7 @@ void HQ::update(float deltaTime)
 
 void HQ::addUnitToSpawn(const std::function<Entity* (const UnitSpawnerBuilding&)>& unitToSpawn)
 {
-	if ((static_cast<int>(m_unitsToSpawn.size() * Globals::WORKER_RESOURCE_COST) + Globals::WORKER_RESOURCE_COST <=
-		m_owningFaction.getCurrentResourceAmount()))
+	if (isUnitSpawnable(static_cast<int>(m_unitsToSpawn.size()), Globals::WORKER_RESOURCE_COST, Globals::WORKER_POPULATION_COST, m_owningFaction))
 	{
 		UnitSpawnerBuilding::addUnitToSpawn(unitToSpawn);
 	}
