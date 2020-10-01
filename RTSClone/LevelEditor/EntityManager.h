@@ -15,6 +15,7 @@ class EntityManager : private NonCopyable, private NonMovable
 public:
 	EntityManager();
 
+	bool isEntitySelected() const;
 	Entity* getSelectedEntity();
 	const std::vector<Entity>& getEntities() const;
 	

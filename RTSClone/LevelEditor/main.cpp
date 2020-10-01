@@ -65,9 +65,8 @@ int main()
 	shaderHandler->setUniformMat4f(eShaderType::SelectionBox, "uOrthographic", glm::ortho(0.0f, static_cast<float>(windowSize.x),
 		static_cast<float>(windowSize.y), 0.0f));
 
-	std::unique_ptr<Level> level;
-	const std::string levelName = "Level.txt";
 	PlayableAreaDisplay playableAreaDisplay;
+	std::unique_ptr<Level> level = std::make_unique<Level>("Level.txt", playableAreaDisplay);
 	SelectionBox selectionBox;
 	
 	sf::Clock gameClock;
@@ -87,7 +86,6 @@ int main()
 	while (window.isOpen())
 	{
 		float deltaTime = gameClock.restart().asSeconds();
-		
 		//Handle Input
 		sf::Event currentSFMLEvent;
 		while (window.pollEvent(currentSFMLEvent))
@@ -103,18 +101,14 @@ int main()
 				window.close();
 				break;
 			case sf::Event::KeyPressed:
-				switch (currentSFMLEvent.key.code)
+				if (currentSFMLEvent.key.code == sf::Keyboard::Escape)
 				{
-				case sf::Keyboard::Escape:
 					window.close();
-					break;
 				}
 				break;
 			case sf::Event::MouseButtonPressed:
 			{
-				switch (currentSFMLEvent.mouseButton.button)
-				{
-				case sf::Mouse::Button::Left:
+				if (currentSFMLEvent.mouseButton.button == sf::Mouse::Button::Left)
 				{
 					if (!ImGui::IsWindowHovered(ImGuiHoveredFlags_::ImGuiHoveredFlags_AnyWindow))
 					{
@@ -134,11 +128,9 @@ int main()
 						}
 					}
 				}
-				break;
-				case sf::Mouse::Button::Right:
+				else if (currentSFMLEvent.mouseButton.button == sf::Mouse::Button::Right)
+				{
 					plannedEntityActive = false;
-					break;
-				break;
 				}
 			}
 				break;
@@ -158,15 +150,12 @@ int main()
 						selectionBox.setSize(mouseToGroundPosition);
 					}
 
-					if (level)
+					glm::vec3 newPosition = Globals::convertToNodePosition(mouseToGroundPosition);
+					AABB AABB(newPosition, ModelManager::getInstance().getModel(plannedEntity.getModelName()));
+					if (Globals::isWithinMapBounds(AABB, level->getMapSize()))
 					{
-						glm::vec3 newPosition = Globals::convertToNodePosition(mouseToGroundPosition);
-						AABB AABB(newPosition, ModelManager::getInstance().getModel(plannedEntity.getModelName()));
-						if (Globals::isWithinMapBounds(AABB, level->getMapSize()))
-						{
-							plannedEntity.setPosition(newPosition);
-						}
-					}
+						plannedEntity.setPosition(newPosition);
+					}	
 				}
 			}
 				break;
@@ -174,6 +163,7 @@ int main()
 		}
 
 		//Update
+		
 		camera.update(deltaTime);
 		ImGui_SFML_OpenGL3::startFrame();
 		ImGui::SetNextWindowSize(ImVec2(175, static_cast<float>(windowSize.y)), ImGuiCond_FirstUseEver);

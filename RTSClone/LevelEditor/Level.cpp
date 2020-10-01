@@ -69,7 +69,13 @@ namespace
 	constexpr glm::ivec2 DEFAULT_MAP_SIZE = { 30, 30 };
 }
 
-Level::Level(const std::string& string)
+Level::Level(const std::string& string, PlayableAreaDisplay& playableAreaDisplay)
+	: m_levelName(),
+	m_entityManager(),
+	m_players(),
+	m_mapSize(DEFAULT_MAP_SIZE),
+	m_factionStartingResources(DEFAULT_STARTING_RESOURCES),
+	m_factionStartingPopulation(DEFAULT_STARTING_POPULATION)
 {
 	m_players.reserve(static_cast<size_t>(eFactionController::Max) + static_cast<size_t>(1));
 
@@ -84,6 +90,8 @@ Level::Level(const std::string& string)
 		m_players.emplace_back(eFactionController::AI_1, PLAYER_HQ_STARTING_POSITIONS[static_cast<int>(eFactionController::AI_1)],
 			PLAYER_MINERAL_STARTING_POSITIONS[static_cast<int>(eFactionController::AI_1)]);
 	}
+
+	playableAreaDisplay.setSize(m_mapSize);
 }
 
 const std::vector<Player>& Level::getPlayers() const

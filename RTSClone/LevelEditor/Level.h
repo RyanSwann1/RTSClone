@@ -15,7 +15,7 @@ class SelectionBox;
 class Level : private NonCopyable, private NonMovable
 {
 public:
-	Level(const std::string& string);
+	Level(const std::string& string, PlayableAreaDisplay& playableAreaDisplay);
 
 	const std::vector<Player>& getPlayers() const;
 	const glm::ivec2& getMapSize() const;

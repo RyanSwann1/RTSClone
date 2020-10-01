@@ -13,6 +13,11 @@ EntityManager::EntityManager()
 	m_selectedEntityID(Globals::INVALID_ENTITY_ID)
 {}
 
+bool EntityManager::isEntitySelected() const
+{
+	return m_selectedEntityID != Globals::INVALID_ENTITY_ID;
+}
+
 Entity* EntityManager::getSelectedEntity()
 {
 	if(m_selectedEntityID != Globals::INVALID_ENTITY_ID)
