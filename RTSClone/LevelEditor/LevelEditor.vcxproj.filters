@@ -90,6 +90,9 @@
     <ClCompile Include="..\Shared\FactionController.cpp">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="Level.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Shared\imgui\imstb_truetype.h">
@@ -180,6 +183,9 @@
       <Filter>src</Filter>
     </ClInclude>
     <ClInclude Include="..\Shared\FactionController.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="Level.h">
       <Filter>src</Filter>
     </ClInclude>
   </ItemGroup>

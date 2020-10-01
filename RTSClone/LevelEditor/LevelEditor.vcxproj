@@ -161,6 +161,7 @@
     <ClCompile Include="..\Shared\SelectionBox.cpp" />
     <ClCompile Include="..\Shared\ShaderHandler.cpp" />
     <ClCompile Include="EntityManager.cpp" />
+    <ClCompile Include="Level.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="PlayableAreaDisplay.cpp" />
     <ClCompile Include="Player.cpp" />
@@ -194,6 +195,7 @@
     <ClInclude Include="..\Shared\ShaderHandler.h" />
     <ClInclude Include="..\Shared\UniqueEntityIDDistributer.h" />
     <ClInclude Include="EntityManager.h" />
+    <ClInclude Include="Level.h" />
     <ClInclude Include="PlayableAreaDisplay.h" />
     <ClInclude Include="Player.h" />
   </ItemGroup>
