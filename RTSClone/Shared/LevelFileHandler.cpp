@@ -76,7 +76,7 @@ bool LevelFileHandler::saveLevelToFile(const std::string& fileName, const Entity
 	const std::vector<Player>& players, const glm::ivec2& mapSize, int factionStartingResources, 
 	int factionStartingPopulation)
 {
-	std::ofstream file(Globals::SHARED_FILE_DIRECTORY + fileName);
+	std::ofstream file(Globals::SHARED_FILE_DIRECTORY + LEVELS_FILE_DIRECTORY + fileName);
 	assert(file.is_open());
 	if (!file.is_open())
 	{
@@ -101,7 +101,7 @@ bool LevelFileHandler::saveLevelToFile(const std::string& fileName, const Entity
 bool LevelFileHandler::loadLevelFromFile(const std::string& fileName, EntityManager& entityManager, std::vector<Player>& players, 
 	glm::ivec2& mapSize, int& factionStartingResources, int& factionStartingPopulation)
 {
-	std::ifstream file(Globals::SHARED_FILE_DIRECTORY + fileName);
+	std::ifstream file(Globals::SHARED_FILE_DIRECTORY + LEVELS_FILE_DIRECTORY + fileName);
 	if (!file.is_open())
 	{
 		return false;
@@ -271,7 +271,7 @@ bool LevelFileHandler::loadLevelFromFile(const std::string& fileName, std::vecto
 {
 	assert(scenery.empty());
 
-	std::ifstream file(Globals::SHARED_FILE_DIRECTORY + fileName);
+	std::ifstream file(Globals::SHARED_FILE_DIRECTORY + LEVELS_FILE_DIRECTORY + fileName);
 	if (!file.is_open())
 	{
 		return false;
