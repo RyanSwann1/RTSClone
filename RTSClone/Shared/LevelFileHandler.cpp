@@ -17,6 +17,12 @@
 #include <fstream>
 #include <sstream>
 
+namespace
+{
+	const std::string LEVELS_FILE_DIRECTORY = Globals::SHARED_FILE_DIRECTORY + "Levels/";
+	const std::string LEVELS_FILE_NAME = "Levels.txt";
+}
+
 #ifdef GAME
 void loadInPlayers(std::ifstream& file, std::array<std::unique_ptr<Faction>, static_cast<size_t>(eFactionController::Max) + 1>& factions,
 	int startingResources, int startingPopulation);
@@ -135,6 +141,32 @@ bool LevelFileHandler::loadLevelFromFile(const std::string& fileName, EntityMana
 	file.close();
 
 	return true;
+}
+
+std::array<std::string, Globals::MAX_LEVELS> LevelFileHandler::loadLevelNames()
+{
+	std::array<std::string, Globals::MAX_LEVELS> levelNames;
+	std::ifstream file(Globals::SHARED_FILE_DIRECTORY + LEVELS_FILE_DIRECTORY);
+	if (!file.is_open())
+	{
+		std::ofstream file(Globals::SHARED_FILE_DIRECTORY + LEVELS_FILE_DIRECTORY + LEVELS_FILE_NAME);
+		assert(file.is_open());
+	}
+	else
+	{
+		std::string line;
+		int index = 0;
+		while (getline(file, line))
+		{
+			std::stringstream stringstream{ line };
+			stringstream >> levelNames[index];
+			++index;
+
+			assert(index <= static_cast<int>(Globals::MAX_LEVELS));
+		}
+	}
+
+	return levelNames;
 }
 
 void saveMapSizeToFile(std::ostream& os, const glm::ivec2& mapSize)

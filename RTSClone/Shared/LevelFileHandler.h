@@ -2,6 +2,7 @@
 
 #include "FactionController.h"
 #include "glm/glm.hpp"
+#include "Globals.h"
 #include <string>
 #include <vector>
 #include <memory>
@@ -24,9 +25,12 @@ namespace LevelFileHandler
 	bool saveLevelToFile(const std::string& fileName, const EntityManager& entityManager,
 		const std::vector<Player>& players, const glm::ivec2& mapSize, int factionStartingResources, 
 		int factionStartingPopulation);
+
 	bool loadLevelFromFile(const std::string& fileName, EntityManager& entityManager,
 		std::vector<Player>& players, glm::ivec2& mapSize, int& factionStartingResources,
 		int& factionStartingPopulation);
+
+	std::array<std::string, Globals::MAX_LEVELS> loadLevelNames();
 #endif // LEVEL_EDITOR
 
 #ifdef GAME
