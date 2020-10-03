@@ -88,7 +88,7 @@ Level::Level(const std::string& levelName)
 		m_players.emplace_back(eFactionController::AI_1, PLAYER_HQ_STARTING_POSITIONS[static_cast<int>(eFactionController::AI_1)],
 			PLAYER_MINERAL_STARTING_POSITIONS[static_cast<int>(eFactionController::AI_1)]);
 
-		LevelFileHandler::saveLevelToFile(m_levelName, m_entityManager, m_players, m_mapSize, m_factionStartingResources, m_factionStartingPopulation);
+		LevelFileHandler::saveLevelToFile(*this);
 	}
 }
 
@@ -261,8 +261,7 @@ void Level::handleLevelDetails(bool& showDetailsWindow, PlayableAreaDisplay& pla
 
 void Level::save() const
 {
-	if (!LevelFileHandler::saveLevelToFile(m_levelName, m_entityManager, m_players, m_mapSize,
-		 m_factionStartingResources, m_factionStartingPopulation))
+	if (!LevelFileHandler::saveLevelToFile(*this))
 	{
 		std::cout << "Unable to save file " + m_levelName << "\n";
 	}
@@ -315,12 +314,20 @@ const std::ifstream& operator>>(std::ifstream& file, Level& level)
 	file >> level.m_entityManager;
 
 	return file;
-	// TODO: insert return statement here
 }
 
 std::ostream& operator<<(std::ostream& ostream, const Level& level)
 {
+	for (auto& player : level.m_players)
+	{
+		ostream << player;
+	}
+
+	LevelFileHandler::saveFactionStartingPopulation(ostream, level.m_factionStartingPopulation);
+	LevelFileHandler::saveFactionStartingResources(ostream, level.m_factionStartingResources);
+	LevelFileHandler::saveMapSizeToFile(ostream, level.m_mapSize);
+
+	ostream << level.m_entityManager;
 
 	return ostream;
-	// TODO: insert return statement here
 }

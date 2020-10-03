@@ -32,12 +32,6 @@ void loadInPlayer(std::ifstream& file, std::array<std::unique_ptr<Faction>, stat
 void loadInScenery(std::ifstream& file, std::vector<SceneryGameObject>& scenery);
 #endif // GAME
 
-#ifdef LEVEL_EDITOR
-void saveMapSizeToFile(std::ostream& os, const glm::ivec2& mapSize);
-void saveFactionStartingResources(std::ostream& os, int factionStartingResources);
-void saveFactionStartingPopulation(std::ostream& os, int factionStartingPopulation);
-#endif // LEVEL_EDITOR
-
 void LevelFileHandler::loadFromFile(std::ifstream& file, const std::function<void(const std::string&)>& data, 
 	const std::function<bool(const std::string&)>& conditional)
 {
@@ -92,28 +86,16 @@ void LevelFileHandler::saveLevelName(const std::string& fileName)
 	levelsFile << fileName << "\n";
 }
 
-bool LevelFileHandler::saveLevelToFile(const std::string& fileName, const EntityManager& entityManager,
-	const std::vector<Player>& players, const glm::ivec2& mapSize, int factionStartingResources, 
-	int factionStartingPopulation)
+bool LevelFileHandler::saveLevelToFile(const Level& level)
 {
-	std::ofstream file(Globals::SHARED_FILE_DIRECTORY + LEVELS_FILE_DIRECTORY + fileName);
+	std::ofstream file(Globals::SHARED_FILE_DIRECTORY + LEVELS_FILE_DIRECTORY + level.getName());
 	assert(file.is_open());
 	if (!file.is_open())
 	{
 		return false;
 	}
 
-	for (auto& player : players)
-	{
-		file << player;
-	}
-	
-	saveFactionStartingPopulation(file, factionStartingPopulation);
-	saveFactionStartingResources(file, factionStartingResources);
-	saveMapSizeToFile(file, mapSize);
-
-	file << entityManager;
-	file.close();
+	file << level;
 
 	return true;
 }
@@ -133,19 +115,19 @@ bool LevelFileHandler::loadLevelFromFile(Level& level)
 	return true;
 }
 
-void saveMapSizeToFile(std::ostream& os, const glm::ivec2& mapSize)
+void LevelFileHandler::saveMapSizeToFile(std::ostream& os, const glm::ivec2& mapSize)
 {
 	os << Globals::TEXT_HEADER_MAP_SIZE << "\n";
 	os << mapSize.x << " " << mapSize.y << "\n";
 }
 
-void saveFactionStartingResources(std::ostream& os, int factionStartingResources)
+void LevelFileHandler::saveFactionStartingResources(std::ostream& os, int factionStartingResources)
 {
 	os << Globals::TEXT_HEADER_FACTION_STARTING_RESOURCE << "\n";
 	os << factionStartingResources << "\n";
 }
 
-void saveFactionStartingPopulation(std::ostream& os, int factionStartingPopulation)
+void LevelFileHandler::saveFactionStartingPopulation(std::ostream& os, int factionStartingPopulation)
 {
 	os << Globals::TEXT_HEADER_FACTION_STARTING_POPULATION << "\n";
 	os << factionStartingPopulation << "\n";

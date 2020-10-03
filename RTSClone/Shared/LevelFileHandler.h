@@ -30,12 +30,11 @@ namespace LevelFileHandler
 
 #ifdef LEVEL_EDITOR
 	bool isLevelExists(const std::string& fileName);
-
+	void saveMapSizeToFile(std::ostream& os, const glm::ivec2& mapSize);
+	void saveFactionStartingResources(std::ostream& os, int factionStartingResources);
+	void saveFactionStartingPopulation(std::ostream& os, int factionStartingPopulation);
 	void saveLevelName(const std::string& fileName);
-	bool saveLevelToFile(const std::string& fileName, const EntityManager& entityManager,
-		const std::vector<Player>& players, const glm::ivec2& mapSize, int factionStartingResources, 
-		int factionStartingPopulation);
-
+	bool saveLevelToFile(const Level& level);
 	bool loadLevelFromFile(Level& level);
 #endif // LEVEL_EDITOR
 
