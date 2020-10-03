@@ -85,6 +85,13 @@ bool LevelFileHandler::isLevelExists(const std::string& fileName)
 	return false;
 }
 
+void LevelFileHandler::saveLevelName(const std::string& fileName)
+{
+	assert(!isLevelExists(fileName));
+	std::ofstream levelsFile(Globals::SHARED_FILE_DIRECTORY + LEVELS_FILE_DIRECTORY + LEVELS_FILE_NAME, std::fstream::in | std::fstream::out | std::fstream::app);
+	levelsFile << fileName << "\n";
+}
+
 bool LevelFileHandler::saveLevelToFile(const std::string& fileName, const EntityManager& entityManager,
 	const std::vector<Player>& players, const glm::ivec2& mapSize, int factionStartingResources, 
 	int factionStartingPopulation)

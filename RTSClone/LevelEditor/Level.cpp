@@ -96,6 +96,7 @@ std::unique_ptr<Level> Level::create(const std::string& levelName)
 {
 	if (!LevelFileHandler::isLevelExists(levelName))
 	{
+		LevelFileHandler::saveLevelName(levelName);
 		return std::unique_ptr<Level>(new Level(levelName));
 	}
 
