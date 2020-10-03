@@ -15,7 +15,8 @@ class SelectionBox;
 class Level : private NonCopyable, private NonMovable
 {
 public:
-	Level(const std::string& string, PlayableAreaDisplay& playableAreaDisplay);
+	static std::unique_ptr<Level> create(const std::string& levelName);
+	static std::unique_ptr<Level> load(const std::string& levelName);
 
 	const std::vector<Player>& getPlayers() const;
 	const glm::ivec2& getMapSize() const;
@@ -30,7 +31,9 @@ public:
 	void render(ShaderHandler& shaderHandler) const;
 
 private:
-	std::string m_levelName;
+	Level(const std::string& levelName);
+
+	const std::string m_levelName;
 	EntityManager m_entityManager;
 	std::vector<Player> m_players;
 	glm::ivec2 m_mapSize;

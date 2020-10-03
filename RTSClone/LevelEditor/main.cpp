@@ -22,8 +22,25 @@ enum class eWindowState
 {
 	None,
 	PlayerDetails,
-	LevelDetails
+	LevelDetails,
+	LoadLevel,
+	CreateLevel
 };
+
+constexpr size_t MAX_LEVELS = 5;
+bool isLevelNameAvailable(const std::array<std::string, MAX_LEVELS>& levelNames, std::string& availableLevelName)
+{
+	for (const auto& levelName : levelNames)
+	{
+		if (!LevelFileHandler::isLevelExists(levelName))
+		{
+			availableLevelName = levelName;
+			return true;
+		}
+	}
+
+	return false;
+}
 
 int main()
 {
@@ -53,6 +70,15 @@ int main()
 		return -1;
 	}
 
+	const std::array<std::string, MAX_LEVELS> levelNames =
+	{
+		"Level1.txt",
+		"Level2.txt",
+		"Level3.txt",
+		"Level4.txt",
+		"Level5.txt"
+	};
+
 	std::unique_ptr<ShaderHandler> shaderHandler = ShaderHandler::create();
 	assert(shaderHandler);
 	if (!shaderHandler)
@@ -66,9 +92,8 @@ int main()
 		static_cast<float>(windowSize.y), 0.0f));
 
 	PlayableAreaDisplay playableAreaDisplay;
-	std::unique_ptr<Level> level = std::make_unique<Level>("Level.txt", playableAreaDisplay);
+	std::unique_ptr<Level> level; //= std::make_unique<Level>(playableAreaDisplay, "Level.txt");
 	SelectionBox selectionBox;
-	
 	sf::Clock gameClock;
 	Camera camera;
 
@@ -150,12 +175,15 @@ int main()
 						selectionBox.setSize(mouseToGroundPosition);
 					}
 
-					glm::vec3 newPosition = Globals::convertToNodePosition(mouseToGroundPosition);
-					AABB AABB(newPosition, ModelManager::getInstance().getModel(plannedEntity.getModelName()));
-					if (Globals::isWithinMapBounds(AABB, level->getMapSize()))
+					if (level)
 					{
-						plannedEntity.setPosition(newPosition);
-					}	
+						glm::vec3 newPosition = Globals::convertToNodePosition(mouseToGroundPosition);
+						AABB AABB(newPosition, ModelManager::getInstance().getModel(plannedEntity.getModelName()));
+						if (Globals::isWithinMapBounds(AABB, level->getMapSize()))
+						{
+							plannedEntity.setPosition(newPosition);
+						}
+					}
 				}
 			}
 				break;
@@ -163,7 +191,6 @@ int main()
 		}
 
 		//Update
-		
 		camera.update(deltaTime);
 		ImGui_SFML_OpenGL3::startFrame();
 		ImGui::SetNextWindowSize(ImVec2(175, static_cast<float>(windowSize.y)), ImGuiCond_FirstUseEver);
@@ -182,6 +209,16 @@ int main()
 					{
 						showDetailsWindow = true;
 						currentWindowState = eWindowState::LevelDetails;
+					}
+					if (ImGui::MenuItem("Create Level"))
+					{
+						showDetailsWindow = true;
+						currentWindowState = eWindowState::CreateLevel;
+					}
+					if (ImGui::MenuItem("Load Level"))
+					{
+						showDetailsWindow = true;
+						currentWindowState = eWindowState::LoadLevel;
 					}
 					if (ImGui::MenuItem("Save"))
 					{
@@ -251,6 +288,30 @@ int main()
 				{
 					level->handleLevelDetails(showDetailsWindow, playableAreaDisplay);
 				}
+				break;
+			case eWindowState::LoadLevel:
+			{
+				ImGui::Begin("Load Level", &showDetailsWindow, ImGuiWindowFlags_None);
+				for (const auto& levelName : levelNames)
+				{
+					ImGui::Text(levelName.c_str());
+				}
+				ImGui::End();
+			}
+			break;
+			case eWindowState::CreateLevel:
+			{
+				std::string availableLevelName;
+				if (isLevelNameAvailable(levelNames, availableLevelName))
+				{
+					level.reset();
+					level = Level::create(availableLevelName);
+					assert(level);
+					playableAreaDisplay.setSize(level->getMapSize());
+				}
+
+				currentWindowState = eWindowState::None;
+			}
 				break;
 			default:
 				assert(false);

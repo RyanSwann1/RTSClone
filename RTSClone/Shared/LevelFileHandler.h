@@ -14,6 +14,7 @@ class Faction;
 struct Player;
 class Entity;
 #ifdef LEVEL_EDITOR
+class LevelNameGenerator;
 class EntityManager;
 #endif // LEVEL_EDITOR
 namespace LevelFileHandler
@@ -22,6 +23,8 @@ namespace LevelFileHandler
 		const std::function<bool(const std::string&)>& conditional);
 
 #ifdef LEVEL_EDITOR
+	bool isLevelExists(const std::string& fileName);
+
 	bool saveLevelToFile(const std::string& fileName, const EntityManager& entityManager,
 		const std::vector<Player>& players, const glm::ivec2& mapSize, int factionStartingResources, 
 		int factionStartingPopulation);
@@ -29,8 +32,6 @@ namespace LevelFileHandler
 	bool loadLevelFromFile(const std::string& fileName, EntityManager& entityManager,
 		std::vector<Player>& players, glm::ivec2& mapSize, int& factionStartingResources,
 		int& factionStartingPopulation);
-
-	std::array<std::string, Globals::MAX_LEVELS> loadLevelNames();
 #endif // LEVEL_EDITOR
 
 #ifdef GAME

@@ -72,6 +72,23 @@ void LevelFileHandler::loadFromFile(std::ifstream& file, const std::function<voi
 }
 
 #ifdef LEVEL_EDITOR
+bool LevelFileHandler::isLevelExists(const std::string& fileName)
+{
+	std::ifstream file(Globals::SHARED_FILE_DIRECTORY + LEVELS_FILE_DIRECTORY + LEVELS_FILE_NAME);
+	assert(file.is_open());
+
+	std::string line;
+	while (std::getline(file, line))
+	{
+		if (line == fileName)
+		{
+			return true;
+		}
+	}
+
+	return false;
+}
+
 bool LevelFileHandler::saveLevelToFile(const std::string& fileName, const EntityManager& entityManager,
 	const std::vector<Player>& players, const glm::ivec2& mapSize, int factionStartingResources, 
 	int factionStartingPopulation)
@@ -141,32 +158,6 @@ bool LevelFileHandler::loadLevelFromFile(const std::string& fileName, EntityMana
 	file.close();
 
 	return true;
-}
-
-std::array<std::string, Globals::MAX_LEVELS> LevelFileHandler::loadLevelNames()
-{
-	std::array<std::string, Globals::MAX_LEVELS> levelNames;
-	std::ifstream file(Globals::SHARED_FILE_DIRECTORY + LEVELS_FILE_DIRECTORY);
-	if (!file.is_open())
-	{
-		std::ofstream file(Globals::SHARED_FILE_DIRECTORY + LEVELS_FILE_DIRECTORY + LEVELS_FILE_NAME);
-		assert(file.is_open());
-	}
-	else
-	{
-		std::string line;
-		int index = 0;
-		while (getline(file, line))
-		{
-			std::stringstream stringstream{ line };
-			stringstream >> levelNames[index];
-			++index;
-
-			assert(index <= static_cast<int>(Globals::MAX_LEVELS));
-		}
-	}
-
-	return levelNames;
 }
 
 void saveMapSizeToFile(std::ostream& os, const glm::ivec2& mapSize)

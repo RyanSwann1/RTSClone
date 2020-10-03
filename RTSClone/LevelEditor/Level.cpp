@@ -69,8 +69,8 @@ namespace
 	constexpr glm::ivec2 DEFAULT_MAP_SIZE = { 30, 30 };
 }
 
-Level::Level(const std::string& string, PlayableAreaDisplay& playableAreaDisplay)
-	: m_levelName(),
+Level::Level(const std::string& levelName)
+	: m_levelName(levelName),
 	m_entityManager(),
 	m_players(),
 	m_mapSize(DEFAULT_MAP_SIZE),
@@ -82,16 +82,34 @@ Level::Level(const std::string& string, PlayableAreaDisplay& playableAreaDisplay
 	if (!LevelFileHandler::loadLevelFromFile(m_levelName, m_entityManager, m_players, m_mapSize,
 		m_factionStartingResources, m_factionStartingPopulation))
 	{
-		std::cout << "Failed to load level: " << m_levelName << "\n";
-
 		m_players.emplace_back(eFactionController::Player, PLAYER_HQ_STARTING_POSITIONS[static_cast<int>(eFactionController::Player)],
 			PLAYER_MINERAL_STARTING_POSITIONS[static_cast<int>(eFactionController::Player)]);
 
 		m_players.emplace_back(eFactionController::AI_1, PLAYER_HQ_STARTING_POSITIONS[static_cast<int>(eFactionController::AI_1)],
 			PLAYER_MINERAL_STARTING_POSITIONS[static_cast<int>(eFactionController::AI_1)]);
+
+		LevelFileHandler::saveLevelToFile(m_levelName, m_entityManager, m_players, m_mapSize, m_factionStartingResources, m_factionStartingPopulation);
+	}
+}
+
+std::unique_ptr<Level> Level::create(const std::string& levelName)
+{
+	if (!LevelFileHandler::isLevelExists(levelName))
+	{
+		return std::unique_ptr<Level>(new Level(levelName));
 	}
 
-	playableAreaDisplay.setSize(m_mapSize);
+	return std::unique_ptr<Level>();
+}
+
+std::unique_ptr<Level> Level::load(const std::string& levelName)
+{
+	if (LevelFileHandler::isLevelExists(levelName))
+	{
+		return std::unique_ptr<Level>(new Level(levelName));
+	}
+
+	return std::unique_ptr<Level>();
 }
 
 const std::vector<Player>& Level::getPlayers() const
