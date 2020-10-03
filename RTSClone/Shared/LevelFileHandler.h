@@ -8,6 +8,7 @@
 #include <memory>
 #include <functional>
 #include <array>
+#include <fstream>
 
 class SceneryGameObject;
 class Faction;
@@ -16,9 +17,14 @@ class Entity;
 #ifdef LEVEL_EDITOR
 class LevelNameGenerator;
 class EntityManager;
+class Level;
 #endif // LEVEL_EDITOR
 namespace LevelFileHandler
-{
+{ 
+	int loadFactionStartingResources(std::ifstream& file);
+	int loadFactionStartingPopulation(std::ifstream& file);
+	glm::ivec2 loadMapSizeFromFile(std::ifstream& file); 
+	bool isPlayerActive(std::ifstream& file, eFactionController factionController);
 	void loadFromFile(std::ifstream& file, const std::function<void(const std::string&)>& data,
 		const std::function<bool(const std::string&)>& conditional);
 
@@ -29,9 +35,7 @@ namespace LevelFileHandler
 		const std::vector<Player>& players, const glm::ivec2& mapSize, int factionStartingResources, 
 		int factionStartingPopulation);
 
-	bool loadLevelFromFile(const std::string& fileName, EntityManager& entityManager,
-		std::vector<Player>& players, glm::ivec2& mapSize, int& factionStartingResources,
-		int& factionStartingPopulation);
+	bool loadLevelFromFile(Level& level);
 #endif // LEVEL_EDITOR
 
 #ifdef GAME

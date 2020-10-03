@@ -2,6 +2,7 @@
 #ifdef LEVEL_EDITOR
 #include "EntityManager.h"
 #include "Player.h"
+#include "Level.h"
 #include <ostream>
 #endif // LEVEL_EDITOR
 #ifdef GAME
@@ -36,11 +37,6 @@ void saveMapSizeToFile(std::ostream& os, const glm::ivec2& mapSize);
 void saveFactionStartingResources(std::ostream& os, int factionStartingResources);
 void saveFactionStartingPopulation(std::ostream& os, int factionStartingPopulation);
 #endif // LEVEL_EDITOR
-
-int loadFactionStartingResources(std::ifstream& file);
-int loadFactionStartingPopulation(std::ifstream& file);
-glm::ivec2 loadMapSizeFromFile(std::ifstream& file);
-bool isPlayerActive(std::ifstream& file, eFactionController factionController);
 
 void LevelFileHandler::loadFromFile(std::ifstream& file, const std::function<void(const std::string&)>& data, 
 	const std::function<bool(const std::string&)>& conditional)
@@ -115,46 +111,16 @@ bool LevelFileHandler::saveLevelToFile(const std::string& fileName, const Entity
 	return true;
 }
 
-bool LevelFileHandler::loadLevelFromFile(const std::string& fileName, EntityManager& entityManager, std::vector<Player>& players, 
-	glm::ivec2& mapSize, int& factionStartingResources, int& factionStartingPopulation)
+bool LevelFileHandler::loadLevelFromFile(Level& level)
 {
-	std::ifstream file(Globals::SHARED_FILE_DIRECTORY + LEVELS_FILE_DIRECTORY + fileName);
+	std::ifstream file(Globals::SHARED_FILE_DIRECTORY + LEVELS_FILE_DIRECTORY + level.getName());
 	if (!file.is_open())
 	{
 		return false;
 	}
 	
-	for (const auto& factionControllerDetails : FACTION_CONTROLLER_DETAILS)
-	{
-		switch (factionControllerDetails.controller)
-		{
-		case eFactionController::Player:	
-		case eFactionController::AI_1:
-			assert(isPlayerActive(file, factionControllerDetails.controller));
-			players.emplace_back(factionControllerDetails.controller);
-			break;
-		case eFactionController::AI_2:
-		case eFactionController::AI_3:
-			if (isPlayerActive(file, factionControllerDetails.controller))
-			{
-				players.emplace_back(factionControllerDetails.controller);
-			}
-			break;
-		default:
-			assert(false);
-		}
-	}
+	file >> level;
 
-	mapSize = loadMapSizeFromFile(file);
-	factionStartingResources = loadFactionStartingResources(file);
-	factionStartingPopulation = loadFactionStartingPopulation(file);
-
-	for (auto& player : players)
-	{
-		file >> player;
-	}
-
-	file >> entityManager;
 	file.close();
 
 	return true;
@@ -179,7 +145,7 @@ void saveFactionStartingPopulation(std::ostream& os, int factionStartingPopulati
 }
 #endif // LEVEL_EDITOR
 
-int loadFactionStartingResources(std::ifstream& file)
+int LevelFileHandler::loadFactionStartingResources(std::ifstream& file)
 {
 	int factionStartingResources = 0;
 	auto data = [&factionStartingResources](const std::string& line)
@@ -198,7 +164,7 @@ int loadFactionStartingResources(std::ifstream& file)
 	return factionStartingResources;
 }
 
-int loadFactionStartingPopulation(std::ifstream& file)
+int LevelFileHandler::loadFactionStartingPopulation(std::ifstream& file)
 {
 	int factionStartingPopulation = 0;
 	auto data = [&factionStartingPopulation](const std::string& line)
@@ -217,7 +183,7 @@ int loadFactionStartingPopulation(std::ifstream& file)
 	return factionStartingPopulation;
 }
 
-glm::ivec2 loadMapSizeFromFile(std::ifstream& file)
+glm::ivec2 LevelFileHandler::loadMapSizeFromFile(std::ifstream& file)
 {
 	glm::ivec2 mapSize = { 0, 0 };
 	auto data = [&mapSize](const std::string& line)
@@ -236,7 +202,7 @@ glm::ivec2 loadMapSizeFromFile(std::ifstream& file)
 	return mapSize;
 }
 
-bool isPlayerActive(std::ifstream& file, eFactionController factionController)
+bool LevelFileHandler::isPlayerActive(std::ifstream& file, eFactionController factionController)
 {
 	assert(file.is_open());
 	bool playerFound = false;

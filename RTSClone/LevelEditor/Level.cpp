@@ -5,6 +5,7 @@
 #include "imgui/imgui.h"
 #include "SelectionBox.h"
 #include "PlayableAreaDisplay.h"
+#include <fstream>
 
 namespace
 {
@@ -79,8 +80,7 @@ Level::Level(const std::string& levelName)
 {
 	m_players.reserve(static_cast<size_t>(eFactionController::Max) + static_cast<size_t>(1));
 
-	if (!LevelFileHandler::loadLevelFromFile(m_levelName, m_entityManager, m_players, m_mapSize,
-		m_factionStartingResources, m_factionStartingPopulation))
+	if (!LevelFileHandler::loadLevelFromFile(*this))
 	{
 		m_players.emplace_back(eFactionController::Player, PLAYER_HQ_STARTING_POSITIONS[static_cast<int>(eFactionController::Player)],
 			PLAYER_MINERAL_STARTING_POSITIONS[static_cast<int>(eFactionController::Player)]);
@@ -110,6 +110,11 @@ std::unique_ptr<Level> Level::load(const std::string& levelName)
 	}
 
 	return std::unique_ptr<Level>();
+}
+
+const std::string& Level::getName() const
+{
+	return m_levelName;
 }
 
 const std::vector<Player>& Level::getPlayers() const
@@ -270,4 +275,51 @@ void Level::render(ShaderHandler& shaderHandler) const
 	{
 		player.render(shaderHandler);
 	}
+}
+
+const std::ifstream& operator>>(std::ifstream& file, Level& level)
+{
+	assert(file.is_open());
+
+	for (const auto& factionControllerDetails : FACTION_CONTROLLER_DETAILS)
+	{
+		switch (factionControllerDetails.controller)
+		{
+		case eFactionController::Player:
+		case eFactionController::AI_1:
+			assert(LevelFileHandler::isPlayerActive(file, factionControllerDetails.controller));
+			level.m_players.emplace_back(factionControllerDetails.controller);
+			break;
+		case eFactionController::AI_2:
+		case eFactionController::AI_3:
+			if (LevelFileHandler::isPlayerActive(file, factionControllerDetails.controller))
+			{
+				level.m_players.emplace_back(factionControllerDetails.controller);
+			}
+			break;
+		default:
+			assert(false);
+		}
+	}
+
+	level.m_mapSize = LevelFileHandler::loadMapSizeFromFile(file);
+	level.m_factionStartingResources = LevelFileHandler::loadFactionStartingResources(file);
+	level.m_factionStartingPopulation = LevelFileHandler::loadFactionStartingPopulation(file);
+
+	for (auto& player : level.m_players)
+	{
+		file >> player;
+	}
+
+	file >> level.m_entityManager;
+
+	return file;
+	// TODO: insert return statement here
+}
+
+std::ostream& operator<<(std::ostream& ostream, const Level& level)
+{
+
+	return ostream;
+	// TODO: insert return statement here
 }

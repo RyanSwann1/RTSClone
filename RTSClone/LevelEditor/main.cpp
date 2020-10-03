@@ -294,7 +294,18 @@ int main()
 				ImGui::Begin("Load Level", &showDetailsWindow, ImGuiWindowFlags_None);
 				for (const auto& levelName : levelNames)
 				{
-					ImGui::Text(levelName.c_str());
+					if (LevelFileHandler::isLevelExists(levelName))
+					{
+						if (ImGui::Button(levelName.c_str()))
+						{
+							level.reset();
+							level = Level::load(levelName);
+							assert(level);
+							playableAreaDisplay.setSize(level->getMapSize());
+							
+							currentWindowState = eWindowState::None;
+						}
+					}
 				}
 				ImGui::End();
 			}
