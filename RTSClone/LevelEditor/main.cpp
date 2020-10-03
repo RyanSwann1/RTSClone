@@ -298,7 +298,12 @@ int main()
 					{
 						if (ImGui::Button(levelName.c_str()))
 						{
-							level.reset();
+							if (level)
+							{
+								LevelFileHandler::saveLevelToFile(*level);
+								level.reset();
+							}
+
 							level = Level::load(levelName);
 							assert(level);
 							playableAreaDisplay.setSize(level->getMapSize());
@@ -315,7 +320,12 @@ int main()
 				std::string availableLevelName;
 				if (isLevelNameAvailable(levelNames, availableLevelName))
 				{
-					level.reset();
+					if (level)
+					{
+						LevelFileHandler::saveLevelToFile(*level);
+						level.reset();
+					}
+			
 					level = Level::create(availableLevelName);
 					assert(level);
 					playableAreaDisplay.setSize(level->getMapSize());

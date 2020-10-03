@@ -88,6 +88,7 @@ void LevelFileHandler::saveLevelName(const std::string& fileName)
 
 bool LevelFileHandler::saveLevelToFile(const Level& level)
 {
+	assert(isLevelExists(level.getName()));
 	std::ofstream file(Globals::SHARED_FILE_DIRECTORY + LEVELS_FILE_DIRECTORY + level.getName());
 	assert(file.is_open());
 	if (!file.is_open())
