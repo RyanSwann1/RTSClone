@@ -176,10 +176,10 @@ void Level::handleInput(const sf::Event& currentSFMLEvent, const SelectionBox& s
 	}
 }
 
-void Level::handlePlayerDetails(bool& showDetailsWindow)
+void Level::handlePlayerDetails(bool& showGUIWindow)
 {
 	ImGui::SetNextWindowPos(ImVec2(700, 700), ImGuiCond_FirstUseEver);
-	ImGui::Begin("Players", &showDetailsWindow, ImGuiWindowFlags_None);
+	ImGui::Begin("Players", &showGUIWindow, ImGuiWindowFlags_None);
 	ImGui::BeginChild("Players One");
 
 	int newPlayerCount = static_cast<int>(m_players.size());
@@ -229,9 +229,9 @@ void Level::handlePlayerDetails(bool& showDetailsWindow)
 	ImGui::End();
 }
 
-void Level::handleLevelDetails(bool& showDetailsWindow, PlayableAreaDisplay& playableAreaDisplay)
+void Level::handleLevelDetails(bool& showGUIWindow, PlayableAreaDisplay& playableAreaDisplay)
 {
-	ImGui::Begin("Level Details", &showDetailsWindow, ImGuiWindowFlags_None);
+	ImGui::Begin("Level Details", &showGUIWindow, ImGuiWindowFlags_None);
 	if (ImGui::InputInt("x", &m_mapSize.x, 1) ||
 		ImGui::InputInt("z", &m_mapSize.y, 1))
 	{

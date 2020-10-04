@@ -26,8 +26,8 @@ public:
 	void addEntity(eModelName modelName, const glm::vec3& position);
 	void handleInput(const sf::Event& currentSFMLEvent, const SelectionBox& selectionBox, const Camera& camera, 
 		bool plannedEntityActive, const sf::Window& window, const Entity& plannedEntity);
-	void handlePlayerDetails(bool& showDetailsWindow);
-	void handleLevelDetails(bool& showDetailsWindow, PlayableAreaDisplay& playableAreaDisplay);
+	void handlePlayerDetails(bool& showGUIWindow);
+	void handleLevelDetails(bool& showGUIWindow, PlayableAreaDisplay& playableAreaDisplay);
 	void save() const;
 	void render(ShaderHandler& shaderHandler) const;
 

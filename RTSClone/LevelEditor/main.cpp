@@ -99,7 +99,7 @@ int main()
 
 	glm::vec3 previousMousePosition = { 0.0f, Globals::GROUND_HEIGHT, 0.0f };
 	bool plannedEntityActive = false;
-	bool showDetailsWindow = false;
+	bool showGUIWindow = false;
 	eWindowState currentWindowState = eWindowState::None;
 	Entity plannedEntity(eModelName::RocksTall, { 0.0f, 0.0f, 0.0f });
 	int selected = 0;	
@@ -207,22 +207,22 @@ int main()
 				{
 					if (level && ImGui::MenuItem("Player Details"))
 					{
-						showDetailsWindow = true;
+						showGUIWindow = true;
 						currentWindowState = eWindowState::PlayerDetails;
 					}
 					if (level && ImGui::MenuItem("Level Details"))
 					{
-						showDetailsWindow = true;
+						showGUIWindow = true;
 						currentWindowState = eWindowState::LevelDetails;
 					}
 					if (ImGui::MenuItem("Create Level"))
 					{
-						showDetailsWindow = true;
+						showGUIWindow = true;
 						currentWindowState = eWindowState::CreateLevel;
 					}
 					if (ImGui::MenuItem("Load Level"))
 					{
-						showDetailsWindow = true;
+						showGUIWindow = true;
 						currentWindowState = eWindowState::LoadLevel;
 					}
 					if (ImGui::MenuItem("Save"))
@@ -276,7 +276,7 @@ int main()
 		}
 		ImGui::End();
 
-		if (showDetailsWindow)
+		if (showGUIWindow)
 		{
 			switch (currentWindowState)
 			{
@@ -285,18 +285,18 @@ int main()
 			case eWindowState::PlayerDetails:
 				if (level)
 				{
-					level->handlePlayerDetails(showDetailsWindow);
+					level->handlePlayerDetails(showGUIWindow);
 				}	
 				break;
 			case eWindowState::LevelDetails:
 				if (level)
 				{
-					level->handleLevelDetails(showDetailsWindow, playableAreaDisplay);
+					level->handleLevelDetails(showGUIWindow, playableAreaDisplay);
 				}
 				break;
 			case eWindowState::LoadLevel:
 			{
-				ImGui::Begin("Load Level", &showDetailsWindow, ImGuiWindowFlags_None);
+				ImGui::Begin("Load Level", &showGUIWindow, ImGuiWindowFlags_None);
 				for (const auto& levelName : levelNames)
 				{
 					if (LevelFileHandler::isLevelExists(levelName))
