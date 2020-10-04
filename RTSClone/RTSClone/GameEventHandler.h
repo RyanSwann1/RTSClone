@@ -2,19 +2,12 @@
 
 #include "NonCopyable.h"
 #include "NonMovable.h"
-#include "glm/glm.hpp"
 #include "GameEvent.h"
 #include <queue>
-#include <vector>
 #include <memory>
 
-class Level;
-class Map;
-class ProjectileHandler;
-class FactionHandler;
 class GameEventHandler : private NonCopyable, private NonMovable
 {
-	friend class Level;
 public:
 	static GameEventHandler& getInstance()
 	{
@@ -22,12 +15,10 @@ public:
 		return instance;
 	}
 
-	void addEvent(const GameEvent& gameEvent);
-	
+	std::queue<GameEvent> gameEvents;
+
 private:
-	GameEventHandler();
-
-	std::queue<GameEvent> m_gameEvents;
-
-	void handleEvents(Level& level, const Map& map);
+	GameEventHandler()
+		: gameEvents()
+	{}
 };
