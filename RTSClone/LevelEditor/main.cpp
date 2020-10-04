@@ -205,12 +205,12 @@ int main()
 			{
 				if (ImGui::BeginMenu("File"))
 				{
-					if (ImGui::MenuItem("Player Details"))
+					if (level && ImGui::MenuItem("Player Details"))
 					{
 						showDetailsWindow = true;
 						currentWindowState = eWindowState::PlayerDetails;
 					}
-					if (ImGui::MenuItem("Level Details"))
+					if (level && ImGui::MenuItem("Level Details"))
 					{
 						showDetailsWindow = true;
 						currentWindowState = eWindowState::LevelDetails;
