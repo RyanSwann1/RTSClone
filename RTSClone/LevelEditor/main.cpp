@@ -312,8 +312,6 @@ int main()
 							level = Level::load(levelName);
 							assert(level);
 							playableAreaDisplay.setSize(level->getMapSize());
-							
-							currentWindowState = eWindowState::None;
 						}
 					}
 				}
