@@ -231,7 +231,7 @@ void Faction::handleEvent(const GameEvent& gameEvent, const Map& map)
                 }
                 break;
                 case eEntityType::HQ:
-                    GameEventHandler::getInstance().addEvent({ eGameEventType::EliminateFaction, m_controller });
+                    GameEventHandler::getInstance().gameEvents.push({ eGameEventType::EliminateFaction, m_controller });
                     break;
                 case eEntityType::Unit:
                 {
@@ -493,12 +493,12 @@ const Entity* Faction::addBuilding(const Map& map, glm::vec3 position, eEntityTy
         {
             reduceResources(entityType);
             m_allEntities.push_back(addedBuilding);
-            GameEventHandler::getInstance().addEvent({ eGameEventType::RevalidateMovementPaths });
+            GameEventHandler::getInstance().gameEvents.push({ eGameEventType::RevalidateMovementPaths });
 
             return addedBuilding;
         }
     }
-    
+
     return nullptr;
 }
 

@@ -11,7 +11,7 @@ struct BuildingCommand
 {
 	BuildingCommand(const std::function<const Entity*()>& command, const glm::vec3& buildPosition);
 
-	std::function<const Entity*()> command;
+	std::function<const Entity*()> command; //Faction::AddBuilding
 	glm::vec3 buildPosition;
 };
 

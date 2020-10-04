@@ -250,7 +250,7 @@ namespace
         eFactionController targetFaction, const Map& map)
     {
         assert(!selectedUnits.empty());
-
+        
         std::sort(selectedUnits.begin(), selectedUnits.end(), [&](const auto& selectedUnitA, const auto& selectedUnitB)
         {
             return Globals::getSqrDistance(targetEntity.getPosition(), selectedUnitA->getPosition()) <

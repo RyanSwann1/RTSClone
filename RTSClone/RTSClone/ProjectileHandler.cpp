@@ -29,7 +29,7 @@ void ProjectileHandler::update(float deltaTime, const FactionHandler& factionHan
 		{
 			if (projectileCollision)
 			{
-				GameEventHandler::getInstance().addEvent({ eGameEventType::Attack, projectile->getSenderEvent().senderFaction,
+				GameEventHandler::getInstance().gameEvents.push({ eGameEventType::Attack, projectile->getSenderEvent().senderFaction,
 					projectile->getID(), projectile->getSenderEvent().targetFaction, 
 					projectile->getSenderEvent().targetID, projectile->getSenderEvent().damage });
 			}
