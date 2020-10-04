@@ -24,7 +24,6 @@ public:
 	eFactionController getWinningFactionController() const;
 	bool isComplete() const;
 
-	void handleEvent(const GameEvent& gameEvent, const Map& map);
 	void handleInput(const sf::Window& window, const Camera& camera, const sf::Event& currentSFMLEvent, const Map& map);
 	void update(float deltaTime, const Map& map);
 	void renderSelectionBox(const sf::Window& window) const;
@@ -50,4 +49,5 @@ private:
 
 	void setAITargetFaction();
 	void handleGUI();
+	void handleEvent(const GameEvent& gameEvent, const Map& map);
 };	

@@ -244,7 +244,16 @@ void Level::update(float deltaTime, const Map& map)
 	}
 
 	m_projectileHandler.update(deltaTime, m_factionHandler);
-	GameEventHandler::getInstance().handleEvents(*this, map);
+
+	std::queue<GameEvent>& gameEvents = GameEventHandler::getInstance().gameEvents;
+	while (!gameEvents.empty())
+	{
+		const GameEvent& gameEvent = gameEvents.front();
+		handleEvent(gameEvent, map);
+
+		gameEvents.pop();
+	}
+
 	handleGUI();
 }
 
