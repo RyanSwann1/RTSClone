@@ -194,7 +194,12 @@ int main()
 		camera.update(deltaTime);
 		ImGui_SFML_OpenGL3::startFrame();
 		ImGui::SetNextWindowSize(ImVec2(175, static_cast<float>(windowSize.y)), ImGuiCond_FirstUseEver);
-		if (ImGui::Begin("Level Editor", nullptr, ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoMove))
+		std::string titleName = "Level Editor";
+		if (level)
+		{
+			titleName = level->getName();
+		}
+		if (ImGui::Begin(titleName.c_str(), nullptr, ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoMove))
 		{
 			if (ImGui::BeginMenuBar())
 			{
