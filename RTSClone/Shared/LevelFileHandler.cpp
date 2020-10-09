@@ -32,6 +32,12 @@ void loadInPlayer(std::ifstream& file, std::array<std::unique_ptr<Faction>, stat
 void loadInScenery(std::ifstream& file, std::vector<SceneryGameObject>& scenery);
 #endif // GAME
 
+#ifdef LEVEL_EDITOR
+void saveMapSizeToFile(std::ostream& os, const glm::ivec2& mapSize);
+void saveFactionStartingResources(std::ostream& os, int factionStartingResources);
+void saveFactionStartingPopulation(std::ostream& os, int factionStartingPopulation);
+#endif // LEVEL_EDITOR
+
 void LevelFileHandler::loadFromFile(std::ifstream& file, const std::function<void(const std::string&)>& data, 
 	const std::function<bool(const std::string&)>& conditional)
 {
@@ -96,13 +102,23 @@ bool LevelFileHandler::saveLevelToFile(const Level& level)
 		return false;
 	}
 
-	file << level;
+	for (auto& player : level.getPlayers())
+	{
+		file << player;
+	}
+
+	saveFactionStartingPopulation(file, level.getFactionStartingPopulation());
+	saveFactionStartingResources(file, level.getFactionStartingResources());
+	saveMapSizeToFile(file, level.getMapSize());
+
+	file << level.getEntityManager();
 
 	return true;
 }
 
 bool LevelFileHandler::loadLevelFromFile(Level& level)
 {
+	assert(isLevelExists(level.getName()));
 	std::ifstream file(Globals::SHARED_FILE_DIRECTORY + LEVELS_FILE_DIRECTORY + level.getName());
 	if (!file.is_open())
 	{
@@ -116,19 +132,19 @@ bool LevelFileHandler::loadLevelFromFile(Level& level)
 	return true;
 }
 
-void LevelFileHandler::saveMapSizeToFile(std::ostream& os, const glm::ivec2& mapSize)
+void saveMapSizeToFile(std::ostream& os, const glm::ivec2& mapSize)
 {
 	os << Globals::TEXT_HEADER_MAP_SIZE << "\n";
 	os << mapSize.x << " " << mapSize.y << "\n";
 }
 
-void LevelFileHandler::saveFactionStartingResources(std::ostream& os, int factionStartingResources)
+void saveFactionStartingResources(std::ostream& os, int factionStartingResources)
 {
 	os << Globals::TEXT_HEADER_FACTION_STARTING_RESOURCE << "\n";
 	os << factionStartingResources << "\n";
 }
 
-void LevelFileHandler::saveFactionStartingPopulation(std::ostream& os, int factionStartingPopulation)
+void saveFactionStartingPopulation(std::ostream& os, int factionStartingPopulation)
 {
 	os << Globals::TEXT_HEADER_FACTION_STARTING_POPULATION << "\n";
 	os << factionStartingPopulation << "\n";
@@ -243,12 +259,12 @@ void loadInPlayers(std::ifstream& file, std::array<std::unique_ptr<Faction>, sta
 		{
 		case eFactionController::Player:
 		case eFactionController::AI_1:
-			assert(isPlayerActive(file, factionControllerDetails.controller));
+			assert(LevelFileHandler::isPlayerActive(file, factionControllerDetails.controller));
 			loadInPlayer(file, factions, factionControllerDetails, startingResources, startingPopulation);
 			break;
 		case eFactionController::AI_2:
 		case eFactionController::AI_3:
-			if (isPlayerActive(file, factionControllerDetails.controller))
+			if (LevelFileHandler::isPlayerActive(file, factionControllerDetails.controller))
 			{
 				loadInPlayer(file, factions, factionControllerDetails, startingResources, startingPopulation);
 			}

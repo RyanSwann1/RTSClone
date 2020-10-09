@@ -113,6 +113,16 @@ std::unique_ptr<Level> Level::load(const std::string& levelName)
 	return std::unique_ptr<Level>();
 }
 
+int Level::getFactionStartingResources() const
+{
+	return m_factionStartingResources;
+}
+
+int Level::getFactionStartingPopulation() const
+{
+	return m_factionStartingPopulation;
+}
+
 const std::string& Level::getName() const
 {
 	return m_levelName;
@@ -314,20 +324,4 @@ const std::ifstream& operator>>(std::ifstream& file, Level& level)
 	file >> level.m_entityManager;
 
 	return file;
-}
-
-std::ostream& operator<<(std::ostream& ostream, const Level& level)
-{
-	for (auto& player : level.m_players)
-	{
-		ostream << player;
-	}
-
-	LevelFileHandler::saveFactionStartingPopulation(ostream, level.m_factionStartingPopulation);
-	LevelFileHandler::saveFactionStartingResources(ostream, level.m_factionStartingResources);
-	LevelFileHandler::saveMapSizeToFile(ostream, level.m_mapSize);
-
-	ostream << level.m_entityManager;
-
-	return ostream;
 }

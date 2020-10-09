@@ -18,6 +18,8 @@ public:
 	static std::unique_ptr<Level> create(const std::string& levelName);
 	static std::unique_ptr<Level> load(const std::string& levelName);
 
+	int getFactionStartingResources() const;
+	int getFactionStartingPopulation() const;
 	const std::string& getName() const;
 	const std::vector<Player>& getPlayers() const;
 	const glm::ivec2& getMapSize() const;
@@ -32,7 +34,6 @@ public:
 	void render(ShaderHandler& shaderHandler) const;
 
 	friend const std::ifstream& operator>>(std::ifstream& file, Level& level);
-	friend std::ostream& operator<<(std::ostream& ostream, const Level& level);
 
 private:
 	Level(const std::string& levelName);
