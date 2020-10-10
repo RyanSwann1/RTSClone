@@ -132,6 +132,39 @@ bool LevelFileHandler::loadLevelFromFile(Level& level)
 	return true;
 }
 
+void LevelFileHandler::removeLevel(const std::string& fileName)
+{
+	assert(isLevelExists(fileName));
+
+	std::ifstream file(Globals::SHARED_FILE_DIRECTORY + LEVELS_FILE_DIRECTORY + LEVELS_FILE_NAME);
+	assert(file.is_open());
+
+	std::ofstream tempFile(Globals::SHARED_FILE_DIRECTORY + LEVELS_FILE_DIRECTORY + "temp.txt");
+	assert(tempFile.is_open());
+
+	std::string line;
+	while (std::getline(file, line))
+	{
+		std::stringstream stream{ line };
+		if (stream.str() != fileName)
+		{
+			tempFile << stream.str();
+		}
+	}
+
+	file.close();
+	tempFile.close();
+
+	std::remove(std::string(Globals::SHARED_FILE_DIRECTORY + LEVELS_FILE_DIRECTORY + LEVELS_FILE_NAME).c_str());
+
+	std::rename(std::string(Globals::SHARED_FILE_DIRECTORY + LEVELS_FILE_DIRECTORY + "temp.txt").c_str(),
+		std::string(Globals::SHARED_FILE_DIRECTORY + LEVELS_FILE_DIRECTORY + LEVELS_FILE_NAME).c_str());
+
+	std::remove(std::string(Globals::SHARED_FILE_DIRECTORY + LEVELS_FILE_DIRECTORY + "temp.txt").c_str());
+
+	std::remove(std::string(Globals::SHARED_FILE_DIRECTORY + LEVELS_FILE_DIRECTORY + fileName).c_str());
+}
+
 void saveMapSizeToFile(std::ostream& os, const glm::ivec2& mapSize)
 {
 	os << Globals::TEXT_HEADER_MAP_SIZE << "\n";

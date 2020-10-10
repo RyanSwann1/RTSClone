@@ -24,7 +24,8 @@ enum class eWindowState
 	PlayerDetails,
 	LevelDetails,
 	LoadLevel,
-	CreateLevel
+	CreateLevel,
+	RemoveLevel
 };
 
 constexpr size_t MAX_LEVELS = 5;
@@ -92,12 +93,10 @@ int main()
 		static_cast<float>(windowSize.y), 0.0f));
 
 	PlayableAreaDisplay playableAreaDisplay;
-	std::unique_ptr<Level> level; //= std::make_unique<Level>(playableAreaDisplay, "Level.txt");
+	std::unique_ptr<Level> level;
 	SelectionBox selectionBox;
 	sf::Clock gameClock;
 	Camera camera;
-
-	glm::vec3 previousMousePosition = { 0.0f, Globals::GROUND_HEIGHT, 0.0f };
 	bool plannedEntityActive = false;
 	bool showGUIWindow = false;
 	eWindowState currentWindowState = eWindowState::None;
@@ -132,7 +131,6 @@ int main()
 				}
 				break;
 			case sf::Event::MouseButtonPressed:
-			{
 				if (currentSFMLEvent.mouseButton.button == sf::Mouse::Button::Left)
 				{
 					if (!ImGui::IsWindowHovered(ImGuiHoveredFlags_::ImGuiHoveredFlags_AnyWindow))
@@ -157,7 +155,6 @@ int main()
 				{
 					plannedEntityActive = false;
 				}
-			}
 				break;
 			case sf::Event::MouseButtonReleased:
 				selectionBox.reset();
@@ -225,7 +222,12 @@ int main()
 						showGUIWindow = true;
 						currentWindowState = eWindowState::LoadLevel;
 					}
-					if (ImGui::MenuItem("Save"))
+					if (ImGui::MenuItem("Remove Level"))
+					{
+						showGUIWindow = true;
+						currentWindowState = eWindowState::RemoveLevel;
+					}
+					if (ImGui::MenuItem("Save Level"))
 					{
 						if (level)
 						{
@@ -258,21 +260,6 @@ int main()
 				ImGui::EndChild();
 				ImGui::SameLine();
 			}
-
-			/*Entity* selectedEntity = entityManager.getSelectedEntity();
-			if (selectedEntity)
-			{
-				ImGui::Separator();
-				ImGui::BeginChild("Position", ImVec2(150, 250));
-				ImGui::Text("Selected Entity Position");
-				if (ImGui::InputFloat("x", &selectedEntity->getPosition().x, Globals::NODE_SIZE) ||
-					ImGui::InputFloat("z", &selectedEntity->getPosition().z, Globals::NODE_SIZE))
-				{
-					selectedEntity->resetAABB();
-				}
-				ImGui::EndChild();
-			}*/
-
 		}
 		ImGui::End();
 
@@ -306,7 +293,8 @@ int main()
 							if (level)
 							{
 								LevelFileHandler::saveLevelToFile(*level);
-								level.reset();
+								playableAreaDisplay.setSize({ 0, 0 });
+								level.reset();	
 							}
 
 							level = Level::load(levelName);
@@ -326,6 +314,7 @@ int main()
 					if (level)
 					{
 						LevelFileHandler::saveLevelToFile(*level);
+						playableAreaDisplay.setSize({ 0, 0 });
 						level.reset();
 					}
 			
@@ -336,6 +325,25 @@ int main()
 
 				currentWindowState = eWindowState::None;
 			}
+				break;
+			case eWindowState::RemoveLevel:
+				for (const auto& levelName : levelNames)
+				{
+					if (LevelFileHandler::isLevelExists(levelName))
+					{
+						if (ImGui::Button(levelName.c_str()))
+						{
+							if(level && level->getName() == levelName)
+							{
+								playableAreaDisplay.setSize({ 0, 0 });
+								level.reset();
+							}
+
+							LevelFileHandler::removeLevel(levelName);
+							break;
+						}
+					}
+				}
 				break;
 			default:
 				assert(false);

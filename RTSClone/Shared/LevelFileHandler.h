@@ -21,10 +21,11 @@ class Level;
 #endif // LEVEL_EDITOR
 namespace LevelFileHandler
 { 
+	bool isPlayerActive(std::ifstream& file, eFactionController factionController);
+
 	int loadFactionStartingResources(std::ifstream& file);
 	int loadFactionStartingPopulation(std::ifstream& file);
-	glm::ivec2 loadMapSizeFromFile(std::ifstream& file); 
-	bool isPlayerActive(std::ifstream& file, eFactionController factionController);
+	glm::ivec2 loadMapSizeFromFile(std::ifstream& file);
 	void loadFromFile(std::ifstream& file, const std::function<void(const std::string&)>& data,
 		const std::function<bool(const std::string&)>& conditional);
 
@@ -33,6 +34,7 @@ namespace LevelFileHandler
 	void saveLevelName(const std::string& fileName);
 	bool saveLevelToFile(const Level& level);
 	bool loadLevelFromFile(Level& level);
+	void removeLevel(const std::string& fileName);
 #endif // LEVEL_EDITOR
 
 #ifdef GAME
