@@ -43,19 +43,6 @@
 //Game engine from scratch
 //https://www.gamasutra.com/blogs/MichaelKissner/20151027/257369/Writing_a_Game_Engine_from_Scratch__Part_1_Messaging.php
 
-void loadLevel(std::unique_ptr<Level>& level, const std::string& levelName) 
-{
-	assert(!level);
-	level = Level::create(levelName); 
-	assert(level);
-	if (!level)
-	{
-		std::cout << "Unable to load " << levelName << "\n";
-	}
-
-	GameMessenger::getInstance().broadcast<GameMessages::BaseMessage<eGameMessageType::UIClearWinner>>({});
-}
-
 int main()
 {
 	sf::ContextSettings settings;
@@ -141,17 +128,16 @@ int main()
 			}
 		}
 
+		ImGui_SFML_OpenGL3::startFrame();
+		ImGui::ShowDemoWindow();
+
 		if (level && level->isComplete())
 		{
 			GameMessenger::getInstance().broadcast<GameMessages::UIDisplayWinner>(
 				{ level->getWinningFactionController() });
-			
+
 			level.reset();
 		}
-
-		ImGui_SFML_OpenGL3::startFrame();
-		ImGui::ShowDemoWindow();
-
 		if (!level)
 		{
 			ImGui::Begin("Level Selection");
@@ -159,14 +145,20 @@ int main()
 			{
 				if (!levelName.empty() && ImGui::Button(levelName.c_str()))
 				{
-					loadLevel(level, levelName);
+					GameMessenger::getInstance().broadcast<GameMessages::BaseMessage<eGameMessageType::UIClearWinner>>({});
+					level = Level::create(levelName);
+					assert(level);
+					if (!level)
+					{
+						std::cout << "Unable to load " << levelName << "\n";
+					}
 					break;
 				}	
 			}
 
 			ImGui::End();
 		}
-
+		
 		//Update
 		if (level)
 		{
