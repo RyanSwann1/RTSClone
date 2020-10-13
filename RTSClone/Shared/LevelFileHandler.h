@@ -10,13 +10,7 @@
 #include <array>
 #include <fstream>
 
-class SceneryGameObject;
-class Faction;
-struct Player;
-class Entity;
 #ifdef LEVEL_EDITOR
-class LevelNameGenerator;
-class EntityManager;
 class Level;
 #endif // LEVEL_EDITOR
 namespace LevelFileHandler
