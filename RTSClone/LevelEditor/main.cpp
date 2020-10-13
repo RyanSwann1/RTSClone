@@ -28,8 +28,7 @@ enum class eWindowState
 	RemoveLevel
 };
 
-constexpr size_t MAX_LEVELS = 5;
-bool isLevelNameAvailable(const std::array<std::string, MAX_LEVELS>& levelNames, std::string& availableLevelName)
+bool isLevelNameAvailable(const std::array<std::string, Globals::MAX_LEVELS>& levelNames, std::string& availableLevelName)
 {
 	for (const auto& levelName : levelNames)
 	{
@@ -71,7 +70,7 @@ int main()
 		return -1;
 	}
 
-	const std::array<std::string, MAX_LEVELS> levelNames =
+	const std::array<std::string, Globals::MAX_LEVELS> levelNames =
 	{
 		"Level1.txt",
 		"Level2.txt",

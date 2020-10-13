@@ -22,6 +22,7 @@
 #include "GameMessenger.h"
 #include "PathFinding.h"
 #include "PathFindingLocator.h"
+#include "LevelFileHandler.h"
 
 //AI
 //https://www.youtube.com/watch?v=V3qASwCM-PE&list=PLdgLYFdStKu03Dv9GUsXBDQMdyJbkDb8i
@@ -42,7 +43,7 @@
 //Game engine from scratch
 //https://www.gamasutra.com/blogs/MichaelKissner/20151027/257369/Writing_a_Game_Engine_from_Scratch__Part_1_Messaging.php
 
-bool loadLevel(std::unique_ptr<Level>& level, const std::string& levelName) 
+void loadLevel(std::unique_ptr<Level>& level, const std::string& levelName) 
 {
 	assert(!level);
 	level = Level::create(levelName); 
@@ -53,7 +54,6 @@ bool loadLevel(std::unique_ptr<Level>& level, const std::string& levelName)
 	}
 
 	GameMessenger::getInstance().broadcast<GameMessages::BaseMessage<eGameMessageType::UIClearWinner>>({});
-	return level.get();
 }
 
 int main()
@@ -97,12 +97,8 @@ int main()
 	Camera camera;
 	UIManager UIManager;
 	Map map;
-	std::string levelName = "Level.txt";
+	const std::array<std::string, Globals::MAX_LEVELS> levelNames = LevelFileHandler::loadLevelNames();
 	std::unique_ptr<Level> level; 
-	if (!loadLevel(level, levelName))
-	{
-		return -1;
-	}
 
 	shaderHandler->switchToShader(eShaderType::SelectionBox);
 	shaderHandler->setUniformMat4f(eShaderType::SelectionBox, "uOrthographic", 
@@ -127,13 +123,13 @@ int main()
 			case sf::Event::KeyPressed:
 				if (currentSFMLEvent.key.code == sf::Keyboard::Escape)
 				{
-					window.close();
-				}
-				else if (currentSFMLEvent.key.code == sf::Keyboard::Enter && !level)
-				{
-					if (!loadLevel(level, levelName))
+					if (level)
 					{
-						return -1;
+						level.reset();
+					}
+					else
+					{
+						window.close();
 					}
 				}
 				break;
@@ -154,8 +150,22 @@ int main()
 		}
 
 		ImGui_SFML_OpenGL3::startFrame();
-
 		ImGui::ShowDemoWindow();
+
+		if (!level)
+		{
+			ImGui::Begin("Level Selection");
+			for (const auto& levelName : levelNames)
+			{
+				if (!levelName.empty() && ImGui::Button(levelName.c_str()))
+				{
+					loadLevel(level, levelName);
+					break;
+				}	
+			}
+
+			ImGui::End();
+		}
 
 		//Update
 		if (level)
