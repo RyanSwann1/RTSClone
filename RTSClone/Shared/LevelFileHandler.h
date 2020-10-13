@@ -10,6 +10,8 @@
 #include <array>
 #include <fstream>
 
+class Faction;
+class SceneryGameObject;
 #ifdef LEVEL_EDITOR
 class Level;
 #endif // LEVEL_EDITOR
@@ -34,5 +36,7 @@ namespace LevelFileHandler
 #ifdef GAME
 	bool loadLevelFromFile(const std::string& fileName, std::vector<SceneryGameObject>& scenery,
 		std::array<std::unique_ptr<Faction>, static_cast<size_t>(eFactionController::Max) + 1>& factions);
+
+	std::array<std::string, Globals::MAX_LEVELS> loadLevelNames();
 #endif // GAME
 };

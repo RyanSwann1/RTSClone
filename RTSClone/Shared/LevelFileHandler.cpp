@@ -281,6 +281,30 @@ bool LevelFileHandler::loadLevelFromFile(const std::string& fileName, std::vecto
 	return true;
 }
 
+std::array<std::string, Globals::MAX_LEVELS> LevelFileHandler::loadLevelNames()
+{
+	std::ifstream file(Globals::SHARED_FILE_DIRECTORY + LEVELS_FILE_DIRECTORY + LEVELS_FILE_NAME);
+	assert(file.is_open());
+	if (!file.is_open())
+	{
+		//Create level names files file		
+	}
+
+	std::array<std::string, Globals::MAX_LEVELS> levelNames;
+	std::string line;
+	int lineCount = 0;
+	while (std::getline(file, line))
+	{
+		assert(!line.empty() && lineCount < Globals::MAX_LEVELS);
+		std::stringstream stream{ line };
+
+		levelNames[lineCount] = stream.str();
+		++lineCount;
+	}
+
+	return levelNames;
+}
+
 void loadInPlayers(std::ifstream& file, std::array<std::unique_ptr<Faction>, static_cast<size_t>(eFactionController::Max) + 1>& factions,
 	int startingResources, int startingPopulation)
 {
