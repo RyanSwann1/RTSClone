@@ -7,7 +7,7 @@
 namespace 
 {
 	constexpr glm::vec3 UNIT_SCALE{ 0.35f, 0.35f, 0.35f };
-	constexpr glm::vec3 HQ_SCALE{ 1.2f, 1.0f, 0.9f };
+	constexpr glm::vec3 HQ_SCALE{ 1.2f, 1.2f, 0.9f };
 	constexpr glm::vec3 MINERAL_SCALE{ 0.6f, 0.6f, 0.6f };
 	constexpr glm::vec3 WAYPOINT_SCALE{ 1.0f, 1.0f, 1.0f };
 	constexpr glm::vec3 WORKER_SCALE{ 0.8f, 0.8f, 0.8f };
@@ -114,8 +114,8 @@ namespace
 
 #ifdef LEVEL_EDITOR
 	void loadModel(const std::string& fileName, bool renderFromCenterPosition, const glm::vec3& AABBSizeFromCenter,
-		eModelName modelName, const glm::vec3& scale, std::array<std::unique_ptr<Model>, ModelManager::TOTAL_MODELS>& models,
-		bool& loadedAllModels)
+		eModelName modelName, const glm::vec3& scale, 
+		std::array<std::unique_ptr<Model>, static_cast<size_t>(eModelName::Max) + 1>& models, bool& loadedAllModels)
 	{
 		std::unique_ptr<Model> model = Model::create(fileName, renderFromCenterPosition,
 			AABBSizeFromCenter, modelName, scale);
@@ -130,9 +130,9 @@ namespace
 		models[static_cast<int>(model->modelName)] = std::move(model);
 	}
 
-	std::array<std::unique_ptr<Model>, ModelManager::TOTAL_MODELS> initializeModels(bool& loadedAllModels)
+	std::array<std::unique_ptr<Model>, static_cast<size_t>(eModelName::Max) + 1> initializeModels(bool& loadedAllModels)
 	{
-		std::array<std::unique_ptr<Model>, ModelManager::TOTAL_MODELS> models;
+		std::array<std::unique_ptr<Model>, static_cast<size_t>(eModelName::Max) + 1> models;
 		loadModel("terrain.obj", false, { 0.0f, 0.0f, 0.0f }, eModelName::Terrain, { 2000.0f, 1.0f, 2000.0f },
 			models, loadedAllModels);
 
@@ -141,6 +141,8 @@ namespace
 
 		loadModel("rocksTall.obj", true, { 5.0f, 1.0f, 5.0f }, eModelName::RocksTall, { 1.0f, 1.0f, 1.0f },
 			models, loadedAllModels);
+
+		//loadModel("translate.obj", true, {}, eModelName::Translate, { 1.0f, 1.0f, 1.0f }, models, loadedAllModels);
 
 		loadModel("spaceCraft1.obj", false, UNIT_AABB_SIZE_FROM_CENTER, eModelName::Unit, UNIT_SCALE,
 			models, loadedAllModels);
@@ -151,8 +153,7 @@ namespace
 		loadModel("rocksOre.obj", true, MINERAL_AABB_SIZE_FROM_CENTER, eModelName::Mineral, MINERAL_SCALE,
 			models, loadedAllModels);
 
-
-		assert(std::find(models.cbegin(), models.cend(), nullptr) == models.cend());
+		//assert(std::find(models.cbegin(), models.cend(), nullptr) == models.cend());
 		return models;
 	}
 #endif // LEVEL_EDITOR
