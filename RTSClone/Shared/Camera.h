@@ -11,9 +11,10 @@ struct Camera : private NonCopyable, private NonMovable
 
 	glm::mat4 getView() const;
 	glm::mat4 getProjection(const sf::Window& window) const;
-	glm::vec3 getMouseToGroundPosition(const sf::Window& window) const;
 
 #ifdef LEVEL_EDITOR
+	//Return false if ground not found
+	bool getMouseToGroundPosition(const sf::Window& window, glm::vec3& mouseToGroundPosition) const;
 	void onMouseMove(const sf::Window& window, float deltaTime, glm::ivec2 lastMousePosition);
 	void update(float deltaTime, const sf::Window& window, glm::ivec2 lastMousePosition);
 	void zoom(float mouseWheelDelta);
@@ -21,6 +22,7 @@ struct Camera : private NonCopyable, private NonMovable
 #endif // LEVEL_EDITOR
 
 #ifdef GAME
+	glm::vec3 getMouseToGroundPosition(const sf::Window& window) const;
 	void update(float deltaTime);
 #endif // GAME
 

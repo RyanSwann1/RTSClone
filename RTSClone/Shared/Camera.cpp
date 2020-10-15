@@ -4,8 +4,17 @@
 
 namespace
 {
-	constexpr float MAX_RAY_TO_GROUND_DISTANCE = 1500.0f;
+#ifdef LEVEL_EDITOR
+	constexpr float MOVEMENT_SPEED = 15.0f;
+	constexpr float ZOOM_SPEED = 30.0f;
+#endif // LEVEL_EDITOR
+
+#ifdef GAME
 	constexpr float MOVEMENT_SPEED = 110.0f;
+#endif // GAME
+
+	constexpr int MAX_RAY_TO_GROUND_DISTANCE = 2500;
+	constexpr float MINIMUM_HEIGHT = 5.0f;
 	constexpr float SENSITIVITY = 4.0f;
 	constexpr float NEAR_PLANE_DISTANCE = 0.1f;
 	constexpr float FAR_PLANE_DISTANCE = 1750.0f;
@@ -80,9 +89,17 @@ glm::mat4 Camera::getProjection(const sf::Window& window) const
 		static_cast<float>(window.getSize().x) / static_cast<float>(window.getSize().y), nearPlaneDistance, farPlaneDistance);
 }
 
+#ifdef GAME
+void Camera::update(float deltaTime)
+{
+	setFront();
+	moveByArrowKeys(deltaTime);
+}
+
 glm::vec3 Camera::getMouseToGroundPosition(const sf::Window& window) const
 {
-	assert(position.y > 0.0f);
+	assert(position.y >= MINIMUM_HEIGHT);
+
 
 	glm::vec3 rayPositionFromMouse = calculateMouseRay(getProjection(window), getView(), window,
 		{ sf::Mouse::getPosition(window).x, sf::Mouse::getPosition(window).y });
@@ -97,29 +114,52 @@ glm::vec3 Camera::getMouseToGroundPosition(const sf::Window& window) const
 
 	return { rayPosition.x, Globals::GROUND_HEIGHT, rayPosition.z };
 }
-
-#ifdef GAME
-void Camera::update(float deltaTime)
-{
-	setFront();
-	moveByArrowKeys(deltaTime);
-}
 #endif // GAME
 
 #ifdef LEVEL_EDITOR
+bool Camera::getMouseToGroundPosition(const sf::Window& window, glm::vec3& mouseToGroundPosition) const
+{
+	assert(position.y >= MINIMUM_HEIGHT);
+
+	glm::vec3 rayPositionFromMouse = calculateMouseRay(getProjection(window), getView(), window,
+		{ sf::Mouse::getPosition(window).x, sf::Mouse::getPosition(window).y });
+
+	glm::vec3 rayPosition = position;
+	bool groundFound = false;
+	for (int i = 1; i < MAX_RAY_TO_GROUND_DISTANCE; ++i)
+	{
+		rayPosition = rayPositionFromMouse * static_cast<float>(i) + position;
+		if (rayPosition.y <= 0.0f)
+		{
+			groundFound = true;
+			mouseToGroundPosition = rayPosition;
+			break;
+		}
+	}
+
+	return groundFound;
+
+	//while (rayPosition.y > 0.0f)
+	//{
+	//	rayPosition = rayPositionFromMouse * static_cast<float>(i) + position;
+	//	++i;
+	//}
+	//return { rayPosition.x, Globals::GROUND_HEIGHT, rayPosition.z };
+}
+
 void Camera::onMouseMove(const sf::Window& window, float deltaTime, glm::ivec2 lastMousePosition)
 {
-if (!sf::Keyboard::isKeyPressed(sf::Keyboard::LAlt))
-{
-	rotation.x += (static_cast<int>(window.getSize().y / 2) - sf::Mouse::getPosition(window).y) * sensitivity * deltaTime;
-	rotation.y += (sf::Mouse::getPosition(window).x - static_cast<int>(window.getSize().x / 2)) * sensitivity * deltaTime;
+	if (!sf::Keyboard::isKeyPressed(sf::Keyboard::LAlt))
+	{
+		rotation.x += (static_cast<int>(window.getSize().y / 2) - sf::Mouse::getPosition(window).y) * sensitivity * deltaTime;
+		rotation.y += (sf::Mouse::getPosition(window).x - static_cast<int>(window.getSize().x / 2)) * sensitivity * deltaTime;
 
-	sf::Mouse::setPosition(sf::Vector2i(window.getSize().x / 2, window.getSize().y / 2), window);
+		sf::Mouse::setPosition(sf::Vector2i(window.getSize().x / 2, window.getSize().y / 2), window);
 
-	setFront();
-	right = glm::normalize(glm::cross(front, { 0.0f, 1.0f, 0.0f }));
-	up = glm::normalize(glm::cross(right, front));
-}
+		setFront();
+		right = glm::normalize(glm::cross(front, { 0.0f, 1.0f, 0.0f }));
+		up = glm::normalize(glm::cross(right, front));
+	}
 }
 
 void Camera::update(float deltaTime, const sf::Window& window, glm::ivec2 lastMousePosition)
@@ -130,7 +170,6 @@ void Camera::update(float deltaTime, const sf::Window& window, glm::ivec2 lastMo
 	}
 	else
 	{
-		constexpr float MOVEMENT_SPEED = 15.0f;
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::W))
 		{
 			velocity += front * MOVEMENT_SPEED;
@@ -157,7 +196,12 @@ void Camera::update(float deltaTime, const sf::Window& window, glm::ivec2 lastMo
 		}	
 	}
 
-	position += velocity * deltaTime;
+	
+	glm::vec3 newPosition = position + velocity * deltaTime;
+	if (newPosition.y >= MINIMUM_HEIGHT)
+	{
+		position = newPosition;
+	}
 
 	velocity *= 0.9f;
 	setFront();
@@ -204,12 +248,12 @@ void Camera::zoom(const sf::Window& window, glm::ivec2 lastMousePosition)
 	{
 		if (sf::Mouse::getPosition(window).x > lastMousePosition.x)
 		{
-			velocity += front * 25.0f;
+			velocity += front * ZOOM_SPEED;
 			sf::Mouse::setPosition(sf::Vector2i(window.getSize().x / 2, window.getSize().y / 2), window);
 		}
 		else if (sf::Mouse::getPosition(window).x < lastMousePosition.x)
 		{
-			velocity -= front * 25.0f;
+			velocity -= front * ZOOM_SPEED;
 			sf::Mouse::setPosition(sf::Vector2i(window.getSize().x / 2, window.getSize().y / 2), window);
 		}
 	}

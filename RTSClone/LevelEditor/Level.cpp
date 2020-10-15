@@ -165,11 +165,14 @@ void Level::handleInput(const sf::Event& currentSFMLEvent, const SelectionBox& s
 		{
 			if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left))
 			{
-				glm::vec3 mouseToGroundPosition = camera.getMouseToGroundPosition(window);
-				bool entitySelected = m_entityManager.selectEntityAtPosition(mouseToGroundPosition);
-				if (plannedEntityActive && !entitySelected)
+				glm::vec3 mouseToGroundPosition = { 0.0f, 0.0f, 0.0f };
+				if (camera.getMouseToGroundPosition(window, mouseToGroundPosition))
 				{
-					m_entityManager.addEntity(plannedEntity.getModelName(), plannedEntity.getPosition());
+					bool entitySelected = m_entityManager.selectEntityAtPosition(mouseToGroundPosition);
+					if (plannedEntityActive && !entitySelected)
+					{
+						m_entityManager.addEntity(plannedEntity.getModelName(), plannedEntity.getPosition());
+					}
 				}
 			}
 		}

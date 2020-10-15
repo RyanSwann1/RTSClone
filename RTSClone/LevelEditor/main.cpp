@@ -100,6 +100,7 @@ int main()
 	bool showGUIWindow = false;
 	eWindowState currentWindowState = eWindowState::None;
 	Entity plannedEntity(eModelName::RocksTall, { 0.0f, 0.0f, 0.0f });
+	glm::ivec2 lastMousePosition = { 0, 0 };
 	int selected = 0;	
 
 	std::cout << glGetError() << "\n";
@@ -109,6 +110,8 @@ int main()
 	while (window.isOpen())
 	{
 		float deltaTime = gameClock.restart().asSeconds();
+		window.setMouseCursorVisible(true);
+		
 		//Handle Input
 		sf::Event currentSFMLEvent;
 		while (window.pollEvent(currentSFMLEvent))
@@ -128,14 +131,18 @@ int main()
 				{
 					window.close();
 				}
+				if (currentSFMLEvent.key.code == sf::Keyboard::LAlt)
+				{
+					camera.zoom(window, lastMousePosition);
+				}
 				break;
 			case sf::Event::MouseButtonPressed:
 				if (currentSFMLEvent.mouseButton.button == sf::Mouse::Button::Left)
 				{
 					if (!ImGui::IsWindowHovered(ImGuiHoveredFlags_::ImGuiHoveredFlags_AnyWindow))
 					{
-						glm::vec3 mouseToGroundPosition = camera.getMouseToGroundPosition(window);
-						if (level)
+						glm::vec3 mouseToGroundPosition = { 0.0f, 0.0f, 0.0f };
+						if (level && camera.getMouseToGroundPosition(window, mouseToGroundPosition))
 						{
 							bool entitySelected = level->getEntityManager().isEntitySelected();
 							if (plannedEntityActive && !entitySelected)
@@ -146,7 +153,7 @@ int main()
 							{
 								plannedEntityActive = false;
 								selectionBox.setStartingPosition(window, mouseToGroundPosition);
-							}
+							}	
 						}
 					}
 				}
@@ -163,21 +170,30 @@ int main()
 				break;
 			case sf::Event::MouseMoved:
 			{
+				if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Right))
+				{
+					camera.onMouseMove(window, deltaTime, lastMousePosition);
+					window.setMouseCursorVisible(false);
+				}
+
 				if (!ImGui::IsWindowHovered(ImGuiHoveredFlags_::ImGuiHoveredFlags_AnyWindow))
 				{
-					glm::vec3 mouseToGroundPosition = camera.getMouseToGroundPosition(window);
-					if (selectionBox.isActive())
+					glm::vec3 mouseToGroundPosition = { 0.0f, 0.0f, 0.0f };
+					if (camera.getMouseToGroundPosition(window, mouseToGroundPosition))
 					{
-						selectionBox.setSize(mouseToGroundPosition);
-					}
-
-					if (level)
-					{
-						glm::vec3 newPosition = Globals::convertToNodePosition(mouseToGroundPosition);
-						AABB AABB(newPosition, ModelManager::getInstance().getModel(plannedEntity.getModelName()));
-						if (Globals::isWithinMapBounds(AABB, level->getMapSize()))
+						if (selectionBox.isActive())
 						{
-							plannedEntity.setPosition(newPosition);
+							selectionBox.setSize(mouseToGroundPosition);
+						}
+
+						if (level)
+						{
+							glm::vec3 newPosition = Globals::convertToNodePosition(mouseToGroundPosition);
+							AABB AABB(newPosition, ModelManager::getInstance().getModel(plannedEntity.getModelName()));
+							if (Globals::isWithinMapBounds(AABB, level->getMapSize()))
+							{
+								plannedEntity.setPosition(newPosition);
+							}
 						}
 					}
 				}
@@ -187,7 +203,8 @@ int main()
 		}
 
 		//Update
-		camera.update(deltaTime);
+		camera.update(deltaTime, window, lastMousePosition);
+		lastMousePosition = { sf::Mouse::getPosition(window).x, sf::Mouse::getPosition(window).y };
 		ImGui_SFML_OpenGL3::startFrame();
 		ImGui::SetNextWindowSize(ImVec2(175, static_cast<float>(windowSize.y)), ImGuiCond_FirstUseEver);
 		std::string titleName = "Level Editor";
