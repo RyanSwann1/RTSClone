@@ -12,7 +12,16 @@ struct Camera : private NonCopyable, private NonMovable
 	glm::mat4 getView() const;
 	glm::mat4 getProjection(const sf::Window& window) const;
 	glm::vec3 getMouseToGroundPosition(const sf::Window& window) const;
+
+#ifdef LEVEL_EDITOR
+	void onMouseMove(const sf::Window& window, float deltaTime, glm::ivec2 lastMousePosition);
 	void update(float deltaTime);
+#endif // LEVEL_EDITOR
+
+#ifdef GAME
+	void update(float deltaTime);
+#endif // GAME
+
 #ifdef LEVEL_EDITOR
 	void zoom(float mouseWheelDelta);
 #endif // LEVEL_EDITOR
@@ -26,6 +35,7 @@ struct Camera : private NonCopyable, private NonMovable
 	glm::vec3 right;
 	glm::vec2 rotation;
 	glm::vec3 position;
+	glm::vec3 velocity;
 
 private:
 	void moveByArrowKeys(float deltaTime);

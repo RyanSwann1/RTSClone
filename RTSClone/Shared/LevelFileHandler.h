@@ -13,6 +13,8 @@
 class Faction;
 class SceneryGameObject;
 #ifdef LEVEL_EDITOR
+class LevelNameGenerator;
+class EntityManager;
 class Level;
 #endif // LEVEL_EDITOR
 namespace LevelFileHandler

@@ -6,7 +6,7 @@ namespace
 {
 	constexpr float MAX_RAY_TO_GROUND_DISTANCE = 1500.0f;
 	constexpr float MOVEMENT_SPEED = 110.0f;
-	constexpr float SENSITIVITY = 0.1f;
+	constexpr float SENSITIVITY = 4.0f;
 	constexpr float NEAR_PLANE_DISTANCE = 0.1f;
 	constexpr float FAR_PLANE_DISTANCE = 1750.0f;
 	constexpr float FIELD_OF_VIEW = 50.0f;
@@ -61,7 +61,8 @@ Camera::Camera()
 	up({ 0.0f, 1.0f, 0.0f }),
 	right(),
 	rotation(STARTING_ROTATION),
-	position(STARTING_POSITION)
+	position(STARTING_POSITION),
+	velocity()
 {
 	setFront();
 	right = glm::normalize(glm::cross(front, up));
@@ -97,13 +98,75 @@ glm::vec3 Camera::getMouseToGroundPosition(const sf::Window& window) const
 	return { rayPosition.x, Globals::GROUND_HEIGHT, rayPosition.z };
 }
 
+#ifdef GAME
 void Camera::update(float deltaTime)
 {
-	moveByArrowKeys(deltaTime);
 	setFront();
+	moveByArrowKeys(deltaTime);
 }
+#endif // GAME
 
 #ifdef LEVEL_EDITOR
+void Camera::onMouseMove(const sf::Window& window, float deltaTime, glm::ivec2 lastMousePosition)
+{
+	rotation.x += (static_cast<int>(window.getSize().y / 2) - sf::Mouse::getPosition(window).y) * sensitivity * deltaTime;
+	rotation.y += (sf::Mouse::getPosition(window).x - static_cast<int>(window.getSize().x / 2)) * sensitivity * deltaTime;
+
+	sf::Mouse::setPosition(sf::Vector2i(window.getSize().x / 2, window.getSize().y / 2), window);
+
+	setFront();
+	right = glm::normalize(glm::cross(front, { 0.0f, 1.0f, 0.0f }));
+	up = glm::normalize(glm::cross(right, front));
+}
+
+void Camera::update(float deltaTime)
+{
+	constexpr float MOVEMENT_SPEED = 15.0f;
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::W))
+	{
+		velocity += front * MOVEMENT_SPEED;
+	}
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::S))
+	{
+		velocity -= front * MOVEMENT_SPEED;
+	}
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::D))
+	{
+		velocity += right * MOVEMENT_SPEED;
+	}
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::A))
+	{
+		velocity -= right * MOVEMENT_SPEED;
+	}
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::E))
+	{
+		velocity += up * MOVEMENT_SPEED;
+	}
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Q))
+	{
+		velocity -= up * MOVEMENT_SPEED;
+	}
+
+	position += velocity * deltaTime;
+
+	velocity *= 0.9f;
+	setFront();
+	right = glm::normalize(glm::cross(front, { 0.0f, 1.0f, 0.0f }));
+	up = glm::normalize(glm::cross(right, front));
+	if (glm::abs(velocity.x) <= 0.2f)
+	{
+		velocity.x = 0.0f;
+	}
+	if (glm::abs(velocity.y) <= 0.2f)
+	{
+		velocity.y = 0.0f;
+	}
+	if (glm::abs(velocity.z) <= 0.2f)
+	{
+		velocity.z = 0.0f;
+	}
+}
+
 void Camera::zoom(float mouseWheelDelta)
 {
 	glm::vec3 newPosition = { 0.0f, 0.0f, 0.0f };
