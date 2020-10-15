@@ -15,16 +15,14 @@ struct Camera : private NonCopyable, private NonMovable
 
 #ifdef LEVEL_EDITOR
 	void onMouseMove(const sf::Window& window, float deltaTime, glm::ivec2 lastMousePosition);
-	void update(float deltaTime);
+	void update(float deltaTime, const sf::Window& window, glm::ivec2 lastMousePosition);
+	void zoom(float mouseWheelDelta);
+	void zoom(const sf::Window& window, glm::ivec2 lastMousePosition);
 #endif // LEVEL_EDITOR
 
 #ifdef GAME
 	void update(float deltaTime);
 #endif // GAME
-
-#ifdef LEVEL_EDITOR
-	void zoom(float mouseWheelDelta);
-#endif // LEVEL_EDITOR
 
 	const float FOV;
 	const float sensitivity;
