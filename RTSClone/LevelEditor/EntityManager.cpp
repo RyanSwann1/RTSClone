@@ -125,10 +125,7 @@ void EntityManager::renderEntityAABB(ShaderHandler& shaderHandler)
 {
 	for (auto& entity : m_entities)
 	{
-		if (entity.modelName != eModelName::Terrain)
-		{
-			entity.renderAABB(shaderHandler);
-		}
+		entity.renderAABB(shaderHandler);	
 	}
 }
 #endif // RENDER_AABB

@@ -140,7 +140,7 @@ namespace
 		loadModel("rocksTall.obj", true, { 5.0f, 1.0f, 5.0f }, eModelName::RocksTall, { 1.0f, 1.0f, 1.0f },
 			models, loadedAllModels);
 
-		loadModel("translate.obj", true, {0.0f, 0.0f, 0.0f}, eModelName::Translate, { 15.0f, 15.0f, 15.0f }, models, loadedAllModels);
+		loadModel("translate.obj", true, {0.0f, 0.0f, 0.0f}, eModelName::TranslateObject, { 15.0f, 15.0f, 15.0f }, models, loadedAllModels);
 
 		loadModel("spaceCraft1.obj", false, UNIT_AABB_SIZE_FROM_CENTER, eModelName::Unit, UNIT_SCALE,
 			models, loadedAllModels);

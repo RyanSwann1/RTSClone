@@ -412,7 +412,10 @@ int main()
 		playableAreaDisplay.render(*shaderHandler);
 
 #ifdef RENDER_AABB
-		gameObjectManager.renderGameObjectAABB(*shaderHandler);
+		if (level)
+		{
+			translateObject.renderAABB(*shaderHandler);
+		}
 #endif // RENDER_AABB
 
 		shaderHandler->switchToShader(eShaderType::SelectionBox);
