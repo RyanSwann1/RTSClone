@@ -71,7 +71,8 @@ namespace
 }
 
 Level::Level(const std::string& levelName)
-	: m_levelName(levelName),
+	: m_translateObject(),
+	m_levelName(levelName),
 	m_entityManager(),
 	m_players(),
 	m_mapSize(DEFAULT_MAP_SIZE),
@@ -169,6 +170,17 @@ void Level::handleInput(const sf::Event& currentSFMLEvent, const SelectionBox& s
 				if (camera.getMouseToGroundPosition(window, mouseToGroundPosition))
 				{
 					bool entitySelected = m_entityManager.selectEntityAtPosition(mouseToGroundPosition);
+					if (entitySelected)
+					{
+						m_translateObject.setActive(true);
+						Entity* selectedEntity = m_entityManager.getSelectedEntity();
+						assert(selectedEntity);
+						m_translateObject.setPosition(selectedEntity->getPosition());
+					}
+					else
+					{
+						m_translateObject.setActive(false);
+					}
 					if (plannedEntityActive && !entitySelected)
 					{
 						m_entityManager.addEntity(plannedEntity.getModelName(), plannedEntity.getPosition());
@@ -288,7 +300,16 @@ void Level::render(ShaderHandler& shaderHandler) const
 	{
 		player.render(shaderHandler);
 	}
+
+	m_translateObject.render(shaderHandler);
 }
+
+#ifdef RENDER_AABB
+void Level::renderAABB(ShaderHandler& shaderHandler)
+{
+	m_translateObject.renderAABB(shaderHandler);
+}
+#endif // RENDER_AABB
 
 const std::ifstream& operator>>(std::ifstream& file, Level& level)
 {

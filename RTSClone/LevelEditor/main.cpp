@@ -11,7 +11,6 @@
 #include "PlayableAreaDisplay.h"
 #include "Player.h"
 #include "Level.h"
-#include "TranslateObject.h"
 #include <SFML/Graphics.hpp>
 #include <iostream>
 #include <imgui/imgui.h>
@@ -97,7 +96,6 @@ int main()
 	SelectionBox selectionBox;
 	sf::Clock gameClock;
 	Camera camera;
-	TranslateObject translateObject;
 	bool plannedEntityActive = false;
 	bool showGUIWindow = false;
 	eWindowState currentWindowState = eWindowState::None;
@@ -393,7 +391,6 @@ int main()
 		if (level)
 		{
 			level->render(*shaderHandler);
-			translateObject.render(*shaderHandler);
 		}
 
 		if (plannedEntityActive)
@@ -414,7 +411,7 @@ int main()
 #ifdef RENDER_AABB
 		if (level)
 		{
-			translateObject.renderAABB(*shaderHandler);
+			level->renderAABB(*shaderHandler);
 		}
 #endif // RENDER_AABB
 
