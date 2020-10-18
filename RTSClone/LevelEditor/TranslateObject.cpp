@@ -22,5 +22,5 @@ TranslateObject::TranslateObject()
 
 void TranslateObject::render(ShaderHandler& shaderHandler) const
 {
-	ModelManager::getInstance().getModel(eModelName::Translate).render(shaderHandler, m_centerPosition);
+	ModelManager::getInstance().getModel(eModelName::TranslateObject).render(shaderHandler, m_centerPosition);
 }

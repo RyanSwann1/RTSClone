@@ -14,5 +14,6 @@ enum class eModelName
 	Projectile,
 	SupplyDepot,
 	Barracks,
-	Max = Barracks
+	TranslateObject,
+	Max = TranslateObject
 };

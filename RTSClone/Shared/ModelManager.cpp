@@ -106,8 +106,6 @@ namespace
 		loadModel("buildingOpen.obj", true, BARRACKS_AABB_SIZE_FROM_CENTER, eModelName::Barracks, BARRACKS_SCALE,
 			models, loadedAllModels);
 
-
-		assert(std::find(models.cbegin(), models.cend(), nullptr) == models.cend());
 		return models;
 	}
 #endif // GAME
@@ -142,7 +140,7 @@ namespace
 		loadModel("rocksTall.obj", true, { 5.0f, 1.0f, 5.0f }, eModelName::RocksTall, { 1.0f, 1.0f, 1.0f },
 			models, loadedAllModels);
 
-		//loadModel("translate.obj", true, {}, eModelName::Translate, { 1.0f, 1.0f, 1.0f }, models, loadedAllModels);
+		loadModel("translate.obj", true, {0.0f, 0.0f, 0.0f}, eModelName::Translate, { 15.0f, 15.0f, 15.0f }, models, loadedAllModels);
 
 		loadModel("spaceCraft1.obj", false, UNIT_AABB_SIZE_FROM_CENTER, eModelName::Unit, UNIT_SCALE,
 			models, loadedAllModels);
@@ -153,7 +151,6 @@ namespace
 		loadModel("rocksOre.obj", true, MINERAL_AABB_SIZE_FROM_CENTER, eModelName::Mineral, MINERAL_SCALE,
 			models, loadedAllModels);
 
-		//assert(std::find(models.cbegin(), models.cend(), nullptr) == models.cend());
 		return models;
 	}
 #endif // LEVEL_EDITOR

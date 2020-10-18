@@ -15,7 +15,7 @@ struct Camera : private NonCopyable, private NonMovable
 #ifdef LEVEL_EDITOR
 	//Return false if ground not found
 	bool getMouseToGroundPosition(const sf::Window& window, glm::vec3& mouseToGroundPosition) const;
-	void onMouseMove(const sf::Window& window, float deltaTime, glm::ivec2 lastMousePosition);
+	void onMouseMove(const sf::Window& window, float deltaTime, glm::ivec2 lastMouseButtonPress);
 	void update(float deltaTime, const sf::Window& window, glm::ivec2 lastMousePosition);
 	void zoom(float mouseWheelDelta);
 	void zoom(const sf::Window& window, glm::ivec2 lastMousePosition);

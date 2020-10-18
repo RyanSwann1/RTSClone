@@ -132,22 +132,15 @@ bool Camera::getMouseToGroundPosition(const sf::Window& window, glm::vec3& mouse
 		if (rayPosition.y <= 0.0f)
 		{
 			groundFound = true;
-			mouseToGroundPosition = rayPosition;
+			mouseToGroundPosition = { rayPosition.x, Globals::GROUND_HEIGHT, rayPosition.z };
 			break;
 		}
 	}
 
 	return groundFound;
-
-	//while (rayPosition.y > 0.0f)
-	//{
-	//	rayPosition = rayPositionFromMouse * static_cast<float>(i) + position;
-	//	++i;
-	//}
-	//return { rayPosition.x, Globals::GROUND_HEIGHT, rayPosition.z };
 }
 
-void Camera::onMouseMove(const sf::Window& window, float deltaTime, glm::ivec2 lastMousePosition)
+void Camera::onMouseMove(const sf::Window& window, float deltaTime, glm::ivec2 lastMouseButtonPress)
 {
 	if (!sf::Keyboard::isKeyPressed(sf::Keyboard::LAlt))
 	{

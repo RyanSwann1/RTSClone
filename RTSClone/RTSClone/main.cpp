@@ -225,5 +225,6 @@ int main()
 
 	level.reset();
 	ImGui_SFML_OpenGL3::shutdown();
+
 	return 0;
 }
