@@ -11,6 +11,7 @@
 #include "PlayableAreaDisplay.h"
 #include "Player.h"
 #include "Level.h"
+#include "TranslateObject.h"
 #include <SFML/Graphics.hpp>
 #include <iostream>
 #include <imgui/imgui.h>
@@ -96,12 +97,15 @@ int main()
 	SelectionBox selectionBox;
 	sf::Clock gameClock;
 	Camera camera;
+	TranslateObject translateObject;
 	bool plannedEntityActive = false;
 	bool showGUIWindow = false;
 	eWindowState currentWindowState = eWindowState::None;
 	Entity plannedEntity(eModelName::RocksTall, { 0.0f, 0.0f, 0.0f });
 	glm::ivec2 lastMousePosition = { 0, 0 };
+	glm::ivec2 lastMouseButtonPress = { 0, 0 };
 	int selected = 0;	
+	bool mouseMoved = false;
 
 	std::cout << glGetError() << "\n";
 	std::cout << glGetError() << "\n";
@@ -110,7 +114,6 @@ int main()
 	while (window.isOpen())
 	{
 		float deltaTime = gameClock.restart().asSeconds();
-		window.setMouseCursorVisible(true);
 		
 		//Handle Input
 		sf::Event currentSFMLEvent;
@@ -159,6 +162,7 @@ int main()
 				}
 				else if (currentSFMLEvent.mouseButton.button == sf::Mouse::Button::Right)
 				{
+					sf::Mouse::setPosition(sf::Vector2i(window.getSize().x / 2, window.getSize().y / 2), window);
 					plannedEntityActive = false;
 				}
 				break;
@@ -172,8 +176,7 @@ int main()
 			{
 				if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Right))
 				{
-					camera.onMouseMove(window, deltaTime, lastMousePosition);
-					window.setMouseCursorVisible(false);
+					mouseMoved = true;
 				}
 
 				if (!ImGui::IsWindowHovered(ImGuiHoveredFlags_::ImGuiHoveredFlags_AnyWindow))
@@ -181,6 +184,7 @@ int main()
 					glm::vec3 mouseToGroundPosition = { 0.0f, 0.0f, 0.0f };
 					if (camera.getMouseToGroundPosition(window, mouseToGroundPosition))
 					{
+						
 						if (selectionBox.isActive())
 						{
 							selectionBox.setSize(mouseToGroundPosition);
@@ -203,6 +207,12 @@ int main()
 		}
 
 		//Update
+		if (mouseMoved)
+		{
+			mouseMoved = false;
+			camera.onMouseMove(window, deltaTime, lastMousePosition);
+			window.setMouseCursorVisible(false);
+		}
 		camera.update(deltaTime, window, lastMousePosition);
 		lastMousePosition = { sf::Mouse::getPosition(window).x, sf::Mouse::getPosition(window).y };
 		ImGui_SFML_OpenGL3::startFrame();
@@ -383,6 +393,7 @@ int main()
 		if (level)
 		{
 			level->render(*shaderHandler);
+			translateObject.render(*shaderHandler);
 		}
 
 		if (plannedEntityActive)
