@@ -149,7 +149,7 @@ void Level::addEntity(eModelName modelName, const glm::vec3& position)
 	m_entityManager.addEntity(modelName, position);
 }
 
-void Level::handleInput(const sf::Event& currentSFMLEvent, const SelectionBox& selectionBox, const Camera& camera,
+void Level::handleInput(const sf::Event& currentSFMLEvent, const Camera& camera,
 	bool plannedEntityActive, const sf::Window& window, const Entity& plannedEntity)
 {
 	switch (currentSFMLEvent.type)
@@ -160,6 +160,9 @@ void Level::handleInput(const sf::Event& currentSFMLEvent, const SelectionBox& s
 			m_entityManager.removeAllSelectedEntities();
 		}
 		break;
+	case sf::Event::MouseButtonReleased:
+		m_selectionBox.reset();
+		break;
 	case sf::Event::MouseButtonPressed:
 	{
 		if (!ImGui::IsWindowHovered(ImGuiHoveredFlags_::ImGuiHoveredFlags_AnyWindow))
@@ -169,13 +172,11 @@ void Level::handleInput(const sf::Event& currentSFMLEvent, const SelectionBox& s
 				glm::vec3 mouseToGroundPosition = { 0.0f, 0.0f, 0.0f };
 				if (camera.getMouseToGroundPosition(window, mouseToGroundPosition))
 				{
-					bool entitySelected = m_entityManager.selectEntityAtPosition(mouseToGroundPosition);
+					const Entity* entitySelected = m_entityManager.selectEntityAtPosition(mouseToGroundPosition);
 					if (entitySelected)
 					{
 						m_translateObject.setActive(true);
-						Entity* selectedEntity = m_entityManager.getSelectedEntity();
-						assert(selectedEntity);
-						m_translateObject.setPosition(selectedEntity->getPosition());
+						m_translateObject.setPosition(entitySelected->getPosition());
 					}
 					else
 					{
@@ -185,6 +186,10 @@ void Level::handleInput(const sf::Event& currentSFMLEvent, const SelectionBox& s
 					{
 						m_entityManager.addEntity(plannedEntity.getModelName(), plannedEntity.getPosition());
 					}
+					else if (!entitySelected)
+					{
+						m_selectionBox.setStartingPosition(window, mouseToGroundPosition);
+					}
 				}
 			}
 		}
@@ -192,9 +197,18 @@ void Level::handleInput(const sf::Event& currentSFMLEvent, const SelectionBox& s
 	case sf::Event::MouseMoved:
 		if (!ImGui::IsWindowHovered(ImGuiHoveredFlags_::ImGuiHoveredFlags_AnyWindow))
 		{
-			if (selectionBox.isActive() && selectionBox.isMinimumSize())
+			glm::vec3 mouseToGroundPosition = { 0.0f, 0.0f, 0.0f };
+			if (camera.getMouseToGroundPosition(window, mouseToGroundPosition))
 			{
-				m_entityManager.selectEntities(selectionBox);
+				if (m_selectionBox.isActive())
+				{
+					m_selectionBox.setSize(mouseToGroundPosition);
+
+					if (m_selectionBox.isMinimumSize())
+					{
+						m_entityManager.selectEntities(m_selectionBox);
+					}
+				}
 			}
 		}
 		break;
@@ -302,6 +316,11 @@ void Level::render(ShaderHandler& shaderHandler) const
 	}
 
 	m_translateObject.render(shaderHandler);
+}
+
+void Level::renderSelectionBox(sf::Window& window) const
+{
+	m_selectionBox.render(window);
 }
 
 #ifdef RENDER_AABB

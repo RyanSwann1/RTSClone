@@ -21,7 +21,7 @@ public:
 	
 	void addEntity(eModelName modelName, const glm::vec3& position);
 	void removeAllSelectedEntities();
-	bool selectEntityAtPosition(const glm::vec3& position);
+	const Entity* selectEntityAtPosition(const glm::vec3& position);
 	void selectEntities(const SelectionBox& selectionBox);
 	void render(ShaderHandler& shaderHandler) const;
 

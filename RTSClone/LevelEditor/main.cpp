@@ -7,7 +7,6 @@
 #include "Globals.h"
 #include "EntityManager.h"
 #include "LevelFileHandler.h"
-#include "SelectionBox.h"
 #include "PlayableAreaDisplay.h"
 #include "Player.h"
 #include "Level.h"
@@ -93,7 +92,6 @@ int main()
 
 	PlayableAreaDisplay playableAreaDisplay;
 	std::unique_ptr<Level> level;
-	SelectionBox selectionBox;
 	sf::Clock gameClock;
 	Camera camera;
 	bool plannedEntityActive = false;
@@ -119,7 +117,7 @@ int main()
 		{
 			if (level)
 			{
-				level->handleInput(currentSFMLEvent, selectionBox, camera, plannedEntityActive, window, plannedEntity);
+				level->handleInput(currentSFMLEvent, camera, plannedEntityActive, window, plannedEntity);
 			}
 
 			switch (currentSFMLEvent.type)
@@ -153,7 +151,7 @@ int main()
 							else
 							{
 								plannedEntityActive = false;
-								selectionBox.setStartingPosition(window, mouseToGroundPosition);
+								//selectionBox.setStartingPosition(window, mouseToGroundPosition);
 							}	
 						}
 					}
@@ -164,9 +162,7 @@ int main()
 					plannedEntityActive = false;
 				}
 				break;
-			case sf::Event::MouseButtonReleased:
-				selectionBox.reset();
-				break;
+
 			case sf::Event::MouseWheelMoved:
 				camera.zoom(currentSFMLEvent.mouseWheel.delta);
 				break;
@@ -180,23 +176,14 @@ int main()
 				if (!ImGui::IsWindowHovered(ImGuiHoveredFlags_::ImGuiHoveredFlags_AnyWindow))
 				{
 					glm::vec3 mouseToGroundPosition = { 0.0f, 0.0f, 0.0f };
-					if (camera.getMouseToGroundPosition(window, mouseToGroundPosition))
+					if (camera.getMouseToGroundPosition(window, mouseToGroundPosition) && level)
 					{
-						
-						if (selectionBox.isActive())
+						glm::vec3 newPosition = Globals::convertToNodePosition(mouseToGroundPosition);
+						AABB AABB(newPosition, ModelManager::getInstance().getModel(plannedEntity.getModelName()));
+						if (Globals::isWithinMapBounds(AABB, level->getMapSize()))
 						{
-							selectionBox.setSize(mouseToGroundPosition);
-						}
-
-						if (level)
-						{
-							glm::vec3 newPosition = Globals::convertToNodePosition(mouseToGroundPosition);
-							AABB AABB(newPosition, ModelManager::getInstance().getModel(plannedEntity.getModelName()));
-							if (Globals::isWithinMapBounds(AABB, level->getMapSize()))
-							{
-								plannedEntity.setPosition(newPosition);
-							}
-						}
+							plannedEntity.setPosition(newPosition);
+						}	
 					}
 				}
 			}
@@ -415,8 +402,12 @@ int main()
 		}
 #endif // RENDER_AABB
 
-		shaderHandler->switchToShader(eShaderType::SelectionBox);
-		selectionBox.render(window);
+		if (level)
+		{
+			shaderHandler->switchToShader(eShaderType::SelectionBox);
+			level->renderSelectionBox(window);
+		}
+
 		glDisable(GL_BLEND);
 		glEnable(GL_DEPTH_TEST);
 
