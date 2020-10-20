@@ -92,13 +92,10 @@ int main()
 	std::unique_ptr<Level> level;
 	sf::Clock gameClock;
 	Camera camera;
-	bool plannedEntityActive = false;
 	bool showGUIWindow = false;
 	eWindowState currentWindowState = eWindowState::None;
-	Entity plannedEntity(eModelName::RocksTall, { 0.0f, 0.0f, 0.0f });
 	glm::ivec2 lastMousePosition = { 0, 0 };
 	glm::ivec2 lastMouseButtonPress = { 0, 0 };
-	int selected = 0;	
 	bool mouseMoved = false;
 
 	std::cout << glGetError() << "\n";
@@ -115,7 +112,7 @@ int main()
 		{
 			if (level)
 			{
-				level->handleInput(currentSFMLEvent, camera, plannedEntityActive, window, plannedEntity);
+				level->handleInput(currentSFMLEvent, camera, window);
 			}
 
 			switch (currentSFMLEvent.type)
@@ -134,33 +131,11 @@ int main()
 				}
 				break;
 			case sf::Event::MouseButtonPressed:
-				if (currentSFMLEvent.mouseButton.button == sf::Mouse::Button::Left)
-				{
-					if (!ImGui::IsWindowHovered(ImGuiHoveredFlags_::ImGuiHoveredFlags_AnyWindow))
-					{
-						glm::vec3 mouseToGroundPosition = { 0.0f, 0.0f, 0.0f };
-						if (level && camera.getMouseToGroundPosition(window, mouseToGroundPosition))
-						{
-							bool entitySelected = level->getEntityManager().isEntitySelected();
-							if (plannedEntityActive && !entitySelected)
-							{
-								level->addEntity(plannedEntity.getModelName(), plannedEntity.getPosition());
-							}
-							else
-							{
-								plannedEntityActive = false;
-								//selectionBox.setStartingPosition(window, mouseToGroundPosition);
-							}	
-						}
-					}
-				}
-				else if (currentSFMLEvent.mouseButton.button == sf::Mouse::Button::Right)
+				if (currentSFMLEvent.mouseButton.button == sf::Mouse::Button::Right)
 				{
 					sf::Mouse::setPosition(sf::Vector2i(window.getSize().x / 2, window.getSize().y / 2), window);
-					plannedEntityActive = false;
 				}
 				break;
-
 			case sf::Event::MouseWheelMoved:
 				camera.zoom(currentSFMLEvent.mouseWheel.delta);
 				break;
@@ -176,12 +151,7 @@ int main()
 					glm::vec3 mouseToGroundPosition = { 0.0f, 0.0f, 0.0f };
 					if (camera.getMouseToGroundPosition(window, mouseToGroundPosition) && level)
 					{
-						glm::vec3 newPosition = Globals::convertToNodePosition(mouseToGroundPosition);
-						AABB AABB(newPosition, ModelManager::getInstance().getModel(plannedEntity.getModelName()));
-						if (Globals::isWithinMapBounds(AABB, level->getMapSize()))
-						{
-							plannedEntity.setPosition(newPosition);
-						}	
+
 					}
 				}
 			}
@@ -255,19 +225,7 @@ int main()
 
 			if (level)
 			{
-				ImGui::BeginChild("left pane", ImVec2(175, 250), true);
-				const auto& modelNames = ModelManager::getInstance().getModelNames();
-				for (int i = 0; i < modelNames.size(); i++)
-				{
-					if (ImGui::Selectable(modelNames[i].c_str(), selected == i))
-					{
-						selected = i;
-						plannedEntity.setModelName(ModelManager::getInstance().getModelName(modelNames[i]));
-						plannedEntityActive = true;
-					}
-				}
-				ImGui::EndChild();
-				ImGui::SameLine();
+				level->handleModelNamesGUI();
 			}
 		}
 		ImGui::End();
@@ -369,11 +327,6 @@ int main()
 		if (level)
 		{
 			level->render(*shaderHandler);
-		}
-
-		if (plannedEntityActive)
-		{
-			plannedEntity.render(*shaderHandler);
 		}
 
 		glEnable(GL_BLEND);

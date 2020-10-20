@@ -5,6 +5,7 @@
 #include "imgui/imgui.h"
 #include "SelectionBox.h"
 #include "PlayableAreaDisplay.h"
+#include "ModelManager.h"
 #include <fstream>
 
 namespace
@@ -70,8 +71,18 @@ namespace
 	constexpr glm::ivec2 DEFAULT_MAP_SIZE = { 30, 30 };
 }
 
+//PlannedEntity
+PlannedEntity::PlannedEntity()
+	: modelNameIDSelected(0),
+	position(),
+	modelName(),
+	active(false)
+{}
+
+//Level
 Level::Level(const std::string& levelName)
 	: m_levelName(levelName),
+	m_plannedEntity(),
 	m_translateObject(),
 	m_selectionBox(),
 	m_playableAreaDisplay(),
@@ -153,8 +164,7 @@ void Level::addEntity(eModelName modelName, const glm::vec3& position)
 	m_entityManager.addEntity(modelName, position);
 }
 
-void Level::handleInput(const sf::Event& currentSFMLEvent, const Camera& camera,
-	bool plannedEntityActive, const sf::Window& window, const Entity& plannedEntity)
+void Level::handleInput(const sf::Event& currentSFMLEvent, const Camera& camera, const sf::Window& window)
 {
 	switch (currentSFMLEvent.type)
 	{
@@ -186,15 +196,29 @@ void Level::handleInput(const sf::Event& currentSFMLEvent, const Camera& camera,
 					{
 						m_translateObject.setActive(false);
 					}
-					if (plannedEntityActive && !entitySelected)
+					if (m_plannedEntity.active && !entitySelected)
 					{
-						m_entityManager.addEntity(plannedEntity.getModelName(), plannedEntity.getPosition());
+						m_entityManager.addEntity(m_plannedEntity.modelName, m_plannedEntity.position);
 					}
 					else if (!entitySelected && m_translateObject.getCollisionType(mouseToGroundPosition) == eAxisCollision::None)
 					{
 						m_selectionBox.setStartingPosition(window, mouseToGroundPosition);
 					}
+					
+					if (m_plannedEntity.active && getEntityManager().isEntitySelected())
+					{
+						addEntity(m_plannedEntity.modelName, m_plannedEntity.position);
+					}
+					else
+					{
+						m_plannedEntity.active = false;
+					}
+
 				}
+			}
+			else if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Right))
+			{
+				m_plannedEntity.active = false;
 			}
 		}
 	}
@@ -204,6 +228,13 @@ void Level::handleInput(const sf::Event& currentSFMLEvent, const Camera& camera,
 			glm::vec3 mouseToGroundPosition = { 0.0f, 0.0f, 0.0f };
 			if (camera.getMouseToGroundPosition(window, mouseToGroundPosition))
 			{
+				glm::vec3 newPosition = Globals::convertToNodePosition(mouseToGroundPosition);
+				AABB AABB(newPosition, ModelManager::getInstance().getModel(m_plannedEntity.modelName));
+				if (Globals::isWithinMapBounds(AABB, m_mapSize))
+				{
+					m_plannedEntity.position = newPosition;
+				}
+
 				eAxisCollision axisCollision = m_translateObject.getCollisionType(mouseToGroundPosition);
 				switch (axisCollision)
 				{
@@ -229,6 +260,26 @@ void Level::handleInput(const sf::Event& currentSFMLEvent, const Camera& camera,
 		}
 		break;
 	}
+}
+
+void Level::handleModelNamesGUI()
+{
+	ImGui::BeginChild("Model Names pane", ImVec2(175, 250), true);
+
+	const auto& modelNames = ModelManager::getInstance().getModelNames();
+	assert(m_plannedEntity.modelNameIDSelected >= 0 && m_plannedEntity.modelNameIDSelected < modelNames.size());
+	for (int i = 0; i < modelNames.size(); i++)
+	{
+		if (ImGui::Selectable(modelNames[i].c_str(), m_plannedEntity.modelNameIDSelected == i))
+		{
+			m_plannedEntity.modelNameIDSelected;
+			m_plannedEntity.modelName = ModelManager::getInstance().getModelName(modelNames[i]);
+			m_plannedEntity.active = true;
+		}
+	}
+
+	ImGui::EndChild();
+	ImGui::SameLine();
 }
 
 void Level::handlePlayerDetailsGUI(bool& showGUIWindow)
@@ -329,6 +380,11 @@ void Level::render(ShaderHandler& shaderHandler) const
 	for (auto& player : m_players)
 	{
 		player.render(shaderHandler);
+	}
+
+	if (m_plannedEntity.active)
+	{
+		ModelManager::getInstance().getModel(m_plannedEntity.modelName).render(shaderHandler, m_plannedEntity.position);
 	}
 
 	m_translateObject.render(shaderHandler);

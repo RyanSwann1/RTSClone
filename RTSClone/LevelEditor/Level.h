@@ -11,9 +11,18 @@
 #include <vector>
 #include <SFML/Graphics.hpp>
 
+struct PlannedEntity
+{
+	PlannedEntity();
+
+	int modelNameIDSelected;
+	glm::vec3 position;
+	eModelName modelName;
+	bool active;
+};
+
 struct Camera;
 class ShaderHandler;
-class PlayableAreaDisplay;
 class Level : private NonCopyable, private NonMovable
 {
 public:
@@ -28,8 +37,8 @@ public:
 	const EntityManager& getEntityManager() const;
 
 	void addEntity(eModelName modelName, const glm::vec3& position);
-	void handleInput(const sf::Event& currentSFMLEvent, const Camera& camera, bool plannedEntityActive, 
-		const sf::Window& window, const Entity& plannedEntity);
+	void handleInput(const sf::Event& currentSFMLEvent, const Camera& camera, const sf::Window& window);
+	void handleModelNamesGUI();
 	void handlePlayerDetailsGUI(bool& showGUIWindow);
 	void handleLevelDetailsGUI(bool& showGUIWindow);
 	void save() const;
@@ -47,6 +56,7 @@ private:
 	Level(const std::string& levelName);
 
 	const std::string m_levelName;
+	PlannedEntity m_plannedEntity;
 	TranslateObject m_translateObject;
 	SelectionBox m_selectionBox;
 	PlayableAreaDisplay m_playableAreaDisplay;
