@@ -148,7 +148,7 @@ void LevelFileHandler::removeLevel(const std::string& fileName)
 		std::stringstream stream{ line };
 		if (stream.str() != fileName)
 		{
-			tempFile << stream.str();
+			tempFile << stream.str() << "\n";
 		}
 	}
 
