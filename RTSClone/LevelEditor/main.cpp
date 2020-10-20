@@ -145,15 +145,6 @@ int main()
 				{
 					mouseMoved = true;
 				}
-
-				if (!ImGui::IsWindowHovered(ImGuiHoveredFlags_::ImGuiHoveredFlags_AnyWindow))
-				{
-					glm::vec3 mouseToGroundPosition = { 0.0f, 0.0f, 0.0f };
-					if (camera.getMouseToGroundPosition(window, mouseToGroundPosition) && level)
-					{
-
-					}
-				}
 			}
 				break;
 			}

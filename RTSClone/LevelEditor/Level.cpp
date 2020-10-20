@@ -172,9 +172,11 @@ void Level::handleInput(const sf::Event& currentSFMLEvent, const Camera& camera,
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Delete))
 		{
 			m_entityManager.removeAllSelectedEntities();
+			m_translateObject.setActive(false);
 		}
 		break;
 	case sf::Event::MouseButtonReleased:
+		m_translateObject.setSelected(false);
 		m_selectionBox.reset();
 		break;
 	case sf::Event::MouseButtonPressed:
@@ -214,6 +216,11 @@ void Level::handleInput(const sf::Event& currentSFMLEvent, const Camera& camera,
 						m_plannedEntity.active = false;
 					}
 
+					if (m_translateObject.isSelected(mouseToGroundPosition))
+					{
+						sf::Mouse::setPosition(sf::Vector2i(window.getSize().x / 2, window.getSize().y / 2), window);
+						m_translateObject.setSelected(true, mouseToGroundPosition);
+					}
 				}
 			}
 			else if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Right))
@@ -228,33 +235,34 @@ void Level::handleInput(const sf::Event& currentSFMLEvent, const Camera& camera,
 			glm::vec3 mouseToGroundPosition = { 0.0f, 0.0f, 0.0f };
 			if (camera.getMouseToGroundPosition(window, mouseToGroundPosition))
 			{
-				glm::vec3 newPosition = Globals::convertToNodePosition(mouseToGroundPosition);
-				AABB AABB(newPosition, ModelManager::getInstance().getModel(m_plannedEntity.modelName));
-				if (Globals::isWithinMapBounds(AABB, m_mapSize))
+				if (m_plannedEntity.active)
 				{
-					m_plannedEntity.position = newPosition;
-				}
-
-				eAxisCollision axisCollision = m_translateObject.getCollisionType(mouseToGroundPosition);
-				switch (axisCollision)
-				{
-				case eAxisCollision::X:
-				case eAxisCollision::Z:
-					//m_translateObject.setPosition(axisCollision, mouseToGroundPosition);
-					break;
-				case eAxisCollision::None:
-					if (m_selectionBox.isActive())
+					glm::vec3 newPosition = Globals::convertToNodePosition(mouseToGroundPosition);
+					AABB AABB(newPosition, ModelManager::getInstance().getModel(m_plannedEntity.modelName));
+					if (Globals::isWithinMapBounds(AABB, m_mapSize))
 					{
-						m_selectionBox.setSize(mouseToGroundPosition);
-
-						if (m_selectionBox.isMinimumSize())
-						{
-							m_entityManager.selectEntities(m_selectionBox);
-						}
+						m_plannedEntity.position = newPosition;
 					}
-					break;
-				default:
-					assert(false);
+				}
+				else if(m_translateObject.isSelected())
+				{
+					const glm::vec3& position = m_translateObject.getCenterPosition();
+					if (m_translateObject.getAxisCollision() == eAxisCollision::X)
+					{
+						int xDifference = sf::Mouse::getPosition(window).x - window.getSize().x / 2;
+						int yDifference = window.getSize().y / 2 - sf::Mouse::getPosition(window).y;
+
+						m_translateObject.setPosition({ position.x + xDifference + yDifference, position.y, position.z });
+						sf::Mouse::setPosition(sf::Vector2i(window.getSize().x / 2, window.getSize().y / 2), window);
+					}
+					else if (m_translateObject.getAxisCollision() == eAxisCollision::Z)
+					{
+						int xDifference = sf::Mouse::getPosition(window).x - window.getSize().x / 2;
+						int yDifference = window.getSize().y / 2 - sf::Mouse::getPosition(window).y;
+
+						m_translateObject.setPosition({ position.x, position.y, position.z + xDifference + yDifference});
+						sf::Mouse::setPosition(sf::Vector2i(window.getSize().x / 2, window.getSize().y / 2), window);
+					}
 				}
 			}
 		}
@@ -403,7 +411,7 @@ void Level::renderPlayableArea(ShaderHandler& shaderHandler) const
 #ifdef RENDER_AABB
 void Level::renderAABB(ShaderHandler& shaderHandler)
 {
-	//m_translateObject.renderAABB(shaderHandler);
+	m_translateObject.renderAABB(shaderHandler);
 }
 #endif // RENDER_AABB
 
