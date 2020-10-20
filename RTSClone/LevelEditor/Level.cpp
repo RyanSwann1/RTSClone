@@ -71,8 +71,10 @@ namespace
 }
 
 Level::Level(const std::string& levelName)
-	: m_translateObject(),
-	m_levelName(levelName),
+	: m_levelName(levelName),
+	m_translateObject(),
+	m_selectionBox(),
+	m_playableAreaDisplay(),
 	m_entityManager(),
 	m_players(),
 	m_mapSize(DEFAULT_MAP_SIZE),

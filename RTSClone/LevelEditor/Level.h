@@ -46,10 +46,10 @@ public:
 private:
 	Level(const std::string& levelName);
 
+	const std::string m_levelName;
 	TranslateObject m_translateObject;
 	SelectionBox m_selectionBox;
 	PlayableAreaDisplay m_playableAreaDisplay;
-	const std::string m_levelName;
 	EntityManager m_entityManager;
 	std::vector<Player> m_players;
 	glm::ivec2 m_mapSize;

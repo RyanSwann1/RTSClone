@@ -29,6 +29,7 @@ public:
 
 	void resetAABB();
 #endif // LEVEL_EDITOR
+
 #ifdef GAME
 	eEntityType getEntityType() const;
 	int getMaximumHealth() const;
@@ -37,6 +38,7 @@ public:
 	bool isDead() const;
 	void repair();
 #endif // GAME
+
 	int getID() const;
 	const glm::vec3& getPosition() const;
 	const AABB& getAABB() const;
@@ -44,6 +46,7 @@ public:
 	
 	void setSelected(bool selected);
 	void render(ShaderHandler& shaderHandler) const;
+
 #ifdef RENDER_AABB
 	void renderAABB(ShaderHandler& shaderHandler);
 #endif // RENDER_AABB
