@@ -140,7 +140,7 @@ bool Camera::getMouseToGroundPosition(const sf::Window& window, glm::vec3& mouse
 	return groundFound;
 }
 
-void Camera::onMouseMove(const sf::Window& window, float deltaTime, glm::ivec2 lastMouseButtonPress)
+void Camera::onMouseMove(const sf::Window& window, float deltaTime)
 {
 	if (!sf::Keyboard::isKeyPressed(sf::Keyboard::LAlt))
 	{

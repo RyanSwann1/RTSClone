@@ -95,7 +95,6 @@ int main()
 	bool showGUIWindow = false;
 	eWindowState currentWindowState = eWindowState::None;
 	glm::ivec2 lastMousePosition = { 0, 0 };
-	glm::ivec2 lastMouseButtonPress = { 0, 0 };
 	bool mouseMoved = false;
 
 	std::cout << glGetError() << "\n";
@@ -125,10 +124,6 @@ int main()
 				{
 					window.close();
 				}
-				if (currentSFMLEvent.key.code == sf::Keyboard::LAlt)
-				{
-					camera.zoom(window, lastMousePosition);
-				}
 				break;
 			case sf::Event::MouseButtonPressed:
 				if (currentSFMLEvent.mouseButton.button == sf::Mouse::Button::Right)
@@ -154,7 +149,7 @@ int main()
 		if (mouseMoved)
 		{
 			mouseMoved = false;
-			camera.onMouseMove(window, deltaTime, lastMousePosition);
+			camera.onMouseMove(window, deltaTime);
 			window.setMouseCursorVisible(false);
 		}
 		camera.update(deltaTime, window, lastMousePosition);
