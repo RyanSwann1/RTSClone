@@ -7,7 +7,6 @@
 #include "Globals.h"
 #include "EntityManager.h"
 #include "LevelFileHandler.h"
-#include "PlayableAreaDisplay.h"
 #include "Player.h"
 #include "Level.h"
 #include <SFML/Graphics.hpp>
@@ -90,7 +89,6 @@ int main()
 	shaderHandler->setUniformMat4f(eShaderType::SelectionBox, "uOrthographic", glm::ortho(0.0f, static_cast<float>(windowSize.x),
 		static_cast<float>(windowSize.y), 0.0f));
 
-	PlayableAreaDisplay playableAreaDisplay;
 	std::unique_ptr<Level> level;
 	sf::Clock gameClock;
 	Camera camera;
@@ -283,13 +281,13 @@ int main()
 			case eWindowState::PlayerDetails:
 				if (level)
 				{
-					level->handlePlayerDetails(showGUIWindow);
+					level->handlePlayerDetailsGUI(showGUIWindow);
 				}	
 				break;
 			case eWindowState::LevelDetails:
 				if (level)
 				{
-					level->handleLevelDetails(showGUIWindow, playableAreaDisplay);
+					level->handleLevelDetailsGUI(showGUIWindow);
 				}
 				break;
 			case eWindowState::LoadLevel:
@@ -304,13 +302,10 @@ int main()
 							if (level)
 							{
 								LevelFileHandler::saveLevelToFile(*level);
-								playableAreaDisplay.setSize({ 0, 0 });
 								level.reset();	
 							}
 
 							level = Level::load(levelName);
-							assert(level);
-							playableAreaDisplay.setSize(level->getMapSize());
 						}
 					}
 				}
@@ -325,13 +320,10 @@ int main()
 					if (level)
 					{
 						LevelFileHandler::saveLevelToFile(*level);
-						playableAreaDisplay.setSize({ 0, 0 });
 						level.reset();
 					}
 			
 					level = Level::create(availableLevelName);
-					assert(level);
-					playableAreaDisplay.setSize(level->getMapSize());
 				}
 
 				currentWindowState = eWindowState::None;
@@ -346,7 +338,6 @@ int main()
 						{
 							if(level && level->getName() == levelName)
 							{
-								playableAreaDisplay.setSize({ 0, 0 });
 								level.reset();
 							}
 
@@ -393,7 +384,10 @@ int main()
 		shaderHandler->setUniformMat4f(eShaderType::Debug, "uView", view);
 		shaderHandler->setUniformMat4f(eShaderType::Debug, "uProjection", projection);
 
-		playableAreaDisplay.render(*shaderHandler);
+		if (level)
+		{
+			level->renderPlayableArea(*shaderHandler);
+		}
 
 #ifdef RENDER_AABB
 		if (level)

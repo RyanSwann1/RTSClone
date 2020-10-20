@@ -6,6 +6,7 @@
 #include "EntityManager.h"
 #include "TranslateObject.h"
 #include "SelectionBox.h"
+#include "PlayableAreaDisplay.h"
 #include <string>
 #include <vector>
 #include <SFML/Graphics.hpp>
@@ -29,11 +30,12 @@ public:
 	void addEntity(eModelName modelName, const glm::vec3& position);
 	void handleInput(const sf::Event& currentSFMLEvent, const Camera& camera, bool plannedEntityActive, 
 		const sf::Window& window, const Entity& plannedEntity);
-	void handlePlayerDetails(bool& showGUIWindow);
-	void handleLevelDetails(bool& showGUIWindow, PlayableAreaDisplay& playableAreaDisplay);
+	void handlePlayerDetailsGUI(bool& showGUIWindow);
+	void handleLevelDetailsGUI(bool& showGUIWindow);
 	void save() const;
 	void render(ShaderHandler& shaderHandler) const;
 	void renderSelectionBox(sf::Window& window) const;
+	void renderPlayableArea(ShaderHandler& shaderHandler) const;
 
 #ifdef RENDER_AABB
 	void renderAABB(ShaderHandler& shaderHandler);
@@ -46,6 +48,7 @@ private:
 
 	TranslateObject m_translateObject;
 	SelectionBox m_selectionBox;
+	PlayableAreaDisplay m_playableAreaDisplay;
 	const std::string m_levelName;
 	EntityManager m_entityManager;
 	std::vector<Player> m_players;

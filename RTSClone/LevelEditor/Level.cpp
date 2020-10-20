@@ -91,6 +91,8 @@ Level::Level(const std::string& levelName)
 
 		LevelFileHandler::saveLevelToFile(*this);
 	}
+
+	m_playableAreaDisplay.setSize(m_mapSize);
 }
 
 std::unique_ptr<Level> Level::create(const std::string& levelName)
@@ -186,7 +188,7 @@ void Level::handleInput(const sf::Event& currentSFMLEvent, const Camera& camera,
 					{
 						m_entityManager.addEntity(plannedEntity.getModelName(), plannedEntity.getPosition());
 					}
-					else if (!entitySelected)
+					else if (!entitySelected && m_translateObject.getCollisionType(mouseToGroundPosition) == eAxisCollision::None)
 					{
 						m_selectionBox.setStartingPosition(window, mouseToGroundPosition);
 					}
@@ -200,14 +202,26 @@ void Level::handleInput(const sf::Event& currentSFMLEvent, const Camera& camera,
 			glm::vec3 mouseToGroundPosition = { 0.0f, 0.0f, 0.0f };
 			if (camera.getMouseToGroundPosition(window, mouseToGroundPosition))
 			{
-				if (m_selectionBox.isActive())
+				eAxisCollision axisCollision = m_translateObject.getCollisionType(mouseToGroundPosition);
+				switch (axisCollision)
 				{
-					m_selectionBox.setSize(mouseToGroundPosition);
-
-					if (m_selectionBox.isMinimumSize())
+				case eAxisCollision::X:
+				case eAxisCollision::Z:
+					//m_translateObject.setPosition(axisCollision, mouseToGroundPosition);
+					break;
+				case eAxisCollision::None:
+					if (m_selectionBox.isActive())
 					{
-						m_entityManager.selectEntities(m_selectionBox);
+						m_selectionBox.setSize(mouseToGroundPosition);
+
+						if (m_selectionBox.isMinimumSize())
+						{
+							m_entityManager.selectEntities(m_selectionBox);
+						}
 					}
+					break;
+				default:
+					assert(false);
 				}
 			}
 		}
@@ -215,7 +229,7 @@ void Level::handleInput(const sf::Event& currentSFMLEvent, const Camera& camera,
 	}
 }
 
-void Level::handlePlayerDetails(bool& showGUIWindow)
+void Level::handlePlayerDetailsGUI(bool& showGUIWindow)
 {
 	ImGui::SetNextWindowPos(ImVec2(700, 700), ImGuiCond_FirstUseEver);
 	ImGui::Begin("Players", &showGUIWindow, ImGuiWindowFlags_None);
@@ -268,7 +282,7 @@ void Level::handlePlayerDetails(bool& showGUIWindow)
 	ImGui::End();
 }
 
-void Level::handleLevelDetails(bool& showGUIWindow, PlayableAreaDisplay& playableAreaDisplay)
+void Level::handleLevelDetailsGUI(bool& showGUIWindow)
 {
 	ImGui::Begin("Level Details", &showGUIWindow, ImGuiWindowFlags_None);
 	if (ImGui::InputInt("x", &m_mapSize.x, 1) ||
@@ -277,7 +291,7 @@ void Level::handleLevelDetails(bool& showGUIWindow, PlayableAreaDisplay& playabl
 		m_mapSize.x = glm::clamp(m_mapSize.x, 0, MAX_MAP_SIZE);
 		m_mapSize.y = glm::clamp(m_mapSize.y, 0, MAX_MAP_SIZE);
 
-		playableAreaDisplay.setSize(m_mapSize);
+		m_playableAreaDisplay.setSize(m_mapSize);
 	}
 	ImGui::Text("Starting Resources");
 	if (ImGui::InputInt("Resources", &m_factionStartingResources, 5))
@@ -323,10 +337,15 @@ void Level::renderSelectionBox(sf::Window& window) const
 	m_selectionBox.render(window);
 }
 
+void Level::renderPlayableArea(ShaderHandler& shaderHandler) const
+{
+	m_playableAreaDisplay.render(shaderHandler);
+}
+
 #ifdef RENDER_AABB
 void Level::renderAABB(ShaderHandler& shaderHandler)
 {
-	m_translateObject.renderAABB(shaderHandler);
+	//m_translateObject.renderAABB(shaderHandler);
 }
 #endif // RENDER_AABB
 

@@ -10,8 +10,8 @@
 #include "EntityType.h"
 #endif // GAME
 
-class ShaderHandler;
 struct Model;
+class ShaderHandler;
 class Map;
 class Entity : private NonCopyable
 {
