@@ -2,6 +2,12 @@
 #include "ModelManager.h"
 #include "EntityManager.h"
 
+namespace 
+{
+	constexpr glm::vec3 X_OFF_SET{ 10.0f, 0.0f, 0.0f };
+	constexpr glm::vec3 Z_OFF_SET{ 0.0f, 0.0f, -10.0f };
+}
+
 TranslateObject::TranslateObject()
 	: m_currentAxisSelected(eAxisCollision::None),
 	m_selected(false),
@@ -9,8 +15,8 @@ TranslateObject::TranslateObject()
 	m_xAABB(),
 	m_zAABB()
 {
-	m_xAABB.reset({ m_position.x - 25.0 / 2.0f, m_position.y, m_position.z }, { 25.0f, 5.0f, 5.0f });
-	m_zAABB.reset({ m_position.x, m_position.y, m_position.z + 25.0 / 2.0f }, { 5.0f, 5.0f, 25.0f });
+	m_xAABB.reset(m_position + X_OFF_SET, { 20.0f, 3.5f, 3.5f });
+	m_zAABB.reset(m_position + Z_OFF_SET, { 3.5f, 3.5f, 20.0f });
 }
 
 eAxisCollision TranslateObject::getCurrentAxisSelected() const
@@ -60,8 +66,8 @@ void TranslateObject::deselect()
 void TranslateObject::setPosition(const glm::vec3& position)
 {
 	m_position = position;
-	m_xAABB.update(m_position);
-	m_zAABB.update(m_position);
+	m_xAABB.update(m_position + X_OFF_SET);
+	m_zAABB.update(m_position + Z_OFF_SET);
 }
 
 void TranslateObject::render(ShaderHandler& shaderHandler, const EntityManager& entityManager) const

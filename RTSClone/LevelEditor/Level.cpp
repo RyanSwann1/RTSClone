@@ -267,6 +267,14 @@ void Level::handleInput(const sf::Event& currentSFMLEvent, const Camera& camera,
 					}
 						break;
 					}
+
+					Entity* selectedEntity = m_entityManager.getSelectedEntity();
+					if (selectedEntity)
+					{
+						glm::vec3 nodePosition = Globals::convertToNodePosition(m_translateObject.getPosition());
+						selectedEntity->setPosition(nodePosition);
+						selectedEntity->resetAABB();
+					}
 				}
 			}
 		}
