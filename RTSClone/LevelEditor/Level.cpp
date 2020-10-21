@@ -172,7 +172,6 @@ void Level::handleInput(const sf::Event& currentSFMLEvent, const Camera& camera,
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Delete))
 		{
 			m_entityManager.removeAllSelectedEntities();
-			m_translateObject.setActive(false);
 		}
 		break;
 	case sf::Event::MouseButtonReleased:
@@ -191,14 +190,11 @@ void Level::handleInput(const sf::Event& currentSFMLEvent, const Camera& camera,
 					const Entity* entitySelected = m_entityManager.selectEntityAtPosition(mouseToGroundPosition);
 					if (entitySelected)
 					{
-						m_translateObject.setActive(true);
 						m_translateObject.setPosition(entitySelected->getPosition());
 						m_plannedEntity.active = false;
 					}
 					else
 					{
-						m_translateObject.setActive(false);
-
 						if (m_plannedEntity.active)
 						{
 							m_entityManager.addEntity(m_plannedEntity.modelName, m_plannedEntity.position);
@@ -250,7 +246,7 @@ void Level::handleInput(const sf::Event& currentSFMLEvent, const Camera& camera,
 				}
 				else if(m_translateObject.isSelected())
 				{
-					const glm::vec3& position = m_translateObject.getCenterPosition();
+					const glm::vec3& position = m_translateObject.getPosition();
 					if (m_translateObject.getCurrentAxisSelected() == eAxisCollision::X)
 					{
 						glm::ivec2 vDifference = { sf::Mouse::getPosition(window).x - window.getSize().x / 2, 
@@ -399,7 +395,7 @@ void Level::render(ShaderHandler& shaderHandler) const
 		ModelManager::getInstance().getModel(m_plannedEntity.modelName).render(shaderHandler, m_plannedEntity.position);
 	}
 
-	m_translateObject.render(shaderHandler);
+	m_translateObject.render(shaderHandler, m_entityManager);
 }
 
 void Level::renderSelectionBox(sf::Window& window) const
@@ -415,7 +411,7 @@ void Level::renderPlayableArea(ShaderHandler& shaderHandler) const
 #ifdef RENDER_AABB
 void Level::renderAABB(ShaderHandler& shaderHandler)
 {
-	m_translateObject.renderAABB(shaderHandler);
+	m_translateObject.renderAABB(shaderHandler, m_entityManager);
 }
 #endif // RENDER_AABB
 

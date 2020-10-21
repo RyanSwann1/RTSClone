@@ -1,18 +1,17 @@
 #include "TranslateObject.h"
 #include "ModelManager.h"
+#include "EntityManager.h"
 
 TranslateObject::TranslateObject()
 	: m_currentAxisSelected(eAxisCollision::None),
 	m_selected(false),
 	m_active(false),
-	m_centerPosition(),
-	m_xPosition(),
+	m_position(),
 	m_xAABB(),
-	m_zPosition(),
 	m_zAABB()
 {
-	m_xAABB.reset({ m_centerPosition.x - 25.0 / 2.0f, m_centerPosition.y, m_centerPosition.z }, { 25.0f, 5.0f, 5.0f });
-	m_zAABB.reset({ m_centerPosition.x, m_centerPosition.y, m_centerPosition.z + 25.0 / 2.0f }, { 5.0f, 5.0f, 25.0f });
+	m_xAABB.reset({ m_position.x - 25.0 / 2.0f, m_position.y, m_position.z }, { 25.0f, 5.0f, 5.0f });
+	m_zAABB.reset({ m_position.x, m_position.y, m_position.z + 25.0 / 2.0f }, { 5.0f, 5.0f, 25.0f });
 }
 
 eAxisCollision TranslateObject::getCurrentAxisSelected() const
@@ -25,9 +24,9 @@ bool TranslateObject::isSelected() const
 	return m_selected;
 }
 
-const glm::vec3& TranslateObject::getCenterPosition() const
+const glm::vec3& TranslateObject::getPosition() const
 {
-	return m_centerPosition;
+	return m_position;
 }
 
 void TranslateObject::setSelected(bool selected, const glm::vec3& position)
@@ -53,30 +52,25 @@ void TranslateObject::deselect()
 	m_selected = false;
 }
 
-void TranslateObject::setActive(bool active)
-{
-	m_active = active;
-}
-
 void TranslateObject::setPosition(const glm::vec3& position)
 {
-	m_centerPosition = position;
-	m_xAABB.update(m_centerPosition);
-	m_zAABB.update(m_centerPosition);
+	m_position = position;
+	m_xAABB.update(m_position);
+	m_zAABB.update(m_position);
 }
 
-void TranslateObject::render(ShaderHandler& shaderHandler) const
+void TranslateObject::render(ShaderHandler& shaderHandler, const EntityManager& entityManager) const
 {
-	if (m_active)
+	if (entityManager.isEntitySelected())
 	{
-		ModelManager::getInstance().getModel(eModelName::TranslateObject).render(shaderHandler, m_centerPosition);
+		ModelManager::getInstance().getModel(eModelName::TranslateObject).render(shaderHandler, m_position);
 	}
 }
 
 #ifdef RENDER_AABB
-void TranslateObject::renderAABB(ShaderHandler& shaderHandler)
+void TranslateObject::renderAABB(ShaderHandler& shaderHandler, const EntityManager& entityManager)
 {
-	if (m_active)
+	if (entityManager.isEntitySelected())
 	{
 		m_xAABB.render(shaderHandler);
 		m_zAABB.render(shaderHandler);

@@ -13,6 +13,7 @@ enum class eAxisCollision
 	Z
 };
 
+class EntityManager;
 class ShaderHandler;
 class TranslateObject : private NonCopyable, private NonMovable
 {
@@ -21,25 +22,22 @@ public:
 
 	eAxisCollision getCurrentAxisSelected() const;
 	bool isSelected() const;
-	const glm::vec3& getCenterPosition() const;
+	const glm::vec3& getPosition() const;
 	
 	void setSelected(bool selected, const glm::vec3& position);
 	void deselect();
-	void setActive(bool active);
 	void setPosition(const glm::vec3& position);
-	void render(ShaderHandler& shaderHandler) const;
+	void render(ShaderHandler& shaderHandler, const EntityManager& entityManager) const;
 
 #ifdef RENDER_AABB
-	void renderAABB(ShaderHandler& shaderHandler);
+	void renderAABB(ShaderHandler& shaderHandler, const EntityManager& entityManager);
 #endif // RENDER_AABB
 
 private:
 	eAxisCollision m_currentAxisSelected;
 	bool m_selected;
 	bool m_active;
-	glm::vec3 m_centerPosition;
-	glm::vec3 m_xPosition;
+	glm::vec3 m_position;
 	AABB m_xAABB;
-	glm::vec3 m_zPosition;
 	AABB m_zAABB;
 };
