@@ -10,20 +10,11 @@
 
 namespace
 {
-	constexpr std::array<glm::vec3, static_cast<size_t>(eFactionController::Max) + 1> PLAYER_HQ_STARTING_POSITIONS =
-	{
-		glm::vec3(35.0f, Globals::GROUND_HEIGHT, 15.0f),
-		glm::vec3(35.0f, Globals::GROUND_HEIGHT, 150.0f),
-		glm::vec3(135.0f, Globals::GROUND_HEIGHT, 150.0f),
-		glm::vec3(135.0f, Globals::GROUND_HEIGHT, 15.0f)
-	};
-	constexpr std::array<glm::vec3, static_cast<size_t>(eFactionController::Max) + 1> PLAYER_MINERAL_STARTING_POSITIONS =
-	{
-		glm::vec3(70.0f, Globals::GROUND_HEIGHT, Globals::NODE_SIZE),
-		glm::vec3(70.0f, Globals::GROUND_HEIGHT, 150.0f),
-		glm::vec3(170.0f, Globals::GROUND_HEIGHT, 150.0f),
-		glm::vec3(170.0f, Globals::GROUND_HEIGHT, Globals::NODE_SIZE)
-	};
+	constexpr glm::vec3 PLAYER_HQ_STARTING_POSITION =
+		glm::vec3(4.0f * static_cast<float>(Globals::NODE_SIZE), Globals::GROUND_HEIGHT, 3.0f * static_cast<float>(Globals::NODE_SIZE));
+
+	constexpr glm::vec3 PLAYER_MINERAL_STARTING_POSITION =
+		glm::vec3(11.0f * static_cast<float>(Globals::NODE_SIZE), Globals::GROUND_HEIGHT, static_cast<float>(Globals::NODE_SIZE));
 
 	constexpr int MAX_MAP_SIZE = 60 * Globals::NODE_SIZE;
 	constexpr int DEFAULT_STARTING_RESOURCES = 100;
@@ -57,11 +48,8 @@ Level::Level(const std::string& levelName)
 
 	if (!LevelFileHandler::loadLevelFromFile(*this))
 	{
-		m_players.emplace_back(eFactionController::Player, PLAYER_HQ_STARTING_POSITIONS[static_cast<int>(eFactionController::Player)],
-			PLAYER_MINERAL_STARTING_POSITIONS[static_cast<int>(eFactionController::Player)]);
-
-		m_players.emplace_back(eFactionController::AI_1, PLAYER_HQ_STARTING_POSITIONS[static_cast<int>(eFactionController::AI_1)],
-			PLAYER_MINERAL_STARTING_POSITIONS[static_cast<int>(eFactionController::AI_1)]);
+		m_players.emplace_back(eFactionController::Player, PLAYER_HQ_STARTING_POSITION, PLAYER_MINERAL_STARTING_POSITION);
+		m_players.emplace_back(eFactionController::AI_1, PLAYER_HQ_STARTING_POSITION, PLAYER_MINERAL_STARTING_POSITION);
 
 		LevelFileHandler::saveLevelToFile(*this);
 	}
@@ -298,8 +286,7 @@ void Level::handlePlayersGUI()
 					assert(false);
 				}
 
-				m_players.emplace_back(factionController, PLAYER_HQ_STARTING_POSITIONS[newPlayerCount - 1],
-					PLAYER_MINERAL_STARTING_POSITIONS[newPlayerCount - 1]);
+				m_players.emplace_back(factionController, PLAYER_HQ_STARTING_POSITION, PLAYER_MINERAL_STARTING_POSITION);
 			}
 			else if (newPlayerCount < static_cast<int>(m_players.size()))
 			{
