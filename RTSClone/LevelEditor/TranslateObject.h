@@ -19,18 +19,16 @@ class TranslateObject : private NonCopyable, private NonMovable
 public:
 	TranslateObject();
 
-	eAxisCollision getAxisCollision() const;
+	eAxisCollision getCurrentAxisSelected() const;
 	bool isSelected() const;
-	bool isSelected(const glm::vec3& position) const;
 	const glm::vec3& getCenterPosition() const;
-	eAxisCollision getCollisionType(const glm::vec3& mouseToGroundPosition) const;
 	
 	void setSelected(bool selected, const glm::vec3& position);
-	void setSelected(bool selected);
+	void deselect();
 	void setActive(bool active);
 	void setPosition(const glm::vec3& position);
-	void setPosition(eAxisCollision axisCollision, const glm::vec3& position);
 	void render(ShaderHandler& shaderHandler) const;
+
 #ifdef RENDER_AABB
 	void renderAABB(ShaderHandler& shaderHandler);
 #endif // RENDER_AABB
