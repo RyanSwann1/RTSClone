@@ -37,7 +37,6 @@ public:
 private:
 	eAxisCollision m_currentAxisSelected;
 	bool m_selected;
-	bool m_active;
 	glm::vec3 m_position;
 	AABB m_xAABB;
 	AABB m_zAABB;

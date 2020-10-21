@@ -5,7 +5,6 @@
 TranslateObject::TranslateObject()
 	: m_currentAxisSelected(eAxisCollision::None),
 	m_selected(false),
-	m_active(false),
 	m_position(),
 	m_xAABB(),
 	m_zAABB()
