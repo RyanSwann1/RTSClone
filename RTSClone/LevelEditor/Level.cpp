@@ -236,19 +236,17 @@ void Level::handleInput(const sf::Event& currentSFMLEvent, const Camera& camera,
 					{
 					case eAxisCollision::X:
 					{
-						glm::ivec2 vDifference = { sf::Mouse::getPosition(window).x - window.getSize().x / 2,
-							window.getSize().y / 2 - sf::Mouse::getPosition(window).y };
+						int xDifference = window.getSize().y / 2 - sf::Mouse::getPosition(window).y;
 
-						m_translateObject.setPosition({ position.x + vDifference.x + vDifference.y, position.y, position.z });
+						m_translateObject.setPosition({ position.x + static_cast<float>(xDifference) * 0.4f, position.y, position.z });
 						sf::Mouse::setPosition(sf::Vector2i(window.getSize().x / 2, window.getSize().y / 2), window);
 					}
 						break;
 					case eAxisCollision::Z:
 					{
-						glm::ivec2 vDifference = { sf::Mouse::getPosition(window).x - window.getSize().x / 2,
-							window.getSize().y / 2 - sf::Mouse::getPosition(window).y };
+						int zDifference = sf::Mouse::getPosition(window).x - window.getSize().x / 2;
 
-						m_translateObject.setPosition({ position.x, position.y, position.z + vDifference.x + vDifference.y });
+						m_translateObject.setPosition({ position.x, position.y, position.z + static_cast<float>(zDifference) * 0.4f});
 						sf::Mouse::setPosition(sf::Vector2i(window.getSize().x / 2, window.getSize().y / 2), window);
 					}
 						break;

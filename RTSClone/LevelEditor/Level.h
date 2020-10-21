@@ -5,7 +5,6 @@
 #include "Player.h"
 #include "EntityManager.h"
 #include "TranslateObject.h"
-#include "SelectionBox.h"
 #include "PlayableAreaDisplay.h"
 #include <string>
 #include <vector>
