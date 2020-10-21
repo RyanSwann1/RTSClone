@@ -193,27 +193,20 @@ void Level::handleInput(const sf::Event& currentSFMLEvent, const Camera& camera,
 					{
 						m_translateObject.setActive(true);
 						m_translateObject.setPosition(entitySelected->getPosition());
+						m_plannedEntity.active = false;
 					}
 					else
 					{
 						m_translateObject.setActive(false);
-					}
-					if (m_plannedEntity.active && !entitySelected)
-					{
-						m_entityManager.addEntity(m_plannedEntity.modelName, m_plannedEntity.position);
-					}
-					else if (!entitySelected && m_translateObject.getCollisionType(mouseToGroundPosition) == eAxisCollision::None)
-					{
-						m_selectionBox.setStartingPosition(window, mouseToGroundPosition);
-					}
-					
-					if (m_plannedEntity.active && getEntityManager().isEntitySelected())
-					{
-						addEntity(m_plannedEntity.modelName, m_plannedEntity.position);
-					}
-					else
-					{
-						m_plannedEntity.active = false;
+
+						if (m_plannedEntity.active)
+						{
+							m_entityManager.addEntity(m_plannedEntity.modelName, m_plannedEntity.position);
+						}
+						else if (m_translateObject.getCollisionType(mouseToGroundPosition) == eAxisCollision::None)
+						{
+							m_selectionBox.setStartingPosition(window, mouseToGroundPosition);
+						}
 					}
 
 					if (m_translateObject.isSelected(mouseToGroundPosition))
@@ -244,23 +237,31 @@ void Level::handleInput(const sf::Event& currentSFMLEvent, const Camera& camera,
 						m_plannedEntity.position = newPosition;
 					}
 				}
+				else if (m_selectionBox.isActive())
+				{
+					m_selectionBox.setSize(mouseToGroundPosition);
+					if (m_selectionBox.isMinimumSize())
+					{
+						m_entityManager.selectEntities(m_selectionBox);
+					}
+				}
 				else if(m_translateObject.isSelected())
 				{
 					const glm::vec3& position = m_translateObject.getCenterPosition();
 					if (m_translateObject.getAxisCollision() == eAxisCollision::X)
 					{
-						int xDifference = sf::Mouse::getPosition(window).x - window.getSize().x / 2;
-						int yDifference = window.getSize().y / 2 - sf::Mouse::getPosition(window).y;
+						glm::ivec2 vDifference = { sf::Mouse::getPosition(window).x - window.getSize().x / 2, 
+							window.getSize().y / 2 - sf::Mouse::getPosition(window).y };
 
-						m_translateObject.setPosition({ position.x + xDifference + yDifference, position.y, position.z });
+						m_translateObject.setPosition({ position.x + vDifference.x + vDifference.y, position.y, position.z });
 						sf::Mouse::setPosition(sf::Vector2i(window.getSize().x / 2, window.getSize().y / 2), window);
 					}
 					else if (m_translateObject.getAxisCollision() == eAxisCollision::Z)
 					{
-						int xDifference = sf::Mouse::getPosition(window).x - window.getSize().x / 2;
-						int yDifference = window.getSize().y / 2 - sf::Mouse::getPosition(window).y;
+						glm::ivec2 vDifference = { sf::Mouse::getPosition(window).x - window.getSize().x / 2,
+							window.getSize().y / 2 - sf::Mouse::getPosition(window).y };
 
-						m_translateObject.setPosition({ position.x, position.y, position.z + xDifference + yDifference});
+						m_translateObject.setPosition({ position.x, position.y, position.z + vDifference.x + vDifference.y});
 						sf::Mouse::setPosition(sf::Vector2i(window.getSize().x / 2, window.getSize().y / 2), window);
 					}
 				}
