@@ -19,7 +19,6 @@
 enum class eWindowState
 {
 	None,
-	PlayerDetails,
 	LevelDetails,
 	LoadLevel,
 	CreateLevel,
@@ -167,11 +166,6 @@ int main()
 			{
 				if (ImGui::BeginMenu("File"))
 				{
-					if (level && ImGui::MenuItem("Player Details"))
-					{
-						showGUIWindow = true;
-						currentWindowState = eWindowState::PlayerDetails;
-					}
 					if (level && ImGui::MenuItem("Level Details"))
 					{
 						showGUIWindow = true;
@@ -212,6 +206,7 @@ int main()
 			if (level)
 			{
 				level->handleModelNamesGUI();
+				level->handlePlayersGUI();
 			}
 		}
 		ImGui::End();
@@ -221,12 +216,6 @@ int main()
 			switch (currentWindowState)
 			{
 			case eWindowState::None:
-				break;
-			case eWindowState::PlayerDetails:
-				if (level)
-				{
-					level->handlePlayerDetailsGUI(showGUIWindow);
-				}	
 				break;
 			case eWindowState::LevelDetails:
 				if (level)

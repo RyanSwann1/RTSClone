@@ -10,46 +10,6 @@
 
 namespace
 {
-	void showPlayerDetails(Player& player, const std::string& playerName, const std::string& playerType, int ID)
-	{
-		ImGui::PushID(ID); // Use object uid as identifier. Most commonly you could also use the object pointer as a base ID.
-		ImGui::AlignTextToFramePadding();  // Text and Tree nodes are less high than regular widgets, here we add vertical spacing to make the tree lines equal high.
-		bool nodeOpen = ImGui::TreeNode(playerName.c_str(), "%s_%u", playerType.c_str(), ID);
-		ImGui::NextColumn();
-		ImGui::AlignTextToFramePadding();
-		ImGui::NextColumn();
-		if (nodeOpen)
-		{
-			ImGui::PushID(0);
-			ImGui::AlignTextToFramePadding();
-			ImGui::TreeNodeEx("HQ", ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_NoTreePushOnOpen | ImGuiTreeNodeFlags_Bullet);
-			ImGui::NextColumn();
-			if (ImGui::InputFloat("x", &player.HQ.getPosition().x, Globals::NODE_SIZE) ||
-				ImGui::InputFloat("z", &player.HQ.getPosition().z, Globals::NODE_SIZE))
-			{
-				player.HQ.resetAABB();
-			}
-			ImGui::PopID();
-
-			for (int i = 0; i < player.minerals.size(); ++i)
-			{
-				ImGui::PushID(i + 1);
-				ImGui::AlignTextToFramePadding();
-				ImGui::TreeNodeEx("Mineral", ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_NoTreePushOnOpen | ImGuiTreeNodeFlags_Bullet, "Mineral_%d", i + 1);
-				ImGui::NextColumn();
-				if (ImGui::InputFloat("x", &player.minerals[i].getPosition().x, Globals::NODE_SIZE) ||
-					ImGui::InputFloat("z", &player.minerals[i].getPosition().z, Globals::NODE_SIZE))
-				{
-					player.minerals[i].resetAABB();
-				}
-				ImGui::PopID();
-			}
-
-			ImGui::TreePop();
-		}
-		ImGui::PopID();
-	}
-
 	constexpr std::array<glm::vec3, static_cast<size_t>(eFactionController::Max) + 1> PLAYER_HQ_STARTING_POSITIONS =
 	{
 		glm::vec3(35.0f, Globals::GROUND_HEIGHT, 15.0f),
@@ -277,21 +237,18 @@ void Level::handleModelNamesGUI()
 	{
 		if (ImGui::Selectable(modelNames[i].c_str(), m_plannedEntity.modelNameIDSelected == i))
 		{
-			m_plannedEntity.modelNameIDSelected;
+			m_plannedEntity.modelNameIDSelected = i;
 			m_plannedEntity.modelName = ModelManager::getInstance().getModelName(modelNames[i]);
 			m_plannedEntity.active = true;
 		}
 	}
 
 	ImGui::EndChild();
-	ImGui::SameLine();
 }
 
-void Level::handlePlayerDetailsGUI(bool& showGUIWindow)
+void Level::handlePlayersGUI()
 {
-	ImGui::SetNextWindowPos(ImVec2(700, 700), ImGuiCond_FirstUseEver);
-	ImGui::Begin("Players", &showGUIWindow, ImGuiWindowFlags_None);
-	ImGui::BeginChild("Players One");
+	ImGui::BeginChild("Players Quantity", ImVec2(175, 40), true);
 
 	int newPlayerCount = static_cast<int>(m_players.size());
 	if (ImGui::InputInt("Player Amount", &newPlayerCount, 1, ImGuiInputTextFlags_ReadOnly))
@@ -323,21 +280,29 @@ void Level::handlePlayerDetailsGUI(bool& showGUIWindow)
 		}
 	};
 
+	ImGui::EndChild();
+	
+	ImGui::BeginChild("Players Details", ImVec2(175, 275), true);
 	for (int i = 0; i < static_cast<int>(m_players.size()); ++i)
 	{
-		if (i == 0)
+		if (m_players[i].controller == eFactionController::Player)
 		{
-			showPlayerDetails(m_players[i], "Player", "Human", i);
+			ImGui::Text(std::string("Player " + std::to_string(i)).c_str());
 
 		}
 		else
 		{
-			showPlayerDetails(m_players[i], "Player", "AI", i);
+			ImGui::Text(std::string("AI " + std::to_string(i)).c_str());
+		}
+
+		if (ImGui::InputFloat("x", &m_players[i].HQ.getPosition().x, Globals::NODE_SIZE) ||
+			ImGui::InputFloat("z", &m_players[i].HQ.getPosition().z, Globals::NODE_SIZE))
+		{
+			m_players[i].HQ.resetAABB();
 		}
 	}
 
 	ImGui::EndChild();
-	ImGui::End();
 }
 
 void Level::handleLevelDetailsGUI(bool& showGUIWindow)

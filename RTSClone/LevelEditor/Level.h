@@ -38,7 +38,7 @@ public:
 	void addEntity(eModelName modelName, const glm::vec3& position);
 	void handleInput(const sf::Event& currentSFMLEvent, const Camera& camera, const sf::Window& window, float deltaTime);
 	void handleModelNamesGUI();
-	void handlePlayerDetailsGUI(bool& showGUIWindow);
+	void handlePlayersGUI();
 	void handleLevelDetailsGUI(bool& showGUIWindow);
 	void save() const;
 	void render(ShaderHandler& shaderHandler) const;
