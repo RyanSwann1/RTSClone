@@ -67,6 +67,7 @@ const std::ifstream& operator>>(std::ifstream& file, Player& player)
 		{
 		case eModelName::HQ:
 			player.HQ.setPosition(position);
+			player.HQ.resetAABB();
 			break;
 		case eModelName::Mineral:
 		{
@@ -75,6 +76,7 @@ const std::ifstream& operator>>(std::ifstream& file, Player& player)
 			assert(mineralIndex >= 0 && mineralIndex < player.minerals.size());
 
 			player.minerals[mineralIndex].setPosition(position);
+			player.minerals[mineralIndex].resetAABB();
 		}
 		break;
 		}
