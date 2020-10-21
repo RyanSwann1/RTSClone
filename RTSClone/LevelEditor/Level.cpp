@@ -69,6 +69,7 @@ namespace
 	constexpr int DEFAULT_STARTING_RESOURCES = 100;
 	constexpr int DEFAULT_STARTING_POPULATION = 5;
 	constexpr glm::ivec2 DEFAULT_MAP_SIZE = { 30, 30 };
+	constexpr float ENTITY_TRANSLATE_SPEED = 5.0f;
 }
 
 //PlannedEntity
@@ -163,7 +164,7 @@ void Level::addEntity(eModelName modelName, const glm::vec3& position)
 	m_entityManager.addEntity(modelName, position);
 }
 
-void Level::handleInput(const sf::Event& currentSFMLEvent, const Camera& camera, const sf::Window& window)
+void Level::handleInput(const sf::Event& currentSFMLEvent, const Camera& camera, const sf::Window& window, float deltaTime)
 {
 	switch (currentSFMLEvent.type)
 	{
@@ -238,7 +239,7 @@ void Level::handleInput(const sf::Event& currentSFMLEvent, const Camera& camera,
 					{
 						int xDifference = window.getSize().y / 2 - sf::Mouse::getPosition(window).y;
 
-						m_translateObject.setPosition({ position.x + static_cast<float>(xDifference) * 0.4f, position.y, position.z });
+						m_translateObject.setPosition({ position.x + static_cast<float>(xDifference) * ENTITY_TRANSLATE_SPEED * deltaTime, position.y, position.z });
 						sf::Mouse::setPosition(sf::Vector2i(window.getSize().x / 2, window.getSize().y / 2), window);
 					}
 						break;
@@ -246,7 +247,7 @@ void Level::handleInput(const sf::Event& currentSFMLEvent, const Camera& camera,
 					{
 						int zDifference = sf::Mouse::getPosition(window).x - window.getSize().x / 2;
 
-						m_translateObject.setPosition({ position.x, position.y, position.z + static_cast<float>(zDifference) * 0.4f});
+						m_translateObject.setPosition({ position.x, position.y, position.z + static_cast<float>(zDifference) * ENTITY_TRANSLATE_SPEED * deltaTime});
 						sf::Mouse::setPosition(sf::Vector2i(window.getSize().x / 2, window.getSize().y / 2), window);
 					}
 						break;

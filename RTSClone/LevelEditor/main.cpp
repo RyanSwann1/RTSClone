@@ -111,7 +111,7 @@ int main()
 		{
 			if (level)
 			{
-				level->handleInput(currentSFMLEvent, camera, window);
+				level->handleInput(currentSFMLEvent, camera, window, deltaTime);
 			}
 
 			switch (currentSFMLEvent.type)
