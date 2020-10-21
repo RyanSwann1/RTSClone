@@ -43,7 +43,6 @@ public:
 	void handleLevelDetailsGUI(bool& showGUIWindow);
 	void save() const;
 	void render(ShaderHandler& shaderHandler) const;
-	void renderSelectionBox(sf::Window& window) const;
 	void renderPlayableArea(ShaderHandler& shaderHandler) const;
 
 #ifdef RENDER_AABB
@@ -58,7 +57,6 @@ private:
 	const std::string m_levelName;
 	PlannedEntity m_plannedEntity;
 	TranslateObject m_translateObject;
-	SelectionBox m_selectionBox;
 	PlayableAreaDisplay m_playableAreaDisplay;
 	EntityManager m_entityManager;
 	std::vector<Player> m_players;

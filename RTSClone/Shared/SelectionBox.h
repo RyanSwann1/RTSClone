@@ -15,10 +15,14 @@ public:
 	bool isActive() const;
 	bool isMinimumSize() const;
 
-	void setStartingPosition(const sf::Window& window, const glm::vec3& mouseToGroundPosition);
-	void setSize(const glm::vec3& mouseToGroundPosition);
+	void setStartingPosition(const sf::Window& window, const glm::vec3& position);
+	void setSize(const glm::vec3& position);
 	void reset();
 	void render(const sf::Window& window) const;
+
+#ifdef RENDER_AABB
+	void renderAABB(ShaderHandler& shaderHandler);
+#endif // RENDER_AABB
 
 private:
 	AABB m_AABB;

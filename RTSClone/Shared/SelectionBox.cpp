@@ -57,16 +57,28 @@ bool SelectionBox::isMinimumSize() const
         (m_AABB.getForward() - m_AABB.getBack() >= MINIMUM_SIZE);
 }
 
-void SelectionBox::setStartingPosition(const sf::Window& window, const glm::vec3& mouseToGroundPosition)
+void SelectionBox::setStartingPosition(const sf::Window& window, const glm::vec3& position)
 {
-    m_worldStartingPosition = mouseToGroundPosition;
+    m_worldStartingPosition = position;
     m_screenStartingPosition = { sf::Mouse::getPosition(window).x, sf::Mouse::getPosition(window).y };
     m_active = true;
 }
 
-void SelectionBox::setSize(const glm::vec3& mouseToGroundPosition)
+void SelectionBox::setSize(const glm::vec3& position)
 {
-    m_AABB.reset(m_worldStartingPosition, mouseToGroundPosition - m_worldStartingPosition);
+    glm::vec3 startingPosition = {
+        glm::min(m_worldStartingPosition.x, position.x),
+        m_worldStartingPosition.y,
+        glm::min(m_worldStartingPosition.z, position.z) 
+    };
+
+    glm::vec3 size = {
+        std::abs(position.x - m_worldStartingPosition.x),
+        m_worldStartingPosition.y, 
+        std::abs(position.z - m_worldStartingPosition.z)
+    };
+
+    m_AABB.reset(startingPosition, size);
 }
 
 void SelectionBox::reset()
@@ -91,5 +103,13 @@ void SelectionBox::render(const sf::Window& window) const
         glVertexAttribPointer(0, 2, GL_INT, GL_FALSE, sizeof(glm::ivec2), (const void*)0);
 
         glDrawArrays(GL_TRIANGLES, 0, 6);
+    }
+}
+
+void SelectionBox::renderAABB(ShaderHandler& shaderHandler)
+{
+    if (m_active && isMinimumSize())
+    {
+        m_AABB.render(shaderHandler);
     }
 }

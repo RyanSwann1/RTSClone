@@ -335,12 +335,6 @@ int main()
 		}
 #endif // RENDER_AABB
 
-		if (level)
-		{
-			shaderHandler->switchToShader(eShaderType::SelectionBox);
-			level->renderSelectionBox(window);
-		}
-
 		glDisable(GL_BLEND);
 		glEnable(GL_DEPTH_TEST);
 

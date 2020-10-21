@@ -84,7 +84,6 @@ Level::Level(const std::string& levelName)
 	: m_levelName(levelName),
 	m_plannedEntity(),
 	m_translateObject(),
-	m_selectionBox(),
 	m_playableAreaDisplay(),
 	m_entityManager(),
 	m_players(),
@@ -176,7 +175,6 @@ void Level::handleInput(const sf::Event& currentSFMLEvent, const Camera& camera,
 		break;
 	case sf::Event::MouseButtonReleased:
 		m_translateObject.deselect();
-		m_selectionBox.reset();
 		break;
 	case sf::Event::MouseButtonPressed:
 	{
@@ -206,10 +204,6 @@ void Level::handleInput(const sf::Event& currentSFMLEvent, const Camera& camera,
 							{
 								m_entityManager.addEntity(m_plannedEntity.modelName, m_plannedEntity.position);
 							}
-							else if (!m_translateObject.isSelected())
-							{
-								m_selectionBox.setStartingPosition(window, mouseToGroundPosition);
-							}
 						}
 					}
 				}
@@ -233,23 +227,6 @@ void Level::handleInput(const sf::Event& currentSFMLEvent, const Camera& camera,
 					if (Globals::isWithinMapBounds(AABB, m_mapSize))
 					{
 						m_plannedEntity.position = newPosition;
-					}
-				}
-				else if (m_selectionBox.isActive())
-				{
-					m_selectionBox.setSize(mouseToGroundPosition);
-					if (m_selectionBox.isMinimumSize())
-					{
-						m_entityManager.selectEntities(m_selectionBox);
-						if (m_entityManager.isEntitySelected())
-						{
-							const Entity* selectedEntity = m_entityManager.getSelectedEntity();
-							assert(selectedEntity);
-							if (selectedEntity)
-							{
-								m_translateObject.setPosition(selectedEntity->getPosition());
-							}
-						}
 					}
 				}
 				else if(m_translateObject.isSelected())
@@ -417,11 +394,6 @@ void Level::render(ShaderHandler& shaderHandler) const
 	}
 
 	m_translateObject.render(shaderHandler, m_entityManager);
-}
-
-void Level::renderSelectionBox(sf::Window& window) const
-{
-	m_selectionBox.render(window);
 }
 
 void Level::renderPlayableArea(ShaderHandler& shaderHandler) const
