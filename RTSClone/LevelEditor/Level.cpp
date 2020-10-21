@@ -241,6 +241,15 @@ void Level::handleInput(const sf::Event& currentSFMLEvent, const Camera& camera,
 					if (m_selectionBox.isMinimumSize())
 					{
 						m_entityManager.selectEntities(m_selectionBox);
+						if (m_entityManager.isEntitySelected())
+						{
+							const Entity* selectedEntity = m_entityManager.getSelectedEntity();
+							assert(selectedEntity);
+							if (selectedEntity)
+							{
+								m_translateObject.setPosition(selectedEntity->getPosition());
+							}
+						}
 					}
 				}
 				else if(m_translateObject.isSelected())
