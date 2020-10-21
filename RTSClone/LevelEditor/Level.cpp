@@ -295,9 +295,19 @@ void Level::handlePlayersGUI()
 			ImGui::Text(std::string("AI " + std::to_string(i)).c_str());
 		}
 
-		if (ImGui::InputFloat("x", &m_players[i].HQ.getPosition().x, Globals::NODE_SIZE) ||
-			ImGui::InputFloat("z", &m_players[i].HQ.getPosition().z, Globals::NODE_SIZE))
+		glm::vec3 playerPosition = m_players[i].HQ.getPosition();
+		if (ImGui::InputFloat("x", &playerPosition.x, Globals::NODE_SIZE) ||
+			ImGui::InputFloat("z", &playerPosition.z, Globals::NODE_SIZE))
 		{
+			for (auto& mineral : m_players[i].minerals)
+			{
+				glm::vec3 vDifference = playerPosition - m_players[i].HQ.getPosition();
+				const glm::vec3& mineralPosition = mineral.getPosition();
+				mineral.setPosition({ mineralPosition.x + vDifference.x, mineralPosition.y + vDifference.y, mineralPosition.z + vDifference.z });
+				mineral.resetAABB();
+			}
+
+			m_players[i].HQ.setPosition(playerPosition);
 			m_players[i].HQ.resetAABB();
 		}
 	}
