@@ -28,10 +28,10 @@ public:
 	void setSelected(bool selected, const glm::vec3& position);
 	void deselect();
 	void setPosition(const glm::vec3& position);
-	void render(ShaderHandler& shaderHandler, const EntityManager& entityManager) const;
+	void render(ShaderHandler& shaderHandler, bool active) const;
 
 #ifdef RENDER_AABB
-	void renderAABB(ShaderHandler& shaderHandler, const EntityManager& entityManager);
+	void renderAABB(ShaderHandler& shaderHandler, bool active);
 #endif // RENDER_AABB
 
 private:

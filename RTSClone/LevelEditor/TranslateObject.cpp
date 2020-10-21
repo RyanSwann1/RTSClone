@@ -70,18 +70,18 @@ void TranslateObject::setPosition(const glm::vec3& position)
 	m_zAABB.update(m_position + Z_OFF_SET);
 }
 
-void TranslateObject::render(ShaderHandler& shaderHandler, const EntityManager& entityManager) const
+void TranslateObject::render(ShaderHandler& shaderHandler, bool active) const
 {
-	if (entityManager.isEntitySelected())
+	if (active)
 	{
 		ModelManager::getInstance().getModel(eModelName::TranslateObject).render(shaderHandler, m_position);
 	}
 }
 
 #ifdef RENDER_AABB
-void TranslateObject::renderAABB(ShaderHandler& shaderHandler, const EntityManager& entityManager)
+void TranslateObject::renderAABB(ShaderHandler& shaderHandler, bool active)
 {
-	if (entityManager.isEntitySelected())
+	if (active)
 	{
 		m_xAABB.render(shaderHandler);
 		m_zAABB.render(shaderHandler);

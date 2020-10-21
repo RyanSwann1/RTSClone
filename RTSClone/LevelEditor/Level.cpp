@@ -48,6 +48,7 @@ Level::Level(const std::string& levelName)
 	m_playableAreaDisplay(),
 	m_entityManager(),
 	m_players(),
+	m_selectedPlayer(nullptr),
 	m_mapSize(DEFAULT_MAP_SIZE),
 	m_factionStartingResources(DEFAULT_STARTING_RESOURCES),
 	m_factionStartingPopulation(DEFAULT_STARTING_POPULATION)
@@ -146,7 +147,8 @@ void Level::handleInput(const sf::Event& currentSFMLEvent, const Camera& camera,
 				glm::vec3 mouseToGroundPosition = { 0.0f, 0.0f, 0.0f };
 				if (camera.getMouseToGroundPosition(window, mouseToGroundPosition))
 				{
-					if (m_entityManager.isEntitySelected() && m_translateObject.isSelected(mouseToGroundPosition))
+					if (m_translateObject.isSelected(mouseToGroundPosition) &&
+						(m_entityManager.isEntitySelected() || m_selectedPlayer))
 					{
 						m_translateObject.setSelected(true, mouseToGroundPosition);
 						sf::Mouse::setPosition(sf::Vector2i(window.getSize().x / 2, window.getSize().y / 2), window);
@@ -164,6 +166,20 @@ void Level::handleInput(const sf::Event& currentSFMLEvent, const Camera& camera,
 							if (m_plannedEntity.active)
 							{
 								m_entityManager.addEntity(m_plannedEntity.modelName, m_plannedEntity.position);
+							}
+							else
+							{
+								m_selectedPlayer = nullptr;
+
+								auto player = std::find_if(m_players.begin(), m_players.end(), [&mouseToGroundPosition](const auto& player)
+								{
+									return player.HQ.getAABB().contains(mouseToGroundPosition);
+								});
+								if (player != m_players.cend())
+								{
+									m_translateObject.setPosition(player->HQ.getPosition());
+									m_selectedPlayer = &(*player);
+								}
 							}
 						}
 					}
@@ -219,6 +235,18 @@ void Level::handleInput(const sf::Event& currentSFMLEvent, const Camera& camera,
 						glm::vec3 nodePosition = Globals::convertToNodePosition(m_translateObject.getPosition());
 						selectedEntity->setPosition(nodePosition);
 						selectedEntity->resetAABB();
+					}
+					else if (m_selectedPlayer)
+					{
+						glm::vec3 nodePosition = Globals::convertToNodePosition(m_translateObject.getPosition());
+						for (auto& mineral : m_selectedPlayer->minerals)
+						{
+							mineral.setPosition(mineral.getPosition() + nodePosition - m_selectedPlayer->HQ.getPosition());
+							mineral.resetAABB();
+						}
+
+						m_selectedPlayer->HQ.setPosition(nodePosition);
+						m_selectedPlayer->HQ.resetAABB();
 					}
 				}
 			}
@@ -288,7 +316,6 @@ void Level::handlePlayersGUI()
 		if (m_players[i].controller == eFactionController::Player)
 		{
 			ImGui::Text(std::string("Player " + std::to_string(i)).c_str());
-
 		}
 		else
 		{
@@ -367,7 +394,7 @@ void Level::render(ShaderHandler& shaderHandler) const
 		ModelManager::getInstance().getModel(m_plannedEntity.modelName).render(shaderHandler, m_plannedEntity.position);
 	}
 
-	m_translateObject.render(shaderHandler, m_entityManager);
+	m_translateObject.render(shaderHandler, m_entityManager.isEntitySelected() || m_selectedPlayer);
 }
 
 void Level::renderPlayableArea(ShaderHandler& shaderHandler) const
@@ -378,7 +405,7 @@ void Level::renderPlayableArea(ShaderHandler& shaderHandler) const
 #ifdef RENDER_AABB
 void Level::renderAABB(ShaderHandler& shaderHandler)
 {
-	m_translateObject.renderAABB(shaderHandler, m_entityManager);
+	m_translateObject.renderAABB(shaderHandler, m_entityManager.isEntitySelected() || m_selectedPlayer);
 }
 #endif // RENDER_AABB
 

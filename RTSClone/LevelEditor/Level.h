@@ -59,6 +59,7 @@ private:
 	PlayableAreaDisplay m_playableAreaDisplay;
 	EntityManager m_entityManager;
 	std::vector<Player> m_players;
+	Player* m_selectedPlayer;
 	glm::ivec2 m_mapSize;
 	int m_factionStartingResources;
 	int m_factionStartingPopulation;
