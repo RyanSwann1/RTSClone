@@ -187,30 +187,29 @@ void Level::handleInput(const sf::Event& currentSFMLEvent, const Camera& camera,
 				glm::vec3 mouseToGroundPosition = { 0.0f, 0.0f, 0.0f };
 				if (camera.getMouseToGroundPosition(window, mouseToGroundPosition))
 				{
-					const Entity* entitySelected = m_entityManager.selectEntityAtPosition(mouseToGroundPosition);
-					if (entitySelected)
+					if (m_entityManager.isEntitySelected() && m_translateObject.isSelected(mouseToGroundPosition))
 					{
-						m_translateObject.setPosition(entitySelected->getPosition());
-						m_plannedEntity.active = false;
+						m_translateObject.setSelected(true, mouseToGroundPosition);
+						sf::Mouse::setPosition(sf::Vector2i(window.getSize().x / 2, window.getSize().y / 2), window);
 					}
 					else
 					{
-						if (m_plannedEntity.active)
+						const Entity* entitySelected = m_entityManager.selectEntityAtPosition(mouseToGroundPosition);
+						if (entitySelected)
 						{
-							m_entityManager.addEntity(m_plannedEntity.modelName, m_plannedEntity.position);
+							m_translateObject.setPosition(entitySelected->getPosition());
+							m_plannedEntity.active = false;
 						}
-						else if (!m_translateObject.isSelected())
+						else
 						{
-							m_selectionBox.setStartingPosition(window, mouseToGroundPosition);
-						}
-					}
-
-					if (m_entityManager.isEntitySelected())
-					{
-						m_translateObject.setSelected(true, mouseToGroundPosition);
-						if (m_translateObject.isSelected())
-						{
-							sf::Mouse::setPosition(sf::Vector2i(window.getSize().x / 2, window.getSize().y / 2), window);
+							if (m_plannedEntity.active)
+							{
+								m_entityManager.addEntity(m_plannedEntity.modelName, m_plannedEntity.position);
+							}
+							else if (!m_translateObject.isSelected())
+							{
+								m_selectionBox.setStartingPosition(window, mouseToGroundPosition);
+							}
 						}
 					}
 				}
@@ -247,21 +246,26 @@ void Level::handleInput(const sf::Event& currentSFMLEvent, const Camera& camera,
 				else if(m_translateObject.isSelected())
 				{
 					const glm::vec3& position = m_translateObject.getPosition();
-					if (m_translateObject.getCurrentAxisSelected() == eAxisCollision::X)
+					switch (m_translateObject.getCurrentAxisSelected())
 					{
-						glm::ivec2 vDifference = { sf::Mouse::getPosition(window).x - window.getSize().x / 2, 
+					case eAxisCollision::X:
+					{
+						glm::ivec2 vDifference = { sf::Mouse::getPosition(window).x - window.getSize().x / 2,
 							window.getSize().y / 2 - sf::Mouse::getPosition(window).y };
 
 						m_translateObject.setPosition({ position.x + vDifference.x + vDifference.y, position.y, position.z });
 						sf::Mouse::setPosition(sf::Vector2i(window.getSize().x / 2, window.getSize().y / 2), window);
 					}
-					else if (m_translateObject.getCurrentAxisSelected() == eAxisCollision::Z)
+						break;
+					case eAxisCollision::Z:
 					{
 						glm::ivec2 vDifference = { sf::Mouse::getPosition(window).x - window.getSize().x / 2,
 							window.getSize().y / 2 - sf::Mouse::getPosition(window).y };
 
-						m_translateObject.setPosition({ position.x, position.y, position.z + vDifference.x + vDifference.y});
+						m_translateObject.setPosition({ position.x, position.y, position.z + vDifference.x + vDifference.y });
 						sf::Mouse::setPosition(sf::Vector2i(window.getSize().x / 2, window.getSize().y / 2), window);
+					}
+						break;
 					}
 				}
 			}

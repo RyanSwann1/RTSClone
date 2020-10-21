@@ -24,6 +24,11 @@ bool TranslateObject::isSelected() const
 	return m_selected;
 }
 
+bool TranslateObject::isSelected(const glm::vec3& position) const
+{
+	return m_xAABB.contains(position) || m_zAABB.contains(position);
+}
+
 const glm::vec3& TranslateObject::getPosition() const
 {
 	return m_position;
@@ -43,6 +48,7 @@ void TranslateObject::setSelected(bool selected, const glm::vec3& position)
 	}
 	else
 	{
+		m_selected = false;
 		m_currentAxisSelected = eAxisCollision::None;
 	}
 }
