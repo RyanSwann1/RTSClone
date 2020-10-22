@@ -106,6 +106,7 @@ void SelectionBox::render(const sf::Window& window) const
     }
 }
 
+#ifdef RENDER_AABB
 void SelectionBox::renderAABB(ShaderHandler& shaderHandler)
 {
     if (m_active && isMinimumSize())
@@ -113,3 +114,4 @@ void SelectionBox::renderAABB(ShaderHandler& shaderHandler)
         m_AABB.render(shaderHandler);
     }
 }
+#endif // RENDER_AABB
