@@ -2,6 +2,7 @@
 
 #include "Entity.h"
 #include "Timer.h"
+#include "NonMovable.h"
 #include <functional>
 
 class Map;

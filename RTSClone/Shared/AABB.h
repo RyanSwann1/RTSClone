@@ -1,6 +1,7 @@
 #pragma once
 
 #include "glm/glm.hpp"
+#include <vector>
 
 #ifdef RENDER_AABB
 #include "Mesh.h"

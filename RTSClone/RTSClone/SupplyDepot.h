@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Entity.h"
+#include "NonMovable.h"
 
 class SupplyDepot : public Entity, private NonMovable
 {
