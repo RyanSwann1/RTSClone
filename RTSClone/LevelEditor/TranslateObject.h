@@ -22,10 +22,9 @@ public:
 
 	eAxisCollision getCurrentAxisSelected() const;
 	bool isSelected() const;
-	bool isSelected(const glm::vec3& position) const;
 	const glm::vec3& getPosition() const;
 	
-	void setSelected(bool selected, const glm::vec3& position);
+	void setSelected(const glm::vec3& position);
 	void deselect();
 	void setPosition(const glm::vec3& position);
 	void render(ShaderHandler& shaderHandler, bool active) const;

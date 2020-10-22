@@ -29,26 +29,21 @@ bool TranslateObject::isSelected() const
 	return m_selected;
 }
 
-bool TranslateObject::isSelected(const glm::vec3& position) const
-{
-	return m_xAABB.contains(position) || m_zAABB.contains(position);
-}
-
 const glm::vec3& TranslateObject::getPosition() const
 {
 	return m_position;
 }
 
-void TranslateObject::setSelected(bool selected, const glm::vec3& position)
+void TranslateObject::setSelected(const glm::vec3& position)
 {
 	if (m_xAABB.contains(position))
 	{
-		m_selected = selected;
+		m_selected = true;
 		m_currentAxisSelected = eAxisCollision::X;
 	}
 	else if (m_zAABB.contains(position))
 	{
-		m_selected = selected;
+		m_selected = true;
 		m_currentAxisSelected = eAxisCollision::Z;
 	}
 	else

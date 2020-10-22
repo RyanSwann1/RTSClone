@@ -135,10 +135,10 @@ void Level::handleInput(const sf::Event& currentSFMLEvent, const Camera& camera,
 				glm::vec3 mouseToGroundPosition = { 0.0f, 0.0f, 0.0f };
 				if (camera.getMouseToGroundPosition(window, mouseToGroundPosition))
 				{
-					if (m_translateObject.isSelected(mouseToGroundPosition) &&
+					m_translateObject.setSelected(mouseToGroundPosition);
+					if (m_translateObject.isSelected() &&
 						(m_entityManager.isEntitySelected() || m_selectedPlayer))
 					{
-						m_translateObject.setSelected(true, mouseToGroundPosition);
 						sf::Mouse::setPosition(sf::Vector2i(window.getSize().x / 2, window.getSize().y / 2), window);
 					}
 					else
