@@ -10,7 +10,7 @@ namespace
 	constexpr glm::vec3 HQ_SCALE{ 1.2f, 1.2f, 0.9f };
 	constexpr glm::vec3 MINERAL_SCALE{ 0.6f, 0.6f, 0.6f };
 	constexpr glm::vec3 WAYPOINT_SCALE{ 1.0f, 1.0f, 1.0f };
-	constexpr glm::vec3 WORKER_SCALE{ 0.8f, 0.8f, 0.8f };
+	constexpr glm::vec3 WORKER_SCALE{ 1.0f, 1.0f, 1.0f };
 	constexpr glm::vec3 SUPPLY_DEPOT_SCALE{ 1.0f, 1.0f, 1.0f };
 	constexpr glm::vec3 BARRACKS_SCALE{ 0.5f, 0.5f, 0.5f };
 	constexpr glm::vec3 WORKER_MINERAL_SCALE = { 0.2f, 0.2f, 0.2f };
@@ -25,6 +25,43 @@ namespace
 	constexpr glm::vec3 PROJECTILE_AABB_SIZE_FROM_CENTER = { 1.0f, 1.0f, 1.0f };
 	constexpr glm::vec3 SUPPLY_DEPOT_AABB_SIZE_FROM_CENTER = { 3.0f, 1.0f, 3.0f };
 	constexpr glm::vec3 BARRACKS_AABB_SIZE_FROM_CENTER = { 3.0f, 1.0f, 3.0f };
+	
+	void loadModel(const std::string& fileName, bool renderFromCenterPosition, const glm::vec3& AABBSizeFromCenter,
+		eModelName modelName, const glm::vec3& scale, std::array<std::unique_ptr<Model>, static_cast<size_t>(eModelName::Max) + 1>& models,
+		bool& loadedAllModels)
+	{
+		std::unique_ptr<Model> model = Model::create(fileName, renderFromCenterPosition,
+			AABBSizeFromCenter, modelName, scale);
+		assert(model);
+		if (!model)
+		{
+			std::cout << "Failed to load " << fileName << "\n";
+			loadedAllModels = false;
+		}
+
+		assert(!models[static_cast<int>(model->modelName)]);
+		models[static_cast<int>(model->modelName)] = std::move(model);
+	}
+
+	void loadSharedModels(std::array<std::unique_ptr<Model>, static_cast<size_t>(eModelName::Max) + 1>& models, bool& loadedAllModels) 
+	{
+		loadModel("terrain.obj", false, { 0.0f, 0.0f, 0.0f }, eModelName::Terrain, { 2000.0f, 1.0f, 2000.0f },
+			models, loadedAllModels);
+
+		loadModel("meteorFull.obj", false, { 5.0f, 50.0f, 5.0f }, eModelName::Meteor, { 1.0f, 1.0f, 1.0f },
+			models, loadedAllModels);
+
+		loadModel("meteorHalf.obj", false, { 5.0f, 1.0f, 5.0f }, eModelName::MeteorHalf, { 1.0f, 1.0f, 1.0f }, models, loadedAllModels);
+
+		loadModel("rocksTall.obj", true, { 5.0f, 1.0f, 5.0f }, eModelName::RocksTall, { 1.0f, 1.0f, 1.0f },
+			models, loadedAllModels);
+
+		loadModel("portal.obj", true, HQ_AABB_SIZE_FROM_CENTER, eModelName::HQ, HQ_SCALE,
+			models, loadedAllModels);
+
+		loadModel("rocksOre.obj", true, MINERAL_AABB_SIZE_FROM_CENTER, eModelName::Mineral, MINERAL_SCALE,
+			models, loadedAllModels);
+	}
 
 #ifdef GAME
 	eModelName getModelName(eEntityType entityType)
@@ -50,42 +87,12 @@ namespace
 		}
 	}
 
-	void loadModel(const std::string& fileName, bool renderFromCenterPosition, const glm::vec3& AABBSizeFromCenter,
-		eModelName modelName, const glm::vec3& scale, std::array<std::unique_ptr<Model>, static_cast<size_t>(eModelName::Max) + 1>& models,
-		bool& loadedAllModels)
-	{
-		std::unique_ptr<Model> model = Model::create(fileName, renderFromCenterPosition,
-			AABBSizeFromCenter, modelName, scale);
-		assert(model);
-		if (!model)
-		{
-			std::cout << "Failed to load " << fileName << "\n";
-			loadedAllModels = false;
-		}
-
-		assert(!models[static_cast<int>(model->modelName)]);
-		models[static_cast<int>(model->modelName)] = std::move(model);
-	}
-
-	std::array<std::unique_ptr<Model>, static_cast<size_t>(eModelName::Max) + 1> initializeModels(bool& loadedAllModels)
+	std::array<std::unique_ptr<Model>, static_cast<size_t>(eModelName::Max) + 1> loadGameModels(bool& loadedAllModels)
 	{
 		std::array<std::unique_ptr<Model>, static_cast<size_t>(eModelName::Max) + 1> models;
-		loadModel("terrain.obj", false, { 0.0f, 0.0f, 0.0f }, eModelName::Terrain, { 2000.0f, 1.0f, 2000.0f },
-			models, loadedAllModels);
-
-		loadModel("meteorFull.obj", false, { 5.0f, 1.0f, 5.0f }, eModelName::Meteor, { 1.0f, 1.0f, 1.0f },
-			models, loadedAllModels);
-
-		loadModel("rocksTall.obj", true, { 5.0f, 1.0f, 5.0f }, eModelName::RocksTall, { 1.0f, 1.0f, 1.0f },
-			models, loadedAllModels);
+		loadSharedModels(models, loadedAllModels);
 
 		loadModel("spaceCraft1.obj", false, UNIT_AABB_SIZE_FROM_CENTER, eModelName::Unit, UNIT_SCALE,
-			models, loadedAllModels);
-
-		loadModel("portal.obj", true, HQ_AABB_SIZE_FROM_CENTER, eModelName::HQ, HQ_SCALE,
-			models, loadedAllModels);
-
-		loadModel("rocksOre.obj", true, MINERAL_AABB_SIZE_FROM_CENTER, eModelName::Mineral, MINERAL_SCALE,
 			models, loadedAllModels);
 
 		loadModel("rocksOre.obj", true, WORKER_MINERAL_AABB_SIZE_FROM_CENTER, eModelName::WorkerMineral, WORKER_MINERAL_SCALE,
@@ -111,47 +118,12 @@ namespace
 #endif // GAME
 
 #ifdef LEVEL_EDITOR
-	void loadModel(const std::string& fileName, bool renderFromCenterPosition, const glm::vec3& AABBSizeFromCenter,
-		eModelName modelName, const glm::vec3& scale, 
-		std::array<std::unique_ptr<Model>, static_cast<size_t>(eModelName::Max) + 1>& models, bool& loadedAllModels)
-	{
-		std::unique_ptr<Model> model = Model::create(fileName, renderFromCenterPosition,
-			AABBSizeFromCenter, modelName, scale);
-		assert(model);
-		if (!model)
-		{
-			std::cout << "Failed to load " << fileName << "\n";
-			loadedAllModels = false;
-		}
-
-		assert(!models[static_cast<int>(model->modelName)]);
-		models[static_cast<int>(model->modelName)] = std::move(model);
-	}
-
-	std::array<std::unique_ptr<Model>, static_cast<size_t>(eModelName::Max) + 1> initializeModels(bool& loadedAllModels)
+	std::array<std::unique_ptr<Model>, static_cast<size_t>(eModelName::Max) + 1> loadLevelEditorModels(bool& loadedAllModels)
 	{
 		std::array<std::unique_ptr<Model>, static_cast<size_t>(eModelName::Max) + 1> models;
-		loadModel("terrain.obj", false, { 0.0f, 0.0f, 0.0f }, eModelName::Terrain, { 2000.0f, 1.0f, 2000.0f },
-			models, loadedAllModels);
-
-		loadModel("meteorFull.obj", false, { 5.0f, 1.0f, 5.0f }, eModelName::Meteor, { 1.0f, 1.0f, 1.0f },
-			models, loadedAllModels);
-
-		loadModel("meteorHalf.obj", false, { 5.0f, 1.0f, 5.0f }, eModelName::MeteorHalf, { 1.0f, 1.0f, 1.0f }, models, loadedAllModels);
-
-		loadModel("rocksTall.obj", true, { 5.0f, 1.0f, 5.0f }, eModelName::RocksTall, { 1.0f, 1.0f, 1.0f },
-			models, loadedAllModels);
+		loadSharedModels(models, loadedAllModels);
 
 		loadModel("translate.obj", true, {0.0f, 0.0f, 0.0f}, eModelName::TranslateObject, { 15.0f, 15.0f, 15.0f }, models, loadedAllModels);
-
-		loadModel("spaceCraft1.obj", false, UNIT_AABB_SIZE_FROM_CENTER, eModelName::Unit, UNIT_SCALE,
-			models, loadedAllModels);
-
-		loadModel("portal.obj", true, HQ_AABB_SIZE_FROM_CENTER, eModelName::HQ, HQ_SCALE,
-			models, loadedAllModels);
-
-		loadModel("rocksOre.obj", true, MINERAL_AABB_SIZE_FROM_CENTER, eModelName::Mineral, MINERAL_SCALE,
-			models, loadedAllModels);
 
 		return models;
 	}
@@ -176,6 +148,11 @@ eModelName ModelManager::getModelName(const std::string& modelName) const
 
 	return iter->second;
 }
+
+ModelManager::ModelManager()
+	: m_loadedAllModels(true),
+	m_models(loadLevelEditorModels(m_loadedAllModels))
+{}
 #endif // LEVEL_EDITOR
 
 const Model& ModelManager::getModel(eModelName modelName) const
@@ -195,9 +172,9 @@ const Model& ModelManager::getModel(eEntityType entityType) const
 
 	return *m_models[static_cast<int>(modelName)];
 }
-#endif // GAME
 
 ModelManager::ModelManager()
 	: m_loadedAllModels(true),
-	m_models(initializeModels(m_loadedAllModels))
+	m_models(loadGameModels(m_loadedAllModels))
 {}
+#endif // GAME
