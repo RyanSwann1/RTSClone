@@ -12,7 +12,7 @@
 namespace
 {
 	constexpr glm::vec3 COLOR = { 1.0f, 0.0f, 0.0f };
-	constexpr float OPACITY = 0.4f;
+	constexpr float OPACITY = 0.2f;
 	void generateMesh(float left, float right, float back, float forward, Mesh& mesh)
 	{
 		mesh.m_vertices.clear();

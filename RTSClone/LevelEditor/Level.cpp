@@ -402,6 +402,12 @@ void Level::renderPlayableArea(ShaderHandler& shaderHandler) const
 void Level::renderAABB(ShaderHandler& shaderHandler)
 {
 	m_translateObject.renderAABB(shaderHandler, m_entityManager.isEntitySelected() || m_selectedPlayer);
+	m_entityManager.renderEntityAABB(shaderHandler);
+
+	for (auto& player : m_players)
+	{
+		player.renderAABB(shaderHandler);
+	}
 }
 #endif // RENDER_AABB
 

@@ -15,7 +15,11 @@ struct Player : private NonCopyable
 	Player& operator=(Player&&) noexcept;
 
 	void render(ShaderHandler& shaderHandler) const;
-	
+
+#ifdef RENDER_AABB
+	void renderAABB(ShaderHandler& shaderHandler);
+#endif // RENDER_AABB
+
 	friend const std::ifstream& operator>>(std::ifstream& file, Player& player);
 	friend std::ostream& operator<<(std::ostream& ostream, const Player& player);
 

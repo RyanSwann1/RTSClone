@@ -55,6 +55,17 @@ void Player::render(ShaderHandler& shaderHandler) const
 	HQ.render(shaderHandler);
 }
 
+#ifdef RENDER_AABB
+void Player::renderAABB(ShaderHandler& shaderHandler)
+{
+	HQ.renderAABB(shaderHandler);
+	for (auto& mineral : minerals)
+	{
+		mineral.renderAABB(shaderHandler);
+	}
+}
+#endif // RENDER_AABB
+
 const std::ifstream& operator>>(std::ifstream& file, Player& player)
 {
 	auto data = [&player](const std::string& line)
