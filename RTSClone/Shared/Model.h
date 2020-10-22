@@ -14,11 +14,11 @@ struct Model : private NonMovable, private NonCopyable
 	static std::unique_ptr<Model> create(const std::string& fileName, bool renderFromCentrePosition, 
 		const glm::vec3& AABBSizeFromCenter, eModelName modelName, const glm::vec3& scale);
 
+	bool isCollidable() const;
 	void attachMeshesToVAO() const;
 	void render(ShaderHandler& shaderHandler, const glm::vec3& position) const;
 	void render(ShaderHandler& shaderHandler, const Entity& entity) const;
 
-	const std::string nameText;
 	const eModelName modelName;
 	const bool renderFromCentrePosition;
 	const glm::vec3 AABBSizeFromCenter;
@@ -27,7 +27,8 @@ struct Model : private NonMovable, private NonCopyable
     std::vector<MeshTextureDetails> textures;
 	
 private:
-	Model(bool renderFromCentrePosition, const glm::vec3& sizeFromCentre, eModelName modelName, const glm::vec3& scale);
+	Model(bool renderFromCentrePosition, const glm::vec3& sizeFromCentre, eModelName modelName, 
+		const glm::vec3& scale);
 
 	void render(ShaderHandler& shaderHandler, glm::vec3 entityPosition, bool entitySelected) const;
 };

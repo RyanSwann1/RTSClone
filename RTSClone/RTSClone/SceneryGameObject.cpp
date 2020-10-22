@@ -9,13 +9,16 @@ SceneryGameObject::SceneryGameObject(eModelName modelName, const glm::vec3& posi
 	m_position(position),
 	m_active(true)
 {
-	AABB AABB(m_position, ModelManager::getInstance().getModel(m_modelName));
-	GameMessenger::getInstance().broadcast<GameMessages::MapModification<eGameMessageType::AddEntityToMap>>({ AABB });	
+	if (ModelManager::getInstance().getModel(m_modelName).isCollidable())
+	{
+		AABB AABB(m_position, ModelManager::getInstance().getModel(m_modelName));
+		GameMessenger::getInstance().broadcast<GameMessages::MapModification<eGameMessageType::AddEntityToMap>>({ AABB });
+	}
 }
 
 SceneryGameObject::~SceneryGameObject()
 {
-	if (m_active)
+	if (m_active && ModelManager::getInstance().getModel(m_modelName).isCollidable())
 	{
 		AABB AABB(m_position, ModelManager::getInstance().getModel(m_modelName));
 		GameMessenger::getInstance().broadcast<GameMessages::MapModification<eGameMessageType::RemoveEntityFromMap>>({ AABB });
