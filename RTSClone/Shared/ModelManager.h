@@ -23,7 +23,7 @@ public:
 	bool isAllModelsLoaded() const;
 
 #ifdef LEVEL_EDITOR
-	static const size_t TOTAL_MODEL_NAMES = 2;
+	static const size_t TOTAL_MODEL_NAMES = 3;
 	const std::array<std::string, TOTAL_MODEL_NAMES> getModelNames() const;
 	eModelName getModelName(const std::string& modelName) const;
 #endif // LEVEL_EDITOR
@@ -41,11 +41,13 @@ private:
 	const std::unordered_map<std::string, eModelName> m_modelNameConversions
 	{
 		{"Meteor", eModelName::Meteor},
-		{"RocksTall", eModelName::RocksTall}
+		{"RocksTall", eModelName::RocksTall},
+		{"MeteorHalf", eModelName::MeteorHalf}
 	};
 	const std::array<std::string, TOTAL_MODEL_NAMES> m_modelNames
 	{
 		"Meteor",
+		"MeteorHalf",
 		"RocksTall"
 	};
 #endif // LEVEL_EDITOR

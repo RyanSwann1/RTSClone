@@ -137,6 +137,8 @@ namespace
 		loadModel("meteorFull.obj", false, { 5.0f, 1.0f, 5.0f }, eModelName::Meteor, { 1.0f, 1.0f, 1.0f },
 			models, loadedAllModels);
 
+		loadModel("meteorHalf.obj", false, { 5.0f, 1.0f, 5.0f }, eModelName::MeteorHalf, { 1.0f, 1.0f, 1.0f }, models, loadedAllModels);
+
 		loadModel("rocksTall.obj", true, { 5.0f, 1.0f, 5.0f }, eModelName::RocksTall, { 1.0f, 1.0f, 1.0f },
 			models, loadedAllModels);
 

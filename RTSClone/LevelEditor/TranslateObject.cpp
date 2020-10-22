@@ -15,8 +15,8 @@ TranslateObject::TranslateObject()
 	m_xAABB(),
 	m_zAABB()
 {
-	m_xAABB.reset(m_position + X_OFF_SET, { 20.0f, 3.5f, 3.5f });
-	m_zAABB.reset(m_position + Z_OFF_SET, { 3.5f, 3.5f, 20.0f });
+	m_xAABB.reset(m_position + X_OFF_SET, { 20.0f, 5.0f, 5.0f });
+	m_zAABB.reset(m_position + Z_OFF_SET, { 5.0f, 5.0f, 20.0f });
 }
 
 eAxisCollision TranslateObject::getCurrentAxisSelected() const
