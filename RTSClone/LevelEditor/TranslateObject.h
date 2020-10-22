@@ -10,6 +10,7 @@ enum class eAxisCollision
 {
 	None = 0,
 	X,
+	Y,
 	Z
 };
 
@@ -38,5 +39,6 @@ private:
 	bool m_selected;
 	glm::vec3 m_position;
 	AABB m_xAABB;
+	AABB m_yAABB;
 	AABB m_zAABB;
 };

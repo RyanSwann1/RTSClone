@@ -4,8 +4,8 @@
 
 namespace 
 {
-	constexpr glm::vec3 X_OFF_SET{ 10.0f, 0.0f, 0.0f };
-	constexpr glm::vec3 Z_OFF_SET{ 0.0f, 0.0f, -10.0f };
+	constexpr glm::vec3 X_OFF_SET{ 15.0f, 0.0f, 0.0f };
+	constexpr glm::vec3 Z_OFF_SET{ 0.0f, 0.0f, -15.0f };
 }
 
 TranslateObject::TranslateObject()
@@ -13,9 +13,11 @@ TranslateObject::TranslateObject()
 	m_selected(false),
 	m_position(),
 	m_xAABB(),
+	m_yAABB(),
 	m_zAABB()
 {
 	m_xAABB.reset(m_position + X_OFF_SET, { 20.0f, 5.0f, 5.0f });
+	m_yAABB.reset(m_position, { 5.0f, 20.0f, 5.0f });
 	m_zAABB.reset(m_position + Z_OFF_SET, { 5.0f, 5.0f, 20.0f });
 }
 
@@ -41,6 +43,11 @@ void TranslateObject::setSelected(const glm::vec3& position)
 		m_selected = true;
 		m_currentAxisSelected = eAxisCollision::X;
 	}
+	else if (m_yAABB.contains(position))
+	{
+		m_selected = true;
+		m_currentAxisSelected = eAxisCollision::Y;
+	}
 	else if (m_zAABB.contains(position))
 	{
 		m_selected = true;
@@ -62,6 +69,7 @@ void TranslateObject::setPosition(const glm::vec3& position)
 {
 	m_position = position;
 	m_xAABB.update(m_position + X_OFF_SET);
+	m_yAABB.update(m_position);
 	m_zAABB.update(m_position + Z_OFF_SET);
 }
 
@@ -79,6 +87,7 @@ void TranslateObject::renderAABB(ShaderHandler& shaderHandler, bool active)
 	if (active)
 	{
 		m_xAABB.render(shaderHandler);
+		m_yAABB.render(shaderHandler);
 		m_zAABB.render(shaderHandler);
 	}
 }

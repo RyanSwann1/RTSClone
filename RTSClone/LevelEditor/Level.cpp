@@ -207,6 +207,15 @@ void Level::handleInput(const sf::Event& currentSFMLEvent, const Camera& camera,
 						sf::Mouse::setPosition(sf::Vector2i(window.getSize().x / 2, window.getSize().y / 2), window);
 					}
 						break;
+					case eAxisCollision::Y:
+					{
+						int xDifference = window.getSize().y / 2 - sf::Mouse::getPosition(window).y;
+
+						m_translateObject.setPosition({ position.x, position.y + static_cast<float>(xDifference) * ENTITY_TRANSLATE_SPEED * deltaTime, position.z });
+						sf::Mouse::setPosition(sf::Vector2i(window.getSize().x / 2, window.getSize().y / 2), window);
+					}
+
+						break;
 					case eAxisCollision::Z:
 					{
 						int zDifference = sf::Mouse::getPosition(window).x - window.getSize().x / 2;
