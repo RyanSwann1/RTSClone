@@ -2,12 +2,13 @@
 #include "ShaderHandler.h"
 #include "ModelLoader.h"
 #include "Entity.h"
+#include "Globals.h"
 #include "glm/gtc/matrix_transform.hpp"
 #include "glm/gtx/transform.hpp"
 
-Model::Model(bool renderFromCentrePosition, const glm::vec3& AABBSizeFromCenter, eModelName modelName, 
-	const glm::vec3& scale)
-	: modelName(modelName),
+Model::Model(bool renderFromCentrePosition, const glm::vec3& AABBSizeFromCenter, const glm::vec3& scale,
+	const std::string& fileName)
+	: modelName(fileName),
 	renderFromCentrePosition(renderFromCentrePosition),
 	AABBSizeFromCenter(AABBSizeFromCenter),
 	scale(scale),
@@ -34,9 +35,9 @@ void Model::render(ShaderHandler & shaderHandler, glm::vec3 entityPosition, bool
 }
 
 std::unique_ptr<Model> Model::create(const std::string & fileName, bool renderFromCentrePosition, 
-	const glm::vec3& AABBSizeFromCenter, eModelName modelName, const glm::vec3& scale)
+	const glm::vec3& AABBSizeFromCenter, const glm::vec3& scale)
 {
-	Model* model = new Model(renderFromCentrePosition, AABBSizeFromCenter, modelName, scale);
+	Model* model = new Model(renderFromCentrePosition, AABBSizeFromCenter, scale, fileName);
 	if (!ModelLoader::loadModel(fileName, *model))
 	{
 		delete model;
@@ -45,33 +46,6 @@ std::unique_ptr<Model> Model::create(const std::string & fileName, bool renderFr
 	
 	model->attachMeshesToVAO();
 	return std::unique_ptr<Model>(model);
-}
-
-bool Model::isCollidable() const
-{
-	switch (modelName)
-	{
-		case eModelName::Meteor:
-		case eModelName::BuildingCorridorOpen:
-		case eModelName::BuildingCorridorOpenEnd:
-		case eModelName::AlienBones:
-		case eModelName::RocksTall:
-		case eModelName::HQ:
-		case eModelName::WorkerMineral:
-		case eModelName::Worker:
-		case eModelName::SupplyDepot:
-		case eModelName::Barracks:
-			return true;
-		case eModelName::Terrain:
-		case eModelName::Unit:
-		case eModelName::RocksSmallA:
-		case eModelName::Waypoint:
-		case eModelName::TranslateObject:
-			return false;
-		default:
-			assert(false);
-			return false;
-	}
 }
 
 void Model::attachMeshesToVAO() const
