@@ -7,6 +7,18 @@
 #include <unordered_map>
 #endif // LEVEL_EDITOR
 
+//Commonly Refferred to game models
+extern const std::string TERRAIN_MODEL_NAME;
+extern const std::string HQ_MODEL_NAME;
+extern const std::string MINERALS_MODEL_NAME;
+extern const std::string UNIT_MODEL_NAME;
+extern const std::string WORKER_MODEL_NAME;
+extern const std::string SUPPLY_DEPOT_MODEL_NAME;
+extern const std::string BARRACKS_MODEL_NAME;
+extern const std::string WAYPOINT_MODEL_NAME;
+extern const std::string PROJECTILE_MODEL_NAME;
+extern const std::string TRANSLATE_MODEL_NAME;
+
 #ifdef GAME
 enum class eEntityType;
 #endif // GAME
@@ -19,36 +31,17 @@ public:
 		return instance;
 	}
 
-	const Model& getModel(eModelName modelName) const;
+	const Model& getModel(const std::string& modelName) const;
 	bool isAllModelsLoaded() const;
 
 #ifdef LEVEL_EDITOR
-	static const size_t TOTAL_MODEL_NAMES = 3;
-	const std::array<std::string, TOTAL_MODEL_NAMES> getModelNames() const;
-	eModelName getModelName(const std::string& modelName) const;
+	bool isModelLoaded(const std::string& modelName) const;
+	const std::vector<std::string>& getModelNames() const;
 #endif // LEVEL_EDITOR
-
-#ifdef GAME
-	const Model& getModel(eEntityType entityType) const;
-#endif // GAME
 
 private:
 	ModelManager();
 	bool m_loadedAllModels;
-	const std::array<std::unique_ptr<Model>, static_cast<size_t>(eModelName::Max) + 1> m_models;
-
-#ifdef LEVEL_EDITOR	
-	const std::unordered_map<std::string, eModelName> m_modelNameConversions
-	{
-		{"Meteor", eModelName::Meteor},
-		{"RocksTall", eModelName::RocksTall},
-		{"MeteorHalf", eModelName::MeteorHalf}
-	};
-	const std::array<std::string, TOTAL_MODEL_NAMES> m_modelNames
-	{
-		"Meteor",
-		"MeteorHalf",
-		"RocksTall"
-	};
-#endif // LEVEL_EDITOR
+	const std::vector<std::unique_ptr<Model>> m_models;
+	const std::vector<std::string> m_modelNames;
 };
