@@ -114,7 +114,7 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>GAME;RENDER_AABB;RENDER_PATHING;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>GAME;RENDER_PATHING;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)..\Shared\assimp\include;$(ProjectDir)..\Shared\SFML-2.5.1\include;$(ProjectDir)..\Shared</AdditionalIncludeDirectories>
     </ClCompile>
@@ -158,6 +158,7 @@
     <ClCompile Include="..\Shared\imgui_impl\imgui_impl_sfml.cpp" />
     <ClCompile Include="..\Shared\LevelFileHandler.cpp" />
     <ClCompile Include="..\Shared\Mesh.cpp" />
+    <ClCompile Include="..\Shared\Mineral.cpp" />
     <ClCompile Include="..\Shared\Model.cpp" />
     <ClCompile Include="..\Shared\ModelLoader.cpp" />
     <ClCompile Include="..\Shared\ModelManager.cpp" />
@@ -184,7 +185,6 @@
     <ClCompile Include="UnitSpawnerBuilding.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Map.cpp" />
-    <ClCompile Include="Mineral.cpp" />
     <ClCompile Include="PathFinding.cpp" />
     <ClCompile Include="PriorityQueue.cpp" />
     <ClCompile Include="SupplyDepot.cpp" />
@@ -211,10 +211,10 @@
     <ClInclude Include="..\Shared\khrplatform.h" />
     <ClInclude Include="..\Shared\LevelFileHandler.h" />
     <ClInclude Include="..\Shared\Mesh.h" />
+    <ClInclude Include="..\Shared\Mineral.h" />
     <ClInclude Include="..\Shared\Model.h" />
     <ClInclude Include="..\Shared\ModelLoader.h" />
     <ClInclude Include="..\Shared\ModelManager.h" />
-    <ClInclude Include="..\Shared\ModelName.h" />
     <ClInclude Include="..\Shared\NonCopyable.h" />
     <ClInclude Include="..\Shared\NonMovable.h" />
     <ClInclude Include="..\Shared\SelectionBox.h" />
@@ -281,7 +281,6 @@
     <ClInclude Include="Worker.h" />
     <ClInclude Include="UnitSpawnerBuilding.h" />
     <ClInclude Include="Map.h" />
-    <ClInclude Include="Mineral.h" />
     <ClInclude Include="PathFinding.h" />
     <ClInclude Include="PriorityQueue.h" />
     <ClInclude Include="SupplyDepot.h" />

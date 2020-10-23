@@ -3,9 +3,6 @@
 #include "Model.h"
 #include <memory>
 #include <array>
-#ifdef LEVEL_EDITOR
-#include <unordered_map>
-#endif // LEVEL_EDITOR
 
 //Commonly Refferred to game models
 extern const std::string TERRAIN_MODEL_NAME;

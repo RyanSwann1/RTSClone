@@ -14,7 +14,7 @@
 #endif // GAME
 #include "Globals.h"
 #include "Entity.h"
-#include "ModelName.h"
+#include "ModelManager.h"
 #include <fstream>
 #include <sstream>
 
@@ -342,23 +342,20 @@ void loadInPlayer(std::ifstream& file, std::array<std::unique_ptr<Faction>, stat
 	auto data = [&hqStartingPosition, &mineralPositions](const std::string& line)
 	{
 		std::stringstream stream{ line };
-		std::string rawModelName;
+		std::string modelName;
 		glm::vec3 position;
-		stream >> rawModelName >> position.x >> position.y >> position.z;
-		switch (static_cast<eModelName>(std::stoi(rawModelName)))
+		stream >> modelName >> position.x >> position.y >> position.z;
+		if (modelName == HQ_MODEL_NAME)
 		{
-		case eModelName::HQ:
 			hqStartingPosition = position;
-			break;
-		case eModelName::Mineral:
+		}
+		else if (modelName == MINERALS_MODEL_NAME)
 		{
 			int mineralIndex = -1;
 			stream >> mineralIndex;
 			assert(mineralIndex >= 0 && mineralIndex < Globals::MAX_MINERALS_PER_FACTION);
 
 			mineralPositions[mineralIndex] = position;
-		}
-		break;
 		}
 	};
 
@@ -394,11 +391,11 @@ void loadInScenery(std::ifstream& file, std::vector<SceneryGameObject>& scenery)
 	auto data = [&scenery](const std::string& line)
 	{
 		std::stringstream stream{ line };
-		std::string rawModelName;
+		std::string modelName;
 		glm::vec3 position;
-		stream >> rawModelName >> position.x >> position.y >> position.z;
+		stream >> modelName >> position.x >> position.y >> position.z;
 
-		scenery.emplace_back(static_cast<eModelName>(std::stoi(rawModelName)), position);
+		scenery.emplace_back(ModelManager::getInstance().getModel(modelName), position);
 	};
 
 	auto conditional = [](const std::string& line)
