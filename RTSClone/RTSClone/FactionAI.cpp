@@ -255,3 +255,25 @@ Worker* FactionAI::getAvailableWorker(const glm::vec3& position)
 
 	return selectedWorker;
 }
+
+const Entity* FactionAI::addBuilding(const Map& map, glm::vec3 position, eEntityType entityType)
+{
+	if (isEntityAffordable(entityType) && !map.isPositionOccupied(position))
+	{
+		return Faction::addBuilding(map, position, entityType);
+	}
+	
+	switch (entityType)
+	{
+	case eEntityType::SupplyDepot:
+		m_actionQueue.push(eActionType::BuildSupplyDepot);
+		break;
+	case eEntityType::Barracks:
+		m_actionQueue.push(eActionType::BuildBarracks);
+		break;
+	default:
+		assert(false);
+	}
+	
+	return nullptr;
+}

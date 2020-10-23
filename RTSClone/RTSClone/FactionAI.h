@@ -41,4 +41,6 @@ private:
 	bool instructWorkerToBuild(eEntityType entityType, const glm::vec3& position, const Map& map, Worker& worker);
 	const Mineral& getRandomMineral() const;
 	Worker* getAvailableWorker(const glm::vec3& position);
+
+	const Entity* addBuilding(const Map& map, glm::vec3 position, eEntityType entityType) override;
 };
