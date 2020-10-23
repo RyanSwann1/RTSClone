@@ -58,64 +58,20 @@ protected:
 	std::list<Barracks> m_barracks;
 	HQ m_HQ;
 
+	bool isExceedPopulationLimit(eEntityType entityType) const;
 	bool isEntityAffordable(eEntityType entityType) const;
 
-	virtual const Entity* addBuilding(const Map& map, glm::vec3 position, eEntityType entityType);
 	bool addUnitToSpawn(eEntityType unitType, const Map& map, UnitSpawnerBuilding& building);
 	bool instructWorkerToBuild(eEntityType entityType, const glm::vec3& position, const Map& map, Worker& worker);
-
-	template <class Unit>
-	Entity* spawnUnit(const Map& map, std::list<Unit>& units, eEntityType entityType, const UnitSpawnerBuilding& building)
-	{
-		if (isEntityAffordable(entityType) && !isExceedPopulationLimit(entityType))
-		{
-			switch (entityType)
-			{
-			case eEntityType::Unit:
-				if (building.isWaypointActive())
-				{
-					units.emplace_back(*this, Globals::convertToNodePosition(building.getUnitSpawnPosition()), PathFindingLocator::get().getClosestAvailablePosition(
-						building.getWaypointPosition(), m_units, m_workers, map), map);
-				}
-				else
-				{
-					units.emplace_back(*this, Globals::convertToNodePosition(PathFindingLocator::get().getClosestAvailablePosition(building.getUnitSpawnPosition(),
-						m_units, m_workers, map)));
-				}
-				break;
-			case eEntityType::Worker:
-				if (building.isWaypointActive())
-				{
-					units.emplace_back(*this, building.getUnitSpawnPosition(), PathFindingLocator::get().getClosestAvailablePosition(
-						building.getWaypointPosition(), m_units, m_workers, map), map);
-				}
-				else
-				{
-					units.emplace_back(*this, PathFindingLocator::get().getClosestAvailablePosition(
-						building.getUnitSpawnPosition(), m_units, m_workers, map));
-				}
-				break;
-			default:
-				assert(false);
-			}
-
-			reduceResources(entityType);
-			increaseCurrentPopulationAmount(entityType);
-			m_allEntities.push_back(&units.back());
-
-			return &units.back();
-		}
-
-		return nullptr;
-	}
+	virtual const Entity* addBuilding(const Map& map, glm::vec3 position, eEntityType entityType);
+	virtual Entity* spawnUnit(const Map& map, const UnitSpawnerBuilding& building);
+	virtual Entity* spawnWorker(const Map& map, const UnitSpawnerBuilding& building);
 
 private:
 	const eFactionController m_controller;
 	int m_currentResourceAmount;
 	int m_currentPopulationAmount;
 	int m_currentPopulationLimit;
-
-	bool isExceedPopulationLimit(eEntityType entityType) const;
 
 	void reduceResources(eEntityType addedEntityType);
 	void increaseCurrentPopulationAmount(eEntityType entityType);

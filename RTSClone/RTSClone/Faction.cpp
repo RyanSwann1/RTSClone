@@ -511,12 +511,12 @@ bool Faction::addUnitToSpawn(eEntityType unitType, const Map& map, UnitSpawnerBu
         case eEntityType::Unit:
             assert(building.getEntityType() == eEntityType::Barracks);
             static_cast<Barracks&>(building).addUnitToSpawn([this, &map, unitType](const UnitSpawnerBuilding& building)
-                { return this->spawnUnit<Unit>(map, this->m_units, unitType, building); });
+            { return this->spawnUnit(map, building); });
             break;
         case eEntityType::Worker:
             assert(building.getEntityType() == eEntityType::HQ);
             static_cast<HQ&>(building).addUnitToSpawn([this, &map, unitType](const UnitSpawnerBuilding& building)
-                { return this->spawnUnit<Worker>(map, this->m_workers, unitType, building); });
+            { return this->spawnWorker(map, building); });
             break;
         default:
             assert(false);
@@ -638,4 +638,54 @@ bool Faction::instructWorkerToBuild(eEntityType entityType, const glm::vec3& pos
     }
 
     return false;
+}
+
+Entity* Faction::spawnUnit(const Map& map, const UnitSpawnerBuilding& building)
+{
+    if (isEntityAffordable(eEntityType::Unit) && !isExceedPopulationLimit(eEntityType::Unit))
+    {
+        if (building.isWaypointActive())
+        {
+            m_units.emplace_back(*this, Globals::convertToNodePosition(building.getUnitSpawnPosition()), PathFindingLocator::get().getClosestAvailablePosition(
+                building.getWaypointPosition(), m_units, m_workers, map), map);
+        }
+        else
+        {
+            m_units.emplace_back(*this, Globals::convertToNodePosition(PathFindingLocator::get().getClosestAvailablePosition(building.getUnitSpawnPosition(),
+                m_units, m_workers, map)));
+        }
+
+        reduceResources(eEntityType::Unit);
+        increaseCurrentPopulationAmount(eEntityType::Unit);
+        m_allEntities.push_back(&m_units.back());
+
+        return &m_units.back();
+    }
+
+    return nullptr;
+}
+
+Entity* Faction::spawnWorker(const Map& map, const UnitSpawnerBuilding& building)
+{
+    if (isEntityAffordable(eEntityType::Worker) && !isExceedPopulationLimit(eEntityType::Worker))
+    {
+        if (building.isWaypointActive())
+        {
+            m_workers.emplace_back(*this, building.getUnitSpawnPosition(), PathFindingLocator::get().getClosestAvailablePosition(
+                building.getWaypointPosition(), m_units, m_workers, map), map);
+        }
+        else
+        {
+            m_workers.emplace_back(*this, PathFindingLocator::get().getClosestAvailablePosition(
+                building.getUnitSpawnPosition(), m_units, m_workers, map));
+        }
+
+        reduceResources(eEntityType::Worker);
+        increaseCurrentPopulationAmount(eEntityType::Worker);
+        m_allEntities.push_back(&m_workers.back());
+
+        return &m_workers.back();
+    }
+
+    return nullptr;
 }
