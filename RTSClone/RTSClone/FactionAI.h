@@ -42,7 +42,7 @@ private:
 	const Mineral& getRandomMineral() const;
 	Worker* getAvailableWorker(const glm::vec3& position);
 	
-	const Entity* addBuilding(const Map& map, glm::vec3 position, eEntityType entityType) override;
+	const Entity* spawnBuilding(const Map& map, glm::vec3 position, eEntityType entityType) override;
 	Entity* spawnUnit(const Map& map, const UnitSpawnerBuilding& building) override;
 	Entity* spawnWorker(const Map& map, const UnitSpawnerBuilding& building) override;
 };

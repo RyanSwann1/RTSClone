@@ -256,11 +256,11 @@ Worker* FactionAI::getAvailableWorker(const glm::vec3& position)
 	return selectedWorker;
 }
 
-const Entity* FactionAI::addBuilding(const Map& map, glm::vec3 position, eEntityType entityType)
+const Entity* FactionAI::spawnBuilding(const Map& map, glm::vec3 position, eEntityType entityType)
 {
 	if (isEntityAffordable(entityType) && !map.isPositionOccupied(position))
 	{
-		return Faction::addBuilding(map, position, entityType);
+		return Faction::spawnBuilding(map, position, entityType);
 	}
 	
 	switch (entityType)

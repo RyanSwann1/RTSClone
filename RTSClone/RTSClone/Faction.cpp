@@ -469,7 +469,7 @@ bool Faction::isEntityAffordable(eEntityType entityType) const
     }
 }
 
-const Entity* Faction::addBuilding(const Map& map, glm::vec3 position, eEntityType entityType)
+const Entity* Faction::spawnBuilding(const Map& map, glm::vec3 position, eEntityType entityType)
 {
     if (isEntityAffordable(entityType) && !map.isPositionOccupied(position))
     {
@@ -625,7 +625,7 @@ bool Faction::instructWorkerToBuild(eEntityType entityType, const glm::vec3& pos
         if (plannedBuilding == m_plannedBuildings.cend())
         {
             if (worker.build([this, &map, buildPosition, entityType]()
-                { return addBuilding(map, buildPosition, entityType); }, buildPosition, map))
+                { return spawnBuilding(map, buildPosition, entityType); }, buildPosition, map))
             {
                 m_plannedBuildings.emplace_back(worker.getID(), buildPosition, entityType);
                 return true;
