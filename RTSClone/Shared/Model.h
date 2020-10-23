@@ -3,7 +3,6 @@
 #include "NonCopyable.h"
 #include "NonMovable.h"
 #include "Mesh.h"
-
 #include <string>
 #include <memory>
 #include <vector>

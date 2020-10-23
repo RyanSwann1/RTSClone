@@ -117,6 +117,16 @@ Level::~Level()
 	GameMessenger::getInstance().broadcast<GameMessages::BaseMessage<eGameMessageType::UIClearDisplaySelectedEntity>>({});
 }
 
+const Faction* Level::getPlayer() const
+{
+	if (m_factionHandler.isFactionActive(eFactionController::Player))
+	{
+		return &m_factionHandler.getFaction(eFactionController::Player);
+	}
+
+	return nullptr;
+}
+
 eFactionController Level::getWinningFactionController() const
 {
 	assert(isComplete());

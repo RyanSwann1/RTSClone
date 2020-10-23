@@ -152,6 +152,14 @@ int main()
 					{
 						std::cout << "Unable to load " << levelName << "\n";
 					}
+					else
+					{
+						const Faction* playerFaction = level->getPlayer();
+						if (playerFaction)
+						{
+							camera.position = glm::vec3(playerFaction->getHQPosition().x, camera.position.y, playerFaction->getHQPosition().z);
+						}
+					}
 					break;
 				}	
 			}
