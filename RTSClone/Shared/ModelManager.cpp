@@ -9,7 +9,6 @@
 #include <iostream>
 #include <functional>
 #endif // LEVEL_EDITOR
-
 #include <iostream>
 
 const std::string TERRAIN_MODEL_NAME = "terrain.obj";

@@ -3,9 +3,7 @@
 #include "NonCopyable.h"
 #include "glm/glm.hpp"
 #include "AABB.h"
-#ifdef LEVEL_EDITOR
-#include "ModelName.h"
-#endif // LEVEL_EDITOR
+#include <functional>
 #ifdef GAME
 #include "EntityType.h"
 #endif // GAME
@@ -20,13 +18,11 @@ public:
 	Entity& operator=(Entity&&) noexcept;
 
 #ifdef LEVEL_EDITOR
-	Entity();
-	Entity(eModelName modelName, const glm::vec3& startingPosition);
+	Entity(const Model& model);
+	Entity(const Model& model, const glm::vec3& startingPosition);
 	glm::vec3& getPosition();
-	void setModelName(eModelName modelName);
+	const Model& getModel() const;
 	void setPosition(const glm::vec3& position);
-	eModelName getModelName() const;
-
 	void resetAABB();
 #endif // LEVEL_EDITOR
 
@@ -53,7 +49,7 @@ public:
 
 protected:	
 #ifdef GAME
-	Entity(const glm::vec3& startingPosition, eEntityType entityType, int health = 0);
+	Entity(const Model& model, const glm::vec3& startingPosition, eEntityType entityType, int health = 0);
 #endif // GAME
 	glm::vec3 m_position;
 	AABB m_AABB;
@@ -65,8 +61,6 @@ private:
 	int m_health;
 	eEntityType m_type;
 #endif // GAME
-#ifdef LEVEL_EDITOR
-	eModelName m_modelName;
-#endif // LEVEL_EDITOR
+	std::reference_wrapper<const Model> m_model;
 	bool m_selected;
 };

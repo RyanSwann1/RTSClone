@@ -19,9 +19,6 @@ extern const std::string WAYPOINT_MODEL_NAME;
 extern const std::string PROJECTILE_MODEL_NAME;
 extern const std::string TRANSLATE_MODEL_NAME;
 
-#ifdef GAME
-enum class eEntityType;
-#endif // GAME
 class ModelManager : private NonMovable, private NonCopyable
 {
 public:

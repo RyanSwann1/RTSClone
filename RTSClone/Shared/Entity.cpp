@@ -6,13 +6,14 @@
 #include "UniqueEntityIDDistributer.h"
 
 #ifdef GAME
-Entity::Entity(const glm::vec3& startingPosition, eEntityType entityType, int health)
+Entity::Entity(const Model& model, const glm::vec3& startingPosition, eEntityType entityType, int health)
 	: m_position(0.0f, 0.0f, 0.0f),
 	m_AABB(),
 	m_ID(UniqueEntityIDDistributer::getInstance().getUniqueEntityID()),
 	m_maximumHealth(health),
 	m_health(health),
 	m_type(entityType),
+	m_model(model),
 	m_selected(false)
 {
 	switch (m_type)
@@ -37,22 +38,22 @@ Entity::Entity(const glm::vec3& startingPosition, eEntityType entityType, int he
 #endif // GAME
 
 #ifdef LEVEL_EDITOR
-Entity::Entity()
+Entity::Entity(const Model& model)
 	: m_position(),
 	m_AABB(),
 	m_ID(UniqueEntityIDDistributer::getInstance().getUniqueEntityID()),
-	m_modelName(),
+	m_model(model),
 	m_selected(false)
 {}
 
-Entity::Entity(eModelName modelName, const glm::vec3& startingPosition)
+Entity::Entity(const Model& model, const glm::vec3& startingPosition)
 	: m_position(startingPosition),
 	m_AABB(),
 	m_ID(UniqueEntityIDDistributer::getInstance().getUniqueEntityID()),
-	m_modelName(modelName),
+	m_model(model),
 	m_selected(false)
 {
-	m_AABB.reset(m_position, ModelManager::getInstance().getModel(m_modelName));
+	m_AABB.reset(m_position, m_model);
 }
 
 glm::vec3& Entity::getPosition()
@@ -60,9 +61,9 @@ glm::vec3& Entity::getPosition()
 	return m_position;
 }
 
-void Entity::setModelName(eModelName modelName)
+const Model& Entity::getModel() const
 {
-	m_modelName = modelName;
+	return m_model;
 }
 
 void Entity::setPosition(const glm::vec3 & position)
@@ -70,13 +71,9 @@ void Entity::setPosition(const glm::vec3 & position)
 	m_position = position;
 }
 
-eModelName Entity::getModelName() const
-{
-	return m_modelName;
-}
 void Entity::resetAABB()
 {
-	m_AABB.reset(m_position, ModelManager::getInstance().getModel(m_modelName));
+	m_AABB.reset(m_position, m_model);
 }
 #endif // LEVEL_EDITOR
 
@@ -84,6 +81,7 @@ Entity::Entity(Entity&& orig) noexcept
 	: m_position(orig.m_position),
 	m_AABB(std::move(orig.m_AABB)),
 	m_ID(orig.m_ID),
+	m_model(orig.m_model),
 	m_selected(orig.m_selected)
 {
 #ifdef GAME
@@ -91,9 +89,6 @@ Entity::Entity(Entity&& orig) noexcept
 	m_health = orig.m_health;
 	m_type = orig.m_type;
 #endif // GAME
-#ifdef LEVEL_EDITOR
-	m_modelName = orig.m_modelName;
-#endif // LEVEL_EDITOR
 
 	orig.m_ID = Globals::INVALID_ENTITY_ID;
 }
@@ -103,15 +98,14 @@ Entity& Entity::operator=(Entity&& orig) noexcept
 	m_position = orig.m_position;
 	m_AABB = std::move(orig.m_AABB);
 	m_ID = orig.m_ID;
+	m_model = std::move(orig.m_model);
+	m_selected = orig.m_selected;
+
 #ifdef GAME
 	m_maximumHealth = orig.m_maximumHealth;
 	m_health = orig.m_health;
 	m_type = orig.m_type;
 #endif // GAME
-#ifdef LEVEL_EDITOR
-	m_modelName = orig.m_modelName;
-#endif // LEVEL_EDITOR
-	m_selected = orig.m_selected;
 
 	orig.m_ID = Globals::INVALID_ENTITY_ID;
 	return *this;
@@ -179,13 +173,7 @@ void Entity::setSelected(bool selected)
 
 void Entity::render(ShaderHandler& shaderHandler) const
 {
-#ifdef GAME
-	ModelManager::getInstance().getModel(m_type).render(shaderHandler, *this);
-#endif // GAME
-
-#ifdef LEVEL_EDITOR
-	ModelManager::getInstance().getModel(m_modelName).render(shaderHandler, *this);
-#endif // LEVEL_EDITOR
+	m_model.get().render(shaderHandler, *this);
 }
 
 #ifdef RENDER_AABB
