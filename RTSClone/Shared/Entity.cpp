@@ -33,7 +33,7 @@ Entity::Entity(const Model& model, const glm::vec3& startingPosition, eEntityTyp
 		assert(false);
 	}
 
-	m_AABB.reset(m_position, ModelManager::getInstance().getModel(m_type));
+	m_AABB.reset(m_position, m_model);
 }
 #endif // GAME
 

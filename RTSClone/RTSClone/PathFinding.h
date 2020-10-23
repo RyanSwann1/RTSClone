@@ -14,10 +14,7 @@
 #include <functional>
 #include <list>
 
-namespace GameMessages
-{
-	struct NewMapSize;
-};
+struct Model;
 class Faction;
 class Entity;
 class Worker;
@@ -79,7 +76,7 @@ public:
 		return shortestDistancePosition;
 	}
 
-	bool isBuildingSpawnAvailable(const glm::vec3& startingPosition, eEntityType entityTypeToBuild, const Map& map,
+	bool isBuildingSpawnAvailable(const glm::vec3& startingPosition, const Model& model, const Map& map,
 		glm::vec3& buildPosition, float minDistanceFromHQ, float maxDistanceFromHQ, float distanceFromMinerals, const Faction& owningFaction);
 
 	bool isPositionAvailable(const glm::vec3& nodePosition, const Map& map, const std::list<Unit>& units, const std::list<Worker>& workers, 

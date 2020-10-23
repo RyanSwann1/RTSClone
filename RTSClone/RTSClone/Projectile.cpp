@@ -2,6 +2,7 @@
 #include "ShaderHandler.h"
 #include "GameEvent.h"
 #include "Globals.h"
+#include "ModelManager.h"
 
 namespace
 {
@@ -9,7 +10,7 @@ namespace
 }
 
 Projectile::Projectile(const GameEvent& gameEvent)
-	: Entity(gameEvent.startingPosition, eEntityType::Projectile),
+	: Entity(ModelManager::getInstance().getModel(PROJECTILE_MODEL_NAME), gameEvent.startingPosition, eEntityType::Projectile),
 	m_senderEvent(gameEvent)
 {}
 

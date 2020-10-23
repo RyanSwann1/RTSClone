@@ -197,7 +197,7 @@ void PathFinding::clearAttackPositions()
 	m_attackPositions.clear();
 }
 
-bool PathFinding::isBuildingSpawnAvailable(const glm::vec3& startingPosition, eEntityType entityTypeToBuild, const Map& map, 
+bool PathFinding::isBuildingSpawnAvailable(const glm::vec3& startingPosition, const Model& model, const Map& map, 
 	glm::vec3& buildPosition, float minDistanceFromHQ, float maxDistanceFromHQ, float distanceFromMinerals, const Faction& owningFaction)
 {
 	m_graph.reset(m_frontier);
@@ -215,9 +215,7 @@ bool PathFinding::isBuildingSpawnAvailable(const glm::vec3& startingPosition, eE
 		{
 			if (adjacentPosition.valid)
 			{
-				AABB buildingAABB(Globals::convertToWorldPosition(adjacentPosition.position),
-					ModelManager::getInstance().getModel(entityTypeToBuild));
-
+				AABB buildingAABB(Globals::convertToWorldPosition(adjacentPosition.position), model);
 				if (!map.isAABBOccupied(buildingAABB))
 				{
 					const auto& owningFactionMinerals = owningFaction.getMinerals();

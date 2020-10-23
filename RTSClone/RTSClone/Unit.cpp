@@ -61,8 +61,8 @@ namespace
 #endif // RENDER_PATHING
 }
 
-Unit::Unit(const Faction& owningFaction, const glm::vec3& startingPosition, eEntityType entityType, int health)
-	: Entity(startingPosition, entityType, health),
+Unit::Unit(const Faction& owningFaction, const glm::vec3& startingPosition, eEntityType entityType, int health, const Model& model)
+	: Entity(model, startingPosition, entityType, health),
 	m_owningFaction(owningFaction),
 	m_pathToPosition(),
 	m_front(),
@@ -73,8 +73,8 @@ Unit::Unit(const Faction& owningFaction, const glm::vec3& startingPosition, eEnt
 {}
 
 Unit::Unit(const Faction& owningFaction, const glm::vec3 & startingPosition, const glm::vec3 & destinationPosition, 
-	const Map & map, eEntityType entityType, int health)
-	: Entity(startingPosition, entityType, health),
+	const Map & map, eEntityType entityType, int health, const Model& model)
+	: Entity(model, startingPosition, entityType, health),
 	m_owningFaction(owningFaction),
 	m_pathToPosition(),
 	m_front(),

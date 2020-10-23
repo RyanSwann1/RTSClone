@@ -48,7 +48,8 @@ namespace
 //Barracks
 Barracks::Barracks(const glm::vec3& startingPosition, const Faction& owningFaction)
 	: UnitSpawnerBuilding(startingPosition, eEntityType::Barracks, TIME_BETWEEN_UNIT_SPAWN, 
-		Globals::BARRACKS_STARTING_HEALTH, owningFaction)
+		Globals::BARRACKS_STARTING_HEALTH, owningFaction,
+		ModelManager::getInstance().getModel(BARRACKS_MODEL_NAME))
 {}
 
 void Barracks::update(float deltaTime)
@@ -67,7 +68,8 @@ void Barracks::addUnitToSpawn(const std::function<Entity* (const UnitSpawnerBuil
 //HQ
 HQ::HQ(const glm::vec3& startingPosition, const Faction& owningFaction)
 	: UnitSpawnerBuilding(startingPosition, eEntityType::HQ, TIME_BETWEEN_WORKER_SPAWN, 
-		Globals::HQ_STARTING_HEALTH, owningFaction)
+		Globals::HQ_STARTING_HEALTH, owningFaction,
+		ModelManager::getInstance().getModel(HQ_MODEL_NAME))
 {}
 
 void HQ::update(float deltaTime)
@@ -182,15 +184,15 @@ void UnitSpawnerBuilding::render(ShaderHandler& shaderHandler) const
 {
 	if (isSelected() && isWaypointActive())
 	{
-		ModelManager::getInstance().getModel(eModelName::Waypoint).render(shaderHandler, m_waypointPosition);
+		ModelManager::getInstance().getModel(WAYPOINT_MODEL_NAME).render(shaderHandler, m_waypointPosition);
 	}
 
 	Entity::render(shaderHandler);
 }
 
 UnitSpawnerBuilding::UnitSpawnerBuilding(const glm::vec3& startingPosition, eEntityType entityType, 
-	float spawnTimerExpirationTime, int health, const Faction& owningFaction)
-	: Entity(startingPosition, entityType, health),
+	float spawnTimerExpirationTime, int health, const Faction& owningFaction, const Model& model)
+	: Entity(model, startingPosition, entityType, health),
 	m_owningFaction(owningFaction),
 	m_unitsToSpawn(),
 	m_spawnTimer(spawnTimerExpirationTime, false),

@@ -31,7 +31,8 @@ BuildingCommand::BuildingCommand(const std::function<const Entity*()>& command, 
 
 //Worker
 Worker::Worker(const Faction& owningFaction, const glm::vec3& startingPosition)
-	: Unit(owningFaction, startingPosition, eEntityType::Worker, Globals::WORKER_STARTING_HEALTH),
+	: Unit(owningFaction, startingPosition, eEntityType::Worker, Globals::WORKER_STARTING_HEALTH,
+		ModelManager::getInstance().getModel(WORKER_MODEL_NAME)),
 	m_buildingCommands(),
 	m_repairTargetEntityID(Globals::INVALID_ENTITY_ID),
 	m_currentResourceAmount(0),
@@ -42,7 +43,8 @@ Worker::Worker(const Faction& owningFaction, const glm::vec3& startingPosition)
 {}
 
 Worker::Worker(const Faction& owningFaction, const glm::vec3 & startingPosition, const glm::vec3 & destinationPosition, const Map & map)
-	: Unit(owningFaction, startingPosition, eEntityType::Worker, Globals::WORKER_STARTING_HEALTH),
+	: Unit(owningFaction, startingPosition, eEntityType::Worker, Globals::WORKER_STARTING_HEALTH,
+		ModelManager::getInstance().getModel(WORKER_MODEL_NAME)),
 	m_buildingCommands(),
 	m_repairTargetEntityID(Globals::INVALID_ENTITY_ID),
 	m_currentResourceAmount(0),
@@ -269,8 +271,8 @@ void Worker::render(ShaderHandler& shaderHandler) const
 {
 	if (m_currentResourceAmount > 0 && getCurrentState() != eUnitState::Harvesting)
 	{
-		ModelManager::getInstance().getModel(eModelName::WorkerMineral).render(
-			shaderHandler, { m_position.x - 0.5f, m_position.y, m_position.z - 0.5f });
+		//ModelManager::getInstance().getModel(eModelName::WorkerMineral).render(
+			//shaderHandler, { m_position.x - 0.5f, m_position.y, m_position.z - 0.5f });
 	}
 
 	Entity::render(shaderHandler);

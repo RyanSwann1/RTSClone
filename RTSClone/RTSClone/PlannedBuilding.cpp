@@ -67,6 +67,16 @@ void PlannedBuilding::render(ShaderHandler& shaderHandler) const
 {
     if (m_active)
     {
-        ModelManager::getInstance().getModel(m_entityType).render(shaderHandler, m_position);
+        switch (m_entityType)
+        {
+        case eEntityType::SupplyDepot:
+            ModelManager::getInstance().getModel(SUPPLY_DEPOT_MODEL_NAME).render(shaderHandler, m_position);
+            break;
+        case eEntityType::Barracks:
+            ModelManager::getInstance().getModel(BARRACKS_MODEL_NAME).render(shaderHandler, m_position);
+            break;
+        default:
+            assert(false);
+        }
     }
 }

@@ -5,6 +5,7 @@
 #include "NonMovable.h"
 #include <functional>
 
+struct Model;
 class Map;
 class Faction;
 class UnitSpawnerBuilding : public Entity, private NonMovable
@@ -23,7 +24,7 @@ public:
 
 protected:
 	UnitSpawnerBuilding(const glm::vec3& startingPosition, eEntityType entityType, float spawnTimerExpirationTime, int health, 
-		const Faction& owningFaction);
+		const Faction& owningFaction, const Model& model);
 	
 	void update(float deltaTime, int resourceCost, int populationCost);
 	void addUnitToSpawn(const std::function<Entity* (const UnitSpawnerBuilding&)>& unitToSpawn);

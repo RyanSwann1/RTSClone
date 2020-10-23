@@ -129,7 +129,8 @@ void FactionAI::update(float deltaTime, const Map & map, FactionHandler& faction
 				{
 					glm::vec3 buildPosition = { 0.0f, 0.0f, 0.0f };
 					if (isEntityAffordable(eEntityType::Barracks) &&
-						PathFindingLocator::get().isBuildingSpawnAvailable(m_HQ.getPosition(), eEntityType::Barracks, map, buildPosition,
+						PathFindingLocator::get().isBuildingSpawnAvailable(m_HQ.getPosition(), 
+							ModelManager::getInstance().getModel(BARRACKS_MODEL_NAME), map, buildPosition,
 							MIN_DISTANCE_FROM_HQ, MAX_DISTANCE_FROM_HQ, DISTANCE_FROM_MINERALS, *this))
 					{
 						Worker* availableWorker = getAvailableWorker(buildPosition);
@@ -148,7 +149,8 @@ void FactionAI::update(float deltaTime, const Map & map, FactionHandler& faction
 				{
 					glm::vec3 buildPosition = { 0.0f, 0.0f, 0.0f };
 					if (isEntityAffordable(eEntityType::SupplyDepot) &&
-						PathFindingLocator::get().isBuildingSpawnAvailable(m_HQ.getPosition(), eEntityType::SupplyDepot, map, buildPosition,
+						PathFindingLocator::get().isBuildingSpawnAvailable(m_HQ.getPosition(), 
+							ModelManager::getInstance().getModel(SUPPLY_DEPOT_MODEL_NAME), map, buildPosition,
 							MIN_DISTANCE_FROM_HQ, MAX_DISTANCE_FROM_HQ, DISTANCE_FROM_MINERALS, *this))
 					{
 						Worker* availableWorker = getAvailableWorker(buildPosition);

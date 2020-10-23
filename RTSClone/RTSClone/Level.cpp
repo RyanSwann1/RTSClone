@@ -292,7 +292,7 @@ void Level::render(ShaderHandler& shaderHandler) const
 	}
 
 	m_projectileHandler.render(shaderHandler);
-	ModelManager::getInstance().getModel(eModelName::Terrain).render(shaderHandler, Globals::TERRAIN_POSITION);
+	ModelManager::getInstance().getModel(TERRAIN_MODEL_NAME).render(shaderHandler, Globals::TERRAIN_POSITION);
 }
 
 #ifdef RENDER_AABB

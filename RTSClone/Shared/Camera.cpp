@@ -214,7 +214,7 @@ void Camera::update(float deltaTime, const sf::Window& window, glm::ivec2 lastMo
 	}
 }
 
-void Camera::zoom(float mouseWheelDelta)
+void Camera::zoom(int mouseWheelDelta)
 {
 	glm::vec3 newPosition = { 0.0f, 0.0f, 0.0f };
 	if (mouseWheelDelta > 0)

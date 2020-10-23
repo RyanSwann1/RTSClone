@@ -5,6 +5,7 @@
 #include "Timer.h"
 #include "EntityTarget.h"
 #include "Globals.h"
+#include "ModelManager.h"
 #include <functional>
 #include <vector>
 #include <list>
@@ -35,9 +36,11 @@ class FactionHandler;
 class Unit : public Entity, private NonMovable
 {
 public:
-	Unit(const Faction& owningFaction, const glm::vec3& startingPosition, eEntityType entityType = eEntityType::Unit, int health = Globals::UNIT_STARTING_HEALTH);
+	Unit(const Faction& owningFaction, const glm::vec3& startingPosition, eEntityType entityType = eEntityType::Unit, int health = Globals::UNIT_STARTING_HEALTH,
+		const Model& model = ModelManager::getInstance().getModel(UNIT_MODEL_NAME));
 	Unit(const Faction& owningFaction, const glm::vec3& startingPosition, const glm::vec3& destinationPosition, 
-		const Map& map, eEntityType entityType = eEntityType::Unit, int health = Globals::UNIT_STARTING_HEALTH);
+		const Map& map, eEntityType entityType = eEntityType::Unit, int health = Globals::UNIT_STARTING_HEALTH, 
+		const Model& model = ModelManager::getInstance().getModel(UNIT_MODEL_NAME));
 
 	float getGridAttackRange() const;
 	float getAttackRange() const;

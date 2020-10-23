@@ -2,10 +2,10 @@
 #include "GameMessenger.h"
 #include "GameMessages.h"
 #include "Globals.h"
-#include "UniqueEntityIDDistributer.h"
+#include "ModelManager.h"
 
 SupplyDepot::SupplyDepot(const glm::vec3& startingPosition)
-	: Entity(startingPosition, eEntityType::SupplyDepot, 10)
+	: Entity(ModelManager::getInstance().getModel(SUPPLY_DEPOT_MODEL_NAME), startingPosition, eEntityType::SupplyDepot, Globals::SUPPLY_DEPOT_STARTING_HEALTH)
 {
 	GameMessenger::getInstance().broadcast<GameMessages::MapModification<eGameMessageType::AddEntityToMap>>({ m_AABB });
 }

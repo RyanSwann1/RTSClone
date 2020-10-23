@@ -4,29 +4,26 @@
 #include "ModelManager.h"
 #include "Globals.h"
 
-SceneryGameObject::SceneryGameObject(eModelName modelName, const glm::vec3& position)
-	: m_modelName(modelName),
+SceneryGameObject::SceneryGameObject(const Model& model, const glm::vec3& position)
+	: m_model(model),
 	m_position(position),
 	m_active(true)
 {
-	if (ModelManager::getInstance().getModel(m_modelName).isCollidable())
-	{
-		AABB AABB(m_position, ModelManager::getInstance().getModel(m_modelName));
-		GameMessenger::getInstance().broadcast<GameMessages::MapModification<eGameMessageType::AddEntityToMap>>({ AABB });
-	}
+	AABB AABB(m_position, m_model);
+	GameMessenger::getInstance().broadcast<GameMessages::MapModification<eGameMessageType::AddEntityToMap>>({ AABB });
 }
 
 SceneryGameObject::~SceneryGameObject()
 {
-	if (m_active && ModelManager::getInstance().getModel(m_modelName).isCollidable())
+	if (m_active)
 	{
-		AABB AABB(m_position, ModelManager::getInstance().getModel(m_modelName));
+		AABB AABB(m_position, m_model);
 		GameMessenger::getInstance().broadcast<GameMessages::MapModification<eGameMessageType::RemoveEntityFromMap>>({ AABB });
 	}
 }
 
 SceneryGameObject::SceneryGameObject(SceneryGameObject&& orig) noexcept
-	: m_modelName(orig.m_modelName),
+	: m_model(orig.m_model),
 	m_position(orig.m_position),
 	m_active(orig.m_active)
 {
@@ -35,7 +32,7 @@ SceneryGameObject::SceneryGameObject(SceneryGameObject&& orig) noexcept
 
 SceneryGameObject& SceneryGameObject::operator=(SceneryGameObject&& orig) noexcept
 {
-	m_modelName = orig.m_modelName;
+	m_model = orig.m_model;
 	m_position = orig.m_position;
 	m_active = orig.m_active;
 
@@ -46,7 +43,7 @@ SceneryGameObject& SceneryGameObject::operator=(SceneryGameObject&& orig) noexce
 
 void SceneryGameObject::render(ShaderHandler& shaderHandler) const
 {
-	ModelManager::getInstance().getModel(m_modelName).render(shaderHandler, m_position);
+	m_model.get().render(shaderHandler, m_position);
 }
 
 #ifdef RENDER_AABB
