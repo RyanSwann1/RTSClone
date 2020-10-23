@@ -100,12 +100,11 @@ glm::vec3 Camera::getMouseToGroundPosition(const sf::Window& window) const
 {
 	assert(position.y >= MINIMUM_HEIGHT);
 
-
 	glm::vec3 rayPositionFromMouse = calculateMouseRay(getProjection(window), getView(), window,
 		{ sf::Mouse::getPosition(window).x, sf::Mouse::getPosition(window).y });
 
 	glm::vec3 rayPosition = position;
-	int i = position.y;
+	int i = static_cast<int>(position.y);
 	while (rayPosition.y > 0.0f)
 	{
 		rayPosition = rayPositionFromMouse * static_cast<float>(i) + position;
@@ -255,20 +254,20 @@ void Camera::zoom(const sf::Window& window, glm::ivec2 lastMousePosition)
 
 void Camera::moveByArrowKeys(float deltaTime)
 {
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left) || sf::Keyboard::isKeyPressed(sf::Keyboard::A))
 	{
 		position -= glm::normalize(glm::cross(front, up)) * MOVEMENT_SPEED * deltaTime;
 	}
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right) || sf::Keyboard::isKeyPressed(sf::Keyboard::D))
 	{
 		position += glm::normalize(glm::cross(front, up)) * MOVEMENT_SPEED * deltaTime;
 	}
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up) || sf::Keyboard::isKeyPressed(sf::Keyboard::W))
 	{
 		position.x += glm::cos(glm::radians(rotation.y)) * MOVEMENT_SPEED * deltaTime;
 		position.z += glm::sin(glm::radians(rotation.y)) * MOVEMENT_SPEED * deltaTime;
 	}
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down) || sf::Keyboard::isKeyPressed(sf::Keyboard::S))
 	{
 		position.x -= glm::cos(glm::radians(rotation.y)) * MOVEMENT_SPEED * deltaTime;
 		position.z -= glm::sin(glm::radians(rotation.y)) * MOVEMENT_SPEED * deltaTime;
