@@ -60,7 +60,7 @@ protected:
 
 	bool isEntityAffordable(eEntityType entityType) const;
 
-	const Entity* addBuilding(const Map& map, glm::vec3 position, eEntityType entityType);
+	virtual const Entity* addBuilding(const Map& map, glm::vec3 position, eEntityType entityType);
 	bool addUnitToSpawn(eEntityType unitType, const Map& map, UnitSpawnerBuilding& building);
 	bool instructWorkerToBuild(eEntityType entityType, const glm::vec3& position, const Map& map, Worker& worker);
 
