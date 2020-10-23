@@ -16,8 +16,7 @@ struct PlannedEntity
 
 	int modelNameIDSelected;
 	glm::vec3 position;
-	eModelName modelName;
-	bool active;
+	const Model* model;
 };
 
 struct Camera;
@@ -35,10 +34,10 @@ public:
 	const glm::ivec2& getMapSize() const;
 	const EntityManager& getEntityManager() const;
 
-	void addEntity(eModelName modelName, const glm::vec3& position);
 	void handleInput(const sf::Event& currentSFMLEvent, const Camera& camera, const sf::Window& window, float deltaTime);
 	void handleModelNamesGUI();
 	void handlePlayersGUI();
+	void handleSelectedEntityGUI();
 	void handleLevelDetailsGUI(bool& showGUIWindow);
 	void save() const;
 	void render(ShaderHandler& shaderHandler) const;

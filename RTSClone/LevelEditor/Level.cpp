@@ -27,8 +27,7 @@ namespace
 PlannedEntity::PlannedEntity()
 	: modelNameIDSelected(0),
 	position(),
-	modelName(),
-	active(false)
+	model(nullptr)
 {}
 
 //Level
@@ -108,11 +107,6 @@ const EntityManager& Level::getEntityManager() const
 	return m_entityManager;
 }
 
-void Level::addEntity(eModelName modelName, const glm::vec3& position)
-{
-	m_entityManager.addEntity(modelName, position);
-}
-
 void Level::handleInput(const sf::Event& currentSFMLEvent, const Camera& camera, const sf::Window& window, float deltaTime)
 {
 	switch (currentSFMLEvent.type)
@@ -147,13 +141,13 @@ void Level::handleInput(const sf::Event& currentSFMLEvent, const Camera& camera,
 						if (entitySelected)
 						{
 							m_translateObject.setPosition(entitySelected->getPosition());
-							m_plannedEntity.active = false;
+							m_plannedEntity.model = nullptr;
 						}
 						else
 						{
-							if (m_plannedEntity.active)
+							if (m_plannedEntity.model)
 							{
-								m_entityManager.addEntity(m_plannedEntity.modelName, m_plannedEntity.position);
+								m_entityManager.addEntity(*m_plannedEntity.model, m_plannedEntity.position);
 							}
 							else
 							{
@@ -175,7 +169,7 @@ void Level::handleInput(const sf::Event& currentSFMLEvent, const Camera& camera,
 			}
 			else if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Right))
 			{
-				m_plannedEntity.active = false;
+				m_plannedEntity.model = nullptr;
 			}
 		}
 	}
@@ -185,10 +179,10 @@ void Level::handleInput(const sf::Event& currentSFMLEvent, const Camera& camera,
 			glm::vec3 mouseToGroundPosition = { 0.0f, 0.0f, 0.0f };
 			if (camera.getMouseToGroundPosition(window, mouseToGroundPosition))
 			{
-				if (m_plannedEntity.active)
+				if (m_plannedEntity.model)
 				{
 					glm::vec3 newPosition = Globals::convertToNodePosition(mouseToGroundPosition);
-					AABB AABB(newPosition, ModelManager::getInstance().getModel(m_plannedEntity.modelName));
+					AABB AABB(newPosition, *m_plannedEntity.model);
 					if (Globals::isWithinMapBounds(AABB, m_mapSize))
 					{
 						m_plannedEntity.position = newPosition;
@@ -256,16 +250,16 @@ void Level::handleModelNamesGUI()
 {
 	ImGui::BeginChild("Model Names pane", ImVec2(175, 250), true);
 
-	const auto& modelNames = ModelManager::getInstance().getModelNames();
+	const std::vector<std::string>& modelNames = ModelManager::getInstance().getModelNames();
 	assert(m_plannedEntity.modelNameIDSelected >= 0 && m_plannedEntity.modelNameIDSelected < modelNames.size());
-	for (int i = 0; i < modelNames.size(); i++)
+	for (int i = 0; i < modelNames.size(); i++)	
 	{
-		if (ImGui::Selectable(modelNames[i].c_str(), m_plannedEntity.modelNameIDSelected == i))
+		if (ModelManager::getInstance().isModelLoaded(modelNames[i]) && 
+			ImGui::Selectable(modelNames[i].c_str(), m_plannedEntity.modelNameIDSelected == i))
 		{
 			m_plannedEntity.modelNameIDSelected = i;
-			m_plannedEntity.modelName = ModelManager::getInstance().getModelName(modelNames[i]);
-			m_plannedEntity.active = true;
-		}
+			m_plannedEntity.model = &ModelManager::getInstance().getModel(modelNames[i]);
+		}	
 	}
 
 	ImGui::EndChild();
@@ -338,6 +332,18 @@ void Level::handlePlayersGUI()
 	ImGui::EndChild();
 }
 
+void Level::handleSelectedEntityGUI()
+{
+	Entity* selectedEntity = m_entityManager.getSelectedEntity();
+	if (selectedEntity)
+	{
+		ImGui::BeginChild("Selected Entity", ImVec2(175, 275), true);
+		ImGui::Text("Selected Entity");
+
+		ImGui::EndChild();
+	}
+}
+
 void Level::handleLevelDetailsGUI(bool& showGUIWindow)
 {
 	ImGui::Begin("Level Details", &showGUIWindow, ImGuiWindowFlags_None);
@@ -385,9 +391,10 @@ void Level::render(ShaderHandler& shaderHandler) const
 		player.render(shaderHandler);
 	}
 
-	if (m_plannedEntity.active)
+	if (m_plannedEntity.model)
 	{
-		ModelManager::getInstance().getModel(m_plannedEntity.modelName).render(shaderHandler, m_plannedEntity.position);
+		m_plannedEntity.model->render(shaderHandler, m_plannedEntity.position);
+		//ModelManager::getInstance().getModel(m_plannedEntity.modelName).render(shaderHandler, m_plannedEntity.position);
 	}
 
 	m_translateObject.render(shaderHandler, m_entityManager.isEntitySelected() || m_selectedPlayer);
