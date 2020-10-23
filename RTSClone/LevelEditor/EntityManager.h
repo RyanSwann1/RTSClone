@@ -7,9 +7,9 @@
 #include <memory>
 #include <ostream>
 
+struct Model;
 class SelectionBox;
 class ShaderHandler;
-enum class eModelName;
 class EntityManager : private NonCopyable, private NonMovable
 {
 public:
@@ -19,7 +19,7 @@ public:
 	Entity* getSelectedEntity();
 	const std::vector<Entity>& getEntities() const;
 	
-	void addEntity(eModelName modelName, const glm::vec3& position);
+	void addEntity(const Model& model, const glm::vec3& position);
 	void removeAllSelectedEntities();
 	const Entity* selectEntityAtPosition(const glm::vec3& position);
 	void selectEntities(const SelectionBox& selectionBox);

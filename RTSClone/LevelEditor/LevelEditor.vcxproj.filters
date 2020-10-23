@@ -96,6 +96,9 @@
     <ClCompile Include="TranslateObject.cpp">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="..\Shared\Mineral.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Shared\imgui\imstb_truetype.h">
@@ -158,9 +161,6 @@
     <ClInclude Include="..\Shared\ModelManager.h">
       <Filter>src</Filter>
     </ClInclude>
-    <ClInclude Include="..\Shared\ModelName.h">
-      <Filter>src</Filter>
-    </ClInclude>
     <ClInclude Include="..\Shared\NonCopyable.h">
       <Filter>src</Filter>
     </ClInclude>
@@ -192,6 +192,9 @@
       <Filter>src</Filter>
     </ClInclude>
     <ClInclude Include="TranslateObject.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Shared\Mineral.h">
       <Filter>src</Filter>
     </ClInclude>
   </ItemGroup>

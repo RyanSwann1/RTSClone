@@ -40,7 +40,7 @@ const std::vector<Entity>& EntityManager::getEntities() const
 	return m_entities;
 }
 
-void EntityManager::addEntity(eModelName modelName, const glm::vec3& position)
+void EntityManager::addEntity(const Model& model, const glm::vec3& position)
 {
 	auto entity = std::find_if(m_entities.cbegin(), m_entities.cend(), [&position](const auto& gameObject)
 	{
@@ -48,7 +48,7 @@ void EntityManager::addEntity(eModelName modelName, const glm::vec3& position)
 	});
 	if (entity == m_entities.cend())
 	{
-		m_entities.emplace_back(modelName, position);
+		m_entities.emplace_back(model, position);
 	}
 }
 
@@ -119,7 +119,7 @@ void EntityManager::render(ShaderHandler& shaderHandler) const
 		entity.render(shaderHandler);
 	}
 
-	ModelManager::getInstance().getModel(eModelName::Terrain).render(shaderHandler, Globals::TERRAIN_POSITION);
+	ModelManager::getInstance().getModel(TERRAIN_MODEL_NAME).render(shaderHandler, Globals::TERRAIN_POSITION);
 }
 
 #ifdef RENDER_AABB
@@ -137,11 +137,11 @@ const std::ifstream& operator>>(std::ifstream& file, EntityManager& entityManage
 	auto data = [&entityManager](const std::string& line)
 	{
 		std::stringstream stream{ line };
-		std::string rawModelName;
+		std::string modelName;
 		glm::vec3 position;
-		stream >> rawModelName >> position.x >> position.y >> position.z;
+		stream >> modelName >> position.x >> position.y >> position.z;
 
-		entityManager.m_entities.emplace_back(static_cast<eModelName>(std::stoi(rawModelName)), position);
+		entityManager.m_entities.emplace_back(ModelManager::getInstance().getModel(modelName), position);
 	};
 
 	auto conditional = [](const std::string& line)
@@ -159,7 +159,7 @@ std::ostream& operator<<(std::ostream& ostream, const EntityManager& entityManag
 	ostream << Globals::TEXT_HEADER_SCENERY << "\n";
 	for (const auto& entity : entityManager.m_entities)
 	{
-		ostream << static_cast<int>(entity.getModelName()) << " " <<
+		ostream << entity.getModel().modelName << " " <<
 			entity.getPosition().x << " " << entity.getPosition().y << " " << entity.getPosition().z << "\n";
 	}
 	

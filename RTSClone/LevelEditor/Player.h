@@ -1,8 +1,8 @@
 #pragma once
 
-#include "Entity.h"
 #include "Globals.h"
 #include "FactionController.h"
+#include "Mineral.h"
 #include <array>
 #include <string>
 #include <ostream>
@@ -25,5 +25,5 @@ struct Player : private NonCopyable
 
 	eFactionController controller;
 	Entity HQ;
-	std::array<Entity, Globals::MAX_MINERALS_PER_FACTION> minerals;
+	std::array<Mineral, Globals::MAX_MINERALS_PER_FACTION> minerals;
 };

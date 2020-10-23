@@ -1,30 +1,24 @@
 #include "Player.h"
 #include "LevelFileHandler.h"
+#include "ModelManager.h"
 #include <sstream>
 #include <fstream>
 #include <functional>
 
 Player::Player(eFactionController controller)
 	: controller(controller),
-	HQ(),
+	HQ(ModelManager::getInstance().getModel(HQ_MODEL_NAME)),
 	minerals()
-{
-	HQ.setModelName(eModelName::HQ); //TODO: Change to constructor
-	for (auto& mineral : minerals)
-	{
-		mineral.setModelName(eModelName::Mineral);
-	}
-}
+{}
 
 Player::Player(eFactionController factionController, const glm::vec3& hqStartingPosition, const glm::vec3& startingMineralPosition)
 	: controller(factionController),
-	HQ(eModelName::HQ, hqStartingPosition),
+	HQ(ModelManager::getInstance().getModel(HQ_MODEL_NAME), hqStartingPosition),
 	minerals()
 {
 	glm::vec3 mineralSpawnPosition = Globals::convertToNodePosition(startingMineralPosition);
 	for (auto& mineral : minerals)
 	{
-		mineral.setModelName(eModelName::Mineral);
 		mineral.setPosition(mineralSpawnPosition);
 		mineralSpawnPosition.z += Globals::NODE_SIZE;
 	}
@@ -71,16 +65,15 @@ const std::ifstream& operator>>(std::ifstream& file, Player& player)
 	auto data = [&player](const std::string& line)
 	{
 		std::stringstream stream{ line };
-		std::string rawModelName;
+		std::string modelName;
 		glm::vec3 position;
-		stream >> rawModelName >> position.x >> position.y >> position.z;
-		switch (static_cast<eModelName>(std::stoi(rawModelName)))
+		stream >> modelName >> position.x >> position.y >> position.z;
+		if (modelName == HQ_MODEL_NAME)
 		{
-		case eModelName::HQ:
 			player.HQ.setPosition(position);
 			player.HQ.resetAABB();
-			break;
-		case eModelName::Mineral:
+		}
+		else if (modelName == MINERALS_MODEL_NAME)
 		{
 			int mineralIndex = 0;
 			stream >> mineralIndex;
@@ -88,8 +81,6 @@ const std::ifstream& operator>>(std::ifstream& file, Player& player)
 
 			player.minerals[mineralIndex].setPosition(position);
 			player.minerals[mineralIndex].resetAABB();
-		}
-		break;
 		}
 	};
 
@@ -108,12 +99,12 @@ std::ostream& operator<<(std::ostream& ostream, const Player& player)
 {
 	ostream << FACTION_CONTROLLER_DETAILS[static_cast<int>(player.controller)].text << "\n";
 
-	ostream << static_cast<int>(player.HQ.getModelName()) << " " <<  
+	ostream << player.HQ.getModel().modelName << " " <<  
 		player.HQ.getPosition().x << " " << player.HQ.getPosition().y << " " << player.HQ.getPosition().z << "\n";
 
 	for (int i = 0; i < player.minerals.size(); ++i)
 	{
-		ostream << static_cast<int>(player.minerals[i].getModelName()) << " " <<
+		ostream << player.minerals[i].getModel().modelName << " " <<
 			player.minerals[i].getPosition().x << " " << player.minerals[i].getPosition().y << " " << 
 			player.minerals[i].getPosition().z << " " << i << "\n";
 	}

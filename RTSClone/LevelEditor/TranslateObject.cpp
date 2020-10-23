@@ -77,7 +77,7 @@ void TranslateObject::render(ShaderHandler& shaderHandler, bool active) const
 {
 	if (active)
 	{
-		ModelManager::getInstance().getModel(eModelName::TranslateObject).render(shaderHandler, m_position);
+		ModelManager::getInstance().getModel(TRANSLATE_MODEL_NAME).render(shaderHandler, m_position);
 	}
 }
 

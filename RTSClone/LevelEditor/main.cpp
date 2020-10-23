@@ -160,7 +160,7 @@ int main()
 		{
 			titleName = level->getName();
 		}
-		if (ImGui::Begin(titleName.c_str(), nullptr, ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoMove))
+		if (ImGui::Begin(titleName.c_str(), nullptr, ImGuiWindowFlags_MenuBar))
 		{
 			if (ImGui::BeginMenuBar())
 			{
@@ -207,6 +207,7 @@ int main()
 			{
 				level->handleModelNamesGUI();
 				level->handlePlayersGUI();
+				level->handleSelectedEntityGUI();
 			}
 		}
 		ImGui::End();
