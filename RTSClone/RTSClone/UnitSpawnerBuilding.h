@@ -27,10 +27,10 @@ protected:
 		const Faction& owningFaction, const Model& model);
 	
 	void update(float deltaTime, int resourceCost, int populationCost);
-	void addUnitToSpawn(const std::function<Entity* (const UnitSpawnerBuilding&)>& unitToSpawn);
+	void addUnitToSpawn(const std::function<const Entity* (const UnitSpawnerBuilding&)>& unitToSpawn);
 
 	const Faction& m_owningFaction;
-	std::vector<std::function<Entity* (const UnitSpawnerBuilding&)>> m_unitsToSpawn;
+	std::vector<std::function<const Entity* (const UnitSpawnerBuilding&)>> m_unitsToSpawn;
 	Timer m_spawnTimer;
 
 private:
@@ -45,7 +45,7 @@ public:
 	void update(float deltaTime);
 	
 private:
-	void addUnitToSpawn(const std::function<Entity* (const UnitSpawnerBuilding&)>& unitToSpawn);
+	void addUnitToSpawn(const std::function<const Entity* (const UnitSpawnerBuilding&)>& unitToSpawn);
 };
 
 class HQ : public UnitSpawnerBuilding
@@ -56,5 +56,5 @@ public:
 	void update(float deltaTime);
 	
 private:
-	void addUnitToSpawn(const std::function<Entity* (const UnitSpawnerBuilding&)>& unitToSpawn);
+	void addUnitToSpawn(const std::function<const Entity* (const UnitSpawnerBuilding&)>& unitToSpawn);
 };

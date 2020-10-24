@@ -640,7 +640,7 @@ bool Faction::instructWorkerToBuild(eEntityType entityType, const glm::vec3& pos
     return false;
 }
 
-Entity* Faction::spawnUnit(const Map& map, const UnitSpawnerBuilding& building)
+const Entity* Faction::spawnUnit(const Map& map, const UnitSpawnerBuilding& building)
 {
     if (isEntityAffordable(eEntityType::Unit) && !isExceedPopulationLimit(eEntityType::Unit))
     {
@@ -665,7 +665,7 @@ Entity* Faction::spawnUnit(const Map& map, const UnitSpawnerBuilding& building)
     return nullptr;
 }
 
-Entity* Faction::spawnWorker(const Map& map, const UnitSpawnerBuilding& building)
+const Entity* Faction::spawnWorker(const Map& map, const UnitSpawnerBuilding& building)
 {
     if (isEntityAffordable(eEntityType::Worker) && !isExceedPopulationLimit(eEntityType::Worker))
     {

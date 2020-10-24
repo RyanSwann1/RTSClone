@@ -57,7 +57,7 @@ void Barracks::update(float deltaTime)
 	UnitSpawnerBuilding::update(deltaTime, Globals::UNIT_RESOURCE_COST, Globals::UNIT_POPULATION_COST);
 }
 
-void Barracks::addUnitToSpawn(const std::function<Entity* (const UnitSpawnerBuilding&)>& unitToSpawn)
+void Barracks::addUnitToSpawn(const std::function<const Entity* (const UnitSpawnerBuilding&)>& unitToSpawn)
 {
 	if (isUnitSpawnable(static_cast<int>(m_unitsToSpawn.size()), Globals::UNIT_RESOURCE_COST, Globals::UNIT_POPULATION_COST, m_owningFaction))
 	{
@@ -77,7 +77,7 @@ void HQ::update(float deltaTime)
 	UnitSpawnerBuilding::update(deltaTime, Globals::WORKER_RESOURCE_COST, Globals::WORKER_POPULATION_COST);
 }
 
-void HQ::addUnitToSpawn(const std::function<Entity* (const UnitSpawnerBuilding&)>& unitToSpawn)
+void HQ::addUnitToSpawn(const std::function<const Entity* (const UnitSpawnerBuilding&)>& unitToSpawn)
 {
 	if (isUnitSpawnable(static_cast<int>(m_unitsToSpawn.size()), Globals::WORKER_RESOURCE_COST, Globals::WORKER_POPULATION_COST, m_owningFaction))
 	{
@@ -125,7 +125,7 @@ glm::vec3 UnitSpawnerBuilding::getUnitSpawnPosition() const
 	}
 }
 
-void UnitSpawnerBuilding::addUnitToSpawn(const std::function<Entity* (const UnitSpawnerBuilding&)>& unitToSpawn)
+void UnitSpawnerBuilding::addUnitToSpawn(const std::function<const Entity* (const UnitSpawnerBuilding&)>& unitToSpawn)
 {
 	if (static_cast<int>(m_unitsToSpawn.size()) < MAX_UNITS_SPAWNABLE)
 	{

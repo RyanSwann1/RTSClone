@@ -278,7 +278,7 @@ const Entity* FactionAI::spawnBuilding(const Map& map, glm::vec3 position, eEnti
 	return nullptr;
 }
 
-Entity* FactionAI::spawnUnit(const Map& map, const UnitSpawnerBuilding& building)
+const Entity* FactionAI::spawnUnit(const Map& map, const UnitSpawnerBuilding& building)
 {
 	if (isEntityAffordable(eEntityType::Unit) && !isExceedPopulationLimit(eEntityType::Unit))
 	{
@@ -289,7 +289,7 @@ Entity* FactionAI::spawnUnit(const Map& map, const UnitSpawnerBuilding& building
 	return nullptr;
 }
 
-Entity* FactionAI::spawnWorker(const Map& map, const UnitSpawnerBuilding& building)
+const Entity* FactionAI::spawnWorker(const Map& map, const UnitSpawnerBuilding& building)
 {
 	if (isEntityAffordable(eEntityType::Worker) && !isExceedPopulationLimit(eEntityType::Worker))
 	{
