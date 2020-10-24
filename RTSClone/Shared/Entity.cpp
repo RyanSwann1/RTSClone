@@ -40,6 +40,7 @@ Entity::Entity(const Model& model, const glm::vec3& startingPosition, eEntityTyp
 #ifdef LEVEL_EDITOR
 Entity::Entity(const Model& model)
 	: m_position(),
+	m_rotation(),
 	m_AABB(),
 	m_ID(UniqueEntityIDDistributer::getInstance().getUniqueEntityID()),
 	m_model(model),
@@ -48,12 +49,18 @@ Entity::Entity(const Model& model)
 
 Entity::Entity(const Model& model, const glm::vec3& startingPosition)
 	: m_position(startingPosition),
+	m_rotation(),
 	m_AABB(),
 	m_ID(UniqueEntityIDDistributer::getInstance().getUniqueEntityID()),
 	m_model(model),
 	m_selected(false)
 {
 	m_AABB.reset(m_position, m_model);
+}
+
+glm::vec3& Entity::getRotation()
+{
+	return m_rotation;
 }
 
 glm::vec3& Entity::getPosition()
@@ -79,6 +86,7 @@ void Entity::resetAABB()
 
 Entity::Entity(Entity&& orig) noexcept
 	: m_position(orig.m_position),
+	m_rotation(orig.m_rotation),
 	m_AABB(std::move(orig.m_AABB)),
 	m_ID(orig.m_ID),
 	m_model(orig.m_model),
@@ -96,6 +104,7 @@ Entity::Entity(Entity&& orig) noexcept
 Entity& Entity::operator=(Entity&& orig) noexcept
 {
 	m_position = orig.m_position;
+	m_rotation = orig.m_rotation;
 	m_AABB = std::move(orig.m_AABB);
 	m_ID = orig.m_ID;
 	m_model = std::move(orig.m_model);
@@ -114,6 +123,11 @@ Entity& Entity::operator=(Entity&& orig) noexcept
 int Entity::getID() const
 {
 	return m_ID;
+}
+
+const glm::vec3& Entity::getRotation() const
+{
+	return m_rotation;
 }
 
 #ifdef GAME

@@ -29,5 +29,6 @@ private:
 	Model(bool renderFromCentrePosition, const glm::vec3& sizeFromCentre, const glm::vec3& scale,
 		const std::string& fileName);
 
-	void render(ShaderHandler& shaderHandler, glm::vec3 entityPosition, bool entitySelected) const;
+	void render(ShaderHandler& shaderHandler, glm::vec3 entityPosition, bool entitySelected, 
+		glm::vec3 rotation = glm::vec3()) const;
 };

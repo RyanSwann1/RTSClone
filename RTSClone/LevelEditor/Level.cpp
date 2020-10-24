@@ -339,9 +339,9 @@ void Level::handleSelectedEntityGUI()
 	{
 		ImGui::BeginChild("Selected Entity", ImVec2(175, 275), true);
 		ImGui::Text("Selected Entity");
+		
 		ImGui::NewLine();
 		ImGui::Text("Position");
-
 		if (ImGui::InputFloat("x", &selectedEntity->getPosition().x, Globals::NODE_SIZE) ||
 			ImGui::InputFloat("y", &selectedEntity->getPosition().y, 1.0f) ||
 			ImGui::InputFloat("z", &selectedEntity->getPosition().z, Globals::NODE_SIZE))
@@ -349,6 +349,13 @@ void Level::handleSelectedEntityGUI()
 			selectedEntity->resetAABB();
 			m_translateObject.setPosition(selectedEntity->getPosition());
 		}
+
+		ImGui::NewLine();
+		ImGui::Text("Rotation");
+		if (ImGui::InputFloat("xx", &selectedEntity->getRotation().x, 90.0f) ||
+			ImGui::InputFloat("yy", &selectedEntity->getRotation().y, 90.0f) ||
+			ImGui::InputFloat("zz", &selectedEntity->getRotation().z, 90.0f))
+		{}
 
 		ImGui::EndChild();
 	}

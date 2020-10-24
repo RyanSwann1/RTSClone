@@ -16,16 +16,27 @@ Model::Model(bool renderFromCentrePosition, const glm::vec3& AABBSizeFromCenter,
 	textures()
 {}
 
-void Model::render(ShaderHandler & shaderHandler, glm::vec3 entityPosition, bool entitySelected) const
+void Model::render(ShaderHandler & shaderHandler, glm::vec3 entityPosition, bool entitySelected, glm::vec3 rotation) const
 {
+	glm::mat4 model = glm::mat4(1.0f);
 	if (renderFromCentrePosition)
 	{
 		entityPosition.x += AABBSizeFromCenter.x;
 		entityPosition.z -= AABBSizeFromCenter.z;
-	}
 
-	glm::mat4 model = glm::translate(glm::mat4(1.0f), entityPosition);
-	model = glm::scale(model, scale);
+		model = glm::translate(model, entityPosition);
+		model = glm::scale(model, scale);
+		model = glm::translate(model, glm::vec3(-AABBSizeFromCenter.x, 0.0f, AABBSizeFromCenter.z));
+		model = glm::rotate(model, glm::radians(rotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
+		model = glm::translate(model, glm::vec3(AABBSizeFromCenter.x, 0.0f, -AABBSizeFromCenter.z));
+	}
+	else
+	{
+		model = glm::translate(model, entityPosition);
+		model = glm::scale(model, scale);
+		model = glm::rotate(model, glm::radians(rotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
+	}
+	
 	shaderHandler.setUniformMat4f(eShaderType::Default, "uModel", model);
 
 	for (const auto& mesh : meshes)
@@ -63,5 +74,5 @@ void Model::render(ShaderHandler& shaderHandler, const glm::vec3& position) cons
 
 void Model::render(ShaderHandler& shaderHandler, const Entity& entity) const
 {
-	render(shaderHandler, entity.getPosition(), entity.isSelected());
+	render(shaderHandler, entity.getPosition(), entity.isSelected(), entity.getRotation());
 }
