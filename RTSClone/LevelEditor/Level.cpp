@@ -352,10 +352,13 @@ void Level::handleSelectedEntityGUI()
 
 		ImGui::NewLine();
 		ImGui::Text("Rotation");
-		if (ImGui::InputFloat("xx", &selectedEntity->getRotation().x, 90.0f) ||
-			ImGui::InputFloat("yy", &selectedEntity->getRotation().y, 90.0f) ||
-			ImGui::InputFloat("zz", &selectedEntity->getRotation().z, 90.0f))
-		{}
+		if(ImGui::InputFloat("yy", &selectedEntity->getRotation().y, 90.0f))
+		{
+			if (glm::abs(selectedEntity->getRotation().y) >= 360.0f)
+			{
+				selectedEntity->setRotation({ selectedEntity->getRotation().x, 0.0f, selectedEntity->getRotation().z });
+			}
+		}
 
 		ImGui::EndChild();
 	}
