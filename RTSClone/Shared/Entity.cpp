@@ -8,6 +8,7 @@
 #ifdef GAME
 Entity::Entity(const Model& model, const glm::vec3& startingPosition, eEntityType entityType, int health)
 	: m_position(0.0f, 0.0f, 0.0f),
+	m_rotation(0.0f, 0.0f, 0.0f),
 	m_AABB(),
 	m_ID(UniqueEntityIDDistributer::getInstance().getUniqueEntityID()),
 	m_maximumHealth(health),
@@ -47,9 +48,9 @@ Entity::Entity(const Model& model)
 	m_selected(false)
 {}
 
-Entity::Entity(const Model& model, const glm::vec3& startingPosition)
+Entity::Entity(const Model& model, const glm::vec3& startingPosition, glm::vec3 startingRotation)
 	: m_position(startingPosition),
-	m_rotation(),
+	m_rotation(startingRotation),
 	m_AABB(),
 	m_ID(UniqueEntityIDDistributer::getInstance().getUniqueEntityID()),
 	m_model(model),
@@ -76,6 +77,11 @@ const Model& Entity::getModel() const
 void Entity::setPosition(const glm::vec3 & position)
 {
 	m_position = position;
+}
+
+void Entity::setRotation(const glm::vec3 rotation)
+{
+	m_rotation = rotation;
 }
 
 void Entity::resetAABB()

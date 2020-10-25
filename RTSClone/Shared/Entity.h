@@ -19,10 +19,12 @@ public:
 
 #ifdef LEVEL_EDITOR
 	Entity(const Model& model);
-	Entity(const Model& model, const glm::vec3& startingPosition);
+	Entity(const Model& model, const glm::vec3& startingPosition, glm::vec3 startingRotation = glm::vec3());
+	glm::vec3& getRotation();
 	glm::vec3& getPosition();
 	const Model& getModel() const;
 	void setPosition(const glm::vec3& position);
+	void setRotation(const glm::vec3 rotation);
 	void resetAABB();
 #endif // LEVEL_EDITOR
 
@@ -36,6 +38,7 @@ public:
 #endif // GAME
 
 	int getID() const;
+	const glm::vec3& getRotation() const;
 	const glm::vec3& getPosition() const;
 	const AABB& getAABB() const;
 	bool isSelected() const;
@@ -52,6 +55,7 @@ protected:
 	Entity(const Model& model, const glm::vec3& startingPosition, eEntityType entityType, int health = 0);
 #endif // GAME
 	glm::vec3 m_position;
+	glm::vec3 m_rotation;
 	AABB m_AABB;
 	
 private:
