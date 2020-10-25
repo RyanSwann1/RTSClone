@@ -138,10 +138,11 @@ const std::ifstream& operator>>(std::ifstream& file, EntityManager& entityManage
 	{
 		std::stringstream stream{ line };
 		std::string modelName;
+		glm::vec3 rotation;
 		glm::vec3 position;
-		stream >> modelName >> position.x >> position.y >> position.z;
+		stream >> modelName >> rotation.x >> rotation.y >> rotation.z >> position.x >> position.y >> position.z;
 
-		entityManager.m_entities.emplace_back(ModelManager::getInstance().getModel(modelName), position);
+		entityManager.m_entities.emplace_back(ModelManager::getInstance().getModel(modelName), position, rotation);
 	};
 
 	auto conditional = [](const std::string& line)
@@ -160,6 +161,7 @@ std::ostream& operator<<(std::ostream& ostream, const EntityManager& entityManag
 	for (const auto& entity : entityManager.m_entities)
 	{
 		ostream << entity.getModel().modelName << " " <<
+			entity.getRotation().x << " " << entity.getRotation().y << " " << entity.getRotation().z << " " <<
 			entity.getPosition().x << " " << entity.getPosition().y << " " << entity.getPosition().z << "\n";
 	}
 	

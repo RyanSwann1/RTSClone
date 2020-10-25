@@ -66,10 +66,12 @@ const std::ifstream& operator>>(std::ifstream& file, Player& player)
 	{
 		std::stringstream stream{ line };
 		std::string modelName;
+		glm::vec3 rotation;
 		glm::vec3 position;
-		stream >> modelName >> position.x >> position.y >> position.z;
+		stream >> modelName >> rotation.x >> rotation.y >> rotation.z >> position.x >> position.y >> position.z;
 		if (modelName == HQ_MODEL_NAME)
 		{
+			player.HQ.setRotation(rotation);
 			player.HQ.setPosition(position);
 			player.HQ.resetAABB();
 		}
@@ -80,6 +82,7 @@ const std::ifstream& operator>>(std::ifstream& file, Player& player)
 			assert(mineralIndex >= 0 && mineralIndex < player.minerals.size());
 
 			player.minerals[mineralIndex].setPosition(position);
+			player.minerals[mineralIndex].setRotation(rotation);
 			player.minerals[mineralIndex].resetAABB();
 		}
 	};
@@ -99,12 +102,17 @@ std::ostream& operator<<(std::ostream& ostream, const Player& player)
 {
 	ostream << FACTION_CONTROLLER_DETAILS[static_cast<int>(player.controller)].text << "\n";
 
-	ostream << player.HQ.getModel().modelName << " " <<  
+	ostream << player.HQ.getModel().modelName << " " <<
+		player.HQ.getRotation().x << " " << player.HQ.getRotation().y << " " << player.HQ.getRotation().z << " " <<
 		player.HQ.getPosition().x << " " << player.HQ.getPosition().y << " " << player.HQ.getPosition().z << "\n";
 
 	for (int i = 0; i < player.minerals.size(); ++i)
 	{
 		ostream << player.minerals[i].getModel().modelName << " " <<
+			
+			player.minerals[i].getRotation().x << " " << player.minerals[i].getRotation().y << " " << 
+			player.minerals[i].getRotation().z << " " << 
+
 			player.minerals[i].getPosition().x << " " << player.minerals[i].getPosition().y << " " << 
 			player.minerals[i].getPosition().z << " " << i << "\n";
 	}
