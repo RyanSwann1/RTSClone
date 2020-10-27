@@ -52,7 +52,8 @@ public:
 
 protected:	
 #ifdef GAME
-	Entity(const Model& model, const glm::vec3& startingPosition, eEntityType entityType, int health = 0);
+	Entity(const Model& model, const glm::vec3& startingPosition, eEntityType entityType, 
+		int health = 0, glm::vec3 startingRotation = glm::vec3());
 #endif // GAME
 	glm::vec3 m_position;
 	glm::vec3 m_rotation;

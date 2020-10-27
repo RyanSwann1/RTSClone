@@ -6,9 +6,10 @@
 #include "UniqueEntityIDDistributer.h"
 
 #ifdef GAME
-Entity::Entity(const Model& model, const glm::vec3& startingPosition, eEntityType entityType, int health)
-	: m_position(0.0f, 0.0f, 0.0f),
-	m_rotation(0.0f, 0.0f, 0.0f),
+Entity::Entity(const Model& model, const glm::vec3& startingPosition, eEntityType entityType, 
+	int health, glm::vec3 startingRotation)
+	: m_position(startingPosition),
+	m_rotation(startingRotation),
 	m_AABB(),
 	m_ID(UniqueEntityIDDistributer::getInstance().getUniqueEntityID()),
 	m_maximumHealth(health),
@@ -28,7 +29,6 @@ Entity::Entity(const Model& model, const glm::vec3& startingPosition, eEntityTyp
 		break;
 	case eEntityType::Worker:
 	case eEntityType::Projectile:
-		m_position = startingPosition;
 		break;
 	default:
 		assert(false);
