@@ -7,12 +7,12 @@
 #include "glm/gtx/transform.hpp"
 
 Model::Model(bool renderFromCentrePosition, const glm::vec3& AABBSizeFromCenter, const glm::vec3& scale,
-	const std::string& fileName)
+	const std::string& fileName, std::vector<Mesh>&& meshes)
 	: modelName(fileName),
 	renderFromCentrePosition(renderFromCentrePosition),
 	AABBSizeFromCenter(AABBSizeFromCenter),
 	scale(scale),
-	meshes(),
+	meshes(std::move(meshes)),
 	textures()
 {}
 
@@ -48,14 +48,15 @@ void Model::render(ShaderHandler & shaderHandler, glm::vec3 entityPosition, bool
 std::unique_ptr<Model> Model::create(const std::string & fileName, bool renderFromCentrePosition, 
 	const glm::vec3& AABBSizeFromCenter, const glm::vec3& scale)
 {
-	Model* model = new Model(renderFromCentrePosition, AABBSizeFromCenter, scale, fileName);
-	if (!ModelLoader::loadModel(fileName, *model))
+	std::vector<Mesh> meshes;
+	if (!ModelLoader::loadModel(fileName, meshes))
 	{
-		delete model;
 		return std::unique_ptr<Model>();
 	}
-	
+
+	Model* model = new Model(renderFromCentrePosition, AABBSizeFromCenter, scale, fileName, std::move(meshes));
 	model->attachMeshesToVAO();
+
 	return std::unique_ptr<Model>(model);
 }
 

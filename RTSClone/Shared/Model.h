@@ -22,12 +22,12 @@ struct Model : private NonMovable, private NonCopyable
 	const bool renderFromCentrePosition;
 	const glm::vec3 AABBSizeFromCenter;
 	const glm::vec3 scale;
-	std::vector<Mesh> meshes;
+	const std::vector<Mesh> meshes;
     std::vector<MeshTextureDetails> textures;
 	
 private:
 	Model(bool renderFromCentrePosition, const glm::vec3& sizeFromCentre, const glm::vec3& scale,
-		const std::string& fileName);
+		const std::string& fileName, std::vector<Mesh>&& meshes);
 
 	void render(ShaderHandler& shaderHandler, glm::vec3 entityPosition, bool entitySelected, 
 		glm::vec3 rotation = glm::vec3()) const;
