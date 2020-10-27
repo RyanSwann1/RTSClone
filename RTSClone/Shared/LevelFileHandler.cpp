@@ -343,8 +343,9 @@ void loadInPlayer(std::ifstream& file, std::array<std::unique_ptr<Faction>, stat
 	{
 		std::stringstream stream{ line };
 		std::string modelName;
+		glm::vec3 rotation;
 		glm::vec3 position;
-		stream >> modelName >> position.x >> position.y >> position.z;
+		stream >> modelName >> rotation.x >> rotation.y >> rotation.z >> position.x >> position.y >> position.z;
 		if (modelName == HQ_MODEL_NAME)
 		{
 			hqStartingPosition = position;
@@ -392,10 +393,11 @@ void loadInScenery(std::ifstream& file, std::vector<SceneryGameObject>& scenery)
 	{
 		std::stringstream stream{ line };
 		std::string modelName;
+		glm::vec3 rotation;
 		glm::vec3 position;
-		stream >> modelName >> position.x >> position.y >> position.z;
+		stream >> modelName >> rotation.x >> rotation.y >> rotation.z >> position.x >> position.y >> position.z;
 
-		scenery.emplace_back(ModelManager::getInstance().getModel(modelName), position);
+		scenery.emplace_back(ModelManager::getInstance().getModel(modelName), position, rotation);
 	};
 
 	auto conditional = [](const std::string& line)
