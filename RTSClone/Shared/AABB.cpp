@@ -15,8 +15,8 @@ namespace
 	constexpr float OPACITY = 0.2f;
 	void generateMesh(float left, float right, float back, float forward, Mesh& mesh)
 	{
-		mesh.m_vertices.clear();
-		mesh.m_indices.clear();
+		mesh.vertices.clear();
+		mesh.indices.clear();
 
 		const std::array<glm::vec3, 4> CUBE_FACE_TOP =
 		{
@@ -28,12 +28,12 @@ namespace
 
 		for (const auto& i : CUBE_FACE_TOP)
 		{
-			mesh.m_vertices.emplace_back(i);
+			mesh.vertices.emplace_back(i);
 		}
 
 		for (unsigned int i : Globals::CUBE_FACE_INDICIES)
 		{
-			mesh.m_indices.push_back(i);
+			mesh.indices.push_back(i);
 		}
 
 		mesh.attachToVAO();

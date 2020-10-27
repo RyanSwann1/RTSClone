@@ -34,8 +34,8 @@ namespace
 			glm::vec3(0.0f, 0.0f, 0.0f)
 		};
 
-		mesh.m_indices.clear();
-		mesh.m_vertices.clear();
+		mesh.indices.clear();
+		mesh.vertices.clear();
 
 		int elementCount = 0;
 		for (const auto& pathNode : path)
@@ -45,12 +45,12 @@ namespace
 				glm::vec3 position = { pathNode + i };
 				position.x -= static_cast<float>(Globals::NODE_SIZE) / 2.0f;
 				position.z -= static_cast<float>(Globals::NODE_SIZE) / 2.0f;
-				mesh.m_vertices.emplace_back(position);
+				mesh.vertices.emplace_back(position);
 			}
 
 			for (unsigned int i : Globals::CUBE_FACE_INDICIES)
 			{
-				mesh.m_indices.push_back(i + elementCount);
+				mesh.indices.push_back(i + elementCount);
 			}
 
 			elementCount += Globals::CUBE_FACE_INDICIE_COUNT;

@@ -22,7 +22,6 @@ struct Model : private NonMovable, private NonCopyable
 	const glm::vec3 AABBSizeFromCenter;
 	const glm::vec3 scale;
 	const std::vector<Mesh> meshes;
-    std::vector<MeshTextureDetails> textures;
 	
 private:
 	Model(bool renderFromCentrePosition, const glm::vec3& sizeFromCentre, const glm::vec3& scale,

@@ -9,94 +9,94 @@ namespace
 }
 
 Mesh::Mesh()
-	: m_vaoID(Globals::INVALID_OPENGL_ID),
-	m_vboID(Globals::INVALID_OPENGL_ID),
-	m_indicesID(Globals::INVALID_OPENGL_ID),
-	m_vertices(),
-	m_indices(),
-	m_textures(),
-	m_material()
+	: vaoID(Globals::INVALID_OPENGL_ID),
+	vboID(Globals::INVALID_OPENGL_ID),
+	indiciesID(Globals::INVALID_OPENGL_ID),
+	vertices(),
+	indices(),
+	textures(),
+	material()
 {
-	glGenVertexArrays(1, &m_vaoID);
-	glGenBuffers(1, &m_vboID);
-	glGenBuffers(1, &m_indicesID);
+	glGenVertexArrays(1, &vaoID);
+	glGenBuffers(1, &vboID);
+	glGenBuffers(1, &indiciesID);
 }
 
 Mesh::Mesh(std::vector<Vertex>&& vertices, std::vector<unsigned int>&& indices, std::vector<MeshTextureDetails>&& textures, const Material& material)
-	: m_vaoID(Globals::INVALID_OPENGL_ID),
-	m_vboID(Globals::INVALID_OPENGL_ID),
-	m_indicesID(Globals::INVALID_OPENGL_ID),
-	m_vertices(std::move(vertices)),
-	m_indices(std::move(indices)),
-	m_textures(std::move(textures)),
-	m_material(material)
+	: vaoID(Globals::INVALID_OPENGL_ID),
+	vboID(Globals::INVALID_OPENGL_ID),
+	indiciesID(Globals::INVALID_OPENGL_ID),
+	vertices(std::move(vertices)),
+	indices(std::move(indices)),
+	textures(std::move(textures)),
+	material(material)
 {
-	glGenVertexArrays(1, &m_vaoID);
-	glGenBuffers(1, &m_vboID);
-	glGenBuffers(1, &m_indicesID);
+	glGenVertexArrays(1, &vaoID);
+	glGenBuffers(1, &vboID);
+	glGenBuffers(1, &indiciesID);
 }
 
 Mesh::Mesh(Mesh&& orig) noexcept
-	: m_vaoID(orig.m_vaoID),
-	m_vboID(orig.m_vboID),
-	m_indicesID(orig.m_indicesID),
-	m_vertices(std::move(orig.m_vertices)),
-	m_indices(std::move(orig.m_indices)),
-	m_textures(std::move(orig.m_textures)),
-	m_material(orig.m_material)
+	: vaoID(orig.vaoID),
+	vboID(orig.vboID),
+	indiciesID(orig.indiciesID),
+	vertices(std::move(orig.vertices)),
+	indices(std::move(orig.indices)),
+	textures(std::move(orig.textures)),
+	material(orig.material)
 {
-	orig.m_vaoID = Globals::INVALID_OPENGL_ID;
-	orig.m_vboID = Globals::INVALID_OPENGL_ID;
-	orig.m_indicesID = Globals::INVALID_OPENGL_ID;
+	orig.vaoID = Globals::INVALID_OPENGL_ID;
+	orig.vboID = Globals::INVALID_OPENGL_ID;
+	orig.indiciesID = Globals::INVALID_OPENGL_ID;
 }
 
 Mesh& Mesh::operator=(Mesh&& orig) noexcept
 {
-	m_vaoID = orig.m_vaoID;
-	m_vboID = orig.m_vboID;
-	m_indicesID = orig.m_indicesID;
-	m_vertices = std::move(orig.m_vertices);
-	m_indices = std::move(orig.m_indices);
-	m_textures = std::move(orig.m_textures);
-	m_material = orig.m_material;
+	vaoID = orig.vaoID;
+	vboID = orig.vboID;
+	indiciesID = orig.indiciesID;
+	vertices = std::move(orig.vertices);
+	indices = std::move(orig.indices);
+	textures = std::move(orig.textures);
+	material = orig.material;
 
-	orig.m_vaoID = Globals::INVALID_OPENGL_ID;
-	orig.m_vboID = Globals::INVALID_OPENGL_ID;
-	orig.m_indicesID = Globals::INVALID_OPENGL_ID;
+	orig.vaoID = Globals::INVALID_OPENGL_ID;
+	orig.vboID = Globals::INVALID_OPENGL_ID;
+	orig.indiciesID = Globals::INVALID_OPENGL_ID;
 
 	return *this;
 }
 
 Mesh::~Mesh()
 {
-	if (m_vaoID != Globals::INVALID_OPENGL_ID &&
-		m_vboID != Globals::INVALID_OPENGL_ID &&
-		m_indicesID != Globals::INVALID_OPENGL_ID)
+	if (vaoID != Globals::INVALID_OPENGL_ID &&
+		vboID != Globals::INVALID_OPENGL_ID &&
+		indiciesID != Globals::INVALID_OPENGL_ID)
 	{
-		glDeleteVertexArrays(1, &m_vaoID);
-		glDeleteBuffers(1, &m_vboID);
-		glDeleteBuffers(1, &m_indicesID);
+		glDeleteVertexArrays(1, &vaoID);
+		glDeleteBuffers(1, &vboID);
+		glDeleteBuffers(1, &indiciesID);
 	}
 	else
 	{
-		assert(m_vaoID == Globals::INVALID_OPENGL_ID &&
-			m_vboID == Globals::INVALID_OPENGL_ID &&
-			m_indicesID == Globals::INVALID_OPENGL_ID);
+		assert(vaoID == Globals::INVALID_OPENGL_ID &&
+			vboID == Globals::INVALID_OPENGL_ID &&
+			indiciesID == Globals::INVALID_OPENGL_ID);
 	}
 }
 
 void Mesh::bind() const
 {
-    glBindVertexArray(m_vaoID);
+    glBindVertexArray(vaoID);
 }
 
 void Mesh::attachToVAO() const
 {
     bind();
 
-	assert(!m_vertices.empty());
-    glBindBuffer(GL_ARRAY_BUFFER, m_vboID);
-    glBufferData(GL_ARRAY_BUFFER, m_vertices.size() * sizeof(Vertex), m_vertices.data(), GL_STATIC_DRAW);
+	assert(!vertices.empty());
+    glBindBuffer(GL_ARRAY_BUFFER, vboID);
+    glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex), vertices.data(), GL_STATIC_DRAW);
 
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const void*)offsetof(Vertex, position));
@@ -107,19 +107,19 @@ void Mesh::attachToVAO() const
 	glEnableVertexAttribArray(2);
 	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const void*)offsetof(Vertex, textCoords));
 
-	assert(!m_indices.empty());
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indicesID);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_indices.size() * sizeof(unsigned int), m_indices.data(), GL_STATIC_DRAW);
+	assert(!indices.empty());
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indiciesID);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), indices.data(), GL_STATIC_DRAW);
 }
 
 void Mesh::render(ShaderHandler& shaderHandler, bool selected) const
 {
-	if (!m_textures.empty())
+	if (!textures.empty())
 	{
-		assert(m_textures.size() == static_cast<size_t>(1));
-		glBindTexture(GL_TEXTURE_2D, m_textures.front().ID);
+		assert(textures.size() == static_cast<size_t>(1));
+		glBindTexture(GL_TEXTURE_2D, textures.front().ID);
 
-		assert(!m_indices.empty());
+		assert(!indices.empty());
 		bind();
 		switch (shaderHandler.getActiveShaderType())
 		{
@@ -130,16 +130,16 @@ void Mesh::render(ShaderHandler& shaderHandler, bool selected) const
 			assert(false);
 		}
 		
-		glDrawElements(GL_TRIANGLES, m_indices.size(), GL_UNSIGNED_INT, nullptr);
+		glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, nullptr);
 	}
 	else
 	{
-		assert(!m_indices.empty());
+		assert(!indices.empty());
 		bind();
 		switch (shaderHandler.getActiveShaderType())
 		{
 		case eShaderType::Default:
-			shaderHandler.setUniformVec3(eShaderType::Default, "uMaterialColour", m_material.Diffuse);
+			shaderHandler.setUniformVec3(eShaderType::Default, "uMaterialColour", material.Diffuse);
 
 			if (selected)
 			{
@@ -151,7 +151,7 @@ void Mesh::render(ShaderHandler& shaderHandler, bool selected) const
 			}
 			break;
 		}
-		glDrawElements(GL_TRIANGLES, m_indices.size(), GL_UNSIGNED_INT, nullptr);
+		glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, nullptr);
 	}
 }
 
