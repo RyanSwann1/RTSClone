@@ -4,9 +4,10 @@
 #include "ModelManager.h"
 #include "Globals.h"
 
-SceneryGameObject::SceneryGameObject(const Model& model, const glm::vec3& position)
+SceneryGameObject::SceneryGameObject(const Model& model, const glm::vec3& position, const glm::vec3& rotation)
 	: m_model(model),
 	m_position(position),
+	m_rotation(rotation),
 	m_active(true)
 {
 	AABB AABB(m_position, m_model);
@@ -25,6 +26,7 @@ SceneryGameObject::~SceneryGameObject()
 SceneryGameObject::SceneryGameObject(SceneryGameObject&& orig) noexcept
 	: m_model(orig.m_model),
 	m_position(orig.m_position),
+	m_rotation(orig.m_rotation),
 	m_active(orig.m_active)
 {
 	orig.m_active = false;
@@ -34,6 +36,7 @@ SceneryGameObject& SceneryGameObject::operator=(SceneryGameObject&& orig) noexce
 {
 	m_model = orig.m_model;
 	m_position = orig.m_position;
+	m_rotation = orig.m_rotation;
 	m_active = orig.m_active;
 
 	orig.m_active = false;
@@ -43,7 +46,7 @@ SceneryGameObject& SceneryGameObject::operator=(SceneryGameObject&& orig) noexce
 
 void SceneryGameObject::render(ShaderHandler& shaderHandler) const
 {
-	m_model.get().render(shaderHandler, m_position);
+	m_model.get().render(shaderHandler, m_position, m_rotation);
 }
 
 #ifdef RENDER_AABB

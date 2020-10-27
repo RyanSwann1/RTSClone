@@ -9,7 +9,7 @@ class ShaderHandler;
 class SceneryGameObject : private NonCopyable
 {
 public:
-	SceneryGameObject(const Model& model, const glm::vec3& position);
+	SceneryGameObject(const Model& model, const glm::vec3& position, const glm::vec3& rotation);
 	SceneryGameObject(SceneryGameObject&&) noexcept;
 	SceneryGameObject& operator=(SceneryGameObject&&) noexcept;
 	~SceneryGameObject();
@@ -23,5 +23,6 @@ public:
 private:
 	std::reference_wrapper<const Model> m_model;
 	glm::vec3 m_position;
+	glm::vec3 m_rotation;
 	bool m_active;
 };
