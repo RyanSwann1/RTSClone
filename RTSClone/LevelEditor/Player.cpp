@@ -110,11 +110,11 @@ std::ostream& operator<<(std::ostream& ostream, const Player& player)
 	{
 		ostream << player.minerals[i].getModel().modelName << " " <<
 			
-			player.minerals[i].getRotation().x << " " << player.minerals[i].getRotation().y << " " << 
-			player.minerals[i].getRotation().z << " " << 
+		player.minerals[i].getRotation().x << " " << player.minerals[i].getRotation().y << " " << 
+		player.minerals[i].getRotation().z << " " << 
 
-			player.minerals[i].getPosition().x << " " << player.minerals[i].getPosition().y << " " << 
-			player.minerals[i].getPosition().z << " " << i << "\n";
+		player.minerals[i].getPosition().x << " " << player.minerals[i].getPosition().y << " " << 
+		player.minerals[i].getPosition().z << " " << i << "\n";
 	}
 
 	return ostream;

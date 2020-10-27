@@ -17,7 +17,7 @@ Model::Model(bool renderFromCentrePosition, const glm::vec3& AABBSizeFromCenter,
 	attachMeshesToVAO();
 }
 
-void Model::render(ShaderHandler & shaderHandler, glm::vec3 entityPosition, bool entitySelected, glm::vec3 rotation) const
+void Model::render(ShaderHandler & shaderHandler, glm::vec3 entityPosition, bool entitySelected, const glm::vec3& rotation) const
 {
 	glm::mat4 model = glm::mat4(1.0f);
 	if (renderFromCentrePosition)
@@ -66,9 +66,9 @@ std::unique_ptr<Model> Model::create(const std::string & fileName, bool renderFr
 	return std::unique_ptr<Model>(new Model(renderFromCentrePosition, AABBSizeFromCenter, scale, fileName, std::move(meshes)));
 }
 
-void Model::render(ShaderHandler& shaderHandler, const glm::vec3& position) const
+void Model::render(ShaderHandler& shaderHandler, const glm::vec3& position, glm::vec3 rotation) const
 {	
-	render(shaderHandler, position, false);
+	render(shaderHandler, position, false, rotation);
 }
 
 void Model::render(ShaderHandler& shaderHandler, const Entity& entity) const
