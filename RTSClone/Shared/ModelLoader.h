@@ -1,9 +1,10 @@
 #pragma once
 
 #include <string>
+#include <vector>
 
-struct Model;
+struct Mesh;
 namespace ModelLoader
 {
-	bool loadModel(const std::string& fileName, Model& model);
+	bool loadModel(const std::string& fileName, std::vector<Mesh>& meshes);
 }
