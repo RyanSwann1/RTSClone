@@ -14,7 +14,6 @@ struct Model : private NonMovable, private NonCopyable
 	static std::unique_ptr<Model> create(const std::string& fileName, bool renderFromCentrePosition, 
 		const glm::vec3& AABBSizeFromCenter, const glm::vec3& scale);
 
-	void attachMeshesToVAO() const;
 	void render(ShaderHandler& shaderHandler, const glm::vec3& position) const;
 	void render(ShaderHandler& shaderHandler, const Entity& entity) const;
 
@@ -31,4 +30,5 @@ private:
 
 	void render(ShaderHandler& shaderHandler, glm::vec3 entityPosition, bool entitySelected, 
 		glm::vec3 rotation = glm::vec3()) const;
+	void attachMeshesToVAO() const;
 };

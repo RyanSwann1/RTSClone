@@ -12,9 +12,10 @@ Model::Model(bool renderFromCentrePosition, const glm::vec3& AABBSizeFromCenter,
 	renderFromCentrePosition(renderFromCentrePosition),
 	AABBSizeFromCenter(AABBSizeFromCenter),
 	scale(scale),
-	meshes(std::move(meshes)),
-	textures()
-{}
+	meshes(std::move(meshes))
+{
+	attachMeshesToVAO();
+}
 
 void Model::render(ShaderHandler & shaderHandler, glm::vec3 entityPosition, bool entitySelected, glm::vec3 rotation) const
 {
@@ -45,6 +46,14 @@ void Model::render(ShaderHandler & shaderHandler, glm::vec3 entityPosition, bool
 	}
 }
 
+void Model::attachMeshesToVAO() const
+{
+	for (const auto& mesh : meshes)
+	{
+		mesh.attachToVAO();
+	}
+}
+
 std::unique_ptr<Model> Model::create(const std::string & fileName, bool renderFromCentrePosition, 
 	const glm::vec3& AABBSizeFromCenter, const glm::vec3& scale)
 {
@@ -54,18 +63,7 @@ std::unique_ptr<Model> Model::create(const std::string & fileName, bool renderFr
 		return std::unique_ptr<Model>();
 	}
 
-	Model* model = new Model(renderFromCentrePosition, AABBSizeFromCenter, scale, fileName, std::move(meshes));
-	model->attachMeshesToVAO();
-
-	return std::unique_ptr<Model>(model);
-}
-
-void Model::attachMeshesToVAO() const
-{
-	for (const auto& mesh : meshes)
-	{
-		mesh.attachToVAO();
-	}
+	return std::unique_ptr<Model>(new Model(renderFromCentrePosition, AABBSizeFromCenter, scale, fileName, std::move(meshes)));
 }
 
 void Model::render(ShaderHandler& shaderHandler, const glm::vec3& position) const
