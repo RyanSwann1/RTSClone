@@ -10,6 +10,7 @@
 #include "FactionHandler.h"
 #include "PathFindingLocator.h"
 #include "PathFinding.h"
+#include "glm/gtx/vector_angle.hpp"
 
 namespace
 {
@@ -59,13 +60,28 @@ namespace
 		mesh.attachToVAO();
 	};
 #endif // RENDER_PATHING
+
+	float getAngle(const glm::vec3& positionB, const glm::vec3& positionA)
+	{
+		glm::vec3 n = glm::normalize(positionB - positionA);
+		float angle = 0.0f;
+		if (n.x >= 0.0f)
+		{
+			angle = 360.0f - glm::degrees(glm::angle({ 0.0f, 0.0f, -1.0f }, glm::normalize(positionB - positionA)));
+		}
+		else if (n.x < 0.0f)
+		{
+			angle = glm::degrees(glm::angle({ 0.0f, 0.0f, -1.0f }, glm::normalize(positionB - positionA)));
+		}
+
+		return angle;
+	}
 }
 
 Unit::Unit(const Faction& owningFaction, const glm::vec3& startingPosition, eEntityType entityType, int health, const Model& model)
 	: Entity(model, startingPosition, entityType, health),
 	m_owningFaction(owningFaction),
 	m_pathToPosition(),
-	m_front(),
 	m_currentState(eUnitState::Idle),
 	m_attackTimer(TIME_BETWEEN_ATTACK, true),
 	m_stateHandlerTimer(TIME_BETWEEN_STATE, true),
@@ -77,7 +93,6 @@ Unit::Unit(const Faction& owningFaction, const glm::vec3 & startingPosition, con
 	: Entity(model, startingPosition, entityType, health),
 	m_owningFaction(owningFaction),
 	m_pathToPosition(),
-	m_front(),
 	m_currentState(eUnitState::Idle),
 	m_attackTimer(TIME_BETWEEN_ATTACK, true),
 	m_stateHandlerTimer(TIME_BETWEEN_STATE, true),
@@ -106,7 +121,7 @@ const glm::vec3& Unit::getDestination() const
 	assert(!isPathEmpty());
 	return m_pathToPosition.front();
 }
-	
+
 eUnitState Unit::getCurrentState() const
 {
 	return m_currentState;
@@ -124,7 +139,6 @@ void Unit::setTarget(eFactionController targetFaction, int targetID)
 
 void Unit::moveToAttackPosition(const Entity& targetEntity, eFactionController targetFaction, const Map& map)
 {
-	//TODO: Rename: closest next position
 	glm::vec3 closestDestination = m_position;
 	if (!m_pathToPosition.empty())
 	{
@@ -151,7 +165,7 @@ void Unit::moveToAttackPosition(const Entity& targetEntity, eFactionController t
 	}
 }
 
-void Unit::moveTo(const glm::vec3& destinationPosition, const Map& map, const AdjacentPositions& adjacentPositions, 
+void Unit::moveTo(const glm::vec3& destinationPosition, const Map& map, const AdjacentPositions& adjacentPositions,
 	eUnitState state)
 {
 	glm::vec3 closestDestination = m_position;
@@ -188,7 +202,7 @@ void Unit::update(float deltaTime, FactionHandler& factionHandler, const Map& ma
 	if (!m_pathToPosition.empty())
 	{
 		glm::vec3 newPosition = Globals::moveTowards(m_position, m_pathToPosition.back(), MOVEMENT_SPEED * deltaTime);
-		m_front = glm::normalize(glm::vec3(newPosition - m_position));
+		m_rotation.y = getAngle(newPosition, m_position);
 		m_position = newPosition;
 		m_AABB.update(m_position);
 
@@ -310,6 +324,7 @@ void Unit::update(float deltaTime, FactionHandler& factionHandler, const Map& ma
 					}
 					else if (Globals::getSqrDistance(targetEntity->getPosition(), m_position) <= UNIT_ATTACK_RANGE * UNIT_ATTACK_RANGE)
 					{
+						m_rotation.y = getAngle(targetEntity->getPosition(), m_position);
 						GameEventHandler::getInstance().gameEvents.push({ eGameEventType::SpawnProjectile, m_owningFaction.getController(), getID(),
 							opposingFaction.getController(), targetEntity->getID(), DAMAGE, m_position, targetEntity->getPosition() });
 					}

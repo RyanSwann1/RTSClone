@@ -36,7 +36,8 @@ class FactionHandler;
 class Unit : public Entity, private NonMovable
 {
 public:
-	Unit(const Faction& owningFaction, const glm::vec3& startingPosition, eEntityType entityType = eEntityType::Unit, int health = Globals::UNIT_STARTING_HEALTH,
+	Unit(const Faction& owningFaction, const glm::vec3& startingPosition, 
+		eEntityType entityType = eEntityType::Unit, int health = Globals::UNIT_STARTING_HEALTH,
 		const Model& model = ModelManager::getInstance().getModel(UNIT_MODEL_NAME));
 	Unit(const Faction& owningFaction, const glm::vec3& startingPosition, const glm::vec3& destinationPosition, 
 		const Map& map, eEntityType entityType = eEntityType::Unit, int health = Globals::UNIT_STARTING_HEALTH, 
@@ -66,7 +67,6 @@ protected:
 	void switchToState(eUnitState newState, const Map& map, const Entity* targetEntity = nullptr);
 
 private:
-	glm::vec3 m_front;
 	eUnitState m_currentState;
 	Timer m_attackTimer;
 	Timer m_stateHandlerTimer;
