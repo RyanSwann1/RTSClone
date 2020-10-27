@@ -63,18 +63,7 @@ namespace
 
 	float getAngle(const glm::vec3& positionB, const glm::vec3& positionA)
 	{
-		glm::vec3 n = glm::normalize(positionB - positionA);
-		float angle = 0.0f;
-		if (n.x >= 0.0f)
-		{
-			angle = 360.0f - glm::degrees(glm::angle({ 0.0f, 0.0f, -1.0f }, glm::normalize(positionB - positionA)));
-		}
-		else if (n.x < 0.0f)
-		{
-			angle = glm::degrees(glm::angle({ 0.0f, 0.0f, -1.0f }, glm::normalize(positionB - positionA)));
-		}
-
-		return angle;
+		return glm::degrees(atan2(positionB.z - positionA.z, positionA.x - positionB.x)) + 90.0f;
 	}
 }
 
@@ -313,8 +302,7 @@ void Unit::update(float deltaTime, FactionHandler& factionHandler, const Map& ma
 						m_target.set(opposingFaction.getController(), targetEntity->getID());
 					}
 				}
-
-				if (targetEntity)
+				else if (targetEntity)
 				{
 					if ((Globals::getSqrDistance(targetEntity->getPosition(), m_position) > UNIT_ATTACK_RANGE * UNIT_ATTACK_RANGE) ||
 						!PathFindingLocator::get().isTargetInLineOfSight(m_position, *targetEntity, map))
