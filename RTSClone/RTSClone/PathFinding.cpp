@@ -6,6 +6,8 @@
 #include "ModelManager.h"
 #include "AdjacentPositions.h"
 #include "Faction.h"
+#include "GameMessenger.h"
+#include "GameMessages.h"
 #include <limits>
 #include <queue>
 
@@ -185,16 +187,29 @@ namespace
 }
 
 PathFinding::PathFinding()
-	: m_unitFormationPositions(),
+	: m_sharedPositionContainer(),
 	m_graph(),
 	m_frontier(),
 	m_openQueue(),
 	m_closedQueue()
-{}
+{
+	
+}
+
+PathFinding::~PathFinding()
+{
+
+}
 
 void PathFinding::clearAttackPositions()
 {
-	m_attackPositions.clear();
+	m_sharedPositionContainer.clear();
+}
+
+void PathFinding::onNewMapSize(const GameMessages::NewMapSize& gameMessage)
+{
+	m_sharedPositionContainer.clear();
+	m_sharedPositionContainer.reserve(gameMessage.mapSize.x * gameMessage.mapSize.y);
 }
 
 bool PathFinding::isBuildingSpawnAvailable(const glm::vec3& startingPosition, const Model& model, const Map& map, 
@@ -330,12 +345,12 @@ const std::vector<glm::vec3>& PathFinding::getFormationPositions(const glm::vec3
 	//TODO: Sort by closest
 	assert(!selectedUnits.empty() && std::find(selectedUnits.cbegin(), selectedUnits.cend(), nullptr) == selectedUnits.cend());
 	m_graph.reset(m_frontier);
-	m_unitFormationPositions.clear();
+	m_sharedPositionContainer.clear();
 
 	int selectedUnitIndex = 0;
 	m_frontier.push(Globals::convertToGridPosition(startingPosition));
 
-	while (!m_frontier.empty() && m_unitFormationPositions.size() < selectedUnits.size())
+	while (!m_frontier.empty() && m_sharedPositionContainer.size() < selectedUnits.size())
 	{
 		glm::ivec2 position = m_frontier.front();
 		m_frontier.pop();
@@ -351,10 +366,10 @@ const std::vector<glm::vec3>& PathFinding::getFormationPositions(const glm::vec3
 					m_frontier.push(adjacentPosition.position);
 
 					assert(selectedUnitIndex < selectedUnits.size());
-					m_unitFormationPositions.emplace_back(Globals::convertToWorldPosition(adjacentPosition.position));
+					m_sharedPositionContainer.emplace_back(Globals::convertToWorldPosition(adjacentPosition.position));
 					++selectedUnitIndex;
 					
-					if (m_unitFormationPositions.size() == selectedUnits.size())
+					if (m_sharedPositionContainer.size() == selectedUnits.size())
 					{
 						break;
 					}
@@ -363,7 +378,7 @@ const std::vector<glm::vec3>& PathFinding::getFormationPositions(const glm::vec3
 		}
 	}
 
-	return m_unitFormationPositions;
+	return m_sharedPositionContainer;
 }
 
 glm::vec3 PathFinding::getClosestAvailablePosition(const glm::vec3& startingPosition, const std::list<Unit>& units, 
@@ -507,12 +522,12 @@ void PathFinding::setUnitAttackPosition(const Unit& unit, const Entity& targetEn
 			unit.getGridAttackRange() && isPositionInLineOfSight(currentNode.position, targetEntity, map))
 		{
 			positionFound = true;
-			m_attackPositions.push_back(Globals::convertToWorldPosition(currentNode.position));
+			m_sharedPositionContainer.push_back(Globals::convertToWorldPosition(currentNode.position));
 			getPathFromClosedQueue(pathToPosition, startingPositionOnGrid, currentNode, m_closedQueue, map);
 		}
 		else
 		{
-			for (const auto& adjacentPosition : getAdjacentPositions(currentNode.position, map, m_attackPositions))
+			for (const auto& adjacentPosition : getAdjacentPositions(currentNode.position, map, m_sharedPositionContainer))
 			{
 				if (!adjacentPosition.valid || m_closedQueue.contains(adjacentPosition.position))
 				{

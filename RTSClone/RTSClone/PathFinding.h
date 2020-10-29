@@ -14,6 +14,10 @@
 #include <functional>
 #include <list>
 
+namespace GameMessages
+{
+	struct NewMapSize;
+}
 struct Model;
 class Faction;
 class Entity;
@@ -24,6 +28,7 @@ class PathFinding : private NonCopyable, private NonMovable
 {
 public:
 	PathFinding();
+	~PathFinding();
 
 	template <class Entity>
 	glm::vec3 getClosestAvailablePosition(const Entity& currentEntity, const std::list<Entity>& entities, const Map& map) const
@@ -107,12 +112,13 @@ public:
 	void clearAttackPositions();
 
 private:
-	std::vector<glm::vec3> m_unitFormationPositions;
-	std::vector<glm::vec3> m_attackPositions;
+	std::vector<glm::vec3> m_sharedPositionContainer;
 	//BFS
 	Graph m_graph;
 	std::queue<glm::ivec2> m_frontier;
 	//A*
 	PriorityQueue m_openQueue;
 	PriorityQueue m_closedQueue;
+
+	void onNewMapSize(const GameMessages::NewMapSize& gameMessage);
 };
