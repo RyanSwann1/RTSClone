@@ -2,5 +2,5 @@
 
 //Sponza
 //Stanford Bunny
-//Laughing Buddha
+//Happy Buddha
 //Dragon
