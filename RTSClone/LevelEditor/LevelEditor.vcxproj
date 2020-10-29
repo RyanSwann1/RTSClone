@@ -199,6 +199,7 @@
     <ClInclude Include="..\Shared\UniqueEntityIDDistributer.h" />
     <ClInclude Include="EntityManager.h" />
     <ClInclude Include="Level.h" />
+    <ClInclude Include="Notes.h" />
     <ClInclude Include="PlayableAreaDisplay.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="TranslateObject.h" />

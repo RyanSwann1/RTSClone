@@ -197,6 +197,9 @@
     <ClInclude Include="..\Shared\Mineral.h">
       <Filter>src</Filter>
     </ClInclude>
+    <ClInclude Include="Notes.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\Shared\Shaders\VertexShader.glsl">
