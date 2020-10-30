@@ -40,7 +40,6 @@ void processNode(aiNode* node, const aiScene* scene, std::vector<Mesh>& meshes, 
 {
     for (unsigned int i = 0; i < node->mNumMeshes; i++)
     {
-
         aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
         meshes.emplace_back(processMesh(mesh, scene, loadedTextures, directory));
     }
@@ -55,7 +54,6 @@ Mesh processMesh(aiMesh* mesh, const aiScene* scene, std::vector<MeshTextureDeta
 {
     std::vector<Vertex> vertices;
     vertices.reserve(static_cast<size_t>(mesh->mNumVertices));
-    for (unsigned int i = 0; i < mesh->mNumVertices; i++)
     for (unsigned int i = 0; i < mesh->mNumVertices; i++)
     {
         glm::vec3 position = { mesh->mVertices[i].x, mesh->mVertices[i].y, mesh->mVertices[i].z };
