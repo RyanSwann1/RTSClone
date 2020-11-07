@@ -45,4 +45,6 @@ private:
 	const Entity* spawnBuilding(const Map& map, glm::vec3 position, eEntityType entityType) override;
 	const Entity* spawnUnit(const Map& map, const UnitSpawnerBuilding& building) override;
 	const Entity* spawnWorker(const Map& map, const UnitSpawnerBuilding& building) override;
+
+	void onBuild(const Map& map, eEntityType entityTypeToBuild);
 };

@@ -22,7 +22,7 @@
 
 namespace
 {
-	constexpr float DELAY_TIMER_EXPIRATION = 3.0f;
+	constexpr float DELAY_TIMER_EXPIRATION = 5.0f;
 	constexpr float IDLE_TIMER_EXPIRATION = 1.0f;
 	constexpr float MIN_SPAWN_TIMER_EXPIRATION = 7.5f;
 	constexpr float MAX_SPAWN_TIMER_EXPIRATION = 15.0f;
@@ -124,45 +124,11 @@ void FactionAI::update(float deltaTime, const Map & map, FactionHandler& faction
 			switch (action.actionType)
 			{
 			case eActionType::BuildBarracks:
-			{
-				if (!m_workers.empty())
-				{
-					glm::vec3 buildPosition = { 0.0f, 0.0f, 0.0f };
-					if (isEntityAffordable(eEntityType::Barracks) &&
-						PathFindingLocator::get().isBuildingSpawnAvailable(m_HQ.getPosition(), 
-							ModelManager::getInstance().getModel(BARRACKS_MODEL_NAME), map, buildPosition,
-							MIN_DISTANCE_FROM_HQ, MAX_DISTANCE_FROM_HQ, DISTANCE_FROM_MINERALS, *this))
-					{
-						Worker* availableWorker = getAvailableWorker(buildPosition);
-						assert(availableWorker);
-						if (availableWorker && instructWorkerToBuild(eEntityType::Barracks, buildPosition, map, *availableWorker))
-						{
-							m_actionQueue.pop();
-						}
-					}
-				}
-			}
-			break;
+				onBuild(map, eEntityType::Barracks);
+				break;
 			case eActionType::BuildSupplyDepot:
-			{
-				if (!m_workers.empty())
-				{
-					glm::vec3 buildPosition = { 0.0f, 0.0f, 0.0f };
-					if (isEntityAffordable(eEntityType::SupplyDepot) &&
-						PathFindingLocator::get().isBuildingSpawnAvailable(m_HQ.getPosition(), 
-							ModelManager::getInstance().getModel(SUPPLY_DEPOT_MODEL_NAME), map, buildPosition,
-							MIN_DISTANCE_FROM_HQ, MAX_DISTANCE_FROM_HQ, DISTANCE_FROM_MINERALS, *this))
-					{
-						Worker* availableWorker = getAvailableWorker(buildPosition);
-						assert(availableWorker);
-						if (availableWorker && instructWorkerToBuild(eEntityType::SupplyDepot, buildPosition, map, *availableWorker))
-						{
-							m_actionQueue.pop();
-						}
-					}
-				}
-			}
-			break;
+				onBuild(map, eEntityType::SupplyDepot);
+				break;
 			default:
 				assert(false);
 			}
@@ -298,4 +264,24 @@ const Entity* FactionAI::spawnWorker(const Map& map, const UnitSpawnerBuilding& 
 
 	m_spawnQueue.push(eEntityType::Worker);
 	return nullptr;
+}
+
+void FactionAI::onBuild(const Map& map, eEntityType entityTypeToBuild)
+{
+	if (!m_workers.empty())
+	{
+		glm::vec3 buildPosition = { 0.0f, 0.0f, 0.0f };
+		if (isEntityAffordable(entityTypeToBuild) &&
+			PathFindingLocator::get().isBuildingSpawnAvailable(m_HQ.getPosition(),
+				ModelManager::getInstance().getModel(BARRACKS_MODEL_NAME), map, buildPosition,
+				MIN_DISTANCE_FROM_HQ, MAX_DISTANCE_FROM_HQ, DISTANCE_FROM_MINERALS, *this))
+		{
+			Worker* availableWorker = getAvailableWorker(buildPosition);
+			assert(availableWorker);
+			if (availableWorker && instructWorkerToBuild(entityTypeToBuild, buildPosition, map, *availableWorker))
+			{
+				m_actionQueue.pop();
+			}
+		}
+	}
 }
