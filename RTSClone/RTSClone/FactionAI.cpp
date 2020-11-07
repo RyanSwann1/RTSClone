@@ -3,6 +3,7 @@
 #include "ModelManager.h"
 #include "PathFinding.h"
 #include "PathFindingLocator.h"
+#include "FactionHandler.h"
 #include <limits>
 
 //Levels
@@ -61,6 +62,7 @@ FactionAI::FactionAI(eFactionController factionController, const glm::vec3& hqSt
 		m_spawnQueue.push(eEntityType::Worker);
 	}
 
+	m_actionQueue.emplace(eActionType::BuildTurret);
 	m_actionQueue.emplace(eActionType::BuildBarracks);
 	m_actionQueue.emplace(eActionType::BuildSupplyDepot);
 }
@@ -120,14 +122,16 @@ void FactionAI::update(float deltaTime, const Map & map, FactionHandler& faction
 
 		if (!m_actionQueue.empty())
 		{
-			const AIAction& action = m_actionQueue.front();
-			switch (action.actionType)
+			switch (m_actionQueue.front().actionType)
 			{
 			case eActionType::BuildBarracks:
-				onBuild(map, eEntityType::Barracks);
+				onBuild(map, eEntityType::Barracks, factionHandler);
 				break;
 			case eActionType::BuildSupplyDepot:
-				onBuild(map, eEntityType::SupplyDepot);
+				onBuild(map, eEntityType::SupplyDepot, factionHandler);
+				break;
+			case eActionType::BuildTurret:
+				onBuild(map, eEntityType::Turret, factionHandler);
 				break;
 			default:
 				assert(false);
@@ -237,6 +241,9 @@ const Entity* FactionAI::spawnBuilding(const Map& map, glm::vec3 position, eEnti
 	case eEntityType::Barracks:
 		m_actionQueue.push(eActionType::BuildBarracks);
 		break;
+	case eEntityType::Turret:
+		m_actionQueue.push(eActionType::BuildTurret);
+		break;
 	default:
 		assert(false);
 	}
@@ -266,22 +273,52 @@ const Entity* FactionAI::spawnWorker(const Map& map, const UnitSpawnerBuilding& 
 	return nullptr;
 }
 
-void FactionAI::onBuild(const Map& map, eEntityType entityTypeToBuild)
+void FactionAI::onBuild(const Map& map, eEntityType entityTypeToBuild, FactionHandler& factionHandler)
 {
-	if (!m_workers.empty())
+	switch (entityTypeToBuild)
 	{
-		glm::vec3 buildPosition = { 0.0f, 0.0f, 0.0f };
-		if (isEntityAffordable(entityTypeToBuild) &&
-			PathFindingLocator::get().isBuildingSpawnAvailable(m_HQ.getPosition(),
-				ModelManager::getInstance().getModel(BARRACKS_MODEL_NAME), map, buildPosition,
-				MIN_DISTANCE_FROM_HQ, MAX_DISTANCE_FROM_HQ, DISTANCE_FROM_MINERALS, *this))
+	case eEntityType::Barracks:
+	case eEntityType::SupplyDepot:
+		if (!m_workers.empty())
 		{
-			Worker* availableWorker = getAvailableWorker(buildPosition);
-			assert(availableWorker);
-			if (availableWorker && instructWorkerToBuild(entityTypeToBuild, buildPosition, map, *availableWorker))
+			glm::vec3 buildPosition = { 0.0f, 0.0f, 0.0f };
+			if (isEntityAffordable(entityTypeToBuild) &&
+				PathFindingLocator::get().isBuildingSpawnAvailable(m_HQ.getPosition(),
+					ModelManager::getInstance().getModel(BARRACKS_MODEL_NAME), map, buildPosition,
+					MIN_DISTANCE_FROM_HQ, MAX_DISTANCE_FROM_HQ, DISTANCE_FROM_MINERALS, *this))
 			{
-				m_actionQueue.pop();
+				Worker* availableWorker = getAvailableWorker(buildPosition);
+				assert(availableWorker);
+				if (availableWorker && instructWorkerToBuild(entityTypeToBuild, buildPosition, map, *availableWorker))
+				{
+					m_actionQueue.pop();
+				}
 			}
 		}
+		break;
+	case eEntityType::Turret:
+		if (!m_workers.empty() && isEntityAffordable(entityTypeToBuild))
+		{
+			glm::vec3 buildPosition{ 0.0f, 0.0f, 0.0f };
+			if(PathFindingLocator::get().isBuildingSpawnAvailable(m_HQ.getPosition(), 
+				ModelManager::getInstance().getModel(TURRET_MODEL_NAME), map, buildPosition, 
+				MIN_DISTANCE_FROM_HQ, MAX_DISTANCE_FROM_HQ, DISTANCE_FROM_MINERALS, *this))
+			{
+				const Faction& opposingFaction = factionHandler.getRandomOpposingFaction(getController());
+				if (Globals::getSqrDistance(opposingFaction.getHQPosition(), buildPosition) <=
+					Globals::getSqrDistance(opposingFaction.getHQPosition(), getHQPosition()))
+				{
+					Worker* availableWorker = getAvailableWorker(buildPosition);
+					assert(availableWorker);
+					if (availableWorker && instructWorkerToBuild(entityTypeToBuild, buildPosition, map, *availableWorker))
+					{
+						m_actionQueue.pop();
+					}
+				}
+			}
+		}
+		break;
+	default:
+		assert(false);
 	}
 }

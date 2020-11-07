@@ -7,7 +7,8 @@
 enum class eActionType
 {
 	BuildSupplyDepot,
-	BuildBarracks
+	BuildBarracks,
+	BuildTurret
 };
 
 struct AIAction
@@ -46,5 +47,5 @@ private:
 	const Entity* spawnUnit(const Map& map, const UnitSpawnerBuilding& building) override;
 	const Entity* spawnWorker(const Map& map, const UnitSpawnerBuilding& building) override;
 
-	void onBuild(const Map& map, eEntityType entityTypeToBuild);
+	void onBuild(const Map& map, eEntityType entityTypeToBuild, FactionHandler& factionHandler);
 };
