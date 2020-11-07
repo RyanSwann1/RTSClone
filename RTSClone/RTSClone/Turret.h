@@ -18,7 +18,8 @@ class Turret : public Entity, private NonMovable
 {
 public:
 	Turret(const glm::vec3& startingPosition, const Faction& owningFaction);
-
+	~Turret();
+	
 	void update(float deltaTime, FactionHandler& factionHandler, const Map& map);
 
 private:
