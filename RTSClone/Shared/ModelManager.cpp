@@ -21,6 +21,7 @@ const std::string BARRACKS_MODEL_NAME = "buildingOpen.obj";
 const std::string WAYPOINT_MODEL_NAME = "laserSabel.obj";
 const std::string PROJECTILE_MODEL_NAME = "laserSabel.obj";
 const std::string TRANSLATE_MODEL_NAME = "translate.obj";
+const std::string TURRET_MODEL_NAME = "turret_single.obj";
 
 namespace 
 {
@@ -90,6 +91,8 @@ namespace
 
 		loadModel("rocksOre.obj", true, MINERAL_AABB_SIZE_FROM_CENTER, MINERAL_SCALE,
 			models, loadedAllModels);
+
+		loadModel("turret_single.obj", false, { 5.0f, 1.0f, 5.0f }, { 5.0f, 5.0f, 5.0f }, models, loadedAllModels);
 	}
 
 #ifdef GAME
