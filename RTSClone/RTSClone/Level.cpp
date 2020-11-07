@@ -66,6 +66,8 @@ void Level::handleGUI()
 				switch (targetEntity->getEntityType())
 				{
 				case eEntityType::Unit:
+				case eEntityType::SupplyDepot:
+				case eEntityType::Turret:
 					GameMessenger::getInstance().broadcast<GameMessages::UIDisplaySelectedEntity>(
 						{ m_selectedTargetGUI.getFactionController(), m_selectedTargetGUI.getID(), targetEntity->getEntityType(),
 						targetEntity->getHealth() });
@@ -78,14 +80,13 @@ void Level::handleGUI()
 						targetEntity->getHealth(), buildTimer.getExpiredTime() - buildTimer.getElaspedTime() });		
 				}
 					break;
-				case eEntityType::SupplyDepot:
-					break;
+				default:
+					assert(false);
 				}
 			}
 			else
 			{
 				const UnitSpawnerBuilding& unitSpawnerBuilding = static_cast<const UnitSpawnerBuilding&>(*targetEntity);
-
 				GameMessenger::getInstance().broadcast<GameMessages::UIDisplaySelectedEntity>(
 					{ m_selectedTargetGUI.getFactionController(), m_selectedTargetGUI.getID(), targetEntity->getEntityType(),
 					unitSpawnerBuilding.getHealth(), unitSpawnerBuilding.getCurrentSpawnCount(), 

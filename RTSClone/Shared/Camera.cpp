@@ -20,7 +20,7 @@ namespace
 	constexpr float FAR_PLANE_DISTANCE = 1750.0f;
 	constexpr float FIELD_OF_VIEW = 50.0f;
 	constexpr glm::vec3 STARTING_POSITION = { 0.0f, 72.0f, 43.0f };
-	constexpr glm::vec3 STARTING_ROTATION = { -75.0f, 0.0f, 0.0f };
+	constexpr glm::vec3 STARTING_ROTATION = { -70.0f, 0.0f, 0.0f };
 
 	glm::vec2 getNormalizedDeviceCoords(const sf::Window& window, const glm::ivec2& mousePosition)
 	{

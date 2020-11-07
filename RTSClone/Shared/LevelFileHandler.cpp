@@ -48,6 +48,7 @@ void LevelFileHandler::loadFromFile(std::ifstream& file, const std::function<voi
 	{
 		if (beginReadingFromFile)
 		{
+			assert(!line.empty());
 			if (line[0] == *Globals::TEXT_HEADER_BEGINNING.c_str())
 			{
 				break;

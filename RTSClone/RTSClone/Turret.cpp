@@ -60,7 +60,6 @@ void Turret::update(float deltaTime, FactionHandler& factionHandler, const Map& 
 			}
 		}
 	}
-		
 		break;
 	case eTurretState::Attacking:
 	{

@@ -241,7 +241,8 @@ bool PathFinding::isBuildingSpawnAvailable(const glm::vec3& startingPosition, co
 						return Globals::getSqrDistance(mineral.getPosition(), adjacentWorldPosition) < distanceFromMinerals * distanceFromMinerals;
 					});
 
-					if (mineral == owningFactionMinerals.cend() &&
+					if (!map.isPositionOccupied(adjacentPosition.position) &&
+						mineral == owningFactionMinerals.cend() &&
 						Globals::getSqrDistance(owningFaction.getHQPosition(), adjacentWorldPosition) >= minDistanceFromHQ * minDistanceFromHQ &&
 						Globals::getSqrDistance(owningFaction.getHQPosition(), adjacentWorldPosition) <= maxDistanceFromHQ * maxDistanceFromHQ)
 					{
