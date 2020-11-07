@@ -11,7 +11,7 @@ namespace
 {
 	constexpr int TURRET_STARTING_HEALTH = 5;
 	constexpr int TURRET_DAMAGE = 2;
-	constexpr float TURRET_ATTACK_RANGE = Globals::NODE_SIZE * 5.0f;
+	constexpr float TURRET_ATTACK_RANGE = Globals::NODE_SIZE * 15.0f;
 	constexpr float TIME_BETWEEN_ATTACK = 2.0f;
 	constexpr float TIME_BETWEEN_IDLE_CHECK = 1.0f;
 }
@@ -65,6 +65,8 @@ void Turret::update(float deltaTime, FactionHandler& factionHandler, const Map& 
 			{
 				GameEventHandler::getInstance().gameEvents.push({ eGameEventType::SpawnProjectile, m_owningFaction.getController(), getID(),
 					opposingFaction.getController(), targetEntity->getID(), TURRET_DAMAGE, m_position, targetEntity->getPosition() });
+
+				m_rotation.y = Globals::getAngle(targetEntity->getPosition(), m_position, 270.0f);
 			}
 			else
 			{
