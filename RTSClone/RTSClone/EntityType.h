@@ -9,5 +9,6 @@ enum class eEntityType
 	Barracks,
 	Mineral,
 	Projectile,
-	Max = Projectile
+	Turret,
+	Max = Turret
 };

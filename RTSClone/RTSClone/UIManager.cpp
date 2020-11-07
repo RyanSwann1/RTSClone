@@ -12,15 +12,17 @@
 
 namespace 
 {
+	//Follows order of eEntityType
 	const std::array<std::string, static_cast<size_t>(eEntityType::Max) + 1> ENTITY_NAME_CONVERSIONS =
 	{
-		"Unit", 
+		"Unit",
 		"Worker",
 		"HQ",
 		"SupplyDepot",
 		"Barracks",
 		"Mineral",
-		"Projectile"
+		"Projectile",
+		"Turret"
 	};
 
 	const std::array<std::string, static_cast<size_t>(eFactionController::Max) + 1> FACTION_NAME_CONVERSIONS =
@@ -132,6 +134,12 @@ void SelectedEntityWidget::render(const sf::Window& window)
 				{
 					GameEventHandler::getInstance().gameEvents.push(
 						{ eGameEventType::PlayerActivatePlannedBuilding, eEntityType::SupplyDepot, m_receivedMessage.entityID });
+				}
+
+				if (ImGui::Button("Turret"))
+				{
+					GameEventHandler::getInstance().gameEvents.push(
+						{ eGameEventType::PlayerActivatePlannedBuilding, eEntityType::Turret, m_receivedMessage.entityID });
 				}
 			}
 		}

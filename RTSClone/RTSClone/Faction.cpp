@@ -203,7 +203,6 @@ void Faction::handleEvent(const GameEvent& gameEvent, const Map& map)
                     assert(worker != m_workers.end());
 
                     m_workers.erase(worker);
-                    m_allEntities.erase(entity);
                 }
                 break;
                 case eEntityType::SupplyDepot:
@@ -215,7 +214,6 @@ void Faction::handleEvent(const GameEvent& gameEvent, const Map& map)
                     assert(supplyDepot != m_supplyDepots.end());
 
                     m_supplyDepots.erase(supplyDepot);
-                    m_allEntities.erase(entity);
                 }
                 break;
                 case eEntityType::Barracks:
@@ -227,7 +225,6 @@ void Faction::handleEvent(const GameEvent& gameEvent, const Map& map)
                     assert(barracks != m_barracks.end());
 
                     m_barracks.erase(barracks);
-                    m_allEntities.erase(entity);
                 }
                 break;
                 case eEntityType::HQ:
@@ -243,12 +240,24 @@ void Faction::handleEvent(const GameEvent& gameEvent, const Map& map)
                     assert(unit != m_units.end());
 
                     m_units.erase(unit);
-                    m_allEntities.erase(entity);
                 }
                 break;
+                case eEntityType::Turret:
+                {
+                    auto turret = std::find_if(m_turrets.begin(), m_turrets.end(), [targetID](const auto& turret)
+                    {
+                        return turret.getID() == targetID;
+                    });
+                    assert(turret != m_turrets.cend());
+
+                    m_turrets.erase(turret);
+                }
+                    break;
                 default:
                     assert(false);
                 }
+
+                m_allEntities.erase(entity);
             }   
         }
     }
@@ -346,6 +355,11 @@ void Faction::update(float deltaTime, const Map& map, FactionHandler& factionHan
         barracks.update(deltaTime);
     }
 
+    for (auto& turret : m_turrets)
+    {
+        turret.update(deltaTime, factionHandler, map);
+    }
+
     m_HQ.update(deltaTime);
 
     handleCollisions<Unit>(m_units, map);
@@ -379,6 +393,11 @@ void Faction::render(ShaderHandler& shaderHandler) const
     for (const auto& minerals : m_minerals)
     {
         minerals.render(shaderHandler);
+    }
+
+    for (const auto& turret : m_turrets)
+    {
+        turret.render(shaderHandler);
     }
 }
 
@@ -463,6 +482,8 @@ bool Faction::isEntityAffordable(eEntityType entityType) const
         return m_currentResourceAmount - Globals::SUPPLY_DEPOT_RESOURCE_COST >= 0;
     case eEntityType::Barracks:
         return m_currentResourceAmount - Globals::BARRACKS_RESOURCE_COST >= 0;
+    case eEntityType::Turret:
+        return m_currentResourceAmount - Globals::TURRET_RESOURCE_COST >= 0;
     default:
         assert(false);
         return false;
@@ -484,6 +505,10 @@ const Entity* Faction::spawnBuilding(const Map& map, glm::vec3 position, eEntity
         case eEntityType::Barracks:
             m_barracks.emplace_back(position, *this);
             addedBuilding = &m_barracks.back();
+            break;
+        case eEntityType::Turret:
+            m_turrets.emplace_back(position, *this);
+            addedBuilding = &m_turrets.back();
             break;
         default:
             assert(false);
@@ -545,6 +570,11 @@ void Faction::reduceResources(eEntityType addedEntityType)
     case eEntityType::Barracks:
         m_currentResourceAmount -= Globals::BARRACKS_RESOURCE_COST;
         break;
+    case eEntityType::Turret:
+        m_currentResourceAmount -= Globals::TURRET_RESOURCE_COST;
+        break;
+    default:
+        assert(false);
     }
 }
 
@@ -615,6 +645,7 @@ bool Faction::instructWorkerToBuild(eEntityType entityType, const glm::vec3& pos
     {
     case eEntityType::Barracks:
     case eEntityType::SupplyDepot:
+    case eEntityType::Turret:
     {
         glm::vec3 buildPosition = Globals::convertToNodePosition(position);
         auto plannedBuilding = std::find_if(m_plannedBuildings.cbegin(), m_plannedBuildings.cend(), [&buildPosition](const auto& plannedBuilding)

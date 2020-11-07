@@ -47,6 +47,7 @@ namespace Globals
 	constexpr int UNIT_RESOURCE_COST = 100;
 	constexpr int WORKER_POPULATION_COST = 1;
 	constexpr int UNIT_POPULATION_COST = 2;
+	constexpr int TURRET_RESOURCE_COST = 50;
 	constexpr int POPULATION_INCREMENT = 5;
 
 #ifdef GAME

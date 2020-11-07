@@ -9,6 +9,7 @@
 #include "Mineral.h"
 #include "FactionController.h"
 #include "PlannedBuilding.h"
+#include "Turret.h"
 #include <list>
 
 struct GameEvent;
@@ -56,6 +57,7 @@ protected:
 	std::list<Worker> m_workers;
 	std::list<SupplyDepot> m_supplyDepots;
 	std::list<Barracks> m_barracks;
+	std::list<Turret> m_turrets;
 	HQ m_HQ;
 
 	bool isExceedPopulationLimit(eEntityType entityType) const;

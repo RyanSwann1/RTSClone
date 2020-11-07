@@ -138,9 +138,6 @@
     <ClCompile Include="UIManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="EntityTarget.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="PlannedBuilding.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -151,6 +148,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\Shared\Mineral.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Turret.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="TargetEntity.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -425,9 +428,6 @@
     <ClInclude Include="UIManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="EntityTarget.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="PlannedBuilding.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -435,6 +435,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\Shared\Mineral.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Turret.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="TargetEntity.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
