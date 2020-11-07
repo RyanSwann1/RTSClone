@@ -211,4 +211,9 @@ namespace Globals
 
 		return distrib(gen);
 	}
+
+	inline float getAngle(const glm::vec3& positionB, const glm::vec3& positionA, float offsetYRotation = 90.0f)
+	{
+		return glm::degrees(atan2(positionB.z - positionA.z, positionA.x - positionB.x)) + offsetYRotation;
+	}
 }

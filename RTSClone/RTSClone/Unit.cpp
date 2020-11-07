@@ -60,11 +60,6 @@ namespace
 		mesh.attachToVAO();
 	};
 #endif // RENDER_PATHING
-
-	float getAngle(const glm::vec3& positionB, const glm::vec3& positionA)
-	{
-		return glm::degrees(atan2(positionB.z - positionA.z, positionA.x - positionB.x)) + 90.0f;
-	}
 }
 
 Unit::Unit(const Faction& owningFaction, const glm::vec3& startingPosition, eEntityType entityType, int health, const Model& model)
@@ -191,7 +186,7 @@ void Unit::update(float deltaTime, FactionHandler& factionHandler, const Map& ma
 	if (!m_pathToPosition.empty())
 	{
 		glm::vec3 newPosition = Globals::moveTowards(m_position, m_pathToPosition.back(), MOVEMENT_SPEED * deltaTime);
-		m_rotation.y = getAngle(newPosition, m_position);
+		m_rotation.y = Globals::getAngle(newPosition, m_position);
 		m_position = newPosition;
 		m_AABB.update(m_position);
 
@@ -312,7 +307,7 @@ void Unit::update(float deltaTime, FactionHandler& factionHandler, const Map& ma
 					}
 					else if (Globals::getSqrDistance(targetEntity->getPosition(), m_position) <= UNIT_ATTACK_RANGE * UNIT_ATTACK_RANGE)
 					{
-						m_rotation.y = getAngle(targetEntity->getPosition(), m_position);
+						m_rotation.y = Globals::getAngle(targetEntity->getPosition(), m_position);
 						GameEventHandler::getInstance().gameEvents.push({ eGameEventType::SpawnProjectile, m_owningFaction.getController(), getID(),
 							opposingFaction.getController(), targetEntity->getID(), DAMAGE, m_position, targetEntity->getPosition() });
 					}
