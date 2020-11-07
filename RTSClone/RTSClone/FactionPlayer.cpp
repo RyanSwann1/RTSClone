@@ -298,7 +298,7 @@ FactionPlayer::FactionPlayer(eFactionController factionController, const glm::ve
 {}
 
 void FactionPlayer::handleInput(const sf::Event& currentSFMLEvent, const sf::Window& window, const Camera& camera, const Map& map,
-    const std::vector<const Faction*>& opposingFactions, EntityTarget& selectedTargetGUI)
+    const std::vector<const Faction*>& opposingFactions, TargetEntity& selectedTargetGUI)
 {
     switch (currentSFMLEvent.type)
     {
@@ -353,7 +353,7 @@ void FactionPlayer::update(float deltaTime, const Map& map, FactionHandler& fact
         { getCurrentResourceAmount(), getCurrentPopulationAmount(), getMaximumPopulationAmount() });
 }
 
-void FactionPlayer::updateSelectionBox(EntityTarget& selectedTargetGUI)
+void FactionPlayer::updateSelectionBox(TargetEntity& selectedTargetGUI)
 {
     if (m_selectionBox.isActive() && m_selectionBox.isMinimumSize())
     {
@@ -440,7 +440,7 @@ bool FactionPlayer::instructWorkerToBuild(const Map& map)
     return false;
 }
 
-void FactionPlayer::onLeftClick(const sf::Window& window, const Camera& camera, const Map& map, EntityTarget& selectedTargetGUI)
+void FactionPlayer::onLeftClick(const sf::Window& window, const Camera& camera, const Map& map, TargetEntity& selectedTargetGUI)
 {
     bool selectAllUnits = false;
     int keepEntityIDSelected = Globals::INVALID_ENTITY_ID;

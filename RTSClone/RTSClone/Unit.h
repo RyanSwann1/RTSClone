@@ -3,7 +3,7 @@
 #include "Entity.h"
 #include "AdjacentPositions.h"
 #include "Timer.h"
-#include "EntityTarget.h"
+#include "TargetEntity.h"
 #include "Globals.h"
 #include "ModelManager.h"
 #include <functional>
@@ -70,7 +70,7 @@ private:
 	eUnitState m_currentState;
 	Timer m_attackTimer;
 	Timer m_stateHandlerTimer;
-	EntityTarget m_target;
+	TargetEntity m_targetEntity;
 #ifdef RENDER_PATHING
 	Mesh m_renderPathMesh;
 #endif // RENDER_PATHING

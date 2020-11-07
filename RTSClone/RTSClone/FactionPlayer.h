@@ -4,7 +4,7 @@
 #include "SelectionBox.h"
 #include <SFML/Graphics.hpp>
 
-class EntityTarget;
+class TargetEntity;
 struct Camera;
 class FactionPlayer : public Faction
 {
@@ -14,11 +14,11 @@ public:
 		int startingPopulation);
 
 	void handleInput(const sf::Event& currentSFMLEvent, const sf::Window& window, const Camera& camera, const Map& map, 
-		const std::vector<const Faction*>& opposingFactions, EntityTarget& selectedTargetGUI);
+		const std::vector<const Faction*>& opposingFactions, TargetEntity& selectedTargetGUI);
 	
 	void handleEvent(const GameEvent& gameEvent, const Map& map) override;
 	void update(float deltaTime, const Map& map, FactionHandler& factionHandler) override;
-	void updateSelectionBox(EntityTarget& selectedTargetGUI);
+	void updateSelectionBox(TargetEntity& selectedTargetGUI);
 	void render(ShaderHandler& shaderHandler) const override;
 	void renderSelectionBox(const sf::Window& window) const;
 
@@ -34,7 +34,7 @@ private:
 	void instructUnitToAttack(Unit& Unit, const Entity& targetEntity, eFactionController targetEntityOwningFaction, const Map& map);
 	bool instructWorkerToBuild(const Map& map);
 
-	void onLeftClick(const sf::Window& window, const Camera& camera, const Map& map, EntityTarget& selectedTargetGUI);
+	void onLeftClick(const sf::Window& window, const Camera& camera, const Map& map, TargetEntity& selectedTargetGUI);
 	void onRightClick(const sf::Window& window, const Camera& camera,
 		const std::vector<const Faction*>& opposingFactions, const Map& map);
 	void onMouseMove(const sf::Window& window, const Camera& camera, const Map& map);

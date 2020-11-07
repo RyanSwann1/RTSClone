@@ -7,7 +7,6 @@
 #include "FactionAI.h"
 #include "SceneryGameObject.h"
 #include "FactionHandler.h"
-#include "EntityTarget.h"
 #include <string>
 #include <vector>
 #include <memory>
@@ -46,7 +45,7 @@ private:
 	std::array<std::unique_ptr<Faction>, static_cast<size_t>(eFactionController::Max) + 1> m_factions;
 	FactionHandler m_factionHandler;
 	ProjectileHandler m_projectileHandler;
-	EntityTarget m_selectedTargetGUI;
+	TargetEntity m_selectedTargetGUI;
 
 	void setAITargetFaction();
 	void handleGUI();
