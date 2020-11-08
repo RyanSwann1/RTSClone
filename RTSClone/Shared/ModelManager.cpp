@@ -92,7 +92,7 @@ namespace
 		loadModel("rocksOre.obj", true, MINERAL_AABB_SIZE_FROM_CENTER, MINERAL_SCALE,
 			models, loadedAllModels);
 
-		loadModel("turret_single.obj", false, { 5.0f, 1.0f, 5.0f }, { 5.0f, 5.0f, 5.0f }, models, loadedAllModels);
+		loadModel("turret_single.obj", false, { 3.0f, 1.0f, 3.0f }, { 5.0f, 5.0f, 5.0f }, models, loadedAllModels);
 	}
 
 #ifdef GAME
