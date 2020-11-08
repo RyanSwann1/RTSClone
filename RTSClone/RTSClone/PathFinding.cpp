@@ -186,7 +186,6 @@ namespace
 	}
 }
 
-
 PathFinding::PathFinding()
 	: m_sharedPositionContainer(),
 	m_graph(),
@@ -194,10 +193,13 @@ PathFinding::PathFinding()
 	m_openQueue(),
 	m_closedQueue()
 {
+	GameMessenger::getInstance().subscribe<GameMessages::NewMapSize>(
+		[this](const GameMessages::NewMapSize& gameMessage) { return onNewMapSize(gameMessage); }, this);
 }
 
 PathFinding::~PathFinding()
 {
+	GameMessenger::getInstance().unsubscribe<GameMessages::NewMapSize>(this);
 }
 
 void PathFinding::clearAttackPositions()
