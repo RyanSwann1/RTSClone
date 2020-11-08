@@ -186,6 +186,7 @@ namespace
 	}
 }
 
+
 PathFinding::PathFinding()
 	: m_sharedPositionContainer(),
 	m_graph(),
@@ -193,12 +194,10 @@ PathFinding::PathFinding()
 	m_openQueue(),
 	m_closedQueue()
 {
-	
 }
 
 PathFinding::~PathFinding()
 {
-
 }
 
 void PathFinding::clearAttackPositions()
@@ -316,21 +315,45 @@ bool PathFinding::isPositionAvailable(const glm::vec3& nodePosition, const Map& 
 	return false;
 }
 
-bool PathFinding::isTargetInLineOfSight(const glm::vec3& unitPosition, const Entity& targetEntity, const Map& map) const
+bool PathFinding::isTargetInLineOfSight(const glm::vec3& entityPosition, const Entity& targetEntity, const Map& map) const
 {
-	glm::vec3 direction = glm::normalize(targetEntity.getPosition() - unitPosition);
+	glm::vec3 direction = glm::normalize(targetEntity.getPosition() - entityPosition);
 	constexpr float step = 0.5f;
-	float distance = glm::distance(targetEntity.getPosition(), unitPosition);
+	float distance = glm::distance(targetEntity.getPosition(), entityPosition);
 	bool targetEntityVisible = true;
 
-	for (int i = 0; i < std::ceil(distance / step); ++i)
+	for (int i = 1; i < std::ceil(distance / step); ++i)
 	{
-		glm::vec3 position = unitPosition + direction * static_cast<float>(i);
+		glm::vec3 position = entityPosition + direction * static_cast<float>(i);
 		if (targetEntity.getAABB().contains(position))
 		{
 			break;
 		}
 		else if (map.isPositionOccupied(position))
+		{
+			targetEntityVisible = false;
+			break;
+		}
+	}
+
+	return targetEntityVisible;
+}
+
+bool PathFinding::isTargetInLineOfSight(const glm::vec3& entityPosition, const Entity& targetEntity, const Map& map, const AABB& senderAABB) const
+{
+	glm::vec3 direction = glm::normalize(targetEntity.getPosition() - entityPosition);
+	constexpr float step = 0.5f;
+	float distance = glm::distance(targetEntity.getPosition(), entityPosition);
+	bool targetEntityVisible = true;
+
+	for (int i = 1; i < std::ceil(distance / step); ++i)
+	{
+		glm::vec3 position = entityPosition + direction * static_cast<float>(i);
+		if (targetEntity.getAABB().contains(position))
+		{
+			break;
+		}
+		else if (!senderAABB.contains(position) && map.isPositionOccupied(position))
 		{
 			targetEntityVisible = false;
 			break;
