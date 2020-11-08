@@ -16,12 +16,12 @@
 
 namespace Globals
 { 
-	const std::string SHARED_FILE_DIRECTORY = "../Shared/";
-	const std::string TEXT_HEADER_BEGINNING = "#";
-	const std::string TEXT_HEADER_SCENERY = TEXT_HEADER_BEGINNING + "Scenery";
-	const std::string TEXT_HEADER_MAP_SIZE = TEXT_HEADER_BEGINNING + "Map Size";
-	const std::string TEXT_HEADER_FACTION_STARTING_RESOURCE = TEXT_HEADER_BEGINNING + "Faction Starting Resources";
-	const std::string TEXT_HEADER_FACTION_STARTING_POPULATION = TEXT_HEADER_BEGINNING + "Faction Starting Population";
+	inline const std::string SHARED_FILE_DIRECTORY = "../Shared/";
+	inline const std::string TEXT_HEADER_BEGINNING = "#";
+	inline const std::string TEXT_HEADER_SCENERY = TEXT_HEADER_BEGINNING + "Scenery";
+	inline const std::string TEXT_HEADER_MAP_SIZE = TEXT_HEADER_BEGINNING + "Map Size";
+	inline const std::string TEXT_HEADER_FACTION_STARTING_RESOURCE = TEXT_HEADER_BEGINNING + "Faction Starting Resources";
+	inline const std::string TEXT_HEADER_FACTION_STARTING_POPULATION = TEXT_HEADER_BEGINNING + "Faction Starting Population";
 	constexpr glm::vec3 TERRAIN_POSITION = { 0.0f, -0.01f, 0.0f };
 	constexpr size_t MAX_LEVELS = 5;
 	constexpr unsigned int INVALID_OPENGL_ID = 0;
@@ -51,9 +51,9 @@ namespace Globals
 	constexpr int POPULATION_INCREMENT = 5;
 
 #ifdef GAME
-	const TypeComparison<eEntityType> UNIT_SPAWNER_TYPES({ eEntityType::HQ, eEntityType::Barracks });
-	const TypeComparison<eEntityType> BUILDING_TYPES({ eEntityType::HQ, eEntityType::Barracks, eEntityType::SupplyDepot });
-	const TypeComparison<eEntityType> UNIT_TYPES({ eEntityType::Unit, eEntityType::Worker });
+	inline const TypeComparison<eEntityType> UNIT_SPAWNER_TYPES({ eEntityType::HQ, eEntityType::Barracks });
+	inline const TypeComparison<eEntityType> BUILDING_TYPES({ eEntityType::HQ, eEntityType::Barracks, eEntityType::SupplyDepot });
+	inline const TypeComparison<eEntityType> UNIT_TYPES({ eEntityType::Unit, eEntityType::Worker });
 #endif // GAME
 
 	constexpr int CUBE_FACE_INDICIE_COUNT = 4;
