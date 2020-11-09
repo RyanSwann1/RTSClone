@@ -173,7 +173,6 @@
     <ClCompile Include="GameEvent.cpp" />
     <ClCompile Include="GameMessages.cpp" />
     <ClCompile Include="GameMessenger.cpp" />
-    <ClCompile Include="Globals.cpp" />
     <ClCompile Include="Graph.cpp" />
     <ClCompile Include="Level.cpp" />
     <ClCompile Include="PathFindingLocator.cpp" />
