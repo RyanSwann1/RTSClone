@@ -10,6 +10,7 @@
 #include "GameMessages.h"
 #include <limits>
 #include <queue>
+#include <random>
 
 namespace
 {
@@ -452,12 +453,17 @@ glm::vec3 PathFinding::getClosestAvailablePosition(const glm::vec3& startingPosi
 
 glm::vec3 PathFinding::getAvailablePositionOutsideAABB(const Entity& senderEntity, const Map& map)
 {
-	for (glm::vec2 direction : ALL_DIRECTIONS_ON_GRID)
+	static std::random_device rd;
+	static std::mt19937 g(rd());
+	std::array<glm::ivec2, 8> shuffledAllDirectionsOnGrid = ALL_DIRECTIONS_ON_GRID;
+	std::shuffle(shuffledAllDirectionsOnGrid.begin(), shuffledAllDirectionsOnGrid.end(), g);
+
+	for (glm::vec2 direction : shuffledAllDirectionsOnGrid)
 	{
 		glm::vec2 position = Globals::convertToGridPosition(senderEntity.getPosition());
-		for (int ray = 1; ray <= Globals::NODE_SIZE * 5; ++ray)
+		for (int i = 1; i <= Globals::NODE_SIZE * 10; ++i)
 		{
-			position = position + direction * 1.0f;
+			position = position + direction * static_cast<float>(i);
 			if (!map.isPositionOccupied(position) && map.isWithinBounds(position))
 			{
 				return Globals::convertToWorldPosition(position);

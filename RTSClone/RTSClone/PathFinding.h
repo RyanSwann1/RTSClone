@@ -107,7 +107,7 @@ public:
 	void setUnitAttackPosition(const Unit& unit, const Entity& targetEntity, std::vector<glm::vec3>& pathToPosition,
 		const Map& map, const std::list<Unit>& units);
 
-	void getPathToPosition(const Unit& unit, const glm::vec3& destination, std::vector<glm::vec3>& pathToPosition, 
+	void getPathToPosition(const Unit& unit, const glm::vec3& destination, std::vector<glm::vec3>& pathToPosition,
 		const AdjacentPositions& adjacentPositions, const std::list<Unit>& units, const Map& map);
 
 	void clearAttackPositions();
