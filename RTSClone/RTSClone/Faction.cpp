@@ -641,11 +641,23 @@ bool Faction::instructWorkerToBuild(eEntityType entityType, const glm::vec3& pos
 {
     assert(map.isWithinBounds(position) && !map.isPositionOccupied(position));
 
+    bool withinMapBounds = false;
     switch (entityType)
     {
     case eEntityType::Barracks:
+        withinMapBounds = map.isWithinBounds(AABB(position,  ModelManager::getInstance().getModel(BARRACKS_MODEL_NAME) ));
+        break;
     case eEntityType::SupplyDepot:
+        withinMapBounds = map.isWithinBounds(AABB(position, ModelManager::getInstance().getModel(SUPPLY_DEPOT_MODEL_NAME)));
+        break;
     case eEntityType::Turret:
+        withinMapBounds = map.isWithinBounds(AABB(position, ModelManager::getInstance().getModel(TURRET_MODEL_NAME)));
+        break;  
+    default:
+        assert(false);
+    }
+
+    if (withinMapBounds)
     {
         glm::vec3 buildPosition = Globals::convertToNodePosition(position);
         auto plannedBuilding = std::find_if(m_plannedBuildings.cbegin(), m_plannedBuildings.cend(), [&buildPosition](const auto& plannedBuilding)
@@ -656,16 +668,12 @@ bool Faction::instructWorkerToBuild(eEntityType entityType, const glm::vec3& pos
         if (plannedBuilding == m_plannedBuildings.cend())
         {
             if (worker.build([this, &map, buildPosition, entityType]()
-                { return spawnBuilding(map, buildPosition, entityType); }, buildPosition, map))
+            { return spawnBuilding(map, buildPosition, entityType); }, buildPosition, map))
             {
                 m_plannedBuildings.emplace_back(worker.getID(), buildPosition, entityType);
                 return true;
             }
         }
-    }
-    break;
-    default:
-        assert(false);
     }
 
     return false;
