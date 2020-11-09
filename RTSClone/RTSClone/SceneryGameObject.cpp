@@ -52,7 +52,7 @@ void SceneryGameObject::render(ShaderHandler& shaderHandler) const
 #ifdef RENDER_AABB
 void SceneryGameObject::renderAABB(ShaderHandler& shaderHandler)
 {
-	AABB AABB(m_position, ModelManager::getInstance().getModel(m_modelName));
+	AABB AABB(m_position, m_model);
 	AABB.render(shaderHandler);
 }
 #endif // RENDER_AABB
