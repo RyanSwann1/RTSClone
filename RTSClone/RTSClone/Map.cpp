@@ -101,7 +101,10 @@ void Map::addEntityToMap(const GameMessages::MapModification<eGameMessageType::A
 		{
 			glm::ivec2 positionOnGrid = Globals::convertToGridPosition({ x, Globals::GROUND_HEIGHT, y });
 			assert(isWithinBounds(positionOnGrid));
-			m_map[Globals::convertTo1D(positionOnGrid, m_size)] = true;
+			if (isWithinBounds(positionOnGrid))
+			{
+				m_map[Globals::convertTo1D(positionOnGrid, m_size)] = true;
+			}
 		}
 	}
 }
@@ -114,7 +117,10 @@ void Map::removeEntityFromMap(const GameMessages::MapModification<eGameMessageTy
 		{
 			glm::ivec2 positionOnGrid = Globals::convertToGridPosition({ x, Globals::GROUND_HEIGHT, y });
 			assert(isWithinBounds(positionOnGrid));
-			m_map[Globals::convertTo1D(positionOnGrid, m_size)] = false;
+			if (isWithinBounds(positionOnGrid))
+			{
+				m_map[Globals::convertTo1D(positionOnGrid, m_size)] = false;
+			}
 		}
 	}
 }
