@@ -300,7 +300,8 @@ void FactionAI::onBuild(const Map& map, eEntityType entityTypeToBuild, FactionHa
 		if (!m_workers.empty() && isEntityAffordable(entityTypeToBuild))
 		{
 			glm::vec3 buildPosition{ 0.0f, 0.0f, 0.0f };
-			if(PathFindingLocator::get().isBuildingSpawnAvailable(m_HQ.getPosition(), 
+			if(isEntityAffordable(entityTypeToBuild) &&
+				PathFindingLocator::get().isBuildingSpawnAvailable(m_HQ.getPosition(), 
 				ModelManager::getInstance().getModel(TURRET_MODEL_NAME), map, buildPosition, 
 				MIN_DISTANCE_FROM_HQ, MAX_DISTANCE_FROM_HQ, DISTANCE_FROM_MINERALS, *this))
 			{
