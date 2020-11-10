@@ -8,6 +8,7 @@
 #include "EntityType.h"
 #endif // GAME
 
+enum class eFactionController;
 struct Model;
 class ShaderHandler;
 class Map;
@@ -35,6 +36,7 @@ public:
 	void reduceHealth(int damage);
 	bool isDead() const;
 	void repair();
+	void render(ShaderHandler& shaderHandler, eFactionController owningFactionController) const;
 #endif // GAME
 
 	int getID() const;
@@ -44,6 +46,7 @@ public:
 	bool isSelected() const;
 	
 	void setSelected(bool selected);
+
 	void render(ShaderHandler& shaderHandler) const;
 
 #ifdef RENDER_AABB

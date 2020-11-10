@@ -34,7 +34,7 @@ public:
 	void update(float deltaTime, const UnitSpawnerBuilding& HQ, const Map& map, FactionHandler& factionHandler);
 	void moveTo(const glm::vec3& destinationPosition, const Map& map, const AdjacentPositions& adjacentPositions,
 		eUnitState state = eUnitState::Moving, const Mineral* mineralToHarvest = nullptr);
-	void render(ShaderHandler& shaderHandler) const;
+	void render(ShaderHandler& shaderHandler, eFactionController owningFactionController) const;
 
 private:
 	std::queue<BuildingCommand> m_buildingCommands;

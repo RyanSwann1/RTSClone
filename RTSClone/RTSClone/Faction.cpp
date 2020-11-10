@@ -368,36 +368,36 @@ void Faction::update(float deltaTime, const Map& map, FactionHandler& factionHan
 
 void Faction::render(ShaderHandler& shaderHandler) const
 {
-    m_HQ.render(shaderHandler);
+    m_HQ.render(shaderHandler, m_controller);
 
     for (const auto& unit : m_units)
     {
-        unit.render(shaderHandler);
+        unit.render(shaderHandler, m_controller);
     }
 
     for (const auto& worker : m_workers)
     {
-        worker.render(shaderHandler);
+        worker.render(shaderHandler, m_controller);
     }
 
     for (const auto& supplyDepot : m_supplyDepots)
     {
-        supplyDepot.render(shaderHandler);
+        supplyDepot.render(shaderHandler, m_controller);
     }
 
     for (const auto& barracks : m_barracks)
     {
-        barracks.render(shaderHandler);
+        barracks.render(shaderHandler, m_controller);
     }
 
     for (const auto& minerals : m_minerals)
     {
-        minerals.render(shaderHandler);
+        minerals.render(shaderHandler, m_controller);
     }
 
     for (const auto& turret : m_turrets)
     {
-        turret.render(shaderHandler);
+        turret.render(shaderHandler, m_controller);
     }
 }
 

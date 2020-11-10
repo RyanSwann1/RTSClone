@@ -267,7 +267,7 @@ void Worker::moveTo(const glm::vec3& destinationPosition, const Map& map, const 
 	Unit::moveTo(destinationPosition, map, adjacentPositions, state);
 }
 
-void Worker::render(ShaderHandler& shaderHandler) const
+void Worker::render(ShaderHandler& shaderHandler, eFactionController owningFactionController) const
 {
 	if (m_currentResourceAmount > 0 && getCurrentState() != eUnitState::Harvesting)
 	{
@@ -275,7 +275,7 @@ void Worker::render(ShaderHandler& shaderHandler) const
 			//shaderHandler, { m_position.x - 0.5f, m_position.y, m_position.z - 0.5f });
 	}
 
-	Entity::render(shaderHandler);
+	Entity::render(shaderHandler, owningFactionController);
 }
 
 void Worker::clearBuildingCommands()

@@ -4,6 +4,7 @@
 #include "ModelManager.h"
 #include "Globals.h"
 #include "UniqueEntityIDDistributer.h"
+#include "FactionController.h"
 
 #ifdef GAME
 Entity::Entity(const Model& model, const glm::vec3& startingPosition, eEntityType entityType, 
@@ -169,6 +170,11 @@ void Entity::repair()
 	{
 		++m_health;
 	}
+}
+
+void Entity::render(ShaderHandler& shaderHandler, eFactionController owningFactionController) const
+{
+	m_model.get().render(shaderHandler, *this, owningFactionController);
 }
 #endif // GAME
 

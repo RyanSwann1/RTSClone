@@ -5,6 +5,7 @@
 #include "NonMovable.h"
 #include <functional>
 
+enum class eFactionController;
 struct Model;
 class Map;
 class Faction;
@@ -20,7 +21,7 @@ public:
 	glm::vec3 getUnitSpawnPosition() const;
 
 	void setWaypointPosition(const glm::vec3& position, const Map& map);
-	void render(ShaderHandler& shaderHandler) const;
+	void render(ShaderHandler& shaderHandler, eFactionController owningFactionController) const;
 
 protected:
 	UnitSpawnerBuilding(const glm::vec3& startingPosition, eEntityType entityType, float spawnTimerExpirationTime, int health, 

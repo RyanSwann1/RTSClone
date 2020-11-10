@@ -180,14 +180,14 @@ void UnitSpawnerBuilding::update(float deltaTime, int resourceCost, int populati
 	}
 }
 
-void UnitSpawnerBuilding::render(ShaderHandler& shaderHandler) const
+void UnitSpawnerBuilding::render(ShaderHandler& shaderHandler, eFactionController owningFactionController) const
 {
 	if (isSelected() && isWaypointActive())
 	{
 		ModelManager::getInstance().getModel(WAYPOINT_MODEL_NAME).render(shaderHandler, m_waypointPosition);
 	}
 
-	Entity::render(shaderHandler);
+	Entity::render(shaderHandler, owningFactionController);
 }
 
 UnitSpawnerBuilding::UnitSpawnerBuilding(const glm::vec3& startingPosition, eEntityType entityType, 
