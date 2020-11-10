@@ -405,7 +405,7 @@ void Faction::renderPlannedBuildings(ShaderHandler& shaderHandler) const
 {
     for (const auto& plannedBuilding : m_plannedBuildings)
     {
-        plannedBuilding.render(shaderHandler);
+        plannedBuilding.render(shaderHandler, m_controller);
     }
 }
 

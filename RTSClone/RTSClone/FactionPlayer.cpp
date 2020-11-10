@@ -377,7 +377,7 @@ void FactionPlayer::render(ShaderHandler& shaderHandler) const
 {
     Faction::render(shaderHandler);
 
-    m_plannedBuilding.render(shaderHandler);
+    m_plannedBuilding.render(shaderHandler, getController());
 }
 
 void FactionPlayer::renderSelectionBox(const sf::Window& window) const
