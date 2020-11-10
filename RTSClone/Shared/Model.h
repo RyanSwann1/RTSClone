@@ -7,6 +7,7 @@
 #include <memory>
 #include <vector>
 
+enum class eFactionController;
 class Entity;
 class ShaderHandler;
 struct Model : private NonMovable, private NonCopyable
@@ -15,7 +16,7 @@ struct Model : private NonMovable, private NonCopyable
 		const glm::vec3& AABBSizeFromCenter, const glm::vec3& scale);
 
 	void render(ShaderHandler& shaderHandler, const glm::vec3& position, glm::vec3 rotation = glm::vec3()) const;
-	void render(ShaderHandler& shaderHandler, const Entity& entity) const;
+	void render(ShaderHandler& shaderHandler, const Entity& entity, eFactionController owningFactionController) const;
 
 	const std::string modelName;
 	const bool renderFromCentrePosition;
@@ -29,5 +30,7 @@ private:
 
 	void render(ShaderHandler& shaderHandler, glm::vec3 entityPosition, bool entitySelected, 
 		const glm::vec3& rotation) const;
+	void render(ShaderHandler& shaderHandler, glm::vec3 entityPosition, bool entitySelected,
+		const glm::vec3& rotation, eFactionController owningFaction) const;
 	void attachMeshesToVAO() const;
 };
