@@ -129,7 +129,7 @@ void Mesh::render(ShaderHandler& shaderHandler, bool selected) const
 	{
 		assert(!indices.empty());
 		bind();
-		shaderHandler.setUniformVec3(eShaderType::Default, "uMaterialColour", material.Diffuse);
+		shaderHandler.setUniformVec3(eShaderType::Default, "uMaterialColour", material.diffuse);
 		if (selected)
 		{
 			shaderHandler.setUniform1f(eShaderType::Default, "uSelectedAmplifier", SELECTED_MESH_AMPLIFIER);
@@ -173,7 +173,7 @@ void Mesh::render(ShaderHandler& shaderHandler, eFactionController owningFaction
 	}
 	else
 	{
-		shaderHandler.setUniformVec3(eShaderType::Default, "uMaterialColour", material.Diffuse);
+		shaderHandler.setUniformVec3(eShaderType::Default, "uMaterialColour", material.diffuse);
 	}
 	
 	if (selected)
@@ -204,4 +204,15 @@ MeshTextureDetails::MeshTextureDetails(unsigned int ID, const std::string& type,
 	: ID(ID),
 	type(type),
 	path(path)
+{}
+
+//Material
+Material::Material()
+	: diffuse(),
+	name()
+{}
+
+Material::Material(const glm::vec3 & diffuse, const std::string & name)
+	: diffuse(diffuse),
+	name(name)
 {}

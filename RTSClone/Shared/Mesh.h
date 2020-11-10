@@ -10,7 +10,10 @@
 
 struct Material 
 {
-	glm::vec3 Diffuse;
+	Material();
+	Material(const glm::vec3& diffuse, const std::string& name);
+
+	glm::vec3 diffuse;
 	std::string name;
 };
 
