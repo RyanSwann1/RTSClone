@@ -3,6 +3,7 @@
 #include "EntityType.h"
 #include "glm/glm.hpp"
 
+enum class eFactionController;
 class Map;
 struct GameEvent;
 class ShaderHandler;
@@ -20,7 +21,7 @@ public:
 	void setActive(bool active);
 	void setPosition(const glm::vec3& newPosition, const Map& map);
 	void set(const GameEvent& gameEvent);
-	void render(ShaderHandler& shaderHandler) const;
+	void render(ShaderHandler& shaderHandler, eFactionController owningFactionController) const;
 
 private:
 	bool m_active;

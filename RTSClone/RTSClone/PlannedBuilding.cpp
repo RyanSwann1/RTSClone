@@ -69,20 +69,20 @@ void PlannedBuilding::set(const GameEvent& gameEvent)
     m_workerID = gameEvent.targetID;
 }
 
-void PlannedBuilding::render(ShaderHandler& shaderHandler) const
+void PlannedBuilding::render(ShaderHandler& shaderHandler, eFactionController owningFactionController) const
 {
     if (m_active)
     {
         switch (m_entityType)
         {
         case eEntityType::SupplyDepot:
-            ModelManager::getInstance().getModel(SUPPLY_DEPOT_MODEL_NAME).render(shaderHandler, m_position);
+            ModelManager::getInstance().getModel(SUPPLY_DEPOT_MODEL_NAME).render(shaderHandler, m_position, owningFactionController);
             break;
         case eEntityType::Barracks:
-            ModelManager::getInstance().getModel(BARRACKS_MODEL_NAME).render(shaderHandler, m_position);
+            ModelManager::getInstance().getModel(BARRACKS_MODEL_NAME).render(shaderHandler, m_position, owningFactionController);
             break;
         case eEntityType::Turret:
-            ModelManager::getInstance().getModel(TURRET_MODEL_NAME).render(shaderHandler, m_position);
+            ModelManager::getInstance().getModel(TURRET_MODEL_NAME).render(shaderHandler, m_position, owningFactionController);
             break;
         default:
             assert(false);
