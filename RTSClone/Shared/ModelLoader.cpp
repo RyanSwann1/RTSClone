@@ -117,8 +117,11 @@ Material loadMaterial(aiMaterial* mat)
     Material material;
     aiColor3D color(0.f, 0.f, 0.f);
 
+    aiString materialName;
     mat->Get(AI_MATKEY_COLOR_DIFFUSE, color);
+    mat->Get(AI_MATKEY_NAME, materialName);
     material.Diffuse = glm::vec3(color.r, color.g, color.b);
+    material.name = materialName.C_Str();
 
     return material;
 }
