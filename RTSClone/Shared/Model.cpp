@@ -101,6 +101,11 @@ void Model::render(ShaderHandler& shaderHandler, const glm::vec3& position, glm:
 	render(shaderHandler, position, false, rotation);
 }
 
+void Model::render(ShaderHandler& shaderHandler, const glm::vec3& position, eFactionController owningFactionController, glm::vec3 rotation) const
+{
+	render(shaderHandler, position, false, rotation, owningFactionController);
+}
+
 void Model::render(ShaderHandler& shaderHandler, const Entity& entity) const
 {
 	render(shaderHandler, entity.getPosition(), entity.isSelected(), entity.getRotation());

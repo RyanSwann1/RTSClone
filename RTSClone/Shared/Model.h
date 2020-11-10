@@ -16,6 +16,8 @@ struct Model : private NonMovable, private NonCopyable
 		const glm::vec3& AABBSizeFromCenter, const glm::vec3& scale);
 
 	void render(ShaderHandler& shaderHandler, const glm::vec3& position, glm::vec3 rotation = glm::vec3()) const;
+	void render(ShaderHandler& shaderHandler, const glm::vec3& position, eFactionController owningFactionController, 
+		glm::vec3 rotation = glm::vec3()) const;
 	void render(ShaderHandler& shaderHandler, const Entity& entity) const;
 	void render(ShaderHandler& shaderHandler, const Entity& entity, eFactionController owningFactionController) const;
 
