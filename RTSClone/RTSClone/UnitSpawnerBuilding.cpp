@@ -26,7 +26,7 @@ namespace
 	bool isEntityAffordable(const Faction& owningFaction, int resourceCost, int populationCost)
 	{
 		return owningFaction.getCurrentResourceAmount() >= resourceCost &&
-			owningFaction.getCurrentPopulationAmount() + populationCost > owningFaction.getMaximumPopulationAmount();
+			owningFaction.getCurrentPopulationAmount() + populationCost <= owningFaction.getMaximumPopulationAmount();
 	}
 
 	bool isUnitSpawnable(int unitToSpawnCount, int resourceCost, int populationCost, const Faction& owningFaction)
@@ -166,14 +166,13 @@ void UnitSpawnerBuilding::update(float deltaTime, int resourceCost, int populati
 		{
 			m_unitsToSpawn.pop_back();
 
-			if (!m_unitsToSpawn.empty() && 
-				!isEntityAffordable(m_owningFaction, resourceCost, populationCost))
+			if (m_unitsToSpawn.empty())
 			{
-				m_unitsToSpawn.clear();
 				m_spawnTimer.setActive(false);
 			}
-			else if (m_unitsToSpawn.empty())
+			else if (!isEntityAffordable(m_owningFaction, resourceCost, populationCost))
 			{
+				m_unitsToSpawn.clear();
 				m_spawnTimer.setActive(false);
 			}
 		}
