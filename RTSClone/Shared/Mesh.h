@@ -11,6 +11,7 @@
 struct Material 
 {
 	glm::vec3 Diffuse;
+	std::string name;
 };
 
 struct MeshTextureDetails
@@ -32,6 +33,7 @@ struct Vertex
 	glm::vec2 textCoords;
 };
 
+enum class eFactionController;
 class ShaderHandler;
 struct Mesh : private NonCopyable
 {
@@ -44,12 +46,15 @@ struct Mesh : private NonCopyable
 	void bind() const;
 	void attachToVAO() const;
 	void render(ShaderHandler& shaderHandler, bool selected = false) const;
+	void render(ShaderHandler& shaderHandler, eFactionController owningFactionController, bool selected = false) const;
 
-	unsigned int vaoID;
-	unsigned int vboID;
-	unsigned int indiciesID;
 	std::vector<Vertex> vertices;
 	std::vector<unsigned int> indices;
 	std::vector<MeshTextureDetails> textures;
 	Material material;
+
+private:
+	unsigned int vaoID;
+	unsigned int vboID;
+	unsigned int indiciesID;
 };

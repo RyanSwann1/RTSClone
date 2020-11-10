@@ -121,14 +121,7 @@ void Mesh::render(ShaderHandler& shaderHandler, bool selected) const
 
 		assert(!indices.empty());
 		bind();
-		switch (shaderHandler.getActiveShaderType())
-		{
-		case eShaderType::Default:
-			shaderHandler.setUniformVec3(eShaderType::Default, "uMaterialColour", { 1.0f, 1.0f, 1.0f });
-			break;
-		default:
-			assert(false);
-		}
+		shaderHandler.setUniformVec3(eShaderType::Default, "uMaterialColour", { 1.0f, 1.0f, 1.0f });
 		
 		glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, nullptr);
 	}
@@ -136,23 +129,63 @@ void Mesh::render(ShaderHandler& shaderHandler, bool selected) const
 	{
 		assert(!indices.empty());
 		bind();
-		switch (shaderHandler.getActiveShaderType())
+		shaderHandler.setUniformVec3(eShaderType::Default, "uMaterialColour", material.Diffuse);
+		if (selected)
 		{
-		case eShaderType::Default:
-			shaderHandler.setUniformVec3(eShaderType::Default, "uMaterialColour", material.Diffuse);
-
-			if (selected)
-			{
-				shaderHandler.setUniform1f(eShaderType::Default, "uSelectedAmplifier", SELECTED_MESH_AMPLIFIER);
-			}
-			else
-			{
-				shaderHandler.setUniform1f(eShaderType::Default, "uSelectedAmplifier", 1.0f);
-			}
-			break;
+			shaderHandler.setUniform1f(eShaderType::Default, "uSelectedAmplifier", SELECTED_MESH_AMPLIFIER);
 		}
+		else
+		{
+			shaderHandler.setUniform1f(eShaderType::Default, "uSelectedAmplifier", 1.0f);
+		}
+
 		glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, nullptr);
 	}
+}
+
+void Mesh::render(ShaderHandler& shaderHandler, eFactionController owningFactionController, bool selected) const
+{
+	assert(!indices.empty());
+	bind();
+
+	if (material.name == Globals::FACTION_MATERIAL_NAME_ID)
+	{
+		glm::vec3 diffuseMaterial = glm::vec3(1.0f, 1.0f, 1.0f);
+		switch (owningFactionController)
+		{
+		case eFactionController::Player:
+			diffuseMaterial = Globals::PLAYER_MATERIAL_DIFFUSE;
+			break;
+		case eFactionController::AI_1:
+			diffuseMaterial = Globals::AI_1_MATERIAL_DIFFUSE;
+			break;
+		case eFactionController::AI_2:
+			diffuseMaterial = Globals::AI_2_MATERIAL_DIFFUSE;
+			break;
+		case eFactionController::AI_3:
+			diffuseMaterial = Globals::AI_3_MATERIAL_DIFFUSE;
+			break;
+		default:
+			assert(false);
+		}
+
+		shaderHandler.setUniformVec3(eShaderType::Default, "uMaterialColour", diffuseMaterial);
+	}
+	else
+	{
+		shaderHandler.setUniformVec3(eShaderType::Default, "uMaterialColour", material.Diffuse);
+	}
+	
+	if (selected)
+	{
+		shaderHandler.setUniform1f(eShaderType::Default, "uSelectedAmplifier", SELECTED_MESH_AMPLIFIER);
+	}
+	else
+	{
+		shaderHandler.setUniform1f(eShaderType::Default, "uSelectedAmplifier", 1.0f);
+	}
+
+	glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, nullptr);
 }
 
 Vertex::Vertex(const glm::vec3& position)
