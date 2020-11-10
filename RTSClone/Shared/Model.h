@@ -36,4 +36,5 @@ private:
 	void render(ShaderHandler& shaderHandler, glm::vec3 entityPosition, bool entitySelected,
 		const glm::vec3& rotation, eFactionController owningFaction) const;
 	void attachMeshesToVAO() const;
+	void setModelMatrix(ShaderHandler& shaderHandler, glm::vec3 entityPosition, bool entitySelected, const glm::vec3& rotation) const;
 };

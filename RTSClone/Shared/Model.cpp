@@ -19,26 +19,7 @@ Model::Model(bool renderFromCentrePosition, const glm::vec3& AABBSizeFromCenter,
 
 void Model::render(ShaderHandler & shaderHandler, glm::vec3 entityPosition, bool entitySelected, const glm::vec3& rotation) const
 {
-	glm::mat4 model = glm::mat4(1.0f);
-	if (renderFromCentrePosition)
-	{
-		entityPosition.x += AABBSizeFromCenter.x;
-		entityPosition.z -= AABBSizeFromCenter.z;
-
-		model = glm::translate(model, entityPosition);
-		model = glm::scale(model, scale);
-		model = glm::translate(model, glm::vec3(-AABBSizeFromCenter.x, 0.0f, AABBSizeFromCenter.z));
-		model = glm::rotate(model, glm::radians(rotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
-		model = glm::translate(model, glm::vec3(AABBSizeFromCenter.x, 0.0f, -AABBSizeFromCenter.z));
-	}
-	else
-	{
-		model = glm::translate(model, entityPosition);
-		model = glm::scale(model, scale);
-		model = glm::rotate(model, glm::radians(rotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
-	}
-	
-	shaderHandler.setUniformMat4f(eShaderType::Default, "uModel", model);
+	setModelMatrix(shaderHandler, entityPosition, entitySelected, rotation);
 
 	for (const auto& mesh : meshes)
 	{
@@ -49,26 +30,7 @@ void Model::render(ShaderHandler & shaderHandler, glm::vec3 entityPosition, bool
 void Model::render(ShaderHandler& shaderHandler, glm::vec3 entityPosition, bool entitySelected, const glm::vec3& rotation, 
 	eFactionController owningFactionController) const
 {
-	glm::mat4 model = glm::mat4(1.0f);
-	if (renderFromCentrePosition)
-	{
-		entityPosition.x += AABBSizeFromCenter.x;
-		entityPosition.z -= AABBSizeFromCenter.z;
-
-		model = glm::translate(model, entityPosition);
-		model = glm::scale(model, scale);
-		model = glm::translate(model, glm::vec3(-AABBSizeFromCenter.x, 0.0f, AABBSizeFromCenter.z));
-		model = glm::rotate(model, glm::radians(rotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
-		model = glm::translate(model, glm::vec3(AABBSizeFromCenter.x, 0.0f, -AABBSizeFromCenter.z));
-	}
-	else
-	{
-		model = glm::translate(model, entityPosition);
-		model = glm::scale(model, scale);
-		model = glm::rotate(model, glm::radians(rotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
-	}
-
-	shaderHandler.setUniformMat4f(eShaderType::Default, "uModel", model);
+	setModelMatrix(shaderHandler, entityPosition, entitySelected, rotation);
 
 	for (const auto& mesh : meshes)
 	{
@@ -82,6 +44,30 @@ void Model::attachMeshesToVAO() const
 	{
 		mesh.attachToVAO();
 	}
+}
+
+void Model::setModelMatrix(ShaderHandler& shaderHandler, glm::vec3 entityPosition, bool entitySelected, const glm::vec3& rotation) const
+{
+	glm::mat4 model = glm::mat4(1.0f);
+	if (renderFromCentrePosition)
+	{
+		entityPosition.x += AABBSizeFromCenter.x;
+		entityPosition.z -= AABBSizeFromCenter.z;
+
+		model = glm::translate(model, entityPosition);
+		model = glm::scale(model, scale);
+		model = glm::translate(model, glm::vec3(-AABBSizeFromCenter.x, 0.0f, AABBSizeFromCenter.z));
+		model = glm::rotate(model, glm::radians(rotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
+		model = glm::translate(model, glm::vec3(AABBSizeFromCenter.x, 0.0f, -AABBSizeFromCenter.z));
+	}
+	else
+	{
+		model = glm::translate(model, entityPosition);
+		model = glm::scale(model, scale);
+		model = glm::rotate(model, glm::radians(rotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
+	}
+
+	shaderHandler.setUniformMat4f(eShaderType::Default, "uModel", model);
 }
 
 std::unique_ptr<Model> Model::create(const std::string & fileName, bool renderFromCentrePosition, 
