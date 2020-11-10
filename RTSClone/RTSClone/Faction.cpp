@@ -304,19 +304,6 @@ void Faction::handleEvent(const GameEvent& gameEvent, const Map& map)
     case eGameEventType::RevalidateMovementPaths:
         revalidateExistingUnitPaths(map);
         break;
-    case eGameEventType::PlayerSpawnUnit:
-    {
-        int targetEntityID = gameEvent.targetID;
-        auto entity = std::find_if(m_allEntities.begin(), m_allEntities.end(), [targetEntityID](const auto& entity)
-        {
-            return entity->getID() == targetEntityID;
-        });
-        if (entity != m_allEntities.end())
-        {
-            addUnitToSpawn(gameEvent.entityType, map, static_cast<UnitSpawnerBuilding&>(*(*entity)));
-        }
-    }
-    break;
     case eGameEventType::RepairEntity:
     {
         int entityID = gameEvent.senderID;
@@ -536,12 +523,12 @@ bool Faction::addUnitToSpawn(eEntityType unitType, const Map& map, UnitSpawnerBu
         case eEntityType::Unit:
             assert(building.getEntityType() == eEntityType::Barracks);
             static_cast<Barracks&>(building).addUnitToSpawn([this, &map, unitType](const UnitSpawnerBuilding& building)
-            { return this->spawnUnit(map, building); });
+                { return this->spawnUnit(map, building); });
             break;
         case eEntityType::Worker:
             assert(building.getEntityType() == eEntityType::HQ);
             static_cast<HQ&>(building).addUnitToSpawn([this, &map, unitType](const UnitSpawnerBuilding& building)
-            { return this->spawnWorker(map, building); });
+                { return this->spawnWorker(map, building); });
             break;
         default:
             assert(false);
