@@ -18,7 +18,7 @@ namespace
 
 	constexpr int MAX_MAP_SIZE = 60 * Globals::NODE_SIZE;
 	constexpr int DEFAULT_STARTING_RESOURCES = 100;
-	constexpr int DEFAULT_STARTING_POPULATION = 5;
+	constexpr int DEFAULT_STARTING_POPULATION_CAP = 5;
 	constexpr glm::ivec2 DEFAULT_MAP_SIZE = { 30, 30 };
 	constexpr float ENTITY_TRANSLATE_SPEED = 5.0f;
 }
@@ -41,7 +41,7 @@ Level::Level(const std::string& levelName)
 	m_selectedPlayer(nullptr),
 	m_mapSize(DEFAULT_MAP_SIZE),
 	m_factionStartingResources(DEFAULT_STARTING_RESOURCES),
-	m_factionStartingPopulation(DEFAULT_STARTING_POPULATION)
+	m_factionStartingPopulationCap(DEFAULT_STARTING_POPULATION_CAP)
 {
 	m_players.reserve(static_cast<size_t>(eFactionController::Max) + static_cast<size_t>(1));
 
@@ -82,9 +82,9 @@ int Level::getFactionStartingResources() const
 	return m_factionStartingResources;
 }
 
-int Level::getFactionStartingPopulation() const
+int Level::getFactionStartingPopulationCap() const
 {
-	return m_factionStartingPopulation;
+	return m_factionStartingPopulationCap;
 }
 
 const std::string& Level::getName() const
@@ -383,12 +383,12 @@ void Level::handleLevelDetailsGUI(bool& showGUIWindow)
 			m_factionStartingResources = Globals::WORKER_RESOURCE_COST;
 		}
 	}
-	ImGui::Text("Starting Population");
-	if (ImGui::InputInt("Population", &m_factionStartingPopulation, 1))
+	ImGui::Text("Starting Population Cap");
+	if (ImGui::InputInt("Population", &m_factionStartingPopulationCap, 1))
 	{
-		if (m_factionStartingPopulation < Globals::WORKER_POPULATION_COST)
+		if (m_factionStartingPopulationCap < Globals::WORKER_POPULATION_COST)
 		{
-			m_factionStartingPopulation = Globals::WORKER_POPULATION_COST;
+			m_factionStartingPopulationCap = Globals::WORKER_POPULATION_COST;
 		}
 	}
 	ImGui::End();
@@ -465,7 +465,7 @@ const std::ifstream& operator>>(std::ifstream& file, Level& level)
 
 	level.m_mapSize = LevelFileHandler::loadMapSizeFromFile(file);
 	level.m_factionStartingResources = LevelFileHandler::loadFactionStartingResources(file);
-	level.m_factionStartingPopulation = LevelFileHandler::loadFactionStartingPopulation(file);
+	level.m_factionStartingPopulationCap = LevelFileHandler::loadFactionStartingPopulationCap(file);
 
 	for (auto& player : level.m_players)
 	{

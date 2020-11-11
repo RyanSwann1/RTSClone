@@ -28,7 +28,7 @@ public:
 	static std::unique_ptr<Level> load(const std::string& levelName);
 
 	int getFactionStartingResources() const;
-	int getFactionStartingPopulation() const;
+	int getFactionStartingPopulationCap() const;
 	const std::string& getName() const;
 	const std::vector<Player>& getPlayers() const;
 	const glm::ivec2& getMapSize() const;
@@ -61,5 +61,5 @@ private:
 	Player* m_selectedPlayer;
 	glm::ivec2 m_mapSize;
 	int m_factionStartingResources;
-	int m_factionStartingPopulation;
+	int m_factionStartingPopulationCap;
 };

@@ -290,8 +290,8 @@ namespace
 
 FactionPlayer::FactionPlayer(eFactionController factionController, const glm::vec3& hqStartingPosition, 
     const std::array<glm::vec3, Globals::MAX_MINERALS_PER_FACTION>& mineralPositions, int startingResources,
-    int startingPopulation)
-    : Faction(factionController, hqStartingPosition, mineralPositions, startingResources, startingPopulation),
+    int startingPopulationCap)
+    : Faction(factionController, hqStartingPosition, mineralPositions, startingResources, startingPopulationCap),
     m_selectionBox(),
     m_previousMouseToGroundPosition(),
     m_attackMoveSelected(false)

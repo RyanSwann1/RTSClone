@@ -49,7 +49,7 @@ public:
 protected:
 	Faction(eFactionController factionController, const glm::vec3& hqStartingPosition, 
 		const std::array<glm::vec3, Globals::MAX_MINERALS_PER_FACTION>& mineralPositions, int startingResources,
-		int startingPopulation);
+		int startingPopulationCap);
 	std::array<Mineral, Globals::MAX_MINERALS_PER_FACTION> m_minerals;
 	std::vector<PlannedBuilding> m_plannedBuildings;
 	std::vector<Entity*> m_allEntities;

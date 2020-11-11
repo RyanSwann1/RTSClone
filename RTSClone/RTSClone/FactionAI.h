@@ -26,7 +26,7 @@ class FactionAI : public Faction
 public:
 	FactionAI(eFactionController factionController, const glm::vec3& hqStartingPosition, 
 		const std::array<glm::vec3, Globals::MAX_MINERALS_PER_FACTION>& mineralPositions, int startingResources,
-		int startingPopulation);
+		int startingPopulationCap);
 
 	void setTargetFaction(const std::vector<const Faction*>& opposingFactions);
 	void update(float deltaTime, const Map& map, FactionHandler& factionHandler) override;
