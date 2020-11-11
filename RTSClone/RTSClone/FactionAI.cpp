@@ -4,6 +4,7 @@
 #include "PathFinding.h"
 #include "PathFindingLocator.h"
 #include "FactionHandler.h"
+#include "GameEvent.h"
 #include <limits>
 
 //Levels
@@ -23,7 +24,7 @@
 
 namespace
 {
-	constexpr float DELAY_TIMER_EXPIRATION = 5.0f;
+	constexpr float DELAY_TIMER_EXPIRATION = 3.0f;
 	constexpr float IDLE_TIMER_EXPIRATION = 1.0f;
 	constexpr float MIN_SPAWN_TIMER_EXPIRATION = 7.5f;
 	constexpr float MAX_SPAWN_TIMER_EXPIRATION = 15.0f;
@@ -32,6 +33,8 @@ namespace
 	constexpr float MAX_DISTANCE_FROM_HQ = static_cast<float>(Globals::NODE_SIZE) * 18.0f;
 	constexpr float MIN_DISTANCE_FROM_HQ = static_cast<float>(Globals::NODE_SIZE) * 3.0f;
 	constexpr float DISTANCE_FROM_MINERALS = static_cast<float>(Globals::NODE_SIZE) * 6.0f;
+
+	constexpr int MAX_WORKERS_REPAIR_BUILDING = 2;
 }
 
 //AIAction
@@ -48,8 +51,8 @@ AIAction::AIAction(eActionType actionType, const glm::vec3& position)
 //FactionAI
 FactionAI::FactionAI(eFactionController factionController, const glm::vec3& hqStartingPosition,
 	const std::array<glm::vec3, Globals::MAX_MINERALS_PER_FACTION>& mineralPositions, int startingResources,
-	int startingPopulation)
-	: Faction(factionController, hqStartingPosition, mineralPositions, startingResources, startingPopulation),
+	int startingPopulationCap)
+	: Faction(factionController, hqStartingPosition, mineralPositions, startingResources, startingPopulationCap),
 	m_spawnQueue(),
 	m_actionQueue(),
 	m_delayTimer(DELAY_TIMER_EXPIRATION, true),
@@ -80,6 +83,40 @@ void FactionAI::setTargetFaction(const std::vector<const Faction*>& opposingFact
 			targetFactionDistance = distance;
 		}
 	}
+}
+
+void FactionAI::handleEvent(const GameEvent& gameEvent, const Map& map)
+{
+	switch (gameEvent.type)
+	{
+	case eGameEventType::Attack:
+	{
+		assert(gameEvent.senderFaction != getController());
+		int targetID = gameEvent.targetID;
+		auto entity = std::find_if(m_allEntities.begin(), m_allEntities.end(), [targetID](const auto& entity)
+		{
+			return entity->getID() == targetID;
+		});
+
+		if (entity != m_allEntities.end())
+		{
+			switch ((*entity)->getEntityType())
+			{
+			case eEntityType::SupplyDepot:
+			break;
+			case eEntityType::Barracks:
+			break;
+			case eEntityType::HQ:
+				instructWorkersToRepair(static_cast<HQ&>(*(*entity)), map);
+			break;
+			case eEntityType::Turret:
+			break;
+			}	
+		}
+	}
+	}
+
+	Faction::handleEvent(gameEvent, map);
 }
 
 void FactionAI::update(float deltaTime, const Map & map, FactionHandler& factionHandler)
@@ -179,6 +216,27 @@ bool FactionAI::instructWorkerToBuild(eEntityType entityType, const glm::vec3& p
 	}
 
 	return false;
+}
+
+void FactionAI::instructWorkersToRepair(const HQ& HQ, const Map& map)
+{
+	int repairCount = 0;
+	for (auto& worker : m_workers)
+	{
+		if (worker.getCurrentState() == eUnitState::Repairing || worker.getCurrentState() == eUnitState::MovingToRepairPosition)
+		{
+			++repairCount;
+
+			if (repairCount == MAX_WORKERS_REPAIR_BUILDING)
+			{
+				break;
+			}
+		}
+		else
+		{
+			worker.setBuildingToRepair(HQ, map);
+		}
+	}
 }
 
 const Mineral& FactionAI::getRandomMineral() const

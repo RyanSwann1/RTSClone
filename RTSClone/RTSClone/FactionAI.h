@@ -29,6 +29,7 @@ public:
 		int startingPopulationCap);
 
 	void setTargetFaction(const std::vector<const Faction*>& opposingFactions);
+	void handleEvent(const GameEvent& gameEvent, const Map& map) override;
 	void update(float deltaTime, const Map& map, FactionHandler& factionHandler) override;
 
 private:
@@ -40,6 +41,7 @@ private:
 	const Faction* m_targetFaction;
 
 	bool instructWorkerToBuild(eEntityType entityType, const glm::vec3& position, const Map& map, Worker& worker);
+	void instructWorkersToRepair(const HQ& HQ, const Map& map);
 	const Mineral& getRandomMineral() const;
 	Worker* getAvailableWorker(const glm::vec3& position);
 	
