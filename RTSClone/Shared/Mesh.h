@@ -23,7 +23,7 @@ struct MeshTextureDetails
 
 	unsigned int ID;
 	std::string type;
-	std::string path;  // we store the path of the texture to compare with other textures
+	std::string path; 
 };
 
 struct Vertex
@@ -48,6 +48,10 @@ struct Mesh : private NonCopyable
 
 	void bind() const;
 	void attachToVAO() const;
+
+#ifdef LEVEL_EDITOR
+	void renderDebugMesh(ShaderHandler& shaderHandler) const;
+#endif // LEVEL_EDITOR
 	void render(ShaderHandler& shaderHandler, bool selected = false) const;
 	void render(ShaderHandler& shaderHandler, eFactionController owningFactionController, bool selected = false) const;
 

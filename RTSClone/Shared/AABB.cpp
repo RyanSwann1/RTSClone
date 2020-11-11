@@ -204,6 +204,6 @@ void AABB::render(ShaderHandler& shaderHandler)
 
 	shaderHandler.setUniformVec3(eShaderType::Debug, "uColor", COLOR);
 	shaderHandler.setUniform1f(eShaderType::Debug, "uOpacity", OPACITY);
-	m_mesh.render(shaderHandler, false);
+	m_mesh.renderDebugMesh(shaderHandler);
 }
 #endif // RENDER_AABB

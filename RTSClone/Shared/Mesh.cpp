@@ -112,6 +112,12 @@ void Mesh::attachToVAO() const
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), indices.data(), GL_STATIC_DRAW);
 }
 
+void Mesh::renderDebugMesh(ShaderHandler& shaderHandler) const
+{
+	bind();
+	glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(indices.size()), GL_UNSIGNED_INT, nullptr);
+}
+
 void Mesh::render(ShaderHandler& shaderHandler, bool selected) const
 {
 	if (!textures.empty())
@@ -122,8 +128,6 @@ void Mesh::render(ShaderHandler& shaderHandler, bool selected) const
 		assert(!indices.empty());
 		bind();
 		shaderHandler.setUniformVec3(eShaderType::Default, "uMaterialColour", { 1.0f, 1.0f, 1.0f });
-		
-		glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, nullptr);
 	}
 	else
 	{
@@ -139,7 +143,7 @@ void Mesh::render(ShaderHandler& shaderHandler, bool selected) const
 			shaderHandler.setUniform1f(eShaderType::Default, "uSelectedAmplifier", 1.0f);
 		}
 
-		glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, nullptr);
+		glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(indices.size()), GL_UNSIGNED_INT, nullptr);
 	}
 }
 
@@ -185,7 +189,7 @@ void Mesh::render(ShaderHandler& shaderHandler, eFactionController owningFaction
 		shaderHandler.setUniform1f(eShaderType::Default, "uSelectedAmplifier", 1.0f);
 	}
 
-	glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, nullptr);
+	glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(indices.size()), GL_UNSIGNED_INT, nullptr);
 }
 
 Vertex::Vertex(const glm::vec3& position)
