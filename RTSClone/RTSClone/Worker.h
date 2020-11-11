@@ -29,7 +29,7 @@ public:
 	bool isHoldingResources() const;
 	int extractResources();	
 
-	void setRepairTargetEntity(int entityID);
+	void setBuildingToRepair(const Entity& building, const Map& map);
 	bool build(const std::function<const Entity*()>& buildingCommand, const glm::vec3& buildPosition, const Map& map);
 	void update(float deltaTime, const UnitSpawnerBuilding& HQ, const Map& map, FactionHandler& factionHandler);
 	void moveTo(const glm::vec3& destinationPosition, const Map& map, const AdjacentPositions& adjacentPositions,

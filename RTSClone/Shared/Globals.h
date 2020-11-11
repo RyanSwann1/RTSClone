@@ -57,7 +57,8 @@ namespace Globals
 
 #ifdef GAME
 	inline const TypeComparison<eEntityType> UNIT_SPAWNER_TYPES({ eEntityType::HQ, eEntityType::Barracks });
-	inline const TypeComparison<eEntityType> BUILDING_TYPES({ eEntityType::HQ, eEntityType::Barracks, eEntityType::SupplyDepot });
+	inline const TypeComparison<eEntityType> BUILDING_TYPES({ eEntityType::HQ, eEntityType::Barracks, 
+		eEntityType::SupplyDepot, eEntityType::Turret });
 	inline const TypeComparison<eEntityType> UNIT_TYPES({ eEntityType::Unit, eEntityType::Worker });
 #endif // GAME
 

@@ -19,6 +19,7 @@ namespace
 	constexpr float MOVEMENT_SPEED = 7.5f;
 	constexpr int RESOURCE_CAPACITY = 30;
 	constexpr int RESOURCE_INCREMENT = 10;
+	constexpr float MINIMUM_REPAIR_DISTANCE = static_cast<float>(Globals::NODE_SIZE) * 4.0f;
 }
 
 //BuildingCommand
@@ -80,10 +81,19 @@ int Worker::extractResources()
 	return resources;
 }
 
-void Worker::setRepairTargetEntity(int entityID)
+void Worker::setBuildingToRepair(const Entity& building, const Map& map)
 {
-	assert(entityID != Globals::INVALID_ENTITY_ID);
-	m_repairTargetEntityID = entityID;
+	assert(Globals::BUILDING_TYPES.isMatch(building.getEntityType()));
+	
+	m_repairTargetEntityID = building.getID();
+
+	if (Globals::getSqrDistance(building.getPosition(), m_position) > MINIMUM_REPAIR_DISTANCE * MINIMUM_REPAIR_DISTANCE)
+	{
+		moveTo(PathFindingLocator::get().getClosestPositionOutsideAABB(building.getPosition(),
+			building.getAABB(), building.getPosition(), map),
+			map, [&](const glm::ivec2& position) { return getAdjacentPositions(position, map); },
+			eUnitState::MovingToRepairPosition);
+	}
 }
 
 bool Worker::build(const std::function<const Entity*()>& buildingCommand, const glm::vec3& buildPosition, const Map& map)
@@ -227,6 +237,8 @@ void Worker::update(float deltaTime, const UnitSpawnerBuilding& HQ, const Map& m
 			const Entity* targetEntity = factionHandler.getFaction(m_owningFaction.getController()).getEntity(m_repairTargetEntityID);
 			if (targetEntity && targetEntity->getHealth() < targetEntity->getMaximumHealth())
 			{
+				m_rotation.y = Globals::getAngle(targetEntity->getPosition(), m_position);
+				
 				GameEventHandler::getInstance().gameEvents.push(
 					{ eGameEventType::RepairEntity, m_owningFaction.getController(), m_repairTargetEntityID });
 			}

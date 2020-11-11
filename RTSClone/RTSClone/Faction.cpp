@@ -179,7 +179,7 @@ void Faction::handleEvent(const GameEvent& gameEvent, const Map& map)
     {
     case eGameEventType::Attack:
     {
-        assert(gameEvent.senderFaction != m_controller && gameEvent.damage > 0 && gameEvent.targetID != Globals::INVALID_ENTITY_ID);
+        assert(gameEvent.senderFaction != m_controller);
         int targetID = gameEvent.targetID;
         auto entity = std::find_if(m_allEntities.begin(), m_allEntities.end(), [targetID](const auto& entity)
         {

@@ -138,11 +138,7 @@ namespace
             if (selectedEntity != entities.cend() &&
                 (*selectedEntity)->getHealth() < (*selectedEntity)->getMaximumHealth())
             {
-                selectedWorker.setRepairTargetEntity((*selectedEntity)->getID());
-                selectedWorker.moveTo(PathFindingLocator::get().getClosestPositionOutsideAABB(selectedWorker.getPosition(),
-                    (*selectedEntity)->getAABB(), (*selectedEntity)->getPosition(), map),
-                    map, [&](const glm::ivec2& position) { return getAdjacentPositions(position, map); },
-                    eUnitState::MovingToRepairPosition);
+                selectedWorker.setBuildingToRepair(*(*selectedEntity), map);
             }
             else
             {
@@ -196,12 +192,7 @@ namespace
                     glm::vec3 destination = PathFindingLocator::get().getClosestPositionOutsideAABB(selectedUnit->getPosition(),
                         (*selectedEntity)->getAABB(), (*selectedEntity)->getPosition(), map);
 
-                    Worker& selectedWorker = static_cast<Worker&>(*selectedUnit);
-                    selectedWorker.setRepairTargetEntity((*selectedEntity)->getID());
-
-                    static_cast<Worker&>(*selectedUnit).moveTo(destination, map, 
-                        [&](const glm::ivec2& position) { return getAdjacentPositions(position, map); },
-                        eUnitState::MovingToRepairPosition);
+                    static_cast<Worker&>(*selectedUnit).setBuildingToRepair(*(*selectedEntity), map);
                 }
             }
         }
