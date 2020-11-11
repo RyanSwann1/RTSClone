@@ -112,11 +112,13 @@ void Mesh::attachToVAO() const
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), indices.data(), GL_STATIC_DRAW);
 }
 
+#ifdef RENDER_AABB
 void Mesh::renderDebugMesh(ShaderHandler& shaderHandler) const
 {
 	bind();
 	glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(indices.size()), GL_UNSIGNED_INT, nullptr);
 }
+#endif // RENDER_AABB
 
 void Mesh::render(ShaderHandler& shaderHandler, bool selected) const
 {

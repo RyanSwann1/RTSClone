@@ -33,7 +33,7 @@ namespace Globals
 	constexpr int MIN_FACTIONS = 2;
 	constexpr int MAX_FACTIONS = 4;
 	constexpr glm::vec3 PLAYER_MATERIAL_DIFFUSE = { 1.0f, 0.2f, 0.2f };
-	constexpr glm::vec3 AI_1_MATERIAL_DIFFUSE = { 1.0f, 0.6f, 0.2f };
+	constexpr glm::vec3 AI_1_MATERIAL_DIFFUSE = { 0.2f, 0.2f, 1.0f };
 	constexpr glm::vec3 AI_2_MATERIAL_DIFFUSE = { 1.0f, 1.0f, 0.2f };
 	constexpr glm::vec3 AI_3_MATERIAL_DIFFUSE = { 0.2f, 1.0f, 0.2f };
 	inline const std::string FACTION_MATERIAL_NAME_ID = "metal";
