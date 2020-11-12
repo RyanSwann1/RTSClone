@@ -17,6 +17,7 @@ namespace
 	constexpr float MOVEMENT_SPEED = 7.5f;
 	constexpr float UNIT_GRID_ATTACK_RANGE = 5.0f;
 	constexpr float UNIT_ATTACK_RANGE = UNIT_GRID_ATTACK_RANGE * Globals::NODE_SIZE;
+
 	constexpr float TIME_BETWEEN_ATTACK = 1.0f;
 	constexpr float TIME_BETWEEN_STATE = 0.25f;
 	constexpr int DAMAGE = 1;
@@ -330,6 +331,34 @@ void Unit::update(float deltaTime, FactionHandler& factionHandler, const Map& ma
 	if (m_stateHandlerTimer.isExpired())
 	{
 		m_stateHandlerTimer.resetElaspedTime();
+	}
+}
+
+void Unit::reduceHealth(const GameEvent& gameEvent, FactionHandler& factionHandler)
+{
+	Entity::reduceHealth(gameEvent);
+	
+	if (!isDead())
+	{
+		if(m_targetEntity.isValid(factionHandler))
+		{
+			const Faction& opposingFaction = factionHandler.getFaction(m_targetEntity.getFactionController());
+			const Entity* targetEntity = opposingFaction.getEntity(m_targetEntity.getID());
+			if (!targetEntity)
+			{
+				m_targetEntity.reset();
+			}
+			else if(Globals::getSqrDistance(targetEntity->getPosition(), m_position) > glm::pow(UNIT_ATTACK_RANGE, 2))
+			{
+				m_targetEntity.set(gameEvent.senderFaction, gameEvent.senderID);
+				m_currentState = eUnitState::AttackingTarget;
+			}
+		}
+		else
+		{
+			m_targetEntity.set(gameEvent.senderFaction, gameEvent.senderID);
+			m_currentState = eUnitState::AttackingTarget;
+		}
 	}
 }
 

@@ -5,6 +5,10 @@
 #include "Globals.h"
 #include "UniqueEntityIDDistributer.h"
 #include "FactionController.h"
+#ifdef GAME
+#include "GameEvent.h"
+#endif // GAME
+
 
 #ifdef GAME
 Entity::Entity(const Model& model, const glm::vec3& startingPosition, eEntityType entityType, 
@@ -154,9 +158,9 @@ int Entity::getHealth() const
 	return m_health;
 }
 
-void Entity::reduceHealth(int damage)
+void Entity::reduceHealth(const GameEvent& gameEvent)
 {
-	m_health -= damage;
+	m_health -= gameEvent.damage;
 }
 
 bool Entity::isDead() const
