@@ -49,9 +49,10 @@ struct Mesh : private NonCopyable
 	void bind() const;
 	void attachToVAO() const;
 
-#ifdef LEVEL_EDITOR
+#if defined RENDER_AABB || defined RENDER_PATHING
 	void renderDebugMesh(ShaderHandler& shaderHandler) const;
-#endif // LEVEL_EDITOR
+#endif // defined RENDER_AABB || defined RENDER_PATHING
+
 	void render(ShaderHandler& shaderHandler, bool selected = false) const;
 	void render(ShaderHandler& shaderHandler, eFactionController owningFactionController, bool selected = false) const;
 
