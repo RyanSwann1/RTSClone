@@ -157,7 +157,7 @@ void Level::handleEvent(const GameEvent& gameEvent, const Map& map)
 	case eGameEventType::Attack:
 		if (m_factionHandler.isFactionActive(gameEvent.targetFaction))
 		{
-			m_factions[static_cast<int>(gameEvent.targetFaction)]->handleEvent(gameEvent, map);
+			m_factions[static_cast<int>(gameEvent.targetFaction)]->handleEvent(gameEvent, map, m_factionHandler);
 		}
 		break;
 	case eGameEventType::RemovePlannedBuilding:
@@ -166,7 +166,7 @@ void Level::handleEvent(const GameEvent& gameEvent, const Map& map)
 	case eGameEventType::RepairEntity:
 		if (m_factionHandler.isFactionActive(gameEvent.senderFaction))
 		{
-			m_factions[static_cast<int>(gameEvent.senderFaction)]->handleEvent(gameEvent, map);
+			m_factions[static_cast<int>(gameEvent.senderFaction)]->handleEvent(gameEvent, map, m_factionHandler);
 		}
 		break;
 	case eGameEventType::SpawnProjectile:
@@ -177,7 +177,7 @@ void Level::handleEvent(const GameEvent& gameEvent, const Map& map)
 		{
 			if (faction)
 			{
-				faction->handleEvent(gameEvent, map);
+				faction->handleEvent(gameEvent, map, m_factionHandler);
 			}
 		}
 		break;
@@ -193,7 +193,7 @@ void Level::handleEvent(const GameEvent& gameEvent, const Map& map)
 	case eGameEventType::PlayerSpawnUnit:
 		if (m_factionHandler.isFactionActive(eFactionController::Player))
 		{
-			m_factions[static_cast<int>(eFactionController::Player)]->handleEvent(gameEvent, map);
+			m_factions[static_cast<int>(eFactionController::Player)]->handleEvent(gameEvent, map, m_factionHandler);
 		}
 		break;
 	default:

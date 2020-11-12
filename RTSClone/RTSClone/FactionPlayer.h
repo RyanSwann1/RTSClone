@@ -16,7 +16,7 @@ public:
 	void handleInput(const sf::Event& currentSFMLEvent, const sf::Window& window, const Camera& camera, const Map& map, 
 		const std::vector<const Faction*>& opposingFactions, TargetEntity& selectedTargetGUI);
 	
-	void handleEvent(const GameEvent& gameEvent, const Map& map) override;
+	void handleEvent(const GameEvent& gameEvent, const Map& map, FactionHandler& factionHandler) override;
 	void update(float deltaTime, const Map& map, FactionHandler& factionHandler) override;
 	void updateSelectionBox(TargetEntity& selectedTargetGUI);
 	void render(ShaderHandler& shaderHandler) const override;

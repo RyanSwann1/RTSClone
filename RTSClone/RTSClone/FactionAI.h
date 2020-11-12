@@ -29,7 +29,7 @@ public:
 		int startingPopulationCap);
 
 	void setTargetFaction(const std::vector<const Faction*>& opposingFactions);
-	void handleEvent(const GameEvent& gameEvent, const Map& map) override;
+	void handleEvent(const GameEvent& gameEvent, const Map& map, FactionHandler& factionHandler) override;
 	void update(float deltaTime, const Map& map, FactionHandler& factionHandler) override;
 
 private:

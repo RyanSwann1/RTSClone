@@ -324,9 +324,9 @@ void FactionPlayer::handleInput(const sf::Event& currentSFMLEvent, const sf::Win
     }
 }
 
-void FactionPlayer::handleEvent(const GameEvent& gameEvent, const Map& map)
+void FactionPlayer::handleEvent(const GameEvent& gameEvent, const Map& map, FactionHandler& factionHandler)
 {
-    Faction::handleEvent(gameEvent, map);
+    Faction::handleEvent(gameEvent, map, factionHandler);
 
     switch (gameEvent.type)
     {

@@ -85,7 +85,7 @@ void FactionAI::setTargetFaction(const std::vector<const Faction*>& opposingFact
 	}
 }
 
-void FactionAI::handleEvent(const GameEvent& gameEvent, const Map& map)
+void FactionAI::handleEvent(const GameEvent& gameEvent, const Map& map, FactionHandler& factionHandler)
 {
 	switch (gameEvent.type)
 	{
@@ -116,7 +116,7 @@ void FactionAI::handleEvent(const GameEvent& gameEvent, const Map& map)
 	}
 	}
 
-	Faction::handleEvent(gameEvent, map);
+	Faction::handleEvent(gameEvent, map, factionHandler);
 }
 
 void FactionAI::update(float deltaTime, const Map & map, FactionHandler& factionHandler)
