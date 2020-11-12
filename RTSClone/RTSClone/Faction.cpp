@@ -194,32 +194,28 @@ void Faction::handleEvent(const GameEvent& gameEvent, const Map& map, FactionHan
                 (*entity)->reduceHealth(gameEvent);
                 if ((*entity)->isDead())
                 {
-                    removeEntity<Worker>(m_workers, targetID);
-                    m_allEntities.erase(entity);
+                    removeEntity<Worker>(m_workers, targetID, entity);
                 }
                 break;
             case eEntityType::Unit:
                 static_cast<Unit&>(*(*entity)).reduceHealth(gameEvent, factionHandler);
                 if ((*entity)->isDead())
                 {
-                    removeEntity<Unit>(m_units, targetID);
-                    m_allEntities.erase(entity);
+                    removeEntity<Unit>(m_units, targetID, entity);
                 }
                 break;
             case eEntityType::SupplyDepot:
                 (*entity)->reduceHealth(gameEvent);
                 if ((*entity)->isDead())
                 {
-                    removeEntity<SupplyDepot>(m_supplyDepots, targetID);
-                    m_allEntities.erase(entity);
+                    removeEntity<SupplyDepot>(m_supplyDepots, targetID, entity);
                 }
                 break;
             case eEntityType::Barracks:
                 (*entity)->reduceHealth(gameEvent);
                 if ((*entity)->isDead())
                 {
-                    removeEntity<Barracks>(m_barracks, targetID);
-                    m_allEntities.erase(entity);
+                    removeEntity<Barracks>(m_barracks, targetID, entity);
                 }
                 break;
             case eEntityType::HQ:
@@ -233,8 +229,7 @@ void Faction::handleEvent(const GameEvent& gameEvent, const Map& map, FactionHan
                 (*entity)->reduceHealth(gameEvent);
                 if ((*entity)->isDead())
                 {
-                    removeEntity<Turret>(m_turrets, targetID);
-                    m_allEntities.erase(entity);
+                    removeEntity<Turret>(m_turrets, targetID, entity);
                 }
                 break;
             default:

@@ -9,7 +9,6 @@
 #include "GameEvent.h"
 #endif // GAME
 
-
 #ifdef GAME
 Entity::Entity(const Model& model, const glm::vec3& startingPosition, eEntityType entityType, 
 	int health, glm::vec3 startingRotation)

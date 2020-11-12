@@ -11,6 +11,7 @@
 #include "PlannedBuilding.h"
 #include "Turret.h"
 #include <list>
+#include <vector>
 
 struct GameEvent;
 class FactionHandler;
@@ -119,8 +120,9 @@ private:
 	}
 
 	//Presumes entity already found in all entities container
-	template <class Entity>
-	void removeEntity(std::list<Entity>& entityContainer, int entityID)
+	template <class T>
+	void removeEntity(std::list<T>& entityContainer, int entityID, 
+		std::vector<Entity*>::iterator& iter)
 	{
 		auto entity = std::find_if(entityContainer.begin(), entityContainer.end(), [entityID](const auto& entity)
 		{
@@ -129,5 +131,7 @@ private:
 		assert(entity != entityContainer.end());
 
 		entityContainer.erase(entity);
+		assert(iter != m_allEntities.cend());
+		m_allEntities.erase(iter);
 	}
 };
