@@ -89,7 +89,7 @@ void FactionAI::handleEvent(const GameEvent& gameEvent, const Map& map, FactionH
 {
 	switch (gameEvent.type)
 	{
-	case eGameEventType::Attack:
+	case eGameEventType::TakeDamage:
 	{
 		assert(gameEvent.senderFaction != getController());
 		int targetID = gameEvent.targetID;

@@ -71,7 +71,7 @@ GameEvent::GameEvent(eGameEventType gameEventType, eFactionController senderFact
 	endingPosition(),
 	entityType()
 {
-	assert(gameEventType == eGameEventType::Attack);
+	assert(gameEventType == eGameEventType::TakeDamage);
 }
 
 GameEvent::GameEvent(eGameEventType gameEventType, eFactionController senderFaction, int senderID, eFactionController targetFaction, int targetID,

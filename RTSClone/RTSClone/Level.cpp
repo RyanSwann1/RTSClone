@@ -154,7 +154,7 @@ void Level::handleEvent(const GameEvent& gameEvent, const Map& map)
 {
 	switch (gameEvent.type)
 	{
-	case eGameEventType::Attack:
+	case eGameEventType::TakeDamage:
 		if (m_factionHandler.isFactionActive(gameEvent.targetFaction))
 		{
 			m_factions[static_cast<int>(gameEvent.targetFaction)]->handleEvent(gameEvent, map, m_factionHandler);

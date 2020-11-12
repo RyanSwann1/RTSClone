@@ -177,7 +177,7 @@ void Faction::handleEvent(const GameEvent& gameEvent, const Map& map, FactionHan
 {
     switch (gameEvent.type)
     {
-    case eGameEventType::Attack:
+    case eGameEventType::TakeDamage:
     {
         assert(gameEvent.senderFaction != m_controller);
         int targetID = gameEvent.targetID;

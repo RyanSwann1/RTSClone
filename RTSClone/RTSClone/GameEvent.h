@@ -9,7 +9,7 @@
 
 enum class eGameEventType
 {
-	Attack = 0,
+	TakeDamage = 0,
 	RemovePlannedBuilding,
 	RemoveAllWorkerPlannedBuildings,
 	AddResources,
