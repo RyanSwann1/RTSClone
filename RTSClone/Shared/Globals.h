@@ -60,6 +60,7 @@ namespace Globals
 	inline const TypeComparison<eEntityType> BUILDING_TYPES({ eEntityType::HQ, eEntityType::Barracks, 
 		eEntityType::SupplyDepot, eEntityType::Turret });
 	inline const TypeComparison<eEntityType> UNIT_TYPES({ eEntityType::Unit, eEntityType::Worker });
+	inline const TypeComparison<eEntityType> ATTACKING_ENTITY_TYPES({ eEntityType::Unit, eEntityType::Turret });
 #endif // GAME
 
 	constexpr int CUBE_FACE_INDICIE_COUNT = 4;

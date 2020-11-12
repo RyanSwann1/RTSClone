@@ -338,7 +338,7 @@ void Unit::reduceHealth(const GameEvent& gameEvent, FactionHandler& factionHandl
 {
 	Entity::reduceHealth(gameEvent);
 	
-	if (!isDead())
+	if (!isDead() && m_owningFaction.getController() != eFactionController::Player)
 	{
 		bool changeTargetEntity = false;
 		if(m_targetEntity.getID() != Globals::INVALID_ENTITY_ID &&
@@ -358,6 +358,10 @@ void Unit::reduceHealth(const GameEvent& gameEvent, FactionHandler& factionHandl
 				}
 			}
 			else if(Globals::getSqrDistance(targetEntity->getPosition(), m_position) > glm::pow(UNIT_ATTACK_RANGE, 2))
+			{
+				changeTargetEntity = true;
+			}
+			else if(!Globals::ATTACKING_ENTITY_TYPES.isMatch(targetEntity->getEntityType()))
 			{
 				changeTargetEntity = true;
 			}
