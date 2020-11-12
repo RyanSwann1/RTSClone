@@ -340,7 +340,8 @@ void Unit::reduceHealth(const GameEvent& gameEvent, FactionHandler& factionHandl
 	
 	if (!isDead())
 	{
-		if(m_targetEntity.isValid(factionHandler))
+		if(m_targetEntity.getID() != Globals::INVALID_ENTITY_ID &&
+			factionHandler.isFactionActive(m_targetEntity.getFactionController()))
 		{
 			const Faction& opposingFaction = factionHandler.getFaction(m_targetEntity.getFactionController());
 			const Entity* targetEntity = opposingFaction.getEntity(m_targetEntity.getID());
