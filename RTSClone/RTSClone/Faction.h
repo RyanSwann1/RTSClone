@@ -33,7 +33,7 @@ public:
 	const Entity* getEntity(const glm::vec3& position) const;
 	const std::array<Mineral, Globals::MAX_MINERALS_PER_FACTION>& getMinerals() const;
 
-	virtual void handleEvent(const GameEvent& gameEvent, const Map& map);
+	virtual void handleEvent(const GameEvent& gameEvent, const Map& map, FactionHandler& factionHandler);
 	virtual void update(float deltaTime, const Map& map, FactionHandler& factionHandler);
 	virtual void render(ShaderHandler& shaderHandler) const;
 	void renderPlannedBuildings(ShaderHandler& shaderHandler) const;
@@ -116,5 +116,18 @@ private:
 		}
 
 		handledUnits.clear();
+	}
+
+	//Presumes entity already found in all entities container
+	template <class Entity>
+	void removeEntity(std::list<Entity>& entityContainer, int entityID)
+	{
+		auto entity = std::find_if(entityContainer.begin(), entityContainer.end(), [entityID](const auto& entity)
+		{
+			return entity.getID() == entityID;
+		});
+		assert(entity != entityContainer.end());
+
+		entityContainer.erase(entity);
 	}
 };

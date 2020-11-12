@@ -173,7 +173,7 @@ const std::array<Mineral, Globals::MAX_MINERALS_PER_FACTION>& Faction::getMinera
     return m_minerals;
 }
 
-void Faction::handleEvent(const GameEvent& gameEvent, const Map& map)
+void Faction::handleEvent(const GameEvent& gameEvent, const Map& map, FactionHandler& factionHandler)
 {
     switch (gameEvent.type)
     {
@@ -188,77 +188,58 @@ void Faction::handleEvent(const GameEvent& gameEvent, const Map& map)
 
         if (entity != m_allEntities.end())
         {
-            (*entity)->reduceHealth(gameEvent.damage);
-            if ((*entity)->isDead())
+            switch ((*entity)->getEntityType())
             {
-                switch ((*entity)->getEntityType())
+            case eEntityType::Worker:
+                (*entity)->reduceHealth(gameEvent);
+                if ((*entity)->isDead())
                 {
-                case eEntityType::Worker:
-                {
-                    decreaseCurrentPopulationAmount(*(*entity));
-                    auto worker = std::find_if(m_workers.begin(), m_workers.end(), [targetID](const auto& worker)
-                    {
-                        return worker.getID() == targetID;
-                    });
-                    assert(worker != m_workers.end());
-
-                    m_workers.erase(worker);
+                    removeEntity<Worker>(m_workers, targetID);
+                    m_allEntities.erase(entity);
                 }
                 break;
-                case eEntityType::SupplyDepot:
+            case eEntityType::Unit:
+                static_cast<Unit&>(*(*entity)).reduceHealth(gameEvent, factionHandler);
+                if ((*entity)->isDead())
                 {
-                    auto supplyDepot = std::find_if(m_supplyDepots.begin(), m_supplyDepots.end(), [targetID](const auto& supplyDepot)
-                    {
-                        return supplyDepot.getID() == targetID;
-                    });
-                    assert(supplyDepot != m_supplyDepots.end());
-
-                    m_supplyDepots.erase(supplyDepot);
+                    removeEntity<Unit>(m_units, targetID);
+                    m_allEntities.erase(entity);
                 }
                 break;
-                case eEntityType::Barracks:
+            case eEntityType::SupplyDepot:
+                (*entity)->reduceHealth(gameEvent);
+                if ((*entity)->isDead())
                 {
-                    auto barracks = std::find_if(m_barracks.begin(), m_barracks.end(), [targetID](const auto& barracks)
-                    {
-                        return barracks.getID() == targetID;
-                    });
-                    assert(barracks != m_barracks.end());
-
-                    m_barracks.erase(barracks);
+                    removeEntity<SupplyDepot>(m_supplyDepots, targetID);
+                    m_allEntities.erase(entity);
                 }
                 break;
-                case eEntityType::HQ:
+            case eEntityType::Barracks:
+                (*entity)->reduceHealth(gameEvent);
+                if ((*entity)->isDead())
+                {
+                    removeEntity<Barracks>(m_barracks, targetID);
+                    m_allEntities.erase(entity);
+                }
+                break;
+            case eEntityType::HQ:
+                (*entity)->reduceHealth(gameEvent);
+                if ((*entity)->isDead())
+                {
                     GameEventHandler::getInstance().gameEvents.push({ eGameEventType::EliminateFaction, m_controller });
-                    break;
-                case eEntityType::Unit:
-                {
-                    decreaseCurrentPopulationAmount(*(*entity));
-                    auto unit = std::find_if(m_units.begin(), m_units.end(), [targetID](const auto& unit)
-                    {
-                        return unit.getID() == targetID;
-                    });
-                    assert(unit != m_units.end());
-
-                    m_units.erase(unit);
                 }
                 break;
-                case eEntityType::Turret:
+            case eEntityType::Turret:
+                (*entity)->reduceHealth(gameEvent);
+                if ((*entity)->isDead())
                 {
-                    auto turret = std::find_if(m_turrets.begin(), m_turrets.end(), [targetID](const auto& turret)
-                    {
-                        return turret.getID() == targetID;
-                    });
-                    assert(turret != m_turrets.cend());
-
-                    m_turrets.erase(turret);
+                    removeEntity<Turret>(m_turrets, targetID);
+                    m_allEntities.erase(entity);
                 }
-                    break;
-                default:
-                    assert(false);
-                }
-
-                m_allEntities.erase(entity);
-            }   
+                break;
+            default:
+                assert(false);
+            }
         }
     }
         break;
