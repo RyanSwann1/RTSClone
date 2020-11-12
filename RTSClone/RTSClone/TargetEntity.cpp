@@ -1,33 +1,34 @@
 #include "TargetEntity.h"
 #include "Globals.h"
+#include "FactionHandler.h"
 
 TargetEntity::TargetEntity()
-	: m_factionController(),
-	m_ID(Globals::INVALID_ENTITY_ID)
+	: m_targetFactionController(),
+	m_targetID(Globals::INVALID_ENTITY_ID)
 {}
 
-TargetEntity::TargetEntity(eFactionController factionController, int targetID)
-	: m_factionController(factionController),
-	m_ID(targetID)
+TargetEntity::TargetEntity(eFactionController targetFactionController, int targetID)
+	: m_targetFactionController(targetFactionController),
+	m_targetID(targetID)
 {}
 
 eFactionController TargetEntity::getFactionController() const
 {
-	return m_factionController;
+	return m_targetFactionController;
 }
 
 int TargetEntity::getID() const
 {
-	return m_ID;
+	return m_targetID;
 }
 
-void TargetEntity::set(eFactionController factionController, int ID)
+void TargetEntity::set(eFactionController targetFactionController, int ID)
 {
-	m_factionController = factionController;
-	m_ID = ID;
+	m_targetFactionController = targetFactionController;
+	m_targetID = ID;
 }
 
 void TargetEntity::reset()
 {
-	m_ID = Globals::INVALID_ENTITY_ID;
+	m_targetID = Globals::INVALID_ENTITY_ID;
 }

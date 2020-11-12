@@ -2,19 +2,20 @@
 
 #include "FactionController.h"
 
+class FactionHandler;
 class TargetEntity
 {
 public:
 	TargetEntity();
-	TargetEntity(eFactionController factionController, int targetID);
+	TargetEntity(eFactionController targetFactionController, int targetID);
 
 	eFactionController getFactionController() const;
 	int getID() const;
 
-	void set(eFactionController factionController, int ID);
+	void set(eFactionController targetFactionController, int ID);
 	void reset();
 
 private:
-	eFactionController m_factionController;
-	int m_ID;
+	eFactionController m_targetFactionController;
+	int m_targetID;
 };
