@@ -21,8 +21,7 @@ public:
 	~Level();
 
 	const Faction* getPlayer() const;
-	eFactionController getWinningFactionController() const;
-	bool isComplete() const;
+	const Faction* getWinningFaction() const;
 
 	void handleInput(const sf::Window& window, const Camera& camera, const sf::Event& currentSFMLEvent, const Map& map);
 	void update(float deltaTime, const Map& map);

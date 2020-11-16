@@ -128,26 +128,22 @@ const Faction* Level::getPlayer() const
 	return nullptr;
 }
 
-eFactionController Level::getWinningFactionController() const
+const Faction* Level::getWinningFaction() const
 {
-	assert(isComplete());
-	eFactionController winningFaction;
-	for (const auto& faction : m_factions)
+	const Faction* winningFaction = nullptr;
+	if (getActiveFactionCount(m_factions) == 1)
 	{
-		if (faction)
+		for (const auto& faction : m_factions)
 		{
-			winningFaction = faction->getController();
-			break;
+			if (faction)
+			{
+				winningFaction = faction.get(); 
+				break;
+			}
 		}
 	}
 
 	return winningFaction;
-}
-
-bool Level::isComplete() const
-{
-	assert(getActiveFactionCount(m_factions) >= 1);
-	return getActiveFactionCount(m_factions) == 1;
 }
 
 void Level::handleEvent(const GameEvent& gameEvent, const Map& map)

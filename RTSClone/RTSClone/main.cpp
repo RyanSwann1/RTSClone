@@ -131,12 +131,16 @@ int main()
 		ImGui_SFML_OpenGL3::startFrame();
 		//ImGui::ShowDemoWindow();
 
-		if (level && level->isComplete())
+		if (level)
 		{
-			GameMessenger::getInstance().broadcast<GameMessages::UIDisplayWinner>(
-				{ level->getWinningFactionController() });
+			const Faction* winningFaction = level->getWinningFaction();
+			if (winningFaction)
+			{
+				GameMessenger::getInstance().broadcast<GameMessages::UIDisplayWinner>(
+					{ winningFaction->getController() });
 
-			level.reset();
+				level.reset();
+			}
 		}
 		if (!level)
 		{

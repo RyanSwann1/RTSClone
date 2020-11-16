@@ -188,9 +188,6 @@
     <ClInclude Include="..\Shared\FactionController.h">
       <Filter>src</Filter>
     </ClInclude>
-    <ClInclude Include="Level.h">
-      <Filter>src</Filter>
-    </ClInclude>
     <ClInclude Include="TranslateObject.h">
       <Filter>src</Filter>
     </ClInclude>
@@ -199,6 +196,9 @@
     </ClInclude>
     <ClInclude Include="Notes.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Level.h">
+      <Filter>src</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
