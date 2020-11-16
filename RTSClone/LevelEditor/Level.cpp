@@ -414,7 +414,6 @@ void Level::render(ShaderHandler& shaderHandler) const
 	if (m_plannedEntity.model)
 	{
 		m_plannedEntity.model->render(shaderHandler, m_plannedEntity.position);
-		//ModelManager::getInstance().getModel(m_plannedEntity.modelName).render(shaderHandler, m_plannedEntity.position);
 	}
 
 	m_translateObject.render(shaderHandler, m_entityManager.isEntitySelected() || m_selectedPlayer);

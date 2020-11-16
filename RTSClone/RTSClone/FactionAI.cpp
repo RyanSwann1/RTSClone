@@ -24,7 +24,7 @@
 
 namespace
 {
-	constexpr float DELAY_TIMER_EXPIRATION = 3.0f;
+	constexpr float DELAY_TIMER_EXPIRATION = 2.0f;
 	constexpr float IDLE_TIMER_EXPIRATION = 1.0f;
 	constexpr float MIN_SPAWN_TIMER_EXPIRATION = 7.5f;
 	constexpr float MAX_SPAWN_TIMER_EXPIRATION = 15.0f;
@@ -50,7 +50,7 @@ AIAction::AIAction(eActionType actionType, const glm::vec3& position)
 
 //FactionAI
 FactionAI::FactionAI(eFactionController factionController, const glm::vec3& hqStartingPosition,
-	const std::array<glm::vec3, Globals::MAX_MINERALS_PER_FACTION>& mineralPositions, int startingResources,
+	const std::vector<glm::vec3>& mineralPositions, int startingResources,
 	int startingPopulationCap)
 	: Faction(factionController, hqStartingPosition, mineralPositions, startingResources, startingPopulationCap),
 	m_spawnQueue(),

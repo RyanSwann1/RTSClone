@@ -22,7 +22,7 @@ namespace LevelFileHandler
 	bool isPlayerActive(std::ifstream& file, eFactionController factionController);
 
 	int loadFactionStartingResources(std::ifstream& file);
-	int loadFactionStartingPopulation(std::ifstream& file);
+	int loadFactionStartingPopulationCap(std::ifstream& file);
 	glm::ivec2 loadMapSizeFromFile(std::ifstream& file);
 	void loadFromFile(std::ifstream& file, const std::function<void(const std::string&)>& data,
 		const std::function<bool(const std::string&)>& conditional);

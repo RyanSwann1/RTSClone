@@ -7,18 +7,17 @@
 
 #ifdef GAME
 Mineral::Mineral(const glm::vec3& startingPosition)
-	: Entity(ModelManager::getInstance().getModel(MINERALS_MODEL_NAME), startingPosition, eEntityType::Mineral)
+	: Entity(ModelManager::getInstance().getModel(MINERALS_MODEL_NAME), 
+		startingPosition, eEntityType::Mineral)
 {
 	GameMessenger::getInstance().broadcast<GameMessages::MapModification<eGameMessageType::AddEntityToMap>>({ m_AABB });
 }
 #endif // GAME
 
 #ifdef LEVEL_EDITOR
-Mineral::Mineral()
-	: Entity(ModelManager::getInstance().getModel(MINERALS_MODEL_NAME))
-{
-
-}
+Mineral::Mineral(const glm::vec3& startingPosition, glm::vec3 startingRotation)
+	: Entity(ModelManager::getInstance().getModel(MINERALS_MODEL_NAME), startingPosition, startingRotation)
+{}
 #endif // LEVEL_EDITOR
 
 Mineral::Mineral(Mineral&& orig) noexcept

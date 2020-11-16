@@ -108,7 +108,7 @@ bool LevelFileHandler::saveLevelToFile(const Level& level)
 		file << player;
 	}
 
-	saveFactionStartingPopulation(file, level.getFactionStartingPopulation());
+	saveFactionStartingPopulation(file, level.getFactionStartingPopulationCap());
 	saveFactionStartingResources(file, level.getFactionStartingResources());
 	saveMapSizeToFile(file, level.getMapSize());
 
@@ -204,7 +204,7 @@ int LevelFileHandler::loadFactionStartingResources(std::ifstream& file)
 	return factionStartingResources;
 }
 
-int LevelFileHandler::loadFactionStartingPopulation(std::ifstream& file)
+int LevelFileHandler::loadFactionStartingPopulationCap(std::ifstream& file)
 {
 	int factionStartingPopulation = 0;
 	auto data = [&factionStartingPopulation](const std::string& line)
@@ -277,7 +277,7 @@ bool LevelFileHandler::loadLevelFromFile(const std::string& fileName, std::vecto
 	glm::ivec2 mapSize = loadMapSizeFromFile(file);
 	GameMessenger::getInstance().broadcast<GameMessages::NewMapSize>({ mapSize });
 	int factionStartingResources = loadFactionStartingResources(file);
-	int factionStartingPopulation = loadFactionStartingPopulation(file);
+	int factionStartingPopulation = loadFactionStartingPopulationCap(file);
 	loadInPlayers(file, factions, factionStartingResources, factionStartingPopulation);
 	loadInScenery(file, scenery);
 	
@@ -338,7 +338,8 @@ void loadInPlayer(std::ifstream& file, std::array<std::unique_ptr<Faction>, stat
 {
 	assert(file.is_open());
 	glm::vec3 hqStartingPosition = { 0.0f, 0.0f, 0.0f };
-	std::array<glm::vec3, Globals::MAX_MINERALS_PER_FACTION> mineralPositions;
+	std::vector<glm::vec3> mineralPositions;
+	mineralPositions.reserve(Globals::MAX_MINERALS_PER_FACTION);
 
 	auto data = [&hqStartingPosition, &mineralPositions](const std::string& line)
 	{
@@ -353,11 +354,7 @@ void loadInPlayer(std::ifstream& file, std::array<std::unique_ptr<Faction>, stat
 		}
 		else if (modelName == MINERALS_MODEL_NAME)
 		{
-			int mineralIndex = -1;
-			stream >> mineralIndex;
-			assert(mineralIndex >= 0 && mineralIndex < Globals::MAX_MINERALS_PER_FACTION);
-
-			mineralPositions[mineralIndex] = position;
+			mineralPositions.push_back(position);
 		}
 	};
 

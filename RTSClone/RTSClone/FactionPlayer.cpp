@@ -100,7 +100,7 @@ namespace
     }
 
     void moveSelectedUnit(const glm::vec3& mouseToGroundPosition, const Map& map, Entity& selectedEntity, const std::list<Unit>& units,
-        const std::vector<Entity*>& entities, const std::array<Mineral, Globals::MAX_MINERALS_PER_FACTION>& minerals, bool attackMoveSelected)
+        const std::vector<Entity*>& entities, const std::vector<Mineral>& minerals, bool attackMoveSelected)
     {
         assert(selectedEntity.getEntityType() == eEntityType::Unit || selectedEntity.getEntityType() == eEntityType::Worker);
         if (selectedEntity.getEntityType() == eEntityType::Unit)
@@ -148,7 +148,7 @@ namespace
     }
 
     void moveSelectedUnits(std::vector<Unit*>& selectedUnits, const glm::vec3& mouseToGroundPosition, const Map& map,
-        const std::array<Mineral, Globals::MAX_MINERALS_PER_FACTION>& minerals, bool attackMoveSelected, const std::list<Unit>& units,
+        const std::vector<Mineral>& minerals, bool attackMoveSelected, const std::list<Unit>& units,
         const std::vector<Entity*>& entities)
     {
         assert(!selectedUnits.empty());
@@ -280,7 +280,7 @@ namespace
 }
 
 FactionPlayer::FactionPlayer(eFactionController factionController, const glm::vec3& hqStartingPosition, 
-    const std::array<glm::vec3, Globals::MAX_MINERALS_PER_FACTION>& mineralPositions, int startingResources,
+    const std::vector<glm::vec3>& mineralPositions, int startingResources,
     int startingPopulationCap)
     : Faction(factionController, hqStartingPosition, mineralPositions, startingResources, startingPopulationCap),
     m_selectionBox(),
