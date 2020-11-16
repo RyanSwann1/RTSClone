@@ -17,7 +17,7 @@ struct GameEvent;
 class FactionHandler;
 class ShaderHandler;
 class Map;
-class Faction : private NonMovable, private NonCopyable
+class Faction : private NonCopyable, private NonMovable
 {
 public:
 	virtual ~Faction() {}
@@ -32,7 +32,7 @@ public:
 	const Entity* getEntity(const AABB& AABB, int entityID) const;
 	const Entity* getEntity(int entityID) const;
 	const Entity* getEntity(const glm::vec3& position) const;
-	const std::array<Mineral, Globals::MAX_MINERALS_PER_FACTION>& getMinerals() const;
+	const std::vector<Mineral>& getMinerals() const;
 
 	virtual void handleEvent(const GameEvent& gameEvent, const Map& map, FactionHandler& factionHandler);
 	virtual void update(float deltaTime, const Map& map, FactionHandler& factionHandler);
@@ -49,9 +49,9 @@ public:
 
 protected:
 	Faction(eFactionController factionController, const glm::vec3& hqStartingPosition, 
-		const std::array<glm::vec3, Globals::MAX_MINERALS_PER_FACTION>& mineralPositions, int startingResources,
+		const std::vector<glm::vec3>& mineralPositions, int startingResources,
 		int startingPopulationCap);
-	std::array<Mineral, Globals::MAX_MINERALS_PER_FACTION> m_minerals;
+	const std::vector<Mineral> m_minerals;
 	std::vector<PlannedBuilding> m_plannedBuildings;
 	std::vector<Entity*> m_allEntities;
 	std::list<Unit> m_units;

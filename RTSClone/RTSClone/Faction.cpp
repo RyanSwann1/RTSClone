@@ -7,28 +7,22 @@
 
 namespace
 {
-    std::array<Mineral, Globals::MAX_MINERALS_PER_FACTION> initializeMinerals(
-        const std::array<glm::vec3, Globals::MAX_MINERALS_PER_FACTION>& mineralPositions)
+    std::vector<Mineral> initializeMinerals(
+        const std::vector<glm::vec3>& mineralPositions)
     {
-        //Done in this way because of how the constructors/move constructors are setup
-        int i = 0;
-        std::array<Mineral, Globals::MAX_MINERALS_PER_FACTION> minerals =
+        std::vector<Mineral> minerals;
+        minerals.reserve(mineralPositions.size());
+        for (const auto& position : mineralPositions)
         {
-            mineralPositions[i],
-            mineralPositions[++i],
-            mineralPositions[++i],
-            mineralPositions[++i],
-            mineralPositions[++i]
-        };
-
-        assert(i + 1 == static_cast<int>(mineralPositions.size()));
+            minerals.emplace_back(position);
+        }
 
         return minerals;
     };
 }
 
 Faction::Faction(eFactionController factionController, const glm::vec3& hqStartingPosition, 
-    const std::array<glm::vec3, Globals::MAX_MINERALS_PER_FACTION>& mineralPositions, int startingResources,
+    const std::vector<glm::vec3>& mineralPositions, int startingResources,
     int startingPopulationCap)
     : m_plannedBuildings(),
     m_minerals(initializeMinerals(mineralPositions)),
@@ -168,7 +162,7 @@ const Entity* Faction::getEntity(const glm::vec3& position) const
     }
 }
 
-const std::array<Mineral, Globals::MAX_MINERALS_PER_FACTION>& Faction::getMinerals() const
+const std::vector<Mineral>& Faction::getMinerals() const
 {
     return m_minerals;
 }
