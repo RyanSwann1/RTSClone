@@ -25,5 +25,5 @@ struct Player : private NonCopyable
 
 	eFactionController controller;
 	Entity HQ;
-	std::array<Mineral, Globals::MAX_MINERALS_PER_FACTION> minerals;
+	std::vector<Mineral> minerals;
 };

@@ -17,9 +17,9 @@ Player::Player(eFactionController factionController, const glm::vec3& hqStarting
 	minerals()
 {
 	glm::vec3 mineralSpawnPosition = Globals::convertToNodePosition(startingMineralPosition);
-	for (auto& mineral : minerals)
+	for (int i = 0; i < Globals::MAX_MINERALS_PER_FACTION; ++i)
 	{
-		mineral.setPosition(mineralSpawnPosition);
+		minerals.emplace_back(mineralSpawnPosition);
 		mineralSpawnPosition.z += Globals::NODE_SIZE;
 	}
 }
@@ -77,13 +77,8 @@ const std::ifstream& operator>>(std::ifstream& file, Player& player)
 		}
 		else if (modelName == MINERALS_MODEL_NAME)
 		{
-			int mineralIndex = 0;
-			stream >> mineralIndex;
-			assert(mineralIndex >= 0 && mineralIndex < player.minerals.size());
-
-			player.minerals[mineralIndex].setPosition(position);
-			player.minerals[mineralIndex].setRotation(rotation);
-			player.minerals[mineralIndex].resetAABB();
+			player.minerals.emplace_back(position, rotation);
+			player.minerals.back().resetAABB();
 		}
 	};
 
@@ -106,15 +101,15 @@ std::ostream& operator<<(std::ostream& ostream, const Player& player)
 		player.HQ.getRotation().x << " " << player.HQ.getRotation().y << " " << player.HQ.getRotation().z << " " <<
 		player.HQ.getPosition().x << " " << player.HQ.getPosition().y << " " << player.HQ.getPosition().z << "\n";
 
-	for (int i = 0; i < player.minerals.size(); ++i)
+	for (const auto& mineral : player.minerals)
 	{
-		ostream << player.minerals[i].getModel().modelName << " " <<
-			
-		player.minerals[i].getRotation().x << " " << player.minerals[i].getRotation().y << " " << 
-		player.minerals[i].getRotation().z << " " << 
+		ostream << mineral.getModel().modelName << " " <<
 
-		player.minerals[i].getPosition().x << " " << player.minerals[i].getPosition().y << " " << 
-		player.minerals[i].getPosition().z << " " << i << "\n";
+		mineral.getRotation().x << " " << mineral.getRotation().y << " " <<
+		mineral.getRotation().z << " " <<
+
+		mineral.getPosition().x << " " << mineral.getPosition().y << " " <<
+		mineral.getPosition().z << " ";
 	}
 
 	return ostream;
