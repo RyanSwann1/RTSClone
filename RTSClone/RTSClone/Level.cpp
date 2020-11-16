@@ -9,7 +9,7 @@
 
 namespace
 {
-	int getActiveFactionCount(const std::array<std::unique_ptr<Faction>, static_cast<size_t>(eFactionController::Max) + 1>& factions)
+	int getActiveFactionCount(const FactionsContainer& factions)
 	{
 		int activeFactions = 0;
 		for (const auto& faction : factions)
@@ -25,8 +25,7 @@ namespace
 	}
 }
 
-Level::Level(std::vector<SceneryGameObject>&& scenery, 
-	std::array<std::unique_ptr<Faction>, static_cast<size_t>(eFactionController::Max) + 1>&& factions)
+Level::Level(std::vector<SceneryGameObject>&& scenery, FactionsContainer&& factions)
 	: m_scenery(std::move(scenery)),
 	m_factions(std::move(factions)),
 	m_factionHandler(m_factions),

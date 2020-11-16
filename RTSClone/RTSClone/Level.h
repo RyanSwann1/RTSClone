@@ -12,6 +12,8 @@
 #include <memory>
 #include <SFML/Graphics.hpp>
 
+using FactionsContainer = std::array<std::unique_ptr<Faction>, static_cast<size_t>(eFactionController::Max) + 1>;
+
 struct Camera;
 class ShaderHandler;
 class Level : private NonCopyable, private NonMovable
@@ -37,11 +39,10 @@ public:
 #endif // RENDER_PATHING
 
 private:
-	Level(std::vector<SceneryGameObject>&& scenery, 
-		std::array<std::unique_ptr<Faction>, static_cast<size_t>(eFactionController::Max) + 1>&& factions);
+	Level(std::vector<SceneryGameObject>&& scenery, FactionsContainer&& factions);
 
 	std::vector<SceneryGameObject> m_scenery;
-	std::array<std::unique_ptr<Faction>, static_cast<size_t>(eFactionController::Max) + 1> m_factions;
+	FactionsContainer m_factions;
 	FactionHandler m_factionHandler;
 	ProjectileHandler m_projectileHandler;
 	TargetEntity m_selectedTargetGUI;
