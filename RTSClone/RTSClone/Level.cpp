@@ -23,6 +23,29 @@ namespace
 		assert(activeFactions > 0);
 		return activeFactions;
 	}
+
+	bool isFactionActive(const FactionsContainer& factions, eFactionController factionController)
+	{
+		return factions[static_cast<int>(factionController)].get();
+	}
+
+	FactionPlayer& getFactionPlayer(FactionsContainer& factions)
+	{
+		assert(isFactionActive(factions, eFactionController::Player));
+		return static_cast<FactionPlayer&>(*factions[static_cast<int>(eFactionController::Player)]);
+	}
+
+	const FactionPlayer& c_getFactionPlayer(const FactionsContainer& factions)
+	{
+		assert(isFactionActive(factions, eFactionController::Player));
+		return static_cast<FactionPlayer&>(*factions[static_cast<int>(eFactionController::Player)]);
+	}
+
+	Faction& getFaction(FactionsContainer& factions, eFactionController factionController)
+	{
+		assert(isFactionActive(factions, factionController));
+		return *factions[static_cast<int>(factionController)].get();
+	}
 }
 
 Level::Level(std::vector<SceneryGameObject>&& scenery, FactionsContainer&& factions)
@@ -150,18 +173,18 @@ void Level::handleEvent(const GameEvent& gameEvent, const Map& map)
 	switch (gameEvent.type)
 	{
 	case eGameEventType::TakeDamage:
-		if (m_factionHandler.isFactionActive(gameEvent.targetFaction))
+		if (isFactionActive(m_factions, gameEvent.targetFaction))
 		{
-			m_factions[static_cast<int>(gameEvent.targetFaction)]->handleEvent(gameEvent, map, m_factionHandler);
+			getFaction(m_factions, gameEvent.targetFaction).handleEvent(gameEvent, map, m_factionHandler);
 		}
 		break;
 	case eGameEventType::RemovePlannedBuilding:
 	case eGameEventType::RemoveAllWorkerPlannedBuildings:
 	case eGameEventType::AddResources:
 	case eGameEventType::RepairEntity:
-		if (m_factionHandler.isFactionActive(gameEvent.senderFaction))
+		if (isFactionActive(m_factions, gameEvent.senderFaction))
 		{
-			m_factions[static_cast<int>(gameEvent.senderFaction)]->handleEvent(gameEvent, map, m_factionHandler);
+			getFaction(m_factions, gameEvent.senderFaction).handleEvent(gameEvent, map, m_factionHandler);
 		}
 		break;
 	case eGameEventType::SpawnProjectile:
@@ -177,18 +200,17 @@ void Level::handleEvent(const GameEvent& gameEvent, const Map& map)
 		}
 		break;
 	case eGameEventType::EliminateFaction:
-		if (m_factionHandler.isFactionActive(gameEvent.senderFaction))
+		if (isFactionActive(m_factions, gameEvent.senderFaction))
 		{
-			assert(m_factions[static_cast<int>(gameEvent.senderFaction)]->getController() == gameEvent.senderFaction);
 			m_factions[static_cast<int>(gameEvent.senderFaction)].reset();
 			setAITargetFaction();
 		}
 		break;
 	case eGameEventType::PlayerActivatePlannedBuilding:
 	case eGameEventType::PlayerSpawnUnit:
-		if (m_factionHandler.isFactionActive(eFactionController::Player))
+		if (isFactionActive(m_factions, eFactionController::Player))
 		{
-			m_factions[static_cast<int>(eFactionController::Player)]->handleEvent(gameEvent, map, m_factionHandler);
+			getFaction(m_factions, eFactionController::Player).handleEvent(gameEvent, map, m_factionHandler);
 		}
 		break;
 	default:
@@ -227,10 +249,10 @@ void Level::handleInput(const sf::Window& window, const Camera& camera, const sf
 		}
 	}
 
-	if (m_factionHandler.isFactionActive(eFactionController::Player))
+	if (isFactionActive(m_factions, eFactionController::Player))
 	{
-		static_cast<FactionPlayer&>(*m_factions[static_cast<int>(eFactionController::Player)]).handleInput(
-			currentSFMLEvent, window, camera, map, m_factionHandler.getOpposingFactions(eFactionController::Player), m_selectedTargetGUI);
+		getFactionPlayer(m_factions).handleInput(
+		currentSFMLEvent, window, camera, map, m_factionHandler.getOpposingFactions(eFactionController::Player), m_selectedTargetGUI);
 	}
 }
 
@@ -244,9 +266,9 @@ void Level::update(float deltaTime, const Map& map)
 		}
 	}
 	
-	if (m_factionHandler.isFactionActive(eFactionController::Player))
+	if (isFactionActive(m_factions, eFactionController::Player))
 	{
-		static_cast<FactionPlayer&>(*m_factions[static_cast<int>(eFactionController::Player)]).updateSelectionBox(m_selectedTargetGUI);
+		getFactionPlayer(m_factions).updateSelectionBox(m_selectedTargetGUI);
 	}
 
 	m_projectileHandler.update(deltaTime, m_factionHandler);
@@ -265,9 +287,9 @@ void Level::update(float deltaTime, const Map& map)
 
 void Level::renderSelectionBox(const sf::Window& window) const
 {
-	if (m_factionHandler.isFactionActive(eFactionController::Player))
+	if (isFactionActive(m_factions, eFactionController::Player))
 	{
-		static_cast<FactionPlayer&>(*m_factions[static_cast<int>(eFactionController::Player)]).renderSelectionBox(window);
+		c_getFactionPlayer(m_factions).renderSelectionBox(window);
 	}
 }
 
