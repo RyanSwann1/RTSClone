@@ -12,7 +12,7 @@ public:
 		const std::vector<glm::vec3>& mineralPositions, int startingResources, int startingPopulationCap);
 
 	void handleInput(const sf::Event& currentSFMLEvent, const sf::Window& window, const Camera& camera, const Map& map, 
-		const std::vector<const Faction*>& opposingFactions);
+		FactionHandler& factionHandler);
 	
 	void handleEvent(const GameEvent& gameEvent, const Map& map, FactionHandler& factionHandler) override;
 	void update(float deltaTime, const Map& map, FactionHandler& factionHandler) override;
@@ -33,8 +33,7 @@ private:
 	bool instructWorkerToBuild(const Map& map);
 
 	void onLeftClick(const sf::Window& window, const Camera& camera, const Map& map);
-	void onRightClick(const sf::Window& window, const Camera& camera,
-		const std::vector<const Faction*>& opposingFactions, const Map& map);
+	void onRightClick(const sf::Window& window, const Camera& camera, FactionHandler& factionHandler, const Map& map);
 
 	template <class Entity>
 	void selectEntity(std::list<Entity>& entities, const glm::vec3& mouseToGroundPosition, bool selectAllEntities = false,

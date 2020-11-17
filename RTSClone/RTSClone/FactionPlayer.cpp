@@ -11,6 +11,7 @@
 #include "GameMessages.h"
 #include "GameEvent.h"
 #include "GameEventHandler.h"
+#include "FactionHandler.h"
 #include <assert.h>
 #include <array>
 #include <algorithm>
@@ -287,8 +288,8 @@ FactionPlayer::FactionPlayer(eFactionController factionController, const glm::ve
     m_attackMoveSelected(false)
 {}
 
-void FactionPlayer::handleInput(const sf::Event& currentSFMLEvent, const sf::Window& window, const Camera& camera, const Map& map,
-    const std::vector<const Faction*>& opposingFactions)
+void FactionPlayer::handleInput(const sf::Event& currentSFMLEvent, const sf::Window& window, const Camera& camera, 
+    const Map& map, FactionHandler& factionHandler)
 {
     switch (currentSFMLEvent.type)
     {
@@ -299,7 +300,7 @@ void FactionPlayer::handleInput(const sf::Event& currentSFMLEvent, const sf::Win
         }
         else if (currentSFMLEvent.mouseButton.button == sf::Mouse::Right)
         {
-            onRightClick(window, camera, opposingFactions, map);
+            onRightClick(window, camera, factionHandler, map);
         }
         break;
     case sf::Event::MouseButtonReleased:
@@ -377,7 +378,7 @@ void FactionPlayer::updateSelectionBox()
             assert(selectedEntity);
             GameEventHandler::getInstance().gameEvents.push({ eGameEventType::SetTargetEntityGUI, getController(), selectedEntity->getID() });
         }
-        else if(!isOnlyOneEntitySelected(m_allEntities))
+        else if (!isOnlyOneEntitySelected(m_allEntities))
         {
             GameEventHandler::getInstance().gameEvents.push({ eGameEventType::ResetTargetEntityGUI });
         }
@@ -470,11 +471,6 @@ void FactionPlayer::onLeftClick(const sf::Window& window, const Camera& camera, 
     {
         selectAllUnits = true;
     }
-
-    if (entityIDSelected != Globals::INVALID_ENTITY_ID)
-    {
-        GameEventHandler::getInstance().gameEvents.push({ eGameEventType::SetTargetEntityGUI, getController(), entityIDSelected });
-    }
     
     m_selectionBox.setStartingPosition(window, mouseToGroundPosition);
 
@@ -486,14 +482,13 @@ void FactionPlayer::onLeftClick(const sf::Window& window, const Camera& camera, 
     m_HQ.setSelected(m_HQ.getAABB().contains(mouseToGroundPosition));
 }
 
-void FactionPlayer::onRightClick(const sf::Window& window, const Camera& camera, 
-    const std::vector<const Faction*>& opposingFactions, const Map& map)
+void FactionPlayer::onRightClick(const sf::Window& window, const Camera& camera, FactionHandler& factionHandler, const Map& map)
 {
     m_plannedBuilding.setActive(false);
     glm::vec3 mouseToGroundPosition = camera.getMouseToGroundPosition(window);
     eFactionController targetEntityFaction;
     const Entity* targetEntity = nullptr;
-    for (const auto& faction : opposingFactions)
+    for (const auto& faction : factionHandler.getOpposingFactions(getController()))
     {
         targetEntity = faction->getEntity(mouseToGroundPosition);
         if (targetEntity)
