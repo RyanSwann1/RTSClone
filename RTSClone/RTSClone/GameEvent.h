@@ -18,7 +18,9 @@ enum class eGameEventType
 	EliminateFaction,
 	PlayerSpawnUnit,
 	PlayerActivatePlannedBuilding,
-	RepairEntity
+	RepairEntity,
+	SetTargetEntityGUI,
+	ResetTargetEntityGUI
 };
 
 struct GameEvent

@@ -12,7 +12,8 @@ GameEvent::GameEvent(eGameEventType gameEventType)
 	endingPosition(),
 	entityType()
 {
-	assert(gameEventType == eGameEventType::RevalidateMovementPaths);
+	assert(gameEventType == eGameEventType::RevalidateMovementPaths ||
+		gameEventType == eGameEventType::ResetTargetEntityGUI);
 }
 
 GameEvent::GameEvent(eGameEventType gameEventType, eEntityType entityType, int targetID)
@@ -56,7 +57,8 @@ GameEvent::GameEvent(eGameEventType gameEventType, eFactionController senderFact
 	entityType()
 {
 	assert(gameEventType == eGameEventType::RemoveAllWorkerPlannedBuildings ||
-		gameEventType == eGameEventType::AddResources || gameEventType == eGameEventType::RepairEntity);
+		gameEventType == eGameEventType::AddResources || gameEventType == eGameEventType::RepairEntity ||
+		gameEventType == eGameEventType::SetTargetEntityGUI);
 }
 
 GameEvent::GameEvent(eGameEventType gameEventType, eFactionController senderFaction, int senderID, 
