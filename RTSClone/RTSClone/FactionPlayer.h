@@ -30,13 +30,15 @@ private:
 	void instructWorkerReturnMinerals(const Map& map);
 	void instructUnitToAttack(Unit& Unit, const Entity& targetEntity, const Faction& targetFaction, const Map& map);
 	bool instructWorkerToBuild(const Map& map);
+	void moveSingularSelectedUnit(const glm::vec3& mouseToGroundPosition, const Map& map, Entity& selectedEntity) const;
+	void moveMultipleSelectedUnits(const glm::vec3& mouseToGroundPosition, const Map& map);
 
 	void onLeftClick(const sf::Window& window, const Camera& camera, const Map& map);
 	void onRightClick(const sf::Window& window, const Camera& camera, FactionHandler& factionHandler, const Map& map);
 
 	template <class Entity>
 	void selectEntity(std::list<Entity>& entities, const glm::vec3& mouseToGroundPosition, bool selectAllEntities = false,
-		int entityIDSelected = Globals::INVALID_ENTITY_ID)
+		int selectEntityID = Globals::INVALID_ENTITY_ID)
 	{
 		auto selectedEntity = std::find_if(entities.begin(), entities.end(), [&mouseToGroundPosition](const auto& entity)
 		{
@@ -59,11 +61,11 @@ private:
 				}
 			}
 		}
-		else
+		else 
 		{
 			for (auto& entity : entities)
 			{
-				if (entityIDSelected == entity.getID())
+				if (selectEntityID == entity.getID())
 				{
 					entity.setSelected(true);
 				}
