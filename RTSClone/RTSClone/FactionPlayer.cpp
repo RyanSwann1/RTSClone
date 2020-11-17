@@ -18,24 +18,20 @@
 
 namespace
 {
-    bool isOneUnitSelected(std::list<Unit>& units, std::list<Worker>& workers, Entity** selectedEntity = nullptr)
+    Unit* isSingularUnitSelected(std::list<Unit>& units, std::list<Worker>& workers)
     {
-        int unitSelectedCount = 0;
+        Unit* selectedUnit = nullptr;
 
         for (auto& unit : units)
         {
             if (unit.isSelected())
             {
-                if (selectedEntity)
+                if (selectedUnit)
                 {
-                    *selectedEntity = &unit;
+                    return nullptr;
                 }
 
-                ++unitSelectedCount;
-                if (unitSelectedCount > 1)
-                {
-                    return false;
-                }
+                selectedUnit = &unit;
             }
         }
 
@@ -43,61 +39,16 @@ namespace
         {
             if (worker.isSelected())
             {
-                if (selectedEntity)
+                if (selectedUnit)
                 {
-                    *selectedEntity = &worker;
+                    return nullptr;
                 }
 
-                ++unitSelectedCount;
-                if (unitSelectedCount > 1)
-                {
-                    return false;
-                }
+                selectedUnit = &worker;
             }
         }
 
-        return unitSelectedCount == 1;
-    }
-
-    bool isOneUnitSelected(const std::list<Unit>& units, const std::list<Worker>& workers, const Entity** selectedEntity = nullptr)
-    {
-        int unitSelectedCount = 0;
-
-        for (const auto& unit : units)
-        {
-            if (unit.isSelected())
-            {
-                if (selectedEntity)
-                {
-                    *selectedEntity = &unit;
-                }
-
-                ++unitSelectedCount;
-                if (unitSelectedCount > 1)
-                {
-                    return false;
-                }
-            }
-        }
-
-        for (const auto& worker : workers)
-        {
-            if (worker.isSelected())
-            {
-                if (selectedEntity)
-                {
-                    *selectedEntity = &worker;
-                }
-
-                ++unitSelectedCount;
-                if (unitSelectedCount > 1)
-                {
-                    return false;
-                }
-            }
-        }
-
-        return unitSelectedCount == 1;
+        return selectedUnit;
     }
 
     void moveSelectedUnit(const glm::vec3& mouseToGroundPosition, const Map& map, Entity& selectedEntity, const std::list<Unit>& units,
@@ -372,13 +323,12 @@ void FactionPlayer::updateSelectionBox()
         selectUnits<Unit>(m_units, m_selectionBox);
         selectUnits<Worker>(m_workers, m_selectionBox);
 
-        const Entity* selectedEntity = nullptr;
-        if (isOneUnitSelected(m_units, m_workers, &selectedEntity))
+        const Unit* selectedUnit = isSingularUnitSelected(m_units, m_workers);
+        if (selectedUnit)
         {
-            assert(selectedEntity);
-            GameEventHandler::getInstance().gameEvents.push({ eGameEventType::SetTargetEntityGUI, getController(), selectedEntity->getID() });
+            GameEventHandler::getInstance().gameEvents.push({ eGameEventType::SetTargetEntityGUI, getController(), selectedUnit->getID() });
         }
-        else if (!isOnlyOneEntitySelected(m_allEntities))
+        else
         {
             GameEventHandler::getInstance().gameEvents.push({ eGameEventType::ResetTargetEntityGUI });
         }
@@ -499,7 +449,7 @@ void FactionPlayer::onRightClick(const sf::Window& window, const Camera& camera,
     }
     if (targetEntity)
     {
-        if (!isOneUnitSelected(m_units, m_workers))
+        if (!isSingularUnitSelected(m_units, m_workers))
         {
             assignSelectedUnits();
             if (!m_selectedUnits.empty())
@@ -532,11 +482,10 @@ void FactionPlayer::onRightClick(const sf::Window& window, const Camera& camera,
             }
         }
 
-        Entity* selectedEntity = nullptr;
-        if (isOneUnitSelected(m_units, m_workers, &selectedEntity))
+        Unit* selectedUnit = isSingularUnitSelected(m_units, m_workers);
+        if (selectedUnit)
         {
-            assert(selectedEntity);
-            moveSelectedUnit(mouseToGroundPosition, map, *selectedEntity, m_units, m_allEntities, m_minerals, m_attackMoveSelected);
+            moveSelectedUnit(mouseToGroundPosition, map, *selectedUnit, m_units, m_allEntities, m_minerals, m_attackMoveSelected);
         }
         else
         {
