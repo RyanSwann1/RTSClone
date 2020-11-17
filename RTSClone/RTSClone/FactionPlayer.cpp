@@ -206,29 +206,6 @@ namespace
             selectedUnit->moveToAttackPosition(targetEntity, targetFaction, map);
         }
     }
-
-    bool isOnlyOneEntitySelected(const std::vector<Entity*>& entities)
-    {
-        int entitySelectedCount = 0;
-        for (const auto& entity : entities)
-        {
-            if (entity->isSelected())
-            {
-                ++entitySelectedCount;
-                if (entitySelectedCount > 1)
-                {
-                    return false;
-                }
-            }
-        }
-
-        return entitySelectedCount == 1;
-    }
-
-    bool isDoubleClick(const glm::vec3& mouseToGroundPosition, const glm::vec3& previousMousePosition)
-    {
-        return mouseToGroundPosition == previousMousePosition;
-    }
 }
 
 FactionPlayer::FactionPlayer(eFactionController factionController, const glm::vec3& hqStartingPosition, 
@@ -407,7 +384,7 @@ void FactionPlayer::onLeftClick(const sf::Window& window, const Camera& camera, 
     bool selectAllUnits = false;
     int entityIDSelected = Globals::INVALID_ENTITY_ID;
     glm::vec3 mouseToGroundPosition = camera.getMouseToGroundPosition(window);
-    if (!isDoubleClick(mouseToGroundPosition, m_previousMouseToGroundPosition))
+    if (mouseToGroundPosition != m_previousMouseToGroundPosition)
     {
         m_previousMouseToGroundPosition = mouseToGroundPosition;
 
