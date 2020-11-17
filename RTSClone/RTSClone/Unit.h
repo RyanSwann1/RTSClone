@@ -51,7 +51,7 @@ public:
 
 	void resetTarget();
 	void setTarget(eFactionController targetFaction, int targetID);
-	void moveToAttackPosition(const Entity& targetEntity, eFactionController targetFaction, const Map& map);
+	void moveToAttackPosition(const Entity& targetEntity, const Faction& targetFaction, const Map& map);
 	void moveTo(const glm::vec3& destinationPosition, const Map& map, const AdjacentPositions& adjacentPositions, 
 		eUnitState state = eUnitState::Moving);
 	void update(float deltaTime, FactionHandler& factionHandler, const Map& map);

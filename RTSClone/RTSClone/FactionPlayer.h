@@ -27,9 +27,8 @@ private:
 	bool m_attackMoveSelected;
 	std::vector<Unit*> m_selectedUnits;
 	
-	void assignSelectedUnits();
 	void instructWorkerReturnMinerals(const Map& map);
-	void instructUnitToAttack(Unit& Unit, const Entity& targetEntity, eFactionController targetEntityOwningFaction, const Map& map);
+	void instructUnitToAttack(Unit& Unit, const Entity& targetEntity, const Faction& targetFaction, const Map& map);
 	bool instructWorkerToBuild(const Map& map);
 
 	void onLeftClick(const sf::Window& window, const Camera& camera, const Map& map);

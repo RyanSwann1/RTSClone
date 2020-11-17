@@ -122,7 +122,7 @@ void Unit::setTarget(eFactionController targetFaction, int targetID)
 	m_targetEntity.set(targetFaction, targetID);
 }
 
-void Unit::moveToAttackPosition(const Entity& targetEntity, eFactionController targetFaction, const Map& map)
+void Unit::moveToAttackPosition(const Entity& targetEntity, const Faction& targetFaction, const Map& map)
 {
 	glm::vec3 closestDestination = m_position;
 	if (!m_pathToPosition.empty())
@@ -133,7 +133,7 @@ void Unit::moveToAttackPosition(const Entity& targetEntity, eFactionController t
 	PathFindingLocator::get().setUnitAttackPosition(*this, targetEntity, m_pathToPosition, map, m_owningFaction.getUnits());
 	if (!m_pathToPosition.empty())
 	{
-		m_targetEntity.set(targetFaction, targetEntity.getID());
+		m_targetEntity.set(targetFaction.getController(), targetEntity.getID());
 		switchToState(eUnitState::Moving, map);
 	}
 	else
