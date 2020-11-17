@@ -213,6 +213,12 @@ void Level::handleEvent(const GameEvent& gameEvent, const Map& map)
 			getFaction(m_factions, eFactionController::Player).handleEvent(gameEvent, map, m_factionHandler);
 		}
 		break;
+	case eGameEventType::SetTargetEntityGUI:
+		m_selectedTargetGUI.set(gameEvent.senderFaction, gameEvent.senderID);
+		break;
+	case eGameEventType::ResetTargetEntityGUI:
+		m_selectedTargetGUI.reset();
+		break;
 	default:
 		assert(false);
 	}
@@ -252,7 +258,7 @@ void Level::handleInput(const sf::Window& window, const Camera& camera, const sf
 	if (isFactionActive(m_factions, eFactionController::Player))
 	{
 		getFactionPlayer(m_factions).handleInput(
-		currentSFMLEvent, window, camera, map, m_factionHandler.getOpposingFactions(eFactionController::Player), m_selectedTargetGUI);
+		currentSFMLEvent, window, camera, map, m_factionHandler.getOpposingFactions(eFactionController::Player));
 	}
 }
 
@@ -268,7 +274,7 @@ void Level::update(float deltaTime, const Map& map)
 	
 	if (isFactionActive(m_factions, eFactionController::Player))
 	{
-		getFactionPlayer(m_factions).updateSelectionBox(m_selectedTargetGUI);
+		getFactionPlayer(m_factions).updateSelectionBox();
 	}
 
 	m_projectileHandler.update(deltaTime, m_factionHandler);

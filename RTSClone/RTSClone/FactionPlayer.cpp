@@ -280,8 +280,7 @@ namespace
 }
 
 FactionPlayer::FactionPlayer(eFactionController factionController, const glm::vec3& hqStartingPosition, 
-    const std::vector<glm::vec3>& mineralPositions, int startingResources,
-    int startingPopulationCap)
+    const std::vector<glm::vec3>& mineralPositions, int startingResources, int startingPopulationCap)
     : Faction(factionController, hqStartingPosition, mineralPositions, startingResources, startingPopulationCap),
     m_selectionBox(),
     m_previousMouseToGroundPosition(),
@@ -289,14 +288,14 @@ FactionPlayer::FactionPlayer(eFactionController factionController, const glm::ve
 {}
 
 void FactionPlayer::handleInput(const sf::Event& currentSFMLEvent, const sf::Window& window, const Camera& camera, const Map& map,
-    const std::vector<const Faction*>& opposingFactions, TargetEntity& selectedTargetGUI)
+    const std::vector<const Faction*>& opposingFactions)
 {
     switch (currentSFMLEvent.type)
     {
     case sf::Event::MouseButtonPressed:
         if (currentSFMLEvent.mouseButton.button == sf::Mouse::Left)
         {
-            onLeftClick(window, camera, map, selectedTargetGUI);
+            onLeftClick(window, camera, map);
         }
         else if (currentSFMLEvent.mouseButton.button == sf::Mouse::Right)
         {
@@ -311,7 +310,15 @@ void FactionPlayer::handleInput(const sf::Event& currentSFMLEvent, const sf::Win
         }
         break;
     case sf::Event::MouseMoved:
-        onMouseMove(window, camera, map);
+        if (m_selectionBox.isActive())
+        {
+            m_selectionBox.setSize(camera.getMouseToGroundPosition(window));
+
+        }
+        else if (m_plannedBuilding.isActive())
+        {
+            m_plannedBuilding.setPosition(camera.getMouseToGroundPosition(window), map);
+        }
         break;
     case sf::Event::KeyPressed:
         switch (currentSFMLEvent.key.code)
@@ -357,7 +364,7 @@ void FactionPlayer::update(float deltaTime, const Map& map, FactionHandler& fact
         { getCurrentResourceAmount(), getCurrentPopulationAmount(), getMaximumPopulationAmount() });
 }
 
-void FactionPlayer::updateSelectionBox(TargetEntity& selectedTargetGUI)
+void FactionPlayer::updateSelectionBox()
 {
     if (m_selectionBox.isActive() && m_selectionBox.isMinimumSize())
     {
@@ -368,11 +375,11 @@ void FactionPlayer::updateSelectionBox(TargetEntity& selectedTargetGUI)
         if (isOneUnitSelected(m_units, m_workers, &selectedEntity))
         {
             assert(selectedEntity);
-            selectedTargetGUI.set(getController(), selectedEntity->getID());
+            GameEventHandler::getInstance().gameEvents.push({ eGameEventType::SetTargetEntityGUI, getController(), selectedEntity->getID() });
         }
         else if(!isOnlyOneEntitySelected(m_allEntities))
         {
-            selectedTargetGUI.reset();
+            GameEventHandler::getInstance().gameEvents.push({ eGameEventType::ResetTargetEntityGUI });
         }
     }
 }
@@ -444,22 +451,19 @@ bool FactionPlayer::instructWorkerToBuild(const Map& map)
     return false;
 }
 
-void FactionPlayer::onLeftClick(const sf::Window& window, const Camera& camera, const Map& map, TargetEntity& selectedTargetGUI)
+void FactionPlayer::onLeftClick(const sf::Window& window, const Camera& camera, const Map& map)
 {
     bool selectAllUnits = false;
-    int keepEntityIDSelected = Globals::INVALID_ENTITY_ID;
+    int entityIDSelected = Globals::INVALID_ENTITY_ID;
     glm::vec3 mouseToGroundPosition = camera.getMouseToGroundPosition(window);
     if (!isDoubleClick(mouseToGroundPosition, m_previousMouseToGroundPosition))
     {
         m_previousMouseToGroundPosition = mouseToGroundPosition;
 
-        if (m_plannedBuilding.isActive())
+        if (m_plannedBuilding.isActive() && instructWorkerToBuild(map))
         {
-            if (instructWorkerToBuild(map))
-            {
-                keepEntityIDSelected = m_plannedBuilding.getWorkerID();
-                m_plannedBuilding.setActive(false);
-            }
+            entityIDSelected = m_plannedBuilding.getWorkerID();
+            m_plannedBuilding.setActive(false);
         }
     }
     else
@@ -467,15 +471,15 @@ void FactionPlayer::onLeftClick(const sf::Window& window, const Camera& camera, 
         selectAllUnits = true;
     }
 
-    if (keepEntityIDSelected != Globals::INVALID_ENTITY_ID)
+    if (entityIDSelected != Globals::INVALID_ENTITY_ID)
     {
-        selectedTargetGUI.set(getController(), keepEntityIDSelected);
+        GameEventHandler::getInstance().gameEvents.push({ eGameEventType::SetTargetEntityGUI, getController(), entityIDSelected });
     }
     
     m_selectionBox.setStartingPosition(window, mouseToGroundPosition);
 
     selectEntity<Unit>(m_units, mouseToGroundPosition, selectAllUnits);
-    selectEntity<Worker>(m_workers, mouseToGroundPosition, selectAllUnits, keepEntityIDSelected);
+    selectEntity<Worker>(m_workers, mouseToGroundPosition, selectAllUnits, entityIDSelected);
     selectEntity<Barracks>(m_barracks, mouseToGroundPosition);
     selectEntity<Turret>(m_turrets, mouseToGroundPosition);
     selectEntity<SupplyDepot>(m_supplyDepots, mouseToGroundPosition);
@@ -552,19 +556,6 @@ void FactionPlayer::onRightClick(const sf::Window& window, const Camera& camera,
         {
             instructWorkerReturnMinerals(map);
         }
-    }
-}
-
-void FactionPlayer::onMouseMove(const sf::Window& window, const Camera& camera, const Map& map)
-{
-    if (m_selectionBox.isActive())
-    {
-        m_selectionBox.setSize(camera.getMouseToGroundPosition(window));
-
-    }
-    else if (m_plannedBuilding.isActive())
-    {
-        m_plannedBuilding.setPosition(camera.getMouseToGroundPosition(window), map);
     }
 }
 

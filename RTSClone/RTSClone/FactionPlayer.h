@@ -4,21 +4,19 @@
 #include "SelectionBox.h"
 #include <SFML/Graphics.hpp>
 
-class TargetEntity;
 struct Camera;
 class FactionPlayer : public Faction
 {
 public:
 	FactionPlayer(eFactionController factionController, const glm::vec3& hqStartingPosition, 
-		const std::vector<glm::vec3>& mineralPositions, int startingResources,
-		int startingPopulationCap);
+		const std::vector<glm::vec3>& mineralPositions, int startingResources, int startingPopulationCap);
 
 	void handleInput(const sf::Event& currentSFMLEvent, const sf::Window& window, const Camera& camera, const Map& map, 
-		const std::vector<const Faction*>& opposingFactions, TargetEntity& selectedTargetGUI);
+		const std::vector<const Faction*>& opposingFactions);
 	
 	void handleEvent(const GameEvent& gameEvent, const Map& map, FactionHandler& factionHandler) override;
 	void update(float deltaTime, const Map& map, FactionHandler& factionHandler) override;
-	void updateSelectionBox(TargetEntity& selectedTargetGUI);
+	void updateSelectionBox();
 	void render(ShaderHandler& shaderHandler) const override;
 	void renderSelectionBox(const sf::Window& window) const;
 
@@ -34,14 +32,13 @@ private:
 	void instructUnitToAttack(Unit& Unit, const Entity& targetEntity, eFactionController targetEntityOwningFaction, const Map& map);
 	bool instructWorkerToBuild(const Map& map);
 
-	void onLeftClick(const sf::Window& window, const Camera& camera, const Map& map, TargetEntity& selectedTargetGUI);
+	void onLeftClick(const sf::Window& window, const Camera& camera, const Map& map);
 	void onRightClick(const sf::Window& window, const Camera& camera,
 		const std::vector<const Faction*>& opposingFactions, const Map& map);
-	void onMouseMove(const sf::Window& window, const Camera& camera, const Map& map);
 
 	template <class Entity>
 	void selectEntity(std::list<Entity>& entities, const glm::vec3& mouseToGroundPosition, bool selectAllEntities = false,
-		int keepEntityIDSelected = Globals::INVALID_ENTITY_ID)
+		int entityIDSelected = Globals::INVALID_ENTITY_ID)
 	{
 		auto selectedEntity = std::find_if(entities.begin(), entities.end(), [&mouseToGroundPosition](const auto& entity)
 		{
@@ -68,7 +65,7 @@ private:
 		{
 			for (auto& entity : entities)
 			{
-				if (keepEntityIDSelected == entity.getID())
+				if (entityIDSelected == entity.getID())
 				{
 					entity.setSelected(true);
 				}

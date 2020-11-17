@@ -105,7 +105,8 @@ namespace
 		std::queue<glm::vec3> positionsToKeep;
 		int positionIndex = 0;
 		glm::vec3 startingPosition = unit.getPosition();
-		while (startingPosition != pathToPosition.front() && positionIndex < pathToPosition.size())
+		while (startingPosition != pathToPosition.front() && 
+			positionIndex < pathToPosition.size())
 		{
 			glm::vec3 targetPosition = pathToPosition[positionIndex];
 			glm::vec3 position = startingPosition;
@@ -113,7 +114,7 @@ namespace
 			constexpr float step = 0.1f;
 			bool collision = false;
 
-			for (int ray = 0; ray <= std::ceil(distance / step); ++ray)
+			for (int ray = step; ray <= std::ceil(distance / step); ++ray)
 			{
 				position = position + glm::normalize(targetPosition - startingPosition) * step;
 
