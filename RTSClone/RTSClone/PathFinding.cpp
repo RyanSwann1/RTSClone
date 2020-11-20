@@ -552,8 +552,8 @@ void PathFinding::setUnitAttackPosition(const Unit& unit, const Entity& targetEn
 		PriorityQueueNode currentNode = m_openQueue.getTop();
 		m_openQueue.popTop();
 
-		if (glm::distance(glm::vec2(targetPositionOnGrid), glm::vec2(currentNode.position)) <
-			unit.getGridAttackRange() && isPositionInLineOfSight(currentNode.position, targetEntity, map) &&
+		if (glm::distance(glm::vec2(targetPositionOnGrid), glm::vec2(currentNode.position)) < unit.getGridAttackRange() && 
+			isPositionInLineOfSight(currentNode.position, targetEntity, map) &&
 			factionHandler.isUnitDestinationUnique(Globals::convertToWorldPosition(currentNode.position)))
 		{
 			positionFound = true;

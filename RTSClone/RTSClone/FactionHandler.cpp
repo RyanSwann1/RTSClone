@@ -33,10 +33,7 @@ bool FactionHandler::isUnitDestinationUnique(const glm::vec3& position) const
 		{
 			auto unit = std::find_if(faction->getUnits().cbegin(), faction->getUnits().cend(), [&position](const auto& unit)
 			{
-				if (!unit.getPathToPosition().empty())
-				{
-					return unit.getPathToPosition().back() == position;
-				}
+				return !unit.getPathToPosition().empty() && unit.getPathToPosition().back() == position;
 			});
 			if (unit != faction->getUnits().cend())
 			{
