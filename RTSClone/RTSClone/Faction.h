@@ -28,6 +28,7 @@ public:
 	const glm::vec3& getHQPosition() const;
 	eFactionController getController() const;
 	const std::list<Unit>& getUnits() const;
+	const std::list<Worker>& getWorkers() const;
 	const Entity* getEntity(const glm::vec3& position, float maxDistance, bool prioritizeUnits = true) const;
 	const Entity* getEntity(const AABB& AABB, int entityID) const;
 	const Entity* getEntity(int entityID) const;
@@ -49,8 +50,7 @@ public:
 
 protected:
 	Faction(eFactionController factionController, const glm::vec3& hqStartingPosition, 
-		const std::vector<glm::vec3>& mineralPositions, int startingResources,
-		int startingPopulationCap);
+		const std::vector<glm::vec3>& mineralPositions, int startingResources, int startingPopulationCap);
 	const std::vector<Mineral> m_minerals;
 	std::vector<PlannedBuilding> m_plannedBuildings;
 	std::vector<Entity*> m_allEntities;

@@ -19,7 +19,7 @@
 namespace
 {
     void moveSelectedUnitsToAttackPosition(std::vector<Unit*>& selectedUnits, const Entity& targetEntity, 
-        const Faction& targetFaction, const Map& map)
+        const Faction& targetFaction, const Map& map, const FactionHandler& factionHandler)
     {
         assert(!selectedUnits.empty());
         
@@ -32,7 +32,7 @@ namespace
         PathFindingLocator::get().clearAttackPositions();
         for (auto& selectedUnit : selectedUnits)
         {
-            selectedUnit->moveToAttackPosition(targetEntity, targetFaction, map);
+            selectedUnit->moveToAttackPosition(targetEntity, targetFaction, map, factionHandler);
         }
     }
 
@@ -59,7 +59,7 @@ namespace
 
     glm::vec3 getAveragePosition(std::vector<Unit*>& selectedUnits)
     {
-        assert(selectedUnits.empty());
+        assert(!selectedUnits.empty());
       
         std::sort(selectedUnits.begin(), selectedUnits.end(), [](const auto& unitA, const auto& unitB)
         {
@@ -348,7 +348,7 @@ void FactionPlayer::moveMultipleSelectedUnits(const glm::vec3& mouseToGroundPosi
                 }
             }
         }
-        else if(!m_selectedUnits.empty())
+        else
         {
             glm::vec3 averagePosition = getAveragePosition(m_selectedUnits);
             for (auto& selectedUnit : m_selectedUnits)
@@ -439,9 +439,9 @@ void FactionPlayer::onRightClick(const sf::Window& window, const Camera& camera,
         {
             instructUnitToAttack(*m_selectedUnits.back(), *targetEntity, *targetFaction, map);
         }
-        else if (m_selectedUnits.size() > static_cast<size_t>(1))
+        else if (m_selectedUnits.size() >= static_cast<size_t>(2))
         {
-            moveSelectedUnitsToAttackPosition(m_selectedUnits, *targetEntity, *targetFaction, map);
+            moveSelectedUnitsToAttackPosition(m_selectedUnits, *targetEntity, *targetFaction, map, factionHandler);
         }
     }
     else
@@ -467,7 +467,7 @@ void FactionPlayer::onRightClick(const sf::Window& window, const Camera& camera,
         {
             moveSingularSelectedUnit(mouseToGroundPosition, map, *m_selectedUnits.back());
         }
-        else if (m_selectedUnits.size() > static_cast<size_t>(1))
+        else if (m_selectedUnits.size() >= static_cast<size_t>(2))
         {
             moveMultipleSelectedUnits(mouseToGroundPosition, map);
         }

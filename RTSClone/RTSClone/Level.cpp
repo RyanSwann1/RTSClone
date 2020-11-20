@@ -257,7 +257,7 @@ void Level::handleInput(const sf::Window& window, const Camera& camera, const sf
 
 	if (isFactionActive(m_factions, eFactionController::Player))
 	{
-		getFactionPlayer(m_factions).handleInput( currentSFMLEvent, window, camera, map, m_factionHandler);
+		getFactionPlayer(m_factions).handleInput(currentSFMLEvent, window, camera, map, m_factionHandler);
 	}
 }
 

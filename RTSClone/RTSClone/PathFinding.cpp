@@ -8,6 +8,7 @@
 #include "Faction.h"
 #include "GameMessenger.h"
 #include "GameMessages.h"
+#include "FactionHandler.h"
 #include <limits>
 #include <queue>
 #include <random>
@@ -532,7 +533,7 @@ glm::vec3 PathFinding::getClosestPositionFromUnitToTarget(const Unit& unit, cons
 }
 
 void PathFinding::setUnitAttackPosition(const Unit& unit, const Entity& targetEntity, std::vector<glm::vec3>& pathToPosition,
-	const Map& map, const std::list<Unit>& units)
+	const Map& map, const std::list<Unit>& units, const FactionHandler& factionHandler)
 {
 	assert(unit.getID() != targetEntity.getID());
 	
@@ -552,7 +553,8 @@ void PathFinding::setUnitAttackPosition(const Unit& unit, const Entity& targetEn
 		m_openQueue.popTop();
 
 		if (glm::distance(glm::vec2(targetPositionOnGrid), glm::vec2(currentNode.position)) <
-			unit.getGridAttackRange() && isPositionInLineOfSight(currentNode.position, targetEntity, map))
+			unit.getGridAttackRange() && isPositionInLineOfSight(currentNode.position, targetEntity, map) &&
+			factionHandler.isUnitDestinationUnique(Globals::convertToWorldPosition(currentNode.position)))
 		{
 			positionFound = true;
 			m_sharedPositionContainer.push_back(Globals::convertToWorldPosition(currentNode.position));

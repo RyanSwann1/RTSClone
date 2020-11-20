@@ -86,6 +86,11 @@ Unit::Unit(const Faction& owningFaction, const glm::vec3 & startingPosition, con
 	moveTo(destinationPosition, map, [&](const glm::ivec2& position) { return getAdjacentPositions(position, map); });
 }
 
+const std::vector<glm::vec3>& Unit::getPathToPosition() const
+{
+	return m_pathToPosition;
+}
+
 float Unit::getGridAttackRange() const
 {
 	return UNIT_GRID_ATTACK_RANGE;
@@ -122,7 +127,8 @@ void Unit::setTarget(eFactionController targetFaction, int targetID)
 	m_targetEntity.set(targetFaction, targetID);
 }
 
-void Unit::moveToAttackPosition(const Entity& targetEntity, const Faction& targetFaction, const Map& map)
+void Unit::moveToAttackPosition(const Entity& targetEntity, const Faction& targetFaction, const Map& map, 
+	const FactionHandler& factionHandler)
 {
 	glm::vec3 closestDestination = m_position;
 	if (!m_pathToPosition.empty())
@@ -130,7 +136,8 @@ void Unit::moveToAttackPosition(const Entity& targetEntity, const Faction& targe
 		closestDestination = m_pathToPosition.back();
 	}
 
-	PathFindingLocator::get().setUnitAttackPosition(*this, targetEntity, m_pathToPosition, map, m_owningFaction.getUnits());
+	PathFindingLocator::get().setUnitAttackPosition(*this, targetEntity, m_pathToPosition, map, 
+		m_owningFaction.getUnits(), factionHandler);
 	if (!m_pathToPosition.empty())
 	{
 		m_targetEntity.set(targetFaction.getController(), targetEntity.getID());
@@ -150,8 +157,7 @@ void Unit::moveToAttackPosition(const Entity& targetEntity, const Faction& targe
 	}
 }
 
-void Unit::moveTo(const glm::vec3& destinationPosition, const Map& map, const AdjacentPositions& adjacentPositions,
-	eUnitState state)
+void Unit::moveTo(const glm::vec3& destinationPosition, const Map& map, const AdjacentPositions& adjacentPositions, eUnitState state)
 {
 	glm::vec3 closestDestination = m_position;
 	if (!m_pathToPosition.empty())

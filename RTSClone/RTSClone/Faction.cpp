@@ -70,6 +70,11 @@ const std::list<Unit>& Faction::getUnits() const
     return m_units;
 }
 
+const std::list<Worker>& Faction::getWorkers() const
+{
+    return m_workers;
+}
+
 const Entity* Faction::getEntity(const glm::vec3& position, float maxDistance, bool prioritizeUnits) const
 {
     const Entity* closestEntity = nullptr;
