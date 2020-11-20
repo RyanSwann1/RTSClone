@@ -25,6 +25,29 @@ FactionHandler::FactionHandler(const std::array<std::unique_ptr<Faction>, static
 	m_opposingFactions.reserve(static_cast<size_t>(getFactionCount(m_factions)));
 }
 
+bool FactionHandler::isUnitDestinationUnique(const glm::vec3& position) const
+{
+	for (const auto& faction : m_factions)
+	{
+		if (faction)
+		{
+			auto unit = std::find_if(faction->getUnits().cbegin(), faction->getUnits().cend(), [&position](const auto& unit)
+			{
+				if (!unit.getPathToPosition().empty())
+				{
+					return unit.getPathToPosition().back() == position;
+				}
+			});
+			if (unit != faction->getUnits().cend())
+			{
+				return false;
+			}
+		}
+	}
+
+	return true;
+}
+
 bool FactionHandler::isFactionActive(eFactionController factionController) const
 {
 	return m_factions[static_cast<int>(factionController)].get();
