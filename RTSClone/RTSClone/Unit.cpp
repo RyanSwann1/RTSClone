@@ -141,14 +141,14 @@ void Unit::moveToAttackPosition(const Entity& targetEntity, const Faction& targe
 	if (!m_pathToPosition.empty())
 	{
 		m_targetEntity.set(targetFaction.getController(), targetEntity.getID());
-		switchToState(eUnitState::Moving, map);
+		switchToState(eUnitState::MovingToAttackPosition, map);
 	}
 	else
 	{
 		if (closestDestination != m_position)
 		{
 			m_pathToPosition.push_back(closestDestination);
-			switchToState(eUnitState::Moving, map);
+			switchToState(eUnitState::MovingToAttackPosition, map);
 		}
 		else
 		{
@@ -284,6 +284,23 @@ void Unit::update(float deltaTime, FactionHandler& factionHandler, const Map& ma
 			switchToState(eUnitState::Idle, map);
 		}
 		break;
+	case eUnitState::MovingToAttackPosition:
+		assert(m_targetEntity.getID() != Globals::INVALID_ENTITY_ID);
+		if (m_stateHandlerTimer.isExpired())
+		{
+			const Entity* targetEntity = nullptr;
+			if (!factionHandler.isFactionActive(m_targetEntity.getFactionController()) ||
+				!factionHandler.getFaction(m_targetEntity.getFactionController()).getEntity(m_targetEntity.getID()))
+			{
+				m_targetEntity.reset();
+				switchToState(eUnitState::Moving, map);
+			}
+		}
+		else if (m_pathToPosition.empty())
+		{
+			switchToState(eUnitState::AttackingTarget, map);
+		}
+		break;
 	case eUnitState::AttackingTarget:
 		assert(m_targetEntity.getID() != Globals::INVALID_ENTITY_ID);
 		if (m_attackTimer.isExpired())
@@ -405,6 +422,7 @@ void Unit::switchToState(eUnitState newState, const Map& map, const Entity* targ
 		}
 		break;
 	case eUnitState::AttackMoving:
+	case eUnitState::MovingToAttackPosition:
 	case eUnitState::Moving:
 	case eUnitState::Harvesting:
 	case eUnitState::Repairing:
