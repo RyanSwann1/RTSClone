@@ -34,8 +34,7 @@ bool FactionHandler::isUnitPositionAvailable(const glm::vec3& position, const Un
 		{
 			auto unit = std::find_if(opposingFaction->getUnits().cbegin(), opposingFaction->getUnits().cend(), [&position](const auto& unit)
 			{
-				if (unit.getCurrentState() == eUnitState::AttackingTarget || 
-					unit.getCurrentState() == eUnitState::Idle)
+				if (ENTITY_UNIT_IDLE_STATES.isMatch(unit.getCurrentState()))
 				{
 					return unit.getAABB().contains(position);
 				}
@@ -56,8 +55,7 @@ bool FactionHandler::isUnitPositionAvailable(const glm::vec3& position, const Un
 	int senderUnitID = senderUnit.getID();
 	auto unit = std::find_if(owningFaction.getUnits().cbegin(), owningFaction.getUnits().cend(), [&position, senderUnitID](const auto& unit)
 	{
-		if (unit.getCurrentState() == eUnitState::AttackingTarget ||
-			unit.getCurrentState() == eUnitState::Idle)
+		if (ENTITY_UNIT_IDLE_STATES.isMatch(unit.getCurrentState()))
 		{
 			return unit.getID() != senderUnitID && unit.getAABB().contains(position);
 		}

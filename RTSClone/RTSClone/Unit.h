@@ -6,6 +6,7 @@
 #include "TargetEntity.h"
 #include "Globals.h"
 #include "ModelManager.h"
+#include "TypeComparison.h"
 #include <functional>
 #include <vector>
 #include <list>
@@ -29,6 +30,8 @@ enum class eUnitState
 	Repairing,
 	Max = Repairing
 };
+
+inline const TypeComparison<eUnitState> ENTITY_UNIT_IDLE_STATES({ eUnitState::Idle, eUnitState::AttackingTarget });
 
 class Faction;
 class Map;
