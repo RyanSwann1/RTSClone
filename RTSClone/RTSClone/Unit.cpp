@@ -141,14 +141,14 @@ void Unit::moveToAttackPosition(const Entity& targetEntity, const Faction& targe
 	if (!m_pathToPosition.empty())
 	{
 		m_targetEntity.set(targetFaction.getController(), targetEntity.getID());
-		switchToState(eUnitState::MovingToAttackPosition, map);
+		switchToState(eUnitState::Moving, map);
 	}
 	else
 	{
 		if (closestDestination != m_position)
 		{
 			m_pathToPosition.push_back(closestDestination);
-			switchToState(eUnitState::MovingToAttackPosition, map);
+			switchToState(eUnitState::Moving, map);
 		}
 		else
 		{
@@ -234,32 +234,18 @@ void Unit::update(float deltaTime, FactionHandler& factionHandler, const Map& ma
 		}
 		break;
 	case eUnitState::Moving:
-		if (m_stateHandlerTimer.isExpired() && Globals::isEntityIDValid(m_targetEntity.getID()))
+		if (m_targetEntity.getID() != Globals::INVALID_ENTITY_ID)
 		{
-			const Entity* targetEntity = nullptr;
-			if (factionHandler.isFactionActive(m_targetEntity.getFactionController()))
+			if (m_stateHandlerTimer.isExpired() &&
+				(!factionHandler.isFactionActive(m_targetEntity.getFactionController()) ||
+				!factionHandler.getFaction(m_targetEntity.getFactionController()).getEntity(m_targetEntity.getID())))
 			{
-				targetEntity = factionHandler.getFaction(m_targetEntity.getFactionController()).getEntity(m_targetEntity.getID());
+				m_targetEntity.reset();
 			}
-			if (targetEntity)
-			{
-				if(Globals::getSqrDistance(targetEntity->getPosition(), m_position) <= UNIT_ATTACK_RANGE * UNIT_ATTACK_RANGE)
-				{
-					if (!PathFindingLocator::get().isTargetInLineOfSight(m_position, *targetEntity, map))
-					{
 
-						moveTo(targetEntity->getPosition(), map, [&](const glm::ivec2& position)
-							{ return getAdjacentPositions(position, map, m_owningFaction.getUnits(), *this); }, eUnitState::Moving);
-					}
-					else
-					{
-						switchToState(eUnitState::AttackingTarget, map, targetEntity);
-					}	
-				}
-			}
-			else
+			if (m_pathToPosition.empty())
 			{
-				switchToState(eUnitState::Idle, map);
+				switchToState(eUnitState::AttackingTarget, map);
 			}
 		}
 		else if (m_pathToPosition.empty())
@@ -280,25 +266,9 @@ void Unit::update(float deltaTime, FactionHandler& factionHandler, const Map& ma
 				}
 			}
 		}
-		else if (m_pathToPosition.empty())
+		if (m_pathToPosition.empty())
 		{
 			switchToState(eUnitState::Idle, map);
-		}
-		break;
-	case eUnitState::MovingToAttackPosition:
-		assert(m_targetEntity.getID() != Globals::INVALID_ENTITY_ID);
-		if (m_stateHandlerTimer.isExpired())
-		{
-			if (!factionHandler.isFactionActive(m_targetEntity.getFactionController()) ||
-				!factionHandler.getFaction(m_targetEntity.getFactionController()).getEntity(m_targetEntity.getID()))
-			{
-				m_targetEntity.reset();
-				switchToState(eUnitState::Moving, map);
-			}
-		}
-		else if (m_pathToPosition.empty())
-		{
-			switchToState(eUnitState::AttackingTarget, map);
 		}
 		break;
 	case eUnitState::SetAttackPosition:
@@ -434,6 +404,10 @@ void Unit::switchToState(eUnitState newState, const Map& map, const Entity* targ
 	case eUnitState::MovingToBuildingPosition:
 	case eUnitState::MovingToRepairPosition:
 	case eUnitState::Building:
+	case eUnitState::Moving:
+	case eUnitState::Harvesting:
+	case eUnitState::Repairing:
+	case eUnitState::AttackMoving:
 		m_targetEntity.reset();
 		break;
 	case eUnitState::AttackingTarget:
@@ -443,12 +417,8 @@ void Unit::switchToState(eUnitState newState, const Map& map, const Entity* targ
 				map, [&](const glm::ivec2& position) { return getAdjacentPositions(position, map, m_owningFaction.getUnits(), *this); }));
 		}
 		break;
-	case eUnitState::AttackMoving:
+
 	case eUnitState::SetAttackPosition:
-	case eUnitState::MovingToAttackPosition:
-	case eUnitState::Moving:
-	case eUnitState::Harvesting:
-	case eUnitState::Repairing:
 		break;
 	default:
 		assert(false);
