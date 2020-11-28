@@ -127,11 +127,6 @@ void Unit::resetTarget()
 	m_targetEntity.reset();
 }
 
-void Unit::setTarget(eFactionController targetFaction, int targetID)
-{
-	m_targetEntity.set(targetFaction, targetID);
-}
-
 void Unit::moveToAttackPosition(const Entity& targetEntity, const Faction& targetFaction, const Map& map, 
 	FactionHandler& factionHandler)
 {

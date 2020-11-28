@@ -19,7 +19,7 @@
 namespace
 {
     void moveSelectedUnitsToAttackPosition(std::vector<Unit*>& selectedUnits, const Entity& targetEntity, 
-        const Faction& targetFaction, const Map& map, const FactionHandler& factionHandler)
+        const Faction& targetFaction, const Map& map, FactionHandler& factionHandler)
     {
         assert(!selectedUnits.empty());
         
@@ -28,8 +28,7 @@ namespace
             return Globals::getSqrDistance(targetEntity.getPosition(), selectedUnitA->getPosition()) <
                 Globals::getSqrDistance(targetEntity.getPosition(), selectedUnitB->getPosition());
         });
-        
-        PathFindingLocator::get().clearAttackPositions();
+
         for (auto& selectedUnit : selectedUnits)
         {
             selectedUnit->moveToAttackPosition(targetEntity, targetFaction, map, factionHandler);
@@ -198,20 +197,11 @@ void FactionPlayer::instructWorkerReturnMinerals(const Map& map)
     {
         if (worker.isSelected() && worker.isHoldingResources())
         {
-            glm::vec3 destination = PathFindingLocator::get().getClosestPositionOutsideAABB(worker.getPosition(), m_HQ.getAABB(), m_HQ.getPosition(), map);
+            glm::vec3 destination = 
+                PathFindingLocator::get().getClosestPositionOutsideAABB(worker.getPosition(), m_HQ.getAABB(), m_HQ.getPosition(), map);
             worker.moveTo(destination, map, [&](const glm::ivec2& position) { return getAdjacentPositions(position, map); },
                 eUnitState::ReturningMineralsToHQ);
         }
-    }
-}
-
-void FactionPlayer::instructUnitToAttack(Unit& unit, const Entity& targetEntity, const Faction& targetFaction, const Map& map)
-{
-    unit.setTarget(targetFaction.getController(), targetEntity.getID());
-    if (unit.getCurrentState() != eUnitState::AttackingTarget)
-    {
-        unit.moveTo(targetEntity.getPosition(), map,
-            [&](const glm::ivec2& position) { return getAdjacentPositions(position, map, m_units, unit); });
     }
 }
 
@@ -437,7 +427,7 @@ void FactionPlayer::onRightClick(const sf::Window& window, const Camera& camera,
 
         if (m_selectedUnits.size() == static_cast<size_t>(1))
         {
-            instructUnitToAttack(*m_selectedUnits.back(), *targetEntity, *targetFaction, map);
+            m_selectedUnits.back()->moveToAttackPosition(*targetEntity, *targetFaction, map, factionHandler);
         }
         else if (m_selectedUnits.size() >= static_cast<size_t>(2))
         {

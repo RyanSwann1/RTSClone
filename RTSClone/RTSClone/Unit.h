@@ -53,7 +53,6 @@ public:
 	eUnitState getCurrentState() const;
 
 	void resetTarget();
-	void setTarget(eFactionController targetFaction, int targetID);
 	void moveToAttackPosition(const Entity& targetEntity, const Faction& targetFaction, const Map& map, 
 		FactionHandler& factionHandler);
 	void moveTo(const glm::vec3& destinationPosition, const Map& map, const AdjacentPositions& adjacentPositions, 

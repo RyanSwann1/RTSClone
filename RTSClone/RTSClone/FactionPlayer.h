@@ -28,7 +28,6 @@ private:
 	std::vector<Unit*> m_selectedUnits;
 	
 	void instructWorkerReturnMinerals(const Map& map);
-	void instructUnitToAttack(Unit& Unit, const Entity& targetEntity, const Faction& targetFaction, const Map& map);
 	bool instructWorkerToBuild(const Map& map);
 	void moveSingularSelectedUnit(const glm::vec3& mouseToGroundPosition, const Map& map, Entity& selectedEntity) const;
 	void moveMultipleSelectedUnits(const glm::vec3& mouseToGroundPosition, const Map& map);
