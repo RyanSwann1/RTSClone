@@ -70,16 +70,16 @@ FactionAI::FactionAI(eFactionController factionController, const glm::vec3& hqSt
 	m_actionQueue.emplace(eActionType::BuildSupplyDepot);
 }
 
-void FactionAI::setTargetFaction(const std::vector<const Faction*>& opposingFactions)
+void FactionAI::setTargetFaction(FactionHandler& factionHandler)
 {
 	m_targetFaction = nullptr;
 	float targetFactionDistance = std::numeric_limits<float>::max();
-	for (const auto& faction : opposingFactions)
+	for (const auto& opposingFaction : factionHandler.getOpposingFactions(getController()))
 	{
-		float distance = Globals::getSqrDistance(faction->getHQPosition(), m_HQ.getPosition());
+		float distance = Globals::getSqrDistance(opposingFaction.get().getHQPosition(), m_HQ.getPosition());
 		if (distance < targetFactionDistance)
 		{
-			m_targetFaction = faction;
+			m_targetFaction = &opposingFaction.get();
 			targetFactionDistance = distance;
 		}
 	}

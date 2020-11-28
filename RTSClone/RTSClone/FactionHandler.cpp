@@ -30,23 +30,20 @@ bool FactionHandler::isUnitPositionAvailable(const glm::vec3& position, const Un
 {
 	for (const auto& opposingFaction : getOpposingFactions(senderUnit.getOwningFactionController()))
 	{
-		if (opposingFaction)
+		auto unit = std::find_if(opposingFaction.get().getUnits().cbegin(), opposingFaction.get().getUnits().cend(), [&position](const auto& unit)
 		{
-			auto unit = std::find_if(opposingFaction->getUnits().cbegin(), opposingFaction->getUnits().cend(), [&position](const auto& unit)
+			if (ENTITY_UNIT_IDLE_STATES.isMatch(unit.getCurrentState()))
 			{
-				if (ENTITY_UNIT_IDLE_STATES.isMatch(unit.getCurrentState()))
-				{
-					return unit.getAABB().contains(position);
-				}
-				else
-				{
-					return !unit.getPathToPosition().empty() && unit.getPathToPosition().front() == position;
-				}
-			});
-			if (unit != opposingFaction->getUnits().cend())
-			{
-				return false;
+				return unit.getAABB().contains(position);
 			}
+			else
+			{
+				return !unit.getPathToPosition().empty() && unit.getPathToPosition().front() == position;
+			}
+		});
+		if (unit != opposingFaction.get().getUnits().cend())
+		{
+			return false;
 		}
 	}
 
@@ -82,7 +79,7 @@ const std::array<std::unique_ptr<Faction>, static_cast<size_t>(eFactionControlle
 	return m_factions;
 }
 
-const std::vector<const Faction*>& FactionHandler::getOpposingFactions(eFactionController factionController)
+const std::vector<std::reference_wrapper<const Faction>>& FactionHandler::getOpposingFactions(eFactionController factionController)
 {
 	m_opposingFactions.clear();
 
@@ -90,8 +87,8 @@ const std::vector<const Faction*>& FactionHandler::getOpposingFactions(eFactionC
 	{
 		if (faction && faction->getController() != factionController)
 		{
-			m_opposingFactions.push_back(faction.get());
-		}
+			m_opposingFactions.push_back(*faction.get());
+		}  
 	}
 
 	return m_opposingFactions;

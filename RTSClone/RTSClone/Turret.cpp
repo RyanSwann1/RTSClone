@@ -51,10 +51,10 @@ void Turret::update(float deltaTime, FactionHandler& factionHandler, const Map& 
 
 		for (const auto& opposingFaction : factionHandler.getOpposingFactions(m_owningFaction.getController()))
 		{
-			const Entity* targetEntity = opposingFaction->getEntity(m_position, TURRET_ATTACK_RANGE);
+			const Entity* targetEntity = opposingFaction.get().getEntity(m_position, TURRET_ATTACK_RANGE);
 			if (targetEntity)
 			{
-				m_targetEntity.set(opposingFaction->getController(), targetEntity->getID());
+				m_targetEntity.set(opposingFaction.get().getController(), targetEntity->getID());
 				m_currentState = eTurretState::Attacking;
 				break;
 			}

@@ -64,8 +64,7 @@ void Level::setAITargetFaction()
 	{
 		if (faction && faction->getController() != eFactionController::Player)
 		{
-			static_cast<FactionAI&>(*faction.get()).setTargetFaction(
-				m_factionHandler.getOpposingFactions(faction->getController()));
+			static_cast<FactionAI&>(*faction.get()).setTargetFaction(m_factionHandler);
 		}
 	}
 }

@@ -210,7 +210,7 @@ void Unit::update(float deltaTime, FactionHandler& factionHandler, const Map& ma
 		{
 			for (const auto& opposingFaction : factionHandler.getOpposingFactions(m_owningFaction.getController()))
 			{
-				const Entity* targetEntity = opposingFaction->getEntity(m_position, UNIT_ATTACK_RANGE);
+				const Entity* targetEntity = opposingFaction.get().getEntity(m_position, UNIT_ATTACK_RANGE);
 				if (targetEntity)
 				{
 					if (PathFindingLocator::get().isTargetInLineOfSight(m_position, *targetEntity, map))
@@ -223,7 +223,7 @@ void Unit::update(float deltaTime, FactionHandler& factionHandler, const Map& ma
 							{ return getAdjacentPositions(position, map, m_owningFaction.getUnits(), *this); });
 					}
 
-					m_targetEntity.set(opposingFaction->getController(), targetEntity->getID());
+					m_targetEntity.set(opposingFaction.get().getController(), targetEntity->getID());
 					break;
 				}
 				else
@@ -259,10 +259,10 @@ void Unit::update(float deltaTime, FactionHandler& factionHandler, const Map& ma
 		{
 			for (const auto& opposingFaction : factionHandler.getOpposingFactions(m_owningFaction.getController()))
 			{
-				const Entity* targetEntity = opposingFaction->getEntity(m_position, UNIT_ATTACK_RANGE);
+				const Entity* targetEntity = opposingFaction.get().getEntity(m_position, UNIT_ATTACK_RANGE);
 				if (targetEntity && PathFindingLocator::get().isTargetInLineOfSight(m_position, *targetEntity, map))
 				{
-					m_targetEntity.set(opposingFaction->getController(), targetEntity->getID());
+					m_targetEntity.set(opposingFaction.get().getController(), targetEntity->getID());
 					switchToState(eUnitState::AttackingTarget, map, targetEntity);
 				}
 			}
