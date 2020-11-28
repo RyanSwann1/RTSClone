@@ -48,13 +48,14 @@ public:
 	float getGridAttackRange() const;
 	float getAttackRange() const;
 	bool isPathEmpty() const;
+	eFactionController getOwningFactionController() const;
 	const glm::vec3& getDestination() const;
 	eUnitState getCurrentState() const;
 
 	void resetTarget();
 	void setTarget(eFactionController targetFaction, int targetID);
 	void moveToAttackPosition(const Entity& targetEntity, const Faction& targetFaction, const Map& map, 
-		const FactionHandler& factionHandler);
+		FactionHandler& factionHandler);
 	void moveTo(const glm::vec3& destinationPosition, const Map& map, const AdjacentPositions& adjacentPositions, 
 	 	eUnitState state = eUnitState::Moving);
 	void update(float deltaTime, FactionHandler& factionHandler, const Map& map);
