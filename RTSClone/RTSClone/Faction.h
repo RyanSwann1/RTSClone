@@ -66,6 +66,7 @@ protected:
 
 	bool addUnitToSpawn(eEntityType unitType, const Map& map, UnitSpawnerBuilding& building);
 	bool instructWorkerToBuild(eEntityType entityType, const glm::vec3& position, const Map& map, Worker& worker);
+	virtual void onEntityRemoval(const Entity& entity) {}
 	virtual const Entity* spawnBuilding(const Map& map, glm::vec3 position, eEntityType entityType);
 	virtual const Entity* spawnUnit(const Map& map, const UnitSpawnerBuilding& building);
 	virtual const Entity* spawnWorker(const Map& map, const UnitSpawnerBuilding& building);
@@ -122,7 +123,7 @@ private:
 	//Presumes entity already found in all entities container
 	template <class T>
 	void removeEntity(std::list<T>& entityContainer, int entityID, 
-		std::vector<Entity*>::iterator& iter)
+		std::vector<Entity*>::iterator iter)
 	{
 		auto entity = std::find_if(entityContainer.begin(), entityContainer.end(), [entityID](const auto& entity)
 		{
@@ -130,6 +131,7 @@ private:
 		});
 		assert(entity != entityContainer.end());
 
+		onEntityRemoval((*entity));
 		entityContainer.erase(entity);
 		assert(iter != m_allEntities.cend());
 		m_allEntities.erase(iter);

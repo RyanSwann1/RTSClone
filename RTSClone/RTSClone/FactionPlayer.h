@@ -27,6 +27,8 @@ private:
 	bool m_attackMoveSelected;
 	std::vector<Unit*> m_selectedUnits;
 	
+	void onEntityRemoval(const Entity& entity) override;
+
 	void instructWorkerReturnMinerals(const Map& map);
 	bool instructWorkerToBuild(const Map& map);
 	void moveSingularSelectedUnit(const glm::vec3& mouseToGroundPosition, const Map& map, Entity& selectedEntity) const;

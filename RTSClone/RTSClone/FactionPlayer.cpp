@@ -191,6 +191,27 @@ void FactionPlayer::renderSelectionBox(const sf::Window& window) const
     m_selectionBox.render(window);
 }
 
+void FactionPlayer::onEntityRemoval(const Entity& entity)
+{
+    switch (entity.getEntityType())
+    {
+    case eEntityType::Worker:
+    case eEntityType::Unit:
+    {
+        int entityID = entity.getID();
+        auto selectedUnit = std::find_if(m_selectedUnits.begin(), m_selectedUnits.end(), [entityID](const auto& selectedUnit)
+        {
+            return selectedUnit->getID() == entityID;
+        });
+        if (selectedUnit != m_selectedUnits.end())
+        {
+            m_selectedUnits.erase(selectedUnit);
+        }
+    }
+        break;
+    }
+}
+
 void FactionPlayer::instructWorkerReturnMinerals(const Map& map)
 {
     for (auto& worker : m_workers)
@@ -411,12 +432,12 @@ void FactionPlayer::onRightClick(const sf::Window& window, const Camera& camera,
     const Faction* targetFaction = nullptr;
     const Entity* targetEntity = nullptr;
 
-    for (const auto& faction : factionHandler.getOpposingFactions(getController()))
+    for (const auto& opposingFactions : factionHandler.getOpposingFactions(getController()))
     {
-        targetEntity = faction->getEntity(mouseToGroundPosition);
+        targetEntity = opposingFactions.get().getEntity(mouseToGroundPosition);
         if (targetEntity)
         {
-            targetFaction = faction;
+            targetFaction = &opposingFactions.get();
             break;
         }
     }
