@@ -111,8 +111,6 @@ public:
 	void getPathToPosition(const Unit& unit, const glm::vec3& destination, std::vector<glm::vec3>& pathToPosition,
 		const AdjacentPositions& adjacentPositions, const std::list<Unit>& units, const Map& map);
 
-	void clearAttackPositions();
-
 private:
 	std::vector<glm::vec3> m_sharedPositionContainer;
 	//BFS

@@ -205,11 +205,6 @@ PathFinding::~PathFinding()
 	GameMessenger::getInstance().unsubscribe<GameMessages::NewMapSize>(this);
 }
 
-void PathFinding::clearAttackPositions()
-{
-	m_sharedPositionContainer.clear();
-}
-
 void PathFinding::onNewMapSize(const GameMessages::NewMapSize& gameMessage)
 {
 	m_sharedPositionContainer.clear();
@@ -553,16 +548,14 @@ void PathFinding::setUnitAttackPosition(const Unit& unit, const Entity& targetEn
 		m_openQueue.popTop();
 
 		if (glm::distance(glm::vec2(targetPositionOnGrid), glm::vec2(currentNode.position)) < unit.getGridAttackRange() && 
-			isPositionInLineOfSight(currentNode.position, targetEntity, map) &&
-			factionHandler.isUnitDestinationUnique(Globals::convertToWorldPosition(currentNode.position)))
+			isPositionInLineOfSight(currentNode.position, targetEntity, map))
 		{
 			positionFound = true;
-			m_sharedPositionContainer.push_back(Globals::convertToWorldPosition(currentNode.position));
 			getPathFromClosedQueue(pathToPosition, startingPositionOnGrid, currentNode, m_closedQueue, map);
 		}
 		else
 		{
-			for (const auto& adjacentPosition : getAdjacentPositions(currentNode.position, map, m_sharedPositionContainer))
+			for (const auto& adjacentPosition : getAdjacentPositions(currentNode.position, map, factionHandler))
 			{
 				if (!adjacentPosition.valid || m_closedQueue.contains(adjacentPosition.position))
 				{

@@ -31,6 +31,7 @@ struct AdjacentPosition
 
 using AdjacentPositions = const std::function<std::array<AdjacentPosition, ALL_DIRECTIONS_ON_GRID.size()>(const glm::ivec2&)>&;
 
+class FactionHandler;
 class Worker;
 class Map;
 class Unit;
@@ -48,4 +49,4 @@ std::array<AdjacentPosition, ALL_DIRECTIONS_ON_GRID.size()> getAllAdjacentPositi
 std::array<AdjacentPosition, ALL_DIRECTIONS_ON_GRID.size()> getAdjacentPositions(const glm::ivec2& position, const Map& map);
 
 std::array<AdjacentPosition, ALL_DIRECTIONS_ON_GRID.size()> getAdjacentPositions(const glm::ivec2& position, const Map& map,
-	const std::vector<glm::vec3>& previousAssignedPositions);
+	const FactionHandler& factionHandler);

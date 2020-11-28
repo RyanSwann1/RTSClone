@@ -3,6 +3,7 @@
 #include "Globals.h"
 #include "Unit.h"
 #include "Worker.h"
+#include "FactionHandler.h"
 
 namespace
 {
@@ -170,23 +171,17 @@ std::array<AdjacentPosition, ALL_DIRECTIONS_ON_GRID.size()> getAdjacentPositions
 }
 
 std::array<AdjacentPosition, ALL_DIRECTIONS_ON_GRID.size()> getAdjacentPositions(const glm::ivec2& position, 
-	const Map& map, const std::vector<glm::vec3>& previousAssignedPositions)
+	const Map& map, const FactionHandler& factionHandler)
 {
 	std::array<AdjacentPosition, ALL_DIRECTIONS_ON_GRID.size()> adjacentPositions;
 	for (int i = 0; i < static_cast<int>(ALL_DIRECTIONS_ON_GRID.size()); ++i)
 	{
 		glm::ivec2 adjacentPosition = position + ALL_DIRECTIONS_ON_GRID[i];
-		if (map.isWithinBounds(adjacentPosition) && !map.isPositionOccupied(adjacentPosition))
+		if (map.isWithinBounds(adjacentPosition) && 
+			!map.isPositionOccupied(adjacentPosition) &&
+			factionHandler.isUnitPositionAvailable(Globals::convertToWorldPosition(adjacentPosition)))
 		{
-			auto previousAssignedPosition =
-				std::find_if(previousAssignedPositions.cbegin(), previousAssignedPositions.cend(), [&](const auto& position)
-			{
-				return position == Globals::convertToWorldPosition(adjacentPosition);
-			});
-			if (previousAssignedPosition == previousAssignedPositions.cend())
-			{
-				adjacentPositions[i] = AdjacentPosition(adjacentPosition);
-			}
+			adjacentPositions[i] = AdjacentPosition(adjacentPosition);
 		}		
 	}
 
