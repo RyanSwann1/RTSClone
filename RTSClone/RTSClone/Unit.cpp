@@ -247,6 +247,7 @@ void Unit::update(float deltaTime, FactionHandler& factionHandler, const Map& ma
 				{
 					if (!PathFindingLocator::get().isTargetInLineOfSight(m_position, *targetEntity, map))
 					{
+
 						moveTo(targetEntity->getPosition(), map, [&](const glm::ivec2& position)
 							{ return getAdjacentPositions(position, map, m_owningFaction.getUnits(), *this); }, eUnitState::Moving);
 					}
@@ -288,7 +289,6 @@ void Unit::update(float deltaTime, FactionHandler& factionHandler, const Map& ma
 		assert(m_targetEntity.getID() != Globals::INVALID_ENTITY_ID);
 		if (m_stateHandlerTimer.isExpired())
 		{
-			const Entity* targetEntity = nullptr;
 			if (!factionHandler.isFactionActive(m_targetEntity.getFactionController()) ||
 				!factionHandler.getFaction(m_targetEntity.getFactionController()).getEntity(m_targetEntity.getID()))
 			{
@@ -299,6 +299,28 @@ void Unit::update(float deltaTime, FactionHandler& factionHandler, const Map& ma
 		else if (m_pathToPosition.empty())
 		{
 			switchToState(eUnitState::AttackingTarget, map);
+		}
+		break;
+	case eUnitState::SetAttackPosition:
+		assert(m_targetEntity.getID() != Globals::INVALID_ENTITY_ID);
+		if (m_stateHandlerTimer.isExpired())
+		{
+			const Entity* targetEntity = nullptr;
+			if (factionHandler.isFactionActive(m_targetEntity.getFactionController()))
+			{
+				targetEntity = factionHandler.getFaction(m_targetEntity.getFactionController()).getEntity(m_targetEntity.getID());
+				if (targetEntity)
+				{
+					const Faction& targetFaction = factionHandler.getFaction(m_targetEntity.getFactionController());
+					moveToAttackPosition(*targetEntity, targetFaction, map, factionHandler);
+				}
+			}
+
+			if (!targetEntity)
+			{
+				m_targetEntity.reset();
+				switchToState(eUnitState::Moving, map);
+			}
 		}
 		break;
 	case eUnitState::AttackingTarget:
@@ -422,6 +444,7 @@ void Unit::switchToState(eUnitState newState, const Map& map, const Entity* targ
 		}
 		break;
 	case eUnitState::AttackMoving:
+	case eUnitState::SetAttackPosition:
 	case eUnitState::MovingToAttackPosition:
 	case eUnitState::Moving:
 	case eUnitState::Harvesting:
