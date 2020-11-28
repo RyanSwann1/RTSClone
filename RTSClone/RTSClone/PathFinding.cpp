@@ -528,7 +528,7 @@ glm::vec3 PathFinding::getClosestPositionFromUnitToTarget(const Unit& unit, cons
 }
 
 void PathFinding::setUnitAttackPosition(const Unit& unit, const Entity& targetEntity, std::vector<glm::vec3>& pathToPosition,
-	const Map& map, const std::list<Unit>& units, const FactionHandler& factionHandler)
+	const Map& map, const std::list<Unit>& units, FactionHandler& factionHandler)
 {
 	assert(unit.getID() != targetEntity.getID());
 	
@@ -555,7 +555,7 @@ void PathFinding::setUnitAttackPosition(const Unit& unit, const Entity& targetEn
 		}
 		else
 		{
-			for (const auto& adjacentPosition : getAdjacentPositions(currentNode.position, map, factionHandler))
+			for (const auto& adjacentPosition : getAdjacentPositions(currentNode.position, map, factionHandler, unit))
 			{
 				if (!adjacentPosition.valid || m_closedQueue.contains(adjacentPosition.position))
 				{

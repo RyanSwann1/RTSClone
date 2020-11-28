@@ -1,5 +1,6 @@
 #include "FactionHandler.h"
 #include "FactionPlayer.h"
+#include "Unit.h"
 
 namespace
 {
@@ -25,21 +26,49 @@ FactionHandler::FactionHandler(const std::array<std::unique_ptr<Faction>, static
 	m_opposingFactions.reserve(static_cast<size_t>(getFactionCount(m_factions)));
 }
 
-bool FactionHandler::isUnitDestinationUnique(const glm::vec3& position) const
+bool FactionHandler::isUnitPositionAvailable(const glm::vec3& position, const Unit& senderUnit)
 {
-	for (const auto& faction : m_factions)
+	for (const auto& opposingFaction : getOpposingFactions(senderUnit.getOwningFactionController()))
 	{
-		if (faction)
+		if (opposingFaction)
 		{
-			auto unit = std::find_if(faction->getUnits().cbegin(), faction->getUnits().cend(), [&position](const auto& unit)
+			auto unit = std::find_if(opposingFaction->getUnits().cbegin(), opposingFaction->getUnits().cend(), [&position](const auto& unit)
 			{
-				return !unit.getPathToPosition().empty() && unit.getPathToPosition().back() == position;
+				if (unit.getCurrentState() == eUnitState::AttackingTarget || 
+					unit.getCurrentState() == eUnitState::Idle)
+				{
+					return unit.getAABB().contains(position);
+				}
+				else
+				{
+					return !unit.getPathToPosition().empty() && unit.getPathToPosition().front() == position;
+				}
 			});
-			if (unit != faction->getUnits().cend())
+			if (unit != opposingFaction->getUnits().cend())
 			{
 				return false;
 			}
 		}
+	}
+
+	assert(isFactionActive(senderUnit.getOwningFactionController()));
+	const Faction& owningFaction = getFaction(senderUnit.getOwningFactionController());
+	int senderUnitID = senderUnit.getID();
+	auto unit = std::find_if(owningFaction.getUnits().cbegin(), owningFaction.getUnits().cend(), [&position, senderUnitID](const auto& unit)
+	{
+		if (unit.getCurrentState() == eUnitState::AttackingTarget ||
+			unit.getCurrentState() == eUnitState::Idle)
+		{
+			return unit.getID() != senderUnitID && unit.getAABB().contains(position);
+		}
+		else
+		{
+			return unit.getID() != senderUnitID && !unit.getPathToPosition().empty() && unit.getPathToPosition().front() == position;
+		}
+	});
+	if (unit != owningFaction.getUnits().cend())
+	{
+		return false;
 	}
 
 	return true;

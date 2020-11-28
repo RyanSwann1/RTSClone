@@ -171,7 +171,7 @@ std::array<AdjacentPosition, ALL_DIRECTIONS_ON_GRID.size()> getAdjacentPositions
 }
 
 std::array<AdjacentPosition, ALL_DIRECTIONS_ON_GRID.size()> getAdjacentPositions(const glm::ivec2& position, 
-	const Map& map, const FactionHandler& factionHandler)
+	const Map& map, FactionHandler& factionHandler, const Unit& unit)
 {
 	std::array<AdjacentPosition, ALL_DIRECTIONS_ON_GRID.size()> adjacentPositions;
 	for (int i = 0; i < static_cast<int>(ALL_DIRECTIONS_ON_GRID.size()); ++i)
@@ -179,7 +179,7 @@ std::array<AdjacentPosition, ALL_DIRECTIONS_ON_GRID.size()> getAdjacentPositions
 		glm::ivec2 adjacentPosition = position + ALL_DIRECTIONS_ON_GRID[i];
 		if (map.isWithinBounds(adjacentPosition) && 
 			!map.isPositionOccupied(adjacentPosition) &&
-			factionHandler.isUnitPositionAvailable(Globals::convertToWorldPosition(adjacentPosition)))
+			factionHandler.isUnitPositionAvailable(Globals::convertToWorldPosition(adjacentPosition), unit))
 		{
 			adjacentPositions[i] = AdjacentPosition(adjacentPosition);
 		}		
