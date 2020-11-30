@@ -1,106 +1,103 @@
 #include "GameEvent.h"
 #include "Globals.h"
 
-GameEvent::GameEvent(eGameEventType gameEventType)
-	: type(gameEventType),
-	senderFaction(),
-	senderID(Globals::INVALID_ENTITY_ID),
-	targetFaction(),
-	targetID(Globals::INVALID_ENTITY_ID),
-	damage(0),
-	startingPosition(),
-	endingPosition(),
-	entityType()
-{
-	assert(gameEventType == eGameEventType::RevalidateMovementPaths ||
-		gameEventType == eGameEventType::ResetTargetEntityGUI);
-}
+GameEvent_1::GameEvent_1(eEntityType entityType, int targetID)
+	: entityType(entityType),
+	targetID(targetID)
+{}
 
-GameEvent::GameEvent(eGameEventType gameEventType, eEntityType entityType, int targetID)
-	: type(gameEventType),
-	senderFaction(),
-	senderID(Globals::INVALID_ENTITY_ID),
-	targetFaction(),
-	targetID(targetID),
-	damage(0),
-	startingPosition(),
-	endingPosition(),
-	entityType(entityType)
-{
-	assert(gameEventType == eGameEventType::PlayerSpawnUnit || 
-		gameEventType == eGameEventType::PlayerActivatePlannedBuilding);
-}
+GameEvent_2::GameEvent_2(eFactionController senderFaction)
+	: senderFaction(senderFaction)
+{}
 
-GameEvent::GameEvent(eGameEventType gameEventType, eFactionController senderFaction)
-	: type(gameEventType),
-	senderFaction(senderFaction),
-	senderID(Globals::INVALID_ENTITY_ID),
-	targetFaction(),
-	targetID(Globals::INVALID_ENTITY_ID),
-	damage(0),
-	startingPosition(),
-	endingPosition(),
-	entityType()
-{
-	assert(gameEventType == eGameEventType::EliminateFaction);
-}
+GameEvent_3::GameEvent_3(eFactionController senderFaction, int senderID)
+	: senderFaction(senderFaction),
+	senderID(senderID)
+{}
 
-GameEvent::GameEvent(eGameEventType gameEventType, eFactionController senderFaction, int senderID)
-	: type(gameEventType),
-	senderFaction(senderFaction),
-	senderID(senderID),
-	targetFaction(),
-	targetID(Globals::INVALID_ENTITY_ID),
-	damage(0),
-	startingPosition(),
-	endingPosition(),
-	entityType()
-{
-	assert(gameEventType == eGameEventType::RemoveAllWorkerPlannedBuildings ||
-		gameEventType == eGameEventType::AddResources || gameEventType == eGameEventType::RepairEntity ||
-		gameEventType == eGameEventType::SetTargetEntityGUI);
-}
-
-GameEvent::GameEvent(eGameEventType gameEventType, eFactionController senderFaction, int senderID, 
-	eFactionController targetFaction, int targetID, int damage)
-	: type(gameEventType),
-	senderFaction(senderFaction),
+GameEvent_4::GameEvent_4(eFactionController senderFaction, int senderID, eFactionController targetFaction, int targetID, int damage)
+	: senderFaction(senderFaction),
 	senderID(senderID),
 	targetFaction(targetFaction),
 	targetID(targetID),
-	damage(damage),
-	startingPosition(),
-	endingPosition(),
-	entityType()
-{
-	assert(gameEventType == eGameEventType::TakeDamage);
-}
+	damage(damage)
+{}
 
-GameEvent::GameEvent(eGameEventType gameEventType, eFactionController senderFaction, int senderID, eFactionController targetFaction, int targetID,
-	int damage, const glm::vec3 & startingPosition, const glm::vec3 & endingPosition)
-	: type(gameEventType),
-	senderFaction(senderFaction),
+GameEvent_5::GameEvent_5(eFactionController senderFaction, int senderID, eFactionController targetFaction, int targetID, int damage, 
+	const glm::vec3& startingPosition, const glm::vec3& endingPosition)
+	: senderFaction(senderFaction),
 	senderID(senderID),
 	targetFaction(targetFaction),
 	targetID(targetID),
 	damage(damage),
 	startingPosition(startingPosition),
-	endingPosition(endingPosition),
-	entityType()
+	endingPosition(endingPosition)
+{}
+
+GameEvent_6::GameEvent_6(eFactionController senderFaction, const glm::vec3& position)
+	: senderFaction(senderFaction),
+	position(position)
+{}
+
+GameEvent GameEvent::createRevalidateMovementPaths()
 {
-	assert(gameEventType == eGameEventType::SpawnProjectile);
+	return { eGameEventType::RevalidateMovementPaths, RevalidateMovementPathsEvent{} };
 }
 
-GameEvent::GameEvent(eGameEventType gameEventType, eFactionController senderFaction, const glm::vec3 & position)
-	: type(gameEventType),
-	senderFaction(senderFaction),
-	senderID(Globals::INVALID_ENTITY_ID),
-	targetFaction(),
-	targetID(Globals::INVALID_ENTITY_ID),
-	damage(0),
-	startingPosition(position),
-	endingPosition(),
-	entityType()
+GameEvent GameEvent::createResetTargetEntityGUI()
 {
-	assert(gameEventType == eGameEventType::RemovePlannedBuilding);
+	return { eGameEventType::ResetTargetEntityGUI, ResetTargetEntityGUIEvent{} };
+}
+
+GameEvent GameEvent::createPlayerSpawnUnit(eEntityType entityType, int targetID)
+{
+	return { eGameEventType::PlayerSpawnUnit, PlayerSpawnUnitEvent{entityType, targetID} };
+}
+
+GameEvent GameEvent::createPlayerActivatePlannedBuilding(eEntityType entityType, int targetID)
+{
+	return { eGameEventType::PlayerActivatePlannedBuilding, PlayerActivatePlannedBuildingEvent{entityType, targetID} };
+}
+
+GameEvent GameEvent::createEliminateFaction(eFactionController senderFaction)
+{
+	return { eGameEventType::EliminateFaction, EliminateFactionEvent{senderFaction} };
+}
+
+GameEvent GameEvent::createRemoveAllWorkerPlannedBuildings(eFactionController senderFaction, int senderID)
+{
+	return { eGameEventType::RemoveAllWorkerPlannedBuildings, RemoveAllWorkerPlannedBuildingsEvent{senderFaction, senderID} };
+}
+
+GameEvent GameEvent::createAddResources(eFactionController senderFaction, int senderID)
+{
+	return { eGameEventType::AddResources, AddResourcesEvent{senderFaction, senderID} };
+}
+
+GameEvent GameEvent::createRepairEntity(eFactionController senderFaction, int senderID)
+{
+	return { eGameEventType::RepairEntity, RepairEntityEvent{senderFaction, senderID} };
+}
+
+GameEvent GameEvent::createSetTargetEntityGUI(eFactionController senderFaction, int senderID)
+{
+	return { eGameEventType::SetTargetEntityGUI,SetTargetEntityGUIEvent{senderFaction, senderID} };
+}
+
+GameEvent GameEvent::createTakeDamage(eFactionController senderFaction, int senderID, eFactionController targetFaction, 
+	int targetID, int damage)
+{
+	return { eGameEventType::TakeDamage, TakeDamageEvent{senderFaction, senderID, targetFaction, targetID, damage} };
+}
+
+GameEvent GameEvent::createSpawnProjectile(eFactionController senderFaction, int senderID, eFactionController targetFaction, 
+	int targetID, int damage, const glm::vec3& startingPosition, const glm::vec3& endingPosition)
+{
+	return { eGameEventType::SpawnProjectile,
+		SpawnProjectileEvent{senderFaction, senderID, targetFaction, targetID, damage, startingPosition, endingPosition} };
+}
+
+GameEvent GameEvent::createRemovePlannedBuilding(eFactionController senderFaction, const glm::vec3& position)
+{
+	return { eGameEventType::RemovePlannedBuilding, RemovePlannedBuildingEvent{senderFaction, position} };
 }
