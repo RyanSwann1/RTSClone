@@ -7,12 +7,12 @@ GameEvent_1::GameEvent_1(eEntityType entityType, int targetID)
 {}
 
 GameEvent_2::GameEvent_2(eFactionController senderFaction)
-	: senderFaction(senderFaction)
+	: factionController(senderFaction)
 {}
 
 GameEvent_3::GameEvent_3(eFactionController senderFaction, int senderID)
-	: senderFaction(senderFaction),
-	senderID(senderID)
+	: factionController(senderFaction),
+	entityID(senderID)
 {}
 
 GameEvent_4::GameEvent_4(eFactionController senderFaction, int senderID, eFactionController targetFaction, int targetID, int damage)
@@ -30,12 +30,12 @@ GameEvent_5::GameEvent_5(eFactionController senderFaction, int senderID, eFactio
 	targetFaction(targetFaction),
 	targetID(targetID),
 	damage(damage),
-	startingPosition(startingPosition),
-	endingPosition(endingPosition)
+	spawnPosition(startingPosition),
+	destination(endingPosition)
 {}
 
 GameEvent_6::GameEvent_6(eFactionController senderFaction, const glm::vec3& position)
-	: senderFaction(senderFaction),
+	: factionController(senderFaction),
 	position(position)
 {}
 

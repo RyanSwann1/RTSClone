@@ -41,7 +41,7 @@ struct GameEvent_2
 {
 	GameEvent_2(eFactionController senderFaction);
 
-	eFactionController senderFaction;
+	eFactionController factionController;
 };
 using EliminateFactionEvent = GameEvent_2;
 
@@ -49,8 +49,8 @@ struct GameEvent_3
 {
 	GameEvent_3(eFactionController senderFaction, int senderID);
 
-	eFactionController senderFaction;
-	int senderID;
+	eFactionController factionController;
+	int entityID;
 };
 using RemoveAllWorkerPlannedBuildingsEvent = GameEvent_3;
 using AddResourcesEvent = GameEvent_3;
@@ -80,8 +80,8 @@ struct GameEvent_5
 	eFactionController targetFaction;
 	int targetID;
 	int damage;
-	glm::vec3 startingPosition;
-	glm::vec3 endingPosition;
+	glm::vec3 spawnPosition;
+	glm::vec3 destination;
 };
 using SpawnProjectileEvent = GameEvent_5;
 
@@ -89,7 +89,7 @@ struct GameEvent_6
 {
 	GameEvent_6(eFactionController senderFaction, const glm::vec3& position);
 
-	eFactionController senderFaction;
+	eFactionController factionController;
 	glm::vec3 position;
 };
 using RemovePlannedBuildingEvent = GameEvent_6;

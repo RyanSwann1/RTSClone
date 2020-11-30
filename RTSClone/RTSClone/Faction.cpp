@@ -239,7 +239,7 @@ void Faction::handleEvent(const GameEvent& gameEvent, const Map& map, FactionHan
         break;
     case eGameEventType::RemovePlannedBuilding:
     {
-        assert(gameEvent.data.removePlannedBuilding.senderFaction == m_controller);
+        assert(gameEvent.data.removePlannedBuilding.factionController == m_controller);
         const glm::vec3& buildingPosition = gameEvent.data.removePlannedBuilding.position;
         auto buildingToSpawn = std::find_if(m_plannedBuildings.begin(), m_plannedBuildings.end(), [&buildingPosition](const auto& buildingToSpawn)
         {
@@ -253,7 +253,7 @@ void Faction::handleEvent(const GameEvent& gameEvent, const Map& map, FactionHan
     case eGameEventType::RemoveAllWorkerPlannedBuildings:
         for (auto plannedBuilding = m_plannedBuildings.begin(); plannedBuilding != m_plannedBuildings.end();)
         {
-            if (plannedBuilding->getWorkerID() == gameEvent.data.removeAllWorkerPlannedBuilding.senderID)
+            if (plannedBuilding->getWorkerID() == gameEvent.data.removeAllWorkerPlannedBuilding.entityID)
             {
                 plannedBuilding = m_plannedBuildings.erase(plannedBuilding);
             }
@@ -265,7 +265,7 @@ void Faction::handleEvent(const GameEvent& gameEvent, const Map& map, FactionHan
         break;
     case eGameEventType::AddResources:
     {
-        int workerID = gameEvent.data.addResources.senderID;
+        int workerID = gameEvent.data.addResources.entityID;
         auto worker = std::find_if(m_workers.begin(), m_workers.end(), [workerID](const auto& worker)
         {
             return worker.getID() == workerID;
@@ -281,7 +281,7 @@ void Faction::handleEvent(const GameEvent& gameEvent, const Map& map, FactionHan
         break;
     case eGameEventType::RepairEntity:
     {
-        int entityID = gameEvent.data.repairEntity.senderID;
+        int entityID = gameEvent.data.repairEntity.entityID;
         auto entity = std::find_if(m_allEntities.begin(), m_allEntities.end(), [entityID](const auto& entity)
         {
             return entity->getID() == entityID;

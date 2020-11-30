@@ -315,28 +315,28 @@ void Level::handleEvent(const GameEvent& gameEvent, const Map& map)
 		}
 		break;
 	case eGameEventType::RemovePlannedBuilding:
-		if (isFactionActive(m_factions, gameEvent.data.removePlannedBuilding.senderFaction))
+		if (isFactionActive(m_factions, gameEvent.data.removePlannedBuilding.factionController))
 		{
-			getFaction(m_factions, gameEvent.data.removePlannedBuilding.senderFaction).
+			getFaction(m_factions, gameEvent.data.removePlannedBuilding.factionController).
 				handleEvent(gameEvent, map, m_factionHandler);
 		}
 		break;
 	case eGameEventType::RemoveAllWorkerPlannedBuildings:
-		if (isFactionActive(m_factions, gameEvent.data.removeAllWorkerPlannedBuilding.senderFaction))
+		if (isFactionActive(m_factions, gameEvent.data.removeAllWorkerPlannedBuilding.factionController))
 		{
-			getFaction(m_factions, gameEvent.data.removeAllWorkerPlannedBuilding.senderFaction).handleEvent(gameEvent, map, m_factionHandler);
+			getFaction(m_factions, gameEvent.data.removeAllWorkerPlannedBuilding.factionController).handleEvent(gameEvent, map, m_factionHandler);
 		}
 		break;
 	case eGameEventType::AddResources:
-		if (isFactionActive(m_factions, gameEvent.data.addResources.senderFaction))
+		if (isFactionActive(m_factions, gameEvent.data.addResources.factionController))
 		{
-			getFaction(m_factions, gameEvent.data.addResources.senderFaction).handleEvent(gameEvent, map, m_factionHandler);
+			getFaction(m_factions, gameEvent.data.addResources.factionController).handleEvent(gameEvent, map, m_factionHandler);
 		}
 		break;
 	case eGameEventType::RepairEntity:
-		if (isFactionActive(m_factions, gameEvent.data.repairEntity.senderFaction))
+		if (isFactionActive(m_factions, gameEvent.data.repairEntity.factionController))
 		{
-			getFaction(m_factions, gameEvent.data.repairEntity.senderFaction).handleEvent(gameEvent, map, m_factionHandler);
+			getFaction(m_factions, gameEvent.data.repairEntity.factionController).handleEvent(gameEvent, map, m_factionHandler);
 		}
 		break;
 	case eGameEventType::SpawnProjectile:
@@ -352,9 +352,9 @@ void Level::handleEvent(const GameEvent& gameEvent, const Map& map)
 		}
 		break;
 	case eGameEventType::EliminateFaction:
-		if (isFactionActive(m_factions, gameEvent.data.eliminateFaction.senderFaction))
+		if (isFactionActive(m_factions, gameEvent.data.eliminateFaction.factionController))
 		{
-			m_factions[static_cast<int>(gameEvent.data.eliminateFaction.senderFaction)].reset();
+			m_factions[static_cast<int>(gameEvent.data.eliminateFaction.factionController)].reset();
 			setAITargetFaction();
 		}
 		break;
@@ -366,8 +366,8 @@ void Level::handleEvent(const GameEvent& gameEvent, const Map& map)
 		}
 		break;
 	case eGameEventType::SetTargetEntityGUI:
-		m_selectedTargetGUI.set(gameEvent.data.setTargetEntityGUI.senderFaction, 
-			gameEvent.data.setTargetEntityGUI.senderID);
+		m_selectedTargetGUI.set(gameEvent.data.setTargetEntityGUI.factionController, 
+			gameEvent.data.setTargetEntityGUI.entityID);
 		break;
 	case eGameEventType::ResetTargetEntityGUI:
 		m_selectedTargetGUI.reset();
