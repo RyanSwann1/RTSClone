@@ -26,6 +26,8 @@ private:
 	const Faction& m_owningFaction;
 	TargetEntity m_targetEntity;
 	eTurretState m_currentState;
-	Timer m_idleTimer;
+	Timer m_stateHandlerTimer;
 	Timer m_attackTimer;
+
+	void switchToState(eTurretState newState);
 };

@@ -24,7 +24,7 @@ Turret::Turret(const glm::vec3& startingPosition, const Faction& owningFaction)
 	m_owningFaction(owningFaction),
 	m_targetEntity(),
 	m_currentState(eTurretState::Idle),
-	m_idleTimer(TIME_BETWEEN_IDLE_CHECK, true),
+	m_stateHandlerTimer(0.2f, true),
 	m_attackTimer(TIME_BETWEEN_ATTACK, true)
 {
 	GameMessenger::getInstance().broadcast<GameMessages::MapModification<eGameMessageType::AddEntityToMap>>({ m_AABB });
@@ -37,32 +37,48 @@ Turret::~Turret()
 
 void Turret::update(float deltaTime, FactionHandler& factionHandler, const Map& map)
 {
-	m_idleTimer.update(deltaTime);
+	m_stateHandlerTimer.update(deltaTime);
 	m_attackTimer.update(deltaTime);
 
 	switch (m_currentState)
 	{
 	case eTurretState::Idle:
 	{
-		if (!m_idleTimer.isExpired())
+		assert(m_targetEntity.getID() == Globals::INVALID_ENTITY_ID);
+		if (m_stateHandlerTimer.isExpired())
 		{
-			break;
-		}
-
-		for (const auto& opposingFaction : factionHandler.getOpposingFactions(m_owningFaction.getController()))
-		{
-			const Entity* targetEntity = opposingFaction.get().getEntity(m_position, TURRET_ATTACK_RANGE);
-			if (targetEntity)
+			for (const auto& opposingFaction : factionHandler.getOpposingFactions(m_owningFaction.getController()))
 			{
-				m_targetEntity.set(opposingFaction.get().getController(), targetEntity->getID());
-				m_currentState = eTurretState::Attacking;
-				break;
+				const Entity* targetEntity = opposingFaction.get().getEntity(m_position, TURRET_ATTACK_RANGE);
+				if (targetEntity)
+				{
+					m_targetEntity.set(opposingFaction.get().getController(), targetEntity->getID());
+					switchToState(eTurretState::Attacking);
+					break;
+				}
 			}
 		}
 	}
 		break;
 	case eTurretState::Attacking:
 	{
+		assert(m_targetEntity.getID() != Globals::INVALID_ENTITY_ID);
+		if (m_stateHandlerTimer.isExpired() && factionHandler.isFactionActive(m_targetEntity.getFactionController()))
+		{
+			const Faction& opposingFaction = factionHandler.getFaction(m_targetEntity.getFactionController());
+			const Entity* targetEntity = opposingFaction.getEntity(m_targetEntity.getID());
+			if (targetEntity &&
+				Globals::getSqrDistance(targetEntity->getPosition(), m_position) <= TURRET_ATTACK_RANGE * TURRET_ATTACK_RANGE &&
+				PathFindingLocator::get().isTargetInLineOfSight(m_position, *targetEntity, map, m_AABB))
+			{
+				m_rotation.y = Globals::getAngle(targetEntity->getPosition(), m_position, 270.0f);
+			}
+			else
+			{
+				switchToState(eTurretState::Idle);
+			}
+		}
+
 		if (m_attackTimer.isExpired() && factionHandler.isFactionActive(m_targetEntity.getFactionController()))
 		{
 			const Faction& opposingFaction = factionHandler.getFaction(m_targetEntity.getFactionController());
@@ -71,14 +87,11 @@ void Turret::update(float deltaTime, FactionHandler& factionHandler, const Map& 
 				Globals::getSqrDistance(targetEntity->getPosition(), m_position) <= TURRET_ATTACK_RANGE * TURRET_ATTACK_RANGE &&
 				PathFindingLocator::get().isTargetInLineOfSight(m_position, *targetEntity, map, m_AABB))
 			{
+				m_rotation.y = Globals::getAngle(targetEntity->getPosition(), m_position, 270.0f);
 				GameEventHandler::getInstance().gameEvents.push(GameEvent::createSpawnProjectile(m_owningFaction.getController(), getID(),
 					opposingFaction.getController(), targetEntity->getID(), TURRET_DAMAGE, m_position, targetEntity->getPosition()));
-
-				m_rotation.y = Globals::getAngle(targetEntity->getPosition(), m_position, 270.0f);
-			}
-			else
-			{
-				m_currentState = eTurretState::Idle;
+				
+				m_attackTimer.resetElaspedTime();
 			}
 		}
 	}
@@ -87,13 +100,25 @@ void Turret::update(float deltaTime, FactionHandler& factionHandler, const Map& 
 		assert(false);
 	}
 
-	if (m_idleTimer.isExpired())
+	if (m_stateHandlerTimer.isExpired())
 	{
-		m_idleTimer.resetElaspedTime();
+		m_stateHandlerTimer.resetElaspedTime();
+	}
+}
+
+void Turret::switchToState(eTurretState newState)
+{
+	switch (newState)
+	{
+	case eTurretState::Idle:
+		m_targetEntity.reset();
+		break;
+	case eTurretState::Attacking:
+		m_attackTimer.resetElaspedTime();
+		break;
+	default:
+		assert(false);
 	}
 
-	if (m_attackTimer.isExpired())
-	{
-		m_attackTimer.resetElaspedTime();
-	}
+	m_currentState = newState;
 }
