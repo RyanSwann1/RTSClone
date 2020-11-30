@@ -4,7 +4,6 @@
 #include <SFML/Graphics.hpp>
 #include "ModelLoader.h"
 #include "ShaderHandler.h"
-#include "Texture.h"
 #include "Camera.h"
 #include "Unit.h"
 #include "Map.h"
