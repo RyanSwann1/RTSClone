@@ -197,7 +197,7 @@ void Faction::handleEvent(const GameEvent& gameEvent, const Map& map, FactionHan
                 }
                 break;
             case eEntityType::Unit:
-                static_cast<Unit&>(*(*entity)).reduceHealth(gameEvent.data.takeDamage, factionHandler);
+                static_cast<Unit&>(*(*entity)).reduceHealth(gameEvent.data.takeDamage, factionHandler, map);
                 if ((*entity)->isDead())
                 {
                     removeEntity<Unit>(m_units, targetID, entity);

@@ -206,7 +206,7 @@ void Unit::update(float deltaTime, FactionHandler& factionHandler, const Map& ma
 	switch (m_currentState)
 	{
 	case eUnitState::Idle:
-		//assert(m_targetEntity.getID() == Globals::INVALID_ENTITY_ID);
+		assert(m_targetEntity.getID() == Globals::INVALID_ENTITY_ID);
 		if (m_stateHandlerTimer.isExpired() && getEntityType() == eEntityType::Unit)
 		{
 			for (const auto& opposingFaction : factionHandler.getOpposingFactions(m_owningFaction.getController()))
@@ -262,8 +262,7 @@ void Unit::update(float deltaTime, FactionHandler& factionHandler, const Map& ma
 				const Entity* targetEntity = opposingFaction.get().getEntity(m_position, UNIT_ATTACK_RANGE);
 				if (targetEntity && PathFindingLocator::get().isTargetInLineOfSight(m_position, *targetEntity, map))
 				{
-					m_targetEntity.set(opposingFaction.get().getController(), targetEntity->getID());
-					switchToState(eUnitState::AttackingTarget, map, targetEntity);
+					moveToAttackPosition(*targetEntity, opposingFaction, map, factionHandler);
 				}
 			}
 		}
@@ -295,7 +294,7 @@ void Unit::update(float deltaTime, FactionHandler& factionHandler, const Map& ma
 		}
 		break;
 	case eUnitState::AttackingTarget:
-		assert(m_targetEntity.getID() != Globals::INVALID_ENTITY_ID);
+		assert(m_targetEntity.getID() != Globals::INVALID_ENTITY_ID && m_pathToPosition.empty());
 		if (m_attackTimer.isExpired())
 		{
 			if (factionHandler.isFactionActive(m_targetEntity.getFactionController()))
@@ -349,7 +348,7 @@ void Unit::update(float deltaTime, FactionHandler& factionHandler, const Map& ma
 	}
 }
 
-void Unit::reduceHealth(const GameEvent_4& gameEvent, FactionHandler& factionHandler)
+void Unit::reduceHealth(const GameEvent_4& gameEvent, FactionHandler& factionHandler, const Map& map)
 {
 	Entity::reduceHealth(gameEvent);
 	
@@ -386,10 +385,14 @@ void Unit::reduceHealth(const GameEvent_4& gameEvent, FactionHandler& factionHan
 			changeTargetEntity = true;
 		}
 
-		if (changeTargetEntity)
+		if (changeTargetEntity && factionHandler.isFactionActive(gameEvent.senderFaction))
 		{
-			m_targetEntity.set(gameEvent.senderFaction, gameEvent.senderID);
-			m_currentState = eUnitState::AttackingTarget;
+			const Faction& opposingFaction = factionHandler.getFaction(gameEvent.senderFaction);
+			const Entity* targetEntity = opposingFaction.getEntity(gameEvent.senderID);
+			if (targetEntity)
+			{
+				moveToAttackPosition(*targetEntity, opposingFaction, map, factionHandler);
+			}	
 		}
 	}
 }
