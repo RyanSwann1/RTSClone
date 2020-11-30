@@ -206,6 +206,7 @@ void Unit::update(float deltaTime, FactionHandler& factionHandler, const Map& ma
 	switch (m_currentState)
 	{
 	case eUnitState::Idle:
+		//assert(m_targetEntity.getID() == Globals::INVALID_ENTITY_ID);
 		if (m_stateHandlerTimer.isExpired() && getEntityType() == eEntityType::Unit)
 		{
 			for (const auto& opposingFaction : factionHandler.getOpposingFactions(m_owningFaction.getController()))
@@ -219,8 +220,9 @@ void Unit::update(float deltaTime, FactionHandler& factionHandler, const Map& ma
 					}
 					else if(!Globals::UNIT_TYPES.isMatch(targetEntity->getEntityType()))
 					{
-						moveTo(targetEntity->getPosition(), map, [&](const glm::ivec2& position)
-							{ return getAdjacentPositions(position, map, m_owningFaction.getUnits(), *this); });
+						moveToAttackPosition(*targetEntity, opposingFaction.get(), map, factionHandler);
+						//moveTo(targetEntity->getPosition(), map, [&](const glm::ivec2& position)
+						//	{ return getAdjacentPositions(position, map, m_owningFaction.getUnits(), *this); });
 					}
 
 					m_targetEntity.set(opposingFaction.get().getController(), targetEntity->getID());
@@ -242,6 +244,9 @@ void Unit::update(float deltaTime, FactionHandler& factionHandler, const Map& ma
 			{
 				m_targetEntity.reset();
 			}
+
+			//ioasdiajsd
+			//aiohdjiasj
 
 			if (m_pathToPosition.empty())
 			{
@@ -316,7 +321,7 @@ void Unit::update(float deltaTime, FactionHandler& factionHandler, const Map& ma
 				}
 				else
 				{
-					if ((Globals::getSqrDistance(targetEntity->getPosition(), m_position) > UNIT_ATTACK_RANGE * UNIT_ATTACK_RANGE) ||
+					if (Globals::getSqrDistance(targetEntity->getPosition(), m_position) > UNIT_ATTACK_RANGE * UNIT_ATTACK_RANGE ||
 						!PathFindingLocator::get().isTargetInLineOfSight(m_position, *targetEntity, map))
 					{
 						moveToAttackPosition(*targetEntity, targetFaction, map, factionHandler);
@@ -324,8 +329,8 @@ void Unit::update(float deltaTime, FactionHandler& factionHandler, const Map& ma
 					else if (Globals::getSqrDistance(targetEntity->getPosition(), m_position) <= UNIT_ATTACK_RANGE * UNIT_ATTACK_RANGE)
 					{
 						m_rotation.y = Globals::getAngle(targetEntity->getPosition(), m_position);
-						GameEventHandler::getInstance().gameEvents.push({ eGameEventType::SpawnProjectile, m_owningFaction.getController(), getID(),
-							targetFaction.getController(), targetEntity->getID(), DAMAGE, m_position, targetEntity->getPosition() });
+						GameEventHandler::getInstance().gameEvents.push(GameEvent::createSpawnProjectile(m_owningFaction.getController(), getID(),
+							targetFaction.getController(), targetEntity->getID(), DAMAGE, m_position, targetEntity->getPosition()));
 					}
 				}
 			}
@@ -349,7 +354,7 @@ void Unit::update(float deltaTime, FactionHandler& factionHandler, const Map& ma
 	}
 }
 
-void Unit::reduceHealth(const GameEvent& gameEvent, FactionHandler& factionHandler)
+void Unit::reduceHealth(const GameEvent_4& gameEvent, FactionHandler& factionHandler)
 {
 	Entity::reduceHealth(gameEvent);
 	

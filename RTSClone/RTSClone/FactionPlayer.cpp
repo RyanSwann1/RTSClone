@@ -134,18 +134,18 @@ void FactionPlayer::handleEvent(const GameEvent& gameEvent, const Map& map, Fact
     switch (gameEvent.type)
     {
     case eGameEventType::PlayerActivatePlannedBuilding:
-        m_plannedBuilding.set(gameEvent);
+        m_plannedBuilding.set(gameEvent.data.playerActivatePlannedBuilding);
         break;
     case eGameEventType::PlayerSpawnUnit:
     {
-        int targetEntityID = gameEvent.targetID;
+        int targetEntityID = gameEvent.data.playerSpawnUnit.targetID;
         auto entity = std::find_if(m_allEntities.begin(), m_allEntities.end(), [targetEntityID](const auto& entity)
         {
             return entity->getID() == targetEntityID;
         });
         if (entity != m_allEntities.end())
         {
-            addUnitToSpawn(gameEvent.entityType, map, static_cast<UnitSpawnerBuilding&>(*(*entity)));
+            addUnitToSpawn(gameEvent.data.playerSpawnUnit.entityType, map, static_cast<UnitSpawnerBuilding&>(*(*entity)));
         }
     }
     break;
@@ -170,11 +170,11 @@ void FactionPlayer::updateSelectionBox()
 
         if (m_selectedUnits.size() == static_cast<size_t>(1))
         {
-            GameEventHandler::getInstance().gameEvents.push({ eGameEventType::SetTargetEntityGUI, getController(), m_selectedUnits.back()->getID() });
+            GameEventHandler::getInstance().gameEvents.push(GameEvent::createSetTargetEntityGUI(getController(), m_selectedUnits.back()->getID()));
         }
         else
         {
-            GameEventHandler::getInstance().gameEvents.push({ eGameEventType::ResetTargetEntityGUI });
+            GameEventHandler::getInstance().gameEvents.push(GameEvent::createResetTargetEntityGUI());
         }
     }
 }

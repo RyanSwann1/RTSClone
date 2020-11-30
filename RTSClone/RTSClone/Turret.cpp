@@ -71,8 +71,8 @@ void Turret::update(float deltaTime, FactionHandler& factionHandler, const Map& 
 				Globals::getSqrDistance(targetEntity->getPosition(), m_position) <= TURRET_ATTACK_RANGE * TURRET_ATTACK_RANGE &&
 				PathFindingLocator::get().isTargetInLineOfSight(m_position, *targetEntity, map, m_AABB))
 			{
-				GameEventHandler::getInstance().gameEvents.push({ eGameEventType::SpawnProjectile, m_owningFaction.getController(), getID(),
-					opposingFaction.getController(), targetEntity->getID(), TURRET_DAMAGE, m_position, targetEntity->getPosition() });
+				GameEventHandler::getInstance().gameEvents.push(GameEvent::createSpawnProjectile(m_owningFaction.getController(), getID(),
+					opposingFaction.getController(), targetEntity->getID(), TURRET_DAMAGE, m_position, targetEntity->getPosition()));
 
 				m_rotation.y = Globals::getAngle(targetEntity->getPosition(), m_position, 270.0f);
 			}

@@ -91,8 +91,8 @@ void FactionAI::handleEvent(const GameEvent& gameEvent, const Map& map, FactionH
 	{
 	case eGameEventType::TakeDamage:
 	{
-		assert(gameEvent.senderFaction != getController());
-		int targetID = gameEvent.targetID;
+		assert(gameEvent.data.takeDamage.senderFaction != getController());
+		int targetID = gameEvent.data.takeDamage.targetID;
 		auto entity = std::find_if(m_allEntities.begin(), m_allEntities.end(), [targetID](const auto& entity)
 		{
 			return entity->getID() == targetID;

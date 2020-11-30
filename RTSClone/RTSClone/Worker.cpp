@@ -60,7 +60,7 @@ Worker::Worker(const Faction& owningFaction, const glm::vec3 & startingPosition,
 
 Worker::~Worker()
 {
-	GameEventHandler::getInstance().gameEvents.push({ eGameEventType::RemoveAllWorkerPlannedBuildings, m_owningFaction.getController(), getID() });
+	GameEventHandler::getInstance().gameEvents.push(GameEvent::createRemoveAllWorkerPlannedBuildings(m_owningFaction.getController(), getID()));
 }
 
 const Timer& Worker::getBuildTimer() const
@@ -129,7 +129,7 @@ void Worker::update(float deltaTime, const UnitSpawnerBuilding& HQ, const Map& m
 		assert(isHoldingResources());
 		if (m_pathToPosition.empty())
 		{
-			GameEventHandler::getInstance().gameEvents.push({ eGameEventType::AddResources, m_owningFaction.getController(), getID() });
+			GameEventHandler::getInstance().gameEvents.push(GameEvent::createAddResources(m_owningFaction.getController(), getID()));
 			if (m_mineralToHarvest)
 			{
 				glm::vec3 destination = PathFindingLocator::get().getClosestPositionOutsideAABB(m_position,
@@ -191,11 +191,11 @@ void Worker::update(float deltaTime, const UnitSpawnerBuilding& HQ, const Map& m
 		m_buildingCommands.pop();
 		if (newBuilding)
 		{
-			GameEventHandler::getInstance().gameEvents.push({ eGameEventType::RemovePlannedBuilding, m_owningFaction.getController(), newBuilding->getPosition() });
+			GameEventHandler::getInstance().gameEvents.push(GameEvent::createRemovePlannedBuilding(m_owningFaction.getController(), newBuilding->getPosition()));
 		}
 		else
 		{
-			GameEventHandler::getInstance().gameEvents.push({ eGameEventType::RemoveAllWorkerPlannedBuildings, m_owningFaction.getController(), getID() });
+			GameEventHandler::getInstance().gameEvents.push(GameEvent::createRemoveAllWorkerPlannedBuildings(m_owningFaction.getController(), getID()));
 			clearBuildingCommands();
 		}
 
@@ -239,8 +239,8 @@ void Worker::update(float deltaTime, const UnitSpawnerBuilding& HQ, const Map& m
 			{
 				m_rotation.y = Globals::getAngle(targetEntity->getPosition(), m_position);
 				
-				GameEventHandler::getInstance().gameEvents.push(
-					{ eGameEventType::RepairEntity, m_owningFaction.getController(), m_repairTargetEntityID });
+				GameEventHandler::getInstance().gameEvents.push(GameEvent::createRepairEntity(
+					m_owningFaction.getController(), m_repairTargetEntityID));
 			}
 			else
 			{
@@ -262,7 +262,8 @@ void Worker::moveTo(const glm::vec3& destinationPosition, const Map& map, const 
 
 	if (state != eUnitState::MovingToBuildingPosition && !m_buildingCommands.empty())
 	{
-		GameEventHandler::getInstance().gameEvents.push({ eGameEventType::RemoveAllWorkerPlannedBuildings, m_owningFaction.getController(), getID() });
+		GameEventHandler::getInstance().gameEvents.push(GameEvent::createRemoveAllWorkerPlannedBuildings(
+			m_owningFaction.getController(), getID()));
 		m_buildTimer.resetElaspedTime();
 		clearBuildingCommands();
 	}

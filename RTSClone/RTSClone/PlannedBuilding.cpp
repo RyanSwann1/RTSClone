@@ -61,7 +61,7 @@ void PlannedBuilding::setPosition(const glm::vec3& newPosition, const Map& map)
     }
 }
 
-void PlannedBuilding::set(const GameEvent& gameEvent)
+void PlannedBuilding::set(const GameEvent_1& gameEvent)
 {
     assert(ALLOWED_ENTITY_TYPES.isMatch(gameEvent.entityType));
     m_active = true;

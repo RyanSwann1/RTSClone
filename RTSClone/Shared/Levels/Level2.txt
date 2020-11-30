@@ -1,0 +1,32 @@
+#Player
+portal.obj 0 0 0 24 0 258
+rocksOre.obj 0 0 0 66 0 246 0
+rocksOre.obj 0 0 0 66 0 252 1
+rocksOre.obj 0 0 0 66 0 258 2
+rocksOre.obj 0 0 0 66 0 264 3
+rocksOre.obj 0 0 0 66 0 270 4
+#PlayerAI_1
+portal.obj 0 0 0 24 0 18
+rocksOre.obj 0 0 0 66 0 6 0
+rocksOre.obj 0 0 0 66 0 12 1
+rocksOre.obj 0 0 0 66 0 18 2
+rocksOre.obj 0 0 0 66 0 24 3
+rocksOre.obj 0 0 0 66 0 30 4
+#Faction Starting Population
+5
+#Faction Starting Resources
+100
+#Map Size
+14 47
+#Scenery
+rocksTall.obj 0 0 0 66 0 108
+rocksTall.obj 0 0 0 24 0 174
+rocksTall.obj 0 0 0 60 0 192
+rocksTall.obj 0 0 0 36 0 78
+rocksTall.obj 0 0 0 6 0 114
+meteorHalf.obj 0 0 0 66 0 78
+meteorHalf.obj 0 0 0 60 0 156
+meteorHalf.obj 0 0 0 12 0 204
+alienBones.obj 0 0 0 36 0 138
+alienBones.obj 0 90 0 12 0 150
+alienBones.obj 0 90 0 42 0 108

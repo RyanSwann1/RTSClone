@@ -167,62 +167,6 @@ const Faction* Level::getWinningFaction() const
 	return winningFaction;
 }
 
-void Level::handleEvent(const GameEvent& gameEvent, const Map& map)
-{
-	switch (gameEvent.type)
-	{
-	case eGameEventType::TakeDamage:
-		if (isFactionActive(m_factions, gameEvent.targetFaction))
-		{
-			getFaction(m_factions, gameEvent.targetFaction).handleEvent(gameEvent, map, m_factionHandler);
-		}
-		break;
-	case eGameEventType::RemovePlannedBuilding:
-	case eGameEventType::RemoveAllWorkerPlannedBuildings:
-	case eGameEventType::AddResources:
-	case eGameEventType::RepairEntity:
-		if (isFactionActive(m_factions, gameEvent.senderFaction))
-		{
-			getFaction(m_factions, gameEvent.senderFaction).handleEvent(gameEvent, map, m_factionHandler);
-		}
-		break;
-	case eGameEventType::SpawnProjectile:
-		m_projectileHandler.addProjectile(gameEvent);
-		break;
-	case eGameEventType::RevalidateMovementPaths:
-		for(auto& faction : m_factions)
-		{
-			if (faction)
-			{
-				faction->handleEvent(gameEvent, map, m_factionHandler);
-			}
-		}
-		break;
-	case eGameEventType::EliminateFaction:
-		if (isFactionActive(m_factions, gameEvent.senderFaction))
-		{
-			m_factions[static_cast<int>(gameEvent.senderFaction)].reset();
-			setAITargetFaction();
-		}
-		break;
-	case eGameEventType::PlayerActivatePlannedBuilding:
-	case eGameEventType::PlayerSpawnUnit:
-		if (isFactionActive(m_factions, eFactionController::Player))
-		{
-			getFaction(m_factions, eFactionController::Player).handleEvent(gameEvent, map, m_factionHandler);
-		}
-		break;
-	case eGameEventType::SetTargetEntityGUI:
-		m_selectedTargetGUI.set(gameEvent.senderFaction, gameEvent.senderID);
-		break;
-	case eGameEventType::ResetTargetEntityGUI:
-		m_selectedTargetGUI.reset();
-		break;
-	default:
-		assert(false);
-	}
-}
-
 void Level::handleInput(const sf::Window& window, const Camera& camera, const sf::Event& currentSFMLEvent, const Map& map)
 {
 	if (ImGui::IsWindowHovered(ImGuiHoveredFlags_::ImGuiHoveredFlags_AnyWindow))
@@ -359,3 +303,76 @@ void Level::renderPathing(ShaderHandler& shaderHandler)
 	}
 }
 #endif // RENDER_PATHING
+
+void Level::handleEvent(const GameEvent& gameEvent, const Map& map)
+{
+	switch (gameEvent.type)
+	{
+	case eGameEventType::TakeDamage:
+		if (isFactionActive(m_factions, gameEvent.data.takeDamage.targetFaction))
+		{
+			getFaction(m_factions, gameEvent.data.takeDamage.targetFaction).handleEvent(gameEvent, map, m_factionHandler);
+		}
+		break;
+	case eGameEventType::RemovePlannedBuilding:
+		if (isFactionActive(m_factions, gameEvent.data.removePlannedBuilding.senderFaction))
+		{
+			getFaction(m_factions, gameEvent.data.removePlannedBuilding.senderFaction).
+				handleEvent(gameEvent, map, m_factionHandler);
+		}
+		break;
+	case eGameEventType::RemoveAllWorkerPlannedBuildings:
+		if (isFactionActive(m_factions, gameEvent.data.removeAllWorkerPlannedBuilding.senderFaction))
+		{
+			getFaction(m_factions, gameEvent.data.removeAllWorkerPlannedBuilding.senderFaction).handleEvent(gameEvent, map, m_factionHandler);
+		}
+		break;
+	case eGameEventType::AddResources:
+		if (isFactionActive(m_factions, gameEvent.data.addResources.senderFaction))
+		{
+			getFaction(m_factions, gameEvent.data.addResources.senderFaction).handleEvent(gameEvent, map, m_factionHandler);
+		}
+		break;
+	case eGameEventType::RepairEntity:
+		if (isFactionActive(m_factions, gameEvent.data.repairEntity.senderFaction))
+		{
+			getFaction(m_factions, gameEvent.data.repairEntity.senderFaction).handleEvent(gameEvent, map, m_factionHandler);
+		}
+		break;
+	case eGameEventType::SpawnProjectile:
+		m_projectileHandler.addProjectile(gameEvent);
+		break;
+	case eGameEventType::RevalidateMovementPaths:
+		for (auto& faction : m_factions)
+		{
+			if (faction)
+			{
+				faction->handleEvent(gameEvent, map, m_factionHandler);
+			}
+		}
+		break;
+	case eGameEventType::EliminateFaction:
+		if (isFactionActive(m_factions, gameEvent.data.eliminateFaction.senderFaction))
+		{
+			m_factions[static_cast<int>(gameEvent.data.eliminateFaction.senderFaction)].reset();
+			setAITargetFaction();
+		}
+		break;
+	case eGameEventType::PlayerActivatePlannedBuilding:
+	case eGameEventType::PlayerSpawnUnit:
+		if (isFactionActive(m_factions, eFactionController::Player))
+		{
+			getFaction(m_factions, eFactionController::Player).handleEvent(gameEvent, map, m_factionHandler);
+		}
+		break;
+	case eGameEventType::SetTargetEntityGUI:
+		m_selectedTargetGUI.set(gameEvent.data.setTargetEntityGUI.senderFaction, 
+			gameEvent.data.setTargetEntityGUI.senderID);
+		break;
+	case eGameEventType::ResetTargetEntityGUI:
+		m_selectedTargetGUI.reset();
+		break;
+	default:
+		assert(false);
+	}
+}

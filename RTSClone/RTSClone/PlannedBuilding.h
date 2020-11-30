@@ -5,7 +5,7 @@
 
 enum class eFactionController;
 class Map;
-struct GameEvent;
+struct GameEvent_1;
 class ShaderHandler;
 class PlannedBuilding
 {
@@ -20,7 +20,7 @@ public:
 
 	void setActive(bool active);
 	void setPosition(const glm::vec3& newPosition, const Map& map);
-	void set(const GameEvent& gameEvent);
+	void set(const GameEvent_1& gameEvent);
 	void render(ShaderHandler& shaderHandler, eFactionController owningFactionController) const;
 
 private:

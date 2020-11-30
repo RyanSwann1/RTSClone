@@ -95,13 +95,15 @@ void SelectedEntityWidget::render(const sf::Window& window)
 				case eEntityType::HQ:
 					if (ImGui::Button("Spawn Worker"))
 					{
-						GameEventHandler::getInstance().gameEvents.push({ eGameEventType::PlayerSpawnUnit, eEntityType::Worker, m_receivedMessage.entityID });
+						GameEventHandler::getInstance().gameEvents.push(GameEvent::createPlayerSpawnUnit(
+							eEntityType::Worker, m_receivedMessage.entityID));
 					}
 					break;
 				case eEntityType::Barracks:
 					if (ImGui::Button("Spawn Unit"))
 					{
-						GameEventHandler::getInstance().gameEvents.push({ eGameEventType::PlayerSpawnUnit, eEntityType::Unit, m_receivedMessage.entityID });
+						GameEventHandler::getInstance().gameEvents.push(GameEvent::createPlayerSpawnUnit(
+							eEntityType::Unit, m_receivedMessage.entityID));
 					}
 					break;
 				default:
@@ -126,20 +128,20 @@ void SelectedEntityWidget::render(const sf::Window& window)
 
 				if (ImGui::Button("Barracks"))
 				{
-					GameEventHandler::getInstance().gameEvents.push(
-						{ eGameEventType::PlayerActivatePlannedBuilding, eEntityType::Barracks, m_receivedMessage.entityID });
+					GameEventHandler::getInstance().gameEvents.push(GameEvent::createPlayerActivatePlannedBuilding(
+						eEntityType::Barracks, m_receivedMessage.entityID));
 				}
 
 				if (ImGui::Button("Supply Depot"))
 				{
-					GameEventHandler::getInstance().gameEvents.push(
-						{ eGameEventType::PlayerActivatePlannedBuilding, eEntityType::SupplyDepot, m_receivedMessage.entityID });
+					GameEventHandler::getInstance().gameEvents.push(GameEvent::createPlayerActivatePlannedBuilding(
+						eEntityType::SupplyDepot, m_receivedMessage.entityID ));
 				}
 
 				if (ImGui::Button("Turret"))
 				{
-					GameEventHandler::getInstance().gameEvents.push(
-						{ eGameEventType::PlayerActivatePlannedBuilding, eEntityType::Turret, m_receivedMessage.entityID });
+					GameEventHandler::getInstance().gameEvents.push(GameEvent::createPlayerActivatePlannedBuilding(
+						eEntityType::Turret, m_receivedMessage.entityID));
 				}
 			}
 		}

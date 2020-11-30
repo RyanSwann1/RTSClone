@@ -196,11 +196,6 @@ namespace Globals
 		return currentPosition + glm::vec3(targetPosition - currentPosition) / magnitude * maxDistanceDelta;
 	}
 
-	inline bool isEntityIDValid(int entityID)
-	{
-		return entityID != Globals::INVALID_ENTITY_ID;
-	}
-
 	inline int getRandomNumber(int min, int max)
 	{
 		static std::random_device rd;  //Will be used to obtain a seed for the random number engine

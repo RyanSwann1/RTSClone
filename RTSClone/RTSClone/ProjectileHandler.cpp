@@ -9,7 +9,7 @@ ProjectileHandler::ProjectileHandler()
 
 void ProjectileHandler::addProjectile(const GameEvent& gameEvent)
 {
-	m_projectiles.emplace_back(gameEvent);
+	m_projectiles.emplace_back(gameEvent.data.spawnProjectile);
 }
 
 void ProjectileHandler::update(float deltaTime, const FactionHandler& factionHandler)
@@ -29,9 +29,9 @@ void ProjectileHandler::update(float deltaTime, const FactionHandler& factionHan
 		{
 			if (projectileCollision)
 			{
-				GameEventHandler::getInstance().gameEvents.push({ eGameEventType::TakeDamage, projectile->getSenderEvent().senderFaction,
-					projectile->getID(), projectile->getSenderEvent().targetFaction, 
-					projectile->getSenderEvent().targetID, projectile->getSenderEvent().damage });
+				GameEventHandler::getInstance().gameEvents.push(GameEvent::createTakeDamage(projectile->getSenderEvent().senderFaction,
+					projectile->getID(), projectile->getSenderEvent().targetFaction,
+					projectile->getSenderEvent().targetID, projectile->getSenderEvent().damage));
 			}
 
 			projectile = m_projectiles.erase(projectile);

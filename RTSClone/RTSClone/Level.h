@@ -30,6 +30,7 @@ public:
 	void renderSelectionBox(const sf::Window& window) const;
 	void renderPlannedBuildings(ShaderHandler& shaderHandler) const;
 	void render(ShaderHandler& shaderHandler) const;
+
 #ifdef RENDER_AABB
 	void renderAABB(ShaderHandler& shaderHandler);
 #endif // RENDER_AABB

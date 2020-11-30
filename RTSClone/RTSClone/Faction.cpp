@@ -178,8 +178,8 @@ void Faction::handleEvent(const GameEvent& gameEvent, const Map& map, FactionHan
     {
     case eGameEventType::TakeDamage:
     {
-        assert(gameEvent.senderFaction != m_controller);
-        int targetID = gameEvent.targetID;
+        assert(gameEvent.data.takeDamage.senderFaction != m_controller);
+        int targetID = gameEvent.data.takeDamage.targetID;
         auto entity = std::find_if(m_allEntities.begin(), m_allEntities.end(), [targetID](const auto& entity)
         {
             return entity->getID() == targetID;
@@ -190,42 +190,42 @@ void Faction::handleEvent(const GameEvent& gameEvent, const Map& map, FactionHan
             switch ((*entity)->getEntityType())
             {
             case eEntityType::Worker:
-                (*entity)->reduceHealth(gameEvent);
+                (*entity)->reduceHealth(gameEvent.data.takeDamage);
                 if ((*entity)->isDead())
                 {
                     removeEntity<Worker>(m_workers, targetID, entity);
                 }
                 break;
             case eEntityType::Unit:
-                static_cast<Unit&>(*(*entity)).reduceHealth(gameEvent, factionHandler);
+                static_cast<Unit&>(*(*entity)).reduceHealth(gameEvent.data.takeDamage, factionHandler);
                 if ((*entity)->isDead())
                 {
                     removeEntity<Unit>(m_units, targetID, entity);
                 }
                 break;
             case eEntityType::SupplyDepot:
-                (*entity)->reduceHealth(gameEvent);
+                (*entity)->reduceHealth(gameEvent.data.takeDamage);
                 if ((*entity)->isDead())
                 {
                     removeEntity<SupplyDepot>(m_supplyDepots, targetID, entity);
                 }
                 break;
             case eEntityType::Barracks:
-                (*entity)->reduceHealth(gameEvent);
+                (*entity)->reduceHealth(gameEvent.data.takeDamage);
                 if ((*entity)->isDead())
                 {
                     removeEntity<Barracks>(m_barracks, targetID, entity);
                 }
                 break;
             case eEntityType::HQ:
-                (*entity)->reduceHealth(gameEvent);
+                (*entity)->reduceHealth(gameEvent.data.takeDamage);
                 if ((*entity)->isDead())
                 {
-                    GameEventHandler::getInstance().gameEvents.push({ eGameEventType::EliminateFaction, m_controller });
+                    GameEventHandler::getInstance().gameEvents.push(GameEvent::createEliminateFaction(m_controller));
                 }
                 break;
             case eEntityType::Turret:
-                (*entity)->reduceHealth(gameEvent);
+                (*entity)->reduceHealth(gameEvent.data.takeDamage);
                 if ((*entity)->isDead())
                 {
                     removeEntity<Turret>(m_turrets, targetID, entity);
@@ -239,8 +239,8 @@ void Faction::handleEvent(const GameEvent& gameEvent, const Map& map, FactionHan
         break;
     case eGameEventType::RemovePlannedBuilding:
     {
-        assert(gameEvent.senderFaction == m_controller);
-        const glm::vec3& buildingPosition = gameEvent.startingPosition;
+        assert(gameEvent.data.removePlannedBuilding.senderFaction == m_controller);
+        const glm::vec3& buildingPosition = gameEvent.data.removePlannedBuilding.position;
         auto buildingToSpawn = std::find_if(m_plannedBuildings.begin(), m_plannedBuildings.end(), [&buildingPosition](const auto& buildingToSpawn)
         {
             return buildingToSpawn.getPosition() == buildingPosition;
@@ -253,7 +253,7 @@ void Faction::handleEvent(const GameEvent& gameEvent, const Map& map, FactionHan
     case eGameEventType::RemoveAllWorkerPlannedBuildings:
         for (auto plannedBuilding = m_plannedBuildings.begin(); plannedBuilding != m_plannedBuildings.end();)
         {
-            if (plannedBuilding->getWorkerID() == gameEvent.senderID)
+            if (plannedBuilding->getWorkerID() == gameEvent.data.removeAllWorkerPlannedBuilding.senderID)
             {
                 plannedBuilding = m_plannedBuildings.erase(plannedBuilding);
             }
@@ -265,7 +265,7 @@ void Faction::handleEvent(const GameEvent& gameEvent, const Map& map, FactionHan
         break;
     case eGameEventType::AddResources:
     {
-        int workerID = gameEvent.senderID;
+        int workerID = gameEvent.data.addResources.senderID;
         auto worker = std::find_if(m_workers.begin(), m_workers.end(), [workerID](const auto& worker)
         {
             return worker.getID() == workerID;
@@ -281,7 +281,7 @@ void Faction::handleEvent(const GameEvent& gameEvent, const Map& map, FactionHan
         break;
     case eGameEventType::RepairEntity:
     {
-        int entityID = gameEvent.senderID;
+        int entityID = gameEvent.data.repairEntity.senderID;
         auto entity = std::find_if(m_allEntities.begin(), m_allEntities.end(), [entityID](const auto& entity)
         {
             return entity->getID() == entityID;
@@ -480,7 +480,7 @@ const Entity* Faction::spawnBuilding(const Map& map, glm::vec3 position, eEntity
         {
             reduceResources(entityType);
             m_allEntities.push_back(addedBuilding);
-            GameEventHandler::getInstance().gameEvents.push({ eGameEventType::RevalidateMovementPaths });
+            GameEventHandler::getInstance().gameEvents.push(GameEvent::createRevalidateMovementPaths());
 
             return addedBuilding;
         }
