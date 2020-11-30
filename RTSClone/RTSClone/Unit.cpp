@@ -221,8 +221,6 @@ void Unit::update(float deltaTime, FactionHandler& factionHandler, const Map& ma
 					else if(!Globals::UNIT_TYPES.isMatch(targetEntity->getEntityType()))
 					{
 						moveToAttackPosition(*targetEntity, opposingFaction.get(), map, factionHandler);
-						//moveTo(targetEntity->getPosition(), map, [&](const glm::ivec2& position)
-						//	{ return getAdjacentPositions(position, map, m_owningFaction.getUnits(), *this); });
 					}
 
 					m_targetEntity.set(opposingFaction.get().getController(), targetEntity->getID());
@@ -245,15 +243,12 @@ void Unit::update(float deltaTime, FactionHandler& factionHandler, const Map& ma
 				m_targetEntity.reset();
 			}
 
-			//ioasdiajsd
-			//aiohdjiasj
-
 			if (m_pathToPosition.empty())
 			{
 				switchToState(eUnitState::AttackingTarget, map);
 			}
 		}
-		if (m_pathToPosition.empty())
+		else if (m_pathToPosition.empty())
 		{
 			switchToState(eUnitState::Idle, map);
 		}
@@ -409,7 +404,6 @@ void Unit::switchToState(eUnitState newState, const Map& map, const Entity* targ
 	case eUnitState::MovingToBuildingPosition:
 	case eUnitState::MovingToRepairPosition:
 	case eUnitState::Building:
-	case eUnitState::Moving:
 	case eUnitState::Harvesting:
 	case eUnitState::Repairing:
 	case eUnitState::AttackMoving:
@@ -424,6 +418,7 @@ void Unit::switchToState(eUnitState newState, const Map& map, const Entity* targ
 		break;
 
 	case eUnitState::SetAttackPosition:
+	case eUnitState::Moving:
 		break;
 	default:
 		assert(false);
