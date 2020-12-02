@@ -88,8 +88,8 @@ public:
 	bool isPositionAvailable(const glm::vec3& nodePosition, const Map& map, const std::list<Unit>& units, const std::list<Worker>& workers, 
 		int senderID = Globals::INVALID_ENTITY_ID) const;
 
-	bool isTargetInLineOfSight(const glm::vec3& entityPosition, const Entity& targetEntity, const Map& map) const;
-	bool isTargetInLineOfSight(const glm::vec3& entityPosition, const Entity& targetEntity, const Map& map, const AABB& senderAABB) const;
+	bool isTargetInLineOfSight(const glm::vec3& startingPosition, const Entity& targetEntity, const Map& map) const;
+	bool isTargetInLineOfSight(const glm::vec3& startingPosition, const Entity& targetEntity, const Map& map, const AABB& senderAABB) const;
 
 	const std::vector<glm::vec3>& getFormationPositions(const glm::vec3& startingPosition, const std::vector<Unit*>& selectedUnits,
 		const Map& map);

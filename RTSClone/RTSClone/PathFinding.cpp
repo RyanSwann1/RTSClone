@@ -162,31 +162,6 @@ namespace
 			std::reverse(pathToPosition.begin(), pathToPosition.end());
 		}
 	}
-
-	bool isPositionInLineOfSight(const glm::ivec2& nodePosition, const Entity& targetEntity, const Map& map)
-	{
-		glm::ivec2 targetPositionOnGrid = Globals::convertToGridPosition(targetEntity.getPosition());
-		glm::vec2 direction = glm::normalize(glm::vec2(targetPositionOnGrid) - glm::vec2(nodePosition));
-		constexpr float step = 0.5f;
-		float distance = glm::distance(glm::vec2(targetPositionOnGrid), glm::vec2(nodePosition));
-		bool targetEntityVisible = true;
-
-		for (int i = 0; i < std::ceil(distance / step); ++i)
-		{
-			glm::vec2 position = glm::vec2(nodePosition) + direction * static_cast<float>(i);
-			if (targetEntity.getAABB().contains(Globals::convertToWorldPosition(position)))
-			{
-				break;
-			}
-			else if (map.isPositionOccupied(position))
-			{
-				targetEntityVisible = false;
-				break;
-			}
-		}
-
-		return targetEntityVisible;
-	}
 }
 
 PathFinding::PathFinding()
@@ -315,16 +290,16 @@ bool PathFinding::isPositionAvailable(const glm::vec3& nodePosition, const Map& 
 	return false;
 }
 
-bool PathFinding::isTargetInLineOfSight(const glm::vec3& entityPosition, const Entity& targetEntity, const Map& map) const
+bool PathFinding::isTargetInLineOfSight(const glm::vec3& startingPosition, const Entity& targetEntity, const Map& map) const
 {
-	glm::vec3 direction = glm::normalize(targetEntity.getPosition() - entityPosition);
+	glm::vec3 direction = glm::normalize(targetEntity.getPosition() - startingPosition);
 	constexpr float step = 0.5f;
-	float distance = glm::distance(targetEntity.getPosition(), entityPosition);
+	float distance = glm::distance(targetEntity.getPosition(), startingPosition);
 	bool targetEntityVisible = true;
 
 	for (int i = 1; i < std::ceil(distance / step); ++i)
 	{
-		glm::vec3 position = entityPosition + direction * static_cast<float>(i);
+		glm::vec3 position = startingPosition + direction * static_cast<float>(i);
 		if (targetEntity.getAABB().contains(position))
 		{
 			break;
@@ -339,16 +314,16 @@ bool PathFinding::isTargetInLineOfSight(const glm::vec3& entityPosition, const E
 	return targetEntityVisible;
 }
 
-bool PathFinding::isTargetInLineOfSight(const glm::vec3& entityPosition, const Entity& targetEntity, const Map& map, const AABB& senderAABB) const
+bool PathFinding::isTargetInLineOfSight(const glm::vec3& startingPosition, const Entity& targetEntity, const Map& map, const AABB& senderAABB) const
 {
-	glm::vec3 direction = glm::normalize(targetEntity.getPosition() - entityPosition);
+	glm::vec3 direction = glm::normalize(targetEntity.getPosition() - startingPosition);
 	constexpr float step = 0.5f;
-	float distance = glm::distance(targetEntity.getPosition(), entityPosition);
+	float distance = glm::distance(targetEntity.getPosition(), startingPosition);
 	bool targetEntityVisible = true;
 
 	for (int i = 1; i < std::ceil(distance / step); ++i)
 	{
-		glm::vec3 position = entityPosition + direction * static_cast<float>(i);
+		glm::vec3 position = startingPosition + direction * static_cast<float>(i);
 		if (targetEntity.getAABB().contains(position))
 		{
 			break;
@@ -549,7 +524,7 @@ bool PathFinding::setUnitAttackPosition(const Unit& unit, const Entity& targetEn
 
 		if (Globals::getSqrDistance(glm::vec2(targetPositionOnGrid), glm::vec2(currentNode.position)) <=
 			unit.getGridAttackRange() * unit.getGridAttackRange() && 
-			isPositionInLineOfSight(currentNode.position, targetEntity, map))
+			isTargetInLineOfSight(Globals::convertToWorldPosition(currentNode.position), targetEntity, map))
 		{
 			positionFound = true;
 			if(Globals::convertToWorldPosition(currentNode.position) != unit.getPosition())
