@@ -24,8 +24,8 @@ struct GameEvent_0
 {
 	GameEvent_0() {}
 };
-using RevalidateMovementPathsEvent = GameEvent_0;
-using ResetTargetEntityGUIEvent = GameEvent_0;
+struct RevalidateMovementPathsEvent : public GameEvent_0 { };
+struct ResetTargetEntityGUIEvent : public GameEvent_0 { };
 
 struct GameEvent_1
 {
@@ -34,8 +34,15 @@ struct GameEvent_1
 	eEntityType entityType;
 	int targetID;
 };
-using PlayerSpawnUnitEvent = GameEvent_1;
-using PlayerActivatePlannedBuildingEvent = GameEvent_1;
+
+struct PlayerSpawnUnitEvent : public GameEvent_1 {
+	PlayerSpawnUnitEvent(eEntityType entityType, int targetID) :
+		GameEvent_1(entityType, targetID) {}
+};
+struct PlayerActivatePlannedBuildingEvent : public GameEvent_1 {
+	PlayerActivatePlannedBuildingEvent(eEntityType entityType, int targetID) :
+		GameEvent_1(entityType, targetID) {}
+};
 
 struct GameEvent_2
 {
@@ -43,7 +50,10 @@ struct GameEvent_2
 
 	eFactionController factionController;
 };
-using EliminateFactionEvent = GameEvent_2;
+struct EliminateFactionEvent : public GameEvent_2 {
+	EliminateFactionEvent(eFactionController factionController) :
+		GameEvent_2(factionController) {}
+};
 
 struct GameEvent_3
 {
@@ -52,10 +62,22 @@ struct GameEvent_3
 	eFactionController factionController;
 	int entityID;
 };
-using RemoveAllWorkerPlannedBuildingsEvent = GameEvent_3;
-using AddResourcesEvent = GameEvent_3;
-using RepairEntityEvent = GameEvent_3;
-using SetTargetEntityGUIEvent = GameEvent_3;
+struct RemoveAllWorkerPlannedBuildingsEvent : public GameEvent_3 {
+	RemoveAllWorkerPlannedBuildingsEvent(eFactionController factionController, int senderID) :
+		GameEvent_3(factionController, senderID) {}
+};
+struct AddResourcesEvent : public GameEvent_3 {
+	AddResourcesEvent(eFactionController factionController, int senderID) :
+		GameEvent_3(factionController, senderID) {}
+};
+struct RepairEntityEvent : public GameEvent_3 {
+	RepairEntityEvent(eFactionController factionController, int senderID) :
+		GameEvent_3(factionController, senderID) {}
+};
+struct SetTargetEntityGUIEvent : public GameEvent_3 {
+	SetTargetEntityGUIEvent(eFactionController factionController, int senderID) :
+		GameEvent_3(factionController, senderID) {}
+};
 
 struct GameEvent_4
 {
@@ -68,7 +90,10 @@ struct GameEvent_4
 	int targetID;
 	int damage;
 };
-using TakeDamageEvent = GameEvent_4;
+struct TakeDamageEvent : public GameEvent_4 {
+	TakeDamageEvent(eFactionController senderFaction, int senderID, eFactionController targetFaction,
+		int targetID, int damage) : GameEvent_4(senderFaction, senderID, targetFaction, targetID, damage) {}
+};
 
 struct GameEvent_5
 {
@@ -83,7 +108,11 @@ struct GameEvent_5
 	glm::vec3 spawnPosition;
 	glm::vec3 destination;
 };
-using SpawnProjectileEvent = GameEvent_5;
+struct SpawnProjectileEvent : public GameEvent_5 {
+	SpawnProjectileEvent(eFactionController senderFaction, int senderID, eFactionController targetFaction,
+		int targetID, int damage, const glm::vec3& startingPosition, const glm::vec3& endingPosition)
+		: GameEvent_5(senderFaction, senderID, targetFaction, targetID, damage, startingPosition, endingPosition) {}
+};
 
 struct GameEvent_6
 {
@@ -92,7 +121,10 @@ struct GameEvent_6
 	eFactionController factionController;
 	glm::vec3 position;
 };
-using RemovePlannedBuildingEvent = GameEvent_6;
+struct RemovePlannedBuildingEvent : public GameEvent_6 {
+	RemovePlannedBuildingEvent(eFactionController factionController, const glm::vec3& position)
+		: GameEvent_6(factionController, position) {}
+};
 
 union GameEvents
 {
@@ -109,27 +141,18 @@ union GameEvents
 	SpawnProjectileEvent					spawnProjectile;
 	RemovePlannedBuildingEvent				removePlannedBuilding;
 
-	GameEvents(GameEvent_0 gameEvent)
-	{
-		revalidateMovementPaths = gameEvent;
-		resetTargetEntityGUI = gameEvent;
-	}
-	GameEvents(GameEvent_1 gameEvent)
-	{
-		playerSpawnUnit = gameEvent;
-		playerActivatePlannedBuilding = gameEvent;
-	}
-	GameEvents(GameEvent_2 gameEvent) : eliminateFaction(gameEvent) {}
-	GameEvents(GameEvent_3 gameEvent)
-	{
-		removeAllWorkerPlannedBuilding = gameEvent;
-		addResources = gameEvent;
-		repairEntity = gameEvent;
-		setTargetEntityGUI = gameEvent;
-	}
-	GameEvents(const GameEvent_4& gameEvent) : takeDamage(gameEvent) {}
-	GameEvents(const GameEvent_5& gameEvent) : spawnProjectile(gameEvent) {}
-	GameEvents(const GameEvent_6& gameEvent) : removePlannedBuilding(gameEvent) {}
+	GameEvents(RevalidateMovementPathsEvent gameEvent) :			revalidateMovementPaths(gameEvent) {}
+	GameEvents(ResetTargetEntityGUIEvent gameEvent) :				resetTargetEntityGUI(gameEvent) {}
+	GameEvents(PlayerSpawnUnitEvent gameEvent) :					playerSpawnUnit(gameEvent) {}
+	GameEvents(PlayerActivatePlannedBuildingEvent gameEvent) :		playerActivatePlannedBuilding(gameEvent) {}
+	GameEvents(EliminateFactionEvent gameEvent) :					eliminateFaction(gameEvent) {}
+	GameEvents(RemoveAllWorkerPlannedBuildingsEvent gameEvent) :	removeAllWorkerPlannedBuilding(gameEvent) {}
+	GameEvents(AddResourcesEvent gameEvent) :						addResources(gameEvent) {}
+	GameEvents(RepairEntityEvent gameEvent) :						repairEntity(gameEvent) {}
+	GameEvents(SetTargetEntityGUIEvent gameEvent) :					setTargetEntityGUI(gameEvent) {}
+	GameEvents(const TakeDamageEvent& gameEvent) :					takeDamage(gameEvent) {}
+	GameEvents(const SpawnProjectileEvent& gameEvent) :				spawnProjectile(gameEvent) {}
+	GameEvents(const RemovePlannedBuildingEvent& gameEvent) :		removePlannedBuilding(gameEvent) {}
 };
 
 struct GameEvent
