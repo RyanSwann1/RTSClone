@@ -64,10 +64,10 @@ namespace
 	}
 
 	void getPathFromClosedQueue(std::vector<glm::vec3>& pathToPosition, const glm::ivec2& startingPositionOnGrid,
-		const PriorityQueueNode& initialNode, const PriorityQueue& closedQueue, const Map& map)
+		const PriorityQueueNode& startingNode, const PriorityQueue& closedQueue, const Map& map)
 	{
-		pathToPosition.push_back(Globals::convertToWorldPosition(initialNode.position));
-		glm::ivec2 parentPosition = initialNode.parentPosition;
+		pathToPosition.push_back(Globals::convertToWorldPosition(startingNode.position));
+		glm::ivec2 parentPosition = startingNode.parentPosition;
 
 		while (parentPosition != startingPositionOnGrid)
 		{
@@ -80,10 +80,10 @@ namespace
 	}
 
 	void getPathFromClosedQueue(std::vector<glm::vec3>& pathToPosition, const glm::ivec2& startingPositionOnGrid,
-		const glm::ivec2& initialPathPosition, const PriorityQueue& closedQueue, const Map& map)
+		const glm::ivec2 startingPosition, const PriorityQueue& closedQueue, const Map& map)
 	{
-		pathToPosition.push_back(Globals::convertToWorldPosition(initialPathPosition));
-		glm::ivec2 parentPosition = closedQueue.getNode(initialPathPosition).parentPosition;
+		pathToPosition.push_back(Globals::convertToWorldPosition(startingPosition));
+		glm::ivec2 parentPosition = closedQueue.getNode(startingPosition).parentPosition;
 
 		while (parentPosition != startingPositionOnGrid)
 		{
@@ -527,7 +527,7 @@ glm::vec3 PathFinding::getClosestPositionFromUnitToTarget(const Unit& unit, cons
 	return destination;
 }
 
-void PathFinding::setUnitAttackPosition(const Unit& unit, const Entity& targetEntity, std::vector<glm::vec3>& pathToPosition,
+bool PathFinding::setUnitAttackPosition(const Unit& unit, const Entity& targetEntity, std::vector<glm::vec3>& pathToPosition,
 	const Map& map, const std::list<Unit>& units, FactionHandler& factionHandler)
 {
 	assert(unit.getID() != targetEntity.getID());
@@ -547,11 +547,15 @@ void PathFinding::setUnitAttackPosition(const Unit& unit, const Entity& targetEn
 		PriorityQueueNode currentNode = m_openQueue.getTop();
 		m_openQueue.popTop();
 
-		if (glm::distance(glm::vec2(targetPositionOnGrid), glm::vec2(currentNode.position)) < unit.getGridAttackRange() && 
+		if (Globals::getSqrDistance(glm::vec2(targetPositionOnGrid), glm::vec2(currentNode.position)) <=
+			unit.getGridAttackRange() * unit.getGridAttackRange() && 
 			isPositionInLineOfSight(currentNode.position, targetEntity, map))
 		{
 			positionFound = true;
-			getPathFromClosedQueue(pathToPosition, startingPositionOnGrid, currentNode, m_closedQueue, map);
+			if(Globals::convertToWorldPosition(currentNode.position) != unit.getPosition())
+			{
+				getPathFromClosedQueue(pathToPosition, startingPositionOnGrid, currentNode, m_closedQueue, map);
+			}
 		}
 		else
 		{
@@ -587,6 +591,8 @@ void PathFinding::setUnitAttackPosition(const Unit& unit, const Entity& targetEn
 	}
 
 	convertPathToWaypoints(pathToPosition, unit, units, map);
+	
+	return positionFound;
 }
 
 void PathFinding::getPathToPosition(const Unit& unit, const glm::vec3& destination, std::vector<glm::vec3>& pathToPosition, 
