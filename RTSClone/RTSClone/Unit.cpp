@@ -150,6 +150,11 @@ void Unit::moveToAttackPosition(const Entity& targetEntity, const Faction& targe
 			m_pathToPosition.push_back(closestDestination);
 			switchToState(eUnitState::Moving, map);
 		}
+		else
+		{
+			assert(PathFindingLocator::get().isTargetInLineOfSight(m_position, targetEntity, map));
+			switchToState(eUnitState::AttackingTarget, map);
+		}
 	}
 	else
 	{
@@ -228,30 +233,25 @@ void Unit::update(float deltaTime, FactionHandler& factionHandler, const Map& ma
 	switch (m_currentState)
 	{
 	case eUnitState::Idle:
-		//assert(m_targetEntity.getID() == Globals::INVALID_ENTITY_ID); 
-		if (m_stateHandlerTimer.isExpired() && getEntityType() == eEntityType::Unit)
+		assert(m_targetEntity.getID() == Globals::INVALID_ENTITY_ID);
+		if (m_stateHandlerTimer.isExpired())
 		{
-			for (const auto& opposingFaction : factionHandler.getOpposingFactions(m_owningFaction.getController()))
+			switch (getEntityType())
 			{
-				const Entity* targetEntity = opposingFaction.get().getEntity(m_position, UNIT_ATTACK_RANGE);
-				if (targetEntity)
+			case eEntityType::Unit:
+				for (const auto& opposingFaction : factionHandler.getOpposingFactions(m_owningFaction.getController()))
 				{
-					if (PathFindingLocator::get().isTargetInLineOfSight(m_position, *targetEntity, map))
+					const Entity* targetEntity = opposingFaction.get().getEntity(m_position, UNIT_ATTACK_RANGE, true);
+					if (targetEntity)
 					{
-						switchToState(eUnitState::AttackingTarget, map);
+						moveToAttackPosition(*targetEntity, opposingFaction, map, factionHandler);
 					}
-					else if(!Globals::UNIT_TYPES.isMatch(targetEntity->getEntityType()))
-					{
-						moveToAttackPosition(*targetEntity, opposingFaction.get(), map, factionHandler);
-					}
-
-					m_targetEntity.set(opposingFaction.get().getController(), targetEntity->getID());
-					break;
 				}
-				else
-				{
-					m_targetEntity.reset();
-				}
+				break;
+			case eEntityType::Worker:
+				break;
+			default:
+				assert(false);
 			}
 		}
 		break;
@@ -276,7 +276,7 @@ void Unit::update(float deltaTime, FactionHandler& factionHandler, const Map& ma
 		}
 		break;
 	case eUnitState::AttackMoving:
-		//assert(m_targetEntity.getID() == Globals::INVALID_ENTITY_ID);
+		assert(m_targetEntity.getID() == Globals::INVALID_ENTITY_ID);
 		if (m_stateHandlerTimer.isExpired())
 		{
 			for (const auto& opposingFaction : factionHandler.getOpposingFactions(m_owningFaction.getController()))
