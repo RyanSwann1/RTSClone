@@ -635,8 +635,11 @@ void PathFinding::getPathToPosition(const Unit& unit, const glm::vec3& destinati
 				assert(false);
 			}
 
-			getPathFromClosedQueue(pathToPosition, startingPositionOnGrid, currentNode, m_closedQueue, map);
 			destinationReached = true;
+			if (Globals::convertToWorldPosition(currentNode.position) != unit.getPosition())
+			{
+				getPathFromClosedQueue(pathToPosition, startingPositionOnGrid, currentNode, m_closedQueue, map);
+			}
 		}
 		else
 		{
