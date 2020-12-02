@@ -8,15 +8,15 @@
 class Projectile : public Entity
 {
 public:
-	Projectile(const GameEvent_5& gameEvent);
+	Projectile(const SpawnProjectileEvent& gameEvent);
 	Projectile(Projectile&&) noexcept;
 	Projectile& operator=(Projectile&&) noexcept;
 	
-	const GameEvent_5& getSenderEvent() const;
+	const SpawnProjectileEvent& getSenderEvent() const;
 	bool isReachedDestination() const;
 
 	void update(float deltaTime);
 
 private:
-	GameEvent_5 m_senderEvent;
+	SpawnProjectileEvent m_senderEvent;
 };

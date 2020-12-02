@@ -9,7 +9,7 @@ namespace
 	constexpr float MOVEMENT_SPEED = 90.0f;
 }
 
-Projectile::Projectile(const GameEvent_5& gameEvent)
+Projectile::Projectile(const SpawnProjectileEvent& gameEvent)
 	: Entity(ModelManager::getInstance().getModel(PROJECTILE_MODEL_NAME), gameEvent.spawnPosition, eEntityType::Projectile),
 	m_senderEvent(gameEvent)
 {}
@@ -19,7 +19,7 @@ Projectile::Projectile(Projectile&& orig) noexcept
 	m_senderEvent(orig.m_senderEvent)
 {}
 
-const GameEvent_5& Projectile::getSenderEvent() const
+const SpawnProjectileEvent& Projectile::getSenderEvent() const
 {
 	return m_senderEvent;
 }

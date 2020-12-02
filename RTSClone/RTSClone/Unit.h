@@ -61,7 +61,7 @@ public:
 	void moveTo(const glm::vec3& destinationPosition, const Map& map, const AdjacentPositions& adjacentPositions, 
 	 	eUnitState state = eUnitState::Moving);
 	void update(float deltaTime, FactionHandler& factionHandler, const Map& map);
-	void reduceHealth(const GameEvent_4& gameEvent, FactionHandler& factionHandler, const Map& map);
+	void reduceHealth(const TakeDamageEvent& gameEvent, FactionHandler& factionHandler, const Map& map);
 
 #ifdef RENDER_PATHING
 	void renderPathMesh(ShaderHandler& shaderHandler);

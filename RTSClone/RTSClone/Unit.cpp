@@ -354,7 +354,7 @@ void Unit::update(float deltaTime, FactionHandler& factionHandler, const Map& ma
 	}
 }
 
-void Unit::reduceHealth(const GameEvent_4& gameEvent, FactionHandler& factionHandler, const Map& map)
+void Unit::reduceHealth(const TakeDamageEvent& gameEvent, FactionHandler& factionHandler, const Map& map)
 {
 	Entity::reduceHealth(gameEvent);
 	

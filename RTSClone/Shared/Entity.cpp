@@ -157,7 +157,7 @@ int Entity::getHealth() const
 	return m_health;
 }
 
-void Entity::reduceHealth(const GameEvent_4& gameEvent)
+void Entity::reduceHealth(const TakeDamageEvent& gameEvent)
 {
 	m_health -= gameEvent.damage;
 }

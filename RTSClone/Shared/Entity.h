@@ -6,7 +6,7 @@
 #include <functional>
 #ifdef GAME
 #include "EntityType.h"
-struct GameEvent_4;
+struct TakeDamageEvent;
 class FactionHandler;
 #endif // GAME
 enum class eFactionController;
@@ -34,7 +34,7 @@ public:
 	eEntityType getEntityType() const;
 	int getMaximumHealth() const;
 	int getHealth() const;
-	void reduceHealth(const GameEvent_4& gameEvent);
+	void reduceHealth(const TakeDamageEvent& gameEvent);
 	bool isDead() const;
 	void repair();
 	void render(ShaderHandler& shaderHandler, eFactionController owningFactionController) const;
