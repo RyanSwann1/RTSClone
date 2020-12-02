@@ -294,10 +294,10 @@ bool PathFinding::isTargetInLineOfSight(const glm::vec3& startingPosition, const
 {
 	glm::vec3 direction = glm::normalize(targetEntity.getPosition() - startingPosition);
 	constexpr float step = 0.5f;
-	float distance = glm::distance(targetEntity.getPosition(), startingPosition);
+	float distanceSqr = Globals::getSqrDistance(targetEntity.getPosition(), startingPosition); 
 	bool targetEntityVisible = true;
 
-	for (int i = 1; i < std::ceil(distance / step); ++i)
+	for (int i = 1; i < std::ceil(distanceSqr / (step * step)); ++i)
 	{
 		glm::vec3 position = startingPosition + direction * static_cast<float>(i);
 		if (targetEntity.getAABB().contains(position))
@@ -318,10 +318,10 @@ bool PathFinding::isTargetInLineOfSight(const glm::vec3& startingPosition, const
 {
 	glm::vec3 direction = glm::normalize(targetEntity.getPosition() - startingPosition);
 	constexpr float step = 0.5f;
-	float distance = glm::distance(targetEntity.getPosition(), startingPosition);
+	float distanceSqr = Globals::getSqrDistance(targetEntity.getPosition(), startingPosition);
 	bool targetEntityVisible = true;
 
-	for (int i = 1; i < std::ceil(distance / step); ++i)
+	for (int i = 1; i < std::ceil(distanceSqr / step * step); ++i)
 	{
 		glm::vec3 position = startingPosition + direction * static_cast<float>(i);
 		if (targetEntity.getAABB().contains(position))
