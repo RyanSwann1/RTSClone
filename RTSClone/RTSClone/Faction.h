@@ -4,7 +4,6 @@
 #include "UnitSpawnerBuilding.h"
 #include "Worker.h"
 #include "PathFinding.h"
-#include "PathFindingLocator.h"
 #include "SupplyDepot.h"
 #include "Mineral.h"
 #include "FactionController.h"
@@ -94,7 +93,7 @@ private:
 			{	
 				if (map.isPositionOccupied(entity.getPosition()))
 				{
-					entity.moveTo(PathFindingLocator::get().getClosestAvailablePosition<Entity>(entity, entities, map), map,
+					entity.moveTo(PathFinding::getInstance().getClosestAvailablePosition<Entity>(entity, entities, map), map,
 						[&](const glm::ivec2& position) { return getAdjacentPositions(position, map); });
 				}
 				else
@@ -106,7 +105,7 @@ private:
 							otherEntity.getCurrentState() == eUnitState::Idle &&
 							entity.getAABB().contains(otherEntity.getAABB()))
 						{
-							entity.moveTo(PathFindingLocator::get().getClosestAvailablePosition<Entity>(entity, entities, map), map,
+							entity.moveTo(PathFinding::getInstance().getClosestAvailablePosition<Entity>(entity, entities, map), map,
 								[&](const glm::ivec2& position) { return getAdjacentPositions(position, map); });
 							break;
 						}
@@ -122,8 +121,7 @@ private:
 
 	//Presumes entity already found in all entities container
 	template <class T>
-	void removeEntity(std::list<T>& entityContainer, int entityID, 
-		std::vector<Entity*>::iterator iter)
+	void removeEntity(std::list<T>& entityContainer, int entityID, std::vector<Entity*>::iterator iter)
 	{
 		auto entity = std::find_if(entityContainer.begin(), entityContainer.end(), [entityID](const auto& entity)
 		{

@@ -647,12 +647,12 @@ const Entity* Faction::spawnUnit(const Map& map, const UnitSpawnerBuilding& buil
     {
         if (building.isWaypointActive())
         {
-            m_units.emplace_back(*this, Globals::convertToNodePosition(building.getUnitSpawnPosition()), PathFindingLocator::get().getClosestAvailablePosition(
+            m_units.emplace_back(*this, Globals::convertToNodePosition(building.getUnitSpawnPosition()), PathFinding::getInstance().getClosestAvailablePosition(
                 building.getWaypointPosition(), m_units, m_workers, map), map);
         }
         else
         {
-            m_units.emplace_back(*this, Globals::convertToNodePosition(PathFindingLocator::get().getClosestAvailablePosition(building.getUnitSpawnPosition(),
+            m_units.emplace_back(*this, Globals::convertToNodePosition(PathFinding::getInstance().getClosestAvailablePosition(building.getUnitSpawnPosition(),
                 m_units, m_workers, map)));
         }
 
@@ -672,12 +672,12 @@ const Entity* Faction::spawnWorker(const Map& map, const UnitSpawnerBuilding& bu
     {
         if (building.isWaypointActive())
         {
-            m_workers.emplace_back(*this, building.getUnitSpawnPosition(), PathFindingLocator::get().getClosestAvailablePosition(
+            m_workers.emplace_back(*this, building.getUnitSpawnPosition(), PathFinding::getInstance().getClosestAvailablePosition(
                 building.getWaypointPosition(), m_units, m_workers, map), map);
         }
         else
         {
-            m_workers.emplace_back(*this, PathFindingLocator::get().getClosestAvailablePosition(
+            m_workers.emplace_back(*this, PathFinding::getInstance().getClosestAvailablePosition(
                 building.getUnitSpawnPosition(), m_units, m_workers, map));
         }
 

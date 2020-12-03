@@ -8,7 +8,6 @@
 #include "GameEventHandler.h"
 #include "GameEvent.h"
 #include "FactionHandler.h"
-#include "PathFindingLocator.h"
 #include "PathFinding.h"
 #include "glm/gtx/vector_angle.hpp"
 
@@ -136,7 +135,7 @@ void Unit::moveToAttackPosition(const Entity& targetEntity, const Faction& targe
 		closestDestination = m_pathToPosition.back();
 	}
 
-	if (PathFindingLocator::get().setUnitAttackPosition(*this, targetEntity, m_pathToPosition, map,
+	if (PathFinding::getInstance().setUnitAttackPosition(*this, targetEntity, m_pathToPosition, map,
 		m_owningFaction.getUnits(), factionHandler))
 	{
 		m_targetEntity.set(targetFaction.getController(), targetEntity.getID());
@@ -152,7 +151,7 @@ void Unit::moveToAttackPosition(const Entity& targetEntity, const Faction& targe
 		}
 		else
 		{
-			assert(PathFindingLocator::get().isTargetInLineOfSight(m_position, targetEntity, map));
+			assert(PathFinding::getInstance().isTargetInLineOfSight(m_position, targetEntity, map));
 			switchToState(eUnitState::AttackingTarget, map);
 		}
 	}
@@ -181,7 +180,7 @@ void Unit::moveTo(const glm::vec3& destinationPosition, const Map& map, const Ad
 		closestDestination = m_pathToPosition.back();
 	}
 
-	PathFindingLocator::get().getPathToPosition(*this, destinationPosition, m_pathToPosition, adjacentPositions,
+	PathFinding::getInstance().getPathToPosition(*this, destinationPosition, m_pathToPosition, adjacentPositions,
 		m_owningFaction.getUnits(), map);
 	if (!m_pathToPosition.empty())
 	{
@@ -282,7 +281,7 @@ void Unit::update(float deltaTime, FactionHandler& factionHandler, const Map& ma
 			for (const auto& opposingFaction : factionHandler.getOpposingFactions(m_owningFaction.getController()))
 			{
 				const Entity* targetEntity = opposingFaction.get().getEntity(m_position, UNIT_ATTACK_RANGE);
-				if (targetEntity && PathFindingLocator::get().isTargetInLineOfSight(m_position, *targetEntity, map))
+				if (targetEntity && PathFinding::getInstance().isTargetInLineOfSight(m_position, *targetEntity, map))
 				{
 					moveToAttackPosition(*targetEntity, opposingFaction, map, factionHandler);
 				}
@@ -338,7 +337,7 @@ void Unit::update(float deltaTime, FactionHandler& factionHandler, const Map& ma
 				else
 				{
 					if (Globals::getSqrDistance(targetEntity->getPosition(), m_position) > UNIT_ATTACK_RANGE * UNIT_ATTACK_RANGE ||
-						!PathFindingLocator::get().isTargetInLineOfSight(m_position, *targetEntity, map))
+						!PathFinding::getInstance().isTargetInLineOfSight(m_position, *targetEntity, map))
 					{
 						moveToAttackPosition(*targetEntity, targetFaction, map, factionHandler);
 					}
@@ -444,7 +443,7 @@ void Unit::switchToState(eUnitState newState, const Map& map, const Entity* targ
 		m_attackTimer.resetElaspedTime();
 		if (!Globals::isOnMiddlePosition(m_position) && targetEntity)
 		{
-			m_pathToPosition.emplace_back(PathFindingLocator::get().getClosestPositionFromUnitToTarget(*this, *targetEntity, m_pathToPosition,
+			m_pathToPosition.emplace_back(PathFinding::getInstance().getClosestPositionFromUnitToTarget(*this, *targetEntity, m_pathToPosition,
 				map, [&](const glm::ivec2& position) { return getAdjacentPositions(position, map, m_owningFaction.getUnits(), *this); }));
 		}
 		break;

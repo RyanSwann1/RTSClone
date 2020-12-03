@@ -3,7 +3,6 @@
 #include "FactionHandler.h"
 #include "Globals.h"
 #include "PathFinding.h"
-#include "PathFindingLocator.h"
 #include "GameEventHandler.h"
 #include "GameEvent.h"
 #include "GameMessages.h"
@@ -69,7 +68,7 @@ void Turret::update(float deltaTime, FactionHandler& factionHandler, const Map& 
 			const Entity* targetEntity = opposingFaction.getEntity(m_targetEntity.getID());
 			if (targetEntity &&
 				Globals::getSqrDistance(targetEntity->getPosition(), m_position) <= TURRET_ATTACK_RANGE * TURRET_ATTACK_RANGE &&
-				PathFindingLocator::get().isTargetInLineOfSight(m_position, *targetEntity, map, m_AABB))
+				PathFinding::getInstance().isTargetInLineOfSight(m_position, *targetEntity, map, m_AABB))
 			{
 				m_rotation.y = Globals::getAngle(targetEntity->getPosition(), m_position, 270.0f);
 			}
@@ -85,7 +84,7 @@ void Turret::update(float deltaTime, FactionHandler& factionHandler, const Map& 
 			const Entity* targetEntity = opposingFaction.getEntity(m_targetEntity.getID());
 			if (targetEntity &&
 				Globals::getSqrDistance(targetEntity->getPosition(), m_position) <= TURRET_ATTACK_RANGE * TURRET_ATTACK_RANGE &&
-				PathFindingLocator::get().isTargetInLineOfSight(m_position, *targetEntity, map, m_AABB))
+				PathFinding::getInstance().isTargetInLineOfSight(m_position, *targetEntity, map, m_AABB))
 			{
 				m_rotation.y = Globals::getAngle(targetEntity->getPosition(), m_position, 270.0f);
 				GameEventHandler::getInstance().gameEvents.push(GameEvent::createSpawnProjectile(m_owningFaction.getController(), getID(),

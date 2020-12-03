@@ -2,7 +2,6 @@
 #include "AdjacentPositions.h"
 #include "ModelManager.h"
 #include "PathFinding.h"
-#include "PathFindingLocator.h"
 #include "FactionHandler.h"
 #include "GameEvent.h"
 #include <limits>
@@ -186,7 +185,7 @@ void FactionAI::update(float deltaTime, const Map & map, FactionHandler& faction
 			if (worker.getCurrentState() == eUnitState::Idle)
 			{
 				const Mineral& mineralToHarvest = getRandomMineral();
-				glm::vec3 destination = PathFindingLocator::get().getClosestPositionOutsideAABB(worker.getPosition(),
+				glm::vec3 destination = PathFinding::getInstance().getClosestPositionOutsideAABB(worker.getPosition(),
 					mineralToHarvest.getAABB(), mineralToHarvest.getPosition(), map);
 
 				worker.moveTo(destination, map, [&](const glm::ivec2& position) { return getAdjacentPositions(position, map); },
@@ -341,7 +340,7 @@ void FactionAI::onBuild(const Map& map, eEntityType entityTypeToBuild, FactionHa
 		{
 			glm::vec3 buildPosition = { 0.0f, 0.0f, 0.0f };
 			if (isEntityAffordable(entityTypeToBuild) &&
-				PathFindingLocator::get().isBuildingSpawnAvailable(m_HQ.getPosition(),
+				PathFinding::getInstance().isBuildingSpawnAvailable(m_HQ.getPosition(),
 					ModelManager::getInstance().getModel(BARRACKS_MODEL_NAME), map, buildPosition,
 					MIN_DISTANCE_FROM_HQ, MAX_DISTANCE_FROM_HQ, DISTANCE_FROM_MINERALS, *this))
 			{
@@ -359,7 +358,7 @@ void FactionAI::onBuild(const Map& map, eEntityType entityTypeToBuild, FactionHa
 		{
 			glm::vec3 buildPosition{ 0.0f, 0.0f, 0.0f };
 			if(isEntityAffordable(entityTypeToBuild) &&
-				PathFindingLocator::get().isBuildingSpawnAvailable(m_HQ.getPosition(), 
+				PathFinding::getInstance().isBuildingSpawnAvailable(m_HQ.getPosition(), 
 				ModelManager::getInstance().getModel(TURRET_MODEL_NAME), map, buildPosition, 
 				MIN_DISTANCE_FROM_HQ, MAX_DISTANCE_FROM_HQ, DISTANCE_FROM_MINERALS, *this))
 			{

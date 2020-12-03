@@ -9,7 +9,6 @@
 #include "GameEventHandler.h"
 #include "GameEvent.h"
 #include "FactionHandler.h"
-#include "PathFindingLocator.h"
 
 namespace
 {
@@ -89,7 +88,7 @@ void Worker::setBuildingToRepair(const Entity& building, const Map& map)
 
 	if (Globals::getSqrDistance(building.getPosition(), m_position) > MINIMUM_REPAIR_DISTANCE * MINIMUM_REPAIR_DISTANCE)
 	{
-		moveTo(PathFindingLocator::get().getClosestPositionOutsideAABB(building.getPosition(),
+		moveTo(PathFinding::getInstance().getClosestPositionOutsideAABB(building.getPosition(),
 			building.getAABB(), building.getPosition(), map),
 			map, [&](const glm::ivec2& position) { return getAdjacentPositions(position, map); },
 			eUnitState::MovingToRepairPosition);
@@ -132,7 +131,7 @@ void Worker::update(float deltaTime, const UnitSpawnerBuilding& HQ, const Map& m
 			GameEventHandler::getInstance().gameEvents.push(GameEvent::createAddResources(m_owningFaction.getController(), getID()));
 			if (m_mineralToHarvest)
 			{
-				glm::vec3 destination = PathFindingLocator::get().getClosestPositionOutsideAABB(m_position,
+				glm::vec3 destination = PathFinding::getInstance().getClosestPositionOutsideAABB(m_position,
 					m_mineralToHarvest->getAABB(), m_mineralToHarvest->getPosition(), map);
 
 				moveTo(destination, map, [&](const glm::ivec2& position) { return getAdjacentPositions(position, map); },
@@ -163,7 +162,7 @@ void Worker::update(float deltaTime, const UnitSpawnerBuilding& HQ, const Map& m
 			m_harvestTimer.setActive(false);
 			m_pathToPosition.clear();
 
-			glm::vec3 destination = PathFindingLocator::get().getClosestPositionOutsideAABB(m_position,
+			glm::vec3 destination = PathFinding::getInstance().getClosestPositionOutsideAABB(m_position,
 				HQ.getAABB(), HQ.getPosition(), map);
 			moveTo(destination, map, [&](const glm::ivec2& position) { return getAdjacentPositions(position, map); }, eUnitState::ReturningMineralsToHQ);
 		}
@@ -208,7 +207,7 @@ void Worker::update(float deltaTime, const UnitSpawnerBuilding& HQ, const Map& m
 		{
 			if (newBuilding)
 			{
-				moveTo(PathFindingLocator::get().getAvailablePositionOutsideAABB(*this, map), 
+				moveTo(PathFinding::getInstance().getAvailablePositionOutsideAABB(*this, map), 
 					map, [&](const glm::ivec2& position) { return getAllAdjacentPositions(position, map); });
 			}
 			else
