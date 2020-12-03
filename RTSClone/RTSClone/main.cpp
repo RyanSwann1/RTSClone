@@ -61,6 +61,8 @@ int main()
 
 	glViewport(0, 0, windowSize.x, windowSize.y);
 	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_CULL_FACE);
+	glEnable(GL_BACK);
 	ImGui_SFML_OpenGL3::init(window);
 	
 	if (!ModelManager::getInstance().isAllModelsLoaded())
