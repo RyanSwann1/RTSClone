@@ -101,6 +101,14 @@ void FactionPlayer::handleInput(const sf::Event& currentSFMLEvent, const sf::Win
         m_attackMoveSelected = false;
         if (currentSFMLEvent.mouseButton.button == sf::Mouse::Left)
         {
+            if (m_selectionBox.isActive() && m_selectionBox.isMinimumSize() && !m_selectedUnits.empty())
+            {
+                m_HQ.setSelected(false);
+                deselectEntities<Barracks>(m_barracks);
+                deselectEntities<Turret>(m_turrets);
+                deselectEntities<SupplyDepot>(m_supplyDepots);
+            }
+
             m_selectionBox.reset();
         }
         break;

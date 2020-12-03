@@ -86,4 +86,13 @@ private:
 			unit.setSelected(m_selectionBox.getAABB().contains(unit.getAABB()));
 		}
 	}
+
+	template <class Entity>
+	void deselectEntities(std::list<Entity>& entities)
+	{
+		for (auto& entity : entities)
+		{
+			entity.setSelected(false);
+		}
+	}
 };
