@@ -179,7 +179,7 @@ void FactionPlayer::updateSelectionBox()
         {
             GameEventHandler::getInstance().gameEvents.push(GameEvent::createSetTargetEntityGUI(getController(), m_selectedUnits.back()->getID()));
         }
-        else
+        else if(m_selectedUnits.size() >= static_cast<size_t>(1))
         {
             GameEventHandler::getInstance().gameEvents.push(GameEvent::createResetTargetEntityGUI());
         }
