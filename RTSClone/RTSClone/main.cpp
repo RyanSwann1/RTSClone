@@ -20,7 +20,6 @@
 #include "UIManager.h"
 #include "GameMessenger.h"
 #include "PathFinding.h"
-#include "PathFindingLocator.h"
 #include "LevelFileHandler.h"
 
 //AI
@@ -79,9 +78,10 @@ int main()
 		return -1;
 	}
 
+	GameMessenger::getInstance();
+	PathFinding::getInstance();
+
 	sf::Clock gameClock;
-	PathFinding pathFinding;
-	PathFindingLocator::provide(pathFinding);
 	Camera camera;
 	UIManager UIManager;
 	Map map;
