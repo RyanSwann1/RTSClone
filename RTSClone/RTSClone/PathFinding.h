@@ -28,8 +28,13 @@ class FactionHandler;
 class PathFinding : private NonCopyable, private NonMovable
 {
 public:
-	PathFinding();
 	~PathFinding();
+
+	static PathFinding& getInstance()
+	{
+		static PathFinding instance;
+		return instance;
+	}
 
 	template <class Entity>
 	glm::vec3 getClosestAvailablePosition(const Entity& currentEntity, const std::list<Entity>& entities, const Map& map) const
@@ -112,6 +117,7 @@ public:
 		const AdjacentPositions& adjacentPositions, const std::list<Unit>& units, const Map& map);
 
 private:
+	PathFinding();
 	std::vector<glm::vec3> m_sharedPositionContainer;
 	//BFS
 	Graph m_graph;

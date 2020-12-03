@@ -177,7 +177,9 @@ PathFinding::PathFinding()
 
 PathFinding::~PathFinding()
 {
-	GameMessenger::getInstance().unsubscribe<GameMessages::NewMapSize>(this);
+	//Currently exists within static memory
+	//Don't unsub
+	//GameMessenger::getInstance().unsubscribe<GameMessages::NewMapSize>(this);
 }
 
 void PathFinding::onNewMapSize(const GameMessages::NewMapSize& gameMessage)

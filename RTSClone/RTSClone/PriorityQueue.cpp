@@ -28,7 +28,9 @@ PriorityQueue::PriorityQueue()
 
 PriorityQueue::~PriorityQueue()
 {
-	GameMessenger::getInstance().unsubscribe<GameMessages::NewMapSize>(this);
+	//Currently exists within static memory
+	//Don't unsub
+	//GameMessenger::getInstance().unsubscribe<GameMessages::NewMapSize>(this);
 }
 
 size_t PriorityQueue::getSize() const

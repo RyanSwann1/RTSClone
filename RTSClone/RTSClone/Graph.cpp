@@ -35,7 +35,9 @@ Graph::Graph()
 
 Graph::~Graph()
 {
-	GameMessenger::getInstance().unsubscribe<GameMessages::NewMapSize>(this);
+	//Currently exists within static memory
+	//Don't unsub
+	//GameMessenger::getInstance().unsubscribe<GameMessages::NewMapSize>(this);
 }
 
 void Graph::reset(std::queue<glm::ivec2>& frontier)
