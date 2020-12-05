@@ -9,7 +9,7 @@
 #include "FactionController.h"
 #include "PlannedBuilding.h"
 #include "Turret.h"
-#include <list>
+#include <forward_list>
 #include <vector>
 
 struct GameEvent;
@@ -26,8 +26,8 @@ public:
 	int getCurrentResourceAmount() const;
 	const glm::vec3& getHQPosition() const;
 	eFactionController getController() const;
-	const std::list<Unit>& getUnits() const;
-	const std::list<Worker>& getWorkers() const;
+	const std::forward_list<Unit>& getUnits() const;
+	const std::forward_list<Worker>& getWorkers() const;
 	const Entity* getEntity(const glm::vec3& position, float maxDistance, bool prioritizeUnits = true) const;
 	const Entity* getEntity(const AABB& AABB, int entityID) const;
 	const Entity* getEntity(int entityID) const;
@@ -53,11 +53,11 @@ protected:
 	const std::vector<Mineral> m_minerals;
 	std::vector<PlannedBuilding> m_plannedBuildings;
 	std::vector<Entity*> m_allEntities;
-	std::list<Unit> m_units;
-	std::list<Worker> m_workers;
-	std::list<SupplyDepot> m_supplyDepots;
-	std::list<Barracks> m_barracks;
-	std::list<Turret> m_turrets;
+	std::forward_list<Unit> m_units;
+	std::forward_list<Worker> m_workers;
+	std::forward_list<SupplyDepot> m_supplyDepots;
+	std::forward_list<Barracks> m_barracks;
+	std::forward_list<Turret> m_turrets;
 	HQ m_HQ;
 
 	bool isExceedPopulationLimit(eEntityType entityType) const;
@@ -84,7 +84,7 @@ private:
 	void addResources(Worker& worker);
 
 	template <class Entity>
-	void handleCollisions(std::list<Entity>& entities, const Map& map)
+	void handleCollisions(std::forward_list<Entity>& entities, const Map& map)
 	{
 		static std::vector<const Entity*> handledUnits;
 		for (auto& entity : entities)
@@ -121,7 +121,7 @@ private:
 
 	//Presumes entity already found in all entities container
 	template <class T>
-	void removeEntity(std::list<T>& entityContainer, int entityID, std::vector<Entity*>::iterator iter)
+	void removeEntity(std::forward_list<T>& entityContainer, int entityID, std::vector<Entity*>::iterator iter)
 	{
 		auto entity = std::find_if(entityContainer.begin(), entityContainer.end(), [entityID](const auto& entity)
 		{
@@ -130,7 +130,10 @@ private:
 		assert(entity != entityContainer.end());
 
 		onEntityRemoval((*entity));
-		entityContainer.erase(entity);
+		entityContainer.remove_if([entityID](const auto& entity)
+		{
+			return entity.getID() == entityID;
+		});
 		assert(iter != m_allEntities.cend());
 		m_allEntities.erase(iter);
 	}
