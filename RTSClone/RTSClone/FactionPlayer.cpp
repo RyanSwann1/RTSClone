@@ -34,7 +34,7 @@ namespace
         }
     }
 
-    void setSelectedUnits(std::vector<Unit*>& selectedUnits, std::list<Unit>& units, std::list<Worker>& workers)
+    void setSelectedUnits(std::vector<Unit*>& selectedUnits, std::forward_list<Unit>& units, std::forward_list<Worker>& workers)
     {
         selectedUnits.clear();
 

@@ -38,7 +38,7 @@ private:
 	void onRightClick(const sf::Window& window, const Camera& camera, FactionHandler& factionHandler, const Map& map);
 
 	template <class Entity>
-	void selectEntity(std::list<Entity>& entities, const glm::vec3& mouseToGroundPosition, bool selectAllEntities = false,
+	void selectEntity(std::forward_list<Entity>& entities, const glm::vec3& mouseToGroundPosition, bool selectAllEntities = false,
 		int selectEntityID = Globals::INVALID_ENTITY_ID)
 	{
 		auto selectedEntity = std::find_if(entities.begin(), entities.end(), [&mouseToGroundPosition](const auto& entity)
@@ -79,7 +79,7 @@ private:
 	}
 
 	template <class Entity>
-	void selectUnits(std::list<Entity>& units, const SelectionBox& selectionBox)
+	void selectUnits(std::forward_list<Entity>& units, const SelectionBox& selectionBox)
 	{
 		for (auto& unit : units)
 		{
@@ -88,7 +88,7 @@ private:
 	}
 
 	template <class Entity>
-	void deselectEntities(std::list<Entity>& entities)
+	void deselectEntities(std::forward_list<Entity>& entities)
 	{
 		for (auto& entity : entities)
 		{

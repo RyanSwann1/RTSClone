@@ -146,7 +146,7 @@ void FactionAI::update(float deltaTime, const Map & map, FactionHandler& faction
 				}
 				break;
 			case eEntityType::Unit:
-				if (!m_barracks.empty() && Faction::addUnitToSpawn(entityTypeToSpawn, map, m_barracks.back()))
+				if (!m_barracks.empty() && Faction::addUnitToSpawn(entityTypeToSpawn, map, m_barracks.front()))
 				{
 					m_spawnQueue.pop();
 				}

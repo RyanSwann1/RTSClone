@@ -95,7 +95,7 @@ namespace
 		}
 	}
 
-	void convertPathToWaypoints(std::vector<glm::vec3>& pathToPosition, const Unit& unit, const std::list<Unit>& units,
+	void convertPathToWaypoints(std::vector<glm::vec3>& pathToPosition, const Unit& unit, const std::forward_list<Unit>& units,
 		const Map& map)
 	{
 		if (pathToPosition.size() <= size_t(1))
@@ -242,7 +242,7 @@ bool PathFinding::isBuildingSpawnAvailable(const glm::vec3& startingPosition, co
 	return foundBuildPosition;
 }
 
-bool PathFinding::isPositionAvailable(const glm::vec3& nodePosition, const Map& map, const std::list<Unit>& units, const std::list<Worker>& workers,
+bool PathFinding::isPositionAvailable(const glm::vec3& nodePosition, const Map& map, const std::forward_list<Unit>& units, const std::forward_list<Worker>& workers,
 	int senderID) const
 {
 	assert(nodePosition == Globals::convertToNodePosition(nodePosition));
@@ -382,8 +382,8 @@ const std::vector<glm::vec3>& PathFinding::getFormationPositions(const glm::vec3
 	return m_sharedPositionContainer;
 }
 
-glm::vec3 PathFinding::getClosestAvailablePosition(const glm::vec3& startingPosition, const std::list<Unit>& units, 
-	const std::list<Worker>& workers, const Map& map)
+glm::vec3 PathFinding::getClosestAvailablePosition(const glm::vec3& startingPosition, const std::forward_list<Unit>& units, 
+	const std::forward_list<Worker>& workers, const Map& map)
 {
 	if (isPositionAvailable(Globals::convertToNodePosition(startingPosition), map, units, workers))
 	{
@@ -505,7 +505,7 @@ glm::vec3 PathFinding::getClosestPositionFromUnitToTarget(const Unit& unit, cons
 }
 
 bool PathFinding::setUnitAttackPosition(const Unit& unit, const Entity& targetEntity, std::vector<glm::vec3>& pathToPosition,
-	const Map& map, const std::list<Unit>& units, FactionHandler& factionHandler)
+	const Map& map, const std::forward_list<Unit>& units, FactionHandler& factionHandler)
 {
 	assert(unit.getID() != targetEntity.getID());
 	
@@ -573,7 +573,7 @@ bool PathFinding::setUnitAttackPosition(const Unit& unit, const Entity& targetEn
 }
 
 void PathFinding::getPathToPosition(const Unit& unit, const glm::vec3& destination, std::vector<glm::vec3>& pathToPosition, 
-	const AdjacentPositions& adjacentPositions, const std::list<Unit>& units, const Map& map)
+	const AdjacentPositions& adjacentPositions, const std::forward_list<Unit>& units, const Map& map)
 {
 	assert(adjacentPositions);
 

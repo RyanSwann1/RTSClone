@@ -12,7 +12,7 @@
 #include <queue>
 #include <array>
 #include <functional>
-#include <list>
+#include <forward_list>
 
 namespace GameMessages
 {
@@ -37,7 +37,7 @@ public:
 	}
 
 	template <class Entity>
-	glm::vec3 getClosestAvailablePosition(const Entity& currentEntity, const std::list<Entity>& entities, const Map& map) const
+	glm::vec3 getClosestAvailablePosition(const Entity& currentEntity, const std::forward_list<Entity>& entities, const Map& map) const
 	{
 		assert(currentEntity.getCurrentState() == eUnitState::Idle);
 		constexpr float MAX_RAY_DISTANCE = static_cast<float>(Globals::NODE_SIZE) * 10.0f;
@@ -90,7 +90,7 @@ public:
 	bool isBuildingSpawnAvailable(const glm::vec3& startingPosition, const Model& model, const Map& map,
 		glm::vec3& buildPosition, float minDistanceFromHQ, float maxDistanceFromHQ, float distanceFromMinerals, const Faction& owningFaction);
 
-	bool isPositionAvailable(const glm::vec3& nodePosition, const Map& map, const std::list<Unit>& units, const std::list<Worker>& workers, 
+	bool isPositionAvailable(const glm::vec3& nodePosition, const Map& map, const std::forward_list<Unit>& units, const std::forward_list<Worker>& workers, 
 		int senderID = Globals::INVALID_ENTITY_ID) const;
 
 	bool isTargetInLineOfSight(const glm::vec3& startingPosition, const Entity& targetEntity, const Map& map) const;
@@ -99,8 +99,8 @@ public:
 	const std::vector<glm::vec3>& getFormationPositions(const glm::vec3& startingPosition, const std::vector<Unit*>& selectedUnits,
 		const Map& map);
 
-	glm::vec3 getClosestAvailablePosition(const glm::vec3& startingPosition, const std::list<Unit>& units, 
-		const std::list<Worker>& workers, const Map& map);
+	glm::vec3 getClosestAvailablePosition(const glm::vec3& startingPosition, const std::forward_list<Unit>& units, 
+		const std::forward_list<Worker>& workers, const Map& map);
 
 	glm::vec3 getAvailablePositionOutsideAABB(const Entity& senderEntity, const Map& map);
 
@@ -111,10 +111,10 @@ public:
 		const Map& map, const AdjacentPositions& adjacentPositions) const;
 
 	bool setUnitAttackPosition(const Unit& unit, const Entity& targetEntity, std::vector<glm::vec3>& pathToPosition,
-		const Map& map, const std::list<Unit>& units, FactionHandler& factionHandler);
+		const Map& map, const std::forward_list<Unit>& units, FactionHandler& factionHandler);
 
 	void getPathToPosition(const Unit& unit, const glm::vec3& destination, std::vector<glm::vec3>& pathToPosition,
-		const AdjacentPositions& adjacentPositions, const std::list<Unit>& units, const Map& map);
+		const AdjacentPositions& adjacentPositions, const std::forward_list<Unit>& units, const Map& map);
 
 private:
 	PathFinding();

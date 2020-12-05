@@ -29,8 +29,7 @@ AdjacentPosition::AdjacentPosition(const glm::ivec2 & position, bool valid, bool
 {}
 
 std::array<AdjacentPosition, ALL_DIRECTIONS_ON_GRID.size()> getAdjacentPositions(const glm::ivec2 & position, 
-	const Map & map, const std::list<Unit> & units,
-	const std::list<Worker>& workers)
+	const Map & map, const std::forward_list<Unit> & units, const std::forward_list<Worker>& workers)
 {
 	std::array<AdjacentPosition, ALL_DIRECTIONS_ON_GRID.size()> adjacentPositions;
 	for (int i = 0; i < adjacentPositions.size(); ++i)
@@ -75,7 +74,7 @@ std::array<AdjacentPosition, ALL_DIRECTIONS_ON_GRID.size()> getAdjacentPositions
 }
 
 std::array<AdjacentPosition, ALL_DIRECTIONS_ON_GRID.size()> getAdjacentPositions(const glm::ivec2& position, const Map& map, 
-	const std::list<Unit>& units, const Unit& unit)
+	const std::forward_list<Unit>& units, const Unit& unit)
 {
 	std::array<AdjacentPosition, ALL_DIRECTIONS_ON_GRID.size()> adjacentPositions;
 	for (int i = 0; i < adjacentPositions.size(); ++i)
@@ -107,7 +106,7 @@ std::array<AdjacentPosition, ALL_DIRECTIONS_ON_GRID.size()> getAdjacentPositions
 }
 
 std::array<AdjacentPosition, ALL_DIRECTIONS_ON_GRID.size()> getAdjacentPositions(const glm::ivec2& position, const Map& map, 
-	const std::list<Unit>& units, const Unit& unit, const std::vector<Unit*>& selectedUnits)
+	const std::forward_list<Unit>& units, const Unit& unit, const std::vector<Unit*>& selectedUnits)
 {
 	std::array<AdjacentPosition, ALL_DIRECTIONS_ON_GRID.size()> adjacentPositions;
 	for (int i = 0; i < adjacentPositions.size(); ++i)
