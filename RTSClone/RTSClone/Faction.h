@@ -121,20 +121,16 @@ private:
 
 	//Presumes entity already found in all entities container
 	template <class T>
-	void removeEntity(std::forward_list<T>& entityContainer, int entityID, std::vector<Entity*>::iterator iter)
+	void removeEntity(std::forward_list<T>& entityContainer, int entityID, std::vector<Entity*>::iterator entity)
 	{
-		auto entity = std::find_if(entityContainer.begin(), entityContainer.end(), [entityID](const auto& entity)
-		{
-			return entity.getID() == entityID;
-		});
-		assert(entity != entityContainer.end());
+		assert(entity != m_allEntities.cend());
+		onEntityRemoval(*(*entity));
 
-		onEntityRemoval((*entity));
 		entityContainer.remove_if([entityID](const auto& entity)
 		{
 			return entity.getID() == entityID;
 		});
-		assert(iter != m_allEntities.cend());
-		m_allEntities.erase(iter);
+
+		m_allEntities.erase(entity);
 	}
 };
