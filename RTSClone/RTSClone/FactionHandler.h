@@ -13,9 +13,7 @@ class FactionHandler : private NonCopyable, private NonMovable
 public:
 	FactionHandler(const std::array<std::unique_ptr<Faction>, static_cast<size_t>(eFactionController::Max) + 1>& factions);
 
-	bool isUnitPositionAvailable(const glm::vec3& position, const Unit& senderUnit);
 	bool isFactionActive(eFactionController factionController) const;
-
 	const std::array<std::unique_ptr<Faction>, static_cast<size_t>(eFactionController::Max) + 1>& getFactions() const;
 	const std::vector<std::reference_wrapper<const Faction>>& getOpposingFactions(eFactionController factionController);
 
