@@ -31,8 +31,6 @@ enum class eUnitState
 	Max = Repairing
 };
 
-inline const TypeComparison<eUnitState> ENTITY_UNIT_IDLE_STATES({ eUnitState::Idle, eUnitState::AttackingTarget });
-
 class Faction;
 class Map;
 class ShaderHandler;
