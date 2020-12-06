@@ -31,9 +31,11 @@ public:
 
 	void setBuildingToRepair(const Entity& building, const Map& map);
 	bool build(const std::function<const Entity*()>& buildingCommand, const glm::vec3& buildPosition, const Map& map);
-	void update(float deltaTime, const UnitSpawnerBuilding& HQ, const Map& map, FactionHandler& factionHandler);
+	void update(float deltaTime, const UnitSpawnerBuilding& HQ, const Map& map, FactionHandler& factionHandler,
+		const Timer& unitStateHandlerTimer);
 	void moveTo(const glm::vec3& destinationPosition, const Map& map, const AdjacentPositions& adjacentPositions,
 		eUnitState state = eUnitState::Moving, const Mineral* mineralToHarvest = nullptr);
+
 	void render(ShaderHandler& shaderHandler, eFactionController owningFactionController) const;
 
 private:

@@ -159,9 +159,9 @@ void FactionPlayer::handleEvent(const GameEvent& gameEvent, const Map& map, Fact
     }
 }
 
-void FactionPlayer::update(float deltaTime, const Map& map, FactionHandler& factionHandler)
+void FactionPlayer::update(float deltaTime, const Map& map, FactionHandler& factionHandler, const Timer& unitStateHandlerTimer)
 {
-    Faction::update(deltaTime, map, factionHandler);
+    Faction::update(deltaTime, map, factionHandler, unitStateHandlerTimer);
 
     GameMessenger::getInstance().broadcast<GameMessages::UIDisplayPlayerDetails>(
         { getCurrentResourceAmount(), getCurrentPopulationAmount(), getMaximumPopulationAmount() });

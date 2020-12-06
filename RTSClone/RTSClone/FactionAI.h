@@ -29,7 +29,7 @@ public:
 
 	void setTargetFaction(FactionHandler& factionHandler);
 	void handleEvent(const GameEvent& gameEvent, const Map& map, FactionHandler& factionHandler) override;
-	void update(float deltaTime, const Map& map, FactionHandler& factionHandler) override;
+	void update(float deltaTime, const Map& map, FactionHandler& factionHandler, const Timer& unitStateHandlerTimer) override;
 
 private:
 	std::queue<eEntityType> m_spawnQueue;

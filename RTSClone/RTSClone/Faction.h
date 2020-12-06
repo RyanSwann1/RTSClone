@@ -35,7 +35,7 @@ public:
 	const std::vector<Mineral>& getMinerals() const;
 
 	virtual void handleEvent(const GameEvent& gameEvent, const Map& map, FactionHandler& factionHandler);
-	virtual void update(float deltaTime, const Map& map, FactionHandler& factionHandler);
+	virtual void update(float deltaTime, const Map& map, FactionHandler& factionHandler, const Timer& unitStateHandlerTimer);
 	virtual void render(ShaderHandler& shaderHandler) const;
 	void renderPlannedBuildings(ShaderHandler& shaderHandler) const;
 

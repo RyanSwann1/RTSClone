@@ -300,16 +300,16 @@ void Faction::addResources(Worker& worker)
     m_currentResourceAmount += worker.extractResources();
 }
 
-void Faction::update(float deltaTime, const Map& map, FactionHandler& factionHandler)
+void Faction::update(float deltaTime, const Map& map, FactionHandler& factionHandler, const Timer& unitStateHandlerTimer)
 {
     for (auto& unit : m_units)
     {
-        unit.update(deltaTime, factionHandler, map);
+        unit.update(deltaTime, factionHandler, map, unitStateHandlerTimer);
     }
 
     for (auto& worker : m_workers)
     {
-        worker.update(deltaTime, m_HQ, map, factionHandler);
+        worker.update(deltaTime, m_HQ, map, factionHandler, unitStateHandlerTimer);
     }
 
     for (auto& barracks : m_barracks)

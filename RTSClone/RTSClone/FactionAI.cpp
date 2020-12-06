@@ -118,9 +118,9 @@ void FactionAI::handleEvent(const GameEvent& gameEvent, const Map& map, FactionH
 	Faction::handleEvent(gameEvent, map, factionHandler);
 }
 
-void FactionAI::update(float deltaTime, const Map & map, FactionHandler& factionHandler)
+void FactionAI::update(float deltaTime, const Map & map, FactionHandler& factionHandler, const Timer& unitStateHandlerTimer)
 {
-	Faction::update(deltaTime, map, factionHandler);
+	Faction::update(deltaTime, map, factionHandler, unitStateHandlerTimer);
 
 	m_spawnTimer.update(deltaTime);
 	if (m_spawnTimer.isExpired())
