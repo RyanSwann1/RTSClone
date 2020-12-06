@@ -6,10 +6,24 @@
 #include "GameMessageType.h"
 #include <array>
 
+class MapNode
+{
+public:
+	MapNode();
+	MapNode(bool collidable, int entityID);
+
+	bool isCollidable() const;
+	int getEntityID() const;
+
+private:
+	bool m_collidable;
+	int m_entityID;
+};
+
 namespace GameMessages
 {
-	template <eGameMessageType type>
-	struct MapModification;
+	struct AddToMap;
+	struct RemoveFromMap;
 	struct NewMapSize;
 }
 class AABB;
@@ -29,9 +43,9 @@ public:
 
 private:
 	glm::ivec2 m_size;
-	std::vector<bool> m_map;
+	std::vector<MapNode> m_map;
 	
-	void addEntityToMap(const GameMessages::MapModification<eGameMessageType::AddEntityToMap>& gameMessage);
-	void removeEntityFromMap(const GameMessages::MapModification<eGameMessageType::RemoveEntityFromMap>& gameMessage);
+	void addEntityToMap(const GameMessages::AddToMap& gameMessage);
+	void removeEntityFromMap(const GameMessages::RemoveFromMap& gameMessage);
 	void setSize(const GameMessages::NewMapSize& gameMessage);
 };

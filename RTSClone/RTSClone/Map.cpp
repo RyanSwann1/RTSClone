@@ -3,15 +3,37 @@
 #include "GameMessenger.h"
 #include "GameMessages.h"
 
+//MapNode
+MapNode::MapNode()
+	: m_collidable(false),
+	m_entityID(Globals::INVALID_ENTITY_ID)
+{}
+
+MapNode::MapNode(bool collidable, int entityID)
+	: m_collidable(collidable),
+	m_entityID(entityID)
+{}
+
+bool MapNode::isCollidable() const
+{
+	return m_collidable;
+}
+
+int MapNode::getEntityID() const
+{
+	return m_entityID;
+}
+
+//Map
 Map::Map()
 	: m_size(),
 	m_map()
 {
-	GameMessenger::getInstance().subscribe<GameMessages::MapModification<eGameMessageType::AddEntityToMap>>(
-		[this](const GameMessages::MapModification<eGameMessageType::AddEntityToMap>& gameMessage) { return addEntityToMap(gameMessage); }, this);
+	GameMessenger::getInstance().subscribe<GameMessages::AddToMap>(
+		[this](const GameMessages::AddToMap& gameMessage) { return addEntityToMap(gameMessage); }, this);
 
-	GameMessenger::getInstance().subscribe<GameMessages::MapModification<eGameMessageType::RemoveEntityFromMap>>(
-		[this](const GameMessages::MapModification<eGameMessageType::RemoveEntityFromMap>& gameMessage) { return removeEntityFromMap(gameMessage); }, this);
+	GameMessenger::getInstance().subscribe<GameMessages::RemoveFromMap>(
+		[this](const GameMessages::RemoveFromMap& gameMessage) { return removeEntityFromMap(gameMessage); }, this);
 
 	GameMessenger::getInstance().subscribe<GameMessages::NewMapSize>(
 		[this](const GameMessages::NewMapSize& gameMessage) { return setSize(gameMessage); }, this);
@@ -19,8 +41,8 @@ Map::Map()
 
 Map::~Map()
 {
-	GameMessenger::getInstance().unsubscribe<GameMessages::MapModification<eGameMessageType::AddEntityToMap>>(this);
-	GameMessenger::getInstance().unsubscribe<GameMessages::MapModification<eGameMessageType::RemoveEntityFromMap>>(this);
+	GameMessenger::getInstance().unsubscribe<GameMessages::AddToMap>(this);
+	GameMessenger::getInstance().unsubscribe<GameMessages::RemoveFromMap>(this);
 	GameMessenger::getInstance().unsubscribe<GameMessages::NewMapSize>(this);
 }
 
@@ -61,8 +83,7 @@ bool Map::isAABBOccupied(const AABB& AABB) const
 	{
 		for (int y = static_cast<int>(AABB.getBack()); y <= static_cast<int>(AABB.getForward()); ++y)
 		{
-			glm::ivec2 positionOnGrid = Globals::convertToGridPosition({ x, Globals::GROUND_HEIGHT, y });
-			if (m_map[Globals::convertTo1D(positionOnGrid, m_size)])
+			if (m_map[Globals::convertTo1D(Globals::convertToGridPosition({ x, Globals::GROUND_HEIGHT, y }), m_size)].isCollidable())
 			{
 				return true;
 			}
@@ -76,8 +97,7 @@ bool Map::isPositionOccupied(const glm::vec3& position) const
 {
 	if (isWithinBounds(position))
 	{
-		glm::ivec2 positionOnGrid = Globals::convertToGridPosition(position);
-		return m_map[Globals::convertTo1D(positionOnGrid, m_size)];
+		return m_map[Globals::convertTo1D(Globals::convertToGridPosition(position), m_size)].isCollidable();
 	}
 
 	return true;
@@ -87,39 +107,39 @@ bool Map::isPositionOccupied(const glm::ivec2& position) const
 {
 	if (isWithinBounds(position))
 	{
-		return m_map[Globals::convertTo1D(position, m_size)];
+		return m_map[Globals::convertTo1D(position, m_size)].isCollidable();
 	}
 
 	return true;
 }
 
-void Map::addEntityToMap(const GameMessages::MapModification<eGameMessageType::AddEntityToMap>& gameMessage)
+void Map::addEntityToMap(const GameMessages::AddToMap& gameMessage)
 {
-	for (int x = static_cast<int>(gameMessage.entityAABB.getLeft()); x < static_cast<int>(gameMessage.entityAABB.getRight()); ++x)
+	for (int x = static_cast<int>(gameMessage.AABB.getLeft()); x < static_cast<int>(gameMessage.AABB.getRight()); ++x)
 	{
-		for (int y = static_cast<int>(gameMessage.entityAABB.getBack()); y < static_cast<int>(gameMessage.entityAABB.getForward()); ++y)
+		for (int y = static_cast<int>(gameMessage.AABB.getBack()); y < static_cast<int>(gameMessage.AABB.getForward()); ++y)
 		{
 			glm::ivec2 positionOnGrid = Globals::convertToGridPosition({ x, Globals::GROUND_HEIGHT, y });
 			assert(isWithinBounds(positionOnGrid));
 			if (isWithinBounds(positionOnGrid))
 			{
-				m_map[Globals::convertTo1D(positionOnGrid, m_size)] = true;
+				m_map[Globals::convertTo1D(positionOnGrid, m_size)] = { true, gameMessage.entityID };
 			}
 		}
 	}
 }
 
-void Map::removeEntityFromMap(const GameMessages::MapModification<eGameMessageType::RemoveEntityFromMap>& gameMessage)
+void Map::removeEntityFromMap(const GameMessages::RemoveFromMap& gameMessage)
 {
-	for (int x = static_cast<int>(gameMessage.entityAABB.getLeft()); x < static_cast<int>(gameMessage.entityAABB.getRight()); ++x)
+	for (int x = static_cast<int>(gameMessage.AABB.getLeft()); x < static_cast<int>(gameMessage.AABB.getRight()); ++x)
 	{
-		for (int y = static_cast<int>(gameMessage.entityAABB.getBack()); y < static_cast<int>(gameMessage.entityAABB.getForward()); ++y)
+		for (int y = static_cast<int>(gameMessage.AABB.getBack()); y < static_cast<int>(gameMessage.AABB.getForward()); ++y)
 		{
 			glm::ivec2 positionOnGrid = Globals::convertToGridPosition({ x, Globals::GROUND_HEIGHT, y });
 			assert(isWithinBounds(positionOnGrid));
 			if (isWithinBounds(positionOnGrid))
 			{
-				m_map[Globals::convertTo1D(positionOnGrid, m_size)] = false;
+				m_map[Globals::convertTo1D(positionOnGrid, m_size)] = { false, Globals::INVALID_ENTITY_ID };
 			}
 		}
 	}
@@ -128,5 +148,5 @@ void Map::removeEntityFromMap(const GameMessages::MapModification<eGameMessageTy
 void Map::setSize(const GameMessages::NewMapSize& gameMessage)
 {
 	m_size = gameMessage.mapSize;
-	m_map.resize(static_cast<size_t>(m_size.x * m_size.y), false);
+	m_map.resize(static_cast<size_t>(m_size.x * m_size.y), { false, Globals::INVALID_ENTITY_ID });
 }
