@@ -10,7 +10,7 @@ Mineral::Mineral(const glm::vec3& startingPosition)
 	: Entity(ModelManager::getInstance().getModel(MINERALS_MODEL_NAME), 
 		startingPosition, eEntityType::Mineral)
 {
-	GameMessenger::getInstance().broadcast<GameMessages::MapModification<eGameMessageType::AddEntityToMap>>({ m_AABB });
+	GameMessenger::getInstance().broadcast<GameMessages::AddToMap>({ m_AABB, getID() });
 }
 #endif // GAME
 
@@ -35,7 +35,7 @@ Mineral::~Mineral()
 #ifdef GAME
 	if (getID() != Globals::INVALID_ENTITY_ID)
 	{
-		GameMessenger::getInstance().broadcast<GameMessages::MapModification<eGameMessageType::RemoveEntityFromMap>>({ m_AABB });
+		GameMessenger::getInstance().broadcast<GameMessages::RemoveFromMap>({ m_AABB });
 	}
 #endif // GAME
 }

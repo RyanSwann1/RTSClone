@@ -10,16 +10,14 @@ SceneryGameObject::SceneryGameObject(const Model& model, const glm::vec3& positi
 	m_rotation(rotation),
 	m_active(true)
 {
-	AABB AABB(m_position, m_model);
-	GameMessenger::getInstance().broadcast<GameMessages::MapModification<eGameMessageType::AddEntityToMap>>({ AABB });
+	GameMessenger::getInstance().broadcast<GameMessages::AddToMap>({ {m_position, m_model}, Globals::INVALID_ENTITY_ID });
 }
 
 SceneryGameObject::~SceneryGameObject()
 {
 	if (m_active)
 	{
-		AABB AABB(m_position, m_model);
-		GameMessenger::getInstance().broadcast<GameMessages::MapModification<eGameMessageType::RemoveEntityFromMap>>({ AABB });
+		GameMessenger::getInstance().broadcast<GameMessages::RemoveFromMap>({ {m_position, m_model} });
 	}
 }
 

@@ -87,7 +87,7 @@ void HQ::addUnitToSpawn(const std::function<const Entity* (const UnitSpawnerBuil
 
 UnitSpawnerBuilding::~UnitSpawnerBuilding()
 {
-	GameMessenger::getInstance().broadcast<GameMessages::MapModification<eGameMessageType::RemoveEntityFromMap>>({ m_AABB });
+	GameMessenger::getInstance().broadcast<GameMessages::RemoveFromMap>({ m_AABB });
 }
 
 const Timer& UnitSpawnerBuilding::getSpawnTimer() const
@@ -197,6 +197,6 @@ UnitSpawnerBuilding::UnitSpawnerBuilding(const glm::vec3& startingPosition, eEnt
 	m_spawnTimer(spawnTimerExpirationTime, false),
 	m_waypointPosition(m_position)
 {
+	GameMessenger::getInstance().broadcast<GameMessages::AddToMap>({ m_AABB, getID() });
 	m_unitsToSpawn.reserve(static_cast<size_t>(MAX_UNITS_SPAWNABLE));
-	GameMessenger::getInstance().broadcast<GameMessages::MapModification<eGameMessageType::AddEntityToMap>>({ m_AABB });
 }
