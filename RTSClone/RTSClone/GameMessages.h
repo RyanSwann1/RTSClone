@@ -16,14 +16,23 @@ namespace GameMessages
 		static eGameMessageType getType() { return T; };
 	};
 
-	template <eGameMessageType eventType>
-	struct MapModification : public BaseMessage<eventType>
+	struct AddToMap : public BaseMessage<eGameMessageType::AddEntityToMap>
 	{
-		MapModification(const AABB& entityAABB)
-			: entityAABB(entityAABB)
+		AddToMap(const AABB& AABB, int entityID)
+			: AABB(AABB),
+			entityID(entityID)
 		{}
 
-		const AABB& entityAABB;
+		const AABB& AABB;
+		const int entityID;
+	};
+
+	struct RemoveFromMap : public BaseMessage<eGameMessageType::RemoveEntityFromMap>
+	{
+		RemoveFromMap(const AABB& AABB)
+			: AABB(AABB) {}
+
+		const AABB& AABB;
 	};
 
 	struct NewMapSize : public BaseMessage<eGameMessageType::NewMapSize>
