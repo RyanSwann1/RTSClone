@@ -7,6 +7,7 @@
 #include "FactionAI.h"
 #include "SceneryGameObject.h"
 #include "FactionHandler.h"
+#include "Timer.h"
 #include <string>
 #include <vector>
 #include <memory>
@@ -44,6 +45,7 @@ private:
 
 	std::vector<SceneryGameObject> m_scenery;
 	FactionsContainer m_factions;
+	Timer m_unitStateHandlerTimer;
 	FactionHandler m_factionHandler;
 	ProjectileHandler m_projectileHandler;
 	TargetEntity m_selectedTargetGUI;

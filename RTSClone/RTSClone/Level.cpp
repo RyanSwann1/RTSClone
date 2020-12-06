@@ -9,6 +9,8 @@
 
 namespace
 {
+	constexpr float TIME_BETWEEN_UNIT_STATE = 0.2f;
+
 	int getActiveFactionCount(const FactionsContainer& factions)
 	{
 		int activeFactions = 0;
@@ -51,6 +53,7 @@ namespace
 Level::Level(std::vector<SceneryGameObject>&& scenery, FactionsContainer&& factions)
 	: m_scenery(std::move(scenery)),
 	m_factions(std::move(factions)),
+	m_unitStateHandlerTimer(TIME_BETWEEN_UNIT_STATE, true),
 	m_factionHandler(m_factions),
 	m_projectileHandler(),
 	m_selectedTargetGUI()
@@ -206,14 +209,21 @@ void Level::handleInput(const sf::Window& window, const Camera& camera, const sf
 
 void Level::update(float deltaTime, const Map& map)
 {
+	m_unitStateHandlerTimer.update(deltaTime);
+
 	for (auto& faction : m_factions)
 	{
 		if (faction)
 		{
-			faction->update(deltaTime, map, m_factionHandler);
+			faction->update(deltaTime, map, m_factionHandler, m_unitStateHandlerTimer);
 		}
 	}
 	
+	if (m_unitStateHandlerTimer.isExpired())
+	{
+		m_unitStateHandlerTimer.resetElaspedTime();
+	}
+
 	if (isFactionActive(m_factions, eFactionController::Player))
 	{
 		getFactionPlayer(m_factions).updateSelectionBox();

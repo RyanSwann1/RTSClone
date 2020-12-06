@@ -18,7 +18,7 @@ namespace
 	constexpr float UNIT_ATTACK_RANGE = UNIT_GRID_ATTACK_RANGE * Globals::NODE_SIZE;
 
 	constexpr float TIME_BETWEEN_ATTACK = 1.0f;
-	constexpr float TIME_BETWEEN_STATE = 0.2f;
+
 	constexpr int DAMAGE = 1;
 
 #ifdef RENDER_PATHING
@@ -68,7 +68,6 @@ Unit::Unit(const Faction& owningFaction, const glm::vec3& startingPosition, eEnt
 	m_pathToPosition(),
 	m_currentState(eUnitState::Idle),
 	m_attackTimer(TIME_BETWEEN_ATTACK, true),
-	m_stateHandlerTimer(TIME_BETWEEN_STATE, true),
 	m_targetEntity()
 {}
 
@@ -79,7 +78,6 @@ Unit::Unit(const Faction& owningFaction, const glm::vec3 & startingPosition, con
 	m_pathToPosition(),
 	m_currentState(eUnitState::Idle),
 	m_attackTimer(TIME_BETWEEN_ATTACK, true),
-	m_stateHandlerTimer(TIME_BETWEEN_STATE, true),
 	m_targetEntity()
 {
 	moveTo(destinationPosition, map, [&](const glm::ivec2& position) { return getAdjacentPositions(position, map); });
@@ -200,10 +198,9 @@ void Unit::moveTo(const glm::vec3& destinationPosition, const Map& map, const Ad
 	}
 }
 
-void Unit::update(float deltaTime, FactionHandler& factionHandler, const Map& map)
+void Unit::update(float deltaTime, FactionHandler& factionHandler, const Map& map, const Timer& unitStateHandlerTimer)
 {
 	m_attackTimer.update(deltaTime);
-	m_stateHandlerTimer.update(deltaTime);
 
 	if (!m_pathToPosition.empty())
 	{
@@ -233,7 +230,7 @@ void Unit::update(float deltaTime, FactionHandler& factionHandler, const Map& ma
 	{
 	case eUnitState::Idle:
 		assert(m_targetEntity.getID() == Globals::INVALID_ENTITY_ID);
-		if (m_stateHandlerTimer.isExpired())
+		if (unitStateHandlerTimer.isExpired())
 		{
 			switch (getEntityType())
 			{
@@ -257,7 +254,7 @@ void Unit::update(float deltaTime, FactionHandler& factionHandler, const Map& ma
 	case eUnitState::Moving:
 		if (m_targetEntity.getID() != Globals::INVALID_ENTITY_ID)
 		{
-			if (m_stateHandlerTimer.isExpired() &&
+			if (unitStateHandlerTimer.isExpired() &&
 				(!factionHandler.isFactionActive(m_targetEntity.getFactionController()) ||
 				!factionHandler.getFaction(m_targetEntity.getFactionController()).getEntity(m_targetEntity.getID())))
 			{
@@ -276,7 +273,7 @@ void Unit::update(float deltaTime, FactionHandler& factionHandler, const Map& ma
 		break;
 	case eUnitState::AttackMoving:
 		assert(m_targetEntity.getID() == Globals::INVALID_ENTITY_ID);
-		if (m_stateHandlerTimer.isExpired())
+		if (unitStateHandlerTimer.isExpired())
 		{
 			for (const auto& opposingFaction : factionHandler.getOpposingFactions(m_owningFaction.getController()))
 			{
@@ -294,7 +291,7 @@ void Unit::update(float deltaTime, FactionHandler& factionHandler, const Map& ma
 		break;
 	case eUnitState::SetAttackPosition:
 		assert(m_targetEntity.getID() != Globals::INVALID_ENTITY_ID);
-		if (m_stateHandlerTimer.isExpired())
+		if (unitStateHandlerTimer.isExpired())
 		{
 			const Entity* targetEntity = nullptr;
 			if (factionHandler.isFactionActive(m_targetEntity.getFactionController()))
@@ -316,7 +313,7 @@ void Unit::update(float deltaTime, FactionHandler& factionHandler, const Map& ma
 		break;
 	case eUnitState::AttackingTarget:
 		assert(m_targetEntity.getID() != Globals::INVALID_ENTITY_ID && m_pathToPosition.empty());
-		if (m_stateHandlerTimer.isExpired())
+		if (unitStateHandlerTimer.isExpired())
 		{
 			if (factionHandler.isFactionActive(m_targetEntity.getFactionController()))
 			{
@@ -367,11 +364,6 @@ void Unit::update(float deltaTime, FactionHandler& factionHandler, const Map& ma
 		}
 	
 		break;
-	}
-
-	if (m_stateHandlerTimer.isExpired())
-	{
-		m_stateHandlerTimer.resetElaspedTime();
 	}
 }
 

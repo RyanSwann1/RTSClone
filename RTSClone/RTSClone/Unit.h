@@ -60,7 +60,8 @@ public:
 		FactionHandler& factionHandler);
 	void moveTo(const glm::vec3& destinationPosition, const Map& map, const AdjacentPositions& adjacentPositions, 
 	 	eUnitState state = eUnitState::Moving);
-	void update(float deltaTime, FactionHandler& factionHandler, const Map& map);
+	void update(float deltaTime, FactionHandler& factionHandler, const Map& map,
+		const Timer& unitStateHandlerTimer);
 	void reduceHealth(const TakeDamageEvent& gameEvent, FactionHandler& factionHandler, const Map& map);
 
 #ifdef RENDER_PATHING
@@ -76,7 +77,6 @@ protected:
 private:
 	eUnitState m_currentState;
 	Timer m_attackTimer;
-	Timer m_stateHandlerTimer;
 	TargetEntity m_targetEntity;
 #ifdef RENDER_PATHING
 	Mesh m_renderPathMesh;
