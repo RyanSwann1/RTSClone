@@ -108,6 +108,14 @@ AABB::AABB(const std::vector<Unit*>& selectedUnits)
 }
 #endif // GAME
 
+glm::vec3 AABB::getCenterPosition() const
+{
+	float width = getRight() - getLeft();
+	float depth = getForward() - getBack();
+
+	return glm::vec3(m_left + (width / 2.0f), Globals::GROUND_HEIGHT, m_back + (depth / 2.0f));
+}
+
 float AABB::getLeft() const
 {
 	return m_left;

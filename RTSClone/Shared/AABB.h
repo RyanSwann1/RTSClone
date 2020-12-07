@@ -21,6 +21,8 @@ public:
 #ifdef GAME
 	AABB(const std::vector<Unit*>& selectedUnits);
 #endif // GAME
+	
+	glm::vec3 getCenterPosition() const;
 	float getLeft() const;
 	float getRight() const;
 	float getTop() const;
