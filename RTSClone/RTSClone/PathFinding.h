@@ -107,6 +107,8 @@ public:
 	glm::vec3 getClosestPositionToAABB(const glm::vec3& entityPosition, const AABB& AABB, const Map& map);
 
 	bool setUnitAttackPosition(const Unit& unit, const Entity& targetEntity, std::vector<glm::vec3>& pathToPosition,
+		const Map& map, const FactionPlayer& factionPlayer);
+	bool setUnitAttackPosition(const Unit& unit, const Entity& targetEntity, std::vector<glm::vec3>& pathToPosition,
 		const Map& map, const std::forward_list<Unit>& units, FactionHandler& factionHandler);
 
 	void getPathToPosition(const Unit& unit, const glm::vec3& destination, std::vector<glm::vec3>& pathToPosition,

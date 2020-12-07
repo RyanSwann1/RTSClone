@@ -9,6 +9,7 @@
 #include "GameMessenger.h"
 #include "GameMessages.h"
 #include "FactionHandler.h"
+#include "FactionPlayer.h"
 #include <limits>
 #include <queue>
 #include <random>
@@ -475,6 +476,74 @@ glm::vec3 PathFinding::getClosestPositionToAABB(const glm::vec3& entityPosition,
 
 	assert(closestPosition != centrePositionAABB);
 	return closestPosition;
+}
+
+bool PathFinding::setUnitAttackPosition(const Unit& unit, const Entity& targetEntity, std::vector<glm::vec3>& pathToPosition, 
+	const Map& map, const FactionPlayer& factionPlayer)
+{
+	assert(unit.getID() != targetEntity.getID());
+
+	pathToPosition.clear();
+	m_openQueue.clear();
+	m_closedQueue.clear();
+
+	glm::ivec2 startingPositionOnGrid = Globals::convertToGridPosition(unit.getPosition());
+	glm::ivec2 targetPositionOnGrid = Globals::convertToGridPosition(targetEntity.getPosition());
+	bool positionFound = false;
+	m_openQueue.add({ startingPositionOnGrid, startingPositionOnGrid, 0.0f,
+	Globals::getSqrDistance(glm::vec2(targetPositionOnGrid), glm::vec2(startingPositionOnGrid)) });
+
+	while (!positionFound && !m_openQueue.isEmpty())
+	{
+		PriorityQueueNode currentNode = m_openQueue.getTop();
+		m_openQueue.popTop();
+
+		if (Globals::getSqrDistance(glm::vec2(targetPositionOnGrid), glm::vec2(currentNode.position)) <=
+			unit.getGridAttackRange() * unit.getGridAttackRange() &&
+			isTargetInLineOfSight(Globals::convertToWorldPosition(currentNode.position), targetEntity, map))
+		{
+			positionFound = true;
+			if (Globals::convertToWorldPosition(currentNode.position) != unit.getPosition())
+			{
+				getPathFromClosedQueue(pathToPosition, startingPositionOnGrid, currentNode, m_closedQueue, map);
+			}
+		}
+		else
+		{
+			for (const auto& adjacentPosition : getAdjacentPositions(currentNode.position, map, factionPlayer, unit))
+			{
+				if (!adjacentPosition.valid || m_closedQueue.contains(adjacentPosition.position))
+				{
+					continue;
+				}
+				else
+				{
+					float sqrDistance = Globals::getSqrDistance(glm::vec2(targetPositionOnGrid), glm::vec2(adjacentPosition.position));
+					PriorityQueueNode adjacentNode(adjacentPosition.position, currentNode.position,
+						currentNode.g + Globals::getSqrDistance(glm::vec2(adjacentPosition.position), glm::vec2(currentNode.position)),
+						sqrDistance);
+
+					if (m_openQueue.isSuccessorNodeValid(adjacentNode))
+					{
+						m_openQueue.changeNode(adjacentNode);
+					}
+					else if (!m_openQueue.contains(adjacentPosition.position))
+					{
+						m_openQueue.add(adjacentNode);
+					}
+				}
+			}
+		}
+
+		m_closedQueue.add(currentNode);
+
+		assert(isPriorityQueueWithinSizeLimit(m_openQueue, map.getSize()) &&
+			isPriorityQueueWithinSizeLimit(m_closedQueue, map.getSize()));
+	}
+
+	convertPathToWaypoints(pathToPosition, unit, factionPlayer.getUnits(), map);
+
+	return positionFound;
 }
 
 bool PathFinding::setUnitAttackPosition(const Unit& unit, const Entity& targetEntity, std::vector<glm::vec3>& pathToPosition,

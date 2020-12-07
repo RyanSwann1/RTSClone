@@ -4,6 +4,7 @@
 #include "Unit.h"
 #include "Worker.h"
 #include "FactionHandler.h"
+#include "FactionPlayer.h"
 
 namespace
 {
@@ -218,6 +219,32 @@ std::array<AdjacentPosition, ALL_DIRECTIONS_ON_GRID.size()> getAdjacentPositions
 		{
 			adjacentPositions[i] = AdjacentPosition(adjacentPosition);
 		}		
+	}
+
+	return adjacentPositions;
+}
+
+std::array<AdjacentPosition, ALL_DIRECTIONS_ON_GRID.size()> getAdjacentPositions(const glm::ivec2& position, const Map& map, 
+	const FactionPlayer& factionPlayer, const Unit& unit)
+{
+	glm::vec3 worldPosition = Globals::convertToWorldPosition(position);
+	std::array<AdjacentPosition, ALL_DIRECTIONS_ON_GRID.size()> adjacentPositions;
+	for (int i = 0; i < static_cast<int>(ALL_DIRECTIONS_ON_GRID.size()); ++i)
+	{
+		glm::ivec2 adjacentPosition = position + ALL_DIRECTIONS_ON_GRID[i];
+		if (map.isWithinBounds(adjacentPosition) &&
+			!map.isPositionOccupied(adjacentPosition))
+		{
+			int entityID = unit.getID();
+			auto unit = std::find_if(factionPlayer.getUnits().cbegin(), factionPlayer.getUnits().cend(), [&worldPosition, entityID](const auto& unit)
+			{
+				return entityID != unit.getID() && !unit.getPathToPosition().empty() && unit.getPathToPosition().front() == worldPosition;
+			});
+			if (unit == factionPlayer.getUnits().cend())
+			{
+				adjacentPositions[i] = AdjacentPosition(adjacentPosition);
+			}
+		}
 	}
 
 	return adjacentPositions;
