@@ -102,7 +102,7 @@ public:
 	glm::vec3 getClosestAvailablePosition(const glm::vec3& startingPosition, const std::forward_list<Unit>& units, 
 		const std::forward_list<Worker>& workers, const Map& map);
 
-	glm::vec3 getAvailablePositionOutsideAABB(const Entity& senderEntity, const Map& map);
+	glm::vec3 getRandomAvailablePositionOutsideAABB(const Entity& senderEntity, const Map& map);
 
 	glm::vec3 getClosestPositionToAABB(const glm::vec3& entityPosition, const AABB& AABB, const Map& map);
 

@@ -208,7 +208,7 @@ void Worker::update(float deltaTime, const UnitSpawnerBuilding& HQ, const Map& m
 		{
 			if (newBuilding)
 			{
-				moveTo(PathFinding::getInstance().getAvailablePositionOutsideAABB(*this, map), 
+				moveTo(PathFinding::getInstance().getRandomAvailablePositionOutsideAABB(*this, map), 
 					map, [&](const glm::ivec2& position) { return getAllAdjacentPositions(position, map); });
 			}
 			else
