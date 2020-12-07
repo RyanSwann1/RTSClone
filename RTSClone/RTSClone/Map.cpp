@@ -46,6 +46,12 @@ Map::~Map()
 	GameMessenger::getInstance().unsubscribe<GameMessages::NewMapSize>(this);
 }
 
+const MapNode& Map::getNode(const glm::vec3& position) const
+{
+	assert(isWithinBounds(position));
+	return m_map[Globals::convertTo1D(Globals::convertToGridPosition(position), m_size)];
+}
+
 const glm::ivec2& Map::getSize() const
 {
 	return m_size;

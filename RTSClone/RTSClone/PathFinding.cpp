@@ -425,7 +425,7 @@ glm::vec3 PathFinding::getClosestAvailablePosition(const glm::vec3& startingPosi
 	return Globals::convertToWorldPosition(availablePositionOnGrid);
 }
 
-glm::vec3 PathFinding::getAvailablePositionOutsideAABB(const Entity& senderEntity, const Map& map)
+glm::vec3 PathFinding::getRandomAvailablePositionOutsideAABB(const Entity& senderEntity, const Map& map)
 {
 	static std::random_device rd;
 	static std::mt19937 g(rd());

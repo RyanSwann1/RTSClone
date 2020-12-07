@@ -33,6 +33,7 @@ public:
 	Map();
 	~Map();
 
+	const MapNode& getNode(const glm::vec3& position) const;
 	const glm::ivec2& getSize() const;
 	bool isWithinBounds(const AABB& AABB) const;
 	bool isWithinBounds(const glm::vec3& position) const;
