@@ -477,33 +477,6 @@ glm::vec3 PathFinding::getClosestPositionToAABB(const glm::vec3& entityPosition,
 	return closestPosition;
 }
 
-glm::vec3 PathFinding::getClosestPositionFromUnitToTarget(const Unit& unit, const Entity& entityTarget, std::vector<glm::vec3>& pathToPosition, 
-	const Map& map, const AdjacentPositions& adjacentPositions) const
-{
-	assert(adjacentPositions && isTargetInLineOfSight(unit.getPosition(), entityTarget, map));
-	
-	pathToPosition.clear();
-	glm::ivec2 startingPositionOnGrid = Globals::convertToGridPosition(Globals::convertToNodePosition(unit.getPosition()));
-	glm::ivec2 destinationOnGrid = Globals::convertToGridPosition(entityTarget.getPosition());
-	float shortestDistance = std::numeric_limits<float>::max();
-	glm::vec3 destination = unit.getPosition();
-	
-	for (const auto& adjacentPosition : adjacentPositions(startingPositionOnGrid))
-	{
-		if (adjacentPosition.valid)
-		{
-			float sqrDistance = Globals::getSqrDistance(glm::vec2(destinationOnGrid), glm::vec2(adjacentPosition.position));
-			if (sqrDistance < shortestDistance)
-			{
-				destination = Globals::convertToWorldPosition(adjacentPosition.position);
-				shortestDistance = sqrDistance;
-			}
-		}
-	}
-
-	return destination;
-}
-
 bool PathFinding::setUnitAttackPosition(const Unit& unit, const Entity& targetEntity, std::vector<glm::vec3>& pathToPosition,
 	const Map& map, const std::forward_list<Unit>& units, FactionHandler& factionHandler)
 {
