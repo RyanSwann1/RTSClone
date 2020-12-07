@@ -433,13 +433,7 @@ void Unit::switchToState(eUnitState newState, const Map& map, const Entity* targ
 		break;
 	case eUnitState::AttackingTarget:
 		m_attackTimer.resetElaspedTime();
-		if (!Globals::isOnMiddlePosition(m_position) && targetEntity)
-		{
-			m_pathToPosition.emplace_back(PathFinding::getInstance().getClosestPositionFromUnitToTarget(*this, *targetEntity, m_pathToPosition,
-				map, [&](const glm::ivec2& position) { return getAdjacentPositions(position, map, m_owningFaction.getUnits(), *this); }));
-		}
 		break;
-
 	case eUnitState::SetAttackPosition:
 	case eUnitState::Moving:
 		break;
