@@ -30,8 +30,8 @@ namespace
 	constexpr glm::vec3 MINERAL_SCALE{ 0.75f, 0.75f, 0.75f };
 	constexpr glm::vec3 WAYPOINT_SCALE{ 1.0f, 1.0f, 1.0f };
 	constexpr glm::vec3 WORKER_SCALE{ 1.0f, 1.0f, 1.0f };
-	constexpr glm::vec3 SUPPLY_DEPOT_SCALE{ 1.0f, 1.0f, 1.0f };
-	constexpr glm::vec3 BARRACKS_SCALE{ 0.5f, 0.5f, 0.5f };
+	constexpr glm::vec3 SUPPLY_DEPOT_SCALE{ 1.25f, 1.25f, 1.25f };
+	constexpr glm::vec3 BARRACKS_SCALE{ 0.75f, 0.75f, 0.75f };
 	constexpr glm::vec3 WORKER_MINERAL_SCALE = { 0.2f, 0.2f, 0.2f };
 	constexpr glm::vec3 PROJECTILE_SCALE = { 0.75f, 0.75f, 0.75f };
 
@@ -92,7 +92,7 @@ namespace
 		loadModel("rocksOre.obj", true, MINERAL_AABB_SIZE_FROM_CENTER, MINERAL_SCALE,
 			models, loadedAllModels);
 
-		loadModel("turret_single.obj", false, { 3.0f, 1.0f, 3.0f }, { 5.0f, 5.0f, 5.0f }, models, loadedAllModels);
+		loadModel("turret_single.obj", false, { 3.0f, 1.0f, 3.0f }, { 7.5f, 7.5f, 7.5f }, models, loadedAllModels);
 	}
 
 #ifdef GAME

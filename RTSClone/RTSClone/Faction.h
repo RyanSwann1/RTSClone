@@ -91,7 +91,8 @@ private:
 		{
 			if (entity.getCurrentState() == eUnitState::Idle)
 			{	
-				if (map.isPositionOccupied(entity.getPosition()))
+				MapNode currentMapNode = map.getNode(entity.getPosition());
+				if (currentMapNode.isCollidable() && currentMapNode.getEntityID() != entity.getID())
 				{
 					entity.moveTo(PathFinding::getInstance().getClosestAvailablePosition<Entity>(entity, entities, map), map,
 						[&](const glm::ivec2& position) { return getAdjacentPositions(position, map); });

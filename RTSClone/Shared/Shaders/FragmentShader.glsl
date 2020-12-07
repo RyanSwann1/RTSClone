@@ -8,7 +8,7 @@ uniform float uOpacity;
 in vec2 vTextCoords;
 in vec3 vNormal;
 
-const float ambientFactor = 0.5;
+const float ambientFactor = 0.4;
 
 void main()
 {
