@@ -104,8 +104,7 @@ public:
 
 	glm::vec3 getAvailablePositionOutsideAABB(const Entity& senderEntity, const Map& map);
 
-	glm::vec3 getClosestPositionOutsideAABB(const glm::vec3& entityPosition, const AABB& AABB, const glm::vec3& centrePositionAABB,
-		const Map& map);
+	glm::vec3 getClosestPositionToAABB(const glm::vec3& entityPosition, const AABB& AABB, const Map& map);
 
 	glm::vec3 getClosestPositionFromUnitToTarget(const Unit& unit, const Entity& entityTarget, std::vector<glm::vec3>& pathToPosition,
 		const Map& map, const AdjacentPositions& adjacentPositions) const;

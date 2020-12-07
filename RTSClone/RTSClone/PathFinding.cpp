@@ -448,9 +448,9 @@ glm::vec3 PathFinding::getAvailablePositionOutsideAABB(const Entity& senderEntit
 	return senderEntity.getPosition();
 }
 
-glm::vec3 PathFinding::getClosestPositionOutsideAABB(const glm::vec3& entityPosition, const AABB& AABB, const glm::vec3& centrePositionAABB,
-	const Map& map)
+glm::vec3 PathFinding::getClosestPositionToAABB(const glm::vec3& entityPosition, const AABB& AABB, const Map& map)
 {
+	glm::vec3 centrePositionAABB = AABB.getCenterPosition();
 	glm::vec3 closestPosition = centrePositionAABB;
 	glm::vec3 direction = { 0.0f, 0.0f, 0.0f };
 	if (entityPosition == centrePositionAABB)
