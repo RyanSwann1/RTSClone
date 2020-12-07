@@ -88,8 +88,8 @@ void Worker::setBuildingToRepair(const Entity& building, const Map& map)
 
 	if (Globals::getSqrDistance(building.getPosition(), m_position) > MINIMUM_REPAIR_DISTANCE * MINIMUM_REPAIR_DISTANCE)
 	{
-		moveTo(PathFinding::getInstance().getClosestPositionOutsideAABB(building.getPosition(),
-			building.getAABB(), building.getPosition(), map),
+		moveTo(PathFinding::getInstance().getClosestPositionToAABB(building.getPosition(),
+			building.getAABB(), map),
 			map, [&](const glm::ivec2& position) { return getAdjacentPositions(position, map); },
 			eUnitState::MovingToRepairPosition);
 	}
@@ -132,8 +132,8 @@ void Worker::update(float deltaTime, const UnitSpawnerBuilding& HQ, const Map& m
 			GameEventHandler::getInstance().gameEvents.push(GameEvent::createAddResources(m_owningFaction.getController(), getID()));
 			if (m_mineralToHarvest)
 			{
-				glm::vec3 destination = PathFinding::getInstance().getClosestPositionOutsideAABB(m_position,
-					m_mineralToHarvest->getAABB(), m_mineralToHarvest->getPosition(), map);
+				glm::vec3 destination = PathFinding::getInstance().getClosestPositionToAABB(m_position,
+					m_mineralToHarvest->getAABB(), map);
 
 				moveTo(destination, map, [&](const glm::ivec2& position) { return getAdjacentPositions(position, map); },
 					eUnitState::MovingToMinerals, m_mineralToHarvest);
@@ -163,8 +163,8 @@ void Worker::update(float deltaTime, const UnitSpawnerBuilding& HQ, const Map& m
 			m_harvestTimer.setActive(false);
 			m_pathToPosition.clear();
 
-			glm::vec3 destination = PathFinding::getInstance().getClosestPositionOutsideAABB(m_position,
-				HQ.getAABB(), HQ.getPosition(), map);
+			glm::vec3 destination = PathFinding::getInstance().getClosestPositionToAABB(m_position,
+				HQ.getAABB(), map);
 			moveTo(destination, map, [&](const glm::ivec2& position) { return getAdjacentPositions(position, map); }, eUnitState::ReturningMineralsToHQ);
 		}
 		break;

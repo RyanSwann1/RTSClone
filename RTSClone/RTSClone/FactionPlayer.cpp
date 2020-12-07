@@ -226,7 +226,7 @@ void FactionPlayer::instructWorkerReturnMinerals(const Map& map)
         if (worker.isSelected() && worker.isHoldingResources())
         {
             glm::vec3 destination = 
-                PathFinding::getInstance().getClosestPositionOutsideAABB(worker.getPosition(), m_HQ.getAABB(), m_HQ.getPosition(), map);
+                PathFinding::getInstance().getClosestPositionToAABB(worker.getPosition(), m_HQ.getAABB(), map);
             worker.moveTo(destination, map, [&](const glm::ivec2& position) { return getAdjacentPositions(position, map); },
                 eUnitState::ReturningMineralsToHQ);
         }
@@ -291,8 +291,8 @@ void FactionPlayer::moveSingularSelectedUnit(const glm::vec3& mouseToGroundPosit
         });
         if (mineralToHarvest != m_minerals.cend())
         {
-            selectedWorker.moveTo(PathFinding::getInstance().getClosestPositionOutsideAABB(selectedWorker.getPosition(),
-                mineralToHarvest->getAABB(), mineralToHarvest->getPosition(), map),
+            selectedWorker.moveTo(PathFinding::getInstance().getClosestPositionToAABB(selectedWorker.getPosition(),
+                mineralToHarvest->getAABB(), map),
                 map, [&](const glm::ivec2& position) { return getAdjacentPositions(position, map); },
                 eUnitState::MovingToMinerals, &(*mineralToHarvest));
         }
@@ -335,8 +335,8 @@ void FactionPlayer::moveMultipleSelectedUnits(const glm::vec3& mouseToGroundPosi
         {
             if (selectedUnit->getEntityType() == eEntityType::Worker)
             {
-                glm::vec3 destination = PathFinding::getInstance().getClosestPositionOutsideAABB(selectedUnit->getPosition(),
-                    mineralToHarvest->getAABB(), mineralToHarvest->getPosition(), map);
+                glm::vec3 destination = PathFinding::getInstance().getClosestPositionToAABB(selectedUnit->getPosition(),
+                    mineralToHarvest->getAABB(), map);
 
                 static_cast<Worker&>(*selectedUnit).moveTo(destination, map,
                     [&](const glm::ivec2& position) { return getAdjacentPositions(position, map); },
@@ -359,8 +359,8 @@ void FactionPlayer::moveMultipleSelectedUnits(const glm::vec3& mouseToGroundPosi
                     (*selectedEntity)->getID() != selectedUnit->getID() &&
                     (*selectedEntity)->getHealth() < (*selectedEntity)->getMaximumHealth())
                 {
-                    glm::vec3 destination = PathFinding::getInstance().getClosestPositionOutsideAABB(selectedUnit->getPosition(),
-                        (*selectedEntity)->getAABB(), (*selectedEntity)->getPosition(), map);
+                    glm::vec3 destination = PathFinding::getInstance().getClosestPositionToAABB(selectedUnit->getPosition(),
+                        (*selectedEntity)->getAABB(), map);
 
                     static_cast<Worker&>(*selectedUnit).setBuildingToRepair(*(*selectedEntity), map);
                 }
