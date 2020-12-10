@@ -201,8 +201,7 @@ void Unit::moveTo(const glm::vec3& destinationPosition, const Map& map, const Ad
 		closestDestination = m_pathToPosition.back();
 	}
 	
-	PathFinding::getInstance().getPathToPosition(*this, destinationPosition, m_pathToPosition, adjacentPositions,
-		m_owningFaction.getUnits(), map);
+	PathFinding::getInstance().getPathToPosition(*this, destinationPosition, m_pathToPosition, adjacentPositions, map);
 	if (!m_pathToPosition.empty())
 	{
 		switchToState(state, map);

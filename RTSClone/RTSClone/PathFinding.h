@@ -105,7 +105,7 @@ public:
 		const Map& map, const Faction& owningFaction);
 
 	void getPathToPosition(const Unit& unit, const glm::vec3& destination, std::vector<glm::vec3>& pathToPosition,
-		const AdjacentPositions& adjacentPositions, const std::forward_list<Unit>& units, const Map& map);
+		const AdjacentPositions& adjacentPositions, const Map& map);
 
 private:
 	PathFinding();
