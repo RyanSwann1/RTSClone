@@ -242,33 +242,6 @@ bool PathFinding::isBuildingSpawnAvailable(const glm::vec3& startingPosition, co
 	return foundBuildPosition;
 }
 
-bool PathFinding::isPositionAvailable(const glm::vec3& nodePosition, const Map& map, const std::forward_list<Unit>& units,
-	int senderID) const
-{
-	assert(nodePosition == Globals::convertToNodePosition(nodePosition));
-
-	if (!map.isPositionOccupied(nodePosition))
-	{
-		auto unit = std::find_if(units.cbegin(), units.cend(), [&nodePosition, senderID](const auto& unit) -> bool
-		{
-			if (senderID != Globals::INVALID_ENTITY_ID)
-			{
-				return unit.getID() != senderID && Globals::convertToNodePosition(unit.getPosition()) == nodePosition;
-			}
-			else
-			{
-				return Globals::convertToNodePosition(unit.getPosition()) == nodePosition;
-			}
-		});
-		if (unit != units.cend())
-		{
-			return false;
-		}
-	}
-
-	return false;
-}
-
 bool PathFinding::isTargetInLineOfSight(const glm::vec3& startingPosition, const Entity& targetEntity, const Map& map) const
 {
 	glm::vec3 direction = glm::normalize(targetEntity.getPosition() - startingPosition);
@@ -362,11 +335,8 @@ const std::vector<glm::vec3>& PathFinding::getFormationPositions(const glm::vec3
 glm::vec3 PathFinding::getClosestAvailablePosition(const glm::vec3& startingPosition, const std::forward_list<Unit>& units, 
 	const Map& map)
 {
-	if (isPositionAvailable(Globals::convertToNodePosition(startingPosition), map, units))
-	{
-		return startingPosition;
-	}	
-
+	//Introduce check for individual spawn position check
+	
 	m_graph.reset(m_frontier);
 	m_frontier.push(Globals::convertToGridPosition(startingPosition));
 	glm::ivec2 availablePositionOnGrid = {0, 0};
