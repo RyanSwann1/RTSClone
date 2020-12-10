@@ -380,7 +380,7 @@ void FactionPlayer::moveMultipleSelectedUnits(const glm::vec3& mouseToGroundPosi
                     glm::vec3 position = Globals::convertToNodePosition(mouseToGroundPosition - (averagePosition - selectedUnit->getPosition()));
 
                     selectedUnit->moveTo(position, map, [&](const glm::ivec2& position)
-                    { return getAdjacentPositions(position, map, m_units, *selectedUnit, m_selectedUnits); }, state);
+                        { return getAdjacentPositions(position, map); }, state);
                 }
                 break;
                 case eEntityType::Worker:
