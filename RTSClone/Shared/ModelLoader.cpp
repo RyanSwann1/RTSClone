@@ -14,7 +14,6 @@ namespace
 
 void processNode(aiNode* node, const aiScene* scene, std::vector<Mesh>& meshes, std::vector<MeshTextureDetails>& loadedTextures, const std::string& directory);
 Mesh processMesh(aiMesh* mesh, const aiScene* scene, std::vector<MeshTextureDetails>& loadedTextures, const std::string& directory);
-unsigned int TextureFromFile(const char* path, const std::string& directory);
 void loadMaterialTextures(aiMaterial* mat, aiTextureType type, const std::string& typeName, std::vector<MeshTextureDetails>& loadedTextures, 
     const std::string& directory, std::vector<MeshTextureDetails>& meshTextureDetails);
 Material loadMaterial(aiMaterial* mat);
@@ -80,36 +79,7 @@ Mesh processMesh(aiMesh* mesh, const aiScene* scene, std::vector<MeshTextureDeta
     }
 
     aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
-    std::vector<MeshTextureDetails> textures;
-    loadMaterialTextures(material, aiTextureType_DIFFUSE, "texture_diffuse", loadedTextures, directory, textures);
-
-    return Mesh(std::move(vertices), std::move(indices), std::move(textures), loadMaterial(material));
-}
-
-void loadMaterialTextures(aiMaterial* mat, aiTextureType type, const std::string& typeName, std::vector<MeshTextureDetails>& loadedTextures, 
-    const std::string& directory, std::vector<MeshTextureDetails>& meshTextureDetails)
-{
-    for (unsigned int i = 0; i < mat->GetTextureCount(type); i++)
-    {
-        aiString str;
-        mat->GetTexture(type, i, &str);
-        bool skip = false;
-        for (unsigned int j = 0; j < loadedTextures.size(); j++)
-        {
-            if (std::strcmp(loadedTextures[j].path.data(), str.C_Str()) == 0)
-            {
-                meshTextureDetails.push_back(loadedTextures[j]);
-                skip = true; 
-                break;
-            }
-        }
-        if (!skip)
-        { 
-            unsigned int ID = TextureFromFile(str.C_Str(), directory);
-            meshTextureDetails.emplace_back(ID, typeName, str.C_Str());
-            loadedTextures.emplace_back(ID, typeName, str.C_Str());
-        }
-    }
+    return Mesh(std::move(vertices), std::move(indices), loadMaterial(material));
 }
 
 Material loadMaterial(aiMaterial* mat) 
@@ -120,35 +90,4 @@ Material loadMaterial(aiMaterial* mat)
     mat->Get(AI_MATKEY_NAME, materialName);
 
     return Material({ color.r, color.g, color.b }, materialName.C_Str());
-}
-
-unsigned int TextureFromFile(const char* path, const std::string& directory)
-{
-    std::string filename = std::string(path);
-    filename = directory + '/' + filename;
-
-    unsigned int textureID;
-    glGenTextures(1, &textureID);
-    glBindTexture(GL_TEXTURE_2D, textureID);
-
-    sf::Image image;
-    bool textureLoaded = image.loadFromFile(filename);
-    if (!textureLoaded)
-    {
-        std::cout << "Failed to load texture: " << filename << "\n";
-    }
-    else
-    {
-        image.flipVertically();
-
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);	
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, image.getSize().x, image.getSize().y, 0, GL_RGBA, GL_UNSIGNED_BYTE, image.getPixelsPtr());
-        glGenerateMipmap(GL_TEXTURE_2D);
-    }
-
-    return textureID;
 }

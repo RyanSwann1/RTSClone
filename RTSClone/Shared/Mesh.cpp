@@ -14,7 +14,6 @@ Mesh::Mesh()
 	indiciesID(Globals::INVALID_OPENGL_ID),
 	vertices(),
 	indices(),
-	textures(),
 	material()
 {
 	glGenVertexArrays(1, &vaoID);
@@ -22,13 +21,12 @@ Mesh::Mesh()
 	glGenBuffers(1, &indiciesID);
 }
 
-Mesh::Mesh(std::vector<Vertex>&& vertices, std::vector<unsigned int>&& indices, std::vector<MeshTextureDetails>&& textures, const Material& material)
+Mesh::Mesh(std::vector<Vertex>&& vertices, std::vector<unsigned int>&& indices, const Material& material)
 	: vaoID(Globals::INVALID_OPENGL_ID),
 	vboID(Globals::INVALID_OPENGL_ID),
 	indiciesID(Globals::INVALID_OPENGL_ID),
 	vertices(std::move(vertices)),
 	indices(std::move(indices)),
-	textures(std::move(textures)),
 	material(material)
 {
 	glGenVertexArrays(1, &vaoID);
@@ -42,7 +40,6 @@ Mesh::Mesh(Mesh&& orig) noexcept
 	indiciesID(orig.indiciesID),
 	vertices(std::move(orig.vertices)),
 	indices(std::move(orig.indices)),
-	textures(std::move(orig.textures)),
 	material(orig.material)
 {
 	orig.vaoID = Globals::INVALID_OPENGL_ID;
@@ -57,7 +54,6 @@ Mesh& Mesh::operator=(Mesh&& orig) noexcept
 	indiciesID = orig.indiciesID;
 	vertices = std::move(orig.vertices);
 	indices = std::move(orig.indices);
-	textures = std::move(orig.textures);
 	material = orig.material;
 
 	orig.vaoID = Globals::INVALID_OPENGL_ID;
@@ -122,31 +118,31 @@ void Mesh::renderDebugMesh(ShaderHandler& shaderHandler) const
 
 void Mesh::render(ShaderHandler& shaderHandler, bool selected) const
 {
-	if (!textures.empty())
-	{
-		assert(textures.size() == static_cast<size_t>(1));
-		glBindTexture(GL_TEXTURE_2D, textures.front().ID);
+	//if (!textures.empty())
+	//{
+	//	assert(textures.size() == static_cast<size_t>(1));
+	//	glBindTexture(GL_TEXTURE_2D, textures.front().ID);
 
-		assert(!indices.empty());
-		bind();
-		shaderHandler.setUniformVec3(eShaderType::Default, "uMaterialColour", { 1.0f, 1.0f, 1.0f });
+	//	assert(!indices.empty());
+	//	bind();
+	//	shaderHandler.setUniformVec3(eShaderType::Default, "uMaterialColour", { 1.0f, 1.0f, 1.0f });
+	//}
+	//else
+	//{
+	assert(!indices.empty());
+	bind();
+	shaderHandler.setUniformVec3(eShaderType::Default, "uMaterialColour", material.diffuse);
+	if (selected)
+	{
+		shaderHandler.setUniform1f(eShaderType::Default, "uSelectedAmplifier", SELECTED_MESH_AMPLIFIER);
 	}
 	else
 	{
-		assert(!indices.empty());
-		bind();
-		shaderHandler.setUniformVec3(eShaderType::Default, "uMaterialColour", material.diffuse);
-		if (selected)
-		{
-			shaderHandler.setUniform1f(eShaderType::Default, "uSelectedAmplifier", SELECTED_MESH_AMPLIFIER);
-		}
-		else
-		{
-			shaderHandler.setUniform1f(eShaderType::Default, "uSelectedAmplifier", 1.0f);
-		}
-
-		glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(indices.size()), GL_UNSIGNED_INT, nullptr);
+		shaderHandler.setUniform1f(eShaderType::Default, "uSelectedAmplifier", 1.0f);
 	}
+
+	glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(indices.size()), GL_UNSIGNED_INT, nullptr);
+	//}
 }
 
 void Mesh::render(ShaderHandler& shaderHandler, eFactionController owningFactionController, bool selected) const
