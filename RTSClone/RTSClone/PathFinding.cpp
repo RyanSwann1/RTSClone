@@ -405,17 +405,14 @@ glm::vec3 PathFinding::getClosestAvailablePosition(const glm::vec3& startingPosi
 		{
 			if (adjacentPosition.valid)
 			{
-				if (!adjacentPosition.unitCollision)
-				{
-					availablePositionOnGrid = adjacentPosition.position;
-					availablePositionFound = true;
-					break;
-				}
-				else if (!m_graph.isPositionVisited(adjacentPosition.position, map))
-				{
-					m_graph.addToGraph(adjacentPosition.position, position, map);
-					m_frontier.push(adjacentPosition.position);
-				}
+				availablePositionOnGrid = adjacentPosition.position;
+				availablePositionFound = true;
+				break;
+			}
+			else if (!m_graph.isPositionVisited(adjacentPosition.position, map))
+			{
+				m_graph.addToGraph(adjacentPosition.position, position, map);
+				m_frontier.push(adjacentPosition.position);
 			}
 		}
 

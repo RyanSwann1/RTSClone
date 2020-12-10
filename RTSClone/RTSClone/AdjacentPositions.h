@@ -22,10 +22,9 @@ struct AdjacentPosition
 {
 	AdjacentPosition();
 	AdjacentPosition(const glm::ivec2& position);
-	AdjacentPosition(const glm::ivec2& position, bool valid, bool unitCollision);
+	AdjacentPosition(const glm::ivec2& position, bool valid);
 
 	bool valid;
-	bool unitCollision;
 	glm::ivec2 position;
 };
 

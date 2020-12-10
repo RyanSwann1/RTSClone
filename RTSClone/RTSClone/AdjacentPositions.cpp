@@ -48,19 +48,16 @@ namespace
 
 AdjacentPosition::AdjacentPosition()
 	: valid(false),
-	unitCollision(false),
 	position()
 {}
 
 AdjacentPosition::AdjacentPosition(const glm::ivec2 & position)
 	: valid(true),
-	unitCollision(false),
 	position(position)
 {}
 
-AdjacentPosition::AdjacentPosition(const glm::ivec2 & position, bool valid, bool unitCollision)
+AdjacentPosition::AdjacentPosition(const glm::ivec2 & position, bool valid)
 	: valid(valid),
-	unitCollision(unitCollision),
 	position(position)
 {}
 
@@ -97,11 +94,7 @@ std::array<AdjacentPosition, ALL_DIRECTIONS_ON_GRID.size()> getAdjacentPositions
 
 			if (!unitCollision)
 			{
-				adjacentPositions[i] = AdjacentPosition(adjacentPosition, true, unitCollision);
-			}
-			else
-			{
-				adjacentPositions[i] = AdjacentPosition(adjacentPosition, true, unitCollision);
+				adjacentPositions[i] = AdjacentPosition(adjacentPosition, true);
 			}
 		}
 	}
