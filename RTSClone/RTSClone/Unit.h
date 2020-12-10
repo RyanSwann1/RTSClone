@@ -56,8 +56,7 @@ public:
 	eUnitState getCurrentState() const;
 
 	void resetTarget();
-	void moveToAttackPosition(const Entity& targetEntity, const Faction& targetFaction, const Map& map,
-		const Faction& faction);
+	void moveToAttackPosition(const Entity& targetEntity, const Faction& targetFaction, const Map& map);
 	void moveTo(const glm::vec3& destinationPosition, const Map& map, const AdjacentPositions& adjacentPositions, 
 	 	eUnitState state = eUnitState::Moving);
 	void update(float deltaTime, FactionHandler& factionHandler, const Map& map,
