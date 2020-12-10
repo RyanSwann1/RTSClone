@@ -62,35 +62,6 @@ AdjacentPosition::AdjacentPosition(const glm::ivec2 & position, bool valid)
 	position(position)
 {}
 
-std::array<AdjacentPosition, ALL_DIRECTIONS_ON_GRID.size()> getAdjacentPositions(const glm::ivec2 & position, 
-	const Map & map, const std::forward_list<Unit> & units)
-{
-	std::array<AdjacentPosition, ALL_DIRECTIONS_ON_GRID.size()> adjacentPositions;
-	for (int i = 0; i < adjacentPositions.size(); ++i)
-	{
-		glm::ivec2 adjacentPosition = position + ALL_DIRECTIONS_ON_GRID[i];
-		if (map.isWithinBounds(adjacentPosition) && !map.isPositionOccupied(adjacentPosition))
-		{
-			bool unitCollision = false;
-			for (const auto& unit : units)
-			{
-				if (unit.getAABB().contains(Globals::convertToWorldPosition(adjacentPosition)))
-				{
-					unitCollision = true;
-					break;
-				}
-			}
-
-			if (!unitCollision)
-			{
-				adjacentPositions[i] = AdjacentPosition(adjacentPosition, true);
-			}
-		}
-	}
-
-	return adjacentPositions;
-}
-
 std::array<AdjacentPosition, ALL_DIRECTIONS_ON_GRID.size()> getAdjacentPositions(const glm::ivec2& position, const Map& map, 
 	const std::forward_list<Unit>& units, const Unit& unit)
 {
@@ -206,9 +177,8 @@ std::array<AdjacentPosition, ALL_DIRECTIONS_ON_GRID.size()> getAdjacentPositions
 }
 
 std::array<AdjacentPosition, ALL_DIRECTIONS_ON_GRID.size()> getAdjacentPositions(const glm::ivec2& position, const Map& map, 
-	const FactionPlayer& factionPlayer, const Unit& unit)
+	const Faction& faction, const Unit& unit)
 {
-	glm::vec3 worldPosition = Globals::convertToWorldPosition(position);
 	std::array<AdjacentPosition, ALL_DIRECTIONS_ON_GRID.size()> adjacentPositions;
 	for (int i = 0; i < static_cast<int>(ALL_DIRECTIONS_ON_GRID.size()); ++i)
 	{
@@ -216,12 +186,13 @@ std::array<AdjacentPosition, ALL_DIRECTIONS_ON_GRID.size()> getAdjacentPositions
 		if (map.isWithinBounds(adjacentPosition) &&
 			!map.isPositionOccupied(adjacentPosition))
 		{
-			int entityID = unit.getID();
-			auto unit = std::find_if(factionPlayer.getUnits().cbegin(), factionPlayer.getUnits().cend(), [&worldPosition, entityID](const auto& unit)
+			int unitID = unit.getID();
+			glm::vec3 adjacentWorldPosition = Globals::convertToWorldPosition(adjacentPosition);
+			auto unit = std::find_if(faction.getUnits().cbegin(), faction.getUnits().cend(), [&adjacentWorldPosition, unitID](const auto& unit)
 			{
-				return entityID != unit.getID() && !unit.getPathToPosition().empty() && unit.getPathToPosition().front() == worldPosition;
+				return unitID != unit.getID() && !unit.getPathToPosition().empty() && unit.getPathToPosition().front() == adjacentWorldPosition;
 			});
-			if (unit == factionPlayer.getUnits().cend())
+			if (unit == faction.getUnits().cend())
 			{
 				adjacentPositions[i] = AdjacentPosition(adjacentPosition);
 			}
