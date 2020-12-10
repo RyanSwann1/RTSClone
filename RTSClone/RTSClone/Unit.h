@@ -31,6 +31,7 @@ enum class eUnitState
 	Max = Repairing
 };
 
+class FactionPlayer;
 class Faction;
 class Map;
 class ShaderHandler;
@@ -44,6 +45,7 @@ public:
 	Unit(const Faction& owningFaction, const glm::vec3& startingPosition, const glm::vec3& destinationPosition, 
 		const Map& map, eEntityType entityType = eEntityType::Unit, int health = Globals::UNIT_STARTING_HEALTH, 
 		const Model& model = ModelManager::getInstance().getModel(UNIT_MODEL_NAME));
+	~Unit();
 
 	const std::vector<glm::vec3>& getPathToPosition() const;
 	float getGridAttackRange() const;
@@ -54,6 +56,8 @@ public:
 	eUnitState getCurrentState() const;
 
 	void resetTarget();
+	void moveToAttackPosition(const Entity& targetEntity, const Faction& targetFaction, const Map& map,
+		const Faction& faction);
 	void moveToAttackPosition(const Entity& targetEntity, const Faction& targetFaction, const Map& map, 
 		FactionHandler& factionHandler);
 	void moveTo(const glm::vec3& destinationPosition, const Map& map, const AdjacentPositions& adjacentPositions, 

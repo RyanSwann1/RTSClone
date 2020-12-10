@@ -10,15 +10,15 @@
 #include "FactionHandler.h"
 #include "PathFinding.h"
 #include "glm/gtx/vector_angle.hpp"
+#include "GameMessages.h"
+#include "GameMessenger.h"
 
 namespace
 {
 	constexpr float MOVEMENT_SPEED = 7.5f;
 	constexpr float UNIT_GRID_ATTACK_RANGE = 5.0f;
 	constexpr float UNIT_ATTACK_RANGE = UNIT_GRID_ATTACK_RANGE * Globals::NODE_SIZE;
-
 	constexpr float TIME_BETWEEN_ATTACK = 1.0f;
-
 	constexpr int DAMAGE = 1;
 
 #ifdef RENDER_PATHING
@@ -69,7 +69,12 @@ Unit::Unit(const Faction& owningFaction, const glm::vec3& startingPosition, eEnt
 	m_currentState(eUnitState::Idle),
 	m_attackTimer(TIME_BETWEEN_ATTACK, true),
 	m_targetEntity()
-{}
+{
+	if (getEntityType() == eEntityType::Unit)
+	{
+		GameMessenger::getInstance().broadcast<GameMessages::AddToMap>({ m_AABB, getID() });
+	}
+}
 
 Unit::Unit(const Faction& owningFaction, const glm::vec3 & startingPosition, const glm::vec3 & destinationPosition, 
 	const Map & map, eEntityType entityType, int health, const Model& model)
@@ -81,6 +86,14 @@ Unit::Unit(const Faction& owningFaction, const glm::vec3 & startingPosition, con
 	m_targetEntity()
 {
 	moveTo(destinationPosition, map, [&](const glm::ivec2& position) { return getAdjacentPositions(position, map); });
+}
+
+Unit::~Unit()
+{
+	if (getEntityType() == eEntityType::Unit)
+	{
+		GameMessenger::getInstance().broadcast<GameMessages::RemoveFromMap>({ m_AABB, getID() });
+	}
 }
 
 const std::vector<glm::vec3>& Unit::getPathToPosition() const
@@ -124,6 +137,51 @@ void Unit::resetTarget()
 	m_targetEntity.reset();
 }
 
+void Unit::moveToAttackPosition(const Entity& targetEntity, const Faction& targetFaction, const Map& map, 
+	const Faction& faction)
+{
+	glm::vec3 closestDestination = m_position;
+	if (!m_pathToPosition.empty())
+	{
+		closestDestination = m_pathToPosition.back();
+	}
+
+	if (PathFinding::getInstance().setUnitAttackPosition(*this, targetEntity, m_pathToPosition, map, faction))
+	{
+		m_targetEntity.set(targetFaction.getController(), targetEntity.getID());
+
+		if (!m_pathToPosition.empty())
+		{
+			switchToState(eUnitState::Moving, map);
+		}
+		else if (closestDestination != m_position)
+		{
+			m_pathToPosition.push_back(closestDestination);
+			switchToState(eUnitState::Moving, map);
+		}
+		else
+		{
+			assert(PathFinding::getInstance().isTargetInLineOfSight(*this, targetEntity, map));
+			switchToState(eUnitState::AttackingTarget, map);
+		}
+	}
+	else
+	{
+		if (m_pathToPosition.empty())
+		{
+			if (closestDestination != m_position)
+			{
+				m_pathToPosition.push_back(closestDestination);
+				switchToState(eUnitState::Moving, map);
+			}
+		}
+		else
+		{
+			switchToState(eUnitState::Idle, map);
+		}
+	}
+}
+
 void Unit::moveToAttackPosition(const Entity& targetEntity, const Faction& targetFaction, const Map& map,
 	FactionHandler& factionHandler)
 {
@@ -149,7 +207,7 @@ void Unit::moveToAttackPosition(const Entity& targetEntity, const Faction& targe
 		}
 		else
 		{
-			assert(PathFinding::getInstance().isTargetInLineOfSight(m_position, targetEntity, map));
+			assert(PathFinding::getInstance().isTargetInLineOfSight(*this, targetEntity, map));
 			switchToState(eUnitState::AttackingTarget, map);
 		}
 	}
@@ -223,6 +281,11 @@ void Unit::update(float deltaTime, FactionHandler& factionHandler, const Map& ma
 			}
 			
 			m_pathToPosition.pop_back();
+
+			if (getEntityType() == eEntityType::Unit && m_pathToPosition.empty())
+			{
+				GameMessenger::getInstance().broadcast<GameMessages::AddToMap>({ m_AABB, getID() });
+			}
 		}
 	}
 
@@ -240,7 +303,7 @@ void Unit::update(float deltaTime, FactionHandler& factionHandler, const Map& ma
 					const Entity* targetEntity = opposingFaction.get().getEntity(m_position, UNIT_ATTACK_RANGE, true);
 					if (targetEntity)
 					{
-						moveToAttackPosition(*targetEntity, opposingFaction, map, factionHandler);
+						moveToAttackPosition(*targetEntity, opposingFaction, map, m_owningFaction);
 					}
 				}
 				break;
@@ -278,9 +341,9 @@ void Unit::update(float deltaTime, FactionHandler& factionHandler, const Map& ma
 			for (const auto& opposingFaction : factionHandler.getOpposingFactions(m_owningFaction.getController()))
 			{
 				const Entity* targetEntity = opposingFaction.get().getEntity(m_position, UNIT_ATTACK_RANGE);
-				if (targetEntity && PathFinding::getInstance().isTargetInLineOfSight(m_position, *targetEntity, map))
+				if (targetEntity && PathFinding::getInstance().isTargetInLineOfSight(*this, *targetEntity, map))
 				{
-					moveToAttackPosition(*targetEntity, opposingFaction, map, factionHandler);
+					moveToAttackPosition(*targetEntity, opposingFaction, map, m_owningFaction);
 				}
 			}
 		}
@@ -300,7 +363,7 @@ void Unit::update(float deltaTime, FactionHandler& factionHandler, const Map& ma
 				if (targetEntity)
 				{
 					const Faction& targetFaction = factionHandler.getFaction(m_targetEntity.getFactionController());
-					moveToAttackPosition(*targetEntity, targetFaction, map, factionHandler);
+					moveToAttackPosition(*targetEntity, targetFaction, map, m_owningFaction);
 				}
 			}
 
@@ -334,9 +397,9 @@ void Unit::update(float deltaTime, FactionHandler& factionHandler, const Map& ma
 				else
 				{
 					if (Globals::getSqrDistance(targetEntity->getPosition(), m_position) > UNIT_ATTACK_RANGE * UNIT_ATTACK_RANGE ||
-						!PathFinding::getInstance().isTargetInLineOfSight(m_position, *targetEntity, map))
+						!PathFinding::getInstance().isTargetInLineOfSight(*this, *targetEntity, map))
 					{
-						moveToAttackPosition(*targetEntity, targetFaction, map, factionHandler);
+						moveToAttackPosition(*targetEntity, targetFaction, map, m_owningFaction);
 					}
 					else if (Globals::getSqrDistance(targetEntity->getPosition(), m_position) <= UNIT_ATTACK_RANGE * UNIT_ATTACK_RANGE)
 					{
@@ -410,7 +473,7 @@ void Unit::reduceHealth(const TakeDamageEvent& gameEvent, FactionHandler& factio
 			const Entity* targetEntity = opposingFaction.getEntity(gameEvent.senderID);
 			if (targetEntity)
 			{
-				moveToAttackPosition(*targetEntity, opposingFaction, map, factionHandler);
+				moveToAttackPosition(*targetEntity, opposingFaction, map, m_owningFaction);
 			}	
 		}
 	}
@@ -418,6 +481,12 @@ void Unit::reduceHealth(const TakeDamageEvent& gameEvent, FactionHandler& factio
 
 void Unit::switchToState(eUnitState newState, const Map& map, const Entity* targetEntity)
 {
+	if (getEntityType() == eEntityType::Unit && 
+		(newState == eUnitState::Moving || newState == eUnitState::AttackMoving))
+	{
+		GameMessenger::getInstance().broadcast<GameMessages::RemoveFromMap>({ m_AABB, getID() });
+	}
+
 	switch (newState)
 	{
 	case eUnitState::Idle:
