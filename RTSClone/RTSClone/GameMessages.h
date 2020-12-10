@@ -29,10 +29,12 @@ namespace GameMessages
 
 	struct RemoveFromMap : public BaseMessage<eGameMessageType::RemoveEntityFromMap>
 	{
-		RemoveFromMap(const AABB& AABB)
-			: AABB(AABB) {}
+		RemoveFromMap(const AABB& AABB, int entityID)
+			: AABB(AABB),
+			entityID(entityID) {}
 
 		const AABB& AABB;
+		const int entityID;
 	};
 
 	struct NewMapSize : public BaseMessage<eGameMessageType::NewMapSize>

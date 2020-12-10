@@ -18,6 +18,7 @@ class Entity : private NonCopyable
 public:
 	Entity(Entity&&) noexcept;
 	Entity& operator=(Entity&&) noexcept;
+	virtual ~Entity() {}
 
 #ifdef LEVEL_EDITOR
 	Entity(const Model& model);

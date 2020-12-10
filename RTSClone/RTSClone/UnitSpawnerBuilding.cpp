@@ -87,7 +87,7 @@ void HQ::addUnitToSpawn(const std::function<const Entity* (const UnitSpawnerBuil
 
 UnitSpawnerBuilding::~UnitSpawnerBuilding()
 {
-	GameMessenger::getInstance().broadcast<GameMessages::RemoveFromMap>({ m_AABB });
+	GameMessenger::getInstance().broadcast<GameMessages::RemoveFromMap>({ m_AABB, getID() });
 }
 
 const Timer& UnitSpawnerBuilding::getSpawnTimer() const

@@ -112,6 +112,11 @@ namespace
 		{
 			glm::vec3 targetPosition = pathToPosition[positionIndex];
 			glm::vec3 position = startingPosition;
+			if (startingPosition == targetPosition)
+			{
+				return;
+			}
+			assert(startingPosition != targetPosition);
 			float distance = glm::distance(targetPosition, startingPosition);
 			constexpr float step = 0.1f;
 			bool collision = false;
@@ -120,16 +125,22 @@ namespace
 			{
 				position = position + glm::normalize(targetPosition - startingPosition) * step;
 
-				auto cIter = std::find_if(units.cbegin(), units.cend(), [&position, &unit](const auto& otherUnit)
+				auto collidingUnit = std::find_if(units.cbegin(), units.cend(), [&position, &unit](const auto& otherUnit)
 				{
 					return unit.getID() != otherUnit.getID() && otherUnit.getAABB().contains(position);
 				});
 
-				if (cIter != units.cend() || map.isPositionOccupied(position))
+				MapNode mapNode = map.getNode(position);
+				if (collidingUnit != units.cend() || mapNode.isCollidable())
 				{
 					collision = true;
 					break;
 				}
+				//if (collidingUnit != units.cend() || (mapNode.isCollidable() && mapNode.getEntityID() == Globals::INVALID_ENTITY_ID))// map.isPositionOccupied(position))
+				//{
+				//	collision = true;
+				//	break;
+				//}
 			}
 
 			if (!collision)
@@ -247,17 +258,44 @@ bool PathFinding::isTargetInLineOfSight(const glm::vec3& startingPosition, const
 {
 	glm::vec3 direction = glm::normalize(targetEntity.getPosition() - startingPosition);
 	constexpr float step = 0.5f;
+	float distanceSqr = Globals::getSqrDistance(targetEntity.getPosition(), startingPosition);
+	bool targetEntityVisible = true;
+
+	for (int i = 1; i < std::ceil(distanceSqr / (step * step)); ++i)
+	{
+		glm::vec3 position = startingPosition + direction * static_cast<float>(i);
+		MapNode mapNode = map.getNode(position);
+		if (targetEntity.getAABB().contains(position))
+		{
+			break;
+		}
+		else if (mapNode.isCollidable() && mapNode.getEntityID() == Globals::INVALID_ENTITY_ID)
+		{
+			targetEntityVisible = false;
+			break;
+		}
+	}
+
+	return targetEntityVisible;
+}
+
+bool PathFinding::isTargetInLineOfSight(const Unit& unit, const Entity& targetEntity, const Map& map) const
+{
+	glm::vec3 startingPosition = unit.getPosition();
+	glm::vec3 direction = glm::normalize(targetEntity.getPosition() - startingPosition);
+	constexpr float step = 0.5f;
 	float distanceSqr = Globals::getSqrDistance(targetEntity.getPosition(), startingPosition); 
 	bool targetEntityVisible = true;
 
 	for (int i = 1; i < std::ceil(distanceSqr / (step * step)); ++i)
 	{
 		glm::vec3 position = startingPosition + direction * static_cast<float>(i);
+		MapNode mapNode = map.getNode(position);
 		if (targetEntity.getAABB().contains(position))
 		{
 			break;
 		}
-		else if (map.isPositionOccupied(position))
+		else if(mapNode.isCollidable() && mapNode.getEntityID() == Globals::INVALID_ENTITY_ID)
 		{
 			targetEntityVisible = false;
 			break;
@@ -333,11 +371,8 @@ const std::vector<glm::vec3>& PathFinding::getFormationPositions(const glm::vec3
 	return m_sharedPositionContainer;
 }
 
-glm::vec3 PathFinding::getClosestAvailablePosition(const glm::vec3& startingPosition, const std::forward_list<Unit>& units, 
-	const Map& map)
+glm::vec3 PathFinding::getClosestAvailablePosition(const glm::vec3& startingPosition, const Map& map)
 {
-	//Introduce check for individual spawn position check
-	
 	m_graph.reset(m_frontier);
 	m_frontier.push(Globals::convertToGridPosition(startingPosition));
 	glm::ivec2 availablePositionOnGrid = {0, 0};
@@ -348,7 +383,7 @@ glm::vec3 PathFinding::getClosestAvailablePosition(const glm::vec3& startingPosi
 		glm::ivec2 position = m_frontier.front();
 		m_frontier.pop();
 
-		std::array<AdjacentPosition, ALL_DIRECTIONS_ON_GRID.size()> adjacentPositions = getAdjacentPositions(position, map, units);
+		std::array<AdjacentPosition, ALL_DIRECTIONS_ON_GRID.size()> adjacentPositions = getAdjacentPositions(position, map);
 		for (const auto& adjacentPosition : adjacentPositions)
 		{
 			if (adjacentPosition.valid)
@@ -423,7 +458,7 @@ glm::vec3 PathFinding::getClosestPositionToAABB(const glm::vec3& entityPosition,
 }
 
 bool PathFinding::setUnitAttackPosition(const Unit& unit, const Entity& targetEntity, std::vector<glm::vec3>& pathToPosition, 
-	const Map& map, const FactionPlayer& factionPlayer)
+	const Map& map, const Faction& faction)
 {
 	assert(unit.getID() != targetEntity.getID());
 
@@ -454,7 +489,7 @@ bool PathFinding::setUnitAttackPosition(const Unit& unit, const Entity& targetEn
 		}
 		else
 		{
-			for (const auto& adjacentPosition : getAdjacentPositions(currentNode.position, map, factionPlayer, unit))
+			for (const auto& adjacentPosition : getAdjacentPositions(currentNode.position, map, faction, unit))
 			{
 				if (!adjacentPosition.valid || m_closedQueue.contains(adjacentPosition.position))
 				{
@@ -485,7 +520,7 @@ bool PathFinding::setUnitAttackPosition(const Unit& unit, const Entity& targetEn
 			isPriorityQueueWithinSizeLimit(m_closedQueue, map.getSize()));
 	}
 
-	convertPathToWaypoints(pathToPosition, unit, factionPlayer.getUnits(), map);
+	convertPathToWaypoints(pathToPosition, unit, faction.getUnits(), map);
 
 	return positionFound;
 }

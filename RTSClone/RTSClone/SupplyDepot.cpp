@@ -12,5 +12,5 @@ SupplyDepot::SupplyDepot(const glm::vec3& startingPosition)
 
 SupplyDepot::~SupplyDepot()
 {
-	GameMessenger::getInstance().broadcast<GameMessages::RemoveFromMap>({ m_AABB });
+	GameMessenger::getInstance().broadcast<GameMessages::RemoveFromMap>({ m_AABB, getID() });
 }

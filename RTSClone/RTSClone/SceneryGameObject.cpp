@@ -17,7 +17,7 @@ SceneryGameObject::~SceneryGameObject()
 {
 	if (m_active)
 	{
-		GameMessenger::getInstance().broadcast<GameMessages::RemoveFromMap>({ {m_position, m_model} });
+		GameMessenger::getInstance().broadcast<GameMessages::RemoveFromMap>({ {m_position, m_model}, Globals::INVALID_ENTITY_ID });
 	}
 }
 

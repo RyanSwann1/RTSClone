@@ -91,20 +91,18 @@ public:
 		glm::vec3& buildPosition, float minDistanceFromHQ, float maxDistanceFromHQ, float distanceFromMinerals, const Faction& owningFaction);
 
 	bool isTargetInLineOfSight(const glm::vec3& startingPosition, const Entity& targetEntity, const Map& map) const;
+	bool isTargetInLineOfSight(const Unit& unit, const Entity& targetEntity, const Map& map) const;
 	bool isTargetInLineOfSight(const glm::vec3& startingPosition, const Entity& targetEntity, const Map& map, const AABB& senderAABB) const;
 
 	const std::vector<glm::vec3>& getFormationPositions(const glm::vec3& startingPosition, const std::vector<Unit*>& selectedUnits,
 		const Map& map);
 
-	glm::vec3 getClosestAvailablePosition(const glm::vec3& startingPosition, const std::forward_list<Unit>& units, 
-		const Map& map);
-
+	glm::vec3 getClosestAvailablePosition(const glm::vec3& startingPosition, const Map& map);
 	glm::vec3 getRandomAvailablePositionOutsideAABB(const Entity& senderEntity, const Map& map);
-
 	glm::vec3 getClosestPositionToAABB(const glm::vec3& entityPosition, const AABB& AABB, const Map& map);
 
 	bool setUnitAttackPosition(const Unit& unit, const Entity& targetEntity, std::vector<glm::vec3>& pathToPosition,
-		const Map& map, const FactionPlayer& factionPlayer);
+		const Map& map, const Faction& faction);
 	bool setUnitAttackPosition(const Unit& unit, const Entity& targetEntity, std::vector<glm::vec3>& pathToPosition,
 		const Map& map, const std::forward_list<Unit>& units, FactionHandler& factionHandler);
 

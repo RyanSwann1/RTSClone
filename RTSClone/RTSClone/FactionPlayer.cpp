@@ -18,7 +18,7 @@
 namespace
 {
     void moveSelectedUnitsToAttackPosition(std::vector<Unit*>& selectedUnits, const Entity& targetEntity, 
-        const Faction& targetFaction, const Map& map, FactionHandler& factionHandler)
+        const Faction& targetFaction, const Map& map, const FactionPlayer& factionPlayer)
     {
         assert(!selectedUnits.empty());
         
@@ -30,7 +30,7 @@ namespace
 
         for (auto& selectedUnit : selectedUnits)
         {
-            selectedUnit->moveToAttackPosition(targetEntity, targetFaction, map, factionHandler);
+            selectedUnit->moveToAttackPosition(targetEntity, targetFaction, map, factionPlayer);
         }
     }
 
@@ -459,7 +459,7 @@ void FactionPlayer::onRightClick(const sf::Window& window, const Camera& camera,
         }
         else if (m_selectedUnits.size() >= static_cast<size_t>(2))
         {
-            moveSelectedUnitsToAttackPosition(m_selectedUnits, *targetEntity, *targetFaction, map, factionHandler);
+            moveSelectedUnitsToAttackPosition(m_selectedUnits, *targetEntity, *targetFaction, map, *this);
         }
     }
     else
