@@ -242,7 +242,7 @@ bool PathFinding::isBuildingSpawnAvailable(const glm::vec3& startingPosition, co
 	return foundBuildPosition;
 }
 
-bool PathFinding::isPositionAvailable(const glm::vec3& nodePosition, const Map& map, const std::forward_list<Unit>& units, const std::forward_list<Worker>& workers,
+bool PathFinding::isPositionAvailable(const glm::vec3& nodePosition, const Map& map, const std::forward_list<Unit>& units,
 	int senderID) const
 {
 	assert(nodePosition == Globals::convertToNodePosition(nodePosition));
@@ -260,30 +260,7 @@ bool PathFinding::isPositionAvailable(const glm::vec3& nodePosition, const Map& 
 				return Globals::convertToNodePosition(unit.getPosition()) == nodePosition;
 			}
 		});
-
-		if (unit == units.cend())
-		{
-			auto worker = std::find_if(workers.cbegin(), workers.cend(), [&nodePosition, senderID](const auto& worker) -> bool
-			{
-				if (senderID != Globals::INVALID_ENTITY_ID)
-				{
-					return worker.getID() != senderID && Globals::convertToNodePosition(worker.getPosition()) == nodePosition;
-				}
-				else
-				{
-					return Globals::convertToNodePosition(worker.getPosition()) == nodePosition;
-				}
-			});
-			if (worker != workers.cend())
-			{
-				return false;
-			}
-			else
-			{
-				return true;
-			}
-		}
-		else
+		if (unit != units.cend())
 		{
 			return false;
 		}
@@ -383,9 +360,9 @@ const std::vector<glm::vec3>& PathFinding::getFormationPositions(const glm::vec3
 }
 
 glm::vec3 PathFinding::getClosestAvailablePosition(const glm::vec3& startingPosition, const std::forward_list<Unit>& units, 
-	const std::forward_list<Worker>& workers, const Map& map)
+	const Map& map)
 {
-	if (isPositionAvailable(Globals::convertToNodePosition(startingPosition), map, units, workers))
+	if (isPositionAvailable(Globals::convertToNodePosition(startingPosition), map, units))
 	{
 		return startingPosition;
 	}	
@@ -400,7 +377,7 @@ glm::vec3 PathFinding::getClosestAvailablePosition(const glm::vec3& startingPosi
 		glm::ivec2 position = m_frontier.front();
 		m_frontier.pop();
 
-		std::array<AdjacentPosition, ALL_DIRECTIONS_ON_GRID.size()> adjacentPositions = getAdjacentPositions(position, map, units, workers);
+		std::array<AdjacentPosition, ALL_DIRECTIONS_ON_GRID.size()> adjacentPositions = getAdjacentPositions(position, map, units);
 		for (const auto& adjacentPosition : adjacentPositions)
 		{
 			if (adjacentPosition.valid)

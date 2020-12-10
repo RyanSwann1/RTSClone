@@ -648,12 +648,12 @@ const Entity* Faction::spawnUnit(const Map& map, const UnitSpawnerBuilding& buil
         if (building.isWaypointActive())
         {
             m_units.emplace_front(*this, Globals::convertToNodePosition(building.getUnitSpawnPosition()), PathFinding::getInstance().getClosestAvailablePosition(
-                building.getWaypointPosition(), m_units, m_workers, map), map);
+                building.getWaypointPosition(), m_units, map), map);
         }
         else
         {
             m_units.emplace_front(*this, Globals::convertToNodePosition(PathFinding::getInstance().getClosestAvailablePosition(building.getUnitSpawnPosition(),
-                m_units, m_workers, map)));
+                m_units, map)));
         }
 
         reduceResources(eEntityType::Unit);
@@ -673,12 +673,12 @@ const Entity* Faction::spawnWorker(const Map& map, const UnitSpawnerBuilding& bu
         if (building.isWaypointActive())
         {
             m_workers.emplace_front(*this, building.getUnitSpawnPosition(), PathFinding::getInstance().getClosestAvailablePosition(
-                building.getWaypointPosition(), m_units, m_workers, map), map);
+                building.getWaypointPosition(), m_units, map), map);
         }
         else
         {
             m_workers.emplace_front(*this, PathFinding::getInstance().getClosestAvailablePosition(
-                building.getUnitSpawnPosition(), m_units, m_workers, map));
+                building.getUnitSpawnPosition(), m_units, map));
         }
 
         reduceResources(eEntityType::Worker);
