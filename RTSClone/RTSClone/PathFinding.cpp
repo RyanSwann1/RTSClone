@@ -98,7 +98,6 @@ namespace
 
 	void convertPathToWaypoints(std::vector<glm::vec3>& pathToPosition, const Unit& unit, const Map& map)
 	{
-		return;
 		if (pathToPosition.size() <= size_t(1))
 		{
 			return;
@@ -112,35 +111,18 @@ namespace
 		{
 			glm::vec3 targetPosition = pathToPosition[positionIndex];
 			glm::vec3 position = startingPosition;
-			if (startingPosition == targetPosition)
-			{
-				break;
-			}
-			assert(startingPosition != targetPosition);
 			float distance = glm::distance(targetPosition, startingPosition);
 			constexpr float step = 0.1f;
 			bool collision = false;
-
 			for (int ray = step; ray <= std::ceil(distance / step); ++ray)
 			{
 				position = position + glm::normalize(targetPosition - startingPosition) * step;
 
-				//auto collidingUnit = std::find_if(units.cbegin(), units.cend(), [&position, &unit](const auto& otherUnit)
-				//{
-				//	return unit.getID() != otherUnit.getID() && otherUnit.getAABB().contains(position);
-				//});
-
-				//MapNode mapNode = map.getNode(position);
-				//if (collidingUnit != units.cend() || mapNode.isCollidable())
-				//{
-				//	collision = true;
-				//	break;
-				//}
-				//if (collidingUnit != units.cend() || (mapNode.isCollidable() && mapNode.getEntityID() == Globals::INVALID_ENTITY_ID))// map.isPositionOccupied(position))
-				//{
-				//	collision = true;
-				//	break;
-				//}
+				if (map.isPositionOccupied(position))
+				{
+					collision = true;
+					break;
+				}
 			}
 
 			if (!collision)
