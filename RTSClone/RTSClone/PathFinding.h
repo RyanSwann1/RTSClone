@@ -90,9 +90,6 @@ public:
 	bool isBuildingSpawnAvailable(const glm::vec3& startingPosition, const Model& model, const Map& map,
 		glm::vec3& buildPosition, float minDistanceFromHQ, float maxDistanceFromHQ, float distanceFromMinerals, const Faction& owningFaction);
 
-	bool isPositionAvailable(const glm::vec3& nodePosition, const Map& map, const std::forward_list<Unit>& units, const std::forward_list<Worker>& workers, 
-		int senderID = Globals::INVALID_ENTITY_ID) const;
-
 	bool isTargetInLineOfSight(const glm::vec3& startingPosition, const Entity& targetEntity, const Map& map) const;
 	bool isTargetInLineOfSight(const glm::vec3& startingPosition, const Entity& targetEntity, const Map& map, const AABB& senderAABB) const;
 
@@ -100,7 +97,7 @@ public:
 		const Map& map);
 
 	glm::vec3 getClosestAvailablePosition(const glm::vec3& startingPosition, const std::forward_list<Unit>& units, 
-		const std::forward_list<Worker>& workers, const Map& map);
+		const Map& map);
 
 	glm::vec3 getRandomAvailablePositionOutsideAABB(const Entity& senderEntity, const Map& map);
 
