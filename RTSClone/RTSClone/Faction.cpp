@@ -585,7 +585,7 @@ void Faction::revalidateExistingUnitPaths(const Map& map)
         {
             glm::vec3 destination = unit.getDestination();
             unit.moveTo(destination, map, [&](const glm::ivec2& position)
-                { return getAdjacentPositions(position, map, m_units, unit); }, unit.getCurrentState());
+                { return getAdjacentPositions(position, map); }, unit.getCurrentState());
         }
     }
 

@@ -276,7 +276,7 @@ void FactionPlayer::moveSingularSelectedUnit(const glm::vec3& mouseToGroundPosit
         Unit& selectedUnit = static_cast<Unit&>(selectedEntity);
         selectedUnit.resetTarget();
         selectedUnit.moveTo(Globals::convertToNodePosition(mouseToGroundPosition), map,
-            [&](const glm::ivec2& position) { return getAdjacentPositions(position, map, m_units, selectedUnit); },
+            [&](const glm::ivec2& position) { return getAdjacentPositions(position, map); },
             (m_attackMoveSelected ? eUnitState::AttackMoving : eUnitState::Moving));
     }
         break;

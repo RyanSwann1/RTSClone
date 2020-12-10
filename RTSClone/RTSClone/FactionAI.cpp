@@ -200,7 +200,7 @@ void FactionAI::update(float deltaTime, const Map & map, FactionHandler& faction
 				if (unit.getCurrentState() == eUnitState::Idle)
 				{
 					unit.moveTo(m_targetFaction->getHQPosition(), map, [&](const glm::ivec2& position)
-					{ return getAdjacentPositions(position, map, m_units, unit); }, eUnitState::AttackMoving);
+					{ return getAdjacentPositions(position, map); }, eUnitState::AttackMoving);
 				}
 			}
 		}
