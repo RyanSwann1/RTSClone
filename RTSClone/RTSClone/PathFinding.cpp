@@ -458,7 +458,7 @@ glm::vec3 PathFinding::getClosestPositionToAABB(const glm::vec3& entityPosition,
 }
 
 bool PathFinding::setUnitAttackPosition(const Unit& unit, const Entity& targetEntity, std::vector<glm::vec3>& pathToPosition, 
-	const Map& map, const Faction& faction)
+	const Map& map, const Faction& owningFaction)
 {
 	assert(unit.getID() != targetEntity.getID());
 
@@ -489,7 +489,7 @@ bool PathFinding::setUnitAttackPosition(const Unit& unit, const Entity& targetEn
 		}
 		else
 		{
-			for (const auto& adjacentPosition : getAdjacentPositions(currentNode.position, map, faction, unit))
+			for (const auto& adjacentPosition : getAdjacentPositions(currentNode.position, map, owningFaction, unit))
 			{
 				if (!adjacentPosition.valid || m_closedQueue.contains(adjacentPosition.position))
 				{
@@ -520,7 +520,7 @@ bool PathFinding::setUnitAttackPosition(const Unit& unit, const Entity& targetEn
 			isPriorityQueueWithinSizeLimit(m_closedQueue, map.getSize()));
 	}
 
-	convertPathToWaypoints(pathToPosition, unit, faction.getUnits(), map);
+	convertPathToWaypoints(pathToPosition, unit, owningFaction.getUnits(), map);
 
 	return positionFound;
 }

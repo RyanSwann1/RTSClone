@@ -57,7 +57,7 @@ std::array<AdjacentPosition, ALL_DIRECTIONS_ON_GRID.size()> getAdjacentPositions
 }
 
 std::array<AdjacentPosition, ALL_DIRECTIONS_ON_GRID.size()> getAdjacentPositions(const glm::ivec2& position, const Map& map, 
-	const Faction& faction, const Unit& unit)
+	const Faction& owningFaction, const Unit& unit)
 {
 	std::array<AdjacentPosition, ALL_DIRECTIONS_ON_GRID.size()> adjacentPositions;
 	for (int i = 0; i < static_cast<int>(ALL_DIRECTIONS_ON_GRID.size()); ++i)
@@ -68,11 +68,11 @@ std::array<AdjacentPosition, ALL_DIRECTIONS_ON_GRID.size()> getAdjacentPositions
 		{
 			int unitID = unit.getID();
 			glm::vec3 adjacentWorldPosition = Globals::convertToWorldPosition(adjacentPosition);
-			auto unit = std::find_if(faction.getUnits().cbegin(), faction.getUnits().cend(), [&adjacentWorldPosition, unitID](const auto& unit)
+			auto unit = std::find_if(owningFaction.getUnits().cbegin(), owningFaction.getUnits().cend(), [&adjacentWorldPosition, unitID](const auto& unit)
 			{
 				return unitID != unit.getID() && !unit.getPathToPosition().empty() && unit.getPathToPosition().front() == adjacentWorldPosition;
 			});
-			if (unit == faction.getUnits().cend())
+			if (unit == owningFaction.getUnits().cend())
 			{
 				adjacentPositions[i] = AdjacentPosition(adjacentPosition);
 			}
