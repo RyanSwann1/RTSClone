@@ -455,7 +455,7 @@ void FactionPlayer::onRightClick(const sf::Window& window, const Camera& camera,
 
         if (m_selectedUnits.size() == static_cast<size_t>(1))
         {
-            m_selectedUnits.back()->moveToAttackPosition(*targetEntity, *targetFaction, map, factionHandler);
+            m_selectedUnits.back()->moveToAttackPosition(*targetEntity, *targetFaction, map, *this);
         }
         else if (m_selectedUnits.size() >= static_cast<size_t>(2))
         {

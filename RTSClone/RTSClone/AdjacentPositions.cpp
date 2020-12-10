@@ -9,42 +9,6 @@
 namespace
 {
 	const TypeComparison<eUnitState> COLLIDABLE_UNIT_STATES ({ eUnitState::Idle, eUnitState::AttackingTarget });
-	
-	bool isUnitPositionAvailable(const glm::vec3& position, const Unit& senderUnit, FactionHandler& factionHandler)
-	{
-		for (const auto& opposingFaction : factionHandler.getOpposingFactions(senderUnit.getOwningFactionController()))
-		{
-			auto unit = std::find_if(opposingFaction.get().getUnits().cbegin(), opposingFaction.get().getUnits().cend(), [&position](const auto& unit)
-			{
-				return COLLIDABLE_UNIT_STATES.isMatch(unit.getCurrentState()) && unit.getAABB().contains(position);
-			});
-			if (unit != opposingFaction.get().getUnits().cend())
-			{
-				return false;
-			}
-		}
-
-		assert(factionHandler.isFactionActive(senderUnit.getOwningFactionController()));
-		const Faction& owningFaction = factionHandler.getFaction(senderUnit.getOwningFactionController());
-		int senderUnitID = senderUnit.getID();
-		auto unit = std::find_if(owningFaction.getUnits().cbegin(), owningFaction.getUnits().cend(), [&position, senderUnitID](const auto& unit)
-		{
-			if (COLLIDABLE_UNIT_STATES.isMatch(unit.getCurrentState()))
-			{
-				return unit.getID() != senderUnitID && unit.getAABB().contains(position);
-			}
-			else
-			{
-				return unit.getID() != senderUnitID && !unit.getPathToPosition().empty() && unit.getPathToPosition().front() == position;
-			}
-		});
-		if (unit != owningFaction.getUnits().cend())
-		{
-			return false;
-		}
-
-		return true;
-	}
 }
 
 AdjacentPosition::AdjacentPosition()
@@ -87,24 +51,6 @@ std::array<AdjacentPosition, ALL_DIRECTIONS_ON_GRID.size()> getAdjacentPositions
 		{
 			adjacentPositions[i] = AdjacentPosition(adjacentPosition);
 		}
-	}
-
-	return adjacentPositions;
-}
-
-std::array<AdjacentPosition, ALL_DIRECTIONS_ON_GRID.size()> getAdjacentPositions(const glm::ivec2& position, 
-	const Map& map, FactionHandler& factionHandler, const Unit& unit)
-{
-	std::array<AdjacentPosition, ALL_DIRECTIONS_ON_GRID.size()> adjacentPositions;
-	for (int i = 0; i < static_cast<int>(ALL_DIRECTIONS_ON_GRID.size()); ++i)
-	{
-		glm::ivec2 adjacentPosition = position + ALL_DIRECTIONS_ON_GRID[i];
-		if (map.isWithinBounds(adjacentPosition) && 
-			!map.isPositionOccupied(adjacentPosition) &&
-			isUnitPositionAvailable(Globals::convertToWorldPosition(adjacentPosition), unit, factionHandler))
-		{
-			adjacentPositions[i] = AdjacentPosition(adjacentPosition);
-		}		
 	}
 
 	return adjacentPositions;
