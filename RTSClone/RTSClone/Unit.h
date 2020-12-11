@@ -78,4 +78,7 @@ private:
 #ifdef RENDER_PATHING
 	Mesh m_renderPathMesh;
 #endif // RENDER_PATHING
+
+	void addToMap() const;
+	void removeFromMap() const;
 };

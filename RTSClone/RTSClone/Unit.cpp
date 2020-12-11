@@ -70,16 +70,7 @@ Unit::Unit(const Faction& owningFaction, const glm::vec3& startingPosition, eEnt
 	m_attackTimer(TIME_BETWEEN_ATTACK, true),
 	m_targetEntity()
 {
-	switch (getEntityType())
-	{
-	case eEntityType::Unit:
-		GameMessenger::getInstance().broadcast<GameMessages::AddToMap>({ m_AABB, getID() });
-		break;
-	case eEntityType::Worker:
-		break;
-	default:
-		assert(false);
-	}
+	addToMap();
 }
 
 Unit::Unit(const Faction& owningFaction, const glm::vec3 & startingPosition, const glm::vec3 & destinationPosition, 
@@ -92,20 +83,15 @@ Unit::Unit(const Faction& owningFaction, const glm::vec3 & startingPosition, con
 	m_targetEntity()
 {
 	moveTo(destinationPosition, map, [&](const glm::ivec2& position) { return getAdjacentPositions(position, map); });
+	if (m_pathToPosition.empty())
+	{
+		addToMap();
+	}
 }
 
 Unit::~Unit()
 {
-	switch (getEntityType())
-	{
-	case eEntityType::Unit:
-		GameMessenger::getInstance().broadcast<GameMessages::RemoveFromMap>({ m_AABB, getID() });
-		break;
-	case eEntityType::Worker:
-		break;
-	default:
-		assert(false);
-	}
+	removeFromMap();
 }
 
 const std::vector<glm::vec3>& Unit::getPathToPosition() const
@@ -226,15 +212,16 @@ void Unit::update(float deltaTime, FactionHandler& factionHandler, const Map& ma
 			{
 			case eEntityType::Unit:
 				assert(Globals::isOnMiddlePosition(m_position));
-				if (m_pathToPosition.empty())
-				{
-					GameMessenger::getInstance().broadcast<GameMessages::AddToMap>({ m_AABB, getID() });
-				}
 				break;
 			case eEntityType::Worker:
 				break;
 			default:
 				assert(false);
+			}
+
+			if (m_pathToPosition.empty())
+			{
+				addToMap();
 			}
 		}
 	}
@@ -445,16 +432,7 @@ void Unit::switchToState(eUnitState newState, const Map& map, const Entity* targ
 		break;
 	case eUnitState::AttackMoving:
 		m_targetEntity.reset();
-		switch (getEntityType())
-		{
-		case eEntityType::Unit:
-			GameMessenger::getInstance().broadcast<GameMessages::RemoveFromMap>({ m_AABB, getID() });
-			break;
-		case eEntityType::Worker:
-			break;
-		default:
-			assert(false);
-		}
+		removeFromMap();
 		break;
 	case eUnitState::AttackingTarget:
 		if (m_currentState != newState)
@@ -465,22 +443,41 @@ void Unit::switchToState(eUnitState newState, const Map& map, const Entity* targ
 	case eUnitState::SetAttackPosition:
 		break;
 	case eUnitState::Moving:
-		switch (getEntityType())
-		{
-		case eEntityType::Unit:
-			GameMessenger::getInstance().broadcast<GameMessages::RemoveFromMap>({ m_AABB, getID() });
-			break;
-		case eEntityType::Worker:
-			break;
-		default:
-			assert(false);
-		}
+		removeFromMap();
 		break;
 	default:
 		assert(false);
 	}
 
 	m_currentState = newState;
+}
+
+void Unit::addToMap() const
+{
+	switch (getEntityType())
+	{
+	case eEntityType::Unit:
+		GameMessenger::getInstance().broadcast<GameMessages::AddToMap>({ m_AABB, getID() });
+		break;
+	case eEntityType::Worker:
+		break;
+	default:
+		assert(false);
+	}
+}
+
+void Unit::removeFromMap() const
+{
+	switch (getEntityType())
+	{
+	case eEntityType::Unit:
+		GameMessenger::getInstance().broadcast<GameMessages::RemoveFromMap>({ m_AABB, getID() });
+		break;
+	case eEntityType::Worker:
+		break;
+	default:
+		assert(false);
+	}
 }
 
 #ifdef RENDER_PATHING
