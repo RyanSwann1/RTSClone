@@ -161,7 +161,6 @@ void Unit::moveToAttackPosition(const Entity& targetEntity, const Faction& targe
 		}
 		else
 		{
-			assert(PathFinding::getInstance().isTargetInLineOfSight(*this, targetEntity, map));
 			switchToState(eUnitState::AttackingTarget, map);
 		}
 	}
@@ -458,7 +457,10 @@ void Unit::switchToState(eUnitState newState, const Map& map, const Entity* targ
 		}
 		break;
 	case eUnitState::AttackingTarget:
-		m_attackTimer.resetElaspedTime();
+		if (m_currentState != newState)
+		{
+			m_attackTimer.resetElaspedTime();
+		}
 		break;
 	case eUnitState::SetAttackPosition:
 		break;
