@@ -123,20 +123,9 @@ float Unit::getAttackRange() const
 	return UNIT_ATTACK_RANGE;
 }
 
-bool Unit::isPathEmpty() const
-{
-	return m_pathToPosition.empty();
-}
-
 eFactionController Unit::getOwningFactionController() const
 {
 	return m_owningFaction.getController();
-}
-
-const glm::vec3& Unit::getDestination() const
-{
-	assert(!isPathEmpty());
-	return m_pathToPosition.front();
 }
 
 eUnitState Unit::getCurrentState() const

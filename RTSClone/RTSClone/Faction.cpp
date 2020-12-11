@@ -581,20 +581,19 @@ void Faction::revalidateExistingUnitPaths(const Map& map)
 {
     for (auto& unit : m_units)
     {
-        if (!unit.isPathEmpty())
+        if (!unit.getPathToPosition().empty())
         {
-            glm::vec3 destination = unit.getDestination();
-            unit.moveTo(destination, map, [&](const glm::ivec2& position)
-                { return getAdjacentPositions(position, map); }, unit.getCurrentState());
+            unit.moveTo(unit.getPathToPosition().front(), map, [&](const glm::ivec2& position)
+            { return getAdjacentPositions(position, map); }, unit.getCurrentState());
         }
     }
 
     for (auto& worker : m_workers)
     {
-        if (!worker.isPathEmpty())
+        if (!worker.getPathToPosition().empty())
         {
-            glm::vec3 destination = worker.getDestination();
-            worker.moveTo(destination, map, [&](const glm::ivec2& position) { return getAdjacentPositions(position, map); }, worker.getCurrentState());
+            worker.moveTo(worker.getPathToPosition().front(), map, 
+                [&](const glm::ivec2& position) { return getAdjacentPositions(position, map); }, worker.getCurrentState());
         }
     }
 }
