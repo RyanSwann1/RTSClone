@@ -119,7 +119,7 @@ void Unit::moveToAttackPosition(const Entity& targetEntity, const Faction& targe
 		}
 		else if(closestDestination != m_position)
 		{
-			m_pathToPosition.push_back(closestDestination);
+			PathFinding::getInstance().setUnitAttackPosition(*this, targetEntity, m_pathToPosition, map, factionHandler);
 			switchToState(eUnitState::Moving, map);
 		}
 		else
@@ -133,7 +133,7 @@ void Unit::moveToAttackPosition(const Entity& targetEntity, const Faction& targe
 		{
 			if (closestDestination != m_position)
 			{
-				m_pathToPosition.push_back(closestDestination);
+				PathFinding::getInstance().setUnitAttackPosition(*this, targetEntity, m_pathToPosition, map, factionHandler);
 				switchToState(eUnitState::Moving, map);
 			}
 		}
@@ -163,7 +163,10 @@ void Unit::moveTo(const glm::vec3& destinationPosition, const Map& map, const Ad
 	{
 		if (closestDestination != m_position)
 		{
-			m_pathToPosition.push_back(closestDestination);
+			Unit& unit = *this;
+			PathFinding::getInstance().getPathToPosition(*this, closestDestination, m_pathToPosition, [&](const glm::ivec2& position)
+				{ return getAdjacentPositions(position, map, factionHandler, unit); }, map);
+
 			switchToState(state, map);
 		}
 		else
