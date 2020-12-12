@@ -31,6 +31,8 @@ enum class eUnitState
 	Max = Repairing
 };
 
+extern const TypeComparison<eUnitState> COLLIDABLE_UNIT_STATES; //({ eUnitState::Idle, eUnitState::AttackingTarget });
+
 class Faction;
 class Map;
 class ShaderHandler;
@@ -40,9 +42,6 @@ class Unit : public Entity, private NonMovable
 public:
 	Unit(const Faction& owningFaction, const glm::vec3& startingPosition, 
 		eEntityType entityType = eEntityType::Unit, int health = Globals::UNIT_STARTING_HEALTH,
-		const Model& model = ModelManager::getInstance().getModel(UNIT_MODEL_NAME));
-	Unit(const Faction& owningFaction, const glm::vec3& startingPosition, const glm::vec3& destinationPosition, 
-		const Map& map, eEntityType entityType = eEntityType::Unit, int health = Globals::UNIT_STARTING_HEALTH, 
 		const Model& model = ModelManager::getInstance().getModel(UNIT_MODEL_NAME));
 
 	const std::vector<glm::vec3>& getPathToPosition() const;
@@ -57,7 +56,7 @@ public:
 	void moveToAttackPosition(const Entity& targetEntity, const Faction& targetFaction, const Map& map, 
 		FactionHandler& factionHandler);
 	void moveTo(const glm::vec3& destinationPosition, const Map& map, const AdjacentPositions& adjacentPositions, 
-	 	eUnitState state = eUnitState::Moving);
+		FactionHandler& factionHandler, eUnitState state = eUnitState::Moving);
 	void update(float deltaTime, FactionHandler& factionHandler, const Map& map,
 		const Timer& unitStateHandlerTimer);
 	void reduceHealth(const TakeDamageEvent& gameEvent, FactionHandler& factionHandler, const Map& map);

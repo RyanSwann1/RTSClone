@@ -11,6 +11,8 @@
 #include "PathFinding.h"
 #include "glm/gtx/vector_angle.hpp"
 
+const TypeComparison<eUnitState> COLLIDABLE_UNIT_STATES({ eUnitState::Idle, eUnitState::AttackingTarget });
+
 namespace
 {
 	constexpr float MOVEMENT_SPEED = 7.5f;
@@ -70,18 +72,6 @@ Unit::Unit(const Faction& owningFaction, const glm::vec3& startingPosition, eEnt
 	m_attackTimer(TIME_BETWEEN_ATTACK, true),
 	m_targetEntity()
 {}
-
-Unit::Unit(const Faction& owningFaction, const glm::vec3 & startingPosition, const glm::vec3 & destinationPosition, 
-	const Map & map, eEntityType entityType, int health, const Model& model)
-	: Entity(model, startingPosition, entityType, health),
-	m_owningFaction(owningFaction),
-	m_pathToPosition(),
-	m_currentState(eUnitState::Idle),
-	m_attackTimer(TIME_BETWEEN_ATTACK, true),
-	m_targetEntity()
-{
-	moveTo(destinationPosition, map, [&](const glm::ivec2& position) { return getAdjacentPositions(position, map); });
-}
 
 const std::vector<glm::vec3>& Unit::getPathToPosition() const
 {
@@ -170,7 +160,8 @@ void Unit::moveToAttackPosition(const Entity& targetEntity, const Faction& targe
 	}
 }
 
-void Unit::moveTo(const glm::vec3& destinationPosition, const Map& map, const AdjacentPositions& adjacentPositions, eUnitState state)
+void Unit::moveTo(const glm::vec3& destinationPosition, const Map& map, const AdjacentPositions& adjacentPositions, 
+	FactionHandler& factionHandler, eUnitState state)
 {
 	glm::vec3 closestDestination = m_position;
 	if (!m_pathToPosition.empty())
@@ -179,7 +170,7 @@ void Unit::moveTo(const glm::vec3& destinationPosition, const Map& map, const Ad
 	}
 
 	PathFinding::getInstance().getPathToPosition(*this, destinationPosition, m_pathToPosition, adjacentPositions,
-		m_owningFaction.getUnits(), map);
+		m_owningFaction.getUnits(), map, factionHandler);
 	if (!m_pathToPosition.empty())
 	{
 		switchToState(state, map);
@@ -221,7 +212,7 @@ void Unit::update(float deltaTime, FactionHandler& factionHandler, const Map& ma
 			default:
 				assert(false);
 			}
-			
+
 			m_pathToPosition.pop_back();
 		}
 	}
