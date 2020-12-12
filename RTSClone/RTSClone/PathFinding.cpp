@@ -446,8 +446,7 @@ glm::vec3 PathFinding::getClosestAvailablePosition(const glm::vec3& startingPosi
 		glm::ivec2 position = m_frontier.front();
 		m_frontier.pop();
 
-		std::array<AdjacentPosition, ALL_DIRECTIONS_ON_GRID.size()> adjacentPositions = getAdjacentPositions(position, map, units, workers);
-		for (const auto& adjacentPosition : adjacentPositions)
+		for (const auto& adjacentPosition : getAdjacentPositions(position, map, units, workers))
 		{
 			if (adjacentPosition.valid)
 			{
