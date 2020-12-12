@@ -6,16 +6,21 @@
 #include "FactionHandler.h"
 
 namespace
-{
-	const TypeComparison<eUnitState> COLLIDABLE_UNIT_STATES ({ eUnitState::Idle, eUnitState::AttackingTarget });
-	
+{	
 	bool isUnitPositionAvailable(const glm::vec3& position, const Unit& senderUnit, FactionHandler& factionHandler)
 	{
 		for (const auto& opposingFaction : factionHandler.getOpposingFactions(senderUnit.getOwningFactionController()))
 		{
 			auto unit = std::find_if(opposingFaction.get().getUnits().cbegin(), opposingFaction.get().getUnits().cend(), [&position](const auto& unit)
 			{
-				return COLLIDABLE_UNIT_STATES.isMatch(unit.getCurrentState()) && unit.getAABB().contains(position);
+				if (COLLIDABLE_UNIT_STATES.isMatch(unit.getCurrentState()))
+				{
+					return unit.getAABB().contains(position);
+				}
+				else
+				{
+					return !unit.getPathToPosition().empty() && unit.getPathToPosition().front() == position;
+				}
 			});
 			if (unit != opposingFaction.get().getUnits().cend())
 			{
@@ -95,72 +100,6 @@ std::array<AdjacentPosition, ALL_DIRECTIONS_ON_GRID.size()> getAdjacentPositions
 			if (!unitCollision)
 			{
 				adjacentPositions[i] = AdjacentPosition(adjacentPosition, true);
-			}
-		}
-	}
-
-	return adjacentPositions;
-}
-
-std::array<AdjacentPosition, ALL_DIRECTIONS_ON_GRID.size()> getAdjacentPositions(const glm::ivec2& position, const Map& map, 
-	const std::forward_list<Unit>& units, const Unit& unit)
-{
-	std::array<AdjacentPosition, ALL_DIRECTIONS_ON_GRID.size()> adjacentPositions;
-	for (int i = 0; i < adjacentPositions.size(); ++i)
-	{
-		glm::ivec2 adjacentPosition = position + ALL_DIRECTIONS_ON_GRID[i];
-		if (map.isWithinBounds(adjacentPosition) && !map.isPositionOccupied(adjacentPosition))
-		{
-			bool unitCollision = false;
-			for (const auto& otherUnit : units)
-			{
-				if (&otherUnit != &unit && COLLIDABLE_UNIT_STATES.isMatch(otherUnit.getCurrentState()))// == eUnitState::Idle)
-				{
-					if (otherUnit.getAABB().contains(Globals::convertToWorldPosition(adjacentPosition)))
-					{
-						unitCollision = true;
-						break;
-					}
-				}
-			}
-
-			if (!unitCollision)
-			{
-				adjacentPositions[i] = AdjacentPosition(adjacentPosition);
-			}
-		}
-	}
-
-	return adjacentPositions;
-}
-
-std::array<AdjacentPosition, ALL_DIRECTIONS_ON_GRID.size()> getAdjacentPositions(const glm::ivec2& position, const Map& map, 
-	const std::forward_list<Unit>& units, const Unit& unit, const std::vector<Unit*>& selectedUnits)
-{
-	std::array<AdjacentPosition, ALL_DIRECTIONS_ON_GRID.size()> adjacentPositions;
-	for (int i = 0; i < adjacentPositions.size(); ++i)
-	{
-		glm::ivec2 adjacentPosition = position + ALL_DIRECTIONS_ON_GRID[i];
-		if (map.isWithinBounds(adjacentPosition) && !map.isPositionOccupied(adjacentPosition))
-		{
-			bool unitCollision = false;
-			for (const auto& otherUnit : units)
-			{
-				if (&otherUnit != &unit &&
-					std::find(selectedUnits.cbegin(), selectedUnits.cend(), &otherUnit) == selectedUnits.cend() &&
-					COLLIDABLE_UNIT_STATES.isMatch(otherUnit.getCurrentState()))// == eUnitState::Idle)
-				{
-					if (otherUnit.getAABB().contains(Globals::convertToWorldPosition(adjacentPosition)))
-					{
-						unitCollision = true;
-						break;
-					}
-				}
-			}
-
-			if (!unitCollision)
-			{
-				adjacentPositions[i] = AdjacentPosition(adjacentPosition);
 			}
 		}
 	}
