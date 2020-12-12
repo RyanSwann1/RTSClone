@@ -165,7 +165,8 @@ void Worker::update(float deltaTime, const UnitSpawnerBuilding& HQ, const Map& m
 
 			glm::vec3 destination = PathFinding::getInstance().getClosestPositionToAABB(m_position,
 				HQ.getAABB(), map);
-			moveTo(destination, map, [&](const glm::ivec2& position) { return getAdjacentPositions(position, map); }, eUnitState::ReturningMineralsToHQ);
+			moveTo(destination, map, [&](const glm::ivec2& position) { return getAdjacentPositions(position, map); }, 
+				eUnitState::ReturningMineralsToHQ);
 		}
 		break;
 	case eUnitState::MovingToBuildingPosition:
@@ -253,7 +254,7 @@ void Worker::update(float deltaTime, const UnitSpawnerBuilding& HQ, const Map& m
 	}
 }
 
-void Worker::moveTo(const glm::vec3& destinationPosition, const Map& map, const AdjacentPositions& adjacentPositions,
+void Worker::moveTo(const glm::vec3& destinationPosition, const Map& map, const AdjacentPositions& adjacentPositions, 
 	eUnitState state, const Mineral* mineralToHarvest)
 {
 	assert(state == eUnitState::Moving || state == eUnitState::MovingToBuildingPosition || 
@@ -264,6 +265,7 @@ void Worker::moveTo(const glm::vec3& destinationPosition, const Map& map, const 
 	{
 		GameEventHandler::getInstance().gameEvents.push(GameEvent::createRemoveAllWorkerPlannedBuildings(
 			m_owningFaction.getController(), getID()));
+		 
 		m_buildTimer.resetElaspedTime();
 		clearBuildingCommands();
 	}
@@ -277,7 +279,30 @@ void Worker::moveTo(const glm::vec3& destinationPosition, const Map& map, const 
 		m_mineralToHarvest = mineralToHarvest;
 	}
 
-	Unit::moveTo(destinationPosition, map, adjacentPositions, state);
+	glm::vec3 closestDestination = m_position;
+	if (!m_pathToPosition.empty())
+	{
+		closestDestination = m_pathToPosition.back();
+	}
+
+	PathFinding::getInstance().getPathToPosition(*this, destinationPosition, m_pathToPosition, adjacentPositions,
+		m_owningFaction.getUnits(), map);
+	if (!m_pathToPosition.empty())
+	{
+		switchToState(state, map);
+	}
+	else
+	{
+		if (closestDestination != m_position)
+		{
+			m_pathToPosition.push_back(closestDestination);
+			switchToState(state, map);
+		}
+		else
+		{
+			switchToState(eUnitState::Idle, map);
+		}
+	}
 }
 
 void Worker::render(ShaderHandler& shaderHandler, eFactionController owningFactionController) const
