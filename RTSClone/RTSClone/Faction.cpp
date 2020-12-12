@@ -653,18 +653,18 @@ void Faction::revalidateExistingUnitPaths(const Map& map, FactionHandler& factio
 {
     for (auto& unit : m_units)
     {
-        if (!unit.isPathEmpty())
+        if (!unit.getPathToPosition().empty())
         {
-            unit.moveTo(unit.getDestination(), map, [&](const glm::ivec2& position)
+            unit.moveTo(unit.getPathToPosition().front(), map, [&](const glm::ivec2& position)
                 { return getAdjacentPositions(position, map, factionHandler, unit); }, factionHandler, unit.getCurrentState());
         }
     }
 
     for (auto& worker : m_workers)
     {
-        if (!worker.isPathEmpty())
+        if (!worker.getPathToPosition().empty())
         {
-            worker.moveTo(worker.getDestination(), map,
+            worker.moveTo(worker.getPathToPosition().front(), map,
                 [&](const glm::ivec2& position) { return getAdjacentPositions(position, map); }, worker.getCurrentState());
         }
     }

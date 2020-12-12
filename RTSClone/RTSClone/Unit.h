@@ -47,9 +47,7 @@ public:
 	const std::vector<glm::vec3>& getPathToPosition() const;
 	float getGridAttackRange() const;
 	float getAttackRange() const;
-	bool isPathEmpty() const;
 	eFactionController getOwningFactionController() const;
-	const glm::vec3& getDestination() const;
 	eUnitState getCurrentState() const;
 
 	void resetTarget();
