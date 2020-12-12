@@ -11,16 +11,12 @@
 #include "PathFinding.h"
 #include "glm/gtx/vector_angle.hpp"
 
-const TypeComparison<eUnitState> COLLIDABLE_UNIT_STATES({ eUnitState::Idle, eUnitState::AttackingTarget });
-
 namespace
 {
 	constexpr float MOVEMENT_SPEED = 7.5f;
 	constexpr float UNIT_GRID_ATTACK_RANGE = 5.0f;
 	constexpr float UNIT_ATTACK_RANGE = UNIT_GRID_ATTACK_RANGE * Globals::NODE_SIZE;
-
 	constexpr float TIME_BETWEEN_ATTACK = 1.0f;
-
 	constexpr int DAMAGE = 1;
 
 #ifdef RENDER_PATHING

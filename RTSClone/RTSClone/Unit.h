@@ -31,8 +31,6 @@ enum class eUnitState
 	Max = Repairing
 };
 
-extern const TypeComparison<eUnitState> COLLIDABLE_UNIT_STATES;
-
 class Faction;
 class Map;
 class ShaderHandler;

@@ -305,13 +305,13 @@ bool PathFinding::isUnitPositionAvailable(const glm::vec3& position, const Unit&
 	{
 		auto unit = std::find_if(opposingFaction.get().getUnits().cbegin(), opposingFaction.get().getUnits().cend(), [&position](const auto& unit)
 		{
-			if (COLLIDABLE_UNIT_STATES.isMatch(unit.getCurrentState()))
+			if (!unit.getPathToPosition().empty())
 			{
-				return unit.getAABB().contains(position);
+				return unit.getPathToPosition().front() == position;
 			}
 			else
 			{
-				return !unit.getPathToPosition().empty() && unit.getPathToPosition().front() == position;
+				return unit.getAABB().contains(position);
 			}
 		});
 		if (unit != opposingFaction.get().getUnits().cend())
@@ -325,13 +325,13 @@ bool PathFinding::isUnitPositionAvailable(const glm::vec3& position, const Unit&
 	int senderUnitID = senderUnit.getID();
 	auto unit = std::find_if(owningFaction.getUnits().cbegin(), owningFaction.getUnits().cend(), [&position, senderUnitID](const auto& unit)
 	{
-		if (COLLIDABLE_UNIT_STATES.isMatch(unit.getCurrentState()))
+		if (!unit.getPathToPosition().empty())
 		{
-			return unit.getID() != senderUnitID && unit.getAABB().contains(position);
+			return unit.getID() != senderUnitID && unit.getPathToPosition().front() == position;
 		}
 		else
 		{
-			return unit.getID() != senderUnitID && !unit.getPathToPosition().empty() && unit.getPathToPosition().front() == position;
+			return unit.getID() != senderUnitID && unit.getAABB().contains(position);
 		}
 	});
 	if (unit != owningFaction.getUnits().cend())
