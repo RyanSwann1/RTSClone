@@ -31,8 +31,8 @@ private:
 
 	void instructWorkerReturnMinerals(const Map& map);
 	bool instructWorkerToBuild(const Map& map);
-	void moveSingularSelectedUnit(const glm::vec3& mouseToGroundPosition, const Map& map, Entity& selectedEntity) const;
-	void moveMultipleSelectedUnits(const glm::vec3& mouseToGroundPosition, const Map& map);
+	void moveSingularSelectedUnit(const glm::vec3& mouseToGroundPosition, const Map& map, Entity& selectedEntity, FactionHandler& factionHandler) const;
+	void moveMultipleSelectedUnits(const glm::vec3& mouseToGroundPosition, const Map& map, FactionHandler& factionHandler);
 
 	void onLeftClick(const sf::Window& window, const Camera& camera, const Map& map);
 	void onRightClick(const sf::Window& window, const Camera& camera, FactionHandler& factionHandler, const Map& map);

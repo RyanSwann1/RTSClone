@@ -277,7 +277,7 @@ void Faction::handleEvent(const GameEvent& gameEvent, const Map& map, FactionHan
     }
         break;
     case eGameEventType::RevalidateMovementPaths:
-        revalidateExistingUnitPaths(map);
+        revalidateExistingUnitPaths(map, factionHandler);
         break;
     case eGameEventType::RepairEntity:
     {
@@ -298,6 +298,78 @@ void Faction::handleEvent(const GameEvent& gameEvent, const Map& map, FactionHan
 void Faction::addResources(Worker& worker)
 {
     m_currentResourceAmount += worker.extractResources();
+}
+
+void Faction::handleUnitCollisions(const Map& map, FactionHandler& factionHandler)
+{
+    static std::vector<const Entity*> handledUnits;
+    for (auto& unit : m_units)
+    {
+        if (unit.getCurrentState() == eUnitState::Idle)
+        {
+            MapNode currentMapNode = map.getNode(unit.getPosition());
+            if (currentMapNode.isCollidable() && currentMapNode.getEntityID() != unit.getID())
+            {
+                unit.moveTo(PathFinding::getInstance().getClosestAvailablePosition<Unit>(unit, m_units, map), map,
+                    [&](const glm::ivec2& position) { return getAdjacentPositions(position, map); }, factionHandler);
+            }
+            else
+            {
+                for (const auto& otherUnit : m_units)
+                {
+                    if (&unit != &otherUnit &&
+                        std::find(handledUnits.cbegin(), handledUnits.cend(), &otherUnit) == handledUnits.cend() &&
+                        otherUnit.getCurrentState() == eUnitState::Idle &&
+                        unit.getAABB().contains(otherUnit.getAABB()))
+                    {
+                        unit.moveTo(PathFinding::getInstance().getClosestAvailablePosition<Unit>(unit, m_units, map), map,
+                            [&](const glm::ivec2& position) { return getAdjacentPositions(position, map); }, factionHandler);
+                        break;
+                    }
+                }
+            }
+        }
+
+        handledUnits.push_back(&unit);
+    }
+
+    handledUnits.clear();
+}
+
+void Faction::handleWorkerCollisions(const Map& map)
+{
+    static std::vector<const Entity*> handledUnits;
+    for (auto& worker : m_workers)
+    {
+        if (worker.getCurrentState() == eUnitState::Idle)
+        {
+            MapNode currentMapNode = map.getNode(worker.getPosition());
+            if (currentMapNode.isCollidable() && currentMapNode.getEntityID() != worker.getID())
+            {
+                worker.moveTo(PathFinding::getInstance().getClosestAvailablePosition<Worker>(worker, m_workers, map), map,
+                    [&](const glm::ivec2& position) { return getAdjacentPositions(position, map); });
+            }
+            else
+            {
+                for (const auto& otherWorker : m_workers)
+                {
+                    if (&worker != &otherWorker &&
+                        std::find(handledUnits.cbegin(), handledUnits.cend(), &otherWorker) == handledUnits.cend() &&
+                        otherWorker.getCurrentState() == eUnitState::Idle &&
+                        worker.getAABB().contains(otherWorker.getAABB()))
+                    {
+                        worker.moveTo(PathFinding::getInstance().getClosestAvailablePosition<Worker>(worker, m_workers, map), map,
+                            [&](const glm::ivec2& position) { return getAdjacentPositions(position, map); });
+                        break;
+                    }
+                }
+            }
+        }
+
+        handledUnits.push_back(&worker);
+    }
+
+    handledUnits.clear();
 }
 
 void Faction::update(float deltaTime, const Map& map, FactionHandler& factionHandler, const Timer& unitStateHandlerTimer)
@@ -324,8 +396,8 @@ void Faction::update(float deltaTime, const Map& map, FactionHandler& factionHan
 
     m_HQ.update(deltaTime);
 
-    handleCollisions<Unit>(m_units, map);
-    handleCollisions<Worker>(m_workers, map);
+    handleUnitCollisions(map, factionHandler);
+    handleWorkerCollisions(map);
 }
 
 void Faction::render(ShaderHandler& shaderHandler) const
@@ -489,7 +561,7 @@ const Entity* Faction::spawnBuilding(const Map& map, glm::vec3 position, eEntity
     return nullptr;
 }
 
-bool Faction::addUnitToSpawn(eEntityType unitType, const Map& map, UnitSpawnerBuilding& building)
+bool Faction::addUnitToSpawn(eEntityType unitType, const Map& map, UnitSpawnerBuilding& building, FactionHandler& factionHandler)
 {
     if (isEntityAffordable(unitType) && !isExceedPopulationLimit(unitType))
     {
@@ -497,8 +569,8 @@ bool Faction::addUnitToSpawn(eEntityType unitType, const Map& map, UnitSpawnerBu
         {
         case eEntityType::Unit:
             assert(building.getEntityType() == eEntityType::Barracks);
-            static_cast<Barracks&>(building).addUnitToSpawn([this, &map, unitType](const UnitSpawnerBuilding& building)
-                { return this->spawnUnit(map, building); });
+            static_cast<Barracks&>(building).addUnitToSpawn([this, &map, unitType, &factionHandler](const UnitSpawnerBuilding& building)
+                { return this->spawnUnit(map, building, factionHandler); });
             break;
         case eEntityType::Worker:
             assert(building.getEntityType() == eEntityType::HQ);
@@ -577,15 +649,14 @@ void Faction::increasePopulationLimit()
     m_currentPopulationLimit += Globals::POPULATION_INCREMENT;
 }
 
-void Faction::revalidateExistingUnitPaths(const Map& map)
+void Faction::revalidateExistingUnitPaths(const Map& map, FactionHandler& factionHandler)
 {
     for (auto& unit : m_units)
     {
         if (!unit.isPathEmpty())
         {
-            glm::vec3 destination = unit.getDestination();
-            unit.moveTo(destination, map, [&](const glm::ivec2& position)
-                { return getAdjacentPositions(position, map, m_units, unit); }, unit.getCurrentState());
+            unit.moveTo(unit.getDestination(), map, [&](const glm::ivec2& position)
+                { return getAdjacentPositions(position, map, factionHandler, unit); }, factionHandler, unit.getCurrentState());
         }
     }
 
@@ -593,8 +664,8 @@ void Faction::revalidateExistingUnitPaths(const Map& map)
     {
         if (!worker.isPathEmpty())
         {
-            glm::vec3 destination = worker.getDestination();
-            worker.moveTo(destination, map, [&](const glm::ivec2& position) { return getAdjacentPositions(position, map); }, worker.getCurrentState());
+            worker.moveTo(worker.getDestination(), map,
+                [&](const glm::ivec2& position) { return getAdjacentPositions(position, map); }, worker.getCurrentState());
         }
     }
 }
@@ -641,14 +712,18 @@ bool Faction::instructWorkerToBuild(eEntityType entityType, const glm::vec3& pos
     return false;
 }
 
-const Entity* Faction::spawnUnit(const Map& map, const UnitSpawnerBuilding& building)
+const Entity* Faction::spawnUnit(const Map& map, const UnitSpawnerBuilding& building, FactionHandler& factionHandler)
 {
     if (isEntityAffordable(eEntityType::Unit) && !isExceedPopulationLimit(eEntityType::Unit))
     {
         if (building.isWaypointActive())
         {
-            m_units.emplace_front(*this, Globals::convertToNodePosition(building.getUnitSpawnPosition()), PathFinding::getInstance().getClosestAvailablePosition(
-                building.getWaypointPosition(), m_units, m_workers, map), map);
+            m_units.emplace_front(*this, Globals::convertToNodePosition(building.getUnitSpawnPosition()));
+            
+            glm::vec3 destination = PathFinding::getInstance().getClosestAvailablePosition(building.getWaypointPosition(), m_units, m_workers, map);
+            Unit& unit = m_units.front();
+            m_units.front().moveTo(destination, map, [&](const glm::ivec2& position)
+                { return getAdjacentPositions(position, map, factionHandler, unit); }, factionHandler);
         }
         else
         {

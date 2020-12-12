@@ -63,11 +63,11 @@ protected:
 	bool isExceedPopulationLimit(eEntityType entityType) const;
 	bool isEntityAffordable(eEntityType entityType) const;
 
-	bool addUnitToSpawn(eEntityType unitType, const Map& map, UnitSpawnerBuilding& building);
+	bool addUnitToSpawn(eEntityType unitType, const Map& map, UnitSpawnerBuilding& building, FactionHandler& factionHandler);
 	bool instructWorkerToBuild(eEntityType entityType, const glm::vec3& position, const Map& map, Worker& worker);
 	virtual void onEntityRemoval(const Entity& entity) {}
 	virtual const Entity* spawnBuilding(const Map& map, glm::vec3 position, eEntityType entityType);
-	virtual const Entity* spawnUnit(const Map& map, const UnitSpawnerBuilding& building);
+	virtual const Entity* spawnUnit(const Map& map, const UnitSpawnerBuilding& building, FactionHandler& factionHandler);
 	virtual const Entity* spawnWorker(const Map& map, const UnitSpawnerBuilding& building);
 
 private:
@@ -80,45 +80,11 @@ private:
 	void increaseCurrentPopulationAmount(eEntityType entityType);
 	void decreaseCurrentPopulationAmount(const Entity& entity);
 	void increasePopulationLimit();
-	void revalidateExistingUnitPaths(const Map& map);
+	void revalidateExistingUnitPaths(const Map& map, FactionHandler& factionHandler);
 	void addResources(Worker& worker);
 
-	template <class Entity>
-	void handleCollisions(std::forward_list<Entity>& entities, const Map& map)
-	{
-		static std::vector<const Entity*> handledUnits;
-		for (auto& entity : entities)
-		{
-			if (entity.getCurrentState() == eUnitState::Idle)
-			{	
-				MapNode currentMapNode = map.getNode(entity.getPosition());
-				if (currentMapNode.isCollidable() && currentMapNode.getEntityID() != entity.getID())
-				{
-					entity.moveTo(PathFinding::getInstance().getClosestAvailablePosition<Entity>(entity, entities, map), map,
-						[&](const glm::ivec2& position) { return getAdjacentPositions(position, map); });
-				}
-				else
-				{
-					for (const auto& otherEntity : entities)
-					{
-						if (&entity != &otherEntity &&
-							std::find(handledUnits.cbegin(), handledUnits.cend(), &otherEntity) == handledUnits.cend() &&
-							otherEntity.getCurrentState() == eUnitState::Idle &&
-							entity.getAABB().contains(otherEntity.getAABB()))
-						{
-							entity.moveTo(PathFinding::getInstance().getClosestAvailablePosition<Entity>(entity, entities, map), map,
-								[&](const glm::ivec2& position) { return getAdjacentPositions(position, map); });
-							break;
-						}
-					}
-				}
-			}
-
-			handledUnits.push_back(&entity);
-		}
-
-		handledUnits.clear();
-	}
+	void handleUnitCollisions(const Map& map, FactionHandler& factionHandler);
+	void handleWorkerCollisions(const Map& map);
 
 	//Presumes entity already found in all entities container
 	template <class T>

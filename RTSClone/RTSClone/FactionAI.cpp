@@ -140,13 +140,13 @@ void FactionAI::update(float deltaTime, const Map & map, FactionHandler& faction
 			switch (entityTypeToSpawn)
 			{
 			case eEntityType::Worker:
-				if (Faction::addUnitToSpawn(entityTypeToSpawn, map, m_HQ))
+				if (Faction::addUnitToSpawn(entityTypeToSpawn, map, m_HQ, factionHandler))
 				{
 					m_spawnQueue.pop();
 				}
 				break;
 			case eEntityType::Unit:
-				if (!m_barracks.empty() && Faction::addUnitToSpawn(entityTypeToSpawn, map, m_barracks.front()))
+				if (!m_barracks.empty() && Faction::addUnitToSpawn(entityTypeToSpawn, map, m_barracks.front(), factionHandler))
 				{
 					m_spawnQueue.pop();
 				}
@@ -200,7 +200,7 @@ void FactionAI::update(float deltaTime, const Map & map, FactionHandler& faction
 				if (unit.getCurrentState() == eUnitState::Idle)
 				{
 					unit.moveTo(m_targetFaction->getHQPosition(), map, [&](const glm::ivec2& position)
-					{ return getAdjacentPositions(position, map, m_units, unit); }, eUnitState::AttackMoving);
+					{ return getAdjacentPositions(position, map, factionHandler, unit); }, factionHandler, eUnitState::AttackMoving);
 				}
 			}
 		}
@@ -308,11 +308,11 @@ const Entity* FactionAI::spawnBuilding(const Map& map, glm::vec3 position, eEnti
 	return nullptr;
 }
 
-const Entity* FactionAI::spawnUnit(const Map& map, const UnitSpawnerBuilding& building)
+const Entity* FactionAI::spawnUnit(const Map& map, const UnitSpawnerBuilding& building, FactionHandler& factionHandler)
 {
 	if (isEntityAffordable(eEntityType::Unit) && !isExceedPopulationLimit(eEntityType::Unit))
 	{
-		return Faction::spawnUnit(map, building);
+		return Faction::spawnUnit(map, building, factionHandler);
 	}
 
 	m_spawnQueue.push(eEntityType::Unit);

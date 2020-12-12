@@ -152,7 +152,7 @@ void FactionPlayer::handleEvent(const GameEvent& gameEvent, const Map& map, Fact
         });
         if (entity != m_allEntities.end())
         {
-            addUnitToSpawn(gameEvent.data.playerSpawnUnit.entityType, map, static_cast<UnitSpawnerBuilding&>(*(*entity)));
+            addUnitToSpawn(gameEvent.data.playerSpawnUnit.entityType, map, static_cast<UnitSpawnerBuilding&>(*(*entity)), factionHandler);
         }
     }
     break;
@@ -267,7 +267,8 @@ bool FactionPlayer::instructWorkerToBuild(const Map& map)
     return false;
 }
 
-void FactionPlayer::moveSingularSelectedUnit(const glm::vec3& mouseToGroundPosition, const Map& map, Entity& selectedEntity) const
+void FactionPlayer::moveSingularSelectedUnit(const glm::vec3& mouseToGroundPosition, const Map& map, Entity& selectedEntity, 
+    FactionHandler& factionHandler) const
 {
     switch (selectedEntity.getEntityType())
     {
@@ -276,8 +277,8 @@ void FactionPlayer::moveSingularSelectedUnit(const glm::vec3& mouseToGroundPosit
         Unit& selectedUnit = static_cast<Unit&>(selectedEntity);
         selectedUnit.resetTarget();
         selectedUnit.moveTo(Globals::convertToNodePosition(mouseToGroundPosition), map,
-            [&](const glm::ivec2& position) { return getAdjacentPositions(position, map, m_units, selectedUnit); },
-            (m_attackMoveSelected ? eUnitState::AttackMoving : eUnitState::Moving));
+            [&](const glm::ivec2& position) { return getAdjacentPositions(position, map, factionHandler, selectedUnit); },
+            factionHandler, (m_attackMoveSelected ? eUnitState::AttackMoving : eUnitState::Moving));
     }
         break;
     case eEntityType::Worker:
@@ -310,7 +311,8 @@ void FactionPlayer::moveSingularSelectedUnit(const glm::vec3& mouseToGroundPosit
             }
             else
             {
-                selectedWorker.moveTo(mouseToGroundPosition, map, [&](const glm::ivec2& position) { return getAdjacentPositions(position, map); });
+                selectedWorker.moveTo(mouseToGroundPosition, map, [&](const glm::ivec2& position) 
+                { return getAdjacentPositions(position, map); });
             }
         }
     }
@@ -320,7 +322,7 @@ void FactionPlayer::moveSingularSelectedUnit(const glm::vec3& mouseToGroundPosit
     }
 }
 
-void FactionPlayer::moveMultipleSelectedUnits(const glm::vec3& mouseToGroundPosition, const Map& map)
+void FactionPlayer::moveMultipleSelectedUnits(const glm::vec3& mouseToGroundPosition, const Map& map, FactionHandler& factionHandler)
 {
     assert(!m_selectedUnits.empty());
 
@@ -380,7 +382,7 @@ void FactionPlayer::moveMultipleSelectedUnits(const glm::vec3& mouseToGroundPosi
                     glm::vec3 position = Globals::convertToNodePosition(mouseToGroundPosition - (averagePosition - selectedUnit->getPosition()));
 
                     selectedUnit->moveTo(position, map, [&](const glm::ivec2& position)
-                    { return getAdjacentPositions(position, map, m_units, *selectedUnit, m_selectedUnits); }, state);
+                    { return getAdjacentPositions(position, map, factionHandler, *selectedUnit); }, factionHandler, state);
                 }
                 break;
                 case eEntityType::Worker:
@@ -483,11 +485,11 @@ void FactionPlayer::onRightClick(const sf::Window& window, const Camera& camera,
 
         if (m_selectedUnits.size() == static_cast<size_t>(1))
         {
-            moveSingularSelectedUnit(mouseToGroundPosition, map, *m_selectedUnits.back());
+            moveSingularSelectedUnit(mouseToGroundPosition, map, *m_selectedUnits.back(), factionHandler);
         }
         else if (m_selectedUnits.size() >= static_cast<size_t>(2))
         {
-            moveMultipleSelectedUnits(mouseToGroundPosition, map);
+            moveMultipleSelectedUnits(mouseToGroundPosition, map, factionHandler);
         }
     }
 }
