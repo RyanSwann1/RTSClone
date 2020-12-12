@@ -109,7 +109,7 @@ void Unit::moveToAttackPosition(const Entity& targetEntity, const Faction& targe
 	}
 
 	if (PathFinding::getInstance().setUnitAttackPosition(*this, targetEntity, m_pathToPosition, map,
-		m_owningFaction.getUnits(), factionHandler))
+		factionHandler))
 	{
 		m_targetEntity.set(targetFaction.getController(), targetEntity.getID());
 
@@ -124,7 +124,6 @@ void Unit::moveToAttackPosition(const Entity& targetEntity, const Faction& targe
 		}
 		else
 		{
-			assert(PathFinding::getInstance().isTargetInLineOfSight(m_position, targetEntity, map));
 			switchToState(eUnitState::AttackingTarget, map);
 		}
 	}
@@ -155,7 +154,7 @@ void Unit::moveTo(const glm::vec3& destinationPosition, const Map& map, const Ad
 	}
 
 	PathFinding::getInstance().getPathToPosition(*this, destinationPosition, m_pathToPosition, adjacentPositions,
-		m_owningFaction.getUnits(), map, factionHandler);
+		map, factionHandler);
 	if (!m_pathToPosition.empty())
 	{
 		switchToState(state, map);

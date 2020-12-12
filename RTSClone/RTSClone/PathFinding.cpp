@@ -519,7 +519,7 @@ glm::vec3 PathFinding::getClosestPositionToAABB(const glm::vec3& entityPosition,
 }
 
 bool PathFinding::setUnitAttackPosition(const Unit& unit, const Entity& targetEntity, std::vector<glm::vec3>& pathToPosition,
-	const Map& map, const std::forward_list<Unit>& units, FactionHandler& factionHandler)
+	const Map& map, FactionHandler& factionHandler)
 {
 	assert(unit.getID() != targetEntity.getID());
 	
@@ -587,7 +587,7 @@ bool PathFinding::setUnitAttackPosition(const Unit& unit, const Entity& targetEn
 }
 
 void PathFinding::getPathToPosition(const Unit& unit, const glm::vec3& destination, std::vector<glm::vec3>& pathToPosition, 
-	const AdjacentPositions& adjacentPositions, const std::forward_list<Unit>& units, const Map& map, FactionHandler& factionHandler)
+	const AdjacentPositions& adjacentPositions, const Map& map, FactionHandler& factionHandler)
 {
 	assert(adjacentPositions);
 
@@ -679,7 +679,8 @@ void PathFinding::getPathToPosition(const Unit& unit, const glm::vec3& destinati
 	convertPathToWaypoints(pathToPosition, unit, factionHandler, map);
 }
 
-void PathFinding::getPathToPosition(const Unit& unit, const glm::vec3& destination, std::vector<glm::vec3>& pathToPosition, const AdjacentPositions& adjacentPositions, const std::forward_list<Unit>& units, const Map& map)
+void PathFinding::getPathToPosition(const Unit& unit, const glm::vec3& destination, std::vector<glm::vec3>& pathToPosition, 
+	const AdjacentPositions& adjacentPositions, const Map& map)
 {
 	assert(adjacentPositions);
 

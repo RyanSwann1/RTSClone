@@ -286,7 +286,7 @@ void Worker::moveTo(const glm::vec3& destinationPosition, const Map& map, const 
 	}
 
 	PathFinding::getInstance().getPathToPosition(*this, destinationPosition, m_pathToPosition, adjacentPositions,
-		m_owningFaction.getUnits(), map);
+		map);
 	if (!m_pathToPosition.empty())
 	{
 		switchToState(state, map);
