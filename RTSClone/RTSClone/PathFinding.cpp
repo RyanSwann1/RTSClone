@@ -95,7 +95,69 @@ namespace
 		}
 	}
 
-	void convertPathToWaypoints(std::vector<glm::vec3>& pathToPosition, const Unit& unit, const std::forward_list<Unit>& units,
+
+	void convertPathToWaypoints(std::vector<glm::vec3>& pathToPosition, const Unit& unit, const Map& map)
+	{
+		if (pathToPosition.size() <= size_t(1))
+		{
+			return;
+		}
+
+		std::queue<glm::vec3> positionsToKeep;
+		int positionIndex = 0;
+		glm::vec3 startingPosition = unit.getPosition();
+		while (startingPosition != pathToPosition.front() &&
+			positionIndex < pathToPosition.size())
+		{
+			glm::vec3 targetPosition = pathToPosition[positionIndex];
+			glm::vec3 position = startingPosition;
+			float distance = glm::distance(targetPosition, startingPosition);
+			constexpr float step = Globals::NODE_SIZE;
+			bool collision = false;
+
+			for (int ray = step; ray <= static_cast<int>(distance); ray += step)
+			{
+				position = position + glm::normalize(targetPosition - startingPosition) * step;
+				if (map.isPositionOccupied(position))
+				{
+					collision = true;
+					break;
+				}
+			}
+
+			if (!collision)
+			{
+				positionsToKeep.push(pathToPosition[positionIndex]);
+				startingPosition = pathToPosition[positionIndex];
+				positionIndex = 0;
+
+				//TODO: Due to duplications - need to investigate
+				if (positionsToKeep.size() > pathToPosition.size())
+				{
+					return;
+				}
+			}
+			else
+			{
+				++positionIndex;
+			}
+		}
+
+		if (!positionsToKeep.empty())
+		{
+			pathToPosition.clear();
+			while (!positionsToKeep.empty())
+			{
+				const glm::vec3& positionToKeep = positionsToKeep.front();
+				pathToPosition.push_back(positionToKeep);
+				positionsToKeep.pop();
+			}
+
+			std::reverse(pathToPosition.begin(), pathToPosition.end());
+		}
+	}
+
+	void convertPathToWaypoints(std::vector<glm::vec3>& pathToPosition, const Unit& unit, FactionHandler& factionHandler,
 		const Map& map)
 	{
 		if (pathToPosition.size() <= size_t(1))
@@ -112,19 +174,14 @@ namespace
 			glm::vec3 targetPosition = pathToPosition[positionIndex];
 			glm::vec3 position = startingPosition;
 			float distance = glm::distance(targetPosition, startingPosition);
-			constexpr float step = 0.1f;
+			constexpr float step = Globals::NODE_SIZE;
 			bool collision = false;
 
-			for (int ray = step; ray <= std::ceil(distance / step); ++ray)
+			for (int ray = step; ray <= static_cast<int>(distance); ray += step)
 			{
 				position = position + glm::normalize(targetPosition - startingPosition) * step;
 
-				auto cIter = std::find_if(units.cbegin(), units.cend(), [&position, &unit](const auto& otherUnit)
-				{
-					return unit.getID() != otherUnit.getID() && otherUnit.getAABB().contains(position);
-				});
-
-				if (cIter != units.cend() || map.isPositionOccupied(position))
+				if (!PathFinding::getInstance().isUnitPositionAvailable(position, unit, factionHandler) || map.isPositionOccupied(position))
 				{
 					collision = true;
 					break;
@@ -291,6 +348,50 @@ bool PathFinding::isPositionAvailable(const glm::vec3& nodePosition, const Map& 
 
 	return false;
 }
+
+bool PathFinding::isUnitPositionAvailable(const glm::vec3& position, const Unit& senderUnit, FactionHandler& factionHandler) const
+{
+	for (const auto& opposingFaction : factionHandler.getOpposingFactions(senderUnit.getOwningFactionController()))
+	{
+		auto unit = std::find_if(opposingFaction.get().getUnits().cbegin(), opposingFaction.get().getUnits().cend(), [&position](const auto& unit)
+		{
+			if (COLLIDABLE_UNIT_STATES.isMatch(unit.getCurrentState()))
+			{
+				return unit.getAABB().contains(position);
+			}
+			else
+			{
+				return !unit.getPathToPosition().empty() && unit.getPathToPosition().front() == position;
+			}
+		});
+		if (unit != opposingFaction.get().getUnits().cend())
+		{
+			return false;
+		}
+	}
+
+	assert(factionHandler.isFactionActive(senderUnit.getOwningFactionController()));
+	const Faction& owningFaction = factionHandler.getFaction(senderUnit.getOwningFactionController());
+	int senderUnitID = senderUnit.getID();
+	auto unit = std::find_if(owningFaction.getUnits().cbegin(), owningFaction.getUnits().cend(), [&position, senderUnitID](const auto& unit)
+	{
+		if (COLLIDABLE_UNIT_STATES.isMatch(unit.getCurrentState()))
+		{
+			return unit.getID() != senderUnitID && unit.getAABB().contains(position);
+		}
+		else
+		{
+			return unit.getID() != senderUnitID && !unit.getPathToPosition().empty() && unit.getPathToPosition().front() == position;
+		}
+	});
+	if (unit != owningFaction.getUnits().cend())
+	{
+		return false;
+	}
+
+	return true;
+}
+
 
 bool PathFinding::isTargetInLineOfSight(const glm::vec3& startingPosition, const Entity& targetEntity, const Map& map) const
 {
@@ -537,13 +638,13 @@ bool PathFinding::setUnitAttackPosition(const Unit& unit, const Entity& targetEn
 			isPriorityQueueWithinSizeLimit(m_closedQueue, map.getSize()));
 	}
 
-	convertPathToWaypoints(pathToPosition, unit, units, map);
+	convertPathToWaypoints(pathToPosition, unit, factionHandler, map);
 	
 	return positionFound;
 }
 
 void PathFinding::getPathToPosition(const Unit& unit, const glm::vec3& destination, std::vector<glm::vec3>& pathToPosition, 
-	const AdjacentPositions& adjacentPositions, const std::forward_list<Unit>& units, const Map& map)
+	const AdjacentPositions& adjacentPositions, const std::forward_list<Unit>& units, const Map& map, FactionHandler& factionHandler)
 {
 	assert(adjacentPositions);
 
@@ -632,5 +733,97 @@ void PathFinding::getPathToPosition(const Unit& unit, const glm::vec3& destinati
 		getPathFromClosedQueue(pathToPosition, startingPositionOnGrid, closestAvailablePosition, m_closedQueue, map);
 	}
 
-	convertPathToWaypoints(pathToPosition, unit, units, map);
+	convertPathToWaypoints(pathToPosition, unit, factionHandler, map);
+}
+
+void PathFinding::getPathToPosition(const Unit& unit, const glm::vec3& destination, std::vector<glm::vec3>& pathToPosition, const AdjacentPositions& adjacentPositions, const std::forward_list<Unit>& units, const Map& map)
+{
+	assert(adjacentPositions);
+
+	pathToPosition.clear();
+	if (unit.getPosition() == destination)
+	{
+		return;
+	}
+
+	m_openQueue.clear();
+	m_closedQueue.clear();
+
+	bool destinationReached = false;
+	glm::ivec2 startingPositionOnGrid = Globals::convertToGridPosition(unit.getPosition());
+	glm::ivec2 destinationOnGrid = Globals::convertToGridPosition(destination);
+	float shortestDistance = Globals::getSqrDistance(destination, unit.getPosition());
+	glm::ivec2 closestAvailablePosition = { 0, 0 };
+	m_openQueue.add({ startingPositionOnGrid, startingPositionOnGrid, 0.0f,
+		Globals::getSqrDistance(glm::vec2(destinationOnGrid), glm::vec2(startingPositionOnGrid)) });
+
+	while (!m_openQueue.isEmpty() && !destinationReached)
+	{
+		PriorityQueueNode currentNode = m_openQueue.getTop();
+		m_openQueue.popTop();
+
+		if (currentNode.position == destinationOnGrid)
+		{
+			switch (unit.getEntityType())
+			{
+			case eEntityType::Unit:
+				break;
+			case eEntityType::Worker:
+				pathToPosition.push_back(destination);
+				break;
+			default:
+				assert(false);
+			}
+
+			destinationReached = true;
+			if (Globals::convertToWorldPosition(currentNode.position) != unit.getPosition())
+			{
+				getPathFromClosedQueue(pathToPosition, startingPositionOnGrid, currentNode, m_closedQueue, map);
+			}
+		}
+		else
+		{
+			for (const auto& adjacentPosition : adjacentPositions(currentNode.position))
+			{
+				if (!adjacentPosition.valid || m_closedQueue.contains(adjacentPosition.position))
+				{
+					continue;
+				}
+				else
+				{
+					float sqrDistance = Globals::getSqrDistance(glm::vec2(destinationOnGrid), glm::vec2(adjacentPosition.position));
+					if (sqrDistance < shortestDistance)
+					{
+						closestAvailablePosition = adjacentPosition.position;
+						shortestDistance = sqrDistance;
+					}
+
+					PriorityQueueNode adjacentNode(adjacentPosition.position, currentNode.position,
+						currentNode.g + Globals::getSqrDistance(glm::vec2(adjacentPosition.position), glm::vec2(currentNode.position)),
+						sqrDistance);
+
+					if (m_openQueue.isSuccessorNodeValid(adjacentNode))
+					{
+						m_openQueue.changeNode(adjacentNode);
+					}
+					else if (!m_openQueue.contains(adjacentPosition.position))
+					{
+						m_openQueue.add(adjacentNode);
+					}
+				}
+			}
+		}
+
+		m_closedQueue.add(currentNode);
+
+		assert(isPriorityQueueWithinSizeLimit(m_openQueue, map.getSize()) &&
+			isPriorityQueueWithinSizeLimit(m_closedQueue, map.getSize()));
+	}
+
+	if (pathToPosition.empty() && shortestDistance != Globals::getSqrDistance(destination, unit.getPosition()))
+	{
+		getPathFromClosedQueue(pathToPosition, startingPositionOnGrid, closestAvailablePosition, m_closedQueue, map);
+	}
+
+	convertPathToWaypoints(pathToPosition, unit, map);
 }

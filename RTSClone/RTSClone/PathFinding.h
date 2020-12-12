@@ -93,6 +93,8 @@ public:
 	bool isPositionAvailable(const glm::vec3& nodePosition, const Map& map, const std::forward_list<Unit>& units, const std::forward_list<Worker>& workers, 
 		int senderID = Globals::INVALID_ENTITY_ID) const;
 
+	bool isUnitPositionAvailable(const glm::vec3& position, const Unit& senderUnit, FactionHandler& factionHandler) const;
+
 	bool isTargetInLineOfSight(const glm::vec3& startingPosition, const Entity& targetEntity, const Map& map) const;
 	bool isTargetInLineOfSight(const glm::vec3& startingPosition, const Entity& targetEntity, const Map& map, const AABB& senderAABB) const;
 
@@ -108,6 +110,9 @@ public:
 
 	bool setUnitAttackPosition(const Unit& unit, const Entity& targetEntity, std::vector<glm::vec3>& pathToPosition,
 		const Map& map, const std::forward_list<Unit>& units, FactionHandler& factionHandler);
+
+	void getPathToPosition(const Unit& unit, const glm::vec3& destination, std::vector<glm::vec3>& pathToPosition,
+		const AdjacentPositions& adjacentPositions, const std::forward_list<Unit>& units, const Map& map, FactionHandler& factionHandler);
 
 	void getPathToPosition(const Unit& unit, const glm::vec3& destination, std::vector<glm::vec3>& pathToPosition,
 		const AdjacentPositions& adjacentPositions, const std::forward_list<Unit>& units, const Map& map);
