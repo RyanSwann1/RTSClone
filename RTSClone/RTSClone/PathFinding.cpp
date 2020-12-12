@@ -342,7 +342,6 @@ bool PathFinding::isUnitPositionAvailable(const glm::vec3& position, const Unit&
 	return true;
 }
 
-
 bool PathFinding::isTargetInLineOfSight(const glm::vec3& startingPosition, const Entity& targetEntity, const Map& map) const
 {
 	glm::vec3 direction = glm::normalize(targetEntity.getPosition() - startingPosition);

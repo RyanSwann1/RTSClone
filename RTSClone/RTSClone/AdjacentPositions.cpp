@@ -5,52 +5,6 @@
 #include "Worker.h"
 #include "FactionHandler.h"
 
-namespace
-{	
-	bool isUnitPositionAvailable(const glm::vec3& position, const Unit& senderUnit, FactionHandler& factionHandler)
-	{
-		for (const auto& opposingFaction : factionHandler.getOpposingFactions(senderUnit.getOwningFactionController()))
-		{
-			auto unit = std::find_if(opposingFaction.get().getUnits().cbegin(), opposingFaction.get().getUnits().cend(), [&position](const auto& unit)
-			{
-				if (COLLIDABLE_UNIT_STATES.isMatch(unit.getCurrentState()))
-				{
-					return unit.getAABB().contains(position);
-				}
-				else
-				{
-					return !unit.getPathToPosition().empty() && unit.getPathToPosition().front() == position;
-				}
-			});
-			if (unit != opposingFaction.get().getUnits().cend())
-			{
-				return false;
-			}
-		}
-
-		assert(factionHandler.isFactionActive(senderUnit.getOwningFactionController()));
-		const Faction& owningFaction = factionHandler.getFaction(senderUnit.getOwningFactionController());
-		int senderUnitID = senderUnit.getID();
-		auto unit = std::find_if(owningFaction.getUnits().cbegin(), owningFaction.getUnits().cend(), [&position, senderUnitID](const auto& unit)
-		{
-			if (COLLIDABLE_UNIT_STATES.isMatch(unit.getCurrentState()))
-			{
-				return unit.getID() != senderUnitID && unit.getAABB().contains(position);
-			}
-			else
-			{
-				return unit.getID() != senderUnitID && !unit.getPathToPosition().empty() && unit.getPathToPosition().front() == position;
-			}
-		});
-		if (unit != owningFaction.getUnits().cend())
-		{
-			return false;
-		}
-
-		return true;
-	}
-}
-
 AdjacentPosition::AdjacentPosition()
 	: valid(false),
 	position()
@@ -146,7 +100,7 @@ std::array<AdjacentPosition, ALL_DIRECTIONS_ON_GRID.size()> getAdjacentPositions
 		glm::ivec2 adjacentPosition = position + ALL_DIRECTIONS_ON_GRID[i];
 		if (map.isWithinBounds(adjacentPosition) && 
 			!map.isPositionOccupied(adjacentPosition) &&
-			isUnitPositionAvailable(Globals::convertToWorldPosition(adjacentPosition), unit, factionHandler))
+			PathFinding::getInstance().isUnitPositionAvailable(Globals::convertToWorldPosition(adjacentPosition), unit, factionHandler))
 		{
 			adjacentPositions[i] = AdjacentPosition(adjacentPosition);
 		}		
