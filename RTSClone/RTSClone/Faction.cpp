@@ -311,7 +311,7 @@ void Faction::handleUnitCollisions(const Map& map, FactionHandler& factionHandle
             if (currentMapNode.isCollidable() && currentMapNode.getEntityID() != unit.getID())
             {
                 unit.moveTo(PathFinding::getInstance().getClosestAvailablePosition<Unit>(unit, m_units, map), map,
-                    [&](const glm::ivec2& position) { return getAdjacentPositions(position, map); }, factionHandler);
+                    [&](const glm::ivec2& position) { return getAdjacentPositions(position, map, factionHandler, unit); }, factionHandler);
             }
             else
             {
@@ -323,7 +323,7 @@ void Faction::handleUnitCollisions(const Map& map, FactionHandler& factionHandle
                         unit.getAABB().contains(otherUnit.getAABB()))
                     {
                         unit.moveTo(PathFinding::getInstance().getClosestAvailablePosition<Unit>(unit, m_units, map), map,
-                            [&](const glm::ivec2& position) { return getAdjacentPositions(position, map); }, factionHandler);
+                            [&](const glm::ivec2& position) { return getAdjacentPositions(position, map, factionHandler, unit); }, factionHandler);
                         break;
                     }
                 }
@@ -396,8 +396,11 @@ void Faction::update(float deltaTime, const Map& map, FactionHandler& factionHan
 
     m_HQ.update(deltaTime);
 
-    handleUnitCollisions(map, factionHandler);
-    handleWorkerCollisions(map);
+    if (unitStateHandlerTimer.isExpired())
+    {
+        handleUnitCollisions(map, factionHandler);
+        handleWorkerCollisions(map);
+    }
 }
 
 void Faction::render(ShaderHandler& shaderHandler) const

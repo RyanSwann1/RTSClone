@@ -102,10 +102,10 @@ void Unit::resetTarget()
 void Unit::moveToAttackPosition(const Entity& targetEntity, const Faction& targetFaction, const Map& map,
 	FactionHandler& factionHandler)
 {
-	glm::vec3 closestDestination = m_position;
+	glm::vec3 previousDestination = m_position;
 	if (!m_pathToPosition.empty())
 	{
-		closestDestination = m_pathToPosition.back();
+		previousDestination = m_pathToPosition.back();
 	}
 
 	if (PathFinding::getInstance().setUnitAttackPosition(*this, targetEntity, m_pathToPosition, map,
@@ -117,9 +117,11 @@ void Unit::moveToAttackPosition(const Entity& targetEntity, const Faction& targe
 		{
 			switchToState(eUnitState::Moving, map);
 		}
-		else if(closestDestination != m_position)
+		else if(previousDestination != m_position)
 		{
-			PathFinding::getInstance().setUnitAttackPosition(*this, targetEntity, m_pathToPosition, map, factionHandler);
+			Unit& unit = *this;
+			PathFinding::getInstance().getPathToPosition(*this, previousDestination, m_pathToPosition, [&](const glm::ivec2& position)
+			{ return getAdjacentPositions(position, map, factionHandler, unit); }, map, factionHandler);
 			switchToState(eUnitState::Moving, map);
 		}
 		else
@@ -131,9 +133,11 @@ void Unit::moveToAttackPosition(const Entity& targetEntity, const Faction& targe
 	{
 		if (m_pathToPosition.empty())
 		{
-			if (closestDestination != m_position)
+			if (previousDestination != m_position)
 			{
-				PathFinding::getInstance().setUnitAttackPosition(*this, targetEntity, m_pathToPosition, map, factionHandler);
+				Unit& unit = *this;
+				PathFinding::getInstance().getPathToPosition(*this, previousDestination, m_pathToPosition, [&](const glm::ivec2& position)
+				{ return getAdjacentPositions(position, map, factionHandler, unit); }, map, factionHandler);
 				switchToState(eUnitState::Moving, map);
 			}
 		}
@@ -147,10 +151,10 @@ void Unit::moveToAttackPosition(const Entity& targetEntity, const Faction& targe
 void Unit::moveTo(const glm::vec3& destinationPosition, const Map& map, const AdjacentPositions& adjacentPositions, 
 	FactionHandler& factionHandler, eUnitState state)
 {
-	glm::vec3 closestDestination = m_position;
+	glm::vec3 previousDestination = m_position;
 	if (!m_pathToPosition.empty())
 	{
-		closestDestination = m_pathToPosition.back();
+		previousDestination = m_pathToPosition.back();
 	}
 
 	PathFinding::getInstance().getPathToPosition(*this, destinationPosition, m_pathToPosition, adjacentPositions,
@@ -161,12 +165,11 @@ void Unit::moveTo(const glm::vec3& destinationPosition, const Map& map, const Ad
 	}
 	else
 	{
-		if (closestDestination != m_position)
+		if (previousDestination != m_position)
 		{
 			Unit& unit = *this;
-			PathFinding::getInstance().getPathToPosition(*this, closestDestination, m_pathToPosition, [&](const glm::ivec2& position)
-				{ return getAdjacentPositions(position, map, factionHandler, unit); }, map);
-
+			PathFinding::getInstance().getPathToPosition(*this, previousDestination, m_pathToPosition, [&](const glm::ivec2& position)
+				{ return getAdjacentPositions(position, map, factionHandler, unit); }, map, factionHandler);
 			switchToState(state, map);
 		}
 		else
@@ -410,7 +413,10 @@ void Unit::switchToState(eUnitState newState, const Map& map, const Entity* targ
 		m_targetEntity.reset();
 		break;
 	case eUnitState::AttackingTarget:
-		m_attackTimer.resetElaspedTime();
+		if (m_currentState != newState)
+		{
+			m_attackTimer.resetElaspedTime();
+		}
 		break;
 	case eUnitState::SetAttackPosition:
 	case eUnitState::Moving:
