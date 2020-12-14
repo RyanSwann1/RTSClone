@@ -95,7 +95,6 @@ namespace
 		}
 	}
 
-
 	void convertPathToWaypoints(std::vector<glm::vec3>& pathToPosition, const Unit& unit, const Map& map)
 	{
 		if (pathToPosition.size() <= size_t(1))
@@ -242,7 +241,8 @@ PathFinding::~PathFinding()
 void PathFinding::onNewMapSize(const GameMessages::NewMapSize& gameMessage)
 {
 	m_sharedPositionContainer.clear();
-	m_sharedPositionContainer.reserve(gameMessage.mapSize.x * gameMessage.mapSize.y);
+	m_sharedPositionContainer.reserve(
+		static_cast<size_t>(gameMessage.mapSize.x) * static_cast<size_t>(gameMessage.mapSize.y));
 }
 
 bool PathFinding::isBuildingSpawnAvailable(const glm::vec3& startingPosition, const Model& model, const Map& map, 
@@ -301,6 +301,12 @@ bool PathFinding::isBuildingSpawnAvailable(const glm::vec3& startingPosition, co
 
 bool PathFinding::isUnitPositionAvailable(const glm::vec3& position, const Unit& senderUnit, FactionHandler& factionHandler) const
 {
+	//glm::vec3 middlePosition = position;
+	//if (!Globals::isOnMiddlePosition(position))
+	//{
+	//	middlePosition = Globals::convertToMiddleGridPosition(position);
+	//}
+	//assert(Globals::isOnMiddlePosition(position));
 	for (const auto& opposingFaction : factionHandler.getOpposingFactions(senderUnit.getOwningFactionController()))
 	{
 		auto unit = std::find_if(opposingFaction.get().getUnits().cbegin(), opposingFaction.get().getUnits().cend(), [&position](const auto& unit)
@@ -333,6 +339,37 @@ bool PathFinding::isUnitPositionAvailable(const glm::vec3& position, const Unit&
 		{
 			return unit.getID() != senderUnitID && unit.getAABB().contains(position);
 		}
+	});
+	if (unit != owningFaction.getUnits().cend())
+	{
+		return false;
+	}
+
+	return true;
+}
+
+bool PathFinding::isUnitPositionUnique(const Unit& senderUnit, FactionHandler& factionHandler) const
+{
+	glm::vec3 position = senderUnit.getPosition();
+	assert(Globals::isOnMiddlePosition(position));
+	for (const auto& opposingFaction : factionHandler.getOpposingFactions(senderUnit.getOwningFactionController()))
+	{
+		auto unit = std::find_if(opposingFaction.get().getUnits().cbegin(), opposingFaction.get().getUnits().cend(), [&position](const auto& unit)
+		{
+			return !unit.getPathToPosition().empty() && unit.getPosition() == position;
+		});
+		if (unit != opposingFaction.get().getUnits().cend())
+		{
+			return false;
+		}
+	}
+
+	assert(factionHandler.isFactionActive(senderUnit.getOwningFactionController()));
+	const Faction& owningFaction = factionHandler.getFaction(senderUnit.getOwningFactionController());
+	int senderUnitID = senderUnit.getID();
+	auto unit = std::find_if(owningFaction.getUnits().cbegin(), owningFaction.getUnits().cend(), [&position, senderUnitID](const auto& unit)
+	{
+		return unit.getID() != senderUnitID && !unit.getPathToPosition().empty() && unit.getPosition() == position;
 	});
 	if (unit != owningFaction.getUnits().cend())
 	{
@@ -542,10 +579,24 @@ bool PathFinding::setUnitAttackPosition(const Unit& unit, const Entity& targetEn
 			unit.getGridAttackRange() * unit.getGridAttackRange() && 
 			isTargetInLineOfSight(Globals::convertToWorldPosition(currentNode.position), targetEntity, map))
 		{
-			positionFound = true;
-			if(Globals::convertToWorldPosition(currentNode.position) != unit.getPosition())
+			if (currentNode.position == startingPositionOnGrid)
 			{
-				getPathFromClosedQueue(pathToPosition, startingPositionOnGrid, currentNode, m_closedQueue, map);
+				if (isUnitPositionAvailable(Globals::convertToWorldPosition(startingPositionOnGrid), unit, factionHandler))
+				{
+					positionFound = true;
+					if (Globals::convertToWorldPosition(currentNode.position) != unit.getPosition())
+					{
+						pathToPosition.push_back(Globals::convertToWorldPosition(startingPositionOnGrid));
+					}
+				}
+			}
+			else
+			{
+				positionFound = true;
+				if (Globals::convertToWorldPosition(currentNode.position) != unit.getPosition())
+				{
+					getPathFromClosedQueue(pathToPosition, startingPositionOnGrid, currentNode, m_closedQueue, map);
+				}
 			}
 		}
 		else
@@ -626,10 +677,24 @@ void PathFinding::getPathToPosition(const Unit& unit, const glm::vec3& destinati
 				assert(false);
 			}
 
-			destinationReached = true;
-			if (Globals::convertToWorldPosition(currentNode.position) != unit.getPosition())
+			if (currentNode.position == startingPositionOnGrid)
 			{
-				getPathFromClosedQueue(pathToPosition, startingPositionOnGrid, currentNode, m_closedQueue, map);
+				if (isUnitPositionAvailable(Globals::convertToWorldPosition(startingPositionOnGrid), unit, factionHandler))
+				{
+					destinationReached = true;
+					if (Globals::convertToWorldPosition(currentNode.position) != unit.getPosition())
+					{
+						pathToPosition.push_back(Globals::convertToWorldPosition(startingPositionOnGrid));
+					}
+				}
+			}
+			else
+			{
+				destinationReached = true;
+				if (Globals::convertToWorldPosition(currentNode.position) != unit.getPosition())
+				{
+					getPathFromClosedQueue(pathToPosition, startingPositionOnGrid, currentNode, m_closedQueue, map);
+				}
 			}
 		}
 		else
