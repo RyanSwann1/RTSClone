@@ -210,7 +210,7 @@ void Unit::update(float deltaTime, FactionHandler& factionHandler, const Map& ma
 	switch (m_currentState)
 	{
 	case eUnitState::Idle:
-		assert(m_targetEntity.getID() == Globals::INVALID_ENTITY_ID);
+		assert(Globals::isOnMiddlePosition(m_position) && m_targetEntity.getID() == Globals::INVALID_ENTITY_ID);
 		if (unitStateHandlerTimer.isExpired())
 		{
 			switch (getEntityType())
@@ -235,15 +235,26 @@ void Unit::update(float deltaTime, FactionHandler& factionHandler, const Map& ma
 	case eUnitState::Moving:
 		if (m_targetEntity.getID() != Globals::INVALID_ENTITY_ID)
 		{
-			if (unitStateHandlerTimer.isExpired() &&
-				(!factionHandler.isFactionActive(m_targetEntity.getFactionController()) ||
-				!factionHandler.getFaction(m_targetEntity.getFactionController()).getEntity(m_targetEntity.getID())))
+			if (unitStateHandlerTimer.isExpired())
 			{
-				m_targetEntity.reset();
+				const Entity* targetEntity = nullptr;
+				if (factionHandler.isFactionActive(m_targetEntity.getFactionController()))
+				{
+					targetEntity = factionHandler.getFaction(m_targetEntity.getFactionController()).getEntity(m_targetEntity.getID());
+				}
+				if (targetEntity &&  Globals::getSqrDistance(targetEntity->getPosition(), m_position) <= UNIT_ATTACK_RANGE * UNIT_ATTACK_RANGE)
+				{
+					moveToAttackPosition(*targetEntity, factionHandler.getFaction(m_targetEntity.getFactionController()), map, factionHandler);
+				}
+				else if (!targetEntity)
+				{
+					m_targetEntity.reset();
+				}
 			}
 
 			if (m_pathToPosition.empty())
 			{
+				assert(Globals::isOnMiddlePosition(m_position));
 				switchToState(eUnitState::AttackingTarget, map);
 			}
 		}
@@ -293,7 +304,7 @@ void Unit::update(float deltaTime, FactionHandler& factionHandler, const Map& ma
 		}
 		break;
 	case eUnitState::AttackingTarget:
-		assert(m_targetEntity.getID() != Globals::INVALID_ENTITY_ID && m_pathToPosition.empty());
+		assert(Globals::isOnMiddlePosition(m_position) && m_pathToPosition.empty());
 		if (unitStateHandlerTimer.isExpired())
 		{
 			if (factionHandler.isFactionActive(m_targetEntity.getFactionController()))

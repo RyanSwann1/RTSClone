@@ -568,7 +568,7 @@ bool PathFinding::setUnitAttackPosition(const Unit& unit, const Entity& targetEn
 	glm::ivec2 targetPositionOnGrid = Globals::convertToGridPosition(targetEntity.getPosition());
 	bool positionFound = false;
 	m_openQueue.add({ startingPositionOnGrid, startingPositionOnGrid, 0.0f,
-	Globals::getSqrDistance(glm::vec2(targetPositionOnGrid), glm::vec2(startingPositionOnGrid)) });
+		Globals::getSqrDistance(glm::vec2(targetPositionOnGrid), glm::vec2(startingPositionOnGrid)) });
 
 	while (!positionFound && !m_openQueue.isEmpty())
 	{
