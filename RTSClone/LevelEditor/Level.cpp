@@ -107,7 +107,7 @@ const EntityManager& Level::getEntityManager() const
 	return m_entityManager;
 }
 
-void Level::handleInput(const sf::Event& currentSFMLEvent, const Camera& camera, const sf::Window& window, float deltaTime)
+void Level::handleInput(const sf::Event& currentSFMLEvent, const Camera& camera, const sf::Window& window, float deltaTime, glm::uvec2 windowSize)
 {
 	switch (currentSFMLEvent.type)
 	{
@@ -127,7 +127,7 @@ void Level::handleInput(const sf::Event& currentSFMLEvent, const Camera& camera,
 			if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left))
 			{
 				glm::vec3 mouseToGroundPosition = { 0.0f, 0.0f, 0.0f };
-				if (camera.getMouseToGroundPosition(window, mouseToGroundPosition))
+				if (camera.getMouseToGroundPosition(window, windowSize, mouseToGroundPosition))
 				{
 					m_translateObject.setSelected(mouseToGroundPosition);
 					if (m_translateObject.isSelected() &&
@@ -177,7 +177,7 @@ void Level::handleInput(const sf::Event& currentSFMLEvent, const Camera& camera,
 		if (!ImGui::IsWindowHovered(ImGuiHoveredFlags_::ImGuiHoveredFlags_AnyWindow))
 		{
 			glm::vec3 mouseToGroundPosition = { 0.0f, 0.0f, 0.0f };
-			if (camera.getMouseToGroundPosition(window, mouseToGroundPosition))
+			if (camera.getMouseToGroundPosition(window, windowSize, mouseToGroundPosition))
 			{
 				if (m_plannedEntity.model)
 				{

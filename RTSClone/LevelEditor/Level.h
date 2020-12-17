@@ -34,7 +34,7 @@ public:
 	const glm::ivec2& getMapSize() const;
 	const EntityManager& getEntityManager() const;
 
-	void handleInput(const sf::Event& currentSFMLEvent, const Camera& camera, const sf::Window& window, float deltaTime);
+	void handleInput(const sf::Event& currentSFMLEvent, const Camera& camera, const sf::Window& window, float deltaTime, glm::uvec2 windowSize);
 	void handleModelNamesGUI();
 	void handlePlayersGUI();
 	void handleSelectedEntityGUI();

@@ -110,7 +110,7 @@ int main()
 		{
 			if (level)
 			{
-				level->handleInput(currentSFMLEvent, camera, window, deltaTime);
+				level->handleInput(currentSFMLEvent, camera, window, deltaTime, windowSize);
 			}
 
 			switch (currentSFMLEvent.type)
@@ -291,7 +291,7 @@ int main()
 
 		//Render
 		glm::mat4 view = camera.getView();
-		glm::mat4 projection = camera.getProjection(window);
+		glm::mat4 projection = camera.getProjection(windowSize);
 
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 

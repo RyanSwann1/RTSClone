@@ -116,11 +116,11 @@ glm::vec3 Camera::getMouseToGroundPosition(const sf::Window& window) const
 #endif // GAME
 
 #ifdef LEVEL_EDITOR
-bool Camera::getMouseToGroundPosition(const sf::Window& window, glm::vec3& mouseToGroundPosition) const
+bool Camera::getMouseToGroundPosition(const sf::Window& window, glm::uvec2 windowSize, glm::vec3& mouseToGroundPosition) const
 {
 	assert(position.y >= MINIMUM_HEIGHT);
 
-	glm::vec3 rayPositionFromMouse = calculateMouseRay(getProjection(window), getView(), window,
+	glm::vec3 rayPositionFromMouse = calculateMouseRay(getProjection(windowSize), getView(), window,
 		{ sf::Mouse::getPosition(window).x, sf::Mouse::getPosition(window).y });
 
 	glm::vec3 rayPosition = position;
