@@ -37,13 +37,17 @@ namespace
 	bool createShaderProgram(unsigned int shaderID, const std::string& vertexShaderFilePath, const std::string& fragmentShaderFilePath)
 	{
 		std::string vertexShaderSource;
-		if (!parseShaderFromFile(SHADER_DIRECTORY + vertexShaderFilePath, vertexShaderSource))
+		bool vertexShaderLoaded = parseShaderFromFile(SHADER_DIRECTORY + vertexShaderFilePath, vertexShaderSource);
+		if (!vertexShaderLoaded)
 		{
+			std::cout << "Couldn't load " << vertexShaderFilePath << "\n";
 			return false;
 		}
 		std::string fragmentShaderSource;
-		if (!parseShaderFromFile(SHADER_DIRECTORY + fragmentShaderFilePath, fragmentShaderSource))
+		bool fragmentShaderLoaded = parseShaderFromFile(SHADER_DIRECTORY + fragmentShaderFilePath, fragmentShaderSource);
+		if (!fragmentShaderLoaded)
 		{
+			std::cout << "Couldn't load: " << fragmentShaderFilePath << "\n";
 			return false;
 		}
 
@@ -105,27 +109,42 @@ ShaderHandler::ShaderHandler()
 std::unique_ptr<ShaderHandler> ShaderHandler::create()
 {
 	std::unique_ptr<ShaderHandler> shaderHandler = std::unique_ptr<ShaderHandler>(new ShaderHandler());
-	bool shaderLoaded = false;
+	size_t shaderLoadedCounter = 0;
 	for (const auto& shader : shaderHandler->m_shaders)
 	{
 		switch (shader.getType())
 		{
 		case eShaderType::Default:
-			shaderLoaded = createShaderProgram(shader.getID(), "VertexShader.glsl", "FragmentShader.glsl");
+			if (createShaderProgram(shader.getID(), "VertexShader.glsl", "FragmentShader.glsl"))
+			{
+				++shaderLoadedCounter;
+			}
 			break;
 		case eShaderType::SelectionBox:
-			shaderLoaded = createShaderProgram(shader.getID(), "SelectionBoxVertexShader.glsl", "SelectionBoxFragmentShader.glsl");
+			if (createShaderProgram(shader.getID(), "SelectionBoxVertexShader.glsl", "SelectionBoxFragmentShader.glsl"))
+			{
+				++shaderLoadedCounter;
+			}
+			break;
+		case eShaderType::HealthBar:
+			if (createShaderProgram(shader.getID(), "HealthBarVertexShader.glsl", "HealthBarFragmentShader.glsl"))
+			{
+				++shaderLoadedCounter;
+			}
 			break;
 		case eShaderType::Debug:
-			shaderLoaded = createShaderProgram(shader.getID(), "DebugVertexShader.glsl", "DebugFragmentShader.glsl");
+			if (createShaderProgram(shader.getID(), "DebugVertexShader.glsl", "DebugFragmentShader.glsl"))
+			{
+				++shaderLoadedCounter;
+			}
 			break;
 		default:
 			assert(false);
 		}
 	}
 
-	assert(shaderLoaded);
-	return (shaderLoaded ? std::move(shaderHandler) : std::unique_ptr<ShaderHandler>());
+	assert(shaderLoadedCounter == shaderHandler->m_shaders.size());
+	return (shaderLoadedCounter == shaderHandler->m_shaders.size() ? std::move(shaderHandler) : std::unique_ptr<ShaderHandler>());
 }
 
 eShaderType ShaderHandler::getActiveShaderType() const

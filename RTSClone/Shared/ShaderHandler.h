@@ -13,6 +13,7 @@ enum class eShaderType
 {
 	Default = 0,
 	SelectionBox,
+	HealthBar,
 	Debug,
 	Max = Debug
 };
@@ -54,6 +55,7 @@ private:
 	{
 		eShaderType::Default,
 		eShaderType::SelectionBox,
+		eShaderType::HealthBar,
 		eShaderType::Debug
 	};
 };
