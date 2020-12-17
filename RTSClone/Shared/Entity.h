@@ -6,8 +6,10 @@
 #include <functional>
 #ifdef GAME
 #include "EntityType.h"
+#include "HealthBarSprite.h"
 struct TakeDamageEvent;
 class FactionHandler;
+struct Camera;
 #endif // GAME
 enum class eFactionController;
 struct Model;
@@ -16,6 +18,7 @@ class Map;
 class Entity : private NonCopyable
 {
 public:
+	virtual ~Entity();
 	Entity(Entity&&) noexcept;
 	Entity& operator=(Entity&&) noexcept;
 
@@ -38,6 +41,7 @@ public:
 	bool isDead() const;
 	void repair();
 	void render(ShaderHandler& shaderHandler, eFactionController owningFactionController) const;
+	void renderHealthBar(ShaderHandler& shaderHandler, const Camera& camera, glm::uvec2 windowSize) const;
 #endif // GAME
 
 	int getID() const;
@@ -69,6 +73,7 @@ private:
 	int m_maximumHealth;
 	int m_health;
 	eEntityType m_type;
+	HealthBarSprite m_healthbarSprite;
 #endif // GAME
 	std::reference_wrapper<const Model> m_model;
 	bool m_selected;

@@ -7,6 +7,8 @@
 #include "FactionController.h"
 #ifdef GAME
 #include "GameEvent.h"
+#include "glm/gtc/matrix_transform.hpp"
+#include "Camera.h"
 #endif // GAME
 
 #ifdef GAME
@@ -19,6 +21,7 @@ Entity::Entity(const Model& model, const glm::vec3& startingPosition, eEntityTyp
 	m_maximumHealth(health),
 	m_health(health),
 	m_type(entityType),
+	m_healthbarSprite(),
 	m_model(model),
 	m_selected(false)
 {
@@ -95,6 +98,11 @@ void Entity::resetAABB()
 }
 #endif // LEVEL_EDITOR
 
+Entity::~Entity()
+{
+
+}
+
 Entity::Entity(Entity&& orig) noexcept
 	: m_position(orig.m_position),
 	m_rotation(orig.m_rotation),
@@ -107,6 +115,7 @@ Entity::Entity(Entity&& orig) noexcept
 	m_maximumHealth = orig.m_maximumHealth;
 	m_health = orig.m_health;
 	m_type = orig.m_type;
+	m_healthbarSprite = std::move(orig.m_healthbarSprite);
 #endif // GAME
 
 	orig.m_ID = Globals::INVALID_ENTITY_ID;
@@ -178,6 +187,17 @@ void Entity::repair()
 void Entity::render(ShaderHandler& shaderHandler, eFactionController owningFactionController) const
 {
 	m_model.get().render(shaderHandler, *this, owningFactionController);
+}
+
+void Entity::renderHealthBar(ShaderHandler& shaderHandler, const Camera& camera, glm::uvec2 windowSize) const
+{
+	if (isSelected())
+	{
+		glm::vec4 positionNDC = camera.getProjection(glm::ivec2(windowSize.x, windowSize.y)) * camera.getView() * glm::vec4(m_position, 1.0f);
+		positionNDC /= positionNDC.w;
+
+		m_healthbarSprite.render({ positionNDC.x, positionNDC.y }, windowSize);
+	}
 }
 #endif // GAME
 
