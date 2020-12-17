@@ -12,6 +12,24 @@
 #endif // GAME
 
 #ifdef GAME
+namespace
+{
+	const float WORKER_HEALTHBAR_WIDTH = 60.0f;
+	const float WORKER_HEALTHBAR_YOFFSET = 25.0f;
+	const float UNIT_HEALTHBAR_WIDTH = 75.0f;
+	const float UNIT_HEALTHBAR_YOFFSET = 50.0f;
+	const float HQ_HEALTHBAR_WIDTH = 150.0f;
+	const float HQ_HEALTHBAR_YOFFSET = 225.0f;
+	const float SUPPLY_DEPOT_HEALTHBAR_WIDTH = 100.0f;
+	const float SUPPLY_DEPOT_HEALTHBAR_YOFFSET = 85.0f;
+	const float BARRACKS_HEALTHBAR_WIDTH = 100.0f;
+	const float BARRACKS_HEALTHBAR_YOFFSET = 85.0f;
+	const float TURRET_HEALTHBAR_WIDTH = 100.0f;
+	const float TURRET_HEALTHBAR_YOFFSET = 60.0f;
+}
+#endif // GAME
+
+#ifdef GAME
 Entity::Entity(const Model& model, const glm::vec3& startingPosition, eEntityType entityType, 
 	int health, glm::vec3 startingRotation)
 	: m_position(startingPosition),
@@ -201,28 +219,28 @@ void Entity::renderHealthBar(ShaderHandler& shaderHandler, const Camera& camera,
 		switch (getEntityType())
 		{
 		case eEntityType::Unit:
-			width = 75.0 * currentHealth / windowSize.x * 2.0f;
-			yOffset = 50.0f / windowSize.y * 2.0f;
+			width = UNIT_HEALTHBAR_WIDTH * currentHealth / windowSize.x * 2.0f;
+			yOffset = UNIT_HEALTHBAR_YOFFSET / windowSize.y * 2.0f;
 			break;
 		case eEntityType::Worker:
-			width = 60.0f * currentHealth / windowSize.x * 2.0f;
-			yOffset = 25.0f / windowSize.y * 2.0f;
+			width = WORKER_HEALTHBAR_WIDTH * currentHealth / windowSize.x * 2.0f;
+			yOffset = WORKER_HEALTHBAR_YOFFSET / windowSize.y * 2.0f;
 			break;
 		case eEntityType::HQ:
-			width = 150.0f * currentHealth / windowSize.x * 2.0f;
-			yOffset = 225.0f / windowSize.y * 2.0f;
+			width = HQ_HEALTHBAR_WIDTH * currentHealth / windowSize.x * 2.0f;
+			yOffset = HQ_HEALTHBAR_YOFFSET / windowSize.y * 2.0f;
 			break;
 		case eEntityType::SupplyDepot:
-			width = 100.0f * currentHealth / windowSize.x * 2.0f;
-			yOffset = 85.0f / windowSize.y * 2.0f;
+			width = SUPPLY_DEPOT_HEALTHBAR_WIDTH * currentHealth / windowSize.x * 2.0f;
+			yOffset = SUPPLY_DEPOT_HEALTHBAR_YOFFSET / windowSize.y * 2.0f;
 			break;
 		case eEntityType::Barracks:
-			width = 100.0f * currentHealth / windowSize.x * 2.0f;
-			yOffset = 85.0f / windowSize.y * 2.0f;
+			width = BARRACKS_HEALTHBAR_WIDTH * currentHealth / windowSize.x * 2.0f;
+			yOffset = BARRACKS_HEALTHBAR_YOFFSET / windowSize.y * 2.0f;
 			break;
 		case eEntityType::Turret:
-			width = 100.0f * currentHealth / windowSize.x * 2.0f;
-			yOffset = 60.0f / windowSize.y * 2.0f;
+			width = TURRET_HEALTHBAR_WIDTH * currentHealth / windowSize.x * 2.0f;
+			yOffset = TURRET_HEALTHBAR_YOFFSET / windowSize.y * 2.0f;
 			break;
 		default:
 			assert(false);
