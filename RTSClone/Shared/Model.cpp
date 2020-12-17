@@ -99,5 +99,17 @@ void Model::render(ShaderHandler& shaderHandler, const Entity& entity) const
 
 void Model::render(ShaderHandler& shaderHandler, const Entity& entity, eFactionController owningFactionController) const
 {
-	render(shaderHandler, entity.getPosition(), entity.isSelected(), entity.getRotation(), owningFactionController);
+	switch (owningFactionController)
+	{
+	case eFactionController::Player:
+		render(shaderHandler, entity.getPosition(), entity.isSelected(), entity.getRotation(), owningFactionController);
+		break;
+	case eFactionController::AI_1:
+	case eFactionController::AI_2:
+	case eFactionController::AI_3:
+		render(shaderHandler, entity.getPosition(), false, entity.getRotation(), owningFactionController);
+		break;
+	default:
+		assert(false);
+	}
 }
