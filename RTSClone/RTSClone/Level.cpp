@@ -181,21 +181,21 @@ void Level::handleInput(const sf::Window& window, const Camera& camera, const sf
 		currentSFMLEvent.mouseButton.button == sf::Mouse::Left)
 	{
 		glm::vec3 mouseToGroundPosition = camera.getMouseToGroundPosition(window);
-		const Entity* targetEntity = nullptr;
+		const Entity* selectedEntity = nullptr;
 		for (const auto& faction : m_factions)
 		{
 			if (faction)
 			{
-				targetEntity = faction->getEntity(mouseToGroundPosition);
-				if (targetEntity)
+				selectedEntity = faction->getEntity(mouseToGroundPosition);
+				if (selectedEntity)
 				{	
-					m_selectedTargetGUI.set(faction->getController(), targetEntity->getID());
+					m_selectedTargetGUI.set(faction->getController(), selectedEntity->getID());
 					break;
 				}
 			}
 		}
 
-		if(!targetEntity)
+		if(!selectedEntity)
 		{
 			m_selectedTargetGUI.reset();
 		}

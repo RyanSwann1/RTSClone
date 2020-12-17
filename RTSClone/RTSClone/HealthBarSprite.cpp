@@ -10,16 +10,16 @@ namespace
 	const int DEFAULT_HEIGHT = 10;
 	const int QUAD_VERTEX_COUNT = 6;
 
-	std::array<glm::vec2, QUAD_VERTEX_COUNT> getQuadCoords(glm::vec2 position, float width, float height)
+	std::array<glm::vec2, QUAD_VERTEX_COUNT> getQuadCoords(glm::vec2 position, float width, float height, float yOffset)
 	{
 		return
 		{
-			glm::vec2(position.x, position.y),
-			glm::vec2(position.x + width, position.y),
-			glm::vec2(position.x + width, position.y + height),
-			glm::vec2(position.x + width, position.y + height),
-			glm::vec2(position.x, position.y + height),
-			glm::vec2(position.x, position.y)
+			glm::vec2(position.x, position.y + yOffset),
+			glm::vec2(position.x + width, position.y + yOffset),
+			glm::vec2(position.x + width, position.y + height + yOffset),
+			glm::vec2(position.x + width, position.y + height + yOffset),
+			glm::vec2(position.x, position.y + height + yOffset),
+			glm::vec2(position.x, position.y + yOffset)
 		};
 	};
 }
@@ -62,11 +62,13 @@ HealthBarSprite::~HealthBarSprite()
 	onDestroy();
 }
 
-void HealthBarSprite::render(glm::vec2 position, glm::uvec2 windowSize) const
-{
-	float width = (static_cast<float>(DEFAULT_WIDTH) / windowSize.x) * 2.0f;
-	float height = (static_cast<float>(DEFAULT_HEIGHT) / windowSize.y) * 2.0f;
-	std::array<glm::vec2, QUAD_VERTEX_COUNT> quad = getQuadCoords(position, width, height);
+void HealthBarSprite::render(glm::vec2 position, glm::uvec2 windowSize, float width, float yOffset) const
+{ 
+	std::array<glm::vec2, QUAD_VERTEX_COUNT> quad = getQuadCoords(
+		position, 
+		width, 
+		static_cast<float>(DEFAULT_HEIGHT) / windowSize.y * 2.0f,
+		yOffset);
 
 	glBindBuffer(GL_ARRAY_BUFFER, m_vboID);
 	glBufferData(GL_ARRAY_BUFFER, quad.size() * sizeof(glm::vec2), quad.data(), GL_STATIC_DRAW);

@@ -11,7 +11,7 @@ public:
 	HealthBarSprite& operator=(HealthBarSprite&&) noexcept;
 	~HealthBarSprite();
 
-	void render(glm::vec2 position, glm::uvec2 windowSize) const;
+	void render(glm::vec2 position, glm::uvec2 windowSize, float width, float yOffset) const;
 
 private:
 	unsigned int m_vaoID;

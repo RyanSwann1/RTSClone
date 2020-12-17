@@ -195,8 +195,39 @@ void Entity::renderHealthBar(ShaderHandler& shaderHandler, const Camera& camera,
 	{
 		glm::vec4 positionNDC = camera.getProjection(glm::ivec2(windowSize.x, windowSize.y)) * camera.getView() * glm::vec4(m_position, 1.0f);
 		positionNDC /= positionNDC.w;
+		float width = 0.0f;
+		float yOffset = 0.0f;
+		switch (getEntityType())
+		{
+		case eEntityType::Unit:
+			width = 75.0f / windowSize.x * 2.0f; 
+			yOffset = 50.0f / windowSize.y * 2.0f;
+			break;
+		case eEntityType::Worker:
+			width = 60.0f / windowSize.x * 2.0f;
+			yOffset = 25.0f / windowSize.y * 2.0f;
+			break;
+		case eEntityType::HQ:
+			width = 150.0f / windowSize.x * 2.0f;
+			yOffset = 225.0f / windowSize.y * 2.0f;
+			break;
+		case eEntityType::SupplyDepot:
+			width = 100.0f / windowSize.x * 2.0f;
+			yOffset = 85.0f / windowSize.y * 2.0f;
+			break;
+		case eEntityType::Barracks:
+			width = 100.0f / windowSize.x * 2.0f;
+			yOffset = 85.0f / windowSize.y * 2.0f;
+			break;
+		case eEntityType::Turret:
+			width = 100.0f / windowSize.x * 2.0f;
+			yOffset = 60.0f / windowSize.y * 2.0f;
+			break;
+		default:
+			assert(false);
+		}
 
-		m_healthbarSprite.render({ positionNDC.x, positionNDC.y }, windowSize);
+		m_healthbarSprite.render({ positionNDC.x, positionNDC.y }, windowSize, width, yOffset);
 	}
 }
 #endif // GAME
