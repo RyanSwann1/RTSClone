@@ -210,7 +210,7 @@ void Unit::update(float deltaTime, FactionHandler& factionHandler, const Map& ma
 	switch (m_currentState)
 	{
 	case eUnitState::Idle:
-		assert(Globals::isOnMiddlePosition(m_position) && m_targetEntity.getID() == Globals::INVALID_ENTITY_ID);
+		assert(m_targetEntity.getID() == Globals::INVALID_ENTITY_ID);
 		if (unitStateHandlerTimer.isExpired())
 		{
 			switch (getEntityType())

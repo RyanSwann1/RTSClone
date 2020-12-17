@@ -150,9 +150,6 @@
     <ClCompile Include="TargetEntity.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Laboratory.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="HealthBarSprite.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -435,9 +432,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="TargetEntity.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Laboratory.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="HealthBarSprite.h">
