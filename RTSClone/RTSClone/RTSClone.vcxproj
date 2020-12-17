@@ -174,11 +174,13 @@
     <ClCompile Include="GameMessages.cpp" />
     <ClCompile Include="GameMessenger.cpp" />
     <ClCompile Include="Graph.cpp" />
+    <ClCompile Include="Laboratory.cpp" />
     <ClCompile Include="Level.cpp" />
     <ClCompile Include="PlannedBuilding.cpp" />
     <ClCompile Include="Projectile.cpp" />
     <ClCompile Include="ProjectileHandler.cpp" />
     <ClCompile Include="SceneryGameObject.cpp" />
+    <ClCompile Include="HealthBarSprite.cpp" />
     <ClCompile Include="Turret.cpp" />
     <ClCompile Include="UIManager.cpp" />
     <ClCompile Include="TargetEntity.cpp" />
@@ -261,9 +263,11 @@
     <ClInclude Include="assimp\include\version.h" />
     <ClInclude Include="EntityType.h" />
     <ClInclude Include="FactionHandler.h" />
+    <ClInclude Include="Laboratory.h" />
     <ClInclude Include="PlannedBuilding.h" />
     <ClInclude Include="SceneryGameObject.h" />
     <ClInclude Include="Level.h" />
+    <ClInclude Include="HealthBarSprite.h" />
     <ClInclude Include="Turret.h" />
     <ClInclude Include="UIManager.h" />
     <ClInclude Include="TargetEntity.h" />

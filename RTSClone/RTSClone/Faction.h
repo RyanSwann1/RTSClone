@@ -12,6 +12,7 @@
 #include <forward_list>
 #include <vector>
 
+struct Camera;
 struct GameEvent;
 class FactionHandler;
 class ShaderHandler;
@@ -38,6 +39,7 @@ public:
 	virtual void update(float deltaTime, const Map& map, FactionHandler& factionHandler, const Timer& unitStateHandlerTimer);
 	virtual void render(ShaderHandler& shaderHandler) const;
 	void renderPlannedBuildings(ShaderHandler& shaderHandler) const;
+	void renderEntityHealthBars(ShaderHandler& shaderHandler, const Camera& camera, glm::uvec2 windowSize) const;
 
 #ifdef RENDER_PATHING
 	void renderPathing(ShaderHandler& shaderHandler);

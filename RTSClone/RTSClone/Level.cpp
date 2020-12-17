@@ -262,6 +262,17 @@ void Level::renderPlannedBuildings(ShaderHandler& shaderHandler) const
 	}
 }
 
+void Level::renderEntityHealthBars(ShaderHandler& shaderHandler, const Camera& camera, glm::uvec2 windowSize) const
+{
+	for (const auto& faction : m_factions)
+	{
+		if (faction)
+		{
+			faction->renderEntityHealthBars(shaderHandler, camera, windowSize);
+		}
+	}
+}
+
 void Level::render(ShaderHandler& shaderHandler) const
 {
 	for (const auto& gameObject : m_scenery)

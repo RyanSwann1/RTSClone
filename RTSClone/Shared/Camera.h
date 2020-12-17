@@ -10,7 +10,7 @@ struct Camera : private NonCopyable, private NonMovable
 	Camera();
 
 	glm::mat4 getView() const;
-	glm::mat4 getProjection(const sf::Window& window) const;
+	glm::mat4 getProjection(glm::ivec2 windowSize) const;
 
 #ifdef LEVEL_EDITOR
 	//Return false if ground not found

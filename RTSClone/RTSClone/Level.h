@@ -30,6 +30,7 @@ public:
 	void update(float deltaTime, const Map& map);
 	void renderSelectionBox(const sf::Window& window) const;
 	void renderPlannedBuildings(ShaderHandler& shaderHandler) const;
+	void renderEntityHealthBars(ShaderHandler& shaderHandler, const Camera& camera, glm::uvec2 windowSize) const;
 	void render(ShaderHandler& shaderHandler) const;
 
 #ifdef RENDER_AABB

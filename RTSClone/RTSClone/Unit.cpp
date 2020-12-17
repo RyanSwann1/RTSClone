@@ -121,7 +121,7 @@ void Unit::moveToAttackPosition(const Entity& targetEntity, const Faction& targe
 		{
 			Unit& unit = *this;
 			PathFinding::getInstance().getPathToPosition(*this, previousDestination, m_pathToPosition, [&](const glm::ivec2& position)
-			{ return getAdjacentPositions(position, map, factionHandler, unit); }, map, factionHandler);
+				{ return getAdjacentPositions(position, map, factionHandler, unit); }, map, factionHandler);
 			switchToState(eUnitState::Moving, map);
 		}
 		else

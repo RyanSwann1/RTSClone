@@ -83,10 +83,10 @@ glm::mat4 Camera::getView() const
 	return glm::lookAt(position, position + front, up);
 }
 
-glm::mat4 Camera::getProjection(const sf::Window& window) const
+glm::mat4 Camera::getProjection(glm::ivec2 windowSize) const
 {
 	return glm::perspective(glm::radians(FOV),
-		static_cast<float>(window.getSize().x) / static_cast<float>(window.getSize().y), nearPlaneDistance, farPlaneDistance);
+		static_cast<float>(windowSize.x) / static_cast<float>(windowSize.y), nearPlaneDistance, farPlaneDistance);
 }
 
 #ifdef GAME
@@ -100,7 +100,7 @@ glm::vec3 Camera::getMouseToGroundPosition(const sf::Window& window) const
 {
 	assert(position.y >= MINIMUM_HEIGHT);
 
-	glm::vec3 rayPositionFromMouse = calculateMouseRay(getProjection(window), getView(), window,
+	glm::vec3 rayPositionFromMouse = calculateMouseRay(getProjection(glm::ivec2(window.getSize().x, window.getSize().y)), getView(), window,
 		{ sf::Mouse::getPosition(window).x, sf::Mouse::getPosition(window).y });
 
 	glm::vec3 rayPosition = position;

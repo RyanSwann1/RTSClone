@@ -78,7 +78,12 @@ int main()
 		return -1;
 	}
 
+	shaderHandler->switchToShader(eShaderType::SelectionBox);
+	shaderHandler->setUniformMat4f(eShaderType::SelectionBox, "uOrthographic",
+		glm::ortho(0.0f, static_cast<float>(windowSize.x), static_cast<float>(windowSize.y), 0.0f));
+
 	GameMessenger::getInstance();
+
 	PathFinding::getInstance();
 
 	sf::Clock gameClock;
@@ -87,10 +92,6 @@ int main()
 	Map map;
 	const std::array<std::string, Globals::MAX_LEVELS> levelNames = LevelFileHandler::loadLevelNames();
 	std::unique_ptr<Level> level; 
-
-	shaderHandler->switchToShader(eShaderType::SelectionBox);
-	shaderHandler->setUniformMat4f(eShaderType::SelectionBox, "uOrthographic", 
-		glm::ortho(0.0f, static_cast<float>(windowSize.x), static_cast<float>(windowSize.y), 0.0f));
 
 	std::cout << glGetError() << "\n";
 	std::cout << glGetError() << "\n";
@@ -177,11 +178,11 @@ int main()
 		{
 			level->update(deltaTime, map);
 		}
-		camera.update(deltaTime);
+		camera.update(deltaTime);		
 
 		//Render
 		glm::mat4 view = camera.getView(); 
-		glm::mat4 projection = camera.getProjection(window);
+		glm::mat4 projection = camera.getProjection(glm::ivec2(window.getSize().x, window.getSize().y));
 
 		UIManager.render(window);
 
@@ -195,12 +196,16 @@ int main()
 		if (level)
 		{
 			level->render(*shaderHandler);
+			
+			shaderHandler->switchToShader(eShaderType::HealthBar);
+			level->renderEntityHealthBars(*shaderHandler, camera, windowSize); 
 		}
 
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		glDisable(GL_DEPTH_TEST);
 
+		shaderHandler->switchToShader(eShaderType::Default);
 		shaderHandler->setUniform1f(eShaderType::Default, "uOpacity", 0.5f);
 		if (level)
 		{
