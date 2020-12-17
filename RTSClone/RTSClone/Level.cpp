@@ -199,6 +199,11 @@ void Level::handleInput(const sf::Window& window, const Camera& camera, const sf
 		{
 			m_selectedTargetGUI.reset();
 		}
+
+		for (auto& opposingFaction : m_factionHandler.getOpposingFactions(eFactionController::Player))
+		{
+			opposingFaction.get().selectEntity(mouseToGroundPosition);
+		}
 	}
 
 	if (isFactionActive(m_factions, eFactionController::Player))
