@@ -197,36 +197,37 @@ void Entity::renderHealthBar(ShaderHandler& shaderHandler, const Camera& camera,
 		positionNDC /= positionNDC.w;
 		float width = 0.0f;
 		float yOffset = 0.0f;
+		float currentHealth = static_cast<float>(m_health) / static_cast<float>(m_maximumHealth);
 		switch (getEntityType())
 		{
 		case eEntityType::Unit:
-			width = 75.0f / windowSize.x * 2.0f; 
+			width = 75.0 * currentHealth / windowSize.x * 2.0f;
 			yOffset = 50.0f / windowSize.y * 2.0f;
 			break;
 		case eEntityType::Worker:
-			width = 60.0f / windowSize.x * 2.0f;
+			width = 60.0f * currentHealth / windowSize.x * 2.0f;
 			yOffset = 25.0f / windowSize.y * 2.0f;
 			break;
 		case eEntityType::HQ:
-			width = 150.0f / windowSize.x * 2.0f;
+			width = 150.0f * currentHealth / windowSize.x * 2.0f;
 			yOffset = 225.0f / windowSize.y * 2.0f;
 			break;
 		case eEntityType::SupplyDepot:
-			width = 100.0f / windowSize.x * 2.0f;
+			width = 100.0f * currentHealth / windowSize.x * 2.0f;
 			yOffset = 85.0f / windowSize.y * 2.0f;
 			break;
 		case eEntityType::Barracks:
-			width = 100.0f / windowSize.x * 2.0f;
+			width = 100.0f * currentHealth / windowSize.x * 2.0f;
 			yOffset = 85.0f / windowSize.y * 2.0f;
 			break;
 		case eEntityType::Turret:
-			width = 100.0f / windowSize.x * 2.0f;
+			width = 100.0f * currentHealth / windowSize.x * 2.0f;
 			yOffset = 60.0f / windowSize.y * 2.0f;
 			break;
 		default:
 			assert(false);
 		}
-
+		
 		m_healthbarSprite.render({ positionNDC.x, positionNDC.y }, windowSize, width, yOffset);
 	}
 }
