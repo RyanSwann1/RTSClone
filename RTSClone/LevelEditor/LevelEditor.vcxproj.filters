@@ -220,5 +220,11 @@
     <None Include="..\Shared\Shaders\SelectionBoxVertexShader.glsl">
       <Filter>shaders</Filter>
     </None>
+    <None Include="..\Shared\Shaders\HealthBarFragmentShader.glsl">
+      <Filter>shaders</Filter>
+    </None>
+    <None Include="..\Shared\Shaders\HealthBarVertexShader.glsl">
+      <Filter>shaders</Filter>
+    </None>
   </ItemGroup>
 </Project>
