@@ -6,7 +6,7 @@
 #include <functional>
 #ifdef GAME
 #include "EntityType.h"
-#include "HealthBarSprite.h"
+#include "Sprite.h"
 struct TakeDamageEvent;
 class FactionHandler;
 struct Camera;
@@ -73,7 +73,7 @@ private:
 	int m_maximumHealth;
 	int m_health;
 	eEntityType m_type;
-	HealthBarSprite m_healthbarSprite;
+	Sprite m_healthbarSprite;
 #endif // GAME
 	std::reference_wrapper<const Model> m_model;
 	bool m_selected;

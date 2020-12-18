@@ -150,7 +150,7 @@
     <ClCompile Include="TargetEntity.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="HealthBarSprite.cpp">
+    <ClCompile Include="Sprite.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -434,7 +434,7 @@
     <ClInclude Include="TargetEntity.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="HealthBarSprite.h">
+    <ClInclude Include="Sprite.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -3,13 +3,13 @@
 #include "NonCopyable.h"
 #include "glm/glm.hpp"
 
-class HealthBarSprite : private NonCopyable
+class Sprite : private NonCopyable
 {
 public:
-	HealthBarSprite();
-	HealthBarSprite(HealthBarSprite&&) noexcept;
-	HealthBarSprite& operator=(HealthBarSprite&&) noexcept;
-	~HealthBarSprite();
+	Sprite();
+	Sprite(Sprite&&) noexcept;
+	Sprite& operator=(Sprite&&) noexcept;
+	~Sprite();
 
 	void render(glm::vec2 position, glm::uvec2 windowSize, float width, float yOffset) const;
 

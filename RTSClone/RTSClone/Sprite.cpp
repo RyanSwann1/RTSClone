@@ -1,4 +1,4 @@
-#include "HealthBarSprite.h"
+#include "Sprite.h"
 #include "glad.h"
 #include "Globals.h"
 #include "Entity.h"
@@ -24,7 +24,7 @@ namespace
 	};
 }
 
-HealthBarSprite::HealthBarSprite()
+Sprite::Sprite()
 	: m_vaoID(Globals::INVALID_OPENGL_ID),
 	m_vboID(Globals::INVALID_OPENGL_ID)
 {
@@ -32,7 +32,7 @@ HealthBarSprite::HealthBarSprite()
 	glGenBuffers(1, &m_vboID);
 }
 
-HealthBarSprite::HealthBarSprite(HealthBarSprite&& rhs) noexcept
+Sprite::Sprite(Sprite&& rhs) noexcept
 	: m_vaoID(rhs.m_vaoID),
 	m_vboID(rhs.m_vboID)
 {
@@ -40,7 +40,7 @@ HealthBarSprite::HealthBarSprite(HealthBarSprite&& rhs) noexcept
 	rhs.m_vboID = Globals::INVALID_OPENGL_ID;
 }
 
-HealthBarSprite& HealthBarSprite::operator=(HealthBarSprite&& rhs) noexcept
+Sprite& Sprite::operator=(Sprite&& rhs) noexcept
 {
 	assert(this != &rhs);
 	if (this != &rhs)
@@ -57,12 +57,12 @@ HealthBarSprite& HealthBarSprite::operator=(HealthBarSprite&& rhs) noexcept
 	return *this;
 }
 
-HealthBarSprite::~HealthBarSprite()
+Sprite::~Sprite()
 {
 	onDestroy();
 }
 
-void HealthBarSprite::render(glm::vec2 position, glm::uvec2 windowSize, float width, float yOffset) const
+void Sprite::render(glm::vec2 position, glm::uvec2 windowSize, float width, float yOffset) const
 { 
 	std::array<glm::vec2, QUAD_VERTEX_COUNT> quad = getQuadCoords(
 		position, 
@@ -80,7 +80,7 @@ void HealthBarSprite::render(glm::vec2 position, glm::uvec2 windowSize, float wi
 	glDrawArrays(GL_TRIANGLES, 0, QUAD_VERTEX_COUNT);
 }
 
-void HealthBarSprite::onDestroy()
+void Sprite::onDestroy()
 {
 	if (m_vaoID != Globals::INVALID_OPENGL_ID && m_vboID != Globals::INVALID_OPENGL_ID)
 	{
