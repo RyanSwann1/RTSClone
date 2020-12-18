@@ -1,9 +1,9 @@
 #include "ModelLoader.h"
 #include "Model.h"
 #include "glad.h"
-#include <assimp/Importer.hpp>
-#include <assimp/scene.h>
-#include <assimp/postprocess.h>
+#include "assimp/Importer.hpp"
+#include "assimp/scene.h"
+#include "assimp/postprocess.h"
 #include <iostream>
 #include <SFML/Graphics.hpp>
 

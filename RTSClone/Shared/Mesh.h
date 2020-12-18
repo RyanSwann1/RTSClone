@@ -53,6 +53,7 @@ struct Mesh : private NonCopyable
 	void renderDebugMesh(ShaderHandler& shaderHandler) const;
 #endif // defined RENDER_AABB || defined RENDER_PATHING
 
+	void render(ShaderHandler& shaderHandler, glm::vec3 materialColor) const;
 	void render(ShaderHandler& shaderHandler, bool selected = false) const;
 	void render(ShaderHandler& shaderHandler, eFactionController owningFactionController, bool selected = false) const;
 

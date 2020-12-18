@@ -90,10 +90,11 @@ glm::mat4 Camera::getProjection(glm::ivec2 windowSize) const
 }
 
 #ifdef GAME
-void Camera::update(float deltaTime)
+void Camera::update(float deltaTime, glm::uvec2 windowSize, const sf::Window& window)
 {
 	setFront();
 	moveByArrowKeys(deltaTime);
+	moveWithMouse(window, windowSize, deltaTime);
 }
 
 glm::vec3 Camera::getMouseToGroundPosition(const sf::Window& window) const
@@ -271,6 +272,33 @@ void Camera::moveByArrowKeys(float deltaTime)
 	{
 		position.x -= glm::cos(glm::radians(rotation.y)) * MOVEMENT_SPEED * deltaTime;
 		position.z -= glm::sin(glm::radians(rotation.y)) * MOVEMENT_SPEED * deltaTime;
+	}
+}
+
+void Camera::moveWithMouse(const sf::Window& window, glm::uvec2 windowSize, float deltaTime)
+{
+	glm::ivec2 mousePosition = { sf::Mouse::getPosition(window).x, sf::Mouse::getPosition(window).y };
+	constexpr float BOUNDARY = 0.9f;
+	float x = static_cast<float>(mousePosition.x) / windowSize.x * 2.0f;
+	float y = static_cast<float>(mousePosition.y) / windowSize.y * 2.0f;
+
+	if (x <= 0.1f)
+	{
+		position -= glm::normalize(glm::cross(front, up)) * 90.0f * deltaTime;
+	}
+	if (x >= 1.9f)
+	{
+		position += glm::normalize(glm::cross(front, up)) * 90.0f * deltaTime;
+	}
+	if (y >= 1.9f)
+	{
+		position.x -= glm::cos(glm::radians(rotation.y)) * 90.0f * deltaTime;
+		position.z -= glm::sin(glm::radians(rotation.y)) * 90.0f * deltaTime;
+	}
+	if (y <= 0.1f)
+	{
+		position.x += glm::cos(glm::radians(rotation.y)) * 90.0f * deltaTime;
+		position.z += glm::sin(glm::radians(rotation.y)) * 90.0f * deltaTime;
 	}
 }
 

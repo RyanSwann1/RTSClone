@@ -178,7 +178,7 @@ int main()
 		{
 			level->update(deltaTime, map);
 		}
-		camera.update(deltaTime);		
+		camera.update(deltaTime, windowSize, window);		
 
 		//Render
 		glm::mat4 view = camera.getView(); 

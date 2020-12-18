@@ -7,6 +7,10 @@
 #include "ModelManager.h"
 #include "Faction.h"
 #include "Map.h"
+#include "CubeMeshGenerator.h"
+#include "glm/gtc/matrix_transform.hpp"
+#include "glm/gtx/transform.hpp"
+#include "ShaderHandler.h"
 
 namespace
 {
@@ -70,11 +74,25 @@ HQ::HQ(const glm::vec3& startingPosition, const Faction& owningFaction)
 	: UnitSpawnerBuilding(startingPosition, eEntityType::HQ, TIME_BETWEEN_WORKER_SPAWN, 
 		Globals::HQ_STARTING_HEALTH, owningFaction,
 		ModelManager::getInstance().getModel(HQ_MODEL_NAME))
-{}
+{
+	CubeMeshGenerator::generateCubeMesh(m_cubeMesh, { m_position.x, m_position.y + 5.0f, m_position.z });
+}
 
 void HQ::update(float deltaTime)
 {
 	UnitSpawnerBuilding::update(deltaTime, Globals::WORKER_RESOURCE_COST, Globals::WORKER_POPULATION_COST);
+}
+
+void HQ::renderCubeMesh(ShaderHandler& shaderHandler, eFactionController owningFactionController) const
+{
+	//glm::mat4 model = glm::translate(glm::mat4(1.0f), m_position);
+	if (isSelected() && isWaypointActive())
+	{
+		ModelManager::getInstance().getModel(WAYPOINT_MODEL_NAME).render(shaderHandler, m_waypointPosition);
+	}
+
+	shaderHandler.setUniformMat4f(eShaderType::Default, "uModel", glm::mat4(1.0f));
+	m_cubeMesh.render(shaderHandler, { 1.0f, 1.0f, 1.0f });
 }
 
 void HQ::addUnitToSpawn(const std::function<const Entity* (const UnitSpawnerBuilding&)>& unitToSpawn)

@@ -120,6 +120,15 @@ void Mesh::renderDebugMesh(ShaderHandler& shaderHandler) const
 }
 #endif // RENDER_AABB || defined RENDER_PATHING
 
+void Mesh::render(ShaderHandler& shaderHandler, glm::vec3 materialColor) const
+{
+	bind();
+
+	shaderHandler.setUniformVec3(eShaderType::Default, "uMaterialColour", materialColor);
+
+	glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(indices.size()), GL_UNSIGNED_INT, nullptr);
+}
+
 void Mesh::render(ShaderHandler& shaderHandler, bool selected) const
 {
 	if (!textures.empty())

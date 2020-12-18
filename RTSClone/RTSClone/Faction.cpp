@@ -419,8 +419,15 @@ void Faction::update(float deltaTime, const Map& map, FactionHandler& factionHan
 
 void Faction::render(ShaderHandler& shaderHandler) const
 {
-    m_HQ.render(shaderHandler, m_controller);
-
+    if (m_controller == eFactionController::Player)
+    {
+        m_HQ.renderCubeMesh(shaderHandler, m_controller);
+    }
+    else
+    {
+        m_HQ.render(shaderHandler, m_controller);
+    }
+    
     for (const auto& unit : m_units)
     {
         unit.render(shaderHandler, m_controller);

@@ -3,6 +3,7 @@
 #include "Entity.h"
 #include "Timer.h"
 #include "NonMovable.h"
+#include "Mesh.h"
 #include <functional>
 
 enum class eFactionController;
@@ -34,7 +35,6 @@ protected:
 	std::vector<std::function<const Entity* (const UnitSpawnerBuilding&)>> m_unitsToSpawn;
 	Timer m_spawnTimer;
 
-private:
 	glm::vec3 m_waypointPosition;
 };
 
@@ -55,7 +55,11 @@ class HQ : public UnitSpawnerBuilding
 public:
 	HQ(const glm::vec3& startingPosition, const Faction& owningFaction);
 	void update(float deltaTime);
+
+
+	void renderCubeMesh(ShaderHandler& shaderHandler, eFactionController owningFactionController) const;
 	
 private:
+	Mesh m_cubeMesh;
 	void addUnitToSpawn(const std::function<const Entity* (const UnitSpawnerBuilding&)>& unitToSpawn);
 };
