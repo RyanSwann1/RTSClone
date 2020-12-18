@@ -23,7 +23,7 @@ struct Camera : private NonCopyable, private NonMovable
 
 #ifdef GAME
 	glm::vec3 getMouseToGroundPosition(const sf::Window& window) const;
-	void update(float deltaTime);
+	void update(float deltaTime, const sf::Window& window, glm::uvec2 windowSize);
 #endif // GAME
 
 	const float FOV;
@@ -39,5 +39,6 @@ struct Camera : private NonCopyable, private NonMovable
 
 private:
 	void moveByArrowKeys(float deltaTime);
+	void moveByMouse(float deltaTime, const sf::Window& window, glm::uvec2 windowSize);
 	void setFront();
 };

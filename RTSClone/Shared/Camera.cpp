@@ -11,6 +11,7 @@ namespace
 
 #ifdef GAME
 	constexpr float MOVEMENT_SPEED = 110.0f;
+	const float MOUSE_MOVEMENT_SPEED = 90.0f;
 #endif // GAME
 
 	constexpr int MAX_RAY_TO_GROUND_DISTANCE = 2500;
@@ -19,6 +20,7 @@ namespace
 	constexpr float NEAR_PLANE_DISTANCE = 0.1f;
 	constexpr float FAR_PLANE_DISTANCE = 1750.0f;
 	constexpr float FIELD_OF_VIEW = 50.0f;
+	const float MOUSE_MOVE_BOUNDARY = 0.95f;
 	constexpr glm::vec3 STARTING_POSITION = { 0.0f, 72.0f, 43.0f };
 	constexpr glm::vec3 STARTING_ROTATION = { -70.0f, 0.0f, 0.0f };
 
@@ -90,10 +92,11 @@ glm::mat4 Camera::getProjection(glm::ivec2 windowSize) const
 }
 
 #ifdef GAME
-void Camera::update(float deltaTime)
+void Camera::update(float deltaTime, const sf::Window& window, glm::uvec2 windowSize)
 {
 	setFront();
 	moveByArrowKeys(deltaTime);
+	moveByMouse(deltaTime, window, windowSize);
 }
 
 glm::vec3 Camera::getMouseToGroundPosition(const sf::Window& window) const
@@ -271,6 +274,31 @@ void Camera::moveByArrowKeys(float deltaTime)
 	{
 		position.x -= glm::cos(glm::radians(rotation.y)) * MOVEMENT_SPEED * deltaTime;
 		position.z -= glm::sin(glm::radians(rotation.y)) * MOVEMENT_SPEED * deltaTime;
+	}
+}
+
+void Camera::moveByMouse(float deltaTime, const sf::Window& window, glm::uvec2 windowSize)
+{
+	glm::vec2 mousePosition = { static_cast<float>(sf::Mouse::getPosition(window).x), static_cast<float>(sf::Mouse::getPosition(window).y) };
+	glm::vec2 mousePositionNDC = { (mousePosition.x / windowSize.x * 2.0f) - 1.0f, (mousePosition.y / windowSize.y * 2.0f) - 1.0f };
+
+	if (mousePositionNDC.x <= -MOUSE_MOVE_BOUNDARY)
+	{
+		position -= glm::normalize(glm::cross(front, up)) * MOUSE_MOVEMENT_SPEED * deltaTime;
+	}
+	if (mousePositionNDC.x >= MOUSE_MOVE_BOUNDARY)
+	{
+		position += glm::normalize(glm::cross(front, up)) * MOUSE_MOVEMENT_SPEED * deltaTime;
+	}
+	if (mousePositionNDC.y <= -MOUSE_MOVE_BOUNDARY)
+	{
+		position.x += glm::cos(glm::radians(rotation.y)) * MOUSE_MOVEMENT_SPEED * deltaTime;
+		position.z += glm::sin(glm::radians(rotation.y)) * MOUSE_MOVEMENT_SPEED * deltaTime;
+	}
+	if (mousePositionNDC.y >= MOUSE_MOVE_BOUNDARY)
+	{
+		position.x -= glm::cos(glm::radians(rotation.y)) * MOUSE_MOVEMENT_SPEED * deltaTime;
+		position.z -= glm::sin(glm::radians(rotation.y)) * MOUSE_MOVEMENT_SPEED * deltaTime;
 	}
 }
 
