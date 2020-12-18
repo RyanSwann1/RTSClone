@@ -6,8 +6,6 @@
 
 namespace
 {
-	const int DEFAULT_WIDTH = 50;
-	const int DEFAULT_HEIGHT = 10;
 	const int QUAD_VERTEX_COUNT = 6;
 
 	std::array<glm::vec2, QUAD_VERTEX_COUNT> getQuadCoords(glm::vec2 position, float width, float height, float yOffset)
@@ -62,12 +60,12 @@ Sprite::~Sprite()
 	onDestroy();
 }
 
-void Sprite::render(glm::vec2 position, glm::uvec2 windowSize, float width, float yOffset) const
+void Sprite::render(glm::vec2 position, glm::uvec2 windowSize, float width, float height, float yOffset) const
 { 
 	std::array<glm::vec2, QUAD_VERTEX_COUNT> quad = getQuadCoords(
 		position, 
 		width, 
-		static_cast<float>(DEFAULT_HEIGHT) / windowSize.y * 2.0f,
+		height,
 		yOffset);
 
 	glBindBuffer(GL_ARRAY_BUFFER, m_vboID);

@@ -26,6 +26,7 @@ namespace
 	const float BARRACKS_HEALTHBAR_YOFFSET = 85.0f;
 	const float TURRET_HEALTHBAR_WIDTH = 100.0f;
 	const float TURRET_HEALTHBAR_YOFFSET = 60.0f;
+	const float DEFAULT_HEALTH_BAR_HEIGHT = 10.0f;
 }
 #endif // GAME
 
@@ -214,6 +215,7 @@ void Entity::renderHealthBar(ShaderHandler& shaderHandler, const Camera& camera,
 		glm::vec4 positionNDC = camera.getProjection(glm::ivec2(windowSize.x, windowSize.y)) * camera.getView() * glm::vec4(m_position, 1.0f);
 		positionNDC /= positionNDC.w;
 		float width = 0.0f;
+		float height = DEFAULT_HEALTH_BAR_HEIGHT / windowSize.y * 2.0f;
 		float yOffset = 0.0f;
 		float currentHealth = static_cast<float>(m_health) / static_cast<float>(m_maximumHealth);
 		switch (getEntityType())
@@ -246,7 +248,7 @@ void Entity::renderHealthBar(ShaderHandler& shaderHandler, const Camera& camera,
 			assert(false);
 		}
 		
-		m_healthbarSprite.render({ positionNDC.x, positionNDC.y }, windowSize, width, yOffset);
+		m_healthbarSprite.render({ positionNDC.x, positionNDC.y }, windowSize, width, height, yOffset);
 	}
 }
 #endif // GAME

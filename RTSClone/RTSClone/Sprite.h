@@ -11,7 +11,7 @@ public:
 	Sprite& operator=(Sprite&&) noexcept;
 	~Sprite();
 
-	void render(glm::vec2 position, glm::uvec2 windowSize, float width, float yOffset) const;
+	void render(glm::vec2 position, glm::uvec2 windowSize, float width, float height, float yOffset) const;
 
 private:
 	unsigned int m_vaoID;
