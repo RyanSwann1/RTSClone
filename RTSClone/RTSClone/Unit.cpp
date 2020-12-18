@@ -242,20 +242,27 @@ void Unit::update(float deltaTime, FactionHandler& factionHandler, const Map& ma
 				{
 					targetEntity = factionHandler.getFaction(m_targetEntity.getFactionController()).getEntity(m_targetEntity.getID());
 				}
-				if (targetEntity &&  Globals::getSqrDistance(targetEntity->getPosition(), m_position) <= UNIT_ATTACK_RANGE * UNIT_ATTACK_RANGE)
-				{
-					moveToAttackPosition(*targetEntity, factionHandler.getFaction(m_targetEntity.getFactionController()), map, factionHandler);
-				}
-				else if (!targetEntity)
-				{
-					m_targetEntity.reset();
-				}
-			}
 
-			if (m_pathToPosition.empty())
-			{
-				assert(Globals::isOnMiddlePosition(m_position));
-				switchToState(eUnitState::AttackingTarget, map);
+				if (targetEntity)
+				{
+					if (Globals::getSqrDistance(targetEntity->getPosition(), m_position) <= UNIT_ATTACK_RANGE * UNIT_ATTACK_RANGE ||
+						m_pathToPosition.empty())
+					{
+						moveToAttackPosition(*targetEntity, factionHandler.getFaction(m_targetEntity.getFactionController()), map, factionHandler);
+					}
+				}
+				else
+				{
+					if (!m_pathToPosition.empty())
+					{
+						moveTo(m_pathToPosition.front(), map, [&, this](const glm::ivec2& position)
+							{ return getAdjacentPositions(position, map, factionHandler, *this); }, factionHandler, eUnitState::Moving);
+					}
+					else
+					{
+						switchToState(eUnitState::Idle, map);
+					}
+				}
 			}
 		}
 		else if (m_pathToPosition.empty())
