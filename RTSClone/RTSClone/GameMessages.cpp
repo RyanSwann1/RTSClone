@@ -31,9 +31,7 @@ GameMessages::UIDisplaySelectedEntity::UIDisplaySelectedEntity(eFactionControlle
 	queueSize(0),
 	spawnTime(0.0f),
 	buildTime(0.0f)
-{
-	assert(!Globals::UNIT_SPAWNER_TYPES.isMatch(entityType));
-}
+{}
 
 GameMessages::UIDisplaySelectedEntity::UIDisplaySelectedEntity(eFactionController owningFaction, int entityID, eEntityType entityType, 
 	int health, float buildTime)
@@ -55,9 +53,7 @@ GameMessages::UIDisplaySelectedEntity::UIDisplaySelectedEntity(eFactionControlle
 	queueSize(queueSize),
 	spawnTime(spawnTime),
 	buildTime(0.0f)
-{
-	assert(Globals::UNIT_SPAWNER_TYPES.isMatch(entityType));
-}
+{}
 
 GameMessages::UIDisplayWinner::UIDisplayWinner()
 	: winningFaction()

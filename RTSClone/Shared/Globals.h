@@ -58,7 +58,6 @@ namespace Globals
 	constexpr int LABORATORY_RESOURCE_COST = 100;
 
 #ifdef GAME
-	inline const TypeComparison<eEntityType> UNIT_SPAWNER_TYPES({ eEntityType::HQ, eEntityType::Barracks });
 	inline const TypeComparison<eEntityType> BUILDING_TYPES({ eEntityType::HQ, eEntityType::Barracks, 
 		eEntityType::SupplyDepot, eEntityType::Turret });
 	inline const TypeComparison<eEntityType> UNIT_TYPES({ eEntityType::Unit, eEntityType::Worker });

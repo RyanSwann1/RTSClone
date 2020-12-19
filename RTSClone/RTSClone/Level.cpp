@@ -85,37 +85,37 @@ void Level::handleGUI()
 		}
 		else
 		{
-			if (!Globals::UNIT_SPAWNER_TYPES.isMatch(targetEntity->getEntityType()))
+			switch (targetEntity->getEntityType())
 			{
-				switch (targetEntity->getEntityType())
-				{
-				case eEntityType::Unit:
-				case eEntityType::SupplyDepot:
-				case eEntityType::Turret:
-				case eEntityType::Laboratory:
-					GameMessenger::getInstance().broadcast<GameMessages::UIDisplaySelectedEntity>(
-						{ m_selectedTargetGUI.getFactionController(), m_selectedTargetGUI.getID(), targetEntity->getEntityType(),
-						targetEntity->getHealth() });
-					break;
-				case eEntityType::Worker:
-				{
-					const Timer& buildTimer = static_cast<const Worker&>(*targetEntity).getBuildTimer();
-					GameMessenger::getInstance().broadcast<GameMessages::UIDisplaySelectedEntity>(
-						{ m_selectedTargetGUI.getFactionController(), m_selectedTargetGUI.getID(), targetEntity->getEntityType(),
-						targetEntity->getHealth(), buildTimer.getExpiredTime() - buildTimer.getElaspedTime() });		
-				}
-					break;
-				default:
-					assert(false);
-				}
-			}
-			else
+			case eEntityType::HQ:
+			case eEntityType::Barracks:
 			{
 				const UnitSpawnerBuilding& unitSpawnerBuilding = static_cast<const UnitSpawnerBuilding&>(*targetEntity);
+
 				GameMessenger::getInstance().broadcast<GameMessages::UIDisplaySelectedEntity>(
 					{ m_selectedTargetGUI.getFactionController(), m_selectedTargetGUI.getID(), targetEntity->getEntityType(),
-					unitSpawnerBuilding.getHealth(), unitSpawnerBuilding.getCurrentSpawnCount(), 
+					unitSpawnerBuilding.getHealth(), unitSpawnerBuilding.getCurrentSpawnCount(),
 					unitSpawnerBuilding.getSpawnTimer().getExpiredTime() - unitSpawnerBuilding.getSpawnTimer().getElaspedTime() });
+			}
+				break;
+			case eEntityType::Unit:
+			case eEntityType::SupplyDepot:
+			case eEntityType::Turret:
+			case eEntityType::Laboratory:
+				GameMessenger::getInstance().broadcast<GameMessages::UIDisplaySelectedEntity>(
+					{ m_selectedTargetGUI.getFactionController(), m_selectedTargetGUI.getID(), targetEntity->getEntityType(),
+					targetEntity->getHealth() });
+				break;
+			case eEntityType::Worker:
+			{
+				const Timer& buildTimer = static_cast<const Worker&>(*targetEntity).getBuildTimer();
+				GameMessenger::getInstance().broadcast<GameMessages::UIDisplaySelectedEntity>(
+					{ m_selectedTargetGUI.getFactionController(), m_selectedTargetGUI.getID(), targetEntity->getEntityType(),
+					targetEntity->getHealth(), buildTimer.getExpiredTime() - buildTimer.getElaspedTime() });
+			}
+			break;
+			default:
+				assert(false);
 			}
 		}
 	}
