@@ -10,7 +10,7 @@ namespace
     std::vector<Mineral> initializeMinerals(
         const std::vector<glm::vec3>& mineralPositions)
     {
-        std::vector<Mineral> minerals;
+        std::vector<Mineral> minerals(mineralPositions.begin(), mineralPositions.end());
         minerals.reserve(mineralPositions.size());
         for (const auto& position : mineralPositions)
         {
@@ -25,12 +25,13 @@ Faction::Faction(eFactionController factionController, const glm::vec3& hqStarti
     const std::vector<glm::vec3>& mineralPositions, int startingResources,
     int startingPopulationCap)
     : m_plannedBuildings(),
-    m_minerals(initializeMinerals(mineralPositions)),
+    m_minerals(mineralPositions.cbegin(), mineralPositions.cend()),// initializeMinerals(mineralPositions)),
     m_allEntities(),
     m_units(),
     m_workers(),
     m_supplyDepots(),
     m_barracks(),
+    m_laboratories(),
     m_HQ(Globals::convertToNodePosition(hqStartingPosition), *this),
     m_controller(factionController),
     m_currentResourceAmount(startingResources),
@@ -450,6 +451,11 @@ void Faction::render(ShaderHandler& shaderHandler) const
     {
         turret.render(shaderHandler, m_controller);
     }
+    
+    for (const auto& laboratory : m_laboratories)
+    {
+        laboratory.render(shaderHandler, m_controller);
+    }
 }
 
 void Faction::renderPlannedBuildings(ShaderHandler& shaderHandler) const
@@ -543,6 +549,8 @@ bool Faction::isEntityAffordable(eEntityType entityType) const
         return m_currentResourceAmount - Globals::BARRACKS_RESOURCE_COST >= 0;
     case eEntityType::Turret:
         return m_currentResourceAmount - Globals::TURRET_RESOURCE_COST >= 0;
+    case eEntityType::Laboratory:
+        return m_currentResourceAmount - Globals::LABORATORY_RESOURCE_COST >= 0;
     default:
         assert(false);
         return false;
@@ -568,6 +576,10 @@ const Entity* Faction::spawnBuilding(const Map& map, glm::vec3 position, eEntity
         case eEntityType::Turret:
             m_turrets.emplace_front(position, *this);
             addedBuilding = &m_turrets.front();
+            break;
+        case eEntityType::Laboratory:
+            m_laboratories.emplace_front(position);
+            addedBuilding = &m_laboratories.front();
             break;
         default:
             assert(false);
@@ -631,6 +643,9 @@ void Faction::reduceResources(eEntityType addedEntityType)
         break;
     case eEntityType::Turret:
         m_currentResourceAmount -= Globals::TURRET_RESOURCE_COST;
+        break;
+    case eEntityType::Laboratory:
+        m_currentResourceAmount -= Globals::LABORATORY_RESOURCE_COST;
         break;
     default:
         assert(false);
@@ -711,6 +726,9 @@ bool Faction::instructWorkerToBuild(eEntityType entityType, const glm::vec3& pos
     case eEntityType::Turret:
         withinMapBounds = map.isWithinBounds(AABB(position, ModelManager::getInstance().getModel(TURRET_MODEL_NAME)));
         break;  
+    case eEntityType::Laboratory:
+        withinMapBounds = map.isWithinBounds(AABB(position, ModelManager::getInstance().getModel(LABORATORY_MODEL_NAME)));
+        break;
     default:
         assert(false);
     }

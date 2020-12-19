@@ -9,6 +9,7 @@
 #include "FactionController.h"
 #include "PlannedBuilding.h"
 #include "Turret.h"
+#include "Laboratory.h"
 #include <forward_list>
 #include <vector>
 
@@ -61,6 +62,7 @@ protected:
 	std::forward_list<SupplyDepot> m_supplyDepots;
 	std::forward_list<Barracks> m_barracks;
 	std::forward_list<Turret> m_turrets;
+	std::forward_list<Laboratory> m_laboratories;
 	HQ m_HQ;
 
 	bool isExceedPopulationLimit(eEntityType entityType) const;
