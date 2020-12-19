@@ -462,7 +462,7 @@ void Faction::render(ShaderHandler& shaderHandler) const
 
     for (const auto& minerals : m_minerals)
     {
-        minerals.render(shaderHandler, m_controller);
+        minerals.render(shaderHandler);
     }
 
     for (const auto& turret : m_turrets)

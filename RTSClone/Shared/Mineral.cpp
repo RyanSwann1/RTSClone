@@ -1,41 +1,50 @@
 #include "Mineral.h"
-#ifdef GAME
-#include "GameMessenger.h"
-#include "GameMessages.h"
-#endif // GAME
 #include "ModelManager.h"
 
 #ifdef GAME
+#include "GameMessenger.h"
+#include "GameMessages.h"
+
 Mineral::Mineral(const glm::vec3& startingPosition)
-	: Entity(ModelManager::getInstance().getModel(MINERALS_MODEL_NAME), 
-		startingPosition, eEntityType::Mineral)
+	: m_active(true),
+	m_position(startingPosition),
+	m_AABB(),
+	m_model(ModelManager::getInstance().getModel(MINERALS_MODEL_NAME))
 {
-	GameMessenger::getInstance().broadcast<GameMessages::AddToMap>({ m_AABB, getID() });
+	m_position = Globals::convertToMiddleGridPosition(startingPosition);
+	m_AABB.reset(m_position, m_model);
+	GameMessenger::getInstance().broadcast<GameMessages::AddToMap>({ m_AABB, Globals::INVALID_ENTITY_ID });
 }
-#endif // GAME
 
-#ifdef LEVEL_EDITOR
-Mineral::Mineral(const glm::vec3& startingPosition, glm::vec3 startingRotation)
-	: Entity(ModelManager::getInstance().getModel(MINERALS_MODEL_NAME), startingPosition, startingRotation)
-{}
-#endif // LEVEL_EDITOR
-
-Mineral::Mineral(Mineral&& orig) noexcept
-	: Entity(std::move(orig))
-{}
-
-Mineral& Mineral::operator=(Mineral&& orig) noexcept
+Mineral::Mineral(Mineral&& rhs) noexcept
+	: m_active(rhs.m_active),
+	m_position(rhs.m_position),
+	m_AABB(rhs.m_AABB),
+	m_model(rhs.m_model)
 {
-	Entity::operator=(std::move(orig));
-	return *this;
+	rhs.m_active = false;
 }
 
 Mineral::~Mineral()
 {
-#ifdef GAME
-	if (getID() != Globals::INVALID_ENTITY_ID)
+	if (m_active)
 	{
 		GameMessenger::getInstance().broadcast<GameMessages::RemoveFromMap>({ m_AABB });
 	}
-#endif // GAME
 }
+
+const glm::vec3& Mineral::getPosition() const
+{
+	return m_position;
+}
+
+const AABB& Mineral::getAABB() const
+{
+	return m_AABB;
+}
+
+void Mineral::render(ShaderHandler& shaderHandler) const
+{
+	m_model.get().render(shaderHandler, m_position);
+}
+#endif // GAME
