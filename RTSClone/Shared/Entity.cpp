@@ -141,47 +141,6 @@ void Entity::resetAABB()
 Entity::~Entity()
 {}
 
-Entity::Entity(Entity&& rhs) noexcept
-	: m_position(rhs.m_position),
-	m_rotation(rhs.m_rotation),
-	m_AABB(std::move(rhs.m_AABB)),
-	m_ID(rhs.m_ID),
-	m_model(rhs.m_model),
-	m_selected(rhs.m_selected)
-{
-#ifdef GAME
-	m_maximumShield = rhs.m_maximumShield;
-	m_shield = rhs.m_shield;
-	m_maximumHealth = rhs.m_maximumHealth;
-	m_health = rhs.m_health;
-	m_type = rhs.m_type;
-	m_healthbarSprite = std::move(rhs.m_healthbarSprite);
-#endif // GAME
-
-	rhs.m_ID = Globals::INVALID_ENTITY_ID;
-}
-
-Entity& Entity::operator=(Entity&& rhs) noexcept
-{
-	m_position = rhs.m_position;
-	m_rotation = rhs.m_rotation;
-	m_AABB = std::move(rhs.m_AABB);
-	m_ID = rhs.m_ID;
-	m_model = std::move(rhs.m_model);
-	m_selected = rhs.m_selected;
-
-#ifdef GAME
-	m_maximumShield = rhs.m_maximumShield;
-	m_shield = rhs.m_shield;
-	m_maximumHealth = rhs.m_maximumHealth;
-	m_health = rhs.m_health;
-	m_type = rhs.m_type;
-#endif // GAME
-
-	rhs.m_ID = Globals::INVALID_ENTITY_ID;
-	return *this;
-}
-
 int Entity::getID() const
 {
 	return m_ID;

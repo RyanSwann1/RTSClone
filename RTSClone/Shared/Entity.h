@@ -21,8 +21,6 @@ class Entity : private NonCopyable, private NonMovable
 {
 public:
 	virtual ~Entity();
-	Entity(Entity&&) noexcept;
-	Entity& operator=(Entity&&) noexcept;
 
 #ifdef LEVEL_EDITOR
 	Entity(const Model& model);
