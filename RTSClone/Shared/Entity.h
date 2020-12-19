@@ -46,6 +46,7 @@ public:
 	void increaseShield(const Faction& owningFaction);
 	void render(ShaderHandler& shaderHandler, eFactionController owningFactionController) const;
 	void renderHealthBar(ShaderHandler& shaderHandler, const Camera& camera, glm::uvec2 windowSize) const;
+	void renderShieldBar(ShaderHandler& shaderHandler, const Camera& camera, glm::uvec2 windowSize) const;
 #endif // GAME
 
 	int getID() const;
@@ -80,6 +81,7 @@ private:
 	int m_shield;
 	eEntityType m_type;
 	Sprite m_healthbarSprite;
+	Sprite m_shieldBarSprite;
 #endif // GAME
 	std::reference_wrapper<const Model> m_model;
 	bool m_selected;

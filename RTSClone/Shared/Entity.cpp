@@ -28,6 +28,23 @@ namespace
 	const float TURRET_HEALTHBAR_WIDTH = 100.0f;
 	const float TURRET_HEALTHBAR_YOFFSET = 60.0f;
 	const float DEFAULT_HEALTH_BAR_HEIGHT = 10.0f;
+
+	const float WORKER_SHIELD_BAR_WIDTH = 60.0f;
+	const float WORKER_SHIELD_BAR_YOFFSET = 35.0f;
+	const float UNIT_SHIELD_BAR_WIDTH = 75.0f;
+	const float UNIT_SHIELD_BAR_YOFFSET = 60.0f;
+	const float HQ_SHIELD_BAR_WIDTH = 150.0f;
+	const float HQ_SHIELD_BAR_YOFFSET = 235.0f;
+	const float SUPPLY_DEPOT_SHIELD_BAR_WIDTH = 100.0f;
+	const float SUPPLY_DEPOT_SHIELD_BAR_YOFFSET = 95.0f;
+	const float BARRACKS_SHIELD_BAR_WIDTH = 100.0f;
+	const float BARRACKS_SHIELD_BAR_YOFFSET = 95.0f;
+	const float TURRET_SHIELD_BAR_WIDTH = 100.0f;
+	const float TURRET_SHIELD_BAR_YOFFSET = 70.0f;
+	const float DEFAULT_SHIELD_BAR_HEIGHT = 10.0f;
+
+	const glm::vec3 HEALTH_BAR_COLOR = { 0.0f, 0.8f, 0.0f };
+	const glm::vec3 SHIELD_BAR_COLOR = { 0.0f, 1.0f, 1.0f };
 }
 #endif // GAME
 
@@ -278,6 +295,50 @@ void Entity::renderHealthBar(ShaderHandler& shaderHandler, const Camera& camera,
 			assert(false);
 		}
 		
+		shaderHandler.setUniformVec3(eShaderType::HealthBar, "uMaterialColor", HEALTH_BAR_COLOR);
+		m_healthbarSprite.render({ positionNDC.x, positionNDC.y }, windowSize, width, height, yOffset);
+	}
+}
+void Entity::renderShieldBar(ShaderHandler& shaderHandler, const Camera& camera, glm::uvec2 windowSize) const
+{
+	if (isSelected() && m_shield > 0)
+	{
+		glm::vec4 positionNDC = camera.getProjection(glm::ivec2(windowSize.x, windowSize.y)) * camera.getView() * glm::vec4(m_position, 1.0f);
+		positionNDC /= positionNDC.w;
+		float width = 0.0f;
+		float height = DEFAULT_SHIELD_BAR_HEIGHT / windowSize.y * 2.0f;
+		float yOffset = 0.0f;
+		switch (getEntityType())
+		{
+		case eEntityType::Unit:
+			width = UNIT_SHIELD_BAR_WIDTH / windowSize.x * 2.0f;
+			yOffset = UNIT_SHIELD_BAR_YOFFSET / windowSize.y * 2.0f;
+			break;
+		case eEntityType::Worker:
+			width = WORKER_SHIELD_BAR_WIDTH / windowSize.x * 2.0f;
+			yOffset = WORKER_SHIELD_BAR_YOFFSET / windowSize.y * 2.0f;
+			break;
+		case eEntityType::HQ:
+			width = HQ_SHIELD_BAR_WIDTH / windowSize.x * 2.0f;
+			yOffset = HQ_SHIELD_BAR_YOFFSET / windowSize.y * 2.0f;
+			break;
+		case eEntityType::SupplyDepot:
+			width = SUPPLY_DEPOT_SHIELD_BAR_WIDTH / windowSize.x * 2.0f;
+			yOffset = SUPPLY_DEPOT_SHIELD_BAR_YOFFSET / windowSize.y * 2.0f;
+			break;
+		case eEntityType::Barracks:
+			width = BARRACKS_SHIELD_BAR_WIDTH / windowSize.x * 2.0f;
+			yOffset = BARRACKS_SHIELD_BAR_YOFFSET / windowSize.y * 2.0f;
+			break;
+		case eEntityType::Turret:
+			width = TURRET_SHIELD_BAR_WIDTH / windowSize.x * 2.0f;
+			yOffset = TURRET_SHIELD_BAR_YOFFSET / windowSize.y * 2.0f;
+			break;
+		default:
+			assert(false);
+		}
+
+		shaderHandler.setUniformVec3(eShaderType::HealthBar, "uMaterialColor", SHIELD_BAR_COLOR);
 		m_healthbarSprite.render({ positionNDC.x, positionNDC.y }, windowSize, width, height, yOffset);
 	}
 }

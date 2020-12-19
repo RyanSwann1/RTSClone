@@ -489,6 +489,7 @@ void Faction::renderEntityHealthBars(ShaderHandler& shaderHandler, const Camera&
     for (const auto& entity : m_allEntities)
     {
         entity->renderHealthBar(shaderHandler, camera, windowSize);
+        entity->renderShieldBar(shaderHandler, camera, windowSize);
     }
 }
 
