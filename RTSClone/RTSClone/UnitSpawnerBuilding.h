@@ -2,14 +2,13 @@
 
 #include "Entity.h"
 #include "Timer.h"
-#include "NonMovable.h"
 #include <functional>
 
 enum class eFactionController;
 struct Model;
 class Map;
 class Faction;
-class UnitSpawnerBuilding : public Entity, private NonMovable
+class UnitSpawnerBuilding : public Entity
 {
 public:
 	~UnitSpawnerBuilding();

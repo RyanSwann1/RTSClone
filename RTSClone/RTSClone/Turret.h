@@ -1,6 +1,5 @@
 #pragma once
 
-#include "NonMovable.h"
 #include "Entity.h"
 #include "TargetEntity.h"
 #include "Timer.h"
@@ -14,7 +13,7 @@ enum class eTurretState
 class Faction;
 class Map;
 class FactionHandler;
-class Turret : public Entity, private NonMovable
+class Turret : public Entity
 {
 public:
 	Turret(const glm::vec3& startingPosition, const Faction& owningFaction);

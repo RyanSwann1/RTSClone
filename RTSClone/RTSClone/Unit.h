@@ -35,7 +35,7 @@ class Faction;
 class Map;
 class ShaderHandler;
 class FactionHandler;
-class Unit : public Entity, private NonMovable
+class Unit : public Entity
 {
 public:
 	Unit(const Faction& owningFaction, const glm::vec3& startingPosition);

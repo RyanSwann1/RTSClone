@@ -1,6 +1,7 @@
 #pragma once
 
 #include "NonCopyable.h"
+#include "NonMovable.h"
 #include "glm/glm.hpp"
 #include "AABB.h"
 #include <functional>
@@ -16,7 +17,7 @@ enum class eFactionController;
 struct Model;
 class ShaderHandler;
 class Map;
-class Entity : private NonCopyable
+class Entity : private NonCopyable, private NonMovable
 {
 public:
 	virtual ~Entity();
