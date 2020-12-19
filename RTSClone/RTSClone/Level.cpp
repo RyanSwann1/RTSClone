@@ -286,7 +286,7 @@ void Level::render(ShaderHandler& shaderHandler) const
 		gameObject.render(shaderHandler);
 	}
 
-	for(auto& faction : m_factions)
+	for(const auto& faction : m_factions)
 	{
 		if (faction)
 		{
