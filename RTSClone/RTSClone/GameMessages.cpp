@@ -23,33 +23,36 @@ GameMessages::UIDisplaySelectedEntity::UIDisplaySelectedEntity()
 {}
 
 GameMessages::UIDisplaySelectedEntity::UIDisplaySelectedEntity(eFactionController owningFaction, int entityID, eEntityType entityType, 
-	int health)
+	int health, int shield)
 	: owningFaction(owningFaction),
 	entityID(entityID),
 	entityType(entityType),
 	health(health),
+	shield(shield),
 	queueSize(0),
 	spawnTime(0.0f),
 	buildTime(0.0f)
 {}
 
 GameMessages::UIDisplaySelectedEntity::UIDisplaySelectedEntity(eFactionController owningFaction, int entityID, eEntityType entityType, 
-	int health, float buildTime)
+	int health, int shield, float buildTime)
 	: owningFaction(owningFaction),
 	entityID(entityID),
 	entityType(entityType),
 	health(health),
+	shield(shield),
 	queueSize(0),
 	spawnTime(0.0f),
 	buildTime(buildTime)
 {}
 
 GameMessages::UIDisplaySelectedEntity::UIDisplaySelectedEntity(eFactionController owningFaction, int entityID, eEntityType entityType, 
-	int health, int queueSize, float spawnTime)
+	int health, int shield, int queueSize, float spawnTime)
 	: owningFaction(owningFaction),
 	entityID(entityID),
 	entityType(entityType),
 	health(health),
+	shield(shield),
 	queueSize(queueSize),
 	spawnTime(spawnTime),
 	buildTime(0.0f)

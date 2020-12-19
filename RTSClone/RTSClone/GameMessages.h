@@ -37,7 +37,7 @@ namespace GameMessages
 
 	struct NewMapSize : public BaseMessage<eGameMessageType::NewMapSize>
 	{
-		NewMapSize(const glm::ivec2& mapSize)
+		NewMapSize(glm::ivec2 mapSize)
 			: mapSize(mapSize)
 		{}
 
@@ -57,16 +57,18 @@ namespace GameMessages
 	struct UIDisplaySelectedEntity : public BaseMessage<eGameMessageType::UIDisplaySelectedEntity>
 	{
 		UIDisplaySelectedEntity();
-		UIDisplaySelectedEntity(eFactionController owningFaction, int entityID, eEntityType entityType, int health);
-		UIDisplaySelectedEntity(eFactionController owningFaction, int entityID, eEntityType entityType, int health, 
-			float buildTime);
 		UIDisplaySelectedEntity(eFactionController owningFaction, int entityID, eEntityType entityType, int health,
-			int queueSize, float spawnTime);
+			int shield);
+		UIDisplaySelectedEntity(eFactionController owningFaction, int entityID, eEntityType entityType, int health,
+			int shield, float buildTime);
+		UIDisplaySelectedEntity(eFactionController owningFaction, int entityID, eEntityType entityType, int health,
+			int shield, int queueSize, float spawnTime);
 
 		eFactionController owningFaction;
 		int entityID;
 		eEntityType entityType;
 		int health;
+		int shield;
 		int queueSize;
 		float spawnTime;
 		float buildTime;
