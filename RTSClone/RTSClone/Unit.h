@@ -38,9 +38,7 @@ class FactionHandler;
 class Unit : public Entity, private NonMovable
 {
 public:
-	Unit(const Faction& owningFaction, const glm::vec3& startingPosition, 
-		eEntityType entityType = eEntityType::Unit, int health = Globals::UNIT_STARTING_HEALTH,
-		const Model& model = ModelManager::getInstance().getModel(UNIT_MODEL_NAME));
+	Unit(const Faction& owningFaction, const glm::vec3& startingPosition);
 
 	const std::vector<glm::vec3>& getPathToPosition() const;
 	float getGridAttackRange() const;
@@ -62,6 +60,9 @@ public:
 #endif // RENDER_PATHING
 
 protected:
+	Unit(const Faction& owningFaction, const glm::vec3& startingPosition,
+		eEntityType entityType, int health, const Model& model);
+
 	const Faction& m_owningFaction;
 	std::vector<glm::vec3> m_pathToPosition;
 

@@ -191,7 +191,7 @@ void UnitSpawnerBuilding::render(ShaderHandler& shaderHandler, eFactionControlle
 
 UnitSpawnerBuilding::UnitSpawnerBuilding(const glm::vec3& startingPosition, eEntityType entityType, 
 	float spawnTimerExpirationTime, int health, const Faction& owningFaction, const Model& model)
-	: Entity(model, startingPosition, entityType, health),
+	: Entity(model, startingPosition, entityType, health, owningFaction.getCurrentShieldAmount()),
 	m_owningFaction(owningFaction),
 	m_unitsToSpawn(),
 	m_spawnTimer(spawnTimerExpirationTime, false),

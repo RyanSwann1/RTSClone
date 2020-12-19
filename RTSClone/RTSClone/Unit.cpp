@@ -60,8 +60,18 @@ namespace
 #endif // RENDER_PATHING
 }
 
+Unit::Unit(const Faction& owningFaction, const glm::vec3& startingPosition)
+	: Entity(ModelManager::getInstance().getModel(UNIT_MODEL_NAME), startingPosition, eEntityType::Unit, 
+		Globals::UNIT_STARTING_HEALTH, owningFaction.getCurrentShieldAmount()),
+	m_owningFaction(owningFaction),
+	m_pathToPosition(),
+	m_currentState(eUnitState::Idle),
+	m_attackTimer(TIME_BETWEEN_ATTACK, true),
+	m_targetEntity()
+{}
+
 Unit::Unit(const Faction& owningFaction, const glm::vec3& startingPosition, eEntityType entityType, int health, const Model& model)
-	: Entity(model, startingPosition, entityType, health),
+	: Entity(model, startingPosition, entityType, health, owningFaction.getCurrentShieldAmount()),
 	m_owningFaction(owningFaction),
 	m_pathToPosition(),
 	m_currentState(eUnitState::Idle),
@@ -457,4 +467,5 @@ void Unit::renderPathMesh(ShaderHandler& shaderHandler)
 		m_renderPathMesh.renderDebugMesh(shaderHandler);
 	}
 }
+
 #endif // RENDER_PATHING

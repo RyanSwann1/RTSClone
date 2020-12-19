@@ -50,12 +50,12 @@ namespace
 
 #ifdef GAME
 Entity::Entity(const Model& model, const glm::vec3& startingPosition, eEntityType entityType, 
-	int health, glm::vec3 startingRotation)
+	int health, int shield, glm::vec3 startingRotation)
 	: m_position(startingPosition),
 	m_rotation(startingRotation),
 	m_AABB(),
 	m_ID(UniqueEntityIDDistributer::getInstance().getUniqueEntityID()),
-	m_maximumShield(0),
+	m_maximumShield(shield),
 	m_shield(m_maximumShield),
 	m_maximumHealth(health),
 	m_health(health),

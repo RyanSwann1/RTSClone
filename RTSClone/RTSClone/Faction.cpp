@@ -589,7 +589,7 @@ const Entity* Faction::spawnBuilding(const Map& map, glm::vec3 position, eEntity
         switch (entityType)
         {
         case eEntityType::SupplyDepot:
-            m_supplyDepots.emplace_front(position);
+            m_supplyDepots.emplace_front(position, *this);
             addedBuilding = &m_supplyDepots.front();
             increasePopulationLimit();
             break;
@@ -602,7 +602,7 @@ const Entity* Faction::spawnBuilding(const Map& map, glm::vec3 position, eEntity
             addedBuilding = &m_turrets.front();
             break;
         case eEntityType::Laboratory:
-            m_laboratories.emplace_front(position);
+            m_laboratories.emplace_front(position, *this);
             addedBuilding = &m_laboratories.front();
             break;
         default:

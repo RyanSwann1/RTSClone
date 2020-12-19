@@ -19,7 +19,7 @@ namespace
 
 Turret::Turret(const glm::vec3& startingPosition, const Faction& owningFaction)
 	: Entity(ModelManager::getInstance().getModel(TURRET_MODEL_NAME), startingPosition,
-		eEntityType::Turret, TURRET_STARTING_HEALTH),
+		eEntityType::Turret, TURRET_STARTING_HEALTH, owningFaction.getCurrentShieldAmount()),
 	m_owningFaction(owningFaction),
 	m_targetEntity(),
 	m_currentState(eTurretState::Idle),

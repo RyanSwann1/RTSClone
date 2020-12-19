@@ -31,7 +31,7 @@ BuildingCommand::BuildingCommand(const std::function<const Entity*()>& command, 
 
 //Worker
 Worker::Worker(const Faction& owningFaction, const glm::vec3& startingPosition)
-	: Unit(owningFaction, startingPosition, eEntityType::Worker, Globals::WORKER_STARTING_HEALTH,
+	: Unit(owningFaction, startingPosition, eEntityType::Worker, Globals::WORKER_STARTING_HEALTH, 
 		ModelManager::getInstance().getModel(WORKER_MODEL_NAME)),
 	m_buildingCommands(),
 	m_repairTargetEntityID(Globals::INVALID_ENTITY_ID),
