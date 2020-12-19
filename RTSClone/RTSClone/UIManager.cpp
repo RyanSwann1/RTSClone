@@ -34,7 +34,58 @@ namespace
 		"AI_3"
 	};
 
+	void displayHealth(int health)
+	{
+		ImGui::Text("Health:");
+		ImGui::SameLine();
+		ImGui::Text(std::to_string(health).c_str());
+	}
 
+	void displaySpawnTime(float spawnTime)
+	{
+		ImGui::Text("Spawn Time:");
+		ImGui::SameLine();
+		std::stringstream spawnTimeStream;
+		spawnTimeStream << std::fixed << std::setprecision(2) << spawnTime;
+		ImGui::Text(spawnTimeStream.str().c_str());
+	}
+
+	void displaySpawnQueue(int spawnQueueSize)
+	{
+		ImGui::Text("Spawn Queue:");
+		ImGui::SameLine();
+		ImGui::Text(std::to_string(spawnQueueSize).c_str());
+	}
+
+	void displayBuildTime(float buildTime)
+	{
+		ImGui::Text("BuildTime:");
+		ImGui::SameLine();
+		std::stringstream buildTimeStream;
+		buildTimeStream << std::fixed << std::setprecision(2) << buildTime;
+		ImGui::Text(buildTimeStream.str().c_str());
+	}
+
+	void displayResources(int resources)
+	{
+		ImGui::Text("Resources:");
+		ImGui::SameLine();
+		ImGui::Text(std::to_string(resources).c_str());
+	}
+
+	void displayPopulation(int population)
+	{
+		ImGui::Text("Population:");
+		ImGui::SameLine();
+		ImGui::Text(std::to_string(population).c_str());
+	}
+
+	void displayMaxPopulation(int maxPopulation)
+	{
+		ImGui::Text("Max Population:");
+		ImGui::SameLine();
+		ImGui::Text(std::to_string(maxPopulation).c_str());
+	}
 }
 
 //PlayerDetailsWidget
@@ -48,16 +99,9 @@ void PlayerDetailsWidget::render(const sf::Window& window)
 	{
 		ImGui::SetNextWindowSize(ImVec2(750, 750), ImGuiCond_FirstUseEver);
 		ImGui::Begin("Player", nullptr, ImGuiWindowFlags_NoResize);
-		ImGui::Text("Resources:");
-		ImGui::SameLine();
-		ImGui::Text(std::to_string(m_receivedMessage.resourceAmount).c_str());
-		ImGui::Text("Population:");
-		ImGui::SameLine();
-		ImGui::Text(std::to_string(m_receivedMessage.currentPopulationAmount).c_str());
-		ImGui::Text("Max Population:");
-		ImGui::SameLine();
-		ImGui::Text(std::to_string(m_receivedMessage.maximumPopulationAmount).c_str());
-		
+		displayResources(m_receivedMessage.resourceAmount);
+		displayPopulation(m_receivedMessage.currentPopulationAmount);
+		displayMaxPopulation(m_receivedMessage.maximumPopulationAmount);
 		ImGui::End();
 
 		m_active = false;
@@ -78,22 +122,16 @@ void SelectedEntityWidget::render(const sf::Window& window)
 		assert(static_cast<size_t>(m_receivedMessage.entityType) < ENTITY_NAME_CONVERSIONS.size());
 		ImGui::Begin(ENTITY_NAME_CONVERSIONS[static_cast<size_t>(m_receivedMessage.entityType)].c_str(), nullptr,
 			ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse);
-		if (Globals::UNIT_SPAWNER_TYPES.isMatch(m_receivedMessage.entityType))
+
+		displayHealth(m_receivedMessage.health);
+		switch (m_receivedMessage.entityType)
 		{
-			ImGui::Text("Health:");
-			ImGui::SameLine();
-			ImGui::Text(std::to_string(m_receivedMessage.health).c_str());
-			ImGui::Text("Spawn Queue:");
-			ImGui::SameLine();
-			ImGui::Text(std::to_string(m_receivedMessage.queueSize).c_str());
+		case eEntityType::HQ:
+		case eEntityType::Barracks:
 			if (m_receivedMessage.owningFaction == eFactionController::Player)
 			{
-				ImGui::Text("Spawn Time:");
-				ImGui::SameLine();
-				std::stringstream spawnTimeStream;
-				spawnTimeStream << std::fixed << std::setprecision(2) << m_receivedMessage.spawnTime;
-				ImGui::Text(spawnTimeStream.str().c_str());
-
+				displaySpawnQueue(m_receivedMessage.queueSize);
+				displaySpawnTime(m_receivedMessage.spawnTime);
 				switch (m_receivedMessage.entityType)
 				{
 				case eEntityType::HQ:
@@ -114,46 +152,41 @@ void SelectedEntityWidget::render(const sf::Window& window)
 					assert(false);
 				}
 			}
-		}
-		else
-		{
-			ImGui::Text("Health:");
-			ImGui::SameLine();
-			ImGui::Text(std::to_string(m_receivedMessage.health).c_str());
-
-			if (m_receivedMessage.owningFaction == eFactionController::Player &&
-				m_receivedMessage.entityType == eEntityType::Worker)
+			break;
+		case eEntityType::Worker:
+			if (m_receivedMessage.owningFaction == eFactionController::Player)
 			{
-				ImGui::Text("BuildTime:");
-				ImGui::SameLine();
-				std::stringstream buildTimeStream;
-				buildTimeStream << std::fixed << std::setprecision(2) << m_receivedMessage.buildTime;
-				ImGui::Text(buildTimeStream.str().c_str());
+				displayBuildTime(m_receivedMessage.buildTime);
 
 				if (ImGui::Button("Barracks"))
 				{
 					GameEventHandler::getInstance().gameEvents.push(GameEvent::createPlayerActivatePlannedBuilding(
 						eEntityType::Barracks, m_receivedMessage.entityID));
 				}
-
 				if (ImGui::Button("Supply Depot"))
 				{
 					GameEventHandler::getInstance().gameEvents.push(GameEvent::createPlayerActivatePlannedBuilding(
-						eEntityType::SupplyDepot, m_receivedMessage.entityID ));
+						eEntityType::SupplyDepot, m_receivedMessage.entityID));
 				}
-
 				if (ImGui::Button("Turret"))
 				{
 					GameEventHandler::getInstance().gameEvents.push(GameEvent::createPlayerActivatePlannedBuilding(
 						eEntityType::Turret, m_receivedMessage.entityID));
 				}
-
 				if (ImGui::Button("Laboratory"))
 				{
 					GameEventHandler::getInstance().gameEvents.push(GameEvent::createPlayerActivatePlannedBuilding(
 						eEntityType::Laboratory, m_receivedMessage.entityID));
 				}
 			}
+		case eEntityType::Laboratory:
+		case eEntityType::Mineral:
+		case eEntityType::SupplyDepot:
+		case eEntityType::Turret:
+		case eEntityType::Unit:
+			break;
+		default:
+			assert(false);
 		}
 
 		ImGui::End();
