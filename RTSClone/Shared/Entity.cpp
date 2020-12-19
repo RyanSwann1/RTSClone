@@ -52,6 +52,7 @@ Entity::Entity(const Model& model, const glm::vec3& startingPosition, eEntityTyp
 	case eEntityType::SupplyDepot:
 	case eEntityType::Unit:
 	case eEntityType::Turret:
+	case eEntityType::Laboratory:
 		m_position = Globals::convertToMiddleGridPosition(startingPosition);
 		break;
 	case eEntityType::Worker:

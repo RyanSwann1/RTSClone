@@ -43,6 +43,7 @@ namespace Globals
 	constexpr int SUPPLY_DEPOT_STARTING_HEALTH = 10;
 	constexpr int UNIT_STARTING_HEALTH = 5;
 	constexpr int WORKER_STARTING_HEALTH = 2;
+	constexpr int LABORATORY_STARTING_HEALTH = 10;
 
 	constexpr int STARTING_RESOURCES = 1500;
 	constexpr int STARTING_POPULATION = 50;
@@ -54,6 +55,7 @@ namespace Globals
 	constexpr int UNIT_POPULATION_COST = 2;
 	constexpr int TURRET_RESOURCE_COST = 50;
 	constexpr int POPULATION_INCREMENT = 5;
+	constexpr int LABORATORY_RESOURCE_COST = 100;
 
 #ifdef GAME
 	inline const TypeComparison<eEntityType> UNIT_SPAWNER_TYPES({ eEntityType::HQ, eEntityType::Barracks });

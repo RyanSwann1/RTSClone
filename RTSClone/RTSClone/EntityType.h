@@ -10,5 +10,6 @@ enum class eEntityType
 	Mineral,
 	Projectile,
 	Turret,
-	Max = Turret
+	Laboratory,
+	Max = Laboratory
 };

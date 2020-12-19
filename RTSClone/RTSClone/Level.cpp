@@ -92,6 +92,7 @@ void Level::handleGUI()
 				case eEntityType::Unit:
 				case eEntityType::SupplyDepot:
 				case eEntityType::Turret:
+				case eEntityType::Laboratory:
 					GameMessenger::getInstance().broadcast<GameMessages::UIDisplaySelectedEntity>(
 						{ m_selectedTargetGUI.getFactionController(), m_selectedTargetGUI.getID(), targetEntity->getEntityType(),
 						targetEntity->getHealth() });

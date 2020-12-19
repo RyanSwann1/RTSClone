@@ -22,7 +22,8 @@ namespace
 		"Barracks",
 		"Mineral",
 		"Projectile",
-		"Turret"
+		"Turret",
+		"Laboratory"
 	};
 
 	const std::array<std::string, static_cast<size_t>(eFactionController::Max) + 1> FACTION_NAME_CONVERSIONS =
@@ -32,6 +33,8 @@ namespace
 		"AI_2",
 		"AI_3"
 	};
+
+
 }
 
 //PlayerDetailsWidget
@@ -72,7 +75,8 @@ void SelectedEntityWidget::render(const sf::Window& window)
 	{
 		ImGui::SetNextWindowPos(ImVec2(500, 650));
 		ImGui::SetNextWindowSize(ImVec2(300, 300));
-		ImGui::Begin(ENTITY_NAME_CONVERSIONS[static_cast<int>(m_receivedMessage.entityType)].c_str(), nullptr, 
+		assert(static_cast<size_t>(m_receivedMessage.entityType) < ENTITY_NAME_CONVERSIONS.size());
+		ImGui::Begin(ENTITY_NAME_CONVERSIONS[static_cast<size_t>(m_receivedMessage.entityType)].c_str(), nullptr,
 			ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse);
 		if (Globals::UNIT_SPAWNER_TYPES.isMatch(m_receivedMessage.entityType))
 		{
@@ -143,6 +147,12 @@ void SelectedEntityWidget::render(const sf::Window& window)
 					GameEventHandler::getInstance().gameEvents.push(GameEvent::createPlayerActivatePlannedBuilding(
 						eEntityType::Turret, m_receivedMessage.entityID));
 				}
+
+				if (ImGui::Button("Laboratory"))
+				{
+					GameEventHandler::getInstance().gameEvents.push(GameEvent::createPlayerActivatePlannedBuilding(
+						eEntityType::Laboratory, m_receivedMessage.entityID));
+				}
 			}
 		}
 
@@ -182,7 +192,7 @@ UIManager::UIManager()
 	
 	GameMessenger::getInstance().subscribe<GameMessages::BaseMessage<eGameMessageType::UIClearDisplaySelectedEntity>>([this](
 		const GameMessages::BaseMessage<eGameMessageType::UIClearDisplaySelectedEntity>& gameMessage)
-	{ return onClearDisplayEntity(gameMessage); }, this);
+		{ return onClearDisplayEntity(gameMessage); }, this);
 
 	GameMessenger::getInstance().subscribe<GameMessages::BaseMessage<eGameMessageType::UIClearWinner>>([this](
 		const GameMessages::BaseMessage<eGameMessageType::UIClearWinner>& gameMessage)

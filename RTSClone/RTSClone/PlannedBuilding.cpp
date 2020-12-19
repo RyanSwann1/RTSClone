@@ -4,12 +4,6 @@
 #include "GameEvent.h"
 #include "Map.h"
 
-namespace
-{
-    const TypeComparison<eEntityType> ALLOWED_ENTITY_TYPES(
-        { eEntityType::Barracks, eEntityType::SupplyDepot, eEntityType::Turret });
-}
-
 PlannedBuilding::PlannedBuilding()
     : m_active(false),
     m_workerID(Globals::INVALID_ENTITY_ID),
@@ -22,9 +16,7 @@ PlannedBuilding::PlannedBuilding(int workerID, const glm::vec3& position, eEntit
     m_workerID(workerID),
     m_position(Globals::convertToMiddleGridPosition(position)),
     m_entityType(entityType)
-{
-    assert(ALLOWED_ENTITY_TYPES.isMatch(entityType));
-}
+{}
 
 const glm::vec3& PlannedBuilding::getPosition() const
 {
@@ -63,7 +55,6 @@ void PlannedBuilding::setPosition(const glm::vec3& newPosition, const Map& map)
 
 void PlannedBuilding::handleEvent(const PlayerActivatePlannedBuildingEvent& gameEvent)
 {
-    assert(ALLOWED_ENTITY_TYPES.isMatch(gameEvent.entityType));
     m_active = true;
     m_entityType = gameEvent.entityType;
     m_workerID = gameEvent.targetID;
@@ -83,6 +74,9 @@ void PlannedBuilding::render(ShaderHandler& shaderHandler, eFactionController ow
             break;
         case eEntityType::Turret:
             ModelManager::getInstance().getModel(TURRET_MODEL_NAME).render(shaderHandler, m_position, owningFactionController);
+            break;
+        case eEntityType::Laboratory:
+            ModelManager::getInstance().getModel(LABORATORY_MODEL_NAME).render(shaderHandler, m_position, owningFactionController);
             break;
         default:
             assert(false);
