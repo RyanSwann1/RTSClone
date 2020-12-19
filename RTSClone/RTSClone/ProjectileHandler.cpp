@@ -30,7 +30,7 @@ void ProjectileHandler::update(float deltaTime, const FactionHandler& factionHan
 			if (projectileCollision)
 			{
 				GameEventHandler::getInstance().gameEvents.push(GameEvent::createTakeDamage(projectile->getSenderEvent().senderFaction,
-					projectile->getID(), projectile->getSenderEvent().targetFaction,
+					Globals::INVALID_ENTITY_ID, projectile->getSenderEvent().targetFaction,
 					projectile->getSenderEvent().targetID, projectile->getSenderEvent().damage));
 			}
 

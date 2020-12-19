@@ -1,22 +1,26 @@
 #pragma once
 
 #include "GameEvent.h"
-#include "Entity.h"
-#include "EntityType.h"
-#include "glm/glm.hpp"
+#include "AABB.h"
+#include <functional>
 
-class Projectile : public Entity
+struct Model;
+class ShaderHandler;
+class Projectile
 {
 public:
 	Projectile(const SpawnProjectileEvent& gameEvent);
-	Projectile(Projectile&&) noexcept;
-	Projectile& operator=(Projectile&&) noexcept;
 	
+	const AABB& getAABB() const;
 	const SpawnProjectileEvent& getSenderEvent() const;
 	bool isReachedDestination() const;
 
 	void update(float deltaTime);
+	void render(ShaderHandler& shaderHandler) const;
 
 private:
 	SpawnProjectileEvent m_senderEvent;
+	glm::vec3 m_position;
+	AABB m_AABB;
+	std::reference_wrapper<const Model> m_model;
 };

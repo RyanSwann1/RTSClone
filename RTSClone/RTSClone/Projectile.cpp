@@ -1,23 +1,25 @@
 #include "Projectile.h"
 #include "ShaderHandler.h"
-#include "GameEvent.h"
 #include "Globals.h"
 #include "ModelManager.h"
+#include "Model.h"
 
 namespace
 {
-	constexpr float MOVEMENT_SPEED = 90.0f;
+	const float MOVEMENT_SPEED = 90.0f;
 }
 
 Projectile::Projectile(const SpawnProjectileEvent& gameEvent)
-	: Entity(ModelManager::getInstance().getModel(PROJECTILE_MODEL_NAME), gameEvent.spawnPosition, eEntityType::Projectile),
-	m_senderEvent(gameEvent)
+	: m_senderEvent(gameEvent),
+	m_position(gameEvent.spawnPosition),
+	m_AABB(m_position, ModelManager::getInstance().getModel(PROJECTILE_MODEL_NAME)),
+	m_model(ModelManager::getInstance().getModel(PROJECTILE_MODEL_NAME))
 {}
 
-Projectile::Projectile(Projectile&& orig) noexcept
-	: Entity(std::move(orig)),
-	m_senderEvent(orig.m_senderEvent)
-{}
+const AABB& Projectile::getAABB() const
+{
+	return m_AABB;
+}
 
 const SpawnProjectileEvent& Projectile::getSenderEvent() const
 {
@@ -35,10 +37,7 @@ void Projectile::update(float deltaTime)
 	m_AABB.update(m_position);
 }
 
-Projectile& Projectile::operator=(Projectile&& orig) noexcept
+void Projectile::render(ShaderHandler& shaderHandler) const
 {
-	Entity::operator=(std::move(orig));
-	m_senderEvent = orig.m_senderEvent;
-
-	return *this;
+	m_model.get().render(shaderHandler, m_position);
 }
