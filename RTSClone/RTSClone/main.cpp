@@ -197,7 +197,7 @@ int main()
 			level->render(*shaderHandler);
 			
 			shaderHandler->switchToShader(eShaderType::HealthBar);
-			level->renderEntityHealthBars(*shaderHandler, camera, windowSize); 
+			level->renderEntityStatusBars(*shaderHandler, camera, windowSize); 
 		}
 
 		glEnable(GL_BLEND);

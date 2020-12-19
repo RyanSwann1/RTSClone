@@ -268,13 +268,13 @@ void Level::renderPlannedBuildings(ShaderHandler& shaderHandler) const
 	}
 }
 
-void Level::renderEntityHealthBars(ShaderHandler& shaderHandler, const Camera& camera, glm::uvec2 windowSize) const
+void Level::renderEntityStatusBars(ShaderHandler& shaderHandler, const Camera& camera, glm::uvec2 windowSize) const
 {
 	for (const auto& faction : m_factions)
 	{
 		if (faction)
 		{
-			faction->renderEntityHealthBars(shaderHandler, camera, windowSize);
+			faction->renderEntityStatusBars(shaderHandler, camera, windowSize);
 		}
 	}
 }

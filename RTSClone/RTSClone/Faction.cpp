@@ -484,7 +484,7 @@ void Faction::renderPlannedBuildings(ShaderHandler& shaderHandler) const
     }
 }
 
-void Faction::renderEntityHealthBars(ShaderHandler& shaderHandler, const Camera& camera, glm::uvec2 windowSize) const
+void Faction::renderEntityStatusBars(ShaderHandler& shaderHandler, const Camera& camera, glm::uvec2 windowSize) const
 {
     for (const auto& entity : m_allEntities)
     {

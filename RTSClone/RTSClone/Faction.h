@@ -41,7 +41,7 @@ public:
 	virtual void update(float deltaTime, const Map& map, FactionHandler& factionHandler, const Timer& unitStateHandlerTimer);
 	virtual void render(ShaderHandler& shaderHandler) const;
 	void renderPlannedBuildings(ShaderHandler& shaderHandler) const;
-	void renderEntityHealthBars(ShaderHandler& shaderHandler, const Camera& camera, glm::uvec2 windowSize) const;
+	void renderEntityStatusBars(ShaderHandler& shaderHandler, const Camera& camera, glm::uvec2 windowSize) const;
 	void selectEntity(const glm::vec3& position) const;
 
 #ifdef RENDER_PATHING
