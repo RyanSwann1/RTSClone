@@ -10,6 +10,7 @@
 struct TakeDamageEvent;
 class FactionHandler;
 struct Camera;
+class Faction;
 #endif // GAME
 enum class eFactionController;
 struct Model;
@@ -37,9 +38,11 @@ public:
 	eEntityType getEntityType() const;
 	int getMaximumHealth() const;
 	int getHealth() const;
-	void reduceHealth(const TakeDamageEvent& gameEvent);
 	bool isDead() const;
+	
+	void reduceHealth(const TakeDamageEvent& gameEvent);
 	void repair();
+	void increaseShield(const Faction& owningFaction);
 	void render(ShaderHandler& shaderHandler, eFactionController owningFactionController) const;
 	void renderHealthBar(ShaderHandler& shaderHandler, const Camera& camera, glm::uvec2 windowSize) const;
 #endif // GAME
@@ -70,6 +73,8 @@ protected:
 private:
 	int m_ID;
 #ifdef GAME
+	int m_maximumShield;
+	int m_shield;
 	int m_maximumHealth;
 	int m_health;
 	eEntityType m_type;

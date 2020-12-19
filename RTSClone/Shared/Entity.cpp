@@ -6,6 +6,7 @@
 #include "UniqueEntityIDDistributer.h"
 #include "FactionController.h"
 #ifdef GAME
+#include "Faction.h"
 #include "GameEvent.h"
 #include "glm/gtc/matrix_transform.hpp"
 #include "Camera.h"
@@ -37,6 +38,8 @@ Entity::Entity(const Model& model, const glm::vec3& startingPosition, eEntityTyp
 	m_rotation(startingRotation),
 	m_AABB(),
 	m_ID(UniqueEntityIDDistributer::getInstance().getUniqueEntityID()),
+	m_maximumShield(0),
+	m_shield(m_maximumShield),
 	m_maximumHealth(health),
 	m_health(health),
 	m_type(entityType),
@@ -119,44 +122,46 @@ void Entity::resetAABB()
 #endif // LEVEL_EDITOR
 
 Entity::~Entity()
-{
+{}
 
-}
-
-Entity::Entity(Entity&& orig) noexcept
-	: m_position(orig.m_position),
-	m_rotation(orig.m_rotation),
-	m_AABB(std::move(orig.m_AABB)),
-	m_ID(orig.m_ID),
-	m_model(orig.m_model),
-	m_selected(orig.m_selected)
+Entity::Entity(Entity&& rhs) noexcept
+	: m_position(rhs.m_position),
+	m_rotation(rhs.m_rotation),
+	m_AABB(std::move(rhs.m_AABB)),
+	m_ID(rhs.m_ID),
+	m_model(rhs.m_model),
+	m_selected(rhs.m_selected)
 {
 #ifdef GAME
-	m_maximumHealth = orig.m_maximumHealth;
-	m_health = orig.m_health;
-	m_type = orig.m_type;
-	m_healthbarSprite = std::move(orig.m_healthbarSprite);
+	m_maximumShield = rhs.m_maximumShield;
+	m_shield = rhs.m_shield;
+	m_maximumHealth = rhs.m_maximumHealth;
+	m_health = rhs.m_health;
+	m_type = rhs.m_type;
+	m_healthbarSprite = std::move(rhs.m_healthbarSprite);
 #endif // GAME
 
-	orig.m_ID = Globals::INVALID_ENTITY_ID;
+	rhs.m_ID = Globals::INVALID_ENTITY_ID;
 }
 
-Entity& Entity::operator=(Entity&& orig) noexcept
+Entity& Entity::operator=(Entity&& rhs) noexcept
 {
-	m_position = orig.m_position;
-	m_rotation = orig.m_rotation;
-	m_AABB = std::move(orig.m_AABB);
-	m_ID = orig.m_ID;
-	m_model = std::move(orig.m_model);
-	m_selected = orig.m_selected;
+	m_position = rhs.m_position;
+	m_rotation = rhs.m_rotation;
+	m_AABB = std::move(rhs.m_AABB);
+	m_ID = rhs.m_ID;
+	m_model = std::move(rhs.m_model);
+	m_selected = rhs.m_selected;
 
 #ifdef GAME
-	m_maximumHealth = orig.m_maximumHealth;
-	m_health = orig.m_health;
-	m_type = orig.m_type;
+	m_maximumShield = rhs.m_maximumShield;
+	m_shield = rhs.m_shield;
+	m_maximumHealth = rhs.m_maximumHealth;
+	m_health = rhs.m_health;
+	m_type = rhs.m_type;
 #endif // GAME
 
-	orig.m_ID = Globals::INVALID_ENTITY_ID;
+	rhs.m_ID = Globals::INVALID_ENTITY_ID;
 	return *this;
 }
 
@@ -188,7 +193,18 @@ int Entity::getHealth() const
 
 void Entity::reduceHealth(const TakeDamageEvent& gameEvent)
 {
-	m_health -= gameEvent.damage;
+	if (m_shield > 0)
+	{
+		m_shield -= gameEvent.damage;
+		if (m_shield < 0)
+		{
+			m_health -= glm::abs(m_shield);
+		}
+	}
+	else
+	{
+		m_health -= gameEvent.damage;
+	}
 }
 
 bool Entity::isDead() const
@@ -202,6 +218,13 @@ void Entity::repair()
 	{
 		++m_health;
 	}
+}
+
+void Entity::increaseShield(const Faction& owningFaction)
+{
+	m_maximumShield = owningFaction.getCurrentShieldAmount();
+	++m_shield;
+	assert(m_shield <= m_maximumShield);
 }
 
 void Entity::render(ShaderHandler& shaderHandler, eFactionController owningFactionController) const

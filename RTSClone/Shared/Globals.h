@@ -57,6 +57,9 @@ namespace Globals
 	constexpr int POPULATION_INCREMENT = 5;
 	constexpr int LABORATORY_RESOURCE_COST = 100;
 
+	constexpr int MAX_FACTION_SHIELD_AMOUNT = 5;
+	constexpr int FACTION_SHIELD_INCREASE_COST = 100;
+
 #ifdef GAME
 	inline const TypeComparison<eEntityType> BUILDING_TYPES({ eEntityType::HQ, eEntityType::Barracks, 
 		eEntityType::SupplyDepot, eEntityType::Turret });

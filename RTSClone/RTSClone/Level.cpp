@@ -335,6 +335,12 @@ void Level::handleEvent(const GameEvent& gameEvent, const Map& map)
 {
 	switch (gameEvent.type)
 	{
+	case eGameEventType::IncreaseFactionShield:
+		if (isFactionActive(m_factions, gameEvent.data.increaseFactionShield.factionController))
+		{
+			getFaction(m_factions, gameEvent.data.increaseFactionShield.factionController).handleEvent(gameEvent, map, m_factionHandler);
+		}
+		break;
 	case eGameEventType::TakeDamage:
 		if (isFactionActive(m_factions, gameEvent.data.takeDamage.targetFaction))
 		{

@@ -23,6 +23,7 @@ class Faction : private NonCopyable, private NonMovable
 public:
 	virtual ~Faction() {}
 
+	int getCurrentShieldAmount() const;
 	int getCurrentPopulationAmount() const;
 	int getMaximumPopulationAmount() const;
 	int getCurrentResourceAmount() const;
@@ -67,6 +68,7 @@ protected:
 
 	bool isExceedPopulationLimit(eEntityType entityType) const;
 	bool isEntityAffordable(eEntityType entityType) const;
+	bool isAffordable(int resourceAmount) const;
 
 	bool addUnitToSpawn(eEntityType unitType, const Map& map, UnitSpawnerBuilding& building, FactionHandler& factionHandler);
 	bool instructWorkerToBuild(eEntityType entityType, const glm::vec3& position, const Map& map, Worker& worker);
@@ -80,6 +82,7 @@ private:
 	int m_currentResourceAmount;
 	int m_currentPopulationAmount;
 	int m_currentPopulationLimit;
+	int m_currentShieldAmount;
 
 	void reduceResources(eEntityType addedEntityType);
 	void increaseCurrentPopulationAmount(eEntityType entityType);

@@ -41,6 +41,11 @@ Faction::Faction(eFactionController factionController, const glm::vec3& hqStarti
     m_allEntities.push_back(&m_HQ);
 }
 
+int Faction::getCurrentShieldAmount() const
+{
+    return m_currentShieldAmount;
+}
+
 int Faction::getCurrentPopulationAmount() const
 {
     return m_currentPopulationAmount;
@@ -307,6 +312,19 @@ void Faction::handleEvent(const GameEvent& gameEvent, const Map& map, FactionHan
         }
     }
         break;
+    case eGameEventType::IncreaseFactionShield:
+        if (m_currentShieldAmount < Globals::MAX_FACTION_SHIELD_AMOUNT &&
+            isAffordable(Globals::FACTION_SHIELD_INCREASE_COST))
+        {
+            ++m_currentShieldAmount;
+            m_currentResourceAmount -= Globals::FACTION_SHIELD_INCREASE_COST;
+
+            for (auto& entity : m_allEntities)
+            {
+                entity->increaseShield(*this);
+            }
+        }
+        break;
     }
 }
 
@@ -555,6 +573,11 @@ bool Faction::isEntityAffordable(eEntityType entityType) const
         assert(false);
         return false;
     }
+}
+
+bool Faction::isAffordable(int resourceAmount) const
+{
+    return m_currentResourceAmount - resourceAmount >= 0;
 }
 
 const Entity* Faction::spawnBuilding(const Map& map, glm::vec3 position, eEntityType entityType)
