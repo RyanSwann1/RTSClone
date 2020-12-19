@@ -22,6 +22,7 @@ const std::string WAYPOINT_MODEL_NAME = "laserSabel.obj";
 const std::string PROJECTILE_MODEL_NAME = "laserSabel.obj";
 const std::string TRANSLATE_MODEL_NAME = "translate.obj";
 const std::string TURRET_MODEL_NAME = "turret_single.obj";
+const std::string LABORATORY_MODEL_NAME = "hangar_largeB.obj";
 
 namespace 
 {
@@ -65,7 +66,7 @@ namespace
 		models.push_back(std::move(model));
 	}
 
-	void loadSharedModels(std::vector<std::unique_ptr<Model>>& models, bool& loadedAllModels) 
+	void loadSharedModels(std::vector<std::unique_ptr<Model>>& models, bool& loadedAllModels)
 	{
 		loadModel("terrain.obj", false, { 0.0f, 0.0f, 0.0f }, { 2000.0f, 1.0f, 2000.0f },
 			models, loadedAllModels);
@@ -86,13 +87,13 @@ namespace
 		loadModel("rocksTall.obj", true, { 5.0f, 1.0f, 5.0f }, { 1.0f, 1.0f, 1.0f },
 			models, loadedAllModels);
 
-		loadModel("portal.obj", true, HQ_AABB_SIZE_FROM_CENTER, HQ_SCALE,
-			models, loadedAllModels);
+		loadModel("portal.obj", true, HQ_AABB_SIZE_FROM_CENTER, HQ_SCALE, models, loadedAllModels);
 
-		loadModel("rocksOre.obj", true, MINERAL_AABB_SIZE_FROM_CENTER, MINERAL_SCALE,
-			models, loadedAllModels);
+		loadModel("rocksOre.obj", true, MINERAL_AABB_SIZE_FROM_CENTER, MINERAL_SCALE, models, loadedAllModels);
 
 		loadModel("turret_single.obj", false, { 3.0f, 1.0f, 3.0f }, { 7.5f, 7.5f, 7.5f }, models, loadedAllModels);
+
+		loadModel("hangar_largeB.obj", false, { 6.0f, 1.0f, 6.0f }, { 5.0f, 7.0f, 5.0f }, models, loadedAllModels);
 	}
 
 #ifdef GAME

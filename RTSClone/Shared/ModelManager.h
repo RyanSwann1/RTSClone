@@ -16,6 +16,7 @@ extern const std::string WAYPOINT_MODEL_NAME;
 extern const std::string PROJECTILE_MODEL_NAME;
 extern const std::string TRANSLATE_MODEL_NAME;
 extern const std::string TURRET_MODEL_NAME;
+extern const std::string LABORATORY_MODEL_NAME;
 
 class ModelManager : private NonMovable, private NonCopyable
 {
