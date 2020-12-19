@@ -41,6 +41,13 @@ namespace
 		ImGui::Text(std::to_string(health).c_str());
 	}
 
+	void displayShield(int shield)
+	{
+		ImGui::Text("Shield:");
+		ImGui::SameLine();
+		ImGui::Text(std::to_string(shield).c_str());
+	}
+
 	void displaySpawnTime(float spawnTime)
 	{
 		ImGui::Text("Spawn Time:");
@@ -124,6 +131,7 @@ void SelectedEntityWidget::render(const sf::Window& window)
 			ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse);
 
 		displayHealth(m_receivedMessage.health);
+		displayShield(m_receivedMessage.shield);
 		switch (m_receivedMessage.entityType)
 		{
 		case eEntityType::HQ:

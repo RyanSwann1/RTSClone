@@ -94,7 +94,7 @@ void Level::handleGUI()
 
 				GameMessenger::getInstance().broadcast<GameMessages::UIDisplaySelectedEntity>(
 					{ m_selectedTargetGUI.getFactionController(), m_selectedTargetGUI.getID(), targetEntity->getEntityType(),
-					unitSpawnerBuilding.getHealth(), unitSpawnerBuilding.getCurrentSpawnCount(),
+					unitSpawnerBuilding.getHealth(), unitSpawnerBuilding.getShield(), unitSpawnerBuilding.getCurrentSpawnCount(),
 					unitSpawnerBuilding.getSpawnTimer().getExpiredTime() - unitSpawnerBuilding.getSpawnTimer().getElaspedTime() });
 			}
 				break;
@@ -104,14 +104,14 @@ void Level::handleGUI()
 			case eEntityType::Laboratory:
 				GameMessenger::getInstance().broadcast<GameMessages::UIDisplaySelectedEntity>(
 					{ m_selectedTargetGUI.getFactionController(), m_selectedTargetGUI.getID(), targetEntity->getEntityType(),
-					targetEntity->getHealth() });
+					targetEntity->getHealth(), targetEntity->getShield() });
 				break;
 			case eEntityType::Worker:
 			{
 				const Timer& buildTimer = static_cast<const Worker&>(*targetEntity).getBuildTimer();
 				GameMessenger::getInstance().broadcast<GameMessages::UIDisplaySelectedEntity>(
 					{ m_selectedTargetGUI.getFactionController(), m_selectedTargetGUI.getID(), targetEntity->getEntityType(),
-					targetEntity->getHealth(), buildTimer.getExpiredTime() - buildTimer.getElaspedTime() });
+					targetEntity->getHealth(), targetEntity->getShield(), buildTimer.getExpiredTime() - buildTimer.getElaspedTime() });
 			}
 			break;
 			default:

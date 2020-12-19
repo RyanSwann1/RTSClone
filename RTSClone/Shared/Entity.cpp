@@ -191,6 +191,11 @@ int Entity::getHealth() const
 	return m_health;
 }
 
+int Entity::getShield() const
+{
+	return m_shield;
+}
+
 void Entity::reduceHealth(const TakeDamageEvent& gameEvent)
 {
 	if (m_shield > 0)
@@ -199,6 +204,7 @@ void Entity::reduceHealth(const TakeDamageEvent& gameEvent)
 		if (m_shield < 0)
 		{
 			m_health -= glm::abs(m_shield);
+			m_shield = 0;
 		}
 	}
 	else

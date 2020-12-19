@@ -38,6 +38,7 @@ public:
 	eEntityType getEntityType() const;
 	int getMaximumHealth() const;
 	int getHealth() const;
+	int getShield() const;
 	bool isDead() const;
 	
 	void reduceHealth(const TakeDamageEvent& gameEvent);
@@ -73,10 +74,10 @@ protected:
 private:
 	int m_ID;
 #ifdef GAME
-	int m_maximumShield;
-	int m_shield;
 	int m_maximumHealth;
 	int m_health;
+	int m_maximumShield;
+	int m_shield;
 	eEntityType m_type;
 	Sprite m_healthbarSprite;
 #endif // GAME
