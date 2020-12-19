@@ -127,29 +127,28 @@ void SelectedEntityWidget::render(const sf::Window& window)
 		switch (m_receivedMessage.entityType)
 		{
 		case eEntityType::HQ:
+			if (m_receivedMessage.owningFaction == eFactionController::Player)
+			{
+				displaySpawnQueue(m_receivedMessage.queueSize);
+				displaySpawnTime(m_receivedMessage.spawnTime);
+
+				if (ImGui::Button("Spawn Worker"))
+				{
+					GameEventHandler::getInstance().gameEvents.push(GameEvent::createPlayerSpawnUnit(
+						eEntityType::Worker, m_receivedMessage.entityID));
+				}
+			}
+			break;
 		case eEntityType::Barracks:
 			if (m_receivedMessage.owningFaction == eFactionController::Player)
 			{
 				displaySpawnQueue(m_receivedMessage.queueSize);
 				displaySpawnTime(m_receivedMessage.spawnTime);
-				switch (m_receivedMessage.entityType)
+
+				if (ImGui::Button("Spawn Unit"))
 				{
-				case eEntityType::HQ:
-					if (ImGui::Button("Spawn Worker"))
-					{
-						GameEventHandler::getInstance().gameEvents.push(GameEvent::createPlayerSpawnUnit(
-							eEntityType::Worker, m_receivedMessage.entityID));
-					}
-					break;
-				case eEntityType::Barracks:
-					if (ImGui::Button("Spawn Unit"))
-					{
-						GameEventHandler::getInstance().gameEvents.push(GameEvent::createPlayerSpawnUnit(
-							eEntityType::Unit, m_receivedMessage.entityID));
-					}
-					break;
-				default:
-					assert(false);
+					GameEventHandler::getInstance().gameEvents.push(GameEvent::createPlayerSpawnUnit(
+						eEntityType::Unit, m_receivedMessage.entityID));
 				}
 			}
 			break;
@@ -179,7 +178,17 @@ void SelectedEntityWidget::render(const sf::Window& window)
 						eEntityType::Laboratory, m_receivedMessage.entityID));
 				}
 			}
+			break;
 		case eEntityType::Laboratory:
+			if (m_receivedMessage.owningFaction == eFactionController::Player)
+			{
+				if (ImGui::Button("Upgrade Shield"))
+				{
+					GameEventHandler::getInstance().gameEvents.push(GameEvent::createIncreaseFactionShield(
+						m_receivedMessage.owningFaction));
+				}
+			}
+			break;
 		case eEntityType::Mineral:
 		case eEntityType::SupplyDepot:
 		case eEntityType::Turret:
@@ -241,7 +250,7 @@ UIManager::~UIManager()
 	GameMessenger::getInstance().unsubscribe<GameMessages::BaseMessage<eGameMessageType::UIClearWinner>>(this);
 }
 
-void UIManager::render(const sf::Window& window)
+void UIManager::update(const sf::Window& window)
 {
 	m_playerDetailsWidget.render(window);
 	m_selectedEntityWidget.render(window);	

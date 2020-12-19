@@ -57,7 +57,7 @@ public:
 	UIManager();
 	~UIManager();
 
-	void render(const sf::Window& window);
+	void update(const sf::Window& window);
 
 private:
 	PlayerDetailsWidget m_playerDetailsWidget;

@@ -174,17 +174,16 @@ int main()
 		}
 		
 		//Update
+		UIManager.update(window);
 		if (level)
 		{
+			camera.update(deltaTime, window, windowSize);
 			level->update(deltaTime, map);
 		}
-		camera.update(deltaTime, window, windowSize);		
 
 		//Render
 		glm::mat4 view = camera.getView(); 
 		glm::mat4 projection = camera.getProjection(glm::ivec2(window.getSize().x, window.getSize().y));
-
-		UIManager.render(window);
 
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
