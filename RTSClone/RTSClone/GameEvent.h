@@ -17,15 +17,16 @@ enum class eGameEventType
 	PlayerActivatePlannedBuilding,
 	RepairEntity,
 	SetTargetEntityGUI,
-	ResetTargetEntityGUI
+	ResetTargetEntityGUI,
+	IncreaseFactionShield
 };
 
 struct GameEvent_0
 {
 	GameEvent_0() {}
 };
-struct RevalidateMovementPathsEvent : public GameEvent_0 { };
-struct ResetTargetEntityGUIEvent : public GameEvent_0 { };
+struct RevalidateMovementPathsEvent : public GameEvent_0 {};
+struct ResetTargetEntityGUIEvent : public GameEvent_0 {};
 
 struct GameEvent_1
 {
@@ -52,6 +53,11 @@ struct GameEvent_2
 };
 struct EliminateFactionEvent : public GameEvent_2 {
 	EliminateFactionEvent(eFactionController factionController) :
+		GameEvent_2(factionController) {}
+};
+struct IncreaseFactionShieldEvent : public GameEvent_2
+{
+	IncreaseFactionShieldEvent(eFactionController factionController) :
 		GameEvent_2(factionController) {}
 };
 
@@ -133,6 +139,7 @@ union GameEvents
 	PlayerSpawnUnitEvent					playerSpawnUnit;
 	PlayerActivatePlannedBuildingEvent		playerActivatePlannedBuilding;
 	EliminateFactionEvent					eliminateFaction;
+	IncreaseFactionShieldEvent				increaseFactionShield;
 	RemoveAllWorkerPlannedBuildingsEvent	removeAllWorkerPlannedBuilding;
 	AddResourcesEvent						addResources;
 	RepairEntityEvent						repairEntity;
@@ -143,6 +150,7 @@ union GameEvents
 
 	GameEvents(RevalidateMovementPathsEvent gameEvent) :			revalidateMovementPaths(gameEvent) {}
 	GameEvents(ResetTargetEntityGUIEvent gameEvent) :				resetTargetEntityGUI(gameEvent) {}
+	GameEvents(IncreaseFactionShieldEvent gameEvent) :				increaseFactionShield(gameEvent) {}
 	GameEvents(PlayerSpawnUnitEvent gameEvent) :					playerSpawnUnit(gameEvent) {}
 	GameEvents(PlayerActivatePlannedBuildingEvent gameEvent) :		playerActivatePlannedBuilding(gameEvent) {}
 	GameEvents(EliminateFactionEvent gameEvent) :					eliminateFaction(gameEvent) {}
@@ -168,7 +176,8 @@ struct GameEvent
 	static GameEvent createPlayerActivatePlannedBuilding(eEntityType, int targetID);
 	
 	//GameEvent_2
-	static GameEvent createEliminateFaction(eFactionController senderFaction);
+	static GameEvent createEliminateFaction(eFactionController factionController);
+	static GameEvent createIncreaseFactionShield(eFactionController factionController);
 	
 	//GameEvent_3
 	static GameEvent createRemoveAllWorkerPlannedBuildings(eFactionController senderFaction, int senderID);

@@ -59,9 +59,14 @@ GameEvent GameEvent::createPlayerActivatePlannedBuilding(eEntityType entityType,
 	return { eGameEventType::PlayerActivatePlannedBuilding, PlayerActivatePlannedBuildingEvent{entityType, targetID} };
 }
 
-GameEvent GameEvent::createEliminateFaction(eFactionController senderFaction)
+GameEvent GameEvent::createEliminateFaction(eFactionController factionController)
 {
-	return { eGameEventType::EliminateFaction, EliminateFactionEvent{senderFaction} };
+	return { eGameEventType::EliminateFaction, EliminateFactionEvent{factionController} };
+}
+
+GameEvent GameEvent::createIncreaseFactionShield(eFactionController factionController)
+{
+	return { eGameEventType::IncreaseFactionShield, IncreaseFactionShieldEvent{factionController} };	
 }
 
 GameEvent GameEvent::createRemoveAllWorkerPlannedBuildings(eFactionController senderFaction, int senderID)
