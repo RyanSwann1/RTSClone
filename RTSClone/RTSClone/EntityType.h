@@ -7,8 +7,6 @@ enum class eEntityType
 	HQ,
 	SupplyDepot,
 	Barracks,
-	Mineral,
-	Projectile,
 	Turret,
 	Laboratory,
 	Max = Laboratory

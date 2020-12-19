@@ -20,8 +20,6 @@ namespace
 		"HQ",
 		"SupplyDepot",
 		"Barracks",
-		"Mineral",
-		"Projectile",
 		"Turret",
 		"Laboratory"
 	};
@@ -197,7 +195,6 @@ void SelectedEntityWidget::render(const sf::Window& window)
 				}
 			}
 			break;
-		case eEntityType::Mineral:
 		case eEntityType::SupplyDepot:
 		case eEntityType::Turret:
 		case eEntityType::Unit:
