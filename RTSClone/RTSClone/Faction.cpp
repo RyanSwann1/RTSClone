@@ -490,6 +490,23 @@ void Faction::renderEntityStatusBars(ShaderHandler& shaderHandler, const Camera&
     {
         entity->renderHealthBar(shaderHandler, camera, windowSize);
         entity->renderShieldBar(shaderHandler, camera, windowSize);
+
+        //Rendering progress bars
+        switch (entity->getEntityType())
+        {
+        case eEntityType::Barracks:
+        case eEntityType::HQ:
+            static_cast<UnitSpawnerBuilding&>(*(entity)).renderProgressBar(shaderHandler, camera, windowSize);
+            break;
+        case eEntityType::Laboratory:
+        case eEntityType::SupplyDepot:
+        case eEntityType::Turret:
+        case eEntityType::Unit:
+        case eEntityType::Worker:
+            break;
+        default:
+            assert(false);
+        }
     }
 }
 
