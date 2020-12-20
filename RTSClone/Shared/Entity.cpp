@@ -15,21 +15,23 @@
 #ifdef GAME
 namespace
 {
+	const float DEFAULT_HEALTH_BAR_HEIGHT = 10.0f;
 	const float WORKER_HEALTH_BAR_YOFFSET = 35.0f;
 	const float UNIT_HEALTH_BAR_YOFFSET = 50.0f;
 	const float HQ_HEALTH_BAR_YOFFSET = 225.0f;
 	const float SUPPLY_DEPOT_HEALTH_BAR_YOFFSET = 85.0f;
 	const float BARRACKS_HEALTH_BAR_YOFFSET = 85.0f;
 	const float TURRET_HEALTH_BAR_YOFFSET = 60.0f;
-	const float DEFAULT_HEALTH_BAR_HEIGHT = 10.0f;
+	const float LABORATORY_HEALTH_BAR_YOFFSET = 60.0f;
 
+	const float DEFAULT_SHIELD_BAR_HEIGHT = 10.0f;
 	const float WORKER_SHIELD_BAR_YOFFSET = 45.0f;
 	const float UNIT_SHIELD_BAR_YOFFSET = 60.0f;
 	const float HQ_SHIELD_BAR_YOFFSET = 235.0f;
 	const float SUPPLY_DEPOT_SHIELD_BAR_YOFFSET = 95.0f;
 	const float BARRACKS_SHIELD_BAR_YOFFSET = 95.0f;
 	const float TURRET_SHIELD_BAR_YOFFSET = 70.0f;
-	const float DEFAULT_SHIELD_BAR_HEIGHT = 10.0f;
+	const float LABORATORY_SHIELD_BAR_YOFFSET = 70.0f;
 
 	const glm::vec3 HEALTH_BAR_COLOR = { 0.0f, 0.8f, 0.0f };
 	const glm::vec3 SHIELD_BAR_COLOR = { 0.0f, 1.0f, 1.0f };
@@ -236,6 +238,10 @@ void Entity::renderHealthBar(ShaderHandler& shaderHandler, const Camera& camera,
 			width = Globals::TURRET_STAT_BAR_WIDTH * currentHealth / windowSize.x * 2.0f;
 			yOffset = TURRET_HEALTH_BAR_YOFFSET / windowSize.y * 2.0f;
 			break;
+		case eEntityType::Laboratory:
+			width = Globals::LABORATORY_STAT_BAR_WIDTH * currentHealth / windowSize.x * 2.0f;
+			yOffset = LABORATORY_HEALTH_BAR_YOFFSET / windowSize.y * 2.0f;
+			break;
 		default:
 			assert(false);
 		}
@@ -278,6 +284,10 @@ void Entity::renderShieldBar(ShaderHandler& shaderHandler, const Camera& camera,
 		case eEntityType::Turret:
 			width = Globals::TURRET_STAT_BAR_WIDTH / windowSize.x * 2.0f;
 			yOffset = TURRET_SHIELD_BAR_YOFFSET / windowSize.y * 2.0f;
+			break;
+		case eEntityType::Laboratory:
+			width = Globals::LABORATORY_STAT_BAR_WIDTH / windowSize.x * 2.0f;
+			yOffset = LABORATORY_SHIELD_BAR_YOFFSET / windowSize.y * 2.0f;
 			break;
 		default:
 			assert(false);
