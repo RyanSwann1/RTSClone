@@ -7,9 +7,20 @@
 #include "ModelManager.h"
 #include "Faction.h"
 #include "Map.h"
+#include "ShaderHandler.h"
 
 namespace
 {
+	const float TIME_BETWEEN_WORKER_SPAWN = 2.0f;
+	const float TIME_BETWEEN_UNIT_SPAWN = 3.0f;
+	const int MAX_UNITS_SPAWNABLE = 5;
+
+	const float HQ_PROGRESS_BAR_WIDTH = 150.0f;
+	const float HQ_PROGRESS_BAR_YOFFSET = 220.0f;
+
+	const float BARRACKS_PROGRESS_BAR_WIDTH = 100.0f;
+	const float BARRACKS_PROGRESS_BAR_YOFFSET = 80.0f;
+	
 	glm::vec3 getSpawnPosition(const AABB& AABB, const glm::vec3& direction, const glm::vec3& startingPosition)
 	{
 		glm::vec3 position = startingPosition;
@@ -31,18 +42,9 @@ namespace
 
 	bool isUnitSpawnable(int unitToSpawnCount, int resourceCost, int populationCost, const Faction& owningFaction)
 	{
-		if (unitToSpawnCount * resourceCost + resourceCost <= owningFaction.getCurrentResourceAmount() &&
-			unitToSpawnCount * populationCost + populationCost <= owningFaction.getMaximumPopulationAmount())
-		{
-			return true;
-		}
-
-		return false;
+		return unitToSpawnCount * resourceCost + resourceCost <= owningFaction.getCurrentResourceAmount() &&
+			unitToSpawnCount * populationCost + populationCost <= owningFaction.getMaximumPopulationAmount();
 	}
-
-	constexpr float TIME_BETWEEN_WORKER_SPAWN = 2.0f;
-	constexpr float TIME_BETWEEN_UNIT_SPAWN = 3.0f;
-	constexpr int MAX_UNITS_SPAWNABLE = 5;
 }
 
 //Barracks
@@ -187,6 +189,35 @@ void UnitSpawnerBuilding::render(ShaderHandler& shaderHandler, eFactionControlle
 	}
 
 	Entity::render(shaderHandler, owningFactionController);
+}
+
+void UnitSpawnerBuilding::renderProgressBar(ShaderHandler& shaderHandler, const Camera& camera, glm::uvec2 windowSize) const
+{
+	if (isSelected())
+	{
+		glm::vec4 positionNDC = camera.getProjection(glm::ivec2(windowSize.x, windowSize.y)) * camera.getView() * glm::vec4(m_position, 1.0f);
+		positionNDC /= positionNDC.w;
+		float width = 0.0f;
+		float height = Globals::DEFAULT_PROGRESS_BAR_HEIGHT / windowSize.y * 2.0f;
+		float yOffset = 0.0f;
+		float currentTime = m_spawnTimer.getElaspedTime() / m_spawnTimer.getExpiredTime(); 
+		switch (getEntityType())
+		{
+		case eEntityType::HQ:
+			width = HQ_PROGRESS_BAR_WIDTH * currentTime / windowSize.x * 2.0f;
+			yOffset = HQ_PROGRESS_BAR_YOFFSET / windowSize.y * 2.0f;
+			break;
+		case eEntityType::Barracks:
+			width = BARRACKS_PROGRESS_BAR_WIDTH * currentTime / windowSize.x * 2.0f;
+			yOffset = BARRACKS_PROGRESS_BAR_YOFFSET / windowSize.y * 2.0f;
+			break;
+		default:
+			assert(false);
+		}
+
+		shaderHandler.setUniformVec3(eShaderType::HealthBar, "uMaterialColor", Globals::PROGRESS_BAR_COLOR);
+		m_progressBarSprite.render(glm::vec2(positionNDC), windowSize, width, height, yOffset);
+	}
 }
 
 UnitSpawnerBuilding::UnitSpawnerBuilding(const glm::vec3& startingPosition, eEntityType entityType, 

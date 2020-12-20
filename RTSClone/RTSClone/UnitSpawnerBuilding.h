@@ -2,6 +2,7 @@
 
 #include "Entity.h"
 #include "Timer.h"
+#include "Sprite.h"
 #include <functional>
 
 enum class eFactionController;
@@ -21,6 +22,7 @@ public:
 
 	void setWaypointPosition(const glm::vec3& position, const Map& map);
 	void render(ShaderHandler& shaderHandler, eFactionController owningFactionController) const;
+	void renderProgressBar(ShaderHandler& shaderHandler, const Camera& camera, glm::uvec2 windowSize) const;
 
 protected:
 	UnitSpawnerBuilding(const glm::vec3& startingPosition, eEntityType entityType, float spawnTimerExpirationTime, int health, 
@@ -35,6 +37,7 @@ protected:
 
 private:
 	glm::vec3 m_waypointPosition;
+	Sprite m_progressBarSprite;
 };
 
 class Barracks : public UnitSpawnerBuilding

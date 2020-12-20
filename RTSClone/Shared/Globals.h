@@ -60,6 +60,9 @@ namespace Globals
 	constexpr int MAX_FACTION_SHIELD_AMOUNT = 5;
 	constexpr int FACTION_SHIELD_INCREASE_COST = 100;
 
+	const glm::vec3 PROGRESS_BAR_COLOR = { 1.0f, 1.0f, 0.4f };
+	const float DEFAULT_PROGRESS_BAR_HEIGHT = 5.0f;
+
 #ifdef GAME
 	inline const TypeComparison<eEntityType> BUILDING_TYPES({ eEntityType::HQ, eEntityType::Barracks, 
 		eEntityType::SupplyDepot, eEntityType::Turret });
