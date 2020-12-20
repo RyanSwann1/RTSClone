@@ -57,6 +57,13 @@ namespace Globals
 	constexpr int POPULATION_INCREMENT = 5;
 	constexpr int LABORATORY_RESOURCE_COST = 100;
 
+	const float WORKER_STAT_BAR_WIDTH = 60.0f;
+	const float UNIT_STAT_BAR_WIDTH = 75.0f;
+	const float HQ_STAT_BAR_WIDTH = 150.0f;
+	const float SUPPLY_DEPOT_STAT_BAR_WIDTH = 100.0f;
+	const float BARRACKS_STAT_BAR_WIDTH = 100.0f;
+	const float TURRET_STAT_BAR_WIDTH = 100.0f;
+
 	constexpr int MAX_FACTION_SHIELD_AMOUNT = 5;
 	constexpr int FACTION_SHIELD_INCREASE_COST = 100;
 

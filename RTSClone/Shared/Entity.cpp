@@ -15,31 +15,19 @@
 #ifdef GAME
 namespace
 {
-	const float WORKER_HEALTHBAR_WIDTH = 60.0f;
-	const float WORKER_HEALTHBAR_YOFFSET = 35.0f;
-	const float UNIT_HEALTHBAR_WIDTH = 75.0f;
-	const float UNIT_HEALTHBAR_YOFFSET = 50.0f;
-	const float HQ_HEALTHBAR_WIDTH = 150.0f;
-	const float HQ_HEALTHBAR_YOFFSET = 225.0f;
-	const float SUPPLY_DEPOT_HEALTHBAR_WIDTH = 100.0f;
-	const float SUPPLY_DEPOT_HEALTHBAR_YOFFSET = 85.0f;
-	const float BARRACKS_HEALTHBAR_WIDTH = 100.0f;
-	const float BARRACKS_HEALTHBAR_YOFFSET = 85.0f;
-	const float TURRET_HEALTHBAR_WIDTH = 100.0f;
-	const float TURRET_HEALTHBAR_YOFFSET = 60.0f;
+	const float WORKER_HEALTH_BAR_YOFFSET = 35.0f;
+	const float UNIT_HEALTH_BAR_YOFFSET = 50.0f;
+	const float HQ_HEALTH_BAR_YOFFSET = 225.0f;
+	const float SUPPLY_DEPOT_HEALTH_BAR_YOFFSET = 85.0f;
+	const float BARRACKS_HEALTH_BAR_YOFFSET = 85.0f;
+	const float TURRET_HEALTH_BAR_YOFFSET = 60.0f;
 	const float DEFAULT_HEALTH_BAR_HEIGHT = 10.0f;
 
-	const float WORKER_SHIELD_BAR_WIDTH = 60.0f;
 	const float WORKER_SHIELD_BAR_YOFFSET = 45.0f;
-	const float UNIT_SHIELD_BAR_WIDTH = 75.0f;
 	const float UNIT_SHIELD_BAR_YOFFSET = 60.0f;
-	const float HQ_SHIELD_BAR_WIDTH = 150.0f;
 	const float HQ_SHIELD_BAR_YOFFSET = 235.0f;
-	const float SUPPLY_DEPOT_SHIELD_BAR_WIDTH = 100.0f;
 	const float SUPPLY_DEPOT_SHIELD_BAR_YOFFSET = 95.0f;
-	const float BARRACKS_SHIELD_BAR_WIDTH = 100.0f;
 	const float BARRACKS_SHIELD_BAR_YOFFSET = 95.0f;
-	const float TURRET_SHIELD_BAR_WIDTH = 100.0f;
 	const float TURRET_SHIELD_BAR_YOFFSET = 70.0f;
 	const float DEFAULT_SHIELD_BAR_HEIGHT = 10.0f;
 
@@ -225,28 +213,28 @@ void Entity::renderHealthBar(ShaderHandler& shaderHandler, const Camera& camera,
 		switch (getEntityType())
 		{
 		case eEntityType::Unit:
-			width = UNIT_HEALTHBAR_WIDTH * currentHealth / windowSize.x * 2.0f;
-			yOffset = UNIT_HEALTHBAR_YOFFSET / windowSize.y * 2.0f;
+			width = Globals::UNIT_STAT_BAR_WIDTH * currentHealth / windowSize.x * 2.0f;
+			yOffset = UNIT_HEALTH_BAR_YOFFSET / windowSize.y * 2.0f;
 			break;
 		case eEntityType::Worker:
-			width = WORKER_HEALTHBAR_WIDTH * currentHealth / windowSize.x * 2.0f;
-			yOffset = WORKER_HEALTHBAR_YOFFSET / windowSize.y * 2.0f;
+			width = Globals::WORKER_STAT_BAR_WIDTH * currentHealth / windowSize.x * 2.0f;
+			yOffset = WORKER_HEALTH_BAR_YOFFSET / windowSize.y * 2.0f;
 			break;
 		case eEntityType::HQ:
-			width = HQ_HEALTHBAR_WIDTH * currentHealth / windowSize.x * 2.0f;
-			yOffset = HQ_HEALTHBAR_YOFFSET / windowSize.y * 2.0f;
+			width = Globals::HQ_STAT_BAR_WIDTH * currentHealth / windowSize.x * 2.0f;
+			yOffset = HQ_HEALTH_BAR_YOFFSET / windowSize.y * 2.0f;
 			break;
 		case eEntityType::SupplyDepot:
-			width = SUPPLY_DEPOT_HEALTHBAR_WIDTH * currentHealth / windowSize.x * 2.0f;
-			yOffset = SUPPLY_DEPOT_HEALTHBAR_YOFFSET / windowSize.y * 2.0f;
+			width = Globals::SUPPLY_DEPOT_STAT_BAR_WIDTH * currentHealth / windowSize.x * 2.0f;
+			yOffset = SUPPLY_DEPOT_HEALTH_BAR_YOFFSET / windowSize.y * 2.0f;
 			break;
 		case eEntityType::Barracks:
-			width = BARRACKS_HEALTHBAR_WIDTH * currentHealth / windowSize.x * 2.0f;
-			yOffset = BARRACKS_HEALTHBAR_YOFFSET / windowSize.y * 2.0f;
+			width = Globals::BARRACKS_STAT_BAR_WIDTH * currentHealth / windowSize.x * 2.0f;
+			yOffset = BARRACKS_HEALTH_BAR_YOFFSET / windowSize.y * 2.0f;
 			break;
 		case eEntityType::Turret:
-			width = TURRET_HEALTHBAR_WIDTH * currentHealth / windowSize.x * 2.0f;
-			yOffset = TURRET_HEALTHBAR_YOFFSET / windowSize.y * 2.0f;
+			width = Globals::TURRET_STAT_BAR_WIDTH * currentHealth / windowSize.x * 2.0f;
+			yOffset = TURRET_HEALTH_BAR_YOFFSET / windowSize.y * 2.0f;
 			break;
 		default:
 			assert(false);
@@ -268,27 +256,27 @@ void Entity::renderShieldBar(ShaderHandler& shaderHandler, const Camera& camera,
 		switch (getEntityType())
 		{
 		case eEntityType::Unit:
-			width = UNIT_SHIELD_BAR_WIDTH / windowSize.x * 2.0f;
+			width = Globals::UNIT_STAT_BAR_WIDTH / windowSize.x * 2.0f;
 			yOffset = UNIT_SHIELD_BAR_YOFFSET / windowSize.y * 2.0f;
 			break;
 		case eEntityType::Worker:
-			width = WORKER_SHIELD_BAR_WIDTH / windowSize.x * 2.0f;
+			width = Globals::WORKER_STAT_BAR_WIDTH / windowSize.x * 2.0f;
 			yOffset = WORKER_SHIELD_BAR_YOFFSET / windowSize.y * 2.0f;
 			break;
 		case eEntityType::HQ:
-			width = HQ_SHIELD_BAR_WIDTH / windowSize.x * 2.0f;
+			width = Globals::HQ_STAT_BAR_WIDTH / windowSize.x * 2.0f;
 			yOffset = HQ_SHIELD_BAR_YOFFSET / windowSize.y * 2.0f;
 			break;
 		case eEntityType::SupplyDepot:
-			width = SUPPLY_DEPOT_SHIELD_BAR_WIDTH / windowSize.x * 2.0f;
+			width = Globals::SUPPLY_DEPOT_STAT_BAR_WIDTH / windowSize.x * 2.0f;
 			yOffset = SUPPLY_DEPOT_SHIELD_BAR_YOFFSET / windowSize.y * 2.0f;
 			break;
 		case eEntityType::Barracks:
-			width = BARRACKS_SHIELD_BAR_WIDTH / windowSize.x * 2.0f;
+			width = Globals::BARRACKS_STAT_BAR_WIDTH / windowSize.x * 2.0f;
 			yOffset = BARRACKS_SHIELD_BAR_YOFFSET / windowSize.y * 2.0f;
 			break;
 		case eEntityType::Turret:
-			width = TURRET_SHIELD_BAR_WIDTH / windowSize.x * 2.0f;
+			width = Globals::TURRET_STAT_BAR_WIDTH / windowSize.x * 2.0f;
 			yOffset = TURRET_SHIELD_BAR_YOFFSET / windowSize.y * 2.0f;
 			break;
 		default:
