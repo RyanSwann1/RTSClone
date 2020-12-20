@@ -26,7 +26,7 @@ Turret::Turret(const glm::vec3& startingPosition, const Faction& owningFaction)
 	m_stateHandlerTimer(0.2f, true),
 	m_attackTimer(TIME_BETWEEN_ATTACK, true)
 {
-	GameMessenger::getInstance().broadcast<GameMessages::AddToMap>({ m_AABB, getID() });
+	GameMessenger::getInstance().broadcast<GameMessages::AddToMap>({ m_AABB });
 }
 
 Turret::~Turret()

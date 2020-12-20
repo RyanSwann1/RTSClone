@@ -19,7 +19,7 @@ Laboratory::Laboratory(const glm::vec3& startingPosition, const Faction& owningF
 	m_increaseShieldCommands(),
 	m_increaseShieldTimer(INCREASE_SHIELD_TIMER_EXPIRATION, false)
 {
-	GameMessenger::getInstance().broadcast<GameMessages::AddToMap>({ m_AABB, getID() });
+	GameMessenger::getInstance().broadcast<GameMessages::AddToMap>({ m_AABB });
 }
 
 Laboratory::~Laboratory()

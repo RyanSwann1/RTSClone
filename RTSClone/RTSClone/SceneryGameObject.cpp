@@ -10,7 +10,7 @@ SceneryGameObject::SceneryGameObject(const Model& model, const glm::vec3& positi
 	m_rotation(rotation),
 	m_active(true)
 {
-	GameMessenger::getInstance().broadcast<GameMessages::AddToMap>({ {m_position, m_model}, Globals::INVALID_ENTITY_ID });
+	GameMessenger::getInstance().broadcast<GameMessages::AddToMap>({ {m_position, m_model} });
 }
 
 SceneryGameObject::~SceneryGameObject()

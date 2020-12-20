@@ -13,7 +13,7 @@ Mineral::Mineral(const glm::vec3& startingPosition)
 {
 	m_position = Globals::convertToMiddleGridPosition(startingPosition);
 	m_AABB.reset(m_position, m_model);
-	GameMessenger::getInstance().broadcast<GameMessages::AddToMap>({ m_AABB, Globals::INVALID_ENTITY_ID });
+	GameMessenger::getInstance().broadcast<GameMessages::AddToMap>({ m_AABB });
 }
 
 Mineral::Mineral(Mineral&& rhs) noexcept

@@ -19,6 +19,8 @@ namespace
 
         return minerals;
     };
+
+    const float SHIELD_REPLENISH_TIMER_EXPIRATION = 15.0f;
 }
 
 Faction::Faction(eFactionController factionController, const glm::vec3& hqStartingPosition, 
@@ -36,7 +38,9 @@ Faction::Faction(eFactionController factionController, const glm::vec3& hqStarti
     m_controller(factionController),
     m_currentResourceAmount(startingResources),
     m_currentPopulationAmount(0),
-    m_currentPopulationLimit(startingPopulationCap)
+    m_currentPopulationLimit(startingPopulationCap),
+    m_currentShieldAmount(0),
+    m_shieldReplenishTimer(SHIELD_REPLENISH_TIMER_EXPIRATION, true)
 {
     m_allEntities.push_back(&m_HQ);
 }
@@ -358,8 +362,7 @@ void Faction::handleUnitCollisions(const Map& map, FactionHandler& factionHandle
     {
         if (unit.getCurrentState() == eUnitState::Idle)
         {
-            MapNode currentMapNode = map.getNode(unit.getPosition());
-            if (currentMapNode.isCollidable() && currentMapNode.getEntityID() != unit.getID())
+            if (map.isCollidable(unit.getPosition()))
             {
                 unit.moveTo(PathFinding::getInstance().getClosestAvailablePosition<Unit>(unit, m_units, map), map,
                     [&](const glm::ivec2& position) { return getAdjacentPositions(position, map, factionHandler, unit); }, factionHandler);
@@ -394,8 +397,7 @@ void Faction::handleWorkerCollisions(const Map& map)
     {
         if (worker.getCurrentState() == eUnitState::Idle)
         {
-            MapNode currentMapNode = map.getNode(worker.getPosition());
-            if (currentMapNode.isCollidable() && currentMapNode.getEntityID() != worker.getID())
+            if (map.isCollidable(worker.getPosition()))// currentMapNode.isCollidable() && currentMapNode.getEntityID() != worker.getID())
             {
                 worker.moveTo(PathFinding::getInstance().getClosestAvailablePosition<Worker>(worker, m_workers, map), map,
                     [&](const glm::ivec2& position) { return getAdjacentPositions(position, map); });

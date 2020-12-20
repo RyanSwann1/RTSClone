@@ -83,6 +83,7 @@ private:
 	int m_currentPopulationAmount;
 	int m_currentPopulationLimit;
 	int m_currentShieldAmount;
+	Timer m_shieldReplenishTimer;
 
 	void reduceResources(eEntityType addedEntityType);
 	void increaseCurrentPopulationAmount(eEntityType entityType);

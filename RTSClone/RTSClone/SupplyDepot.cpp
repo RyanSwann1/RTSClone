@@ -9,7 +9,7 @@ SupplyDepot::SupplyDepot(const glm::vec3& startingPosition, const Faction& ownin
 	: Entity(ModelManager::getInstance().getModel(SUPPLY_DEPOT_MODEL_NAME), startingPosition, eEntityType::SupplyDepot, 
 		Globals::SUPPLY_DEPOT_STARTING_HEALTH, owningFaction.getCurrentShieldAmount())
 {
-	GameMessenger::getInstance().broadcast<GameMessages::AddToMap>({ m_AABB, getID() });
+	GameMessenger::getInstance().broadcast<GameMessages::AddToMap>({ m_AABB });
 }
 
 SupplyDepot::~SupplyDepot()

@@ -225,6 +225,6 @@ UnitSpawnerBuilding::UnitSpawnerBuilding(const glm::vec3& startingPosition, eEnt
 	m_spawnTimer(spawnTimerExpirationTime, false),
 	m_waypointPosition(m_position)
 {
-	GameMessenger::getInstance().broadcast<GameMessages::AddToMap>({ m_AABB, getID() });
+	GameMessenger::getInstance().broadcast<GameMessages::AddToMap>({ m_AABB });
 	m_unitsToSpawn.reserve(static_cast<size_t>(MAX_UNITS_SPAWNABLE));
 }
