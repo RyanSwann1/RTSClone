@@ -18,13 +18,10 @@ namespace GameMessages
 
 	struct AddToMap : public BaseMessage<eGameMessageType::AddEntityToMap>
 	{
-		AddToMap(const AABB& AABB, int entityID)
-			: AABB(AABB),
-			entityID(entityID)
-		{}
+		AddToMap(const AABB& AABB)
+			: AABB(AABB) {}
 
 		const AABB& AABB;
-		const int entityID;
 	};
 
 	struct RemoveFromMap : public BaseMessage<eGameMessageType::RemoveEntityFromMap>
