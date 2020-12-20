@@ -421,17 +421,21 @@ void FactionPlayer::onLeftClick(const sf::Window& window, const Camera& camera, 
     {
         selectAllUnits = true;
     }
-    
+
     m_selectionBox.setStartingPosition(window, mouseToGroundPosition);
 
     selectEntity<Unit>(m_units, mouseToGroundPosition, selectAllUnits);
     selectEntity<Worker>(m_workers, mouseToGroundPosition, selectAllUnits, entityIDSelected);
     setSelectedUnits(m_selectedUnits, m_units, m_workers);
 
-    selectEntity<Barracks>(m_barracks, mouseToGroundPosition);
-    selectEntity<Turret>(m_turrets, mouseToGroundPosition);
-    selectEntity<SupplyDepot>(m_supplyDepots, mouseToGroundPosition);
-    m_HQ.setSelected(m_HQ.getAABB().contains(mouseToGroundPosition));
+    if (m_selectedUnits.empty())
+    {
+        selectEntity<Barracks>(m_barracks, mouseToGroundPosition);
+        selectEntity<Turret>(m_turrets, mouseToGroundPosition);
+        selectEntity<SupplyDepot>(m_supplyDepots, mouseToGroundPosition);
+        selectEntity<Laboratory>(m_laboratories, mouseToGroundPosition);
+        m_HQ.setSelected(m_HQ.getAABB().contains(mouseToGroundPosition));
+    }
 }
 
 void FactionPlayer::onRightClick(const sf::Window& window, const Camera& camera, FactionHandler& factionHandler, const Map& map)
