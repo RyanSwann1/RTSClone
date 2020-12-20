@@ -5,9 +5,16 @@
 #include "GameMessages.h"
 #include "Faction.h"
 
+namespace
+{
+	const float INCREASE_SHIELD_TIMER_EXPIRATION = 5.0f;
+}
+
 Laboratory::Laboratory(const glm::vec3& startingPosition, const Faction& owningFaction)
-	: Entity (ModelManager::getInstance().getModel(LABORATORY_MODEL_NAME), startingPosition, eEntityType::Laboratory,
-		Globals::LABORATORY_STARTING_HEALTH, owningFaction.getCurrentShieldAmount())
+	: Entity(ModelManager::getInstance().getModel(LABORATORY_MODEL_NAME), startingPosition, eEntityType::Laboratory,
+		Globals::LABORATORY_STARTING_HEALTH, owningFaction.getCurrentShieldAmount()),
+	m_increaseShieldCommands(),
+	m_increaseShieldTimer(INCREASE_SHIELD_TIMER_EXPIRATION, false)
 {
 	GameMessenger::getInstance().broadcast<GameMessages::AddToMap>({ m_AABB, getID() });
 }
@@ -15,4 +22,33 @@ Laboratory::Laboratory(const glm::vec3& startingPosition, const Faction& owningF
 Laboratory::~Laboratory()
 {
 	GameMessenger::getInstance().broadcast<GameMessages::RemoveFromMap>({ m_AABB });
+}
+
+void Laboratory::addIncreaseShieldCommand(const std::function<void()>& command)
+{
+	if (m_increaseShieldCommands.empty())
+	{
+		m_increaseShieldTimer.resetElaspedTime();
+		m_increaseShieldTimer.setActive(true);
+	}
+	
+	m_increaseShieldCommands.push(command);
+}
+
+void Laboratory::update(float deltaTime)
+{
+	if (m_increaseShieldTimer.isActive())
+	{
+		assert(!m_increaseShieldCommands.empty());
+
+		m_increaseShieldTimer.update(deltaTime);
+		if (m_increaseShieldTimer.isExpired())
+		{
+			m_increaseShieldCommands.front()();
+			m_increaseShieldCommands.pop();
+
+			m_increaseShieldTimer.setActive(!m_increaseShieldCommands.empty());
+			m_increaseShieldTimer.resetElaspedTime();
+		}
+	}
 }

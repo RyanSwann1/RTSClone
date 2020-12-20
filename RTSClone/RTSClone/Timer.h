@@ -8,6 +8,7 @@ public:
 	float getExpiredTime() const;
 	float getElaspedTime() const;
 	bool isExpired() const;
+	bool isActive() const;
 
 	void setActive(bool active);
 	void update(float deltaTime);

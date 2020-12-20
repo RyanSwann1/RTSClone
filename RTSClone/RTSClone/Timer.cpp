@@ -21,6 +21,11 @@ bool Timer::isExpired() const
 	return m_elaspedTime >= m_expirationTime;
 }
 
+bool Timer::isActive() const
+{
+	return m_active;
+}
+
 void Timer::setActive(bool active)
 {
 	m_active = active;
