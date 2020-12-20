@@ -348,7 +348,7 @@ void Faction::increaseShield()
 
                 for (auto& entity : allEntities)
                 {
-                    entity->increaseShield(*this);
+                    entity->increaseMaximumShield(*this);
                 }
             });
         }
@@ -445,6 +445,11 @@ void Faction::update(float deltaTime, const Map& map, FactionHandler& factionHan
     for (auto& turret : m_turrets)
     {
         turret.update(deltaTime, factionHandler, map);
+    }
+
+    for (auto& supplyDepot : m_supplyDepots)
+    {
+        supplyDepot.update(deltaTime);
     }
 
     for (auto& laboratory : m_laboratories)

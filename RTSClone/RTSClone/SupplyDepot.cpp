@@ -16,3 +16,8 @@ SupplyDepot::~SupplyDepot()
 {
 	GameMessenger::getInstance().broadcast<GameMessages::RemoveFromMap>({ m_AABB });
 }
+
+void SupplyDepot::update(float deltaTime)
+{
+	Entity::updateShieldReplenishTimer(deltaTime);
+}

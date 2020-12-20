@@ -36,6 +36,7 @@ Turret::~Turret()
 
 void Turret::update(float deltaTime, FactionHandler& factionHandler, const Map& map)
 {
+	Entity::updateShieldReplenishTimer(deltaTime);
 	m_stateHandlerTimer.update(deltaTime);
 	m_attackTimer.update(deltaTime);
 

@@ -40,6 +40,8 @@ void Laboratory::addIncreaseShieldCommand(const std::function<void()>& command)
 
 void Laboratory::update(float deltaTime)
 {
+	Entity::updateShieldReplenishTimer(deltaTime);
+
 	if (m_increaseShieldTimer.isActive())
 	{
 		assert(!m_increaseShieldCommands.empty());
@@ -47,7 +49,7 @@ void Laboratory::update(float deltaTime)
 		m_increaseShieldTimer.update(deltaTime);
 		if (m_increaseShieldTimer.isExpired())
 		{
-			m_increaseShieldCommands.front()();
+			m_increaseShieldCommands.front()(); //Function pointer
 			m_increaseShieldCommands.pop();
 
 			m_increaseShieldTimer.setActive(!m_increaseShieldCommands.empty());
