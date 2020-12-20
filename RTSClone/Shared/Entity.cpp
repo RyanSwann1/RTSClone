@@ -206,95 +206,90 @@ void Entity::renderHealthBar(ShaderHandler& shaderHandler, const Camera& camera,
 {
 	if (isSelected())
 	{
-		glm::vec4 positionNDC = camera.getProjection(glm::ivec2(windowSize.x, windowSize.y)) * camera.getView() * glm::vec4(m_position, 1.0f);
-		positionNDC /= positionNDC.w;
 		float width = 0.0f;
-		float height = DEFAULT_HEALTH_BAR_HEIGHT / windowSize.y * 2.0f;
 		float yOffset = 0.0f;
-		float currentHealth = static_cast<float>(m_health) / static_cast<float>(m_maximumHealth);
 		switch (getEntityType())
 		{
 		case eEntityType::Unit:
-			width = Globals::UNIT_STAT_BAR_WIDTH * currentHealth / windowSize.x * 2.0f;
-			yOffset = UNIT_HEALTH_BAR_YOFFSET / windowSize.y * 2.0f;
+			width = Globals::UNIT_STAT_BAR_WIDTH;
+			yOffset = UNIT_HEALTH_BAR_YOFFSET;
 			break;
 		case eEntityType::Worker:
-			width = Globals::WORKER_STAT_BAR_WIDTH * currentHealth / windowSize.x * 2.0f;
-			yOffset = WORKER_HEALTH_BAR_YOFFSET / windowSize.y * 2.0f;
+			width = Globals::WORKER_STAT_BAR_WIDTH;
+			yOffset = WORKER_HEALTH_BAR_YOFFSET;
 			break;
 		case eEntityType::HQ:
-			width = Globals::HQ_STAT_BAR_WIDTH * currentHealth / windowSize.x * 2.0f;
-			yOffset = HQ_HEALTH_BAR_YOFFSET / windowSize.y * 2.0f;
+			width = Globals::HQ_STAT_BAR_WIDTH;
+			yOffset = HQ_HEALTH_BAR_YOFFSET;
 			break;
 		case eEntityType::SupplyDepot:
-			width = Globals::SUPPLY_DEPOT_STAT_BAR_WIDTH * currentHealth / windowSize.x * 2.0f;
-			yOffset = SUPPLY_DEPOT_HEALTH_BAR_YOFFSET / windowSize.y * 2.0f;
+			width = Globals::SUPPLY_DEPOT_STAT_BAR_WIDTH;
+			yOffset = SUPPLY_DEPOT_HEALTH_BAR_YOFFSET;
 			break;
 		case eEntityType::Barracks:
-			width = Globals::BARRACKS_STAT_BAR_WIDTH * currentHealth / windowSize.x * 2.0f;
-			yOffset = BARRACKS_HEALTH_BAR_YOFFSET / windowSize.y * 2.0f;
+			width = Globals::BARRACKS_STAT_BAR_WIDTH;
+			yOffset = BARRACKS_HEALTH_BAR_YOFFSET;
 			break;
 		case eEntityType::Turret:
-			width = Globals::TURRET_STAT_BAR_WIDTH * currentHealth / windowSize.x * 2.0f;
-			yOffset = TURRET_HEALTH_BAR_YOFFSET / windowSize.y * 2.0f;
+			width = Globals::TURRET_STAT_BAR_WIDTH;
+			yOffset = TURRET_HEALTH_BAR_YOFFSET;
 			break;
 		case eEntityType::Laboratory:
-			width = Globals::LABORATORY_STAT_BAR_WIDTH * currentHealth / windowSize.x * 2.0f;
-			yOffset = LABORATORY_HEALTH_BAR_YOFFSET / windowSize.y * 2.0f;
+			width = Globals::LABORATORY_STAT_BAR_WIDTH;
+			yOffset = LABORATORY_HEALTH_BAR_YOFFSET;
 			break;
 		default:
 			assert(false);
 		}
 		
-		shaderHandler.setUniformVec3(eShaderType::HealthBar, "uMaterialColor", HEALTH_BAR_COLOR);
-		m_healthbarSprite.render({ positionNDC.x, positionNDC.y }, windowSize, width, height, yOffset);
+		float currentHealth = static_cast<float>(m_health) / static_cast<float>(m_maximumHealth);
+		m_healthbarSprite.render(m_position, windowSize, width * currentHealth, DEFAULT_HEALTH_BAR_HEIGHT, yOffset,
+			shaderHandler, camera, HEALTH_BAR_COLOR);
 	}
 }
+
 void Entity::renderShieldBar(ShaderHandler& shaderHandler, const Camera& camera, glm::uvec2 windowSize) const
 {
 	if (isSelected() && m_shield > 0)
 	{
-		glm::vec4 positionNDC = camera.getProjection(glm::ivec2(windowSize.x, windowSize.y)) * camera.getView() * glm::vec4(m_position, 1.0f);
-		positionNDC /= positionNDC.w;
 		float width = 0.0f;
-		float height = DEFAULT_SHIELD_BAR_HEIGHT / windowSize.y * 2.0f;
 		float yOffset = 0.0f;
 		switch (getEntityType())
 		{
 		case eEntityType::Unit:
-			width = Globals::UNIT_STAT_BAR_WIDTH / windowSize.x * 2.0f;
-			yOffset = UNIT_SHIELD_BAR_YOFFSET / windowSize.y * 2.0f;
+			width = Globals::UNIT_STAT_BAR_WIDTH;
+			yOffset = UNIT_SHIELD_BAR_YOFFSET;
 			break;
 		case eEntityType::Worker:
-			width = Globals::WORKER_STAT_BAR_WIDTH / windowSize.x * 2.0f;
-			yOffset = WORKER_SHIELD_BAR_YOFFSET / windowSize.y * 2.0f;
+			width = Globals::WORKER_STAT_BAR_WIDTH;
+			yOffset = WORKER_SHIELD_BAR_YOFFSET;
 			break;
 		case eEntityType::HQ:
-			width = Globals::HQ_STAT_BAR_WIDTH / windowSize.x * 2.0f;
-			yOffset = HQ_SHIELD_BAR_YOFFSET / windowSize.y * 2.0f;
+			width = Globals::HQ_STAT_BAR_WIDTH;
+			yOffset = HQ_SHIELD_BAR_YOFFSET;
 			break;
 		case eEntityType::SupplyDepot:
-			width = Globals::SUPPLY_DEPOT_STAT_BAR_WIDTH / windowSize.x * 2.0f;
-			yOffset = SUPPLY_DEPOT_SHIELD_BAR_YOFFSET / windowSize.y * 2.0f;
+			width = Globals::SUPPLY_DEPOT_STAT_BAR_WIDTH;
+			yOffset = SUPPLY_DEPOT_SHIELD_BAR_YOFFSET;
 			break;
 		case eEntityType::Barracks:
-			width = Globals::BARRACKS_STAT_BAR_WIDTH / windowSize.x * 2.0f;
-			yOffset = BARRACKS_SHIELD_BAR_YOFFSET / windowSize.y * 2.0f;
+			width = Globals::BARRACKS_STAT_BAR_WIDTH;
+			yOffset = BARRACKS_SHIELD_BAR_YOFFSET;
 			break;
 		case eEntityType::Turret:
-			width = Globals::TURRET_STAT_BAR_WIDTH / windowSize.x * 2.0f;
-			yOffset = TURRET_SHIELD_BAR_YOFFSET / windowSize.y * 2.0f;
+			width = Globals::TURRET_STAT_BAR_WIDTH;
+			yOffset = TURRET_SHIELD_BAR_YOFFSET;
 			break;
 		case eEntityType::Laboratory:
-			width = Globals::LABORATORY_STAT_BAR_WIDTH / windowSize.x * 2.0f;
-			yOffset = LABORATORY_SHIELD_BAR_YOFFSET / windowSize.y * 2.0f;
+			width = Globals::LABORATORY_STAT_BAR_WIDTH;
+			yOffset = LABORATORY_SHIELD_BAR_YOFFSET;
 			break;
 		default:
 			assert(false);
 		}
 
-		shaderHandler.setUniformVec3(eShaderType::HealthBar, "uMaterialColor", SHIELD_BAR_COLOR);
-		m_healthbarSprite.render({ positionNDC.x, positionNDC.y }, windowSize, width, height, yOffset);
+		m_shieldBarSprite.render(m_position, windowSize, width, DEFAULT_SHIELD_BAR_HEIGHT, yOffset,
+			shaderHandler, camera, SHIELD_BAR_COLOR);
 	}
 }
 #endif // GAME

@@ -193,28 +193,28 @@ void UnitSpawnerBuilding::render(ShaderHandler& shaderHandler, eFactionControlle
 
 void UnitSpawnerBuilding::renderProgressBar(ShaderHandler& shaderHandler, const Camera& camera, glm::uvec2 windowSize) const
 {
-	glm::vec4 positionNDC = camera.getProjection(glm::ivec2(windowSize.x, windowSize.y)) * camera.getView() * glm::vec4(m_position, 1.0f);
-	positionNDC /= positionNDC.w;
-	float width = 0.0f;
-	float height = Globals::DEFAULT_PROGRESS_BAR_HEIGHT / windowSize.y * 2.0f;
-	float yOffset = 0.0f;
-	float currentTime = m_spawnTimer.getElaspedTime() / m_spawnTimer.getExpiredTime();
-	switch (getEntityType())
+	if (m_spawnTimer.isActive())
 	{
-	case eEntityType::HQ:
-		width = HQ_PROGRESS_BAR_WIDTH * currentTime / windowSize.x * 2.0f;
-		yOffset = HQ_PROGRESS_BAR_YOFFSET / windowSize.y * 2.0f;
-		break;
-	case eEntityType::Barracks:
-		width = BARRACKS_PROGRESS_BAR_WIDTH * currentTime / windowSize.x * 2.0f;
-		yOffset = BARRACKS_PROGRESS_BAR_YOFFSET / windowSize.y * 2.0f;
-		break;
-	default:
-		assert(false);
-	}
+		float currentTime = m_spawnTimer.getElaspedTime() / m_spawnTimer.getExpiredTime();
+		float width = 0.0f;
+		float yOffset = 0.0f;
+		switch (getEntityType())
+		{
+		case eEntityType::HQ:
+			width = HQ_PROGRESS_BAR_WIDTH;
+			yOffset = HQ_PROGRESS_BAR_YOFFSET;
+			break;
+		case eEntityType::Barracks:
+			width = BARRACKS_PROGRESS_BAR_WIDTH;
+			yOffset = BARRACKS_PROGRESS_BAR_YOFFSET;
+			break;
+		default:
+			assert(false);
+		}
 
-	shaderHandler.setUniformVec3(eShaderType::HealthBar, "uMaterialColor", Globals::PROGRESS_BAR_COLOR);
-	m_progressBarSprite.render(glm::vec2(positionNDC), windowSize, width, height, yOffset);
+		m_progressBarSprite.render(m_position, windowSize, width * currentTime, Globals::DEFAULT_PROGRESS_BAR_HEIGHT, yOffset,
+			shaderHandler, camera, Globals::PROGRESS_BAR_COLOR);
+	}
 }
 
 UnitSpawnerBuilding::UnitSpawnerBuilding(const glm::vec3& startingPosition, eEntityType entityType, 

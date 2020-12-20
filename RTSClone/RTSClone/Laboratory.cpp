@@ -62,17 +62,9 @@ void Laboratory::renderProgressBar(ShaderHandler& shaderHandler, const Camera& c
 	if (m_increaseShieldTimer.isActive())
 	{
 		assert(!m_increaseShieldCommands.empty());
-		
-		glm::vec4 positionNDC = camera.getProjection(glm::ivec2(windowSize.x, windowSize.y)) * camera.getView() * glm::vec4(m_position, 1.0f);
-		positionNDC /= positionNDC.w;
-		float width = 0.0f;
-		float height = Globals::DEFAULT_PROGRESS_BAR_HEIGHT / windowSize.y * 2.0f;
-		float yOffset = 0.0f;
-		float currentTime = m_increaseShieldTimer.getElaspedTime() / m_increaseShieldTimer.getExpiredTime();
-		width = Globals::LABORATORY_STAT_BAR_WIDTH * currentTime / windowSize.x * 2.0f;
-		yOffset = PROGRESS_BAR_YOFFSET / windowSize.y * 2.0f;
 
-		shaderHandler.setUniformVec3(eShaderType::HealthBar, "uMaterialColor", Globals::PROGRESS_BAR_COLOR);
-		m_progressBarSprite.render(glm::vec2(positionNDC), windowSize, width, height, yOffset);
+		float currentTime = m_increaseShieldTimer.getElaspedTime() / m_increaseShieldTimer.getExpiredTime();
+		m_progressBarSprite.render(m_position, windowSize, Globals::LABORATORY_STAT_BAR_WIDTH * currentTime, Globals::DEFAULT_PROGRESS_BAR_HEIGHT,
+			PROGRESS_BAR_YOFFSET, shaderHandler, camera, Globals::PROGRESS_BAR_COLOR);
 	}
 }

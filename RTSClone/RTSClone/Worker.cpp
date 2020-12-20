@@ -323,25 +323,22 @@ void Worker::render(ShaderHandler& shaderHandler, eFactionController owningFacti
 
 void Worker::renderProgressBar(ShaderHandler& shaderHandler, const Camera& camera, glm::uvec2 windowSize) const
 {
-	glm::vec4 positionNDC = camera.getProjection(glm::ivec2(windowSize.x, windowSize.y)) * camera.getView() * glm::vec4(m_position, 1.0f);
-	positionNDC /= positionNDC.w;
-
-	float currentTime = 0.0f;
-	if (m_buildTimer.getElaspedTime() > 0.0f)
+	if (m_buildTimer.isActive() || m_harvestTimer.isActive())
 	{
-		currentTime = m_buildTimer.getElaspedTime() / m_buildTimer.getExpiredTime();
-	}
-	else if (m_harvestTimer.getElaspedTime() > 0.0f)
-	{
-		currentTime = m_harvestTimer.getElaspedTime() / m_harvestTimer.getExpiredTime();
-	}
+		float currentTime = 0.0f;
+		switch (getCurrentState())
+		{
+		case eUnitState::Building:
+			currentTime = m_buildTimer.getElaspedTime() / m_buildTimer.getExpiredTime();
+			break;
+		case eUnitState::Harvesting:
+			currentTime = m_harvestTimer.getElaspedTime() / m_harvestTimer.getExpiredTime();
+			break;
+		}
 
-	float width = WORKER_PROGRESS_BAR_WIDTH * currentTime / windowSize.x * 2.0f;
-	float height = Globals::DEFAULT_PROGRESS_BAR_HEIGHT / windowSize.y * 2.0f;
-	float yOffset = WORKER_PROGRESS_BAR_YOFFSET / windowSize.y * 2.0f;
-
-	shaderHandler.setUniformVec3(eShaderType::HealthBar, "uMaterialColor", Globals::PROGRESS_BAR_COLOR);
-	m_buildingProgressSprite.render(glm::vec2(positionNDC), windowSize, width, height, yOffset);
+		m_buildingProgressSprite.render(m_position, windowSize, WORKER_PROGRESS_BAR_WIDTH * currentTime, Globals::DEFAULT_PROGRESS_BAR_HEIGHT,
+			WORKER_PROGRESS_BAR_YOFFSET, shaderHandler, camera, Globals::PROGRESS_BAR_COLOR);
+	}
 }
 
 void Worker::clearBuildingCommands()
