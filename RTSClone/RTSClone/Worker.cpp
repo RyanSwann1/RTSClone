@@ -9,6 +9,8 @@
 #include "GameEventHandler.h"
 #include "GameEvent.h"
 #include "FactionHandler.h"
+#include "ShaderHandler.h"
+#include "Camera.h"
 
 namespace
 {
@@ -19,6 +21,9 @@ namespace
 	constexpr int RESOURCE_CAPACITY = 30;
 	constexpr int RESOURCE_INCREMENT = 10;
 	constexpr float MINIMUM_REPAIR_DISTANCE = static_cast<float>(Globals::NODE_SIZE) * 4.0f;
+
+	const float WORKER_PROGRESS_BAR_WIDTH = 60.0f;
+	const float WORKER_PROGRESS_BAR_YOFFSET = 30.0f;
 }
 
 //BuildingCommand
@@ -314,6 +319,24 @@ void Worker::render(ShaderHandler& shaderHandler, eFactionController owningFacti
 	}
 
 	Entity::render(shaderHandler, owningFactionController);
+}
+
+void Worker::renderProgressBar(ShaderHandler& shaderHandler, const Camera& camera, glm::uvec2 windowSize) const
+{
+	if (isSelected())
+	{
+		glm::vec4 positionNDC = camera.getProjection(glm::ivec2(windowSize.x, windowSize.y)) * camera.getView() * glm::vec4(m_position, 1.0f);
+		positionNDC /= positionNDC.w;
+
+		float currentTime = m_buildTimer.getElaspedTime() / m_buildTimer.getExpiredTime();
+
+		float width = WORKER_PROGRESS_BAR_WIDTH * currentTime / windowSize.x * 2.0f;
+		float height = Globals::DEFAULT_PROGRESS_BAR_HEIGHT / windowSize.y * 2.0f;
+		float yOffset = WORKER_PROGRESS_BAR_YOFFSET / windowSize.y * 2.0f;
+
+		shaderHandler.setUniformVec3(eShaderType::HealthBar, "uMaterialColor", Globals::PROGRESS_BAR_COLOR);
+		m_buildingProgressSprite.render(glm::vec2(positionNDC), windowSize, width, height, yOffset);
+	}
 }
 
 void Worker::clearBuildingCommands()

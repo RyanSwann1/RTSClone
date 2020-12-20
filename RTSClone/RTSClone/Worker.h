@@ -2,6 +2,7 @@
 
 #include "Unit.h"
 #include "Timer.h"
+#include "Sprite.h"
 #include <queue>
 
 //https://stackoverflow.com/questions/50182913/what-are-the-principles-involved-for-an-hierarchical-state-machine-and-how-to-i - HSM
@@ -37,6 +38,7 @@ public:
 		eUnitState state = eUnitState::Moving, const Mineral* mineralToHarvest = nullptr);
 
 	void render(ShaderHandler& shaderHandler, eFactionController owningFactionController) const;
+	void renderProgressBar(ShaderHandler& shaderHandler, const Camera& camera, glm::uvec2 windowSize) const;
 
 private:
 	std::queue<BuildingCommand> m_buildingCommands;
@@ -45,6 +47,7 @@ private:
 	Timer m_harvestTimer;
 	Timer m_buildTimer;
 	Timer m_repairTimer;
+	Sprite m_buildingProgressSprite;
 	const Mineral* m_mineralToHarvest;
 
 	void clearBuildingCommands();

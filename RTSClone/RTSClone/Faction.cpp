@@ -498,11 +498,13 @@ void Faction::renderEntityStatusBars(ShaderHandler& shaderHandler, const Camera&
         case eEntityType::HQ:
             static_cast<UnitSpawnerBuilding&>(*(entity)).renderProgressBar(shaderHandler, camera, windowSize);
             break;
+        case eEntityType::Worker:
+            static_cast<Worker&>(*(entity)).renderProgressBar(shaderHandler, camera, windowSize);
+            break;
         case eEntityType::Laboratory:
         case eEntityType::SupplyDepot:
         case eEntityType::Turret:
         case eEntityType::Unit:
-        case eEntityType::Worker:
             break;
         default:
             assert(false);

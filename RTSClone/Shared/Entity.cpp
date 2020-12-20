@@ -16,7 +16,7 @@
 namespace
 {
 	const float WORKER_HEALTHBAR_WIDTH = 60.0f;
-	const float WORKER_HEALTHBAR_YOFFSET = 25.0f;
+	const float WORKER_HEALTHBAR_YOFFSET = 35.0f;
 	const float UNIT_HEALTHBAR_WIDTH = 75.0f;
 	const float UNIT_HEALTHBAR_YOFFSET = 50.0f;
 	const float HQ_HEALTHBAR_WIDTH = 150.0f;
@@ -30,7 +30,7 @@ namespace
 	const float DEFAULT_HEALTH_BAR_HEIGHT = 10.0f;
 
 	const float WORKER_SHIELD_BAR_WIDTH = 60.0f;
-	const float WORKER_SHIELD_BAR_YOFFSET = 35.0f;
+	const float WORKER_SHIELD_BAR_YOFFSET = 45.0f;
 	const float UNIT_SHIELD_BAR_WIDTH = 75.0f;
 	const float UNIT_SHIELD_BAR_YOFFSET = 60.0f;
 	const float HQ_SHIELD_BAR_WIDTH = 150.0f;
