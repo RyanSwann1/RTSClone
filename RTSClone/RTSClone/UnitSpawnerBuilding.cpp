@@ -212,7 +212,7 @@ void UnitSpawnerBuilding::renderProgressBar(ShaderHandler& shaderHandler, const 
 			assert(false);
 		}
 
-		m_progressBarSprite.render(m_position, windowSize, width * currentTime, Globals::DEFAULT_PROGRESS_BAR_HEIGHT, yOffset,
+		m_statbarSprite.render(m_position, windowSize, width * currentTime, Globals::DEFAULT_PROGRESS_BAR_HEIGHT, yOffset,
 			shaderHandler, camera, Globals::PROGRESS_BAR_COLOR);
 	}
 }

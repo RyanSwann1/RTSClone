@@ -41,7 +41,8 @@ namespace
 #ifdef GAME
 Entity::Entity(const Model& model, const glm::vec3& startingPosition, eEntityType entityType, 
 	int health, int shield, glm::vec3 startingRotation)
-	: m_position(startingPosition),
+	: m_statbarSprite(),
+	m_position(startingPosition),
 	m_rotation(startingRotation),
 	m_AABB(),
 	m_ID(UniqueEntityIDDistributer::getInstance().getUniqueEntityID()),
@@ -50,7 +51,6 @@ Entity::Entity(const Model& model, const glm::vec3& startingPosition, eEntityTyp
 	m_maximumHealth(health),
 	m_health(health),
 	m_type(entityType),
-	m_healthbarSprite(),
 	m_model(model),
 	m_selected(false)
 {
@@ -243,7 +243,7 @@ void Entity::renderHealthBar(ShaderHandler& shaderHandler, const Camera& camera,
 		}
 		
 		float currentHealth = static_cast<float>(m_health) / static_cast<float>(m_maximumHealth);
-		m_healthbarSprite.render(m_position, windowSize, width * currentHealth, DEFAULT_HEALTH_BAR_HEIGHT, yOffset,
+		m_statbarSprite.render(m_position, windowSize, width * currentHealth, DEFAULT_HEALTH_BAR_HEIGHT, yOffset,
 			shaderHandler, camera, HEALTH_BAR_COLOR);
 	}
 }
@@ -288,7 +288,7 @@ void Entity::renderShieldBar(ShaderHandler& shaderHandler, const Camera& camera,
 			assert(false);
 		}
 
-		m_shieldBarSprite.render(m_position, windowSize, width, DEFAULT_SHIELD_BAR_HEIGHT, yOffset,
+		m_statbarSprite.render(m_position, windowSize, width, DEFAULT_SHIELD_BAR_HEIGHT, yOffset,
 			shaderHandler, camera, SHIELD_BAR_COLOR);
 	}
 }

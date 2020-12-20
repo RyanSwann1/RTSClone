@@ -2,7 +2,6 @@
 
 #include "Entity.h"
 #include "Timer.h"
-#include "Sprite.h"
 #include <functional>
 
 enum class eFactionController;
@@ -37,7 +36,6 @@ protected:
 
 private:
 	glm::vec3 m_waypointPosition;
-	Sprite m_progressBarSprite;
 };
 
 class Barracks : public UnitSpawnerBuilding

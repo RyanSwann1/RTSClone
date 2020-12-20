@@ -66,11 +66,12 @@ protected:
 #ifdef GAME
 	Entity(const Model& model, const glm::vec3& startingPosition, eEntityType entityType, 
 		int health, int shield, glm::vec3 startingRotation = glm::vec3());
+	Sprite m_statbarSprite;
 #endif // GAME
 	glm::vec3 m_position;
 	glm::vec3 m_rotation;
 	AABB m_AABB;
-	
+
 private:
 	int m_ID;
 #ifdef GAME
@@ -79,8 +80,6 @@ private:
 	int m_maximumShield;
 	int m_shield;
 	eEntityType m_type;
-	Sprite m_healthbarSprite;
-	Sprite m_shieldBarSprite;
 #endif // GAME
 	std::reference_wrapper<const Model> m_model;
 	bool m_selected;
