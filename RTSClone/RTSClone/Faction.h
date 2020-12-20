@@ -90,6 +90,7 @@ private:
 	void increasePopulationLimit();
 	void revalidateExistingUnitPaths(const Map& map, FactionHandler& factionHandler);
 	void addResources(Worker& worker);
+	void increaseShield();
 
 	void handleUnitCollisions(const Map& map, FactionHandler& factionHandler);
 	void handleWorkerCollisions(const Map& map);

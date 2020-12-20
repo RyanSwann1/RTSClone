@@ -316,13 +316,7 @@ void Faction::handleEvent(const GameEvent& gameEvent, const Map& map, FactionHan
         if (m_currentShieldAmount < Globals::MAX_FACTION_SHIELD_AMOUNT &&
             isAffordable(Globals::FACTION_SHIELD_INCREASE_COST))
         {
-            ++m_currentShieldAmount;
-            m_currentResourceAmount -= Globals::FACTION_SHIELD_INCREASE_COST;
-
-            for (auto& entity : m_allEntities)
-            {
-                entity->increaseShield(*this);
-            }
+            increaseShield();
         }
         break;
     }
@@ -331,6 +325,30 @@ void Faction::handleEvent(const GameEvent& gameEvent, const Map& map, FactionHan
 void Faction::addResources(Worker& worker)
 {
     m_currentResourceAmount += worker.extractResources();
+}
+
+void Faction::increaseShield()
+{
+    assert(m_currentShieldAmount < Globals::MAX_FACTION_SHIELD_AMOUNT);
+    if (isAffordable(Globals::FACTION_SHIELD_INCREASE_COST))
+    {
+        for (auto& laboratory : m_laboratories)
+        {
+            std::vector<Entity*>& allEntities = m_allEntities;
+            int& currentResourcesAmount = m_currentResourceAmount;
+            int& currentShieldAmount = m_currentShieldAmount;
+            laboratory.addIncreaseShieldCommand([&allEntities, &currentResourcesAmount, &currentShieldAmount, this]()
+            {
+                ++currentShieldAmount;
+                currentResourcesAmount -= Globals::FACTION_SHIELD_INCREASE_COST;
+
+                for (auto& entity : allEntities)
+                {
+                    entity->increaseShield(*this);
+                }
+            });
+        }
+    }
 }
 
 void Faction::handleUnitCollisions(const Map& map, FactionHandler& factionHandler)
@@ -425,6 +443,11 @@ void Faction::update(float deltaTime, const Map& map, FactionHandler& factionHan
     for (auto& turret : m_turrets)
     {
         turret.update(deltaTime, factionHandler, map);
+    }
+
+    for (auto& laboratory : m_laboratories)
+    {
+        laboratory.update(deltaTime);
     }
 
     m_HQ.update(deltaTime);
