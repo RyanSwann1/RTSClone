@@ -6,20 +6,6 @@
 #include "GameMessageType.h"
 #include <array>
 
-class MapNode
-{
-public:
-	MapNode();
-	MapNode(bool collidable, int entityID);
-
-	bool isCollidable() const;
-	int getEntityID() const;
-
-private:
-	bool m_collidable;
-	int m_entityID;
-};
-
 namespace GameMessages
 {
 	struct AddToMap;
@@ -33,7 +19,7 @@ public:
 	Map();
 	~Map();
 
-	const MapNode& getNode(const glm::vec3& position) const;
+	bool isCollidable(const glm::vec3& position) const;
 	const glm::ivec2& getSize() const;
 	bool isWithinBounds(const AABB& AABB) const;
 	bool isWithinBounds(const glm::vec3& position) const;
@@ -44,7 +30,7 @@ public:
 
 private:
 	glm::ivec2 m_size;
-	std::vector<MapNode> m_map;
+	std::vector<bool> m_map;
 	
 	void addEntityToMap(const GameMessages::AddToMap& gameMessage);
 	void removeEntityFromMap(const GameMessages::RemoveFromMap& gameMessage);

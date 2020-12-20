@@ -3,28 +3,6 @@
 #include "GameMessenger.h"
 #include "GameMessages.h"
 
-//MapNode
-MapNode::MapNode()
-	: m_collidable(false),
-	m_entityID(Globals::INVALID_ENTITY_ID)
-{}
-
-MapNode::MapNode(bool collidable, int entityID)
-	: m_collidable(collidable),
-	m_entityID(entityID)
-{}
-
-bool MapNode::isCollidable() const
-{
-	return m_collidable;
-}
-
-int MapNode::getEntityID() const
-{
-	return m_entityID;
-}
-
-//Map
 Map::Map()
 	: m_size(),
 	m_map()
@@ -46,7 +24,7 @@ Map::~Map()
 	GameMessenger::getInstance().unsubscribe<GameMessages::NewMapSize>(this);
 }
 
-const MapNode& Map::getNode(const glm::vec3& position) const
+bool Map::isCollidable(const glm::vec3& position) const
 {
 	assert(isWithinBounds(position));
 	return m_map[Globals::convertTo1D(Globals::convertToGridPosition(position), m_size)];
@@ -89,7 +67,7 @@ bool Map::isAABBOccupied(const AABB& AABB) const
 	{
 		for (int y = static_cast<int>(AABB.getBack()); y <= static_cast<int>(AABB.getForward()); ++y)
 		{
-			if (m_map[Globals::convertTo1D(Globals::convertToGridPosition({ x, Globals::GROUND_HEIGHT, y }), m_size)].isCollidable())
+			if (m_map[Globals::convertTo1D(Globals::convertToGridPosition({ x, Globals::GROUND_HEIGHT, y }), m_size)])
 			{
 				return true;
 			}
@@ -103,7 +81,7 @@ bool Map::isPositionOccupied(const glm::vec3& position) const
 {
 	if (isWithinBounds(position))
 	{
-		return m_map[Globals::convertTo1D(Globals::convertToGridPosition(position), m_size)].isCollidable();
+		return m_map[Globals::convertTo1D(Globals::convertToGridPosition(position), m_size)];
 	}
 
 	return true;
@@ -113,7 +91,7 @@ bool Map::isPositionOccupied(const glm::ivec2& position) const
 {
 	if (isWithinBounds(position))
 	{
-		return m_map[Globals::convertTo1D(position, m_size)].isCollidable();
+		return m_map[Globals::convertTo1D(position, m_size)];
 	}
 
 	return true;
@@ -129,7 +107,7 @@ void Map::addEntityToMap(const GameMessages::AddToMap& gameMessage)
 			assert(isWithinBounds(positionOnGrid));
 			if (isWithinBounds(positionOnGrid))
 			{
-				m_map[Globals::convertTo1D(positionOnGrid, m_size)] = { true, gameMessage.entityID };
+				m_map[Globals::convertTo1D(positionOnGrid, m_size)] = true;
 			}
 		}
 	}
@@ -145,7 +123,7 @@ void Map::removeEntityFromMap(const GameMessages::RemoveFromMap& gameMessage)
 			assert(isWithinBounds(positionOnGrid));
 			if (isWithinBounds(positionOnGrid))
 			{
-				m_map[Globals::convertTo1D(positionOnGrid, m_size)] = { false, Globals::INVALID_ENTITY_ID };
+				m_map[Globals::convertTo1D(positionOnGrid, m_size)] = false;
 			}
 		}
 	}
@@ -154,5 +132,5 @@ void Map::removeEntityFromMap(const GameMessages::RemoveFromMap& gameMessage)
 void Map::setSize(const GameMessages::NewMapSize& gameMessage)
 {
 	m_size = gameMessage.mapSize;
-	m_map.resize(static_cast<size_t>(m_size.x * m_size.y), { false, Globals::INVALID_ENTITY_ID });
+	m_map.resize(static_cast<size_t>(m_size.x * m_size.y), false);
 }
