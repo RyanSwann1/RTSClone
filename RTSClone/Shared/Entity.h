@@ -8,6 +8,7 @@
 #ifdef GAME
 #include "EntityType.h"
 #include "Sprite.h"
+#include "Timer.h"
 struct TakeDamageEvent;
 class FactionHandler;
 struct Camera;
@@ -42,7 +43,7 @@ public:
 	
 	void reduceHealth(const TakeDamageEvent& gameEvent);
 	void repair();
-	void increaseShield(const Faction& owningFaction);
+	void increaseMaximumShield(const Faction& owningFaction);
 	void render(ShaderHandler& shaderHandler, eFactionController owningFactionController) const;
 	void renderHealthBar(ShaderHandler& shaderHandler, const Camera& camera, glm::uvec2 windowSize) const;
 	void renderShieldBar(ShaderHandler& shaderHandler, const Camera& camera, glm::uvec2 windowSize) const;
@@ -55,7 +56,6 @@ public:
 	bool isSelected() const;
 	
 	void setSelected(bool selected);
-
 	void render(ShaderHandler& shaderHandler) const;
 
 #ifdef RENDER_AABB
@@ -66,6 +66,9 @@ protected:
 #ifdef GAME
 	Entity(const Model& model, const glm::vec3& startingPosition, eEntityType entityType, 
 		int health, int shield, glm::vec3 startingRotation = glm::vec3());
+	
+	void updateShieldReplenishTimer(float deltaTime);
+	
 	Sprite m_statbarSprite;
 #endif // GAME
 	glm::vec3 m_position;
@@ -80,7 +83,12 @@ private:
 	int m_maximumShield;
 	int m_shield;
 	eEntityType m_type;
+	Timer m_shieldReplenishTimer;
 #endif // GAME
 	std::reference_wrapper<const Model> m_model;
 	bool m_selected;
+
+#ifdef GAME
+	void increaseShield();
+#endif // GAME
 };

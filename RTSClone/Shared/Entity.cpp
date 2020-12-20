@@ -35,6 +35,8 @@ namespace
 
 	const glm::vec3 HEALTH_BAR_COLOR = { 0.0f, 0.8f, 0.0f };
 	const glm::vec3 SHIELD_BAR_COLOR = { 0.0f, 1.0f, 1.0f };
+
+	const float SHIELD_REPLENISH_TIMER_EXPIRATION = 15.0f;
 }
 #endif // GAME
 
@@ -51,6 +53,7 @@ Entity::Entity(const Model& model, const glm::vec3& startingPosition, eEntityTyp
 	m_maximumHealth(health),
 	m_health(health),
 	m_type(entityType),
+	m_shieldReplenishTimer(SHIELD_REPLENISH_TIMER_EXPIRATION, true),
 	m_model(model),
 	m_selected(false)
 {
@@ -71,6 +74,26 @@ Entity::Entity(const Model& model, const glm::vec3& startingPosition, eEntityTyp
 	}
 
 	m_AABB.reset(m_position, m_model);
+}
+
+void Entity::updateShieldReplenishTimer(float deltaTime)
+{
+	assert(m_shieldReplenishTimer.isActive());
+	
+	m_shieldReplenishTimer.update(deltaTime);
+	if (m_shieldReplenishTimer.isExpired())
+	{
+		m_shieldReplenishTimer.resetElaspedTime();
+		increaseShield();
+	}
+}
+
+void Entity::increaseShield()
+{
+	if (m_shield < m_maximumShield)
+	{
+		++m_shield;
+	}
 }
 #endif // GAME
 
@@ -190,11 +213,14 @@ void Entity::repair()
 	}
 }
 
-void Entity::increaseShield(const Faction& owningFaction)
+void Entity::increaseMaximumShield(const Faction& owningFaction)
 {
 	m_maximumShield = owningFaction.getCurrentShieldAmount();
-	++m_shield;
-	assert(m_shield <= m_maximumShield);
+	if (m_maximumShield == 1)
+	{
+		assert(m_shield == 0);
+		m_shield = m_maximumShield;
+	}
 }
 
 void Entity::render(ShaderHandler& shaderHandler, eFactionController owningFactionController) const
