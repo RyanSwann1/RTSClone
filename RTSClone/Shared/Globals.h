@@ -69,6 +69,8 @@ namespace Globals
 	const int FACTION_SHIELD_INCREASE_COST = 100;
 
 	const glm::vec3 PROGRESS_BAR_COLOR = { 1.0f, 1.0f, 0.4f };
+	const glm::vec3 HEALTH_BAR_COLOR = { 0.0f, 0.8f, 0.0f };
+	const glm::vec3 SHIELD_BAR_COLOR = { 0.0f, 1.0f, 1.0f };
 	const float DEFAULT_PROGRESS_BAR_HEIGHT = 5.0f;
 
 #ifdef GAME

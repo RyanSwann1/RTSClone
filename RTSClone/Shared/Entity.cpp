@@ -33,9 +33,6 @@ namespace
 	const float TURRET_SHIELD_BAR_YOFFSET = 70.0f;
 	const float LABORATORY_SHIELD_BAR_YOFFSET = 140.0f;
 
-	const glm::vec3 HEALTH_BAR_COLOR = { 0.0f, 0.8f, 0.0f };
-	const glm::vec3 SHIELD_BAR_COLOR = { 0.0f, 1.0f, 1.0f };
-
 	const float SHIELD_REPLENISH_TIMER_EXPIRATION = 15.0f;
 }
 #endif // GAME
@@ -269,8 +266,8 @@ void Entity::renderHealthBar(ShaderHandler& shaderHandler, const Camera& camera,
 		}
 		
 		float currentHealth = static_cast<float>(m_health) / static_cast<float>(m_maximumHealth);
-		m_statbarSprite.render(m_position, windowSize, width * currentHealth, DEFAULT_HEALTH_BAR_HEIGHT, yOffset,
-			shaderHandler, camera, HEALTH_BAR_COLOR);
+		m_statbarSprite.render(m_position, windowSize, width, width * currentHealth, DEFAULT_HEALTH_BAR_HEIGHT, yOffset,
+			shaderHandler, camera, Globals::HEALTH_BAR_COLOR);
 	}
 }
 
@@ -314,8 +311,8 @@ void Entity::renderShieldBar(ShaderHandler& shaderHandler, const Camera& camera,
 			assert(false);
 		}
 
-		m_statbarSprite.render(m_position, windowSize, width, DEFAULT_SHIELD_BAR_HEIGHT, yOffset,
-			shaderHandler, camera, SHIELD_BAR_COLOR);
+		m_statbarSprite.render(m_position, windowSize, width, width, DEFAULT_SHIELD_BAR_HEIGHT, yOffset,
+			shaderHandler, camera, Globals::SHIELD_BAR_COLOR);
 	}
 }
 #endif // GAME

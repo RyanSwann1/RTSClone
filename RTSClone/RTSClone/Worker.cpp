@@ -336,7 +336,8 @@ void Worker::renderProgressBar(ShaderHandler& shaderHandler, const Camera& camer
 			break;
 		}
 
-		m_statbarSprite.render(m_position, windowSize, WORKER_PROGRESS_BAR_WIDTH * currentTime, Globals::DEFAULT_PROGRESS_BAR_HEIGHT,
+		m_statbarSprite.render(m_position, windowSize, WORKER_PROGRESS_BAR_WIDTH, 
+			WORKER_PROGRESS_BAR_WIDTH * currentTime, Globals::DEFAULT_PROGRESS_BAR_HEIGHT,
 			WORKER_PROGRESS_BAR_YOFFSET, shaderHandler, camera, Globals::PROGRESS_BAR_COLOR);
 	}
 }
