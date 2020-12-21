@@ -323,7 +323,7 @@ void Worker::render(ShaderHandler& shaderHandler, eFactionController owningFacti
 
 void Worker::renderProgressBar(ShaderHandler& shaderHandler, const Camera& camera, glm::uvec2 windowSize) const
 {
-	if (m_buildTimer.isActive() || m_harvestTimer.isActive())
+	if (m_buildTimer.isActive() || m_harvestTimer.isActive() || m_repairTimer.isActive())
 	{
 		float currentTime = 0.0f;
 		switch (getCurrentState())
@@ -333,6 +333,9 @@ void Worker::renderProgressBar(ShaderHandler& shaderHandler, const Camera& camer
 			break;
 		case eUnitState::Harvesting:
 			currentTime = m_harvestTimer.getElaspedTime() / m_harvestTimer.getExpiredTime();
+			break;
+		case eUnitState::Repairing:
+			currentTime = m_repairTimer.getElaspedTime() / m_repairTimer.getExpiredTime();
 			break;
 		}
 
