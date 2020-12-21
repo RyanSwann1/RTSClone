@@ -265,6 +265,9 @@ void Entity::renderHealthBar(ShaderHandler& shaderHandler, const Camera& camera,
 			assert(false);
 		}
 		
+		m_statbarSprite.render(m_position, windowSize, width, width, DEFAULT_HEALTH_BAR_HEIGHT, yOffset,
+			shaderHandler, camera, Globals::BACKGROUND_BAR_COLOR);
+		
 		float currentHealth = static_cast<float>(m_health) / static_cast<float>(m_maximumHealth);
 		m_statbarSprite.render(m_position, windowSize, width, width * currentHealth, DEFAULT_HEALTH_BAR_HEIGHT, yOffset,
 			shaderHandler, camera, Globals::HEALTH_BAR_COLOR);
