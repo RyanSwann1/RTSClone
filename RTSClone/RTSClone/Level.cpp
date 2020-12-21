@@ -178,27 +178,29 @@ void Level::handleInput(const sf::Window& window, const Camera& camera, const sf
 		return;
 	}
 
-	if (currentSFMLEvent.type == sf::Event::MouseButtonPressed &&
-		currentSFMLEvent.mouseButton.button == sf::Mouse::Left)
+	if (currentSFMLEvent.type == sf::Event::MouseButtonPressed)
 	{
 		glm::vec3 mouseToGroundPosition = camera.getMouseToGroundPosition(window);
-		const Entity* selectedEntity = nullptr;
-		for (const auto& faction : m_factions)
+		if (currentSFMLEvent.mouseButton.button == sf::Mouse::Left)
 		{
-			if (faction)
+			const Entity* selectedEntity = nullptr;
+			for (const auto& faction : m_factions)
 			{
-				selectedEntity = faction->getEntity(mouseToGroundPosition);
-				if (selectedEntity)
-				{	
-					m_selectedTargetGUI.set(faction->getController(), selectedEntity->getID());
-					break;
+				if (faction)
+				{
+					selectedEntity = faction->getEntity(mouseToGroundPosition);
+					if (selectedEntity)
+					{
+						m_selectedTargetGUI.set(faction->getController(), selectedEntity->getID());
+						break;
+					}
 				}
 			}
-		}
 
-		if(!selectedEntity)
-		{
-			m_selectedTargetGUI.reset();
+			if (!selectedEntity)
+			{
+				m_selectedTargetGUI.reset();
+			}
 		}
 
 		for (auto& opposingFaction : m_factionHandler.getOpposingFactions(eFactionController::Player))
