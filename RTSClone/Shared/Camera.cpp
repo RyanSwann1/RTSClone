@@ -5,24 +5,24 @@
 namespace
 {
 #ifdef LEVEL_EDITOR
-	constexpr float MOVEMENT_SPEED = 15.0f;
-	constexpr float ZOOM_SPEED = 30.0f;
+	const float MOVEMENT_SPEED = 15.0f;
+	const float ZOOM_SPEED = 30.0f;
 #endif // LEVEL_EDITOR
 
 #ifdef GAME
-	constexpr float MOVEMENT_SPEED = 110.0f;
+	const float MOVEMENT_SPEED = 110.0f;
 	const float MOUSE_MOVEMENT_SPEED = 90.0f;
 #endif // GAME
 
-	constexpr int MAX_RAY_TO_GROUND_DISTANCE = 2500;
-	constexpr float MINIMUM_HEIGHT = 5.0f;
-	constexpr float SENSITIVITY = 4.0f;
-	constexpr float NEAR_PLANE_DISTANCE = 0.1f;
-	constexpr float FAR_PLANE_DISTANCE = 1750.0f;
-	constexpr float FIELD_OF_VIEW = 50.0f;
+	const int MAX_RAY_TO_GROUND_DISTANCE = 2500;
+	const float MINIMUM_HEIGHT = 5.0f;
+	const float SENSITIVITY = 4.0f;
+	const float NEAR_PLANE_DISTANCE = 0.1f;
+	const float FAR_PLANE_DISTANCE = 1750.0f;
+	const float FIELD_OF_VIEW = 50.0f;
 	const float MOUSE_MOVE_BOUNDARY = 0.95f;
-	constexpr glm::vec3 STARTING_POSITION = { 0.0f, 72.0f, 43.0f };
-	constexpr glm::vec3 STARTING_ROTATION = { -70.0f, 0.0f, 0.0f };
+	const glm::vec3 STARTING_POSITION = { 0.0f, 72.0f, 43.0f };
+	const glm::vec3 STARTING_ROTATION = { -70.0f, 0.0f, 0.0f };
 
 	glm::vec2 getNormalizedDeviceCoords(const sf::Window& window, const glm::ivec2& mousePosition)
 	{
@@ -58,9 +58,9 @@ namespace
 		return worldRay;
 	}
 
-	constexpr float ZOOM_STEP = 7.5f;
-	constexpr float MAXIMUM_ZOOM_HEIGHT = 25.0f;
-	constexpr float MINIMUM_ZOOM_HEIGHT = 150.0f;
+	const float ZOOM_STEP = 7.5f;
+	const float MAXIMUM_ZOOM_HEIGHT = 25.0f;
+	const float MINIMUM_ZOOM_HEIGHT = 150.0f;
 }
 
 Camera::Camera()

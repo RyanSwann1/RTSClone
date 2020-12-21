@@ -9,7 +9,7 @@
 
 namespace
 {
-	constexpr float TIME_BETWEEN_UNIT_STATE = 0.2f;
+	const float TIME_BETWEEN_UNIT_STATE = 0.2f;
 
 	int getActiveFactionCount(const FactionsContainer& factions)
 	{

@@ -14,13 +14,13 @@
 
 namespace
 {
-	constexpr float HARVEST_TIME = 2.0f;
-	constexpr float REPAIR_TIME = 3.5f;
-	constexpr float BUILD_TIME = 2.0f;
-	constexpr float MOVEMENT_SPEED = 7.5f;
-	constexpr int RESOURCE_CAPACITY = 30;
-	constexpr int RESOURCE_INCREMENT = 10;
-	constexpr float MINIMUM_REPAIR_DISTANCE = static_cast<float>(Globals::NODE_SIZE) * 4.0f;
+	const float HARVEST_TIME = 2.0f;
+	const float REPAIR_TIME = 3.5f;
+	const float BUILD_TIME = 2.0f;
+	const float MOVEMENT_SPEED = 7.5f;
+	const int RESOURCE_CAPACITY = 30;
+	const int RESOURCE_INCREMENT = 10;
+	const float MINIMUM_REPAIR_DISTANCE = static_cast<float>(Globals::NODE_SIZE) * 4.0f;
 
 	const float WORKER_PROGRESS_BAR_WIDTH = 60.0f;
 	const float WORKER_PROGRESS_BAR_YOFFSET = 30.0f;

@@ -13,19 +13,25 @@
 
 namespace
 {
-	constexpr float MOVEMENT_SPEED = 7.5f;
-	constexpr float UNIT_GRID_ATTACK_RANGE = 5.0f;
-	constexpr float UNIT_ATTACK_RANGE = UNIT_GRID_ATTACK_RANGE * Globals::NODE_SIZE;
-	constexpr float TIME_BETWEEN_ATTACK = 1.0f;
-	constexpr int DAMAGE = 1;
+	const float MOVEMENT_SPEED = 7.5f;
+	const float UNIT_GRID_ATTACK_RANGE = 5.0f;
+	const float UNIT_ATTACK_RANGE = UNIT_GRID_ATTACK_RANGE * Globals::NODE_SIZE;
+	const float TIME_BETWEEN_ATTACK = 1.0f;
+	const int DAMAGE = 1;
 
 #ifdef RENDER_PATHING
-	constexpr glm::vec3 PATH_COLOUR = { 1.0f, 0.27f, 0.0f };
-	constexpr float PATH_OPACITY = 0.25f;
+	const int CUBE_FACE_INDICIE_COUNT = 4;
+	const std::array<unsigned int, 6> CUBE_FACE_INDICIES =
+	{
+		0, 1, 2,
+		2, 3, 0
+	};
+	const glm::vec3 PATH_COLOUR = { 1.0f, 0.27f, 0.0f };
+	const float PATH_OPACITY = 0.25f;
 
 	void generateRenderPath(const std::vector<glm::vec3>& path, Mesh& mesh)
 	{
-		constexpr std::array<glm::vec3, 4> CUBE_FACE_TOP =
+		const std::array<glm::vec3, 4> CUBE_FACE_TOP =
 		{
 			glm::vec3(0.0f, 0.0f, Globals::NODE_SIZE),
 			glm::vec3(Globals::NODE_SIZE, 0.0f, Globals::NODE_SIZE),
@@ -47,12 +53,12 @@ namespace
 				mesh.vertices.emplace_back(position);
 			}
 
-			for (unsigned int i : Globals::CUBE_FACE_INDICIES)
+			for (unsigned int i : CUBE_FACE_INDICIES)
 			{
 				mesh.indices.push_back(i + elementCount);
 			}
 
-			elementCount += Globals::CUBE_FACE_INDICIE_COUNT;
+			elementCount += CUBE_FACE_INDICIE_COUNT;
 		}
 
 		mesh.attachToVAO();

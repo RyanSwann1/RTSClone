@@ -5,7 +5,7 @@
 
 namespace
 {
-	constexpr float SELECTED_MESH_AMPLIFIER = 1.75f;
+	const float SELECTED_MESH_AMPLIFIER = 1.75f;
 }
 
 Mesh::Mesh()

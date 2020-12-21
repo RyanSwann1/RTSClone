@@ -11,8 +11,8 @@
 #include <array>
 namespace
 {
-	constexpr glm::vec3 COLOR = { 1.0f, 0.0f, 0.0f };
-	constexpr float OPACITY = 0.2f;
+	const glm::vec3 COLOR = { 1.0f, 0.0f, 0.0f };
+	const float OPACITY = 0.2f;
 	void generateMesh(float left, float right, float back, float forward, Mesh& mesh)
 	{
 		mesh.vertices.clear();

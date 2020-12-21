@@ -23,17 +23,17 @@
 
 namespace
 {
-	constexpr float DELAY_TIMER_EXPIRATION = 2.0f;
-	constexpr float IDLE_TIMER_EXPIRATION = 1.0f;
-	constexpr float MIN_SPAWN_TIMER_EXPIRATION = 7.5f;
-	constexpr float MAX_SPAWN_TIMER_EXPIRATION = 15.0f;
-	constexpr int STARTING_WORKER_COUNT = 2;
-	constexpr int STARTING_UNIT_COUNT = 1;
-	constexpr float MAX_DISTANCE_FROM_HQ = static_cast<float>(Globals::NODE_SIZE) * 18.0f;
-	constexpr float MIN_DISTANCE_FROM_HQ = static_cast<float>(Globals::NODE_SIZE) * 3.0f;
-	constexpr float DISTANCE_FROM_MINERALS = static_cast<float>(Globals::NODE_SIZE) * 6.0f;
+	const float DELAY_TIMER_EXPIRATION = 2.0f;
+	const float IDLE_TIMER_EXPIRATION = 1.0f;
+	const float MIN_SPAWN_TIMER_EXPIRATION = 7.5f;
+	const float MAX_SPAWN_TIMER_EXPIRATION = 15.0f;
+	const int STARTING_WORKER_COUNT = 2;
+	const int STARTING_UNIT_COUNT = 1;
+	const float MAX_DISTANCE_FROM_HQ = static_cast<float>(Globals::NODE_SIZE) * 18.0f;
+	const float MIN_DISTANCE_FROM_HQ = static_cast<float>(Globals::NODE_SIZE) * 3.0f;
+	const float DISTANCE_FROM_MINERALS = static_cast<float>(Globals::NODE_SIZE) * 6.0f;
 
-	constexpr int MAX_WORKERS_REPAIR_BUILDING = 2;
+	const int MAX_WORKERS_REPAIR_BUILDING = 2;
 }
 
 //AIAction

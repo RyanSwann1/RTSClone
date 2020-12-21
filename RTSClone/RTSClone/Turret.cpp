@@ -10,11 +10,11 @@
 
 namespace
 {
-	constexpr int TURRET_STARTING_HEALTH = 5;
-	constexpr int TURRET_DAMAGE = 2;
-	constexpr float TURRET_ATTACK_RANGE = Globals::NODE_SIZE * 7.0f;
-	constexpr float TIME_BETWEEN_ATTACK = 2.25f;
-	constexpr float TIME_BETWEEN_IDLE_CHECK = 1.0f;
+	const int TURRET_STARTING_HEALTH = 5;
+	const int TURRET_DAMAGE = 2;
+	const float TURRET_ATTACK_RANGE = Globals::NODE_SIZE * 7.0f;
+	const float TIME_BETWEEN_ATTACK = 2.25f;
+	const float TIME_BETWEEN_IDLE_CHECK = 1.0f;
 }
 
 Turret::Turret(const glm::vec3& startingPosition, const Faction& owningFaction)

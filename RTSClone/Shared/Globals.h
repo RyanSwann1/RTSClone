@@ -22,40 +22,40 @@ namespace Globals
 	inline const std::string TEXT_HEADER_MAP_SIZE = TEXT_HEADER_BEGINNING + "Map Size";
 	inline const std::string TEXT_HEADER_FACTION_STARTING_RESOURCE = TEXT_HEADER_BEGINNING + "Faction Starting Resources";
 	inline const std::string TEXT_HEADER_FACTION_STARTING_POPULATION = TEXT_HEADER_BEGINNING + "Faction Starting Population";
-	constexpr glm::vec3 TERRAIN_POSITION = { 0.0f, -0.01f, 0.0f };
-	constexpr size_t MAX_LEVELS = 5;
-	constexpr unsigned int INVALID_OPENGL_ID = 0;
-	constexpr float GROUND_HEIGHT = 0.0f;
-	constexpr int MAP_SIZE = 30;
-	constexpr int NODE_SIZE = 6;
-	constexpr int INVALID_ENTITY_ID = -1;
-	constexpr size_t MAX_MINERALS_PER_FACTION = 5;
-	constexpr int MIN_FACTIONS = 2;
-	constexpr int MAX_FACTIONS = 4;
-	constexpr glm::vec3 PLAYER_MATERIAL_DIFFUSE = { 1.0f, 0.2f, 0.2f };
-	constexpr glm::vec3 AI_1_MATERIAL_DIFFUSE = { 0.2f, 0.2f, 1.0f };
-	constexpr glm::vec3 AI_2_MATERIAL_DIFFUSE = { 1.0f, 1.0f, 0.2f };
-	constexpr glm::vec3 AI_3_MATERIAL_DIFFUSE = { 0.2f, 1.0f, 0.2f };
+	const glm::vec3 TERRAIN_POSITION = { 0.0f, -0.01f, 0.0f };
+	const size_t MAX_LEVELS = 5;
+	const unsigned int INVALID_OPENGL_ID = 0;
+	const float GROUND_HEIGHT = 0.0f;
+	const int MAP_SIZE = 30;
+	const int NODE_SIZE = 6;
+	const int INVALID_ENTITY_ID = -1;
+	const size_t MAX_MINERALS_PER_FACTION = 5;
+	const int MIN_FACTIONS = 2;
+	const int MAX_FACTIONS = 4;
+	const glm::vec3 PLAYER_MATERIAL_DIFFUSE = { 1.0f, 0.2f, 0.2f };
+	const glm::vec3 AI_1_MATERIAL_DIFFUSE = { 0.2f, 0.2f, 1.0f };
+	const glm::vec3 AI_2_MATERIAL_DIFFUSE = { 1.0f, 1.0f, 0.2f };
+	const glm::vec3 AI_3_MATERIAL_DIFFUSE = { 0.2f, 1.0f, 0.2f };
 	inline const std::string FACTION_MATERIAL_NAME_ID = "metal";
 
-	constexpr int HQ_STARTING_HEALTH = 25;
-	constexpr int BARRACKS_STARTING_HEALTH = 10;
-	constexpr int SUPPLY_DEPOT_STARTING_HEALTH = 10;
-	constexpr int UNIT_STARTING_HEALTH = 5;
-	constexpr int WORKER_STARTING_HEALTH = 2;
-	constexpr int LABORATORY_STARTING_HEALTH = 10;
+	const int HQ_STARTING_HEALTH = 25;
+	const int BARRACKS_STARTING_HEALTH = 10;
+	const int SUPPLY_DEPOT_STARTING_HEALTH = 10;
+	const int UNIT_STARTING_HEALTH = 5;
+	const int WORKER_STARTING_HEALTH = 2;
+	const int LABORATORY_STARTING_HEALTH = 10;
 
-	constexpr int STARTING_RESOURCES = 1500;
-	constexpr int STARTING_POPULATION = 50;
-	constexpr int WORKER_RESOURCE_COST = 50;
-	constexpr int SUPPLY_DEPOT_RESOURCE_COST = 50;
-	constexpr int BARRACKS_RESOURCE_COST = 50;
-	constexpr int UNIT_RESOURCE_COST = 100;
-	constexpr int WORKER_POPULATION_COST = 1;
-	constexpr int UNIT_POPULATION_COST = 2;
-	constexpr int TURRET_RESOURCE_COST = 50;
-	constexpr int POPULATION_INCREMENT = 5;
-	constexpr int LABORATORY_RESOURCE_COST = 100;
+	const int STARTING_RESOURCES = 1500;
+	const int STARTING_POPULATION = 50;
+	const int WORKER_RESOURCE_COST = 50;
+	const int SUPPLY_DEPOT_RESOURCE_COST = 50;
+	const int BARRACKS_RESOURCE_COST = 50;
+	const int UNIT_RESOURCE_COST = 100;
+	const int WORKER_POPULATION_COST = 1;
+	const int UNIT_POPULATION_COST = 2;
+	const int TURRET_RESOURCE_COST = 50;
+	const int POPULATION_INCREMENT = 5;
+	const int LABORATORY_RESOURCE_COST = 100;
 
 	const float WORKER_STAT_BAR_WIDTH = 60.0f;
 	const float UNIT_STAT_BAR_WIDTH = 75.0f;
@@ -65,8 +65,8 @@ namespace Globals
 	const float TURRET_STAT_BAR_WIDTH = 100.0f;
 	const float LABORATORY_STAT_BAR_WIDTH = 150.0f;
 
-	constexpr int MAX_FACTION_SHIELD_AMOUNT = 5;
-	constexpr int FACTION_SHIELD_INCREASE_COST = 100;
+	const int MAX_FACTION_SHIELD_AMOUNT = 5;
+	const int FACTION_SHIELD_INCREASE_COST = 100;
 
 	const glm::vec3 PROGRESS_BAR_COLOR = { 1.0f, 1.0f, 0.4f };
 	const float DEFAULT_PROGRESS_BAR_HEIGHT = 5.0f;
@@ -77,13 +77,6 @@ namespace Globals
 	inline const TypeComparison<eEntityType> UNIT_TYPES({ eEntityType::Unit, eEntityType::Worker });
 	inline const TypeComparison<eEntityType> ATTACKING_ENTITY_TYPES({ eEntityType::Unit, eEntityType::Turret });
 #endif // GAME
-
-	constexpr int CUBE_FACE_INDICIE_COUNT = 4;
-	constexpr std::array<unsigned int, 6> CUBE_FACE_INDICIES =
-	{
-		0, 1, 2,
-		2, 3, 0
-	};
 
 	inline void print(const std::string& text)
 	{

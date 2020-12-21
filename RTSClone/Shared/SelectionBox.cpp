@@ -17,7 +17,7 @@ namespace
         };
     };
 
-    constexpr float MINIMUM_SIZE = 1.5f;
+    const float MINIMUM_SIZE = 1.5f;
 };
 
 SelectionBox::SelectionBox()
