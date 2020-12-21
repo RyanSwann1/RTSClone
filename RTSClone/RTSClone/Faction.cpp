@@ -33,7 +33,7 @@ Faction::Faction(eFactionController factionController, const glm::vec3& hqStarti
     m_workers(),
     m_supplyDepots(),
     m_barracks(),
-    m_laboratories(),
+    m_laboratory(),
     m_HQ(Globals::convertToNodePosition(hqStartingPosition), *this),
     m_controller(factionController),
     m_currentResourceAmount(startingResources),
@@ -333,15 +333,15 @@ void Faction::addResources(Worker& worker)
 
 void Faction::increaseShield()
 {
-    assert(m_currentShieldAmount < Globals::MAX_FACTION_SHIELD_AMOUNT);
+    assert(m_laboratory && m_currentShieldAmount < Globals::MAX_FACTION_SHIELD_AMOUNT);
     if (isAffordable(Globals::FACTION_SHIELD_INCREASE_COST))
     {
-        for (auto& laboratory : m_laboratories)
+        std::vector<Entity*>& allEntities = m_allEntities;
+        int& currentResourcesAmount = m_currentResourceAmount;
+        int& currentShieldAmount = m_currentShieldAmount;
+        m_laboratory->addIncreaseShieldCommand([&allEntities, &currentResourcesAmount, &currentShieldAmount, this]()
         {
-            std::vector<Entity*>& allEntities = m_allEntities;
-            int& currentResourcesAmount = m_currentResourceAmount;
-            int& currentShieldAmount = m_currentShieldAmount;
-            laboratory.addIncreaseShieldCommand([&allEntities, &currentResourcesAmount, &currentShieldAmount, this]()
+            if (this->isAffordable(Globals::FACTION_SHIELD_INCREASE_COST))
             {
                 ++currentShieldAmount;
                 currentResourcesAmount -= Globals::FACTION_SHIELD_INCREASE_COST;
@@ -350,8 +350,8 @@ void Faction::increaseShield()
                 {
                     entity->increaseMaximumShield(*this);
                 }
-            });
-        }
+            }
+        });
     }
 }
 
@@ -452,9 +452,9 @@ void Faction::update(float deltaTime, const Map& map, FactionHandler& factionHan
         supplyDepot.update(deltaTime);
     }
 
-    for (auto& laboratory : m_laboratories)
+    if (m_laboratory)
     {
-        laboratory.update(deltaTime);
+        m_laboratory->update(deltaTime);
     }
 
     m_HQ.update(deltaTime);
@@ -500,9 +500,9 @@ void Faction::render(ShaderHandler& shaderHandler) const
         turret.render(shaderHandler, m_controller);
     }
     
-    for (const auto& laboratory : m_laboratories)
+    if (m_laboratory)
     {
-        laboratory.render(shaderHandler, m_controller);
+        m_laboratory->render(shaderHandler, m_controller);
     }
 }
 
@@ -653,8 +653,11 @@ const Entity* Faction::spawnBuilding(const Map& map, glm::vec3 position, eEntity
             addedBuilding = &m_turrets.front();
             break;
         case eEntityType::Laboratory:
-            m_laboratories.emplace_front(position, *this);
-            addedBuilding = &m_laboratories.front();
+            if (!m_laboratory)
+            {
+                m_laboratory = std::make_unique<Laboratory>(position, *this);
+                addedBuilding = m_laboratory.get();
+            }
             break;
         default:
             assert(false);

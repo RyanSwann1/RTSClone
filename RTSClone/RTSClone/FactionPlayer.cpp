@@ -433,7 +433,10 @@ void FactionPlayer::onLeftClick(const sf::Window& window, const Camera& camera, 
         selectEntity<Barracks>(m_barracks, mouseToGroundPosition);
         selectEntity<Turret>(m_turrets, mouseToGroundPosition);
         selectEntity<SupplyDepot>(m_supplyDepots, mouseToGroundPosition);
-        selectEntity<Laboratory>(m_laboratories, mouseToGroundPosition);
+        if (m_laboratory)
+        {
+            m_laboratory->setSelected(m_laboratory->getAABB().contains(mouseToGroundPosition));
+        }
         m_HQ.setSelected(m_HQ.getAABB().contains(mouseToGroundPosition));
     }
 }
