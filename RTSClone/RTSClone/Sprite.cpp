@@ -62,15 +62,17 @@ Sprite::~Sprite()
 	onDestroy();
 }
 
-void Sprite::render(const glm::vec3& position, glm::uvec2 windowSize, float width, float height, float yOffset, 
+void Sprite::render(const glm::vec3& position, glm::uvec2 windowSize, float originalWidth, float spriteWidth, float height, float yOffset, 
 	ShaderHandler& shaderHandler, const Camera& camera, const glm::vec3& materialColor) const
 {
-	glm::vec4 positionNDC = camera.getProjection(glm::ivec2(windowSize.x, windowSize.y)) * camera.getView() * glm::vec4(position, 1.0f);
+	glm::vec4 positionNDC = camera.getProjection(glm::ivec2(windowSize.x, windowSize.y)) * camera.getView() * 
+		glm::vec4(position, 1.0f);
 	positionNDC /= positionNDC.w;
 
+	float originalWidthNDC = originalWidth / windowSize.x * 2.0f;
 	std::array<glm::vec2, QUAD_VERTEX_COUNT> quad = getQuadCoords(
-		glm::vec2(positionNDC),
-		width / windowSize.x * 2.0f,
+		glm::vec2(positionNDC.x - originalWidthNDC / 2.0f, positionNDC.y),
+		spriteWidth / windowSize.x * 2.0f,
 		height / windowSize.y * 2.0f,
 		yOffset / windowSize.y * 2.0f);
 

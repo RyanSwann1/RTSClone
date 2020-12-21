@@ -13,7 +13,7 @@ public:
 	Sprite& operator=(Sprite&&) noexcept;
 	~Sprite();
 
-	void render(const glm::vec3& position, glm::uvec2 windowSize, float width, float height, float yOffset,
+	void render(const glm::vec3& position, glm::uvec2 windowSize, float originalWidth, float spriteWidth, float height, float yOffset,
 		ShaderHandler& shaderHandler, const Camera& camera, const glm::vec3& materialColor) const;
 
 private:
