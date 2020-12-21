@@ -48,7 +48,7 @@ Entity::Entity(const Model& model, const glm::vec3& startingPosition, eEntityTyp
 	m_maximumShield(shield),
 	m_shield(m_maximumShield),
 	m_maximumHealth(health),
-	m_health(health),
+	m_health(2),
 	m_type(entityType),
 	m_shieldReplenishTimer(SHIELD_REPLENISH_TIMER_EXPIRATION, true),
 	m_model(model),

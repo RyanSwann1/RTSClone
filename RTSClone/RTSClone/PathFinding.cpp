@@ -529,7 +529,6 @@ glm::vec3 PathFinding::getRandomAvailablePositionOutsideAABB(const Entity& sende
 glm::vec3 PathFinding::getClosestPositionToAABB(const glm::vec3& entityPosition, const AABB& AABB, const Map& map)
 {
 	glm::vec3 centrePositionAABB = AABB.getCenterPosition();
-	glm::vec3 closestPosition = centrePositionAABB;
 	glm::vec3 direction = { 0.0f, 0.0f, 0.0f };
 	if (entityPosition == centrePositionAABB)
 	{
@@ -540,6 +539,7 @@ glm::vec3 PathFinding::getClosestPositionToAABB(const glm::vec3& entityPosition,
 		direction = glm::normalize(entityPosition - centrePositionAABB);
 	}
 
+	glm::vec3 closestPosition = centrePositionAABB;
 	glm::vec3 position = centrePositionAABB;
 	for (int ray = 1; ray <= Globals::NODE_SIZE * 7; ++ray)
 	{

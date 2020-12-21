@@ -307,7 +307,7 @@ void FactionPlayer::moveSingularSelectedUnit(const glm::vec3& mouseToGroundPosit
             if (selectedEntity != m_allEntities.cend() &&
                 (*selectedEntity)->getHealth() < (*selectedEntity)->getMaximumHealth())
             {
-                selectedWorker.setBuildingToRepair(*(*selectedEntity), map);
+                selectedWorker.setEntityToRepair(*(*selectedEntity), map);
             }
             else
             {
@@ -364,7 +364,7 @@ void FactionPlayer::moveMultipleSelectedUnits(const glm::vec3& mouseToGroundPosi
                     glm::vec3 destination = PathFinding::getInstance().getClosestPositionToAABB(selectedUnit->getPosition(),
                         (*selectedEntity)->getAABB(), map);
 
-                    static_cast<Worker&>(*selectedUnit).setBuildingToRepair(*(*selectedEntity), map);
+                    static_cast<Worker&>(*selectedUnit).setEntityToRepair(*(*selectedEntity), map);
                 }
             }
         }

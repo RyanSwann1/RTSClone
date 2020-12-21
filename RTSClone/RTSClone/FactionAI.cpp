@@ -233,7 +233,7 @@ void FactionAI::instructWorkersToRepair(const HQ& HQ, const Map& map)
 		}
 		else
 		{
-			worker.setBuildingToRepair(HQ, map);
+			worker.setEntityToRepair(HQ, map);
 		}
 	}
 }

@@ -85,19 +85,16 @@ int Worker::extractResources()
 	return resources;
 }
 
-void Worker::setBuildingToRepair(const Entity& building, const Map& map)
+void Worker::setEntityToRepair(const Entity& building, const Map& map)
 {
 	assert(Globals::BUILDING_TYPES.isMatch(building.getEntityType()));
 	
 	m_repairTargetEntityID = building.getID();
 
-	if (Globals::getSqrDistance(building.getPosition(), m_position) > MINIMUM_REPAIR_DISTANCE * MINIMUM_REPAIR_DISTANCE)
-	{
-		moveTo(PathFinding::getInstance().getClosestPositionToAABB(building.getPosition(),
-			building.getAABB(), map),
-			map, [&](const glm::ivec2& position) { return getAdjacentPositions(position, map); },
-			eUnitState::MovingToRepairPosition);
-	}
+	moveTo(PathFinding::getInstance().getClosestPositionToAABB(m_position,
+		building.getAABB(), map),
+		map, [&](const glm::ivec2& position) { return getAdjacentPositions(position, map); },
+		eUnitState::MovingToRepairPosition);
 }
 
 bool Worker::build(const std::function<const Entity*()>& buildingCommand, const glm::vec3& buildPosition, const Map& map)
