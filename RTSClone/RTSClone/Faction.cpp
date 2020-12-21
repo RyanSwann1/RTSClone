@@ -5,29 +5,11 @@
 #include "TypeComparison.h"
 #include "FactionHandler.h"
 
-namespace
-{
-    std::vector<Mineral> initializeMinerals(
-        const std::vector<glm::vec3>& mineralPositions)
-    {
-        std::vector<Mineral> minerals(mineralPositions.begin(), mineralPositions.end());
-        minerals.reserve(mineralPositions.size());
-        for (const auto& position : mineralPositions)
-        {
-            minerals.emplace_back(position);
-        }
-
-        return minerals;
-    };
-
-    const float SHIELD_REPLENISH_TIMER_EXPIRATION = 15.0f;
-}
-
 Faction::Faction(eFactionController factionController, const glm::vec3& hqStartingPosition, 
     const std::vector<glm::vec3>& mineralPositions, int startingResources,
     int startingPopulationCap)
     : m_plannedBuildings(),
-    m_minerals(mineralPositions.cbegin(), mineralPositions.cend()),// initializeMinerals(mineralPositions)),
+    m_minerals(mineralPositions.cbegin(), mineralPositions.cend()),
     m_allEntities(),
     m_units(),
     m_workers(),
@@ -39,8 +21,7 @@ Faction::Faction(eFactionController factionController, const glm::vec3& hqStarti
     m_currentResourceAmount(startingResources),
     m_currentPopulationAmount(0),
     m_currentPopulationLimit(startingPopulationCap),
-    m_currentShieldAmount(0),
-    m_shieldReplenishTimer(SHIELD_REPLENISH_TIMER_EXPIRATION, true)
+    m_currentShieldAmount(0)
 {
     m_allEntities.push_back(&m_HQ);
 }
@@ -253,6 +234,15 @@ void Faction::handleEvent(const GameEvent& gameEvent, const Map& map, FactionHan
                 if ((*entity)->isDead())
                 {
                     removeEntity<Turret>(m_turrets, targetID, entity);
+                }
+                break;
+            case eEntityType::Laboratory:
+                (*entity)->reduceHealth(gameEvent.data.takeDamage);
+                if ((*entity)->isDead())
+                {
+                    m_allEntities.erase(entity);
+                    assert(m_laboratory);
+                    m_laboratory.reset();
                 }
                 break;
             default:
