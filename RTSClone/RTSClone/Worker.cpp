@@ -20,7 +20,7 @@ namespace
 	const float MOVEMENT_SPEED = 7.5f;
 	const int RESOURCE_CAPACITY = 30;
 	const int RESOURCE_INCREMENT = 10;
-	const float MINIMUM_REPAIR_DISTANCE = static_cast<float>(Globals::NODE_SIZE) * 4.0f;
+	const float REPAIR_DISTANCE = static_cast<float>(Globals::NODE_SIZE);
 
 	const float WORKER_PROGRESS_BAR_WIDTH = 60.0f;
 	const float WORKER_PROGRESS_BAR_YOFFSET = 30.0f;
@@ -85,16 +85,19 @@ int Worker::extractResources()
 	return resources;
 }
 
-void Worker::setEntityToRepair(const Entity& building, const Map& map)
+void Worker::setEntityToRepair(const Entity& entity, const Map& map)
 {
-	assert(Globals::BUILDING_TYPES.isMatch(building.getEntityType()));
-	
-	m_repairTargetEntityID = building.getID();
+	m_repairTargetEntityID = entity.getID();
+	m_repairTimer.resetElaspedTime();
 
 	moveTo(PathFinding::getInstance().getClosestPositionToAABB(m_position,
-		building.getAABB(), map),
+		entity.getAABB(), map),
 		map, [&](const glm::ivec2& position) { return getAdjacentPositions(position, map); },
 		eUnitState::MovingToRepairPosition);
+	if (m_pathToPosition.empty())
+	{
+		switchToState(eUnitState::Repairing, map);
+	}
 }
 
 bool Worker::build(const std::function<const Entity*()>& buildingCommand, const glm::vec3& buildPosition, const Map& map)
@@ -136,7 +139,6 @@ void Worker::update(float deltaTime, const UnitSpawnerBuilding& HQ, const Map& m
 			{
 				glm::vec3 destination = PathFinding::getInstance().getClosestPositionToAABB(m_position,
 					m_mineralToHarvest->getAABB(), map);
-
 				moveTo(destination, map, [&](const glm::ivec2& position) { return getAdjacentPositions(position, map); },
 					eUnitState::MovingToMinerals, m_mineralToHarvest);
 			}
@@ -167,7 +169,7 @@ void Worker::update(float deltaTime, const UnitSpawnerBuilding& HQ, const Map& m
 
 			glm::vec3 destination = PathFinding::getInstance().getClosestPositionToAABB(m_position,
 				HQ.getAABB(), map);
-			moveTo(destination, map, [&](const glm::ivec2& position) { return getAdjacentPositions(position, map); }, 
+			moveTo(destination, map, [&](const glm::ivec2& position) { return getAdjacentPositions(position, map); },
 				eUnitState::ReturningMineralsToHQ);
 		}
 		break;
@@ -211,7 +213,7 @@ void Worker::update(float deltaTime, const UnitSpawnerBuilding& HQ, const Map& m
 		{
 			if (newBuilding)
 			{
-				moveTo(PathFinding::getInstance().getRandomAvailablePositionOutsideAABB(*this, map), 
+				moveTo(PathFinding::getInstance().getRandomAvailablePositionOutsideAABB(*this, map),
 					map, [&](const glm::ivec2& position) { return getAllAdjacentPositions(position, map); });
 			}
 			else
@@ -220,8 +222,7 @@ void Worker::update(float deltaTime, const UnitSpawnerBuilding& HQ, const Map& m
 			}
 		}
 	}
-
-		break;
+	break;
 	case eUnitState::MovingToRepairPosition:
 		if (m_pathToPosition.empty())
 		{
@@ -233,17 +234,50 @@ void Worker::update(float deltaTime, const UnitSpawnerBuilding& HQ, const Map& m
 		m_repairTimer.setActive(true);
 		m_repairTimer.update(deltaTime);
 		if (m_repairTimer.isExpired())
-		{	
+		{
 			m_repairTimer.resetElaspedTime();
-
-			assert(factionHandler.isFactionActive(m_owningFaction.getController()));
-			const Entity* targetEntity = factionHandler.getFaction(m_owningFaction.getController()).getEntity(m_repairTargetEntityID);
-			if (targetEntity && targetEntity->getHealth() < targetEntity->getMaximumHealth())
+			const Entity* targetEntity = m_owningFaction.getEntity(m_repairTargetEntityID);
+			if (targetEntity)
 			{
-				m_rotation.y = Globals::getAngle(targetEntity->getPosition(), m_position);
-				
-				GameEventHandler::getInstance().gameEvents.push(GameEvent::createRepairEntity(
-					m_owningFaction.getController(), m_repairTargetEntityID));
+				if (Globals::getSqrDistance(targetEntity->getPosition(), m_position) > REPAIR_DISTANCE * REPAIR_DISTANCE)
+				{
+					setEntityToRepair(*targetEntity, map);
+				}
+				else if (targetEntity->getHealth() + 1 <= targetEntity->getMaximumHealth())
+				{
+					m_rotation.y = Globals::getAngle(targetEntity->getPosition(), m_position);
+
+					GameEventHandler::getInstance().gameEvents.push(GameEvent::createRepairEntity(
+						m_owningFaction.getController(), m_repairTargetEntityID));
+				}
+				else
+				{
+					m_repairTimer.setActive(false);
+					switchToState(eUnitState::Idle, map);
+					m_repairTargetEntityID = Globals::INVALID_ENTITY_ID;
+				}
+			}
+			else
+			{
+				m_repairTimer.setActive(false);
+				switchToState(eUnitState::Idle, map);
+				m_repairTargetEntityID = Globals::INVALID_ENTITY_ID;
+			}
+		}
+		else if (unitStateHandlerTimer.isExpired())
+		{
+			const Entity* targetEntity = m_owningFaction.getEntity(m_repairTargetEntityID);
+			if (targetEntity)
+			{
+				if (Globals::getSqrDistance(targetEntity->getPosition(), m_position) > REPAIR_DISTANCE * REPAIR_DISTANCE)
+				{
+					setEntityToRepair(*targetEntity, map);
+					break;
+				}
+				else
+				{
+					m_rotation.y = Globals::getAngle(targetEntity->getPosition(), m_position);
+				}
 			}
 			else
 			{
