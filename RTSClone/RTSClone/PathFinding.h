@@ -8,6 +8,7 @@
 #include "Map.h"
 #include "PriorityQueue.h"
 #include "Graph.h"
+#include "Worker.h"
 #include <vector>
 #include <queue>
 #include <array>
@@ -39,9 +40,8 @@ public:
 	template <class Entity>
 	glm::vec3 getClosestAvailablePosition(const Entity& currentEntity, const std::forward_list<Entity>& entities, const Map& map) const
 	{
-		assert(currentEntity.getCurrentState() == eUnitState::Idle);
 		constexpr float MAX_RAY_DISTANCE = static_cast<float>(Globals::NODE_SIZE) * 10.0f;
-		constexpr std::array<glm::ivec2, 4> DIRECTIONS_ON_GRID =
+		const std::array<glm::ivec2, 4> DIRECTIONS_ON_GRID =
 		{
 			glm::ivec2(0, 1),
 			glm::ivec2(1, 0),
@@ -60,13 +60,30 @@ public:
 				position = position + glm::normalize(glm::vec3(direction.x, Globals::GROUND_HEIGHT, direction.y)) * ray;
 
 				bool collision = false;
-				for (const auto& otherEntities : entities)
+				for (const auto& otherEntity : entities)
 				{
-					if (&currentEntity == &otherEntities || otherEntities.getCurrentState() != eUnitState::Idle)
+					switch (otherEntity.getEntityType())
+					{
+					case eEntityType::Unit:
+						if (!dynamic_cast<const Unit&>(otherEntity).getPathToPosition().empty())
+						{
+							continue;
+						}
+						break;
+					case eEntityType::Worker:
+						if (!dynamic_cast<const Worker&>(otherEntity).getPathToPosition().empty())
+						{
+							continue;
+						}
+						break;
+					default:
+						assert(false);
+					}
+					if (&currentEntity == &otherEntity)
 					{
 						continue;
 					}
-					else if (otherEntities.getAABB().contains(position) || map.isPositionOccupied(position))
+					else if (otherEntity.getAABB().contains(position) || map.isPositionOccupied(position))
 					{
 						collision = true;
 						break;
@@ -90,8 +107,8 @@ public:
 	bool isBuildingSpawnAvailable(const glm::vec3& startingPosition, const Model& model, const Map& map,
 		glm::vec3& buildPosition, float minDistanceFromHQ, float maxDistanceFromHQ, float distanceFromMinerals, const Faction& owningFaction);
 
-	bool isUnitPositionAvailable(const glm::vec3& position, const Unit& senderUnit, FactionHandler& factionHandler) const;
-	bool isUnitPositionUnique(const Unit& senderUnit, FactionHandler& factionHandler) const;
+	bool isUnitPositionAvailable(const glm::vec3& position, const Entity& entity, FactionHandler& factionHandler, 
+		const Faction& owningFaction) const;
 
 	bool isTargetInLineOfSight(const glm::vec3& startingPosition, const Entity& targetEntity, const Map& map) const;
 	bool isTargetInLineOfSight(const glm::vec3& startingPosition, const Entity& targetEntity, const Map& map, const AABB& senderAABB) const;
@@ -109,11 +126,12 @@ public:
 	bool setUnitAttackPosition(const Unit& unit, const Entity& targetEntity, std::vector<glm::vec3>& pathToPosition,
 		const Map& map, FactionHandler& factionHandler);
 
-	void getPathToPosition(const Unit& unit, const glm::vec3& destination, std::vector<glm::vec3>& pathToPosition,
-		const AdjacentPositions& adjacentPositions, const Map& map, FactionHandler& factionHandler);
+	void getPathToPosition(const Entity& entity, const glm::vec3& destination, std::vector<glm::vec3>& pathToPosition,
+		const AdjacentPositions& adjacentPositions, const Map& map, FactionHandler& factionHandler,
+		const Faction& owningFaction);
 
-	void getPathToPosition(const Unit& unit, const glm::vec3& destination, std::vector<glm::vec3>& pathToPosition,
-		const AdjacentPositions& adjacentPositions, const Map& map);
+	void getPathToPosition(const Entity& entity, const glm::vec3& destination, std::vector<glm::vec3>& pathToPosition,
+		const AdjacentPositions& adjacentPositions, const Map& map, const Faction& owningFaction);
 
 private:
 	PathFinding();

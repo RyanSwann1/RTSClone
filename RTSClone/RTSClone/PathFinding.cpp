@@ -95,7 +95,7 @@ namespace
 		}
 	}
 
-	void convertPathToWaypoints(std::vector<glm::vec3>& pathToPosition, const Unit& unit, const Map& map)
+	void convertPathToWaypoints(std::vector<glm::vec3>& pathToPosition, const Entity& entity, const Map& map)
 	{
 		if (pathToPosition.size() <= size_t(1))
 		{
@@ -104,7 +104,7 @@ namespace
 
 		std::queue<glm::vec3> positionsToKeep;
 		int positionIndex = 0;
-		glm::vec3 startingPosition = unit.getPosition();
+		glm::vec3 startingPosition = entity.getPosition();
 		while (startingPosition != pathToPosition.front() &&
 			positionIndex < pathToPosition.size())
 		{
@@ -156,8 +156,8 @@ namespace
 		}
 	}
 
-	void convertPathToWaypoints(std::vector<glm::vec3>& pathToPosition, const Unit& unit, FactionHandler& factionHandler,
-		const Map& map)
+	void convertPathToWaypoints(std::vector<glm::vec3>& pathToPosition, const Entity& entity, FactionHandler& factionHandler,
+		const Map& map, const Faction& owningFaction)
 	{
 		if (pathToPosition.size() <= size_t(1))
 		{
@@ -166,7 +166,7 @@ namespace
 
 		std::queue<glm::vec3> positionsToKeep;
 		int positionIndex = 0;
-		glm::vec3 startingPosition = unit.getPosition();
+		glm::vec3 startingPosition = entity.getPosition();
 		while (startingPosition != pathToPosition.front() && 
 			positionIndex < pathToPosition.size())
 		{
@@ -180,7 +180,7 @@ namespace
 			{
 				position = position + glm::normalize(targetPosition - startingPosition) * step;
 
-				if (!PathFinding::getInstance().isUnitPositionAvailable(position, unit, factionHandler) || map.isPositionOccupied(position))
+				if (!PathFinding::getInstance().isUnitPositionAvailable(position, entity, factionHandler, owningFaction) || map.isPositionOccupied(position))
 				{
 					collision = true;
 					break;
@@ -299,15 +299,10 @@ bool PathFinding::isBuildingSpawnAvailable(const glm::vec3& startingPosition, co
 	return foundBuildPosition;
 }
 
-bool PathFinding::isUnitPositionAvailable(const glm::vec3& position, const Unit& senderUnit, FactionHandler& factionHandler) const
+bool PathFinding::isUnitPositionAvailable(const glm::vec3& position, const Entity& entity, FactionHandler& factionHandler, 
+	const Faction& owningFaction) const
 {
-	//glm::vec3 middlePosition = position;
-	//if (!Globals::isOnMiddlePosition(position))
-	//{
-	//	middlePosition = Globals::convertToMiddleGridPosition(position);
-	//}
-	//assert(Globals::isOnMiddlePosition(position));
-	for (const auto& opposingFaction : factionHandler.getOpposingFactions(senderUnit.getOwningFactionController()))
+	for (const auto& opposingFaction : factionHandler.getOpposingFactions(owningFaction.getController()))
 	{
 		auto unit = std::find_if(opposingFaction.get().getUnits().cbegin(), opposingFaction.get().getUnits().cend(), [&position](const auto& unit)
 		{
@@ -326,9 +321,8 @@ bool PathFinding::isUnitPositionAvailable(const glm::vec3& position, const Unit&
 		}
 	}
 
-	assert(factionHandler.isFactionActive(senderUnit.getOwningFactionController()));
-	const Faction& owningFaction = factionHandler.getFaction(senderUnit.getOwningFactionController());
-	int senderUnitID = senderUnit.getID();
+	assert(factionHandler.isFactionActive(owningFaction.getController()));
+	int senderUnitID = entity.getID();
 	auto unit = std::find_if(owningFaction.getUnits().cbegin(), owningFaction.getUnits().cend(), [&position, senderUnitID](const auto& unit)
 	{
 		if (!unit.getPathToPosition().empty())
@@ -339,37 +333,6 @@ bool PathFinding::isUnitPositionAvailable(const glm::vec3& position, const Unit&
 		{
 			return unit.getID() != senderUnitID && unit.getAABB().contains(position);
 		}
-	});
-	if (unit != owningFaction.getUnits().cend())
-	{
-		return false;
-	}
-
-	return true;
-}
-
-bool PathFinding::isUnitPositionUnique(const Unit& senderUnit, FactionHandler& factionHandler) const
-{
-	glm::vec3 position = senderUnit.getPosition();
-	assert(Globals::isOnMiddlePosition(position));
-	for (const auto& opposingFaction : factionHandler.getOpposingFactions(senderUnit.getOwningFactionController()))
-	{
-		auto unit = std::find_if(opposingFaction.get().getUnits().cbegin(), opposingFaction.get().getUnits().cend(), [&position](const auto& unit)
-		{
-			return !unit.getPathToPosition().empty() && unit.getPosition() == position;
-		});
-		if (unit != opposingFaction.get().getUnits().cend())
-		{
-			return false;
-		}
-	}
-
-	assert(factionHandler.isFactionActive(senderUnit.getOwningFactionController()));
-	const Faction& owningFaction = factionHandler.getFaction(senderUnit.getOwningFactionController());
-	int senderUnitID = senderUnit.getID();
-	auto unit = std::find_if(owningFaction.getUnits().cbegin(), owningFaction.getUnits().cend(), [&position, senderUnitID](const auto& unit)
-	{
-		return unit.getID() != senderUnitID && !unit.getPathToPosition().empty() && unit.getPosition() == position;
 	});
 	if (unit != owningFaction.getUnits().cend())
 	{
@@ -574,7 +537,7 @@ bool PathFinding::setUnitAttackPosition(const Unit& unit, const Entity& targetEn
 		{
 			if (currentNode.position == startingPositionOnGrid)
 			{
-				if (isUnitPositionAvailable(Globals::convertToWorldPosition(startingPositionOnGrid), unit, factionHandler))
+				if (isUnitPositionAvailable(Globals::convertToWorldPosition(startingPositionOnGrid), unit, factionHandler, unit.getOwningFaction()))
 				{
 					positionFound = true;
 					if (Globals::convertToWorldPosition(currentNode.position) != unit.getPosition())
@@ -625,18 +588,18 @@ bool PathFinding::setUnitAttackPosition(const Unit& unit, const Entity& targetEn
 			isPriorityQueueWithinSizeLimit(m_closedQueue, map.getSize()));
 	}
 
-	convertPathToWaypoints(pathToPosition, unit, factionHandler, map);
+	convertPathToWaypoints(pathToPosition, unit, factionHandler, map, unit.getOwningFaction());
 	
 	return positionFound;
 }
 
-void PathFinding::getPathToPosition(const Unit& unit, const glm::vec3& destination, std::vector<glm::vec3>& pathToPosition, 
-	const AdjacentPositions& adjacentPositions, const Map& map, FactionHandler& factionHandler)
+void PathFinding::getPathToPosition(const Entity& entity, const glm::vec3& destination, std::vector<glm::vec3>& pathToPosition, 
+	const AdjacentPositions& adjacentPositions, const Map& map, FactionHandler& factionHandler, const Faction& owningFaction)
 {
 	assert(adjacentPositions);
 
 	pathToPosition.clear();
-	if (unit.getPosition() == destination)
+	if (entity.getPosition() == destination)
 	{
 		return;
 	}
@@ -645,9 +608,9 @@ void PathFinding::getPathToPosition(const Unit& unit, const glm::vec3& destinati
 	m_closedQueue.clear();
 
 	bool destinationReached = false;
-	glm::ivec2 startingPositionOnGrid = Globals::convertToGridPosition(unit.getPosition());
+	glm::ivec2 startingPositionOnGrid = Globals::convertToGridPosition(entity.getPosition());
 	glm::ivec2 destinationOnGrid = Globals::convertToGridPosition(destination);
-	float shortestDistance = Globals::getSqrDistance(destination, unit.getPosition());
+	float shortestDistance = Globals::getSqrDistance(destination, entity.getPosition());
 	glm::ivec2 closestAvailablePosition = { 0, 0 };
 	m_openQueue.add({ startingPositionOnGrid, startingPositionOnGrid, 0.0f, 
 		Globals::getSqrDistance(glm::vec2(destinationOnGrid), glm::vec2(startingPositionOnGrid)) });
@@ -659,7 +622,7 @@ void PathFinding::getPathToPosition(const Unit& unit, const glm::vec3& destinati
 
 		if (currentNode.position == destinationOnGrid)
 		{
-			switch (unit.getEntityType())
+			switch (entity.getEntityType())
 			{
 			case eEntityType::Unit:
 				break;
@@ -672,10 +635,10 @@ void PathFinding::getPathToPosition(const Unit& unit, const glm::vec3& destinati
 
 			if (currentNode.position == startingPositionOnGrid)
 			{
-				if (isUnitPositionAvailable(Globals::convertToWorldPosition(startingPositionOnGrid), unit, factionHandler))
+				if (isUnitPositionAvailable(Globals::convertToWorldPosition(startingPositionOnGrid), entity, factionHandler, owningFaction))
 				{
 					destinationReached = true;
-					if (Globals::convertToWorldPosition(currentNode.position) != unit.getPosition())
+					if (Globals::convertToWorldPosition(currentNode.position) != entity.getPosition())
 					{
 						pathToPosition.push_back(Globals::convertToWorldPosition(startingPositionOnGrid));
 					}
@@ -684,7 +647,7 @@ void PathFinding::getPathToPosition(const Unit& unit, const glm::vec3& destinati
 			else
 			{
 				destinationReached = true;
-				if (Globals::convertToWorldPosition(currentNode.position) != unit.getPosition())
+				if (Globals::convertToWorldPosition(currentNode.position) != entity.getPosition())
 				{
 					getPathFromClosedQueue(pathToPosition, startingPositionOnGrid, currentNode, m_closedQueue, map);
 				}
@@ -729,21 +692,21 @@ void PathFinding::getPathToPosition(const Unit& unit, const glm::vec3& destinati
 			isPriorityQueueWithinSizeLimit(m_closedQueue, map.getSize()));
 	}
 
-	if (pathToPosition.empty() && shortestDistance != Globals::getSqrDistance(destination, unit.getPosition()))
+	if (pathToPosition.empty() && shortestDistance != Globals::getSqrDistance(destination, entity.getPosition()))
 	{	
 		getPathFromClosedQueue(pathToPosition, startingPositionOnGrid, closestAvailablePosition, m_closedQueue, map);
 	}
 
-	convertPathToWaypoints(pathToPosition, unit, factionHandler, map);
+	convertPathToWaypoints(pathToPosition, entity, factionHandler, map, owningFaction);
 }
 
-void PathFinding::getPathToPosition(const Unit& unit, const glm::vec3& destination, std::vector<glm::vec3>& pathToPosition, 
-	const AdjacentPositions& adjacentPositions, const Map& map)
+void PathFinding::getPathToPosition(const Entity& entity, const glm::vec3& destination, std::vector<glm::vec3>& pathToPosition, 
+	const AdjacentPositions& adjacentPositions, const Map& map, const Faction& owningFaction)
 {
 	assert(adjacentPositions);
 
 	pathToPosition.clear();
-	if (unit.getPosition() == destination)
+	if (entity.getPosition() == destination)
 	{
 		return;
 	}
@@ -752,9 +715,9 @@ void PathFinding::getPathToPosition(const Unit& unit, const glm::vec3& destinati
 	m_closedQueue.clear();
 
 	bool destinationReached = false;
-	glm::ivec2 startingPositionOnGrid = Globals::convertToGridPosition(unit.getPosition());
+	glm::ivec2 startingPositionOnGrid = Globals::convertToGridPosition(entity.getPosition());
 	glm::ivec2 destinationOnGrid = Globals::convertToGridPosition(destination);
-	float shortestDistance = Globals::getSqrDistance(destination, unit.getPosition());
+	float shortestDistance = Globals::getSqrDistance(destination, entity.getPosition());
 	glm::ivec2 closestAvailablePosition = { 0, 0 };
 	m_openQueue.add({ startingPositionOnGrid, startingPositionOnGrid, 0.0f,
 		Globals::getSqrDistance(glm::vec2(destinationOnGrid), glm::vec2(startingPositionOnGrid)) });
@@ -766,7 +729,7 @@ void PathFinding::getPathToPosition(const Unit& unit, const glm::vec3& destinati
 
 		if (currentNode.position == destinationOnGrid)
 		{
-			switch (unit.getEntityType())
+			switch (entity.getEntityType())
 			{
 			case eEntityType::Unit:
 				break;
@@ -778,7 +741,7 @@ void PathFinding::getPathToPosition(const Unit& unit, const glm::vec3& destinati
 			}
 
 			destinationReached = true;
-			if (Globals::convertToWorldPosition(currentNode.position) != unit.getPosition())
+			if (Globals::convertToWorldPosition(currentNode.position) != entity.getPosition())
 			{
 				getPathFromClosedQueue(pathToPosition, startingPositionOnGrid, currentNode, m_closedQueue, map);
 			}
@@ -822,10 +785,10 @@ void PathFinding::getPathToPosition(const Unit& unit, const glm::vec3& destinati
 			isPriorityQueueWithinSizeLimit(m_closedQueue, map.getSize()));
 	}
 
-	if (pathToPosition.empty() && shortestDistance != Globals::getSqrDistance(destination, unit.getPosition()))
+	if (pathToPosition.empty() && shortestDistance != Globals::getSqrDistance(destination, entity.getPosition()))
 	{
 		getPathFromClosedQueue(pathToPosition, startingPositionOnGrid, closestAvailablePosition, m_closedQueue, map);
 	}
 
-	convertPathToWaypoints(pathToPosition, unit, map);
+	convertPathToWaypoints(pathToPosition, entity, map);
 }

@@ -182,14 +182,14 @@ void FactionAI::update(float deltaTime, const Map & map, FactionHandler& faction
 
 		for (auto& worker : m_workers)
 		{
-			if (worker.getCurrentState() == eUnitState::Idle)
+			if (worker.getCurrentState() == eWorkerState::Idle)
 			{
 				const Mineral& mineralToHarvest = getRandomMineral();
 				glm::vec3 destination = PathFinding::getInstance().getClosestPositionToAABB(worker.getPosition(),
 					mineralToHarvest.getAABB(), map);
 
 				worker.moveTo(destination, map, [&](const glm::ivec2& position) { return getAdjacentPositions(position, map); },
-					eUnitState::MovingToMinerals, &mineralToHarvest);
+					eWorkerState::MovingToMinerals, &mineralToHarvest);
 			}
 		}
 
@@ -222,7 +222,7 @@ void FactionAI::instructWorkersToRepair(const HQ& HQ, const Map& map)
 	int repairCount = 0;
 	for (auto& worker : m_workers)
 	{
-		if (worker.getCurrentState() == eUnitState::Repairing || worker.getCurrentState() == eUnitState::MovingToRepairPosition)
+		if (worker.getCurrentState() == eWorkerState::Repairing || worker.getCurrentState() == eWorkerState::MovingToRepairPosition)
 		{
 			++repairCount;
 
@@ -257,13 +257,13 @@ Worker* FactionAI::getAvailableWorker(const glm::vec3& position)
 			selectWorker = true;
 			selectedWorker = &availableWorker;
 		}
-		else if (availableWorker.getCurrentState() == eUnitState::Idle &&
-			selectedWorker->getCurrentState() != eUnitState::Idle)
+		else if (availableWorker.getCurrentState() == eWorkerState::Idle &&
+			selectedWorker->getCurrentState() != eWorkerState::Idle)
 		{
 			selectWorker = true;
 		}
-		else if (availableWorker.getCurrentState() == eUnitState::Idle &&
-			selectedWorker->getCurrentState() == eUnitState::Idle &&
+		else if (availableWorker.getCurrentState() == eWorkerState::Idle &&
+			selectedWorker->getCurrentState() == eWorkerState::Idle &&
 			distance < closestDistance)
 		{
 			selectWorker = true;

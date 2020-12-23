@@ -385,7 +385,7 @@ void Faction::handleWorkerCollisions(const Map& map)
     static std::vector<const Entity*> handledUnits;
     for (auto& worker : m_workers)
     {
-        if (worker.getCurrentState() == eUnitState::Idle)
+        if (worker.getCurrentState() == eWorkerState::Idle)
         {
             if (map.isCollidable(worker.getPosition()))// currentMapNode.isCollidable() && currentMapNode.getEntityID() != worker.getID())
             {
@@ -398,7 +398,7 @@ void Faction::handleWorkerCollisions(const Map& map)
                 {
                     if (&worker != &otherWorker &&
                         std::find(handledUnits.cbegin(), handledUnits.cend(), &otherWorker) == handledUnits.cend() &&
-                        otherWorker.getCurrentState() == eUnitState::Idle &&
+                        otherWorker.getCurrentState() == eWorkerState::Idle &&
                         worker.getAABB().contains(otherWorker.getAABB()))
                     {
                         worker.moveTo(PathFinding::getInstance().getClosestAvailablePosition<Worker>(worker, m_workers, map), map,

@@ -25,14 +25,14 @@ private:
 	SelectionBox m_selectionBox;
 	glm::vec3 m_previousMouseToGroundPosition;
 	bool m_attackMoveSelected;
-	std::vector<Unit*> m_selectedUnits;
+	std::vector<Entity*> m_selectedEntities;
 	
 	void onEntityRemoval(const Entity& entity) override;
 
 	void instructWorkerReturnMinerals(const Map& map);
 	bool instructWorkerToBuild(const Map& map);
-	void moveSingularSelectedUnit(const glm::vec3& mouseToGroundPosition, const Map& map, Entity& selectedEntity, FactionHandler& factionHandler) const;
-	void moveMultipleSelectedUnits(const glm::vec3& mouseToGroundPosition, const Map& map, FactionHandler& factionHandler);
+	void moveSingularSelectedEntity(const glm::vec3& mouseToGroundPosition, const Map& map, Entity& selectedEntity, FactionHandler& factionHandler) const;
+	void moveMultipleSelectedEntities(const glm::vec3& mouseToGroundPosition, const Map& map, FactionHandler& factionHandler);
 
 	void onLeftClick(const sf::Window& window, const Camera& camera, const Map& map);
 	void onRightClick(const sf::Window& window, const Camera& camera, FactionHandler& factionHandler, const Map& map);
