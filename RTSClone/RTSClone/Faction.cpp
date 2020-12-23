@@ -756,19 +756,24 @@ bool Faction::instructWorkerToBuild(eEntityType entityType, const glm::vec3& pos
     assert(map.isWithinBounds(position) && !map.isPositionOccupied(position));
 
     bool AABBWithinMapBounds = false;
+    AABB buildingAABB;
     switch (entityType)
     {
     case eEntityType::Barracks:
-        AABBWithinMapBounds = map.isWithinBounds(AABB(position,  ModelManager::getInstance().getModel(BARRACKS_MODEL_NAME) ));
+        buildingAABB = { position,  ModelManager::getInstance().getModel(BARRACKS_MODEL_NAME) };
+        AABBWithinMapBounds = map.isWithinBounds(buildingAABB);
         break;
     case eEntityType::SupplyDepot:
-        AABBWithinMapBounds = map.isWithinBounds(AABB(position, ModelManager::getInstance().getModel(SUPPLY_DEPOT_MODEL_NAME)));
+        buildingAABB = { position, ModelManager::getInstance().getModel(SUPPLY_DEPOT_MODEL_NAME) };
+        AABBWithinMapBounds = map.isWithinBounds(buildingAABB);
         break;
     case eEntityType::Turret:
-        AABBWithinMapBounds = map.isWithinBounds(AABB(position, ModelManager::getInstance().getModel(TURRET_MODEL_NAME)));
+        buildingAABB = { position, ModelManager::getInstance().getModel(TURRET_MODEL_NAME) };
+        AABBWithinMapBounds = map.isWithinBounds(buildingAABB);
         break;  
     case eEntityType::Laboratory:
-        AABBWithinMapBounds = map.isWithinBounds(AABB(position, ModelManager::getInstance().getModel(LABORATORY_MODEL_NAME)));
+        buildingAABB = { position, ModelManager::getInstance().getModel(LABORATORY_MODEL_NAME) };
+        AABBWithinMapBounds = map.isWithinBounds(buildingAABB);
         break;
     default:
         assert(false);
@@ -776,12 +781,30 @@ bool Faction::instructWorkerToBuild(eEntityType entityType, const glm::vec3& pos
 
     if (AABBWithinMapBounds)
     {
-        glm::vec3 buildPosition = Globals::convertToNodePosition(position);
-        if (worker.build([this, &map, buildPosition, entityType]()
-            { return spawnBuilding(map, buildPosition, entityType); }, buildPosition, map, entityType))
+        bool buildingCommandCollision = false;
+        for (const auto& worker : m_workers)
         {
-         
-            return true;
+            auto buildingCommand = std::find_if(worker.getBuildingCommands().cbegin(), worker.getBuildingCommands().cend(),
+                [&buildingAABB, &position](const auto& buildingCommand)
+            {
+                return buildingAABB.contains(position);
+            });
+            if (buildingCommand != worker.getBuildingCommands().cend())
+            {
+                buildingCommandCollision = true;
+                break;
+            }
+        }
+
+        if (!buildingCommandCollision)
+        {
+            glm::vec3 buildPosition = Globals::convertToNodePosition(position);
+            if (worker.build([this, &map, buildPosition, entityType]()
+                { return spawnBuilding(map, buildPosition, entityType); }, buildPosition, map, entityType))
+            {
+
+                return true;
+            }
         }
     }
 

@@ -47,6 +47,7 @@ public:
 	Worker(const Faction& owningFaction, const glm::vec3& startingPosition);
 	Worker(const Faction& owningFaction, const glm::vec3& startingPosition, const glm::vec3& destinationPosition, const Map& map);
 	
+	const std::deque<BuildingCommand>& getBuildingCommands() const;
 	const std::vector<glm::vec3>& getPathToPosition() const;
 	eWorkerState getCurrentState() const;
 	const Timer& getBuildTimer() const;

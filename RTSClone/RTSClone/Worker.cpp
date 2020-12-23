@@ -69,6 +69,11 @@ Worker::Worker(const Faction& owningFaction, const glm::vec3 & startingPosition,
 		[&](const glm::ivec2& position) { return getAdjacentPositions(position, map); });
 }
 
+const std::deque<BuildingCommand>& Worker::getBuildingCommands() const
+{
+	return m_buildingCommands;
+}
+
 const std::vector<glm::vec3>& Worker::getPathToPosition() const
 {
 	return m_pathToPosition;
