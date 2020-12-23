@@ -3,7 +3,11 @@
 #include "Entity.h"
 #include "Timer.h"
 #include "AdjacentPositions.h"
+#include "PlannedBuilding.h"
 #include <queue>
+#include <vector>
+#include <deque>
+#include <functional>
 #ifdef RENDER_PATHING
 #include "Mesh.h"
 #endif // RENDER_PATHING
@@ -27,10 +31,11 @@ enum class eWorkerState
 
 struct BuildingCommand
 {
-	BuildingCommand(const std::function<const Entity*()>& command, const glm::vec3& buildPosition);
+	BuildingCommand(const std::function<const Entity*()>& command, const glm::vec3& buildPosition, eEntityType entityType);
 
 	std::function<const Entity*()> command; //Faction::AddBuilding
 	glm::vec3 buildPosition;
+	std::reference_wrapper<const Model> m_model;
 };
 
 class Faction;
@@ -41,7 +46,6 @@ class Worker : public Entity
 public:
 	Worker(const Faction& owningFaction, const glm::vec3& startingPosition);
 	Worker(const Faction& owningFaction, const glm::vec3& startingPosition, const glm::vec3& destinationPosition, const Map& map);
-	~Worker();
 	
 	const std::vector<glm::vec3>& getPathToPosition() const;
 	eWorkerState getCurrentState() const;
@@ -50,7 +54,8 @@ public:
 	int extractResources();	
 
 	void setEntityToRepair(const Entity& entity, const Map& map);
-	bool build(const std::function<const Entity*()>& buildingCommand, const glm::vec3& buildPosition, const Map& map);
+	bool build(const std::function<const Entity*()>& buildingCommand, const glm::vec3& buildPosition, 
+		const Map& map, eEntityType entityType);
 	void update(float deltaTime, const UnitSpawnerBuilding& HQ, const Map& map, FactionHandler& factionHandler,
 		const Timer& unitStateHandlerTimer);
 	void moveTo(const glm::vec3& destinationPosition, const Map& map, const AdjacentPositions& adjacentPositions,
@@ -58,6 +63,7 @@ public:
 
 	void render(ShaderHandler& shaderHandler, eFactionController owningFactionController) const;
 	void renderProgressBar(ShaderHandler& shaderHandler, const Camera& camera, glm::uvec2 windowSize) const;
+	void renderBuildingCommands(ShaderHandler& shaderHandler) const;
 
 #ifdef RENDER_PATHING
 	void renderPathMesh(ShaderHandler& shaderHandler);
@@ -67,7 +73,7 @@ private:
 	const Faction& m_owningFaction;
 	eWorkerState m_currentState;
 	std::vector<glm::vec3> m_pathToPosition;
-	std::queue<BuildingCommand> m_buildingCommands;
+	std::deque<BuildingCommand> m_buildingCommands;
 	int m_repairTargetEntityID;
 	int m_currentResourceAmount;
 	Timer m_harvestTimer;
@@ -77,6 +83,4 @@ private:
 #ifdef RENDER_PATHING
 	Mesh m_renderPathMesh;
 #endif // RENDER_PATHING
-
-	void clearBuildingCommands();
 };

@@ -57,7 +57,6 @@ protected:
 	Faction(eFactionController factionController, const glm::vec3& hqStartingPosition, 
 		const std::vector<glm::vec3>& mineralPositions, int startingResources, int startingPopulationCap);
 	const std::vector<Mineral> m_minerals;
-	std::vector<PlannedBuilding> m_plannedBuildings;
 	std::vector<Entity*> m_allEntities;
 	std::forward_list<Unit> m_units;
 	std::forward_list<Worker> m_workers;
@@ -69,7 +68,6 @@ protected:
 
 	bool isExceedPopulationLimit(eEntityType entityType) const;
 	bool isEntityAffordable(eEntityType entityType) const;
-
 
 	bool addUnitToSpawn(eEntityType unitType, const Map& map, UnitSpawnerBuilding& building, FactionHandler& factionHandler);
 	bool instructWorkerToBuild(eEntityType entityType, const glm::vec3& position, const Map& map, Worker& worker);

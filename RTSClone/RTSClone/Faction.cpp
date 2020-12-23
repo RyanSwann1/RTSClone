@@ -8,8 +8,7 @@
 Faction::Faction(eFactionController factionController, const glm::vec3& hqStartingPosition, 
     const std::vector<glm::vec3>& mineralPositions, int startingResources,
     int startingPopulationCap)
-    : m_plannedBuildings(),
-    m_minerals(mineralPositions.cbegin(), mineralPositions.cend()),
+    : m_minerals(mineralPositions.cbegin(), mineralPositions.cend()),
     m_allEntities(),
     m_units(),
     m_workers(),
@@ -251,32 +250,6 @@ void Faction::handleEvent(const GameEvent& gameEvent, const Map& map, FactionHan
         }
     }
         break;
-    case eGameEventType::RemovePlannedBuilding:
-    {
-        assert(gameEvent.data.removePlannedBuilding.factionController == m_controller);
-        const glm::vec3& buildingPosition = gameEvent.data.removePlannedBuilding.position;
-        auto buildingToSpawn = std::find_if(m_plannedBuildings.begin(), m_plannedBuildings.end(), [&buildingPosition](const auto& buildingToSpawn)
-        {
-            return buildingToSpawn.getPosition() == buildingPosition;
-        });
-
-        assert(buildingToSpawn != m_plannedBuildings.end());
-        m_plannedBuildings.erase(buildingToSpawn);
-    }
-        break;
-    case eGameEventType::RemoveAllWorkerPlannedBuildings:
-        for (auto plannedBuilding = m_plannedBuildings.begin(); plannedBuilding != m_plannedBuildings.end();)
-        {
-            if (plannedBuilding->getWorkerID() == gameEvent.data.removeAllWorkerPlannedBuilding.entityID)
-            {
-                plannedBuilding = m_plannedBuildings.erase(plannedBuilding);
-            }
-            else
-            {
-                ++plannedBuilding;
-            }
-        }
-        break;
     case eGameEventType::AddResources:
     {
         int workerID = gameEvent.data.addResources.entityID;
@@ -498,9 +471,9 @@ void Faction::render(ShaderHandler& shaderHandler) const
 
 void Faction::renderPlannedBuildings(ShaderHandler& shaderHandler) const
 {
-    for (const auto& plannedBuilding : m_plannedBuildings)
+    for (const auto& worker : m_workers)
     {
-        plannedBuilding.render(shaderHandler, m_controller);
+        worker.renderBuildingCommands(shaderHandler);
     }
 }
 
@@ -782,41 +755,33 @@ bool Faction::instructWorkerToBuild(eEntityType entityType, const glm::vec3& pos
 {
     assert(map.isWithinBounds(position) && !map.isPositionOccupied(position));
 
-    bool withinMapBounds = false;
+    bool AABBWithinMapBounds = false;
     switch (entityType)
     {
     case eEntityType::Barracks:
-        withinMapBounds = map.isWithinBounds(AABB(position,  ModelManager::getInstance().getModel(BARRACKS_MODEL_NAME) ));
+        AABBWithinMapBounds = map.isWithinBounds(AABB(position,  ModelManager::getInstance().getModel(BARRACKS_MODEL_NAME) ));
         break;
     case eEntityType::SupplyDepot:
-        withinMapBounds = map.isWithinBounds(AABB(position, ModelManager::getInstance().getModel(SUPPLY_DEPOT_MODEL_NAME)));
+        AABBWithinMapBounds = map.isWithinBounds(AABB(position, ModelManager::getInstance().getModel(SUPPLY_DEPOT_MODEL_NAME)));
         break;
     case eEntityType::Turret:
-        withinMapBounds = map.isWithinBounds(AABB(position, ModelManager::getInstance().getModel(TURRET_MODEL_NAME)));
+        AABBWithinMapBounds = map.isWithinBounds(AABB(position, ModelManager::getInstance().getModel(TURRET_MODEL_NAME)));
         break;  
     case eEntityType::Laboratory:
-        withinMapBounds = map.isWithinBounds(AABB(position, ModelManager::getInstance().getModel(LABORATORY_MODEL_NAME)));
+        AABBWithinMapBounds = map.isWithinBounds(AABB(position, ModelManager::getInstance().getModel(LABORATORY_MODEL_NAME)));
         break;
     default:
         assert(false);
     }
 
-    if (withinMapBounds)
+    if (AABBWithinMapBounds)
     {
         glm::vec3 buildPosition = Globals::convertToNodePosition(position);
-        auto plannedBuilding = std::find_if(m_plannedBuildings.cbegin(), m_plannedBuildings.cend(), [&buildPosition](const auto& plannedBuilding)
+        if (worker.build([this, &map, buildPosition, entityType]()
+            { return spawnBuilding(map, buildPosition, entityType); }, buildPosition, map, entityType))
         {
-            return plannedBuilding.getPosition() == Globals::convertToMiddleGridPosition(buildPosition);
-        });
-
-        if (plannedBuilding == m_plannedBuildings.cend())
-        {
-            if (worker.build([this, &map, buildPosition, entityType]()
-            { return spawnBuilding(map, buildPosition, entityType); }, buildPosition, map))
-            {
-                m_plannedBuildings.emplace_back(worker.getID(), buildPosition, entityType);
-                return true;
-            }
+         
+            return true;
         }
     }
 

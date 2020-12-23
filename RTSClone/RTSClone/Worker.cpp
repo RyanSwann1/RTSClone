@@ -29,9 +29,10 @@ namespace
 }
 
 //BuildingCommand
-BuildingCommand::BuildingCommand(const std::function<const Entity*()>& command, const glm::vec3& buildPosition)
+BuildingCommand::BuildingCommand(const std::function<const Entity*()>& command, const glm::vec3& buildPosition, eEntityType entityType)
 	: command(command),
-	buildPosition(buildPosition)
+	buildPosition(buildPosition),
+	m_model(ModelManager::getInstance().getModel(entityType))
 {
 	assert(command);
 }
@@ -66,11 +67,6 @@ Worker::Worker(const Faction& owningFaction, const glm::vec3 & startingPosition,
 {
 	moveTo(destinationPosition, map,
 		[&](const glm::ivec2& position) { return getAdjacentPositions(position, map); });
-}
-
-Worker::~Worker()
-{
-	GameEventHandler::getInstance().gameEvents.push(GameEvent::createRemoveAllWorkerPlannedBuildings(m_owningFaction.getController(), getID()));
 }
 
 const std::vector<glm::vec3>& Worker::getPathToPosition() const
@@ -117,12 +113,13 @@ void Worker::setEntityToRepair(const Entity& entity, const Map& map)
 	}
 }
 
-bool Worker::build(const std::function<const Entity*()>& buildingCommand, const glm::vec3& buildPosition, const Map& map)
+bool Worker::build(const std::function<const Entity*()>& buildingCommand, const glm::vec3& buildPosition, 
+	const Map& map, eEntityType entityType)
 {
 	if (!map.isPositionOccupied(buildPosition))
 	{
-		m_buildingCommands.emplace(buildingCommand, Globals::convertToMiddleGridPosition(buildPosition));
-		if (m_buildingCommands.size() == size_t(1))
+		m_buildingCommands.emplace_back(buildingCommand, Globals::convertToMiddleGridPosition(buildPosition), entityType);
+		if (m_buildingCommands.size() == 1)
 		{
 			moveTo(Globals::convertToMiddleGridPosition(buildPosition), map,
 				[&](const glm::ivec2& position) { return getAdjacentPositions(position, map); }, eWorkerState::MovingToBuildingPosition);
@@ -231,15 +228,10 @@ void Worker::update(float deltaTime, const UnitSpawnerBuilding& HQ, const Map& m
 		m_buildTimer.resetElaspedTime();
 		m_buildTimer.setActive(false);
 		const Entity* newBuilding = m_buildingCommands.front().command();
-		m_buildingCommands.pop();
-		if (newBuilding)
+		m_buildingCommands.pop_front();
+		if (!newBuilding)
 		{
-			GameEventHandler::getInstance().gameEvents.push(GameEvent::createRemovePlannedBuilding(m_owningFaction.getController(), newBuilding->getPosition()));
-		}
-		else
-		{
-			GameEventHandler::getInstance().gameEvents.push(GameEvent::createRemoveAllWorkerPlannedBuildings(m_owningFaction.getController(), getID()));
-			clearBuildingCommands();
+			m_buildingCommands.clear();
 		}
 
 		if (!m_buildingCommands.empty())
@@ -332,12 +324,9 @@ void Worker::moveTo(const glm::vec3& destinationPosition, const Map& map, const 
 	eWorkerState state, const Mineral* mineralToHarvest)
 {
 	if (state != eWorkerState::MovingToBuildingPosition && !m_buildingCommands.empty())
-	{
-		GameEventHandler::getInstance().gameEvents.push(GameEvent::createRemoveAllWorkerPlannedBuildings(
-			m_owningFaction.getController(), getID()));
-		 
+	{		 
 		m_buildTimer.resetElaspedTime();
-		clearBuildingCommands();
+		m_buildingCommands.clear();
 	}
 	else if (state == eWorkerState::Moving)
 	{
@@ -410,13 +399,15 @@ void Worker::renderProgressBar(ShaderHandler& shaderHandler, const Camera& camer
 	}
 }
 
+void Worker::renderBuildingCommands(ShaderHandler& shaderHandler) const
+{
+	for (const auto& buildingCommand : m_buildingCommands)
+	{
+		buildingCommand.m_model.get().render(shaderHandler, buildingCommand.buildPosition);
+	}
+}
+
 void Worker::renderPathMesh(ShaderHandler& shaderHandler)
 {
 	RenderPathMesh::render(shaderHandler, m_pathToPosition, m_renderPathMesh);
-}
-
-void Worker::clearBuildingCommands()
-{
-	std::queue<BuildingCommand> empty;
-	std::swap(m_buildingCommands, empty);
 }
