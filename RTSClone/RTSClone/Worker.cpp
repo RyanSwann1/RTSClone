@@ -11,6 +11,9 @@
 #include "FactionHandler.h"
 #include "ShaderHandler.h"
 #include "Camera.h"
+#ifdef RENDER_PATHING
+#include "RenderPathMesh.h"
+#endif // RENDER_PATHING
 
 namespace
 {
@@ -21,7 +24,6 @@ namespace
 	const int RESOURCE_CAPACITY = 30;
 	const int RESOURCE_INCREMENT = 10;
 	const float REPAIR_DISTANCE = static_cast<float>(Globals::NODE_SIZE);
-
 	const float WORKER_PROGRESS_BAR_WIDTH = 60.0f;
 	const float WORKER_PROGRESS_BAR_YOFFSET = 30.0f;
 }
@@ -36,8 +38,10 @@ BuildingCommand::BuildingCommand(const std::function<const Entity*()>& command, 
 
 //Worker
 Worker::Worker(const Faction& owningFaction, const glm::vec3& startingPosition)
-	: Unit(owningFaction, startingPosition, eEntityType::Worker, Globals::WORKER_STARTING_HEALTH, 
-		ModelManager::getInstance().getModel(WORKER_MODEL_NAME)),
+	: Entity(ModelManager::getInstance().getModel(WORKER_MODEL_NAME), startingPosition, eEntityType::Worker, 
+		Globals::WORKER_STARTING_HEALTH, owningFaction.getCurrentShieldAmount()),
+	m_owningFaction(owningFaction),
+	m_currentState(eWorkerState::Idle),
 	m_buildingCommands(),
 	m_repairTargetEntityID(Globals::INVALID_ENTITY_ID),
 	m_currentResourceAmount(0),
@@ -48,8 +52,10 @@ Worker::Worker(const Faction& owningFaction, const glm::vec3& startingPosition)
 {}
 
 Worker::Worker(const Faction& owningFaction, const glm::vec3 & startingPosition, const glm::vec3 & destinationPosition, const Map & map)
-	: Unit(owningFaction, startingPosition, eEntityType::Worker, Globals::WORKER_STARTING_HEALTH,
-		ModelManager::getInstance().getModel(WORKER_MODEL_NAME)),
+	: Entity(ModelManager::getInstance().getModel(WORKER_MODEL_NAME), startingPosition, eEntityType::Worker, Globals::WORKER_STARTING_HEALTH,
+		owningFaction.getCurrentShieldAmount()),
+	m_owningFaction(owningFaction),
+	m_currentState(eWorkerState::Idle),
 	m_buildingCommands(),
 	m_repairTargetEntityID(Globals::INVALID_ENTITY_ID),
 	m_currentResourceAmount(0),
@@ -65,6 +71,16 @@ Worker::Worker(const Faction& owningFaction, const glm::vec3 & startingPosition,
 Worker::~Worker()
 {
 	GameEventHandler::getInstance().gameEvents.push(GameEvent::createRemoveAllWorkerPlannedBuildings(m_owningFaction.getController(), getID()));
+}
+
+const std::vector<glm::vec3>& Worker::getPathToPosition() const
+{
+	return m_pathToPosition;
+}
+
+eWorkerState Worker::getCurrentState() const
+{
+	return m_currentState;
 }
 
 const Timer& Worker::getBuildTimer() const
@@ -93,10 +109,11 @@ void Worker::setEntityToRepair(const Entity& entity, const Map& map)
 	moveTo(PathFinding::getInstance().getClosestPositionToAABB(m_position,
 		entity.getAABB(), map),
 		map, [&](const glm::ivec2& position) { return getAdjacentPositions(position, map); },
-		eUnitState::MovingToRepairPosition);
+		eWorkerState::MovingToRepairPosition);
+
 	if (m_pathToPosition.empty())
 	{
-		switchToState(eUnitState::Repairing, map);
+		m_currentState = eWorkerState::Repairing;
 	}
 }
 
@@ -108,7 +125,7 @@ bool Worker::build(const std::function<const Entity*()>& buildingCommand, const 
 		if (m_buildingCommands.size() == size_t(1))
 		{
 			moveTo(Globals::convertToMiddleGridPosition(buildPosition), map,
-				[&](const glm::ivec2& position) { return getAdjacentPositions(position, map); }, eUnitState::MovingToBuildingPosition);
+				[&](const glm::ivec2& position) { return getAdjacentPositions(position, map); }, eWorkerState::MovingToBuildingPosition);
 		}
 
 		return true;
@@ -120,17 +137,49 @@ bool Worker::build(const std::function<const Entity*()>& buildingCommand, const 
 void Worker::update(float deltaTime, const UnitSpawnerBuilding& HQ, const Map& map, FactionHandler& factionHandler,
 	const Timer& unitStateHandlerTimer)
 {
-	Unit::update(deltaTime, factionHandler, map, unitStateHandlerTimer);
+	Entity::updateShieldReplenishTimer(deltaTime);
 
-	switch (getCurrentState())
+	if (!m_pathToPosition.empty())
 	{
-	case eUnitState::MovingToMinerals:
+		glm::vec3 newPosition = Globals::moveTowards(m_position, m_pathToPosition.back(), MOVEMENT_SPEED * deltaTime);
+		m_rotation.y = Globals::getAngle(newPosition, m_position);
+		m_position = newPosition;
+		m_AABB.update(m_position);
+
+		if (m_position == m_pathToPosition.back())
+		{
+			switch (getEntityType())
+			{
+			case eEntityType::Unit:
+				assert(Globals::isOnMiddlePosition(m_position));
+				break;
+			case eEntityType::Worker:
+				break;
+			default:
+				assert(false);
+			}
+
+			m_pathToPosition.pop_back();
+		}
+	}
+
+	switch (m_currentState)
+	{
+	case eWorkerState::Idle:
+		break;
+	case eWorkerState::Moving:
 		if (m_pathToPosition.empty())
 		{
-			switchToState(eUnitState::Harvesting, map);
+			m_currentState = eWorkerState::Idle;
 		}
 		break;
-	case eUnitState::ReturningMineralsToHQ:
+	case eWorkerState::MovingToMinerals:
+		if (m_pathToPosition.empty())
+		{
+			m_currentState = eWorkerState::Harvesting;
+		}
+		break;
+	case eWorkerState::ReturningMineralsToHQ:
 		assert(isHoldingResources());
 		if (m_pathToPosition.empty())
 		{
@@ -140,15 +189,15 @@ void Worker::update(float deltaTime, const UnitSpawnerBuilding& HQ, const Map& m
 				glm::vec3 destination = PathFinding::getInstance().getClosestPositionToAABB(m_position,
 					m_mineralToHarvest->getAABB(), map);
 				moveTo(destination, map, [&](const glm::ivec2& position) { return getAdjacentPositions(position, map); },
-					eUnitState::MovingToMinerals, m_mineralToHarvest);
+					eWorkerState::MovingToMinerals, m_mineralToHarvest);
 			}
 			else
 			{
-				switchToState(eUnitState::Idle, map);
+				m_currentState = eWorkerState::Idle;
 			}
 		}
 		break;
-	case eUnitState::Harvesting:
+	case eWorkerState::Harvesting:
 		assert(m_currentResourceAmount <= RESOURCE_CAPACITY);
 		if (m_currentResourceAmount < RESOURCE_CAPACITY)
 		{
@@ -170,17 +219,17 @@ void Worker::update(float deltaTime, const UnitSpawnerBuilding& HQ, const Map& m
 			glm::vec3 destination = PathFinding::getInstance().getClosestPositionToAABB(m_position,
 				HQ.getAABB(), map);
 			moveTo(destination, map, [&](const glm::ivec2& position) { return getAdjacentPositions(position, map); },
-				eUnitState::ReturningMineralsToHQ);
+				eWorkerState::ReturningMineralsToHQ);
 		}
 		break;
-	case eUnitState::MovingToBuildingPosition:
+	case eWorkerState::MovingToBuildingPosition:
 		assert(!m_buildingCommands.empty());
 		if (m_pathToPosition.empty())
 		{
-			switchToState(eUnitState::Building, map);
+			m_currentState = eWorkerState::Building;
 		}
 		break;
-	case eUnitState::Building:
+	case eWorkerState::Building:
 	{
 		assert(m_pathToPosition.empty() && !m_buildingCommands.empty());
 		m_buildTimer.update(deltaTime);
@@ -207,7 +256,7 @@ void Worker::update(float deltaTime, const UnitSpawnerBuilding& HQ, const Map& m
 		if (!m_buildingCommands.empty())
 		{
 			moveTo(m_buildingCommands.front().buildPosition, map,
-				[&](const glm::ivec2& position) { return getAdjacentPositions(position, map); }, eUnitState::MovingToBuildingPosition);
+				[&](const glm::ivec2& position) { return getAdjacentPositions(position, map); }, eWorkerState::MovingToBuildingPosition);
 		}
 		else
 		{
@@ -218,18 +267,18 @@ void Worker::update(float deltaTime, const UnitSpawnerBuilding& HQ, const Map& m
 			}
 			else
 			{
-				switchToState(eUnitState::Idle, map);
+				m_currentState = eWorkerState::Idle;
 			}
 		}
 	}
 	break;
-	case eUnitState::MovingToRepairPosition:
+	case eWorkerState::MovingToRepairPosition:
 		if (m_pathToPosition.empty())
 		{
-			switchToState(eUnitState::Repairing, map);
+			m_currentState = eWorkerState::Repairing;
 		}
 		break;
-	case eUnitState::Repairing:
+	case eWorkerState::Repairing:
 		assert(m_pathToPosition.empty() && m_repairTargetEntityID != Globals::INVALID_ENTITY_ID);
 		m_repairTimer.setActive(true);
 		m_repairTimer.update(deltaTime);
@@ -253,14 +302,14 @@ void Worker::update(float deltaTime, const UnitSpawnerBuilding& HQ, const Map& m
 				else
 				{
 					m_repairTimer.setActive(false);
-					switchToState(eUnitState::Idle, map);
+					m_currentState = eWorkerState::Idle;
 					m_repairTargetEntityID = Globals::INVALID_ENTITY_ID;
 				}
 			}
 			else
 			{
 				m_repairTimer.setActive(false);
-				switchToState(eUnitState::Idle, map);
+				m_currentState = eWorkerState::Idle;
 				m_repairTargetEntityID = Globals::INVALID_ENTITY_ID;
 			}
 		}
@@ -282,7 +331,7 @@ void Worker::update(float deltaTime, const UnitSpawnerBuilding& HQ, const Map& m
 			else
 			{
 				m_repairTimer.setActive(false);
-				switchToState(eUnitState::Idle, map);
+				m_currentState = eWorkerState::Idle;
 				m_repairTargetEntityID = Globals::INVALID_ENTITY_ID;
 			}
 		}
@@ -291,13 +340,9 @@ void Worker::update(float deltaTime, const UnitSpawnerBuilding& HQ, const Map& m
 }
 
 void Worker::moveTo(const glm::vec3& destinationPosition, const Map& map, const AdjacentPositions& adjacentPositions, 
-	eUnitState state, const Mineral* mineralToHarvest)
+	eWorkerState state, const Mineral* mineralToHarvest)
 {
-	assert(state == eUnitState::Moving || state == eUnitState::MovingToBuildingPosition || 
-		state == eUnitState::MovingToMinerals || state == eUnitState::ReturningMineralsToHQ || 
-		state == eUnitState::MovingToRepairPosition);
-
-	if (state != eUnitState::MovingToBuildingPosition && !m_buildingCommands.empty())
+	if (state != eWorkerState::MovingToBuildingPosition && !m_buildingCommands.empty())
 	{
 		GameEventHandler::getInstance().gameEvents.push(GameEvent::createRemoveAllWorkerPlannedBuildings(
 			m_owningFaction.getController(), getID()));
@@ -305,7 +350,7 @@ void Worker::moveTo(const glm::vec3& destinationPosition, const Map& map, const 
 		m_buildTimer.resetElaspedTime();
 		clearBuildingCommands();
 	}
-	else if (state == eUnitState::Moving)
+	else if (state == eWorkerState::Moving)
 	{
 		m_mineralToHarvest = nullptr;
 	}
@@ -322,28 +367,28 @@ void Worker::moveTo(const glm::vec3& destinationPosition, const Map& map, const 
 	}
 
 	PathFinding::getInstance().getPathToPosition(*this, destinationPosition, m_pathToPosition, adjacentPositions,
-		map);
+		map, m_owningFaction);
 	if (!m_pathToPosition.empty())
 	{
-		switchToState(state, map);
+		m_currentState = state;
 	}
 	else
 	{
 		if (closestDestination != m_position)
 		{
 			m_pathToPosition.push_back(closestDestination);
-			switchToState(state, map);
+			m_currentState = state;
 		}
 		else
 		{
-			switchToState(eUnitState::Idle, map);
+			m_currentState = eWorkerState::Idle;
 		}
 	}
 }
 
 void Worker::render(ShaderHandler& shaderHandler, eFactionController owningFactionController) const
 {
-	if (m_currentResourceAmount > 0 && getCurrentState() != eUnitState::Harvesting)
+	if (m_currentResourceAmount > 0 && m_currentState != eWorkerState::Harvesting)
 	{
 		//ModelManager::getInstance().getModel(eModelName::WorkerMineral).render(
 			//shaderHandler, { m_position.x - 0.5f, m_position.y, m_position.z - 0.5f });
@@ -357,15 +402,15 @@ void Worker::renderProgressBar(ShaderHandler& shaderHandler, const Camera& camer
 	if (m_buildTimer.isActive() || m_harvestTimer.isActive() || m_repairTimer.isActive())
 	{
 		float currentTime = 0.0f;
-		switch (getCurrentState())
+		switch (m_currentState)
 		{
-		case eUnitState::Building:
+		case eWorkerState::Building:
 			currentTime = m_buildTimer.getElaspedTime() / m_buildTimer.getExpiredTime();
 			break;
-		case eUnitState::Harvesting:
+		case eWorkerState::Harvesting:
 			currentTime = m_harvestTimer.getElaspedTime() / m_harvestTimer.getExpiredTime();
 			break;
-		case eUnitState::Repairing:
+		case eWorkerState::Repairing:
 			currentTime = m_repairTimer.getElaspedTime() / m_repairTimer.getExpiredTime();
 			break;
 		}
@@ -374,6 +419,11 @@ void Worker::renderProgressBar(ShaderHandler& shaderHandler, const Camera& camer
 			WORKER_PROGRESS_BAR_WIDTH * currentTime, Globals::DEFAULT_PROGRESS_BAR_HEIGHT,
 			WORKER_PROGRESS_BAR_YOFFSET, shaderHandler, camera, Globals::PROGRESS_BAR_COLOR);
 	}
+}
+
+void Worker::renderPathMesh(ShaderHandler& shaderHandler)
+{
+	RenderPathMesh::render(shaderHandler, m_pathToPosition, m_renderPathMesh);
 }
 
 void Worker::clearBuildingCommands()
