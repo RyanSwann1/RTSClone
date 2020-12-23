@@ -349,19 +349,6 @@ void Level::handleEvent(const GameEvent& gameEvent, const Map& map)
 			getFaction(m_factions, gameEvent.data.takeDamage.targetFaction).handleEvent(gameEvent, map, m_factionHandler);
 		}
 		break;
-	case eGameEventType::RemovePlannedBuilding:
-		if (isFactionActive(m_factions, gameEvent.data.removePlannedBuilding.factionController))
-		{
-			getFaction(m_factions, gameEvent.data.removePlannedBuilding.factionController).
-				handleEvent(gameEvent, map, m_factionHandler);
-		}
-		break;
-	case eGameEventType::RemoveAllWorkerPlannedBuildings:
-		if (isFactionActive(m_factions, gameEvent.data.removeAllWorkerPlannedBuilding.factionController))
-		{
-			getFaction(m_factions, gameEvent.data.removeAllWorkerPlannedBuilding.factionController).handleEvent(gameEvent, map, m_factionHandler);
-		}
-		break;
 	case eGameEventType::AddResources:
 		if (isFactionActive(m_factions, gameEvent.data.addResources.factionController))
 		{

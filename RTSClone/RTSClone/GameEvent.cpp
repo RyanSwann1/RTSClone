@@ -34,11 +34,6 @@ GameEvent_5::GameEvent_5(eFactionController senderFaction, int senderID, eFactio
 	destination(endingPosition)
 {}
 
-GameEvent_6::GameEvent_6(eFactionController senderFaction, const glm::vec3& position)
-	: factionController(senderFaction),
-	position(position)
-{}
-
 GameEvent GameEvent::createRevalidateMovementPaths()
 {
 	return { eGameEventType::RevalidateMovementPaths, RevalidateMovementPathsEvent{} };
@@ -69,11 +64,6 @@ GameEvent GameEvent::createIncreaseFactionShield(eFactionController factionContr
 	return { eGameEventType::IncreaseFactionShield, IncreaseFactionShieldEvent{factionController} };	
 }
 
-GameEvent GameEvent::createRemoveAllWorkerPlannedBuildings(eFactionController senderFaction, int senderID)
-{
-	return { eGameEventType::RemoveAllWorkerPlannedBuildings, RemoveAllWorkerPlannedBuildingsEvent{senderFaction, senderID} };
-}
-
 GameEvent GameEvent::createAddResources(eFactionController senderFaction, int senderID)
 {
 	return { eGameEventType::AddResources, AddResourcesEvent{senderFaction, senderID} };
@@ -100,9 +90,4 @@ GameEvent GameEvent::createSpawnProjectile(eFactionController senderFaction, int
 {
 	return { eGameEventType::SpawnProjectile,
 		SpawnProjectileEvent{senderFaction, senderID, targetFaction, targetID, damage, startingPosition, endingPosition} };
-}
-
-GameEvent GameEvent::createRemovePlannedBuilding(eFactionController senderFaction, const glm::vec3& position)
-{
-	return { eGameEventType::RemovePlannedBuilding, RemovePlannedBuildingEvent{senderFaction, position} };
 }
