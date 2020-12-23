@@ -88,9 +88,8 @@ void Unit::moveToAttackPosition(const Entity& targetEntity, const Faction& targe
 		}
 		else if(previousDestination != m_position)
 		{
-			Unit& unit = *this;
 			PathFinding::getInstance().getPathToPosition(*this, previousDestination, m_pathToPosition, [&](const glm::ivec2& position)
-				{ return getAdjacentPositions(position, map, factionHandler, unit); }, map, factionHandler, m_owningFaction);
+				{ return getAdjacentPositions(position, map, factionHandler, *this); }, map, factionHandler, m_owningFaction);
 			switchToState(eUnitState::Moving, map);
 		}
 		else
@@ -104,9 +103,8 @@ void Unit::moveToAttackPosition(const Entity& targetEntity, const Faction& targe
 		{
 			if (previousDestination != m_position)
 			{
-				Unit& unit = *this;
 				PathFinding::getInstance().getPathToPosition(*this, previousDestination, m_pathToPosition, [&](const glm::ivec2& position)
-				{ return getAdjacentPositions(position, map, factionHandler, unit); }, map, factionHandler, m_owningFaction);
+					{ return getAdjacentPositions(position, map, factionHandler, *this); }, map, factionHandler, m_owningFaction);
 				switchToState(eUnitState::Moving, map);
 			}
 		}
@@ -157,22 +155,11 @@ void Unit::update(float deltaTime, FactionHandler& factionHandler, const Map& ma
 	{
 		glm::vec3 newPosition = Globals::moveTowards(m_position, m_pathToPosition.back(), MOVEMENT_SPEED * deltaTime);
 		m_rotation.y = Globals::getAngle(newPosition, m_position);
-		m_position = newPosition;
-		m_AABB.update(m_position);
+		setPosition(newPosition);
 
 		if (m_position == m_pathToPosition.back())
 		{
-			switch (getEntityType())
-			{
-			case eEntityType::Unit:
-				assert(Globals::isOnMiddlePosition(m_position));
-				break;
-			case eEntityType::Worker:
-				break;
-			default:
-				assert(false);
-			}
-
+			assert(Globals::isOnMiddlePosition(m_position));
 			m_pathToPosition.pop_back();
 		}
 	}
@@ -180,25 +167,16 @@ void Unit::update(float deltaTime, FactionHandler& factionHandler, const Map& ma
 	switch (m_currentState)
 	{
 	case eUnitState::Idle:
-		assert(m_targetEntity.getID() == Globals::INVALID_ENTITY_ID);
+		assert(m_pathToPosition.empty() && m_targetEntity.getID() == Globals::INVALID_ENTITY_ID);
 		if (unitStateHandlerTimer.isExpired())
 		{
-			switch (getEntityType())
+			for (const auto& opposingFaction : factionHandler.getOpposingFactions(m_owningFaction.getController()))
 			{
-			case eEntityType::Unit:
-				for (const auto& opposingFaction : factionHandler.getOpposingFactions(m_owningFaction.getController()))
+				const Entity* targetEntity = opposingFaction.get().getEntity(m_position, UNIT_ATTACK_RANGE, true);
+				if (targetEntity)
 				{
-					const Entity* targetEntity = opposingFaction.get().getEntity(m_position, UNIT_ATTACK_RANGE, true);
-					if (targetEntity)
-					{
-						moveToAttackPosition(*targetEntity, opposingFaction, map, factionHandler);
-					}
+					moveToAttackPosition(*targetEntity, opposingFaction, map, factionHandler);
 				}
-				break;
-			case eEntityType::Worker:
-				break;
-			default:
-				assert(false);
 			}
 		}
 		break;

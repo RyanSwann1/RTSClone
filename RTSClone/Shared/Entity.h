@@ -47,6 +47,7 @@ public:
 	void render(ShaderHandler& shaderHandler, eFactionController owningFactionController) const;
 	void renderHealthBar(ShaderHandler& shaderHandler, const Camera& camera, glm::uvec2 windowSize) const;
 	void renderShieldBar(ShaderHandler& shaderHandler, const Camera& camera, glm::uvec2 windowSize) const;
+	void setPosition(const glm::vec3& position);
 #endif // GAME
 
 	int getID() const;

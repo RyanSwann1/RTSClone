@@ -48,7 +48,7 @@ Entity::Entity(const Model& model, const glm::vec3& startingPosition, eEntityTyp
 	m_maximumShield(shield),
 	m_shield(m_maximumShield),
 	m_maximumHealth(health),
-	m_health(m_maximumHealth),
+	m_health(2),
 	m_type(entityType),
 	m_shieldReplenishTimer(SHIELD_REPLENISH_TIMER_EXPIRATION, true),
 	m_model(model),
@@ -317,6 +317,12 @@ void Entity::renderShieldBar(ShaderHandler& shaderHandler, const Camera& camera,
 		m_statbarSprite.render(m_position, windowSize, width, width, DEFAULT_SHIELD_BAR_HEIGHT, yOffset,
 			shaderHandler, camera, Globals::SHIELD_BAR_COLOR);
 	}
+}
+
+void Entity::setPosition(const glm::vec3& position)
+{
+	m_position = position;
+	m_AABB.update(position);
 }
 #endif // GAME
 

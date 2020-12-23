@@ -143,22 +143,10 @@ void Worker::update(float deltaTime, const UnitSpawnerBuilding& HQ, const Map& m
 	{
 		glm::vec3 newPosition = Globals::moveTowards(m_position, m_pathToPosition.back(), MOVEMENT_SPEED * deltaTime);
 		m_rotation.y = Globals::getAngle(newPosition, m_position);
-		m_position = newPosition;
-		m_AABB.update(m_position);
+		setPosition(newPosition);
 
 		if (m_position == m_pathToPosition.back())
 		{
-			switch (getEntityType())
-			{
-			case eEntityType::Unit:
-				assert(Globals::isOnMiddlePosition(m_position));
-				break;
-			case eEntityType::Worker:
-				break;
-			default:
-				assert(false);
-			}
-
 			m_pathToPosition.pop_back();
 		}
 	}
@@ -166,6 +154,7 @@ void Worker::update(float deltaTime, const UnitSpawnerBuilding& HQ, const Map& m
 	switch (m_currentState)
 	{
 	case eWorkerState::Idle:
+		assert(m_pathToPosition.empty());
 		break;
 	case eWorkerState::Moving:
 		if (m_pathToPosition.empty())
