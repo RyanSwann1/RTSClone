@@ -156,6 +156,9 @@
     <ClCompile Include="Laboratory.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="RenderPathMesh.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="assimp\include\Compiler\poppack1.h">
@@ -441,6 +444,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Laboratory.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RenderPathMesh.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
