@@ -19,16 +19,9 @@ enum class eUnitState
 	Idle = 0,
 	Moving,
 	AttackMoving,
-	MovingToMinerals,
-	ReturningMineralsToHQ,
-	Harvesting,
-	MovingToBuildingPosition,
 	SetAttackPosition,
 	AttackingTarget,
-	Building,
-	MovingToRepairPosition,
-	Repairing,
-	Max = Repairing
+	Max = AttackingTarget
 };
 
 class Faction;
@@ -40,6 +33,7 @@ class Unit : public Entity
 public:
 	Unit(const Faction& owningFaction, const glm::vec3& startingPosition);
 
+	const Faction& getOwningFaction() const;
 	const std::vector<glm::vec3>& getPathToPosition() const;
 	float getGridAttackRange() const;
 	float getAttackRange() const;
@@ -59,20 +53,15 @@ public:
 	void renderPathMesh(ShaderHandler& shaderHandler);
 #endif // RENDER_PATHING
 
-protected:
-	Unit(const Faction& owningFaction, const glm::vec3& startingPosition,
-		eEntityType entityType, int health, const Model& model);
-
+private:
 	const Faction& m_owningFaction;
 	std::vector<glm::vec3> m_pathToPosition;
-
-	void switchToState(eUnitState newState, const Map& map, const Entity* targetEntity = nullptr);
-
-private:
 	eUnitState m_currentState;
 	Timer m_attackTimer;
 	TargetEntity m_targetEntity;
 #ifdef RENDER_PATHING
 	Mesh m_renderPathMesh;
 #endif // RENDER_PATHING
+
+	void switchToState(eUnitState newState, const Map& map, const Entity* targetEntity = nullptr);
 };
