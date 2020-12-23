@@ -18,6 +18,9 @@ extern const std::string TRANSLATE_MODEL_NAME;
 extern const std::string TURRET_MODEL_NAME;
 extern const std::string LABORATORY_MODEL_NAME;
 
+#ifdef GAME
+enum class eEntityType;
+#endif // GAME
 class ModelManager : private NonMovable, private NonCopyable
 {
 public:
@@ -26,6 +29,10 @@ public:
 		static ModelManager instance;
 		return instance;
 	}
+
+#ifdef GAME
+	const Model& getModel(eEntityType entityType) const;
+#endif // GAME
 
 	const Model& getModel(const std::string& modelName) const;
 	bool isAllModelsLoaded() const;

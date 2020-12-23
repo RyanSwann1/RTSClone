@@ -154,6 +154,23 @@ namespace
 #endif // LEVEL_EDITOR
 }
 
+const Model& ModelManager::getModel(eEntityType entityType) const
+{
+	switch (entityType)
+	{
+	case eEntityType::SupplyDepot:
+		return ModelManager::getInstance().getModel(SUPPLY_DEPOT_MODEL_NAME);
+	case eEntityType::Barracks:
+		return ModelManager::getInstance().getModel(BARRACKS_MODEL_NAME);
+	case eEntityType::Turret:
+		return ModelManager::getInstance().getModel(TURRET_MODEL_NAME);
+	case eEntityType::Laboratory:
+		return ModelManager::getInstance().getModel(LABORATORY_MODEL_NAME);
+	default:
+		assert(false);
+	}
+}
+
 const Model& ModelManager::getModel(const std::string& modelName) const
 {
 	auto model = std::find_if(m_models.cbegin(), m_models.cend(), [&modelName](const auto& model)
