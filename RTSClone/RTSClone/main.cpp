@@ -88,7 +88,7 @@ int main()
 
 	sf::Clock gameClock;
 	Camera camera;
-	UIManager UIManager;
+	UIManager uiManager;
 	Map map;
 	const std::array<std::string, Globals::MAX_LEVELS> levelNames = LevelFileHandler::loadLevelNames();
 	std::unique_ptr<Level> level; 
@@ -126,7 +126,7 @@ int main()
 
 			if (level)
 			{
-				level->handleInput(window, camera, currentSFMLEvent, map);
+				level->handleInput(window, camera, currentSFMLEvent, map, uiManager);
 			}
 		}
 
@@ -174,11 +174,11 @@ int main()
 		}
 		
 		//Update
-		UIManager.update(window);
+		uiManager.render(window);
 		if (level)
 		{
 			camera.update(deltaTime, window, windowSize);
-			level->update(deltaTime, map);
+			level->update(deltaTime, map, uiManager);
 		}
 
 		//Render

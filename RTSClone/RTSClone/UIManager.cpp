@@ -4,7 +4,9 @@
 #include "GameMessageType.h"
 #include "GameEvent.h"
 #include "GameEventHandler.h"
+#include "FactionHandler.h"
 #include "Globals.h"
+#include "Camera.h"
 #include <imgui/imgui.h>
 #include <string>
 #include <sstream>
@@ -224,7 +226,8 @@ void WinningFactionWidget::render(const sf::Window& window)
 
 //UIManager
 UIManager::UIManager()
-	: m_playerDetailsWidget(),	
+	: m_selectedEntity(),
+	m_playerDetailsWidget(),	
 	m_selectedEntityWidget(),
 	m_winningFactionWidget()
 {
@@ -255,7 +258,99 @@ UIManager::~UIManager()
 	GameMessenger::getInstance().unsubscribe<GameMessages::BaseMessage<eGameMessageType::UIClearWinner>>(this);
 }
 
-void UIManager::update(const sf::Window& window)
+void UIManager::handleInput(const sf::Window& window, const FactionHandler& factionHandler, const Camera& camera,
+	const sf::Event& currentSFMLEvent)
+{
+	if (currentSFMLEvent.type == sf::Event::MouseButtonPressed &&
+		currentSFMLEvent.mouseButton.button == sf::Mouse::Left)
+	{
+		glm::vec3 mouseToGroundPosition = camera.getMouseToGroundPosition(window);
+		const Entity* selectedEntity = nullptr;
+		for (const auto& faction : factionHandler.getFactions())
+		{
+			if (faction)
+			{
+				selectedEntity = faction->getEntity(mouseToGroundPosition);
+				if (selectedEntity)
+				{
+					m_selectedEntity.set(faction->getController(), selectedEntity->getID());
+					break;
+				}
+			}
+		}
+
+		if (!selectedEntity)
+		{
+			m_selectedEntity.reset();
+		}
+	}
+}
+
+void UIManager::handleEvent(const GameEvent& gameEvent)
+{
+	switch (gameEvent.type)
+	{
+	case eGameEventType::SetTargetEntityGUI:
+		m_selectedEntity.set(gameEvent.data.setTargetEntityGUI.factionController,
+			gameEvent.data.setTargetEntityGUI.entityID);
+		break;
+	case eGameEventType::ResetTargetEntityGUI:
+		m_selectedEntity.reset();
+		break;
+	}
+}
+
+void UIManager::update(const FactionHandler& factionHandler)
+{
+	if (m_selectedEntity.getID() != Globals::INVALID_ENTITY_ID &&
+		factionHandler.isFactionActive(m_selectedEntity.getFactionController()))
+	{
+		const Entity* targetEntity = factionHandler.getFaction(m_selectedEntity.getFactionController()).getEntity(m_selectedEntity.getID());
+		if (!targetEntity)
+		{
+			m_selectedEntity.reset();
+			m_selectedEntityWidget.deactivate();
+		}
+		else
+		{
+			switch (targetEntity->getEntityType())
+			{
+			case eEntityType::HQ:
+			case eEntityType::Barracks:
+			{
+				const UnitSpawnerBuilding& unitSpawnerBuilding = static_cast<const UnitSpawnerBuilding&>(*targetEntity);
+				m_selectedEntityWidget.set({ m_selectedEntity.getFactionController(), m_selectedEntity.getID(), targetEntity->getEntityType(),
+					unitSpawnerBuilding.getHealth(), unitSpawnerBuilding.getShield(), unitSpawnerBuilding.getCurrentSpawnCount(),
+					unitSpawnerBuilding.getSpawnTimer().getExpiredTime() - unitSpawnerBuilding.getSpawnTimer().getElaspedTime() });
+			}
+			break;
+			case eEntityType::Unit:
+			case eEntityType::SupplyDepot:
+			case eEntityType::Turret:
+			case eEntityType::Laboratory:
+				m_selectedEntityWidget.set({ m_selectedEntity.getFactionController(), m_selectedEntity.getID(), targetEntity->getEntityType(),
+					targetEntity->getHealth(), targetEntity->getShield() });
+				break;
+			case eEntityType::Worker:
+			{
+				const Timer& buildTimer = static_cast<const Worker&>(*targetEntity).getBuildTimer();
+				m_selectedEntityWidget.set({ m_selectedEntity.getFactionController(), m_selectedEntity.getID(), targetEntity->getEntityType(),
+					targetEntity->getHealth(), targetEntity->getShield(), buildTimer.getExpiredTime() - buildTimer.getElaspedTime() });
+			}
+			break;
+			default:
+				assert(false);
+			}
+		}
+	}
+	else
+	{
+		m_selectedEntity.reset();
+		m_selectedEntityWidget.deactivate();
+	}
+}
+
+void UIManager::render(const sf::Window& window)
 {
 	m_playerDetailsWidget.render(window);
 	m_selectedEntityWidget.render(window);	

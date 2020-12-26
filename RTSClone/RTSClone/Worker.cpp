@@ -408,7 +408,7 @@ void Worker::renderBuildingCommands(ShaderHandler& shaderHandler) const
 {
 	for (const auto& buildingCommand : m_buildingCommands)
 	{
-		buildingCommand.m_model.get().render(shaderHandler, buildingCommand.buildPosition);
+		buildingCommand.m_model.get().render(shaderHandler, buildingCommand.buildPosition, m_owningFaction.getController());
 	}
 }
 

@@ -33,7 +33,6 @@ struct GameEvent_1
 	eEntityType entityType;
 	int targetID;
 };
-
 struct PlayerSpawnUnitEvent : public GameEvent_1 {
 	PlayerSpawnUnitEvent(eEntityType entityType, int targetID) :
 		GameEvent_1(entityType, targetID) {}

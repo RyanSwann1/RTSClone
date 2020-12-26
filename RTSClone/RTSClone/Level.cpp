@@ -4,6 +4,7 @@
 #include "GameMessenger.h"
 #include "GameMessages.h"
 #include "ModelManager.h"
+#include "UIManager.h"
 #include "Camera.h"
 #include <imgui/imgui.h>
 
@@ -55,8 +56,7 @@ Level::Level(std::vector<SceneryGameObject>&& scenery, FactionsContainer&& facti
 	m_factions(std::move(factions)),
 	m_unitStateHandlerTimer(TIME_BETWEEN_UNIT_STATE, true),
 	m_factionHandler(m_factions),
-	m_projectileHandler(),
-	m_selectedTargetGUI()
+	m_projectileHandler()
 {
 	setAITargetFaction();
 }
@@ -69,60 +69,6 @@ void Level::setAITargetFaction()
 		{
 			static_cast<FactionAI&>(*faction.get()).setTargetFaction(m_factionHandler);
 		}
-	}
-}
-
-void Level::handleGUI()
-{
-	if (m_selectedTargetGUI.getID() != Globals::INVALID_ENTITY_ID &&
-		m_factionHandler.isFactionActive(m_selectedTargetGUI.getFactionController()))
-	{
-		const Entity* targetEntity = m_factionHandler.getFaction(m_selectedTargetGUI.getFactionController()).getEntity(m_selectedTargetGUI.getID());
-		if (!targetEntity)
-		{
-			m_selectedTargetGUI.reset();
-			GameMessenger::getInstance().broadcast<GameMessages::BaseMessage<eGameMessageType::UIClearDisplaySelectedEntity>>({});
-		}
-		else
-		{
-			switch (targetEntity->getEntityType())
-			{
-			case eEntityType::HQ:
-			case eEntityType::Barracks:
-			{
-				const UnitSpawnerBuilding& unitSpawnerBuilding = static_cast<const UnitSpawnerBuilding&>(*targetEntity);
-
-				GameMessenger::getInstance().broadcast<GameMessages::UIDisplaySelectedEntity>(
-					{ m_selectedTargetGUI.getFactionController(), m_selectedTargetGUI.getID(), targetEntity->getEntityType(),
-					unitSpawnerBuilding.getHealth(), unitSpawnerBuilding.getShield(), unitSpawnerBuilding.getCurrentSpawnCount(),
-					unitSpawnerBuilding.getSpawnTimer().getExpiredTime() - unitSpawnerBuilding.getSpawnTimer().getElaspedTime() });
-			}
-				break;
-			case eEntityType::Unit:
-			case eEntityType::SupplyDepot:
-			case eEntityType::Turret:
-			case eEntityType::Laboratory:
-				GameMessenger::getInstance().broadcast<GameMessages::UIDisplaySelectedEntity>(
-					{ m_selectedTargetGUI.getFactionController(), m_selectedTargetGUI.getID(), targetEntity->getEntityType(),
-					targetEntity->getHealth(), targetEntity->getShield() });
-				break;
-			case eEntityType::Worker:
-			{
-				const Timer& buildTimer = static_cast<const Worker&>(*targetEntity).getBuildTimer();
-				GameMessenger::getInstance().broadcast<GameMessages::UIDisplaySelectedEntity>(
-					{ m_selectedTargetGUI.getFactionController(), m_selectedTargetGUI.getID(), targetEntity->getEntityType(),
-					targetEntity->getHealth(), targetEntity->getShield(), buildTimer.getExpiredTime() - buildTimer.getElaspedTime() });
-			}
-			break;
-			default:
-				assert(false);
-			}
-		}
-	}
-	else
-	{
-		m_selectedTargetGUI.reset();
-		GameMessenger::getInstance().broadcast<GameMessages::BaseMessage<eGameMessageType::UIClearDisplaySelectedEntity>>({});
 	}
 }
 
@@ -171,51 +117,32 @@ const Faction* Level::getWinningFaction() const
 	return winningFaction;
 }
 
-void Level::handleInput(const sf::Window& window, const Camera& camera, const sf::Event& currentSFMLEvent, const Map& map)
+void Level::handleInput(const sf::Window& window, const Camera& camera, const sf::Event& currentSFMLEvent, const Map& map,
+	UIManager& uiManager)
 {
 	if (ImGui::IsWindowHovered(ImGuiHoveredFlags_::ImGuiHoveredFlags_AnyWindow))
 	{
 		return;
 	}
 
-	if (currentSFMLEvent.type == sf::Event::MouseButtonPressed)
-	{
-		glm::vec3 mouseToGroundPosition = camera.getMouseToGroundPosition(window);
-		if (currentSFMLEvent.mouseButton.button == sf::Mouse::Left)
-		{
-			const Entity* selectedEntity = nullptr;
-			for (const auto& faction : m_factions)
-			{
-				if (faction)
-				{
-					selectedEntity = faction->getEntity(mouseToGroundPosition);
-					if (selectedEntity)
-					{
-						m_selectedTargetGUI.set(faction->getController(), selectedEntity->getID());
-						break;
-					}
-				}
-			}
-
-			if (!selectedEntity)
-			{
-				m_selectedTargetGUI.reset();
-			}
-		}
-
-		for (auto& opposingFaction : m_factionHandler.getOpposingFactions(eFactionController::Player))
-		{
-			opposingFaction.get().selectEntity(mouseToGroundPosition);
-		}
-	}
+	uiManager.handleInput(window, m_factionHandler, camera, currentSFMLEvent);
 
 	if (isFactionActive(m_factions, eFactionController::Player))
 	{
 		getFactionPlayer(m_factions).handleInput(currentSFMLEvent, window, camera, map, m_factionHandler);
 	}
+
+	if (currentSFMLEvent.type == sf::Event::MouseButtonPressed)
+	{
+		glm::vec3 mouseToGroundPosition = camera.getMouseToGroundPosition(window);
+		for (auto& opposingFaction : m_factionHandler.getOpposingFactions(eFactionController::Player))
+		{
+			opposingFaction.get().selectEntity(mouseToGroundPosition);
+		}
+	}
 }
 
-void Level::update(float deltaTime, const Map& map)
+void Level::update(float deltaTime, const Map& map, UIManager& uiManager)
 {
 	m_unitStateHandlerTimer.update(deltaTime);
 
@@ -244,11 +171,12 @@ void Level::update(float deltaTime, const Map& map)
 	{
 		const GameEvent& gameEvent = gameEvents.front();
 		handleEvent(gameEvent, map);
+		uiManager.handleEvent(gameEvent);
 
 		gameEvents.pop();
 	}
 
-	handleGUI();
+	uiManager.update(m_factionHandler);
 }
 
 void Level::renderSelectionBox(const sf::Window& window) const
@@ -387,14 +315,5 @@ void Level::handleEvent(const GameEvent& gameEvent, const Map& map)
 			getFaction(m_factions, eFactionController::Player).handleEvent(gameEvent, map, m_factionHandler);
 		}
 		break;
-	case eGameEventType::SetTargetEntityGUI:
-		m_selectedTargetGUI.set(gameEvent.data.setTargetEntityGUI.factionController, 
-			gameEvent.data.setTargetEntityGUI.entityID);
-		break;
-	case eGameEventType::ResetTargetEntityGUI:
-		m_selectedTargetGUI.reset();
-		break;
-	default:
-		assert(false);
 	}
 }
