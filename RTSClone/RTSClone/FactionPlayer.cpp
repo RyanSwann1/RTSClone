@@ -160,7 +160,7 @@ void FactionPlayer::handleEvent(const GameEvent& gameEvent, const Map& map, Fact
     switch (gameEvent.type)
     {
     case eGameEventType::PlayerActivatePlannedBuilding:
-        m_plannedBuilding.handleEvent(gameEvent.data.playerActivatePlannedBuilding);
+        m_plannedBuilding.activate(gameEvent.data.playerActivatePlannedBuilding);
         break;
     case eGameEventType::PlayerSpawnUnit:
     {
@@ -225,7 +225,7 @@ void FactionPlayer::onEntityRemoval(const Entity& entity)
         removeSelectEntity(m_selectedEntities, entity.getID());
         if (m_plannedBuilding.getWorkerID() == entity.getID())
         {
-            m_plannedBuilding.setActive(false);
+            m_plannedBuilding.deactivate();
         }
         break;
     case eEntityType::Unit:
@@ -276,12 +276,12 @@ int FactionPlayer::instructWorkerToBuild(const Map& map)
             if (selectedWorker != m_workers.end() &&
                 Faction::instructWorkerToBuild(m_plannedBuilding.getEntityType(), m_plannedBuilding.getPosition(), map, *selectedWorker))
             {
-                m_plannedBuilding.setActive(false);
+                m_plannedBuilding.deactivate();
             }
         }
         else if (!isEntityAffordable(m_plannedBuilding.getEntityType()))
         {
-            m_plannedBuilding.setActive(false);
+            m_plannedBuilding.deactivate();
         }
     }
 
@@ -453,7 +453,7 @@ void FactionPlayer::onLeftClick(const sf::Window& window, const Camera& camera, 
 
 void FactionPlayer::onRightClick(const sf::Window& window, const Camera& camera, FactionHandler& factionHandler, const Map& map)
 {
-    m_plannedBuilding.setActive(false);
+    m_plannedBuilding.deactivate();
     glm::vec3 mouseToGroundPosition = camera.getMouseToGroundPosition(window);
     const Faction* targetFaction = nullptr;
     const Entity* targetEntity = nullptr;

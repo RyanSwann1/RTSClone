@@ -11,13 +11,6 @@ PlannedBuilding::PlannedBuilding()
     m_entityType()
 {}
 
-PlannedBuilding::PlannedBuilding(int workerID, const glm::vec3& position, eEntityType entityType)
-    : m_active(true),
-    m_workerID(workerID),
-    m_position(Globals::convertToMiddleGridPosition(position)),
-    m_entityType(entityType)
-{}
-
 const glm::vec3& PlannedBuilding::getPosition() const
 {
     return m_position;
@@ -38,9 +31,10 @@ bool PlannedBuilding::isActive() const
     return m_active;
 }
 
-void PlannedBuilding::setActive(bool active)
+void PlannedBuilding::deactivate()
 {
-    m_active = active;
+    m_active = false;
+    m_workerID = Globals::INVALID_ENTITY_ID;
 }
 
 void PlannedBuilding::setPosition(const glm::vec3& newPosition, const Map& map)
@@ -53,7 +47,7 @@ void PlannedBuilding::setPosition(const glm::vec3& newPosition, const Map& map)
     }
 }
 
-void PlannedBuilding::handleEvent(const PlayerActivatePlannedBuildingEvent& gameEvent)
+void PlannedBuilding::activate(const PlayerActivatePlannedBuildingEvent& gameEvent)
 {
     m_active = true;
     m_entityType = gameEvent.entityType;

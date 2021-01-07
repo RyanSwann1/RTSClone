@@ -11,16 +11,15 @@ class PlannedBuilding
 {
 public:
 	PlannedBuilding();
-	PlannedBuilding(int workerID, const glm::vec3& position, eEntityType entityType);
 
 	const glm::vec3& getPosition() const;
 	int getWorkerID() const;
 	eEntityType getEntityType() const;
 	bool isActive() const;
 
-	void setActive(bool active);
+	void deactivate();
 	void setPosition(const glm::vec3& newPosition, const Map& map);
-	void handleEvent(const PlayerActivatePlannedBuildingEvent& gameEvent);
+	void activate(const PlayerActivatePlannedBuildingEvent& gameEvent);
 	void render(ShaderHandler& shaderHandler, eFactionController owningFactionController) const;
 
 private:
