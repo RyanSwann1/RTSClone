@@ -755,31 +755,26 @@ bool Faction::instructWorkerToBuild(eEntityType entityType, const glm::vec3& pos
 {
     assert(map.isWithinBounds(position) && !map.isPositionOccupied(position));
 
-    bool AABBWithinMapBounds = false;
     AABB buildingAABB;
     switch (entityType)
     {
     case eEntityType::Barracks:
         buildingAABB = { position,  ModelManager::getInstance().getModel(BARRACKS_MODEL_NAME) };
-        AABBWithinMapBounds = map.isWithinBounds(buildingAABB);
         break;
     case eEntityType::SupplyDepot:
         buildingAABB = { position, ModelManager::getInstance().getModel(SUPPLY_DEPOT_MODEL_NAME) };
-        AABBWithinMapBounds = map.isWithinBounds(buildingAABB);
         break;
     case eEntityType::Turret:
         buildingAABB = { position, ModelManager::getInstance().getModel(TURRET_MODEL_NAME) };
-        AABBWithinMapBounds = map.isWithinBounds(buildingAABB);
         break;  
     case eEntityType::Laboratory:
         buildingAABB = { position, ModelManager::getInstance().getModel(LABORATORY_MODEL_NAME) };
-        AABBWithinMapBounds = map.isWithinBounds(buildingAABB);
         break;
     default:
         assert(false);
     }
 
-    if (AABBWithinMapBounds)
+    if (map.isWithinBounds(buildingAABB))
     {
         bool buildingCommandCollision = false;
         for (const auto& worker : m_workers)
