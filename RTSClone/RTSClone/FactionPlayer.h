@@ -4,6 +4,29 @@
 #include "SelectionBox.h"
 #include <SFML/Graphics.hpp>
 
+struct PlayerActivatePlannedBuildingEvent;
+class FactionPlayerPlannedBuilding
+{
+public:
+	FactionPlayerPlannedBuilding();
+
+	const glm::vec3& getPosition() const;
+	int getWorkerID() const;
+	eEntityType getEntityType() const;
+	bool isActive() const;
+
+	void deactivate();
+	void setPosition(const glm::vec3& newPosition, const Map& map);
+	void activate(const PlayerActivatePlannedBuildingEvent& gameEvent);
+	void render(ShaderHandler& shaderHandler, eFactionController owningFactionController) const;
+
+private:
+	bool m_active;
+	int m_workerID;
+	glm::vec3 m_position;
+	eEntityType m_entityType;
+};
+
 struct Camera;
 class FactionPlayer : public Faction
 {
@@ -21,7 +44,7 @@ public:
 	void renderSelectionBox(const sf::Window& window) const;
 
 private:
-	PlannedBuilding m_plannedBuilding;
+	FactionPlayerPlannedBuilding m_plannedBuilding;
 	SelectionBox m_selectionBox;
 	glm::vec3 m_previousMouseToGroundPosition;
 	bool m_attackMoveSelected;

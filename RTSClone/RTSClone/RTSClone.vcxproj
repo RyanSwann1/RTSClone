@@ -176,7 +176,6 @@
     <ClCompile Include="Graph.cpp" />
     <ClCompile Include="Laboratory.cpp" />
     <ClCompile Include="Level.cpp" />
-    <ClCompile Include="PlannedBuilding.cpp" />
     <ClCompile Include="Projectile.cpp" />
     <ClCompile Include="ProjectileHandler.cpp" />
     <ClCompile Include="RenderPathMesh.cpp" />
@@ -265,7 +264,6 @@
     <ClInclude Include="EntityType.h" />
     <ClInclude Include="FactionHandler.h" />
     <ClInclude Include="Laboratory.h" />
-    <ClInclude Include="PlannedBuilding.h" />
     <ClInclude Include="RenderPathMesh.h" />
     <ClInclude Include="SceneryGameObject.h" />
     <ClInclude Include="Level.h" />

@@ -93,6 +93,80 @@ namespace
     }
 }
 
+FactionPlayerPlannedBuilding::FactionPlayerPlannedBuilding()
+    : m_active(false),
+    m_workerID(Globals::INVALID_ENTITY_ID),
+    m_position(),
+    m_entityType()
+{}
+
+const glm::vec3& FactionPlayerPlannedBuilding::getPosition() const
+{
+    return m_position;
+}
+
+int FactionPlayerPlannedBuilding::getWorkerID() const
+{
+    return m_workerID;
+}
+
+eEntityType FactionPlayerPlannedBuilding::getEntityType() const
+{
+    return m_entityType;
+}
+
+bool FactionPlayerPlannedBuilding::isActive() const
+{
+    return m_active;
+}
+
+void FactionPlayerPlannedBuilding::deactivate()
+{
+    m_active = false;
+    m_workerID = Globals::INVALID_ENTITY_ID;
+}
+
+void FactionPlayerPlannedBuilding::setPosition(const glm::vec3& newPosition, const Map& map)
+{
+    assert(m_workerID != Globals::INVALID_ENTITY_ID);
+
+    if (map.isWithinBounds(newPosition) && !map.isPositionOccupied(newPosition))
+    {
+        m_position = Globals::convertToMiddleGridPosition(Globals::convertToNodePosition(newPosition));
+    }
+}
+
+void FactionPlayerPlannedBuilding::activate(const PlayerActivatePlannedBuildingEvent& gameEvent)
+{
+    m_active = true;
+    m_entityType = gameEvent.entityType;
+    m_workerID = gameEvent.targetID;
+}
+
+void FactionPlayerPlannedBuilding::render(ShaderHandler& shaderHandler, eFactionController owningFactionController) const
+{
+    if (m_active)
+    {
+        switch (m_entityType)
+        {
+        case eEntityType::SupplyDepot:
+            ModelManager::getInstance().getModel(SUPPLY_DEPOT_MODEL_NAME).render(shaderHandler, m_position, owningFactionController);
+            break;
+        case eEntityType::Barracks:
+            ModelManager::getInstance().getModel(BARRACKS_MODEL_NAME).render(shaderHandler, m_position, owningFactionController);
+            break;
+        case eEntityType::Turret:
+            ModelManager::getInstance().getModel(TURRET_MODEL_NAME).render(shaderHandler, m_position, owningFactionController);
+            break;
+        case eEntityType::Laboratory:
+            ModelManager::getInstance().getModel(LABORATORY_MODEL_NAME).render(shaderHandler, m_position, owningFactionController);
+            break;
+        default:
+            assert(false);
+        }
+    }
+}
+
 FactionPlayer::FactionPlayer(eFactionController factionController, const glm::vec3& hqStartingPosition, 
     const std::vector<glm::vec3>& mineralPositions, int startingResources, int startingPopulationCap)
     : Faction(factionController, hqStartingPosition, mineralPositions, startingResources, startingPopulationCap),
