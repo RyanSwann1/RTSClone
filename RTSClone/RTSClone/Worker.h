@@ -3,7 +3,6 @@
 #include "Entity.h"
 #include "Timer.h"
 #include "AdjacentPositions.h"
-#include "PlannedBuilding.h"
 #include <queue>
 #include <vector>
 #include <deque>

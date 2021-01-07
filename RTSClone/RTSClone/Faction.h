@@ -7,7 +7,6 @@
 #include "SupplyDepot.h"
 #include "Mineral.h"
 #include "FactionController.h"
-#include "PlannedBuilding.h"
 #include "Turret.h"
 #include "Laboratory.h"
 #include <forward_list>
