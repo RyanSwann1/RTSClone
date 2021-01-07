@@ -30,7 +30,7 @@ private:
 	void onEntityRemoval(const Entity& entity) override;
 
 	void instructWorkerReturnMinerals(const Map& map);
-	bool instructWorkerToBuild(const Map& map);
+	int instructWorkerToBuild(const Map& map);
 	void moveSingularSelectedEntity(const glm::vec3& mouseToGroundPosition, const Map& map, Entity& selectedEntity, FactionHandler& factionHandler) const;
 	void moveMultipleSelectedEntities(const glm::vec3& mouseToGroundPosition, const Map& map, FactionHandler& factionHandler);
 

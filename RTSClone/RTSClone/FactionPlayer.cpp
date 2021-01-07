@@ -256,31 +256,36 @@ void FactionPlayer::instructWorkerReturnMinerals(const Map& map)
     }
 }
 
-bool FactionPlayer::instructWorkerToBuild(const Map& map)
+int FactionPlayer::instructWorkerToBuild(const Map& map)
 {
-    if (map.isWithinBounds(m_plannedBuilding.getPosition()) && 
-        !map.isPositionOccupied(m_plannedBuilding.getPosition()) && 
-        isEntityAffordable(m_plannedBuilding.getEntityType()))
+    int workerID = Globals::INVALID_ENTITY_ID;
+    if (m_plannedBuilding.isActive())
     {
-        assert(m_plannedBuilding.getWorkerID() != Globals::INVALID_ENTITY_ID);
-        int workerID = m_plannedBuilding.getWorkerID();
-        auto selectedWorker = std::find_if(m_workers.begin(), m_workers.end(), [workerID](const auto& worker)
+        workerID = m_plannedBuilding.getWorkerID();
+        if (map.isWithinBounds(m_plannedBuilding.getPosition()) &&
+            !map.isPositionOccupied(m_plannedBuilding.getPosition()) &&
+            isEntityAffordable(m_plannedBuilding.getEntityType()))
         {
-            return worker.getID() == workerID;
-        });
+            assert(m_plannedBuilding.getWorkerID() != Globals::INVALID_ENTITY_ID);
+            auto selectedWorker = std::find_if(m_workers.begin(), m_workers.end(), [workerID](const auto& worker)
+            {
+                return worker.getID() == workerID;
+            });
 
-        assert(selectedWorker != m_workers.cend());
-        if (selectedWorker != m_workers.end())
+            assert(selectedWorker != m_workers.cend());
+            if (selectedWorker != m_workers.end() &&
+                Faction::instructWorkerToBuild(m_plannedBuilding.getEntityType(), m_plannedBuilding.getPosition(), map, *selectedWorker))
+            {
+                m_plannedBuilding.setActive(false);
+            }
+        }
+        else if (!isEntityAffordable(m_plannedBuilding.getEntityType()))
         {
-            return Faction::instructWorkerToBuild(m_plannedBuilding.getEntityType(), m_plannedBuilding.getPosition(), map, *selectedWorker);
+            m_plannedBuilding.setActive(false);
         }
     }
-    else if (!isEntityAffordable(m_plannedBuilding.getEntityType()))
-    {
-        m_plannedBuilding.setActive(false);
-    }
 
-    return false;
+    return workerID;
 }
 
 void FactionPlayer::moveSingularSelectedEntity(const glm::vec3& mouseToGroundPosition, const Map& map, Entity& selectedEntity, 
@@ -419,29 +424,19 @@ void FactionPlayer::moveMultipleSelectedEntities(const glm::vec3& mouseToGroundP
 
 void FactionPlayer::onLeftClick(const sf::Window& window, const Camera& camera, const Map& map)
 {
-    bool selectAllUnits = false;
-    int entityIDSelected = Globals::INVALID_ENTITY_ID;
     glm::vec3 mouseToGroundPosition = camera.getMouseToGroundPosition(window);
+
+    m_selectionBox.setStartingPosition(window, mouseToGroundPosition);
+    
+    int workerIDSelected = instructWorkerToBuild(map);
+    selectEntity<Unit>(m_units, mouseToGroundPosition, mouseToGroundPosition == m_previousMouseToGroundPosition);
+    selectEntity<Worker>(m_workers, mouseToGroundPosition, mouseToGroundPosition == m_previousMouseToGroundPosition, workerIDSelected);
+    setSelectedEntities(m_selectedEntities, m_units, m_workers);
+
     if (mouseToGroundPosition != m_previousMouseToGroundPosition)
     {
         m_previousMouseToGroundPosition = mouseToGroundPosition;
-
-        if (m_plannedBuilding.isActive() && instructWorkerToBuild(map))
-        {
-            entityIDSelected = m_plannedBuilding.getWorkerID();
-            m_plannedBuilding.setActive(false);
-        }
     }
-    else
-    {
-        selectAllUnits = true;
-    }
-
-    m_selectionBox.setStartingPosition(window, mouseToGroundPosition);
-
-    selectEntity<Unit>(m_units, mouseToGroundPosition, selectAllUnits);
-    selectEntity<Worker>(m_workers, mouseToGroundPosition, selectAllUnits, entityIDSelected);
-    setSelectedEntities(m_selectedEntities, m_units, m_workers);
 
     if (m_selectedEntities.empty())
     {
