@@ -21,7 +21,6 @@ namespace
         const Faction& targetFaction, const Map& map, FactionHandler& factionHandler)
     {
         assert(!selectedEntities.empty());
-        
         std::sort(selectedEntities.begin(), selectedEntities.end(), [&](const auto& selectedUnitA, const auto& selectedUnitB)
         {
             return Globals::getSqrDistance(targetEntity.getPosition(), selectedUnitA->getPosition()) <
@@ -66,8 +65,7 @@ namespace
 
     glm::vec3 getAveragePosition(std::vector<Entity*>& selectedEntities)
     {
-        assert(!selectedEntities.empty());
-      
+        assert(!selectedEntities.empty()); 
         std::sort(selectedEntities.begin(), selectedEntities.end(), [](const auto& unitA, const auto& unitB)
         {
             return glm::all(glm::lessThan(unitA->getPosition(), unitB->getPosition()));
@@ -80,6 +78,18 @@ namespace
         }
     
         return { total.x / selectedEntities.size(), total.y / selectedEntities.size(), total.z / selectedEntities.size() };
+    }
+
+    void removeSelectEntity(std::vector<Entity*>& selectedEntities, int entityID)
+    {
+        auto selectedUnit = std::find_if(selectedEntities.begin(), selectedEntities.end(), [entityID](const auto& selectedUnit)
+        {
+            return selectedUnit->getID() == entityID;
+        });
+        if (selectedUnit != selectedEntities.end())
+        {
+            selectedEntities.erase(selectedUnit);
+        }
     }
 }
 
@@ -212,19 +222,23 @@ void FactionPlayer::onEntityRemoval(const Entity& entity)
     switch (entity.getEntityType())
     {
     case eEntityType::Worker:
-    case eEntityType::Unit:
-    {
-        int entityID = entity.getID();
-        auto selectedUnit = std::find_if(m_selectedEntities.begin(), m_selectedEntities.end(), [entityID](const auto& selectedUnit)
+        removeSelectEntity(m_selectedEntities, entity.getID());
+        if (m_plannedBuilding.getWorkerID() == entity.getID())
         {
-            return selectedUnit->getID() == entityID;
-        });
-        if (selectedUnit != m_selectedEntities.end())
-        {
-            m_selectedEntities.erase(selectedUnit);
+            m_plannedBuilding.setActive(false);
         }
-    }
         break;
+    case eEntityType::Unit:
+        removeSelectEntity(m_selectedEntities, entity.getID());
+        break;
+    case eEntityType::HQ:
+    case eEntityType::SupplyDepot:
+    case eEntityType::Barracks:
+    case eEntityType::Turret:
+    case eEntityType::Laboratory:
+        break;
+    default:
+        assert(false);
     }
 }
 
