@@ -113,7 +113,6 @@ struct SpawnProjectileEvent : public GameEvent_5 {
 		: GameEvent_5(senderFaction, senderID, targetFaction, targetID, damage, startingPosition, endingPosition) {}
 };
 
-
 union GameEvents
 {
 	RevalidateMovementPathsEvent			revalidateMovementPaths;

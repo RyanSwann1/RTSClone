@@ -787,7 +787,7 @@ bool Faction::instructWorkerToBuild(eEntityType entityType, const glm::vec3& pos
             auto buildingCommand = std::find_if(worker.getBuildingCommands().cbegin(), worker.getBuildingCommands().cend(),
                 [&buildingAABB, &position](const auto& buildingCommand)
             {
-                return buildingAABB.contains(position);
+                return buildingAABB.contains(buildingCommand.buildPosition);
             });
             if (buildingCommand != worker.getBuildingCommands().cend())
             {
@@ -802,7 +802,6 @@ bool Faction::instructWorkerToBuild(eEntityType entityType, const glm::vec3& pos
             if (worker.build([this, &map, buildPosition, entityType]()
                 { return spawnBuilding(map, buildPosition, entityType); }, buildPosition, map, entityType))
             {
-
                 return true;
             }
         }
