@@ -179,7 +179,7 @@ void Worker::update(float deltaTime, const UnitSpawnerBuilding& HQ, const Map& m
 		}
 		break;
 	case eWorkerState::Harvesting:
-		assert(m_currentResourceAmount <= RESOURCE_CAPACITY);
+		assert(m_currentResourceAmount <= RESOURCE_CAPACITY && m_taskTimer.isActive());
 		if (m_currentResourceAmount < RESOURCE_CAPACITY)
 		{
 			if (m_taskTimer.isExpired())
@@ -190,8 +190,7 @@ void Worker::update(float deltaTime, const UnitSpawnerBuilding& HQ, const Map& m
 		}
 		else
 		{
-			glm::vec3 destination = PathFinding::getInstance().getClosestPositionToAABB(m_position,
-				HQ.getAABB(), map);
+			glm::vec3 destination = PathFinding::getInstance().getClosestPositionToAABB(m_position, HQ.getAABB(), map);
 			moveTo(destination, map, [&](const glm::ivec2& position) { return getAdjacentPositions(position, map); },
 				eWorkerState::ReturningMineralsToHQ);
 		}
@@ -205,7 +204,7 @@ void Worker::update(float deltaTime, const UnitSpawnerBuilding& HQ, const Map& m
 		break;
 	case eWorkerState::Building:
 	{
-		assert(m_pathToPosition.empty() && !m_buildingCommands.empty());
+		assert(m_pathToPosition.empty() && !m_buildingCommands.empty() && m_taskTimer.isActive());
 		if (!m_taskTimer.isExpired())
 		{
 			break;
@@ -244,8 +243,8 @@ void Worker::update(float deltaTime, const UnitSpawnerBuilding& HQ, const Map& m
 		}
 		break;
 	case eWorkerState::Repairing:
-		assert(m_pathToPosition.empty() && 
-			m_repairTargetEntityID != Globals::INVALID_ENTITY_ID);
+		assert(m_pathToPosition.empty() && m_repairTargetEntityID != Globals::INVALID_ENTITY_ID &&
+			m_taskTimer.isActive());
 
 		if (m_taskTimer.isExpired())
 		{
@@ -309,18 +308,9 @@ void Worker::update(float deltaTime, const UnitSpawnerBuilding& HQ, const Map& m
 void Worker::moveTo(const glm::vec3& destinationPosition, const Map& map, const AdjacentPositions& adjacentPositions, 
 	eWorkerState state, const Mineral* mineralToHarvest)
 {
-	if (state != eWorkerState::MovingToBuildingPosition && !m_buildingCommands.empty())
-	{		 
-		m_taskTimer.resetElaspedTime();
-		m_buildingCommands.clear();
-	}
-	else if (state == eWorkerState::Moving)
-	{
-		m_mineralToHarvest = nullptr;
-	}
-
 	if(mineralToHarvest)
 	{
+		assert(state == eWorkerState::MovingToMinerals);
 		m_mineralToHarvest = mineralToHarvest;
 	}
 
@@ -387,10 +377,46 @@ void Worker::renderPathMesh(ShaderHandler& shaderHandler)
 
 void Worker::switchTo(eWorkerState newState)
 {
+	//On Exit Current State
+	switch (m_currentState)
+	{
+	case eWorkerState::Idle:
+	case eWorkerState::Moving:
+		break;
+	case eWorkerState::MovingToMinerals:
+	case eWorkerState::ReturningMineralsToHQ:
+	case eWorkerState::Harvesting:
+		if (newState != eWorkerState::MovingToMinerals && 
+			newState != eWorkerState::ReturningMineralsToHQ &&
+			newState != eWorkerState::Harvesting)
+		{
+			m_mineralToHarvest = nullptr;
+		}
+		break;
+	case eWorkerState::MovingToBuildingPosition:
+	case eWorkerState::Building:
+		if (newState != eWorkerState::MovingToBuildingPosition &&
+			newState != eWorkerState::Building)
+		{
+			m_buildingCommands.clear();
+		}
+		break;
+	case eWorkerState::MovingToRepairPosition:
+	case eWorkerState::Repairing:
+		if (newState != eWorkerState::MovingToRepairPosition &&
+			newState != eWorkerState::Repairing)
+		{
+			m_repairTargetEntityID = Globals::INVALID_ENTITY_ID;
+		}
+		break;
+	default:
+		assert(false);
+	}
+
+	//On Enter New State
 	switch (newState)
 	{
 	case eWorkerState::Idle:
-		m_taskTimer.resetElaspedTime();
 		m_taskTimer.setActive(false);
 		m_pathToPosition.clear();
 		break;
@@ -399,27 +425,27 @@ void Worker::switchTo(eWorkerState newState)
 	case eWorkerState::ReturningMineralsToHQ:
 	case eWorkerState::MovingToBuildingPosition:
 	case eWorkerState::MovingToRepairPosition:
-		m_taskTimer.resetElaspedTime();
 		m_taskTimer.setActive(false);
 		break;
 	case eWorkerState::Harvesting:
 		m_taskTimer.resetExpirationTime(HARVEST_EXPIRATION_TIME);
-		m_taskTimer.resetElaspedTime();
 		m_taskTimer.setActive(true);
+		m_pathToPosition.clear();
 		break;
 	case eWorkerState::Building:
 		m_taskTimer.resetExpirationTime(BUILD_EXPIRATION_TIME);
-		m_taskTimer.resetElaspedTime();
 		m_taskTimer.setActive(true);
+		m_pathToPosition.clear();
 		break;
 	case eWorkerState::Repairing:
 		m_taskTimer.resetExpirationTime(REPAIR_EXPIRATION_TIME);
-		m_taskTimer.resetElaspedTime();
 		m_taskTimer.setActive(true);
+		m_pathToPosition.clear();
 		break;
 	default:
 		assert(false);
 	}
 
+	m_taskTimer.resetElaspedTime();
 	m_currentState = newState;
 }
