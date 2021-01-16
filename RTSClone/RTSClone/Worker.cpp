@@ -310,11 +310,7 @@ void Worker::update(float deltaTime, const UnitSpawnerBuilding& HQ, const Map& m
 void Worker::moveTo(const glm::vec3& destinationPosition, const Map& map, const AdjacentPositions& adjacentPositions, 
 	eWorkerState state, const Mineral* mineralToHarvest)
 {
-	glm::vec3 closestDestination = m_position;
-	if (!m_pathToPosition.empty())
-	{
-		closestDestination = m_pathToPosition.back();
-	}
+	glm::vec3 previousDestination = Globals::getNextPathDestination(m_pathToPosition, m_position);
 
 	PathFinding::getInstance().getPathToPosition(*this, destinationPosition, m_pathToPosition, adjacentPositions,
 		map, m_owningFaction);
@@ -324,9 +320,9 @@ void Worker::moveTo(const glm::vec3& destinationPosition, const Map& map, const 
 	}
 	else
 	{
-		if (closestDestination != m_position)
+		if (previousDestination != m_position)
 		{
-			m_pathToPosition.push_back(closestDestination);
+			m_pathToPosition.push_back(previousDestination);
 			switchTo(state);
 		}
 		else

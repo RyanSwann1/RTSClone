@@ -13,6 +13,7 @@
 #include <array>
 #include <random>
 #include <string>
+#include <vector>
 
 namespace Globals
 { 
@@ -236,5 +237,15 @@ namespace Globals
 	inline float getAngle(const glm::vec3& positionB, const glm::vec3& positionA, float offsetYRotation = 90.0f)
 	{
 		return glm::degrees(atan2(positionB.z - positionA.z, positionA.x - positionB.x)) + offsetYRotation;
+	}
+
+	const glm::vec3& getNextPathDestination(const std::vector<glm::vec3>& pathToPosition, const glm::vec3& position)
+	{
+		if (!pathToPosition.empty())
+		{
+			return pathToPosition.front();
+		}
+
+		return position;
 	}
 }

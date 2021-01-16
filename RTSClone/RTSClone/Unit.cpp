@@ -21,16 +21,6 @@ namespace
 	const float UNIT_ATTACK_RANGE = UNIT_GRID_ATTACK_RANGE * Globals::NODE_SIZE;
 	const float TIME_BETWEEN_ATTACK = 1.0f;
 	const int DAMAGE = 1;
-
-	const glm::vec3& getNextPathDestination(const std::vector<glm::vec3>& pathToPosition, const glm::vec3& position)
-	{
-		if (!pathToPosition.empty())
-		{
-			return pathToPosition.front();
-		}
-
-		return position;
-	}
 }
 
 Unit::Unit(const Faction& owningFaction, const glm::vec3& startingPosition)
@@ -81,7 +71,7 @@ void Unit::resetTarget()
 void Unit::moveToAttackPosition(const Entity& targetEntity, const Faction& targetFaction, const Map& map,
 	FactionHandler& factionHandler)
 {
-	glm::vec3 previousDestination = getNextPathDestination(m_pathToPosition, m_position);
+	glm::vec3 previousDestination = Globals::getNextPathDestination(m_pathToPosition, m_position);
 
 	if (PathFinding::getInstance().setUnitAttackPosition(*this, targetEntity, m_pathToPosition, map,
 		factionHandler))
@@ -124,7 +114,7 @@ void Unit::moveToAttackPosition(const Entity& targetEntity, const Faction& targe
 void Unit::moveTo(const glm::vec3& destinationPosition, const Map& map, const AdjacentPositions& adjacentPositions, 
 	FactionHandler& factionHandler, eUnitState state)
 {
-	glm::vec3 previousDestination = getNextPathDestination(m_pathToPosition, m_position);
+	glm::vec3 previousDestination = Globals::getNextPathDestination(m_pathToPosition, m_position);
 
 	PathFinding::getInstance().getPathToPosition(*this, destinationPosition, m_pathToPosition, adjacentPositions,
 		map, factionHandler, m_owningFaction);
