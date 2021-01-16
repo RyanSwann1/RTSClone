@@ -50,7 +50,7 @@ Entity::Entity(const Model& model, const glm::vec3& startingPosition, eEntityTyp
 	m_maximumHealth(health),
 	m_health(m_maximumHealth),
 	m_type(entityType),
-	m_shieldReplenishTimer(SHIELD_REPLENISH_TIMER_EXPIRATION, true),
+	m_shieldReplenishTimer(SHIELD_REPLENISH_TIMER_EXPIRATION, false),
 	m_model(model),
 	m_selected(false)
 {
@@ -71,12 +71,14 @@ Entity::Entity(const Model& model, const glm::vec3& startingPosition, eEntityTyp
 	}
 
 	m_AABB.reset(m_position, m_model);
+	if (m_maximumShield == 1)
+	{
+		m_shieldReplenishTimer.setActive(true);
+	}
 }
 
 void Entity::update(float deltaTime)
 {
-	assert(m_shieldReplenishTimer.isActive());
-	
 	m_shieldReplenishTimer.update(deltaTime);
 	if (m_shieldReplenishTimer.isExpired())
 	{
@@ -215,8 +217,9 @@ void Entity::increaseMaximumShield(const Faction& owningFaction)
 	m_maximumShield = owningFaction.getCurrentShieldAmount();
 	if (m_maximumShield == 1)
 	{
-		assert(m_shield == 0);
+		assert(m_shield == 0 && !m_shieldReplenishTimer.isActive());
 		m_shield = m_maximumShield;
+		m_shieldReplenishTimer.setActive(true);
 	}
 }
 
