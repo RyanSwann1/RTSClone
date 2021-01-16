@@ -49,7 +49,6 @@ public:
 	const std::deque<BuildingCommand>& getBuildingCommands() const;
 	const std::vector<glm::vec3>& getPathToPosition() const;
 	eWorkerState getCurrentState() const;
-	const Timer& getTaskTimer() const;
 	bool isHoldingResources() const;
 	int extractResources();	
 
@@ -81,4 +80,6 @@ private:
 #ifdef RENDER_PATHING
 	Mesh m_renderPathMesh;
 #endif // RENDER_PATHING
+
+	void switchTo(eWorkerState newState);
 };

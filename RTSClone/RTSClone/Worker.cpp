@@ -80,11 +80,6 @@ eWorkerState Worker::getCurrentState() const
 	return m_currentState;
 }
 
-const Timer& Worker::getTaskTimer() const
-{
-	return m_taskTimer;
-}
-
 bool Worker::isHoldingResources() const
 {
 	return m_currentResourceAmount > 0;
@@ -95,14 +90,13 @@ int Worker::extractResources()
 	assert(isHoldingResources());
 	int resources = m_currentResourceAmount;
 	m_currentResourceAmount = 0;
+
 	return resources;
 }
 
 void Worker::setEntityToRepair(const Entity& entity, const Map& map)
 {
 	m_repairTargetEntityID = entity.getID();
-	m_taskTimer.resetElaspedTime();
-	m_taskTimer.resetExpirationTime(REPAIR_EXPIRATION_TIME);
 
 	glm::vec3 destination = PathFinding::getInstance().getClosestPositionToAABB(m_position, entity.getAABB(), map);
 	moveTo(destination, map, [&](const glm::ivec2& position) { return getAdjacentPositions(position, map); },
@@ -110,7 +104,7 @@ void Worker::setEntityToRepair(const Entity& entity, const Map& map)
 
 	if (m_pathToPosition.empty())
 	{
-		m_currentState = eWorkerState::Repairing;
+		switchTo(eWorkerState::Repairing);
 	}
 }
 
@@ -157,13 +151,13 @@ void Worker::update(float deltaTime, const UnitSpawnerBuilding& HQ, const Map& m
 	case eWorkerState::Moving:
 		if (m_pathToPosition.empty())
 		{
-			m_currentState = eWorkerState::Idle;
+			switchTo(eWorkerState::Idle);
 		}
 		break;
 	case eWorkerState::MovingToMinerals:
 		if (m_pathToPosition.empty())
 		{
-			m_currentState = eWorkerState::Harvesting;
+			switchTo(eWorkerState::Harvesting);
 		}
 		break;
 	case eWorkerState::ReturningMineralsToHQ:
@@ -180,7 +174,7 @@ void Worker::update(float deltaTime, const UnitSpawnerBuilding& HQ, const Map& m
 			}
 			else
 			{
-				m_currentState = eWorkerState::Idle;
+				switchTo(eWorkerState::Idle);
 			}
 		}
 		break;
@@ -188,9 +182,6 @@ void Worker::update(float deltaTime, const UnitSpawnerBuilding& HQ, const Map& m
 		assert(m_currentResourceAmount <= RESOURCE_CAPACITY);
 		if (m_currentResourceAmount < RESOURCE_CAPACITY)
 		{
-			m_taskTimer.resetExpirationTime(HARVEST_EXPIRATION_TIME);
-			m_taskTimer.setActive(true);
-			m_taskTimer.update(deltaTime);
 			if (m_taskTimer.isExpired())
 			{
 				m_taskTimer.resetElaspedTime();
@@ -199,8 +190,6 @@ void Worker::update(float deltaTime, const UnitSpawnerBuilding& HQ, const Map& m
 		}
 		else
 		{
-			m_pathToPosition.clear();
-			m_taskTimer.setActive(false);
 			glm::vec3 destination = PathFinding::getInstance().getClosestPositionToAABB(m_position,
 				HQ.getAABB(), map);
 			moveTo(destination, map, [&](const glm::ivec2& position) { return getAdjacentPositions(position, map); },
@@ -211,22 +200,17 @@ void Worker::update(float deltaTime, const UnitSpawnerBuilding& HQ, const Map& m
 		assert(!m_buildingCommands.empty());
 		if (m_pathToPosition.empty())
 		{
-			m_currentState = eWorkerState::Building;
+			switchTo(eWorkerState::Building);
 		}
 		break;
 	case eWorkerState::Building:
 	{
 		assert(m_pathToPosition.empty() && !m_buildingCommands.empty());
-		m_taskTimer.resetExpirationTime(BUILD_EXPIRATION_TIME);
-		m_taskTimer.setActive(true);
-		m_taskTimer.update(deltaTime);
 		if (!m_taskTimer.isExpired())
 		{
 			break;
 		}
 
-		m_taskTimer.resetElaspedTime();
-		m_taskTimer.setActive(false);
 		const Entity* newBuilding = m_buildingCommands.front().command();
 		m_buildingCommands.pop_front();
 		if (!newBuilding)
@@ -248,7 +232,7 @@ void Worker::update(float deltaTime, const UnitSpawnerBuilding& HQ, const Map& m
 			}
 			else
 			{
-				m_currentState = eWorkerState::Idle;
+				switchTo(eWorkerState::Idle);
 			}
 		}
 	}
@@ -256,14 +240,12 @@ void Worker::update(float deltaTime, const UnitSpawnerBuilding& HQ, const Map& m
 	case eWorkerState::MovingToRepairPosition:
 		if (m_pathToPosition.empty())
 		{
-			m_currentState = eWorkerState::Repairing;
+			switchTo(eWorkerState::Repairing);
 		}
 		break;
 	case eWorkerState::Repairing:
-		assert(m_pathToPosition.empty() && m_repairTargetEntityID != Globals::INVALID_ENTITY_ID);
-		m_taskTimer.resetExpirationTime(REPAIR_EXPIRATION_TIME);
-		m_taskTimer.setActive(true);
-		m_taskTimer.update(deltaTime);
+		assert(m_pathToPosition.empty() && 
+			m_repairTargetEntityID != Globals::INVALID_ENTITY_ID);
 
 		if (m_taskTimer.isExpired())
 		{
@@ -284,15 +266,13 @@ void Worker::update(float deltaTime, const UnitSpawnerBuilding& HQ, const Map& m
 				}
 				else
 				{
-					m_taskTimer.setActive(false);
-					m_currentState = eWorkerState::Idle;
+					switchTo(eWorkerState::Idle);
 					m_repairTargetEntityID = Globals::INVALID_ENTITY_ID;
 				}
 			}
 			else
 			{
-				m_taskTimer.setActive(false);
-				m_currentState = eWorkerState::Idle;
+				switchTo(eWorkerState::Idle);
 				m_repairTargetEntityID = Globals::INVALID_ENTITY_ID;
 			}
 		}
@@ -313,12 +293,16 @@ void Worker::update(float deltaTime, const UnitSpawnerBuilding& HQ, const Map& m
 			}
 			else
 			{
-				m_taskTimer.setActive(false);
-				m_currentState = eWorkerState::Idle;
+				switchTo(eWorkerState::Idle);
 				m_repairTargetEntityID = Globals::INVALID_ENTITY_ID;
 			}
 		}
 		break;
+	}
+
+	if (m_taskTimer.isActive())
+	{
+		m_taskTimer.update(deltaTime);
 	}
 }
 
@@ -350,18 +334,18 @@ void Worker::moveTo(const glm::vec3& destinationPosition, const Map& map, const 
 		map, m_owningFaction);
 	if (!m_pathToPosition.empty())
 	{
-		m_currentState = state;
+		switchTo(state);
 	}
 	else
 	{
 		if (closestDestination != m_position)
 		{
 			m_pathToPosition.push_back(closestDestination);
-			m_currentState = state;
+			switchTo(state);
 		}
 		else
 		{
-			m_currentState = eWorkerState::Idle;
+			switchTo(eWorkerState::Idle);
 		}
 	}
 }
@@ -399,4 +383,43 @@ void Worker::renderBuildingCommands(ShaderHandler& shaderHandler) const
 void Worker::renderPathMesh(ShaderHandler& shaderHandler)
 {
 	RenderPathMesh::render(shaderHandler, m_pathToPosition, m_renderPathMesh);
+}
+
+void Worker::switchTo(eWorkerState newState)
+{
+	switch (newState)
+	{
+	case eWorkerState::Idle:
+		m_taskTimer.resetElaspedTime();
+		m_taskTimer.setActive(false);
+		m_pathToPosition.clear();
+		break;
+	case eWorkerState::Moving:
+	case eWorkerState::MovingToMinerals:
+	case eWorkerState::ReturningMineralsToHQ:
+	case eWorkerState::MovingToBuildingPosition:
+	case eWorkerState::MovingToRepairPosition:
+		m_taskTimer.resetElaspedTime();
+		m_taskTimer.setActive(false);
+		break;
+	case eWorkerState::Harvesting:
+		m_taskTimer.resetExpirationTime(HARVEST_EXPIRATION_TIME);
+		m_taskTimer.resetElaspedTime();
+		m_taskTimer.setActive(true);
+		break;
+	case eWorkerState::Building:
+		m_taskTimer.resetExpirationTime(BUILD_EXPIRATION_TIME);
+		m_taskTimer.resetElaspedTime();
+		m_taskTimer.setActive(true);
+		break;
+	case eWorkerState::Repairing:
+		m_taskTimer.resetExpirationTime(REPAIR_EXPIRATION_TIME);
+		m_taskTimer.resetElaspedTime();
+		m_taskTimer.setActive(true);
+		break;
+	default:
+		assert(false);
+	}
+
+	m_currentState = newState;
 }
