@@ -49,7 +49,7 @@ public:
 	const std::deque<BuildingCommand>& getBuildingCommands() const;
 	const std::vector<glm::vec3>& getPathToPosition() const;
 	eWorkerState getCurrentState() const;
-	const Timer& getBuildTimer() const;
+	const Timer& getTaskTimer() const;
 	bool isHoldingResources() const;
 	int extractResources();	
 
@@ -76,9 +76,7 @@ private:
 	std::deque<BuildingCommand> m_buildingCommands;
 	int m_repairTargetEntityID;
 	int m_currentResourceAmount;
-	Timer m_harvestTimer;
-	Timer m_buildTimer;
-	Timer m_repairTimer;
+	Timer m_taskTimer;
 	const Mineral* m_mineralToHarvest;
 #ifdef RENDER_PATHING
 	Mesh m_renderPathMesh;

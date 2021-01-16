@@ -333,9 +333,18 @@ void UIManager::update(const FactionHandler& factionHandler)
 				break;
 			case eEntityType::Worker:
 			{
-				const Timer& buildTimer = static_cast<const Worker&>(*targetEntity).getBuildTimer();
-				m_selectedEntityWidget.set({ m_selectedEntity.getFactionController(), m_selectedEntity.getID(), targetEntity->getEntityType(),
-					targetEntity->getHealth(), targetEntity->getShield(), buildTimer.getExpiredTime() - buildTimer.getElaspedTime() });
+				const Worker& worker = static_cast<const Worker&>(*targetEntity);
+				if (worker.getCurrentState() == eWorkerState::Building)
+				{
+					const Timer& buildTimer = worker.getTaskTimer();
+					m_selectedEntityWidget.set({ m_selectedEntity.getFactionController(), m_selectedEntity.getID(), targetEntity->getEntityType(),
+						targetEntity->getHealth(), targetEntity->getShield(), buildTimer.getExpiredTime() - buildTimer.getElaspedTime() });
+				}
+				else
+				{
+					m_selectedEntityWidget.set({ m_selectedEntity.getFactionController(), m_selectedEntity.getID(), targetEntity->getEntityType(),
+						targetEntity->getHealth(), targetEntity->getShield(), 0.0f });
+				}
 			}
 			break;
 			default:

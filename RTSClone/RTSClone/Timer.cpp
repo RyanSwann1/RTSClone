@@ -43,3 +43,8 @@ void Timer::resetElaspedTime()
 {
 	m_elaspedTime = 0.0f;
 }
+
+void Timer::resetExpirationTime(float newExpirationTime)
+{
+	m_expirationTime = newExpirationTime;
+}

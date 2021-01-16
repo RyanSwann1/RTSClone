@@ -17,9 +17,9 @@
 
 namespace
 {
-	const float HARVEST_TIME = 2.0f;
-	const float REPAIR_TIME = 3.5f;
-	const float BUILD_TIME = 2.0f;
+	const float HARVEST_EXPIRATION_TIME = 2.0f;
+	const float REPAIR_EXPIRATION_TIME = 3.5f;
+	const float BUILD_EXPIRATION_TIME = 2.0f;
 	const float MOVEMENT_SPEED = 7.5f;
 	const int RESOURCE_CAPACITY = 30;
 	const int RESOURCE_INCREMENT = 10;
@@ -46,9 +46,7 @@ Worker::Worker(const Faction& owningFaction, const glm::vec3& startingPosition)
 	m_buildingCommands(),
 	m_repairTargetEntityID(Globals::INVALID_ENTITY_ID),
 	m_currentResourceAmount(0),
-	m_harvestTimer(HARVEST_TIME, false),
-	m_buildTimer(BUILD_TIME, false),
-	m_repairTimer(REPAIR_TIME, false),
+	m_taskTimer(0.0f, false),
 	m_mineralToHarvest(nullptr)
 {}
 
@@ -60,9 +58,7 @@ Worker::Worker(const Faction& owningFaction, const glm::vec3 & startingPosition,
 	m_buildingCommands(),
 	m_repairTargetEntityID(Globals::INVALID_ENTITY_ID),
 	m_currentResourceAmount(0),
-	m_harvestTimer(HARVEST_TIME, false),
-	m_buildTimer(BUILD_TIME, false),
-	m_repairTimer(REPAIR_TIME, false),
+	m_taskTimer(0.0f, false),
 	m_mineralToHarvest(nullptr)
 {
 	moveTo(destinationPosition, map,
@@ -84,9 +80,9 @@ eWorkerState Worker::getCurrentState() const
 	return m_currentState;
 }
 
-const Timer& Worker::getBuildTimer() const
+const Timer& Worker::getTaskTimer() const
 {
-	return m_buildTimer;
+	return m_taskTimer;
 }
 
 bool Worker::isHoldingResources() const
@@ -105,11 +101,11 @@ int Worker::extractResources()
 void Worker::setEntityToRepair(const Entity& entity, const Map& map)
 {
 	m_repairTargetEntityID = entity.getID();
-	m_repairTimer.resetElaspedTime();
+	m_taskTimer.resetElaspedTime();
+	m_taskTimer.resetExpirationTime(REPAIR_EXPIRATION_TIME);
 
-	moveTo(PathFinding::getInstance().getClosestPositionToAABB(m_position,
-		entity.getAABB(), map),
-		map, [&](const glm::ivec2& position) { return getAdjacentPositions(position, map); },
+	glm::vec3 destination = PathFinding::getInstance().getClosestPositionToAABB(m_position, entity.getAABB(), map);
+	moveTo(destination, map, [&](const glm::ivec2& position) { return getAdjacentPositions(position, map); },
 		eWorkerState::MovingToRepairPosition);
 
 	if (m_pathToPosition.empty())
@@ -192,21 +188,19 @@ void Worker::update(float deltaTime, const UnitSpawnerBuilding& HQ, const Map& m
 		assert(m_currentResourceAmount <= RESOURCE_CAPACITY);
 		if (m_currentResourceAmount < RESOURCE_CAPACITY)
 		{
-			m_harvestTimer.setActive(true);
-			m_harvestTimer.update(deltaTime);
-
-			if (m_harvestTimer.isExpired())
+			m_taskTimer.resetExpirationTime(HARVEST_EXPIRATION_TIME);
+			m_taskTimer.setActive(true);
+			m_taskTimer.update(deltaTime);
+			if (m_taskTimer.isExpired())
 			{
-				m_harvestTimer.resetElaspedTime();
+				m_taskTimer.resetElaspedTime();
 				m_currentResourceAmount += RESOURCE_INCREMENT;
 			}
 		}
-
-		if (m_currentResourceAmount == RESOURCE_CAPACITY)
+		else
 		{
-			m_harvestTimer.setActive(false);
 			m_pathToPosition.clear();
-
+			m_taskTimer.setActive(false);
 			glm::vec3 destination = PathFinding::getInstance().getClosestPositionToAABB(m_position,
 				HQ.getAABB(), map);
 			moveTo(destination, map, [&](const glm::ivec2& position) { return getAdjacentPositions(position, map); },
@@ -223,15 +217,16 @@ void Worker::update(float deltaTime, const UnitSpawnerBuilding& HQ, const Map& m
 	case eWorkerState::Building:
 	{
 		assert(m_pathToPosition.empty() && !m_buildingCommands.empty());
-		m_buildTimer.update(deltaTime);
-		m_buildTimer.setActive(true);
-		if (!m_buildTimer.isExpired())
+		m_taskTimer.resetExpirationTime(BUILD_EXPIRATION_TIME);
+		m_taskTimer.setActive(true);
+		m_taskTimer.update(deltaTime);
+		if (!m_taskTimer.isExpired())
 		{
 			break;
 		}
 
-		m_buildTimer.resetElaspedTime();
-		m_buildTimer.setActive(false);
+		m_taskTimer.resetElaspedTime();
+		m_taskTimer.setActive(false);
 		const Entity* newBuilding = m_buildingCommands.front().command();
 		m_buildingCommands.pop_front();
 		if (!newBuilding)
@@ -266,11 +261,13 @@ void Worker::update(float deltaTime, const UnitSpawnerBuilding& HQ, const Map& m
 		break;
 	case eWorkerState::Repairing:
 		assert(m_pathToPosition.empty() && m_repairTargetEntityID != Globals::INVALID_ENTITY_ID);
-		m_repairTimer.setActive(true);
-		m_repairTimer.update(deltaTime);
-		if (m_repairTimer.isExpired())
+		m_taskTimer.resetExpirationTime(REPAIR_EXPIRATION_TIME);
+		m_taskTimer.setActive(true);
+		m_taskTimer.update(deltaTime);
+
+		if (m_taskTimer.isExpired())
 		{
-			m_repairTimer.resetElaspedTime();
+			m_taskTimer.resetElaspedTime();
 			const Entity* targetEntity = m_owningFaction.getEntity(m_repairTargetEntityID);
 			if (targetEntity)
 			{
@@ -287,14 +284,14 @@ void Worker::update(float deltaTime, const UnitSpawnerBuilding& HQ, const Map& m
 				}
 				else
 				{
-					m_repairTimer.setActive(false);
+					m_taskTimer.setActive(false);
 					m_currentState = eWorkerState::Idle;
 					m_repairTargetEntityID = Globals::INVALID_ENTITY_ID;
 				}
 			}
 			else
 			{
-				m_repairTimer.setActive(false);
+				m_taskTimer.setActive(false);
 				m_currentState = eWorkerState::Idle;
 				m_repairTargetEntityID = Globals::INVALID_ENTITY_ID;
 			}
@@ -316,7 +313,7 @@ void Worker::update(float deltaTime, const UnitSpawnerBuilding& HQ, const Map& m
 			}
 			else
 			{
-				m_repairTimer.setActive(false);
+				m_taskTimer.setActive(false);
 				m_currentState = eWorkerState::Idle;
 				m_repairTargetEntityID = Globals::INVALID_ENTITY_ID;
 			}
@@ -330,7 +327,7 @@ void Worker::moveTo(const glm::vec3& destinationPosition, const Map& map, const 
 {
 	if (state != eWorkerState::MovingToBuildingPosition && !m_buildingCommands.empty())
 	{		 
-		m_buildTimer.resetElaspedTime();
+		m_taskTimer.resetElaspedTime();
 		m_buildingCommands.clear();
 	}
 	else if (state == eWorkerState::Moving)
@@ -382,23 +379,10 @@ void Worker::render(ShaderHandler& shaderHandler, eFactionController owningFacti
 
 void Worker::renderProgressBar(ShaderHandler& shaderHandler, const Camera& camera, glm::uvec2 windowSize) const
 {
-	if (m_buildTimer.isActive() || m_harvestTimer.isActive() || m_repairTimer.isActive())
+	if (m_taskTimer.isActive())
 	{
-		float currentTime = 0.0f;
-		switch (m_currentState)
-		{
-		case eWorkerState::Building:
-			currentTime = m_buildTimer.getElaspedTime() / m_buildTimer.getExpiredTime();
-			break;
-		case eWorkerState::Harvesting:
-			currentTime = m_harvestTimer.getElaspedTime() / m_harvestTimer.getExpiredTime();
-			break;
-		case eWorkerState::Repairing:
-			currentTime = m_repairTimer.getElaspedTime() / m_repairTimer.getExpiredTime();
-			break;
-		}
-
-		m_statbarSprite.render(m_position, windowSize, WORKER_PROGRESS_BAR_WIDTH, 
+		float currentTime = m_taskTimer.getElaspedTime() / m_taskTimer.getExpiredTime();
+		m_statbarSprite.render(m_position, windowSize, WORKER_PROGRESS_BAR_WIDTH,
 			WORKER_PROGRESS_BAR_WIDTH * currentTime, Globals::DEFAULT_PROGRESS_BAR_HEIGHT,
 			WORKER_PROGRESS_BAR_YOFFSET, shaderHandler, camera, Globals::PROGRESS_BAR_COLOR);
 	}

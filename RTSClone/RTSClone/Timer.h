@@ -13,6 +13,7 @@ public:
 	void setActive(bool active);
 	void update(float deltaTime);
 	void resetElaspedTime();
+	void resetExpirationTime(float newExpirationTime);
 
 private:
 	float m_expirationTime;
