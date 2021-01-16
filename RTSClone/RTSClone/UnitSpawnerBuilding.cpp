@@ -153,7 +153,7 @@ void UnitSpawnerBuilding::setWaypointPosition(const glm::vec3& position, const M
 
 void UnitSpawnerBuilding::update(float deltaTime, int resourceCost, int populationCost)
 {
-	Entity::updateShieldReplenishTimer(deltaTime);
+	Entity::update(deltaTime);
 	m_spawnTimer.update(deltaTime);
 	if (m_spawnTimer.isExpired() && !m_unitsToSpawn.empty())
 	{

@@ -40,7 +40,7 @@ void Laboratory::addIncreaseShieldCommand(const std::function<void()>& command)
 
 void Laboratory::update(float deltaTime)
 {
-	Entity::updateShieldReplenishTimer(deltaTime);
+	Entity::update(deltaTime);
 
 	if (m_increaseShieldTimer.isActive())
 	{

@@ -19,5 +19,5 @@ SupplyDepot::~SupplyDepot()
 
 void SupplyDepot::update(float deltaTime)
 {
-	Entity::updateShieldReplenishTimer(deltaTime);
+	Entity::update(deltaTime);
 }

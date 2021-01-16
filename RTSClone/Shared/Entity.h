@@ -68,7 +68,7 @@ protected:
 	Entity(const Model& model, const glm::vec3& startingPosition, eEntityType entityType, 
 		int health, int shield, glm::vec3 startingRotation = glm::vec3());
 	
-	void updateShieldReplenishTimer(float deltaTime);
+	void update(float deltaTime);
 	
 	Sprite m_statbarSprite;
 #endif // GAME

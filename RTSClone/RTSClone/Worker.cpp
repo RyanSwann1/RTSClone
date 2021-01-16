@@ -129,7 +129,7 @@ bool Worker::build(const std::function<const Entity*()>& buildingCommand, const 
 void Worker::update(float deltaTime, const UnitSpawnerBuilding& HQ, const Map& map, FactionHandler& factionHandler,
 	const Timer& unitStateHandlerTimer)
 {
-	Entity::updateShieldReplenishTimer(deltaTime);
+	Entity::update(deltaTime);
 
 	if (!m_pathToPosition.empty())
 	{

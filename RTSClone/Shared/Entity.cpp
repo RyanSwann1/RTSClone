@@ -73,7 +73,7 @@ Entity::Entity(const Model& model, const glm::vec3& startingPosition, eEntityTyp
 	m_AABB.reset(m_position, m_model);
 }
 
-void Entity::updateShieldReplenishTimer(float deltaTime)
+void Entity::update(float deltaTime)
 {
 	assert(m_shieldReplenishTimer.isActive());
 	

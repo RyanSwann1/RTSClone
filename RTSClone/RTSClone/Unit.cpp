@@ -148,7 +148,7 @@ void Unit::moveTo(const glm::vec3& destinationPosition, const Map& map, const Ad
 
 void Unit::update(float deltaTime, FactionHandler& factionHandler, const Map& map, const Timer& unitStateHandlerTimer)
 {
-	Entity::updateShieldReplenishTimer(deltaTime);
+	Entity::update(deltaTime);
 	m_attackTimer.update(deltaTime);
 
 	if (!m_pathToPosition.empty())
