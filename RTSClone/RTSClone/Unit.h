@@ -19,7 +19,6 @@ enum class eUnitState
 	Idle = 0,
 	Moving,
 	AttackMoving,
-	SetAttackPosition,
 	AttackingTarget,
 	Max = AttackingTarget
 };
@@ -63,5 +62,5 @@ private:
 	Mesh m_renderPathMesh;
 #endif // RENDER_PATHING
 
-	void switchToState(eUnitState newState, const Map& map, const Entity* targetEntity = nullptr);
+	void switchToState(eUnitState newState, const Map& map, const Entity* targetEntity = nullptr, const Faction* targetFaction = nullptr);
 };
