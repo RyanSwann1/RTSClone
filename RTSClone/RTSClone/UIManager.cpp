@@ -64,15 +64,6 @@ namespace
 		ImGui::Text(std::to_string(spawnQueueSize).c_str());
 	}
 
-	void displayBuildTime(float buildTime)
-	{
-		ImGui::Text("BuildTime:");
-		ImGui::SameLine();
-		std::stringstream buildTimeStream;
-		buildTimeStream << std::fixed << std::setprecision(2) << buildTime;
-		ImGui::Text(buildTimeStream.str().c_str());
-	}
-
 	void displayResources(int resources)
 	{
 		ImGui::Text("Resources:");
@@ -163,8 +154,6 @@ void SelectedEntityWidget::render(const sf::Window& window)
 		case eEntityType::Worker:
 			if (m_receivedMessage.owningFaction == eFactionController::Player)
 			{
-				displayBuildTime(m_receivedMessage.buildTime);
-
 				if (ImGui::Button("Barracks"))
 				{
 					GameEventHandler::getInstance().gameEvents.push(GameEvent::createPlayerActivatePlannedBuilding(
@@ -328,24 +317,10 @@ void UIManager::update(const FactionHandler& factionHandler)
 			case eEntityType::SupplyDepot:
 			case eEntityType::Turret:
 			case eEntityType::Laboratory:
+			case eEntityType::Worker:
 				m_selectedEntityWidget.set({ m_selectedEntity.getFactionController(), m_selectedEntity.getID(), targetEntity->getEntityType(),
 					targetEntity->getHealth(), targetEntity->getShield() });
 				break;
-			case eEntityType::Worker:
-			{
-				const Worker& worker = static_cast<const Worker&>(*targetEntity);
-				if (worker.getCurrentState() == eWorkerState::Building)
-				{
-					const Timer& buildTimer = worker.getTaskTimer();
-					m_selectedEntityWidget.set({ m_selectedEntity.getFactionController(), m_selectedEntity.getID(), targetEntity->getEntityType(),
-						targetEntity->getHealth(), targetEntity->getShield(), buildTimer.getExpiredTime() - buildTimer.getElaspedTime() });
-				}
-				else
-				{
-					m_selectedEntityWidget.set({ m_selectedEntity.getFactionController(), m_selectedEntity.getID(), targetEntity->getEntityType(),
-						targetEntity->getHealth(), targetEntity->getShield(), 0.0f });
-				}
-			}
 			break;
 			default:
 				assert(false);
