@@ -523,15 +523,16 @@ bool PathFinding::setUnitAttackPosition(const Unit& unit, const Entity& targetEn
 	glm::ivec2 startingPositionOnGrid = Globals::convertToGridPosition(unit.getPosition());
 	glm::ivec2 targetPositionOnGrid = Globals::convertToGridPosition(targetEntity.getPosition());
 	bool positionFound = false;
+
 	m_openQueue.add({ startingPositionOnGrid, startingPositionOnGrid, 0.0f,
-		Globals::getSqrDistance(glm::vec2(targetPositionOnGrid), glm::vec2(startingPositionOnGrid)) });
+		Globals::getSqrDistance(targetPositionOnGrid, startingPositionOnGrid) });
 
 	while (!positionFound && !m_openQueue.isEmpty())
 	{
 		PriorityQueueNode currentNode = m_openQueue.getTop();
 		m_openQueue.popTop();
 
-		if (Globals::getSqrDistance(glm::vec2(targetPositionOnGrid), glm::vec2(currentNode.position)) <=
+		if (Globals::getSqrDistance(targetPositionOnGrid, currentNode.position) <=
 			unit.getGridAttackRange() * unit.getGridAttackRange() && 
 			isTargetInLineOfSight(Globals::convertToWorldPosition(currentNode.position), targetEntity, map))
 		{
@@ -565,9 +566,9 @@ bool PathFinding::setUnitAttackPosition(const Unit& unit, const Entity& targetEn
 				}
 				else
 				{
-					float sqrDistance = Globals::getSqrDistance(glm::vec2(targetPositionOnGrid), glm::vec2(adjacentPosition.position));
+					float sqrDistance = Globals::getSqrDistance(targetPositionOnGrid, adjacentPosition.position);
 					PriorityQueueNode adjacentNode(adjacentPosition.position, currentNode.position,
-						currentNode.g + Globals::getSqrDistance(glm::vec2(adjacentPosition.position), glm::vec2(currentNode.position)),
+						currentNode.g + Globals::getSqrDistance(adjacentPosition.position, currentNode.position),
 						sqrDistance);
 
 					if (m_openQueue.isSuccessorNodeValid(adjacentNode))
@@ -613,7 +614,7 @@ void PathFinding::getPathToPosition(const Entity& entity, const glm::vec3& desti
 	float shortestDistance = Globals::getSqrDistance(destination, entity.getPosition());
 	glm::ivec2 closestAvailablePosition = { 0, 0 };
 	m_openQueue.add({ startingPositionOnGrid, startingPositionOnGrid, 0.0f, 
-		Globals::getSqrDistance(glm::vec2(destinationOnGrid), glm::vec2(startingPositionOnGrid)) });
+		Globals::getSqrDistance(destinationOnGrid, startingPositionOnGrid) });
 
 	while (!m_openQueue.isEmpty() && !destinationReached)
 	{
@@ -663,7 +664,7 @@ void PathFinding::getPathToPosition(const Entity& entity, const glm::vec3& desti
 				}
 				else
 				{
-					float sqrDistance = Globals::getSqrDistance(glm::vec2(destinationOnGrid), glm::vec2(adjacentPosition.position));
+					float sqrDistance = Globals::getSqrDistance(destinationOnGrid, adjacentPosition.position);
 					if (sqrDistance < shortestDistance)
 					{
 						closestAvailablePosition = adjacentPosition.position;
@@ -671,7 +672,7 @@ void PathFinding::getPathToPosition(const Entity& entity, const glm::vec3& desti
 					}
 					
 					PriorityQueueNode adjacentNode(adjacentPosition.position, currentNode.position,
-						currentNode.g + Globals::getSqrDistance(glm::vec2(adjacentPosition.position), glm::vec2(currentNode.position)),
+						currentNode.g + Globals::getSqrDistance(adjacentPosition.position, currentNode.position),
 						sqrDistance);
 
 					if (m_openQueue.isSuccessorNodeValid(adjacentNode))
@@ -720,7 +721,7 @@ void PathFinding::getPathToPosition(const Entity& entity, const glm::vec3& desti
 	float shortestDistance = Globals::getSqrDistance(destination, entity.getPosition());
 	glm::ivec2 closestAvailablePosition = { 0, 0 };
 	m_openQueue.add({ startingPositionOnGrid, startingPositionOnGrid, 0.0f,
-		Globals::getSqrDistance(glm::vec2(destinationOnGrid), glm::vec2(startingPositionOnGrid)) });
+		Globals::getSqrDistance(destinationOnGrid, startingPositionOnGrid) });
 
 	while (!m_openQueue.isEmpty() && !destinationReached)
 	{
@@ -756,7 +757,7 @@ void PathFinding::getPathToPosition(const Entity& entity, const glm::vec3& desti
 				}
 				else
 				{
-					float sqrDistance = Globals::getSqrDistance(glm::vec2(destinationOnGrid), glm::vec2(adjacentPosition.position));
+					float sqrDistance = Globals::getSqrDistance(destinationOnGrid, adjacentPosition.position);
 					if (sqrDistance < shortestDistance)
 					{
 						closestAvailablePosition = adjacentPosition.position;
@@ -764,7 +765,7 @@ void PathFinding::getPathToPosition(const Entity& entity, const glm::vec3& desti
 					}
 
 					PriorityQueueNode adjacentNode(adjacentPosition.position, currentNode.position,
-						currentNode.g + Globals::getSqrDistance(glm::vec2(adjacentPosition.position), glm::vec2(currentNode.position)),
+						currentNode.g + Globals::getSqrDistance(adjacentPosition.position, currentNode.position),
 						sqrDistance);
 
 					if (m_openQueue.isSuccessorNodeValid(adjacentNode))

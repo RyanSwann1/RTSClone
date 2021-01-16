@@ -137,6 +137,14 @@ namespace Globals
 		return x + y + z;
 	}
 
+	inline float getSqrDistance(glm::ivec2 positionB, glm::ivec2 positionA)
+	{
+		float x = glm::pow(static_cast<float>(positionB.x - positionA.x), 2);
+		float y = glm::pow(static_cast<float>(positionB.y - positionA.y), 2);
+
+		return x + y;
+	}
+
 	inline bool isOnNodePosition(const glm::vec3& position)
 	{
 		return static_cast<int>(position.x) % Globals::NODE_SIZE == 0 &&
