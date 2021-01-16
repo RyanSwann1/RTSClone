@@ -22,7 +22,7 @@ namespace
 	const float TIME_BETWEEN_ATTACK = 1.0f;
 	const int DAMAGE = 1;
 
-	glm::vec3 getNextPathDestination(const std::vector<glm::vec3>& pathToPosition, const glm::vec3& position)
+	const glm::vec3& getNextPathDestination(const std::vector<glm::vec3>& pathToPosition, const glm::vec3& position)
 	{
 		if (!pathToPosition.empty())
 		{
