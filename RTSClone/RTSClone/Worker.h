@@ -46,6 +46,7 @@ public:
 	Worker(const Faction& owningFaction, const glm::vec3& startingPosition);
 	Worker(const Faction& owningFaction, const glm::vec3& startingPosition, const glm::vec3& destinationPosition, const Map& map);
 	
+	const Mineral* getMineralToHarvest() const;
 	const std::deque<BuildingCommand>& getBuildingCommands() const;
 	const std::vector<glm::vec3>& getPathToPosition() const;
 	eWorkerState getCurrentState() const;
@@ -81,5 +82,5 @@ private:
 	Mesh m_renderPathMesh;
 #endif // RENDER_PATHING
 
-	void switchTo(eWorkerState newState);
+	void switchTo(eWorkerState newState, const Mineral* mineralToHarvest = nullptr);
 };

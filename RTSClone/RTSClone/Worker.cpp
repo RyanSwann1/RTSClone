@@ -65,6 +65,11 @@ Worker::Worker(const Faction& owningFaction, const glm::vec3 & startingPosition,
 		[&](const glm::ivec2& position) { return getAdjacentPositions(position, map); });
 }
 
+const Mineral* Worker::getMineralToHarvest() const
+{
+	return m_mineralToHarvest;
+}
+
 const std::deque<BuildingCommand>& Worker::getBuildingCommands() const
 {
 	return m_buildingCommands;
@@ -167,7 +172,7 @@ void Worker::update(float deltaTime, const UnitSpawnerBuilding& HQ, const Map& m
 			GameEventHandler::getInstance().gameEvents.push(GameEvent::createAddResources(m_owningFaction.getController(), getID()));
 			if (m_mineralToHarvest)
 			{
-				glm::vec3 destination = PathFinding::getInstance().getClosestPositionToAABB(m_position,
+				glm::vec3 destination = PathFinding::getInstance().getClosestPositionToAABB(m_position, 
 					m_mineralToHarvest->getAABB(), map);
 				moveTo(destination, map, [&](const glm::ivec2& position) { return getAdjacentPositions(position, map); },
 					eWorkerState::MovingToMinerals, m_mineralToHarvest);
@@ -266,13 +271,11 @@ void Worker::update(float deltaTime, const UnitSpawnerBuilding& HQ, const Map& m
 				else
 				{
 					switchTo(eWorkerState::Idle);
-					m_repairTargetEntityID = Globals::INVALID_ENTITY_ID;
 				}
 			}
 			else
 			{
 				switchTo(eWorkerState::Idle);
-				m_repairTargetEntityID = Globals::INVALID_ENTITY_ID;
 			}
 		}
 		else if (unitStateHandlerTimer.isExpired())
@@ -293,7 +296,6 @@ void Worker::update(float deltaTime, const UnitSpawnerBuilding& HQ, const Map& m
 			else
 			{
 				switchTo(eWorkerState::Idle);
-				m_repairTargetEntityID = Globals::INVALID_ENTITY_ID;
 			}
 		}
 		break;
@@ -308,12 +310,6 @@ void Worker::update(float deltaTime, const UnitSpawnerBuilding& HQ, const Map& m
 void Worker::moveTo(const glm::vec3& destinationPosition, const Map& map, const AdjacentPositions& adjacentPositions, 
 	eWorkerState state, const Mineral* mineralToHarvest)
 {
-	if(mineralToHarvest)
-	{
-		assert(state == eWorkerState::MovingToMinerals);
-		m_mineralToHarvest = mineralToHarvest;
-	}
-
 	glm::vec3 closestDestination = m_position;
 	if (!m_pathToPosition.empty())
 	{
@@ -324,7 +320,7 @@ void Worker::moveTo(const glm::vec3& destinationPosition, const Map& map, const 
 		map, m_owningFaction);
 	if (!m_pathToPosition.empty())
 	{
-		switchTo(state);
+		switchTo(state, mineralToHarvest);
 	}
 	else
 	{
@@ -375,7 +371,7 @@ void Worker::renderPathMesh(ShaderHandler& shaderHandler)
 	RenderPathMesh::render(shaderHandler, m_pathToPosition, m_renderPathMesh);
 }
 
-void Worker::switchTo(eWorkerState newState)
+void Worker::switchTo(eWorkerState newState, const Mineral* mineralToHarvest)
 {
 	//On Exit Current State
 	switch (m_currentState)
@@ -421,11 +417,18 @@ void Worker::switchTo(eWorkerState newState)
 		m_pathToPosition.clear();
 		break;
 	case eWorkerState::Moving:
-	case eWorkerState::MovingToMinerals:
 	case eWorkerState::ReturningMineralsToHQ:
 	case eWorkerState::MovingToBuildingPosition:
 	case eWorkerState::MovingToRepairPosition:
 		m_taskTimer.setActive(false);
+		break;
+	case eWorkerState::MovingToMinerals:
+		m_taskTimer.setActive(false);
+		assert(mineralToHarvest);
+		if (mineralToHarvest)
+		{
+			m_mineralToHarvest = mineralToHarvest;
+		}
 		break;
 	case eWorkerState::Harvesting:
 		m_taskTimer.resetExpirationTime(HARVEST_EXPIRATION_TIME);

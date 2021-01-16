@@ -746,7 +746,8 @@ void Faction::revalidateExistingUnitPaths(const Map& map, FactionHandler& factio
         if (!worker.getPathToPosition().empty())
         {
             worker.moveTo(worker.getPathToPosition().front(), map,
-                [&](const glm::ivec2& position) { return getAdjacentPositions(position, map); }, worker.getCurrentState());
+                [&](const glm::ivec2& position) { return getAdjacentPositions(position, map); }, worker.getCurrentState(),
+                worker.getMineralToHarvest());
         }
     }
 }
