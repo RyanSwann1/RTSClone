@@ -48,15 +48,6 @@ namespace
 		ImGui::Text(std::to_string(shield).c_str());
 	}
 
-	void displaySpawnTime(float spawnTime)
-	{
-		ImGui::Text("Spawn Time:");
-		ImGui::SameLine();
-		std::stringstream spawnTimeStream;
-		spawnTimeStream << std::fixed << std::setprecision(2) << spawnTime;
-		ImGui::Text(spawnTimeStream.str().c_str());
-	}
-
 	void displaySpawnQueue(int spawnQueueSize)
 	{
 		ImGui::Text("Spawn Queue:");
@@ -129,7 +120,6 @@ void SelectedEntityWidget::render(const sf::Window& window)
 			if (m_receivedMessage.owningFaction == eFactionController::Player)
 			{
 				displaySpawnQueue(m_receivedMessage.queueSize);
-				displaySpawnTime(m_receivedMessage.spawnTime);
 
 				if (ImGui::Button("Spawn Worker"))
 				{
@@ -142,7 +132,6 @@ void SelectedEntityWidget::render(const sf::Window& window)
 			if (m_receivedMessage.owningFaction == eFactionController::Player)
 			{
 				displaySpawnQueue(m_receivedMessage.queueSize);
-				displaySpawnTime(m_receivedMessage.spawnTime);
 
 				if (ImGui::Button("Spawn Unit"))
 				{
@@ -309,8 +298,7 @@ void UIManager::update(const FactionHandler& factionHandler)
 			{
 				const UnitSpawnerBuilding& unitSpawnerBuilding = static_cast<const UnitSpawnerBuilding&>(*targetEntity);
 				m_selectedEntityWidget.set({ m_selectedEntity.getFactionController(), m_selectedEntity.getID(), targetEntity->getEntityType(),
-					unitSpawnerBuilding.getHealth(), unitSpawnerBuilding.getShield(), unitSpawnerBuilding.getCurrentSpawnCount(),
-					unitSpawnerBuilding.getSpawnTimer().getExpiredTime() - unitSpawnerBuilding.getSpawnTimer().getElaspedTime() });
+					unitSpawnerBuilding.getHealth(), unitSpawnerBuilding.getShield(), unitSpawnerBuilding.getCurrentSpawnCount() });
 			}
 			break;
 			case eEntityType::Unit:

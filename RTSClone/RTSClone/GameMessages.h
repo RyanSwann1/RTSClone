@@ -57,7 +57,7 @@ namespace GameMessages
 		UIDisplaySelectedEntity(eFactionController owningFaction, int entityID, eEntityType entityType, int health,
 			int shield);
 		UIDisplaySelectedEntity(eFactionController owningFaction, int entityID, eEntityType entityType, int health,
-			int shield, int queueSize, float spawnTime);
+			int shield, int queueSize);
 
 		eFactionController owningFaction;
 		int entityID;
@@ -65,7 +65,6 @@ namespace GameMessages
 		int health;
 		int shield;
 		int queueSize;
-		float spawnTime;
 	};
 
 	struct UIDisplayWinner : public BaseMessage<eGameMessageType::UIDisplayWinner>

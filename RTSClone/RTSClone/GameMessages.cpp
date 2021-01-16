@@ -17,8 +17,8 @@ GameMessages::UIDisplaySelectedEntity::UIDisplaySelectedEntity()
 	entityID(Globals::INVALID_ENTITY_ID),
 	entityType(),
 	health(0),
-	queueSize(0),
-	spawnTime(0.0f)
+	shield(0),
+	queueSize(0)
 {}
 
 GameMessages::UIDisplaySelectedEntity::UIDisplaySelectedEntity(eFactionController owningFaction, int entityID, eEntityType entityType, 
@@ -28,19 +28,17 @@ GameMessages::UIDisplaySelectedEntity::UIDisplaySelectedEntity(eFactionControlle
 	entityType(entityType),
 	health(health),
 	shield(shield),
-	queueSize(0),
-	spawnTime(0.0f)
+	queueSize(0)
 {}
 
 GameMessages::UIDisplaySelectedEntity::UIDisplaySelectedEntity(eFactionController owningFaction, int entityID, eEntityType entityType, 
-	int health, int shield, int queueSize, float spawnTime)
+	int health, int shield, int queueSize)
 	: owningFaction(owningFaction),
 	entityID(entityID),
 	entityType(entityType),
 	health(health),
 	shield(shield),
-	queueSize(queueSize),
-	spawnTime(spawnTime)
+	queueSize(queueSize)
 {}
 
 GameMessages::UIDisplayWinner::UIDisplayWinner()
