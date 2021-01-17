@@ -6,6 +6,7 @@
 #include "FactionHandler.h"
 #include "Globals.h"
 #include "Camera.h"
+#include "FactionPlayer.h"
 #include <imgui/imgui.h>
 #include <string>
 #include <sstream>
@@ -254,7 +255,8 @@ void UIManager::handleInput(const sf::Window& window, const FactionHandler& fact
 			}
 		}
 
-		if (!selectedEntity)
+		if (!selectedEntity && 
+			static_cast<const FactionPlayer&>(factionHandler.getFaction(eFactionController::Player)).getSelectedEntities().size() != 1)
 		{
 			m_selectedEntity.reset();
 		}

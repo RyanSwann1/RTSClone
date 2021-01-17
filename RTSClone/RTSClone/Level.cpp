@@ -87,7 +87,6 @@ std::unique_ptr<Level> Level::create(const std::string& levelName)
 Level::~Level()
 {
 	broadcastToMessenger<GameMessages::UIClearDisplaySelectedEntity>({});
-	//GameMessenger::getInstance().broadcast<GameMessages::BaseMessage<eGameMessageType::UIClearDisplaySelectedEntity>>({});
 }
 
 const Faction* Level::getPlayer() const
@@ -126,8 +125,6 @@ void Level::handleInput(const sf::Window& window, const Camera& camera, const sf
 		return;
 	}
 
-	uiManager.handleInput(window, m_factionHandler, camera, currentSFMLEvent);
-
 	if (isFactionActive(m_factions, eFactionController::Player))
 	{
 		getFactionPlayer(m_factions).handleInput(currentSFMLEvent, window, camera, map, m_factionHandler);
@@ -141,6 +138,8 @@ void Level::handleInput(const sf::Window& window, const Camera& camera, const sf
 			opposingFaction.get().selectEntity(mouseToGroundPosition);
 		}
 	}
+
+	uiManager.handleInput(window, m_factionHandler, camera, currentSFMLEvent);
 }
 
 void Level::update(float deltaTime, const Map& map, UIManager& uiManager)

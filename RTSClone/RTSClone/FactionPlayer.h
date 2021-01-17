@@ -34,9 +34,10 @@ public:
 	FactionPlayer(eFactionController factionController, const glm::vec3& hqStartingPosition, 
 		const std::vector<glm::vec3>& mineralPositions, int startingResources, int startingPopulationCap);
 
+	const std::vector<Entity*>& getSelectedEntities() const;
+
 	void handleInput(const sf::Event& currentSFMLEvent, const sf::Window& window, const Camera& camera, const Map& map, 
 		FactionHandler& factionHandler);
-	
 	void handleEvent(const GameEvent& gameEvent, const Map& map, FactionHandler& factionHandler) override;
 	void update(float deltaTime, const Map& map, FactionHandler& factionHandler, const Timer& unitStateHandlerTimer) override;
 	void updateSelectionBox();

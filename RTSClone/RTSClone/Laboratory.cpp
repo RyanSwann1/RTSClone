@@ -24,7 +24,7 @@ Laboratory::Laboratory(const glm::vec3& startingPosition, const Faction& owningF
 
 Laboratory::~Laboratory()
 {
-	broadcastToMessenger<GameMessages::RemoveFromMap>({ m_AABB });
+	broadcastToMessenger<GameMessages::RemoveFromMap>({ m_AABB });	
 }
 
 void Laboratory::addIncreaseShieldCommand(const std::function<void()>& command)

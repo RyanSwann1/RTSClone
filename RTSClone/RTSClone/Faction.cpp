@@ -6,8 +6,7 @@
 #include "FactionHandler.h"
 
 Faction::Faction(eFactionController factionController, const glm::vec3& hqStartingPosition, 
-    const std::vector<glm::vec3>& mineralPositions, int startingResources,
-    int startingPopulationCap)
+    const std::vector<glm::vec3>& mineralPositions, int startingResources, int startingPopulationCap)
     : m_minerals(mineralPositions.cbegin(), mineralPositions.cend()),
     m_allEntities(),
     m_units(),

@@ -175,6 +175,11 @@ FactionPlayer::FactionPlayer(eFactionController factionController, const glm::ve
     m_attackMoveSelected(false)
 {}
 
+const std::vector<Entity*>& FactionPlayer::getSelectedEntities() const
+{
+    return m_selectedEntities;
+}
+
 void FactionPlayer::handleInput(const sf::Event& currentSFMLEvent, const sf::Window& window, const Camera& camera, 
     const Map& map, FactionHandler& factionHandler)
 {
