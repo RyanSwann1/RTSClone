@@ -556,38 +556,12 @@ void Faction::renderAABB(ShaderHandler& shaderHandler)
 
 bool Faction::isExceedPopulationLimit(eEntityType entityType) const
 {
-    switch (entityType)
-    {
-    case eEntityType::Unit:
-        return m_currentPopulationAmount + Globals::UNIT_POPULATION_COST > m_currentPopulationLimit;
-    case eEntityType::Worker:
-        return m_currentPopulationAmount + Globals::WORKER_POPULATION_COST > m_currentPopulationLimit;
-    default:
-        assert(false);
-        return true;
-    }
+    return m_currentPopulationAmount + Globals::ENTITY_POPULATION_COSTS[static_cast<int>(entityType)] > m_currentPopulationLimit;
 }
 
 bool Faction::isEntityAffordable(eEntityType entityType) const
 {
-    switch (entityType)
-    {
-    case eEntityType::Worker:
-        return m_currentResourceAmount - Globals::WORKER_RESOURCE_COST >= 0;
-    case eEntityType::Unit:
-        return  m_currentResourceAmount - Globals::UNIT_RESOURCE_COST >= 0;
-    case eEntityType::SupplyDepot:
-        return m_currentResourceAmount - Globals::SUPPLY_DEPOT_RESOURCE_COST >= 0;
-    case eEntityType::Barracks:
-        return m_currentResourceAmount - Globals::BARRACKS_RESOURCE_COST >= 0;
-    case eEntityType::Turret:
-        return m_currentResourceAmount - Globals::TURRET_RESOURCE_COST >= 0;
-    case eEntityType::Laboratory:
-        return m_currentResourceAmount - Globals::LABORATORY_RESOURCE_COST >= 0;
-    default:
-        assert(false);
-        return false;
-    }
+    return m_currentResourceAmount - Globals::ENTITY_RESOURCE_COSTS[static_cast<int>(entityType)] >= 0;
 }
 
 bool Faction::isAffordable(int resourceAmount) const
@@ -667,62 +641,18 @@ bool Faction::addUnitToSpawn(eEntityType unitType, const Map& map, UnitSpawnerBu
 
 void Faction::reduceResources(eEntityType addedEntityType)
 {
-    assert(isEntityAffordable(addedEntityType));
-    switch (addedEntityType)
-    {
-    case eEntityType::Unit:
-        m_currentResourceAmount -= Globals::UNIT_RESOURCE_COST;
-        break;
-    case eEntityType::Worker:
-        m_currentResourceAmount -= Globals::WORKER_RESOURCE_COST;
-        break;
-    case eEntityType::SupplyDepot:
-        m_currentResourceAmount -= Globals::SUPPLY_DEPOT_RESOURCE_COST;
-        break;
-    case eEntityType::Barracks:
-        m_currentResourceAmount -= Globals::BARRACKS_RESOURCE_COST;
-        break;
-    case eEntityType::Turret:
-        m_currentResourceAmount -= Globals::TURRET_RESOURCE_COST;
-        break;
-    case eEntityType::Laboratory:
-        m_currentResourceAmount -= Globals::LABORATORY_RESOURCE_COST;
-        break;
-    default:
-        assert(false);
-    }
+    m_currentResourceAmount -= Globals::ENTITY_RESOURCE_COSTS[static_cast<int>(addedEntityType)];
 }
 
 void Faction::increaseCurrentPopulationAmount(eEntityType entityType)
 {
-    assert(!isExceedPopulationLimit(entityType));
-    switch (entityType)
-    {
-    case eEntityType::Unit:
-        m_currentPopulationAmount += Globals::UNIT_POPULATION_COST;
-        break;
-    case eEntityType::Worker:
-        m_currentPopulationAmount += Globals::WORKER_POPULATION_COST;
-        break;
-    default:
-        assert(false);
-    }
+    m_currentPopulationAmount += Globals::ENTITY_POPULATION_COSTS[static_cast<int>(entityType)];
 }
 
 void Faction::decreaseCurrentPopulationAmount(const Entity& entity)
 {
     assert(entity.isDead());
-    switch (entity.getEntityType())
-    {
-    case eEntityType::Unit:
-        m_currentPopulationAmount -= Globals::UNIT_POPULATION_COST;
-        break;
-    case eEntityType::Worker:
-        m_currentPopulationAmount -= Globals::WORKER_POPULATION_COST;
-        break;
-    default:
-        assert(false);
-    }
+    m_currentPopulationAmount -= Globals::ENTITY_POPULATION_COSTS[static_cast<int>(entity.getEntityType())];
 }
 
 void Faction::increasePopulationLimit()
