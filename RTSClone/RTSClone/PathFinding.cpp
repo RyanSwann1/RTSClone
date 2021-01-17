@@ -227,7 +227,7 @@ PathFinding::PathFinding()
 	m_openQueue(),
 	m_closedQueue()
 {
-	GameMessenger::getInstance().subscribe<GameMessages::NewMapSize>(
+	subscribeToMessenger<GameMessages::NewMapSize>(
 		[this](const GameMessages::NewMapSize& gameMessage) { return onNewMapSize(gameMessage); }, this);
 }
 

@@ -13,7 +13,7 @@ Mineral::Mineral(const glm::vec3& startingPosition)
 {
 	m_position = Globals::convertToMiddleGridPosition(startingPosition);
 	m_AABB.reset(m_position, m_model);
-	GameMessenger::getInstance().broadcast<GameMessages::AddToMap>({ m_AABB });
+	broadcastToMessenger<GameMessages::AddToMap>({ m_AABB });
 }
 
 Mineral::Mineral(Mineral&& rhs) noexcept
@@ -29,7 +29,7 @@ Mineral::~Mineral()
 {
 	if (m_active)
 	{
-		GameMessenger::getInstance().broadcast<GameMessages::RemoveFromMap>({ m_AABB });
+		broadcastToMessenger<GameMessages::RemoveFromMap>({ m_AABB });
 	}
 }
 

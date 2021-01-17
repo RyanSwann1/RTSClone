@@ -72,8 +72,8 @@ void Unit::moveToAttackPosition(const Entity& targetEntity, const Faction& targe
 	FactionHandler& factionHandler)
 {
 	glm::vec3 previousDestination = Globals::getNextPathDestination(m_pathToPosition, m_position);
-
-	if (PathFinding::getInstance().setUnitAttackPosition(*this, targetEntity, m_pathToPosition, map, factionHandler))
+	bool attackPositionFound = PathFinding::getInstance().setUnitAttackPosition(*this, targetEntity, m_pathToPosition, map, factionHandler);
+	if (attackPositionFound)
 	{
 		if (!m_pathToPosition.empty())
 		{
@@ -113,9 +113,9 @@ void Unit::moveTo(const glm::vec3& destinationPosition, const Map& map, const Ad
 	FactionHandler& factionHandler, eUnitState state)
 {
 	glm::vec3 previousDestination = Globals::getNextPathDestination(m_pathToPosition, m_position);
-
 	PathFinding::getInstance().getPathToPosition(*this, destinationPosition, m_pathToPosition, adjacentPositions,
 		map, factionHandler, m_owningFaction);
+
 	if (!m_pathToPosition.empty())
 	{
 		switchToState(state, map);

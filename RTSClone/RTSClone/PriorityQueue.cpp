@@ -22,8 +22,7 @@ PriorityQueue::PriorityQueue()
 	m_maxSize(),
 	m_addedNodePositions()
 {
-	GameMessenger::getInstance().subscribe<GameMessages::NewMapSize>(
-		[this](const GameMessages::NewMapSize& gameMessage) { return onNewMapSize(gameMessage); }, this);
+	subscribeToMessenger<GameMessages::NewMapSize>([this](const GameMessages::NewMapSize& gameMessage) { return onNewMapSize(gameMessage); }, this);
 }
 
 PriorityQueue::~PriorityQueue()

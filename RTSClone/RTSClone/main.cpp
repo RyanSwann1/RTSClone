@@ -82,7 +82,14 @@ int main()
 	shaderHandler->setUniformMat4f(eShaderType::SelectionBox, "uOrthographic",
 		glm::ortho(0.0f, static_cast<float>(windowSize.x), static_cast<float>(windowSize.y), 0.0f));
 
-	GameMessenger::getInstance();
+	GameMessenger<GameMessages::UIClearDisplaySelectedEntity>::getInstance();
+	GameMessenger<GameMessages::UIClearWinner>::getInstance();
+	GameMessenger<GameMessages::AddToMap>::getInstance();
+	GameMessenger<GameMessages::RemoveFromMap>::getInstance();
+	GameMessenger<GameMessages::NewMapSize>::getInstance();
+	GameMessenger<GameMessages::UIDisplayPlayerDetails>::getInstance();
+	GameMessenger<GameMessages::UIDisplaySelectedEntity>::getInstance();
+	GameMessenger<GameMessages::UIDisplayWinner>::getInstance();
 
 	PathFinding::getInstance();
 
@@ -138,8 +145,10 @@ int main()
 			const Faction* winningFaction = level->getWinningFaction();
 			if (winningFaction)
 			{
-				GameMessenger::getInstance().broadcast<GameMessages::UIDisplayWinner>(
-					{ winningFaction->getController() });
+				broadcastToMessenger<GameMessages::UIDisplayWinner>({ winningFaction->getController() });
+				
+				//GameMessenger::getInstance().broadcast<GameMessages::UIDisplayWinner>(
+					//{ winningFaction->getController() });
 
 				level.reset();
 			}
@@ -151,7 +160,8 @@ int main()
 			{
 				if (!levelName.empty() && ImGui::Button(levelName.c_str()))
 				{
-					GameMessenger::getInstance().broadcast<GameMessages::BaseMessage<eGameMessageType::UIClearWinner>>({});
+					broadcastToMessenger<GameMessages::UIClearWinner>({});
+					//GameMessenger::getInstance().broadcast<GameMessages::BaseMessage<eGameMessageType::UIClearWinner>>({});
 					level = Level::create(levelName);
 					assert(level);
 					if (!level)

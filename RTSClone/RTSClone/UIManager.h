@@ -4,7 +4,6 @@
 #include "NonMovable.h"
 #include "EntityType.h"
 #include "FactionController.h"
-#include "GameMessageType.h"
 #include "GameMessages.h"
 #include "TargetEntity.h"
 #include <SFML/Graphics.hpp>
@@ -76,6 +75,6 @@ private:
 	void onDisplayPlayerDetails(const GameMessages::UIDisplayPlayerDetails& gameMessage);
 	void onDisplayEntity(const GameMessages::UIDisplaySelectedEntity& gameMessage);
 	void onDisplayWinningFaction(const GameMessages::UIDisplayWinner& gameMessage);
-	void onClearDisplayEntity(const GameMessages::BaseMessage<eGameMessageType::UIClearDisplaySelectedEntity>& gameMessage);
-	void onClearDisplayWinner(const GameMessages::BaseMessage<eGameMessageType::UIClearWinner>& gameMessage);
+	void onClearDisplayEntity(GameMessages::UIClearDisplaySelectedEntity message);
+	void onClearDisplayWinner(GameMessages::UIClearWinner message);
 };

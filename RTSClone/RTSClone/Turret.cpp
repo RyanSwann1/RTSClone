@@ -26,12 +26,12 @@ Turret::Turret(const glm::vec3& startingPosition, const Faction& owningFaction)
 	m_stateHandlerTimer(0.2f, true),
 	m_attackTimer(TIME_BETWEEN_ATTACK, true)
 {
-	GameMessenger::getInstance().broadcast<GameMessages::AddToMap>({ m_AABB });
+	broadcastToMessenger<GameMessages::AddToMap>({ m_AABB });
 }
 
 Turret::~Turret()
 {
-	GameMessenger::getInstance().broadcast<GameMessages::RemoveFromMap>({ m_AABB });
+	broadcastToMessenger<GameMessages::RemoveFromMap>({ m_AABB });
 }
 
 void Turret::update(float deltaTime, FactionHandler& factionHandler, const Map& map)

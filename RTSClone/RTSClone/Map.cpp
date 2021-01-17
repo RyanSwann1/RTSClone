@@ -7,21 +7,19 @@ Map::Map()
 	: m_size(),
 	m_map()
 {
-	GameMessenger::getInstance().subscribe<GameMessages::AddToMap>(
-		[this](const GameMessages::AddToMap& gameMessage) { return addEntityToMap(gameMessage); }, this);
-
-	GameMessenger::getInstance().subscribe<GameMessages::RemoveFromMap>(
+	subscribeToMessenger<GameMessages::AddToMap>([this](const GameMessages::AddToMap& gameMessage) { return addEntityToMap(gameMessage); }, this);
+	subscribeToMessenger<GameMessages::RemoveFromMap>(
 		[this](const GameMessages::RemoveFromMap& gameMessage) { return removeEntityFromMap(gameMessage); }, this);
 
-	GameMessenger::getInstance().subscribe<GameMessages::NewMapSize>(
+	subscribeToMessenger<GameMessages::NewMapSize>(
 		[this](const GameMessages::NewMapSize& gameMessage) { return setSize(gameMessage); }, this);
 }
 
 Map::~Map()
 {
-	GameMessenger::getInstance().unsubscribe<GameMessages::AddToMap>(this);
-	GameMessenger::getInstance().unsubscribe<GameMessages::RemoveFromMap>(this);
-	GameMessenger::getInstance().unsubscribe<GameMessages::NewMapSize>(this);
+	unsubscribeToMessenger<GameMessages::AddToMap>(this);
+	unsubscribeToMessenger<GameMessages::RemoveFromMap>(this);
+	unsubscribeToMessenger<GameMessages::NewMapSize>(this);
 }
 
 bool Map::isCollidable(const glm::vec3& position) const

@@ -86,7 +86,8 @@ std::unique_ptr<Level> Level::create(const std::string& levelName)
 
 Level::~Level()
 {
-	GameMessenger::getInstance().broadcast<GameMessages::BaseMessage<eGameMessageType::UIClearDisplaySelectedEntity>>({});
+	broadcastToMessenger<GameMessages::UIClearDisplaySelectedEntity>({});
+	//GameMessenger::getInstance().broadcast<GameMessages::BaseMessage<eGameMessageType::UIClearDisplaySelectedEntity>>({});
 }
 
 const Faction* Level::getPlayer() const

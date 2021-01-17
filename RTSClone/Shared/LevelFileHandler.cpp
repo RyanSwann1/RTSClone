@@ -275,7 +275,7 @@ bool LevelFileHandler::loadLevelFromFile(const std::string& fileName, std::vecto
 	}
 
 	glm::ivec2 mapSize = loadMapSizeFromFile(file);
-	GameMessenger::getInstance().broadcast<GameMessages::NewMapSize>({ mapSize });
+	broadcastToMessenger<GameMessages::NewMapSize>({ mapSize });
 	int factionStartingResources = loadFactionStartingResources(file);
 	int factionStartingPopulation = loadFactionStartingPopulationCap(file);
 	loadInPlayers(file, factions, factionStartingResources, factionStartingPopulation);

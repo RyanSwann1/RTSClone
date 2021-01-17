@@ -19,12 +19,12 @@ Laboratory::Laboratory(const glm::vec3& startingPosition, const Faction& owningF
 	m_increaseShieldCommands(),
 	m_increaseShieldTimer(INCREASE_SHIELD_TIMER_EXPIRATION, false)
 {
-	GameMessenger::getInstance().broadcast<GameMessages::AddToMap>({ m_AABB });
+	broadcastToMessenger<GameMessages::AddToMap>({ m_AABB });
 }
 
 Laboratory::~Laboratory()
 {
-	GameMessenger::getInstance().broadcast<GameMessages::RemoveFromMap>({ m_AABB });
+	broadcastToMessenger<GameMessages::RemoveFromMap>({ m_AABB });
 }
 
 void Laboratory::addIncreaseShieldCommand(const std::function<void()>& command)

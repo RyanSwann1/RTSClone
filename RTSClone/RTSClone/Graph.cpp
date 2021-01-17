@@ -29,7 +29,7 @@ Graph::Graph()
 	: m_size(),
 	m_graph()
 {
-	GameMessenger::getInstance().subscribe<GameMessages::NewMapSize>(
+	subscribeToMessenger<GameMessages::NewMapSize>(
 		[this](const GameMessages::NewMapSize& gameMessage) { return onNewMapSize(gameMessage); }, this);
 }
 
