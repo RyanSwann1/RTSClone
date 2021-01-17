@@ -1,6 +1,5 @@
 #pragma once
 
-#include "GameMessageType.h"
 #include "EntityType.h"
 #include "FactionController.h"
 #include "Globals.h"
@@ -9,14 +8,10 @@ class AABB;
 //Caller is not meant to go out of scope. 
 namespace GameMessages
 {
-	//CRTP - C++
-	template <eGameMessageType T>
-	struct BaseMessage
-	{
-		static eGameMessageType getType() { return T; };
-	};
+	struct UIClearDisplaySelectedEntity {};
+	struct UIClearWinner {};
 
-	struct AddToMap : public BaseMessage<eGameMessageType::AddEntityToMap>
+	struct AddToMap 
 	{
 		AddToMap(const AABB& AABB)
 			: AABB(AABB) {}
@@ -24,7 +19,7 @@ namespace GameMessages
 		const AABB& AABB;
 	};
 
-	struct RemoveFromMap : public BaseMessage<eGameMessageType::RemoveEntityFromMap>
+	struct RemoveFromMap 
 	{
 		RemoveFromMap(const AABB& AABB)
 			: AABB(AABB) {}
@@ -32,7 +27,7 @@ namespace GameMessages
 		const AABB& AABB;
 	};
 
-	struct NewMapSize : public BaseMessage<eGameMessageType::NewMapSize>
+	struct NewMapSize 
 	{
 		NewMapSize(glm::ivec2 mapSize)
 			: mapSize(mapSize)
@@ -41,7 +36,7 @@ namespace GameMessages
 		const glm::ivec2 mapSize;
 	};
 
-	struct UIDisplayPlayerDetails : public BaseMessage<eGameMessageType::UIDisplayPlayerDetails>
+	struct UIDisplayPlayerDetails 
 	{
 		UIDisplayPlayerDetails();
 		UIDisplayPlayerDetails(int resourceAmount, int currentPopulationAmount, int maximumPopulationAmount);
@@ -51,7 +46,7 @@ namespace GameMessages
 		int maximumPopulationAmount;
 	};
 
-	struct UIDisplaySelectedEntity : public BaseMessage<eGameMessageType::UIDisplaySelectedEntity>
+	struct UIDisplaySelectedEntity 
 	{
 		UIDisplaySelectedEntity();
 		UIDisplaySelectedEntity(eFactionController owningFaction, int entityID, eEntityType entityType, int health,
@@ -67,7 +62,7 @@ namespace GameMessages
 		int queueSize;
 	};
 
-	struct UIDisplayWinner : public BaseMessage<eGameMessageType::UIDisplayWinner>
+	struct UIDisplayWinner
 	{
 		UIDisplayWinner();
 		UIDisplayWinner(eFactionController winningFaction);

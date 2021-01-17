@@ -3,8 +3,6 @@
 #include "NonCopyable.h"
 #include "NonMovable.h"
 #include "Globals.h"
-#include "GameMessageType.h"
-#include <array>
 
 namespace GameMessages
 {

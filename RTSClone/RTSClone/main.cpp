@@ -146,9 +146,6 @@ int main()
 			if (winningFaction)
 			{
 				broadcastToMessenger<GameMessages::UIDisplayWinner>({ winningFaction->getController() });
-				
-				//GameMessenger::getInstance().broadcast<GameMessages::UIDisplayWinner>(
-					//{ winningFaction->getController() });
 
 				level.reset();
 			}
@@ -161,7 +158,6 @@ int main()
 				if (!levelName.empty() && ImGui::Button(levelName.c_str()))
 				{
 					broadcastToMessenger<GameMessages::UIClearWinner>({});
-					//GameMessenger::getInstance().broadcast<GameMessages::BaseMessage<eGameMessageType::UIClearWinner>>({});
 					level = Level::create(levelName);
 					assert(level);
 					if (!level)

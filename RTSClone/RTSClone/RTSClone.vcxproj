@@ -172,7 +172,6 @@
     <ClCompile Include="FactionPlayer.cpp" />
     <ClCompile Include="GameEvent.cpp" />
     <ClCompile Include="GameMessages.cpp" />
-    <ClCompile Include="GameMessenger.cpp" />
     <ClCompile Include="Graph.cpp" />
     <ClCompile Include="Laboratory.cpp" />
     <ClCompile Include="Level.cpp" />
@@ -278,7 +277,6 @@
     <ClInclude Include="GameEventHandler.h" />
     <ClInclude Include="GameMessenger.h" />
     <ClInclude Include="GameMessages.h" />
-    <ClInclude Include="GameMessageType.h" />
     <ClInclude Include="Graph.h" />
     <ClInclude Include="Projectile.h" />
     <ClInclude Include="ProjectileHandler.h" />
