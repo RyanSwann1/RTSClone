@@ -20,6 +20,7 @@ extern const std::string LABORATORY_MODEL_NAME;
 
 #ifdef GAME
 enum class eEntityType;
+class AABB;
 #endif // GAME
 class ModelManager : private NonMovable, private NonCopyable
 {
@@ -32,6 +33,7 @@ public:
 
 #ifdef GAME
 	const Model& getModel(eEntityType entityType) const;
+	AABB getModelAABB(const glm::vec3& position, eEntityType entityType) const;
 #endif // GAME
 
 	const Model& getModel(const std::string& modelName) const;

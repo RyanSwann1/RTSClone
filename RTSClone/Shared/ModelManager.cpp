@@ -1,6 +1,7 @@
 #include "ModelManager.h"
 #ifdef GAME
 #include "EntityType.h"
+#include "AABB.h"
 #endif // GAME
 #ifdef LEVEL_EDITOR
 #include "Globals.h"
@@ -169,6 +170,30 @@ const Model& ModelManager::getModel(eEntityType entityType) const
 	default:
 		assert(false);
 	}
+}
+
+AABB ModelManager::getModelAABB(const glm::vec3& position, eEntityType entityType) const
+{
+	AABB modelAABB;
+	switch (entityType)
+	{
+	case eEntityType::Barracks:
+		modelAABB = { position,  ModelManager::getInstance().getModel(BARRACKS_MODEL_NAME) };
+		break;
+	case eEntityType::SupplyDepot:
+		modelAABB = { position, ModelManager::getInstance().getModel(SUPPLY_DEPOT_MODEL_NAME) };
+		break;
+	case eEntityType::Turret:
+		modelAABB = { position, ModelManager::getInstance().getModel(TURRET_MODEL_NAME) };
+		break;
+	case eEntityType::Laboratory:
+		modelAABB = { position, ModelManager::getInstance().getModel(LABORATORY_MODEL_NAME) };
+		break;
+	default:
+		assert(false);
+	}
+
+	return modelAABB;
 }
 
 const Model& ModelManager::getModel(const std::string& modelName) const
