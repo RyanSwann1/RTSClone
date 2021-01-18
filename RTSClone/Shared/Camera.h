@@ -22,7 +22,7 @@ struct Camera : private NonCopyable, private NonMovable
 #endif // LEVEL_EDITOR
 
 #ifdef GAME
-	glm::vec3 getMouseToGroundPosition(const sf::Window& window) const;
+	glm::vec3 getRayToGroundPlaneIntersection(const sf::Window& window) const;
 	void update(float deltaTime, const sf::Window& window, glm::uvec2 windowSize);
 #endif // GAME
 

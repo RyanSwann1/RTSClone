@@ -1,6 +1,7 @@
 #include "Camera.h"
 #include "Globals.h"
 #include "glm/gtc/matrix_transform.hpp"
+#include "glm/gtx/projection.hpp"
 
 namespace
 {
@@ -47,7 +48,7 @@ namespace
 		return glm::normalize(rayWorld);
 	}
 
-	glm::vec3 calculateMouseRay(const glm::mat4& projection, const glm::mat4& view, const sf::Window& window,
+	glm::vec3 calculatorMouseRayDirection(const glm::mat4& projection, const glm::mat4& view, const sf::Window& window,
 		const glm::ivec2& mousePosition)
 	{
 		glm::vec2 normalizedMouseCoords = getNormalizedDeviceCoords(window, mousePosition);
@@ -99,22 +100,18 @@ void Camera::update(float deltaTime, const sf::Window& window, glm::uvec2 window
 	moveByMouse(deltaTime, window, windowSize);
 }
 
-glm::vec3 Camera::getMouseToGroundPosition(const sf::Window& window) const
+glm::vec3 Camera::getRayToGroundPlaneIntersection(const sf::Window& window) const
 {
-	assert(position.y >= MINIMUM_HEIGHT);
-
-	glm::vec3 rayPositionFromMouse = calculateMouseRay(getProjection(glm::ivec2(window.getSize().x, window.getSize().y)), getView(), window,
+	glm::vec3 planeNormal = { 0.0f, 1.0f, 0.0f };
+	glm::vec3 rayStartingPosition = position;
+	glm::vec3 rayDirection = calculatorMouseRayDirection(getProjection(glm::ivec2(window.getSize().x, window.getSize().y)), getView(), window,
 		{ sf::Mouse::getPosition(window).x, sf::Mouse::getPosition(window).y });
 
-	glm::vec3 rayPosition = position;
-	int i = static_cast<int>(position.y);
-	while (rayPosition.y > 0.0f)
-	{
-		rayPosition = rayPositionFromMouse * static_cast<float>(i) + position;
-		++i;
-	}
+	float k = glm::dot(glm::proj(-rayStartingPosition, planeNormal), planeNormal) / glm::dot(glm::proj(rayDirection, planeNormal), planeNormal);
+	glm::vec3 intersection = (rayStartingPosition + rayDirection * k);
 
-	return { rayPosition.x, Globals::GROUND_HEIGHT, rayPosition.z };
+	assert(k >= 0.0f);
+	return intersection;
 }
 #endif // GAME
 

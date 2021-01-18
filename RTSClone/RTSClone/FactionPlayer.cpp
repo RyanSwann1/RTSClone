@@ -213,12 +213,12 @@ void FactionPlayer::handleInput(const sf::Event& currentSFMLEvent, const sf::Win
     case sf::Event::MouseMoved:
         if (m_selectionBox.isActive())
         {
-            m_selectionBox.setSize(camera.getMouseToGroundPosition(window));
+            m_selectionBox.setSize(camera.getRayToGroundPlaneIntersection(window));
 
         }
         else if (m_plannedBuilding.isActive())
         {
-            m_plannedBuilding.setPosition(camera.getMouseToGroundPosition(window), map);
+            m_plannedBuilding.setPosition(camera.getRayToGroundPlaneIntersection(window), map);
         }
         break;
     case sf::Event::KeyPressed:
@@ -503,7 +503,7 @@ void FactionPlayer::moveMultipleSelectedEntities(const glm::vec3& mouseToGroundP
 
 void FactionPlayer::onLeftClick(const sf::Window& window, const Camera& camera, const Map& map)
 {
-    glm::vec3 mouseToGroundPosition = camera.getMouseToGroundPosition(window);
+    glm::vec3 mouseToGroundPosition = camera.getRayToGroundPlaneIntersection(window);
 
     m_selectionBox.setStartingPosition(window, mouseToGroundPosition);
     
@@ -533,7 +533,7 @@ void FactionPlayer::onLeftClick(const sf::Window& window, const Camera& camera, 
 void FactionPlayer::onRightClick(const sf::Window& window, const Camera& camera, FactionHandler& factionHandler, const Map& map)
 {
     m_plannedBuilding.deactivate();
-    glm::vec3 mouseToGroundPosition = camera.getMouseToGroundPosition(window);
+    glm::vec3 mouseToGroundPosition = camera.getRayToGroundPlaneIntersection(window);
     const Faction* targetFaction = nullptr;
     const Entity* targetEntity = nullptr;
 
