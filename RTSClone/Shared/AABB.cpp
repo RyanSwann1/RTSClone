@@ -9,36 +9,36 @@
 #include "ShaderHandler.h"
 #include "Globals.h"
 #include <array>
-namespace
-{
-	const glm::vec3 COLOR = { 1.0f, 0.0f, 0.0f };
-	const float OPACITY = 0.2f;
-	void generateMesh(float left, float right, float back, float forward, Mesh& mesh)
-	{
-		mesh.vertices.clear();
-		mesh.indices.clear();
-
-		const std::array<glm::vec3, 4> CUBE_FACE_TOP =
-		{
-			glm::vec3(left, Globals::GROUND_HEIGHT, back),
-			glm::vec3(right, Globals::GROUND_HEIGHT, back),
-			glm::vec3(right, Globals::GROUND_HEIGHT, forward),
-			glm::vec3(left, Globals::GROUND_HEIGHT, forward)
-		};
-
-		for (const auto& i : CUBE_FACE_TOP)
-		{
-			mesh.vertices.emplace_back(i);
-		}
-
-		for (unsigned int i : Globals::CUBE_FACE_INDICIES)
-		{
-			mesh.indices.push_back(i);
-		}
-
-		mesh.attachToVAO();
-	}
-}
+//namespace
+//{
+//	const glm::vec3 COLOR = { 1.0f, 0.0f, 0.0f };
+//	const float OPACITY = 0.2f;
+//	void generateMesh(float left, float right, float back, float forward, Mesh& mesh)
+//	{
+//		mesh.vertices.clear();
+//		mesh.indices.clear();
+//
+//		const std::array<glm::vec3, 4> CUBE_FACE_TOP =
+//		{
+//			glm::vec3(left, Globals::GROUND_HEIGHT, back),
+//			glm::vec3(right, Globals::GROUND_HEIGHT, back),
+//			glm::vec3(right, Globals::GROUND_HEIGHT, forward),
+//			glm::vec3(left, Globals::GROUND_HEIGHT, forward)
+//		};
+//
+//		for (const auto& i : CUBE_FACE_TOP)
+//		{
+//			mesh.vertices.emplace_back(i);
+//		}
+//
+//		for (unsigned int i : Globals::CUBE_FACE_INDICIES)
+//		{
+//			mesh.indices.push_back(i);
+//		}
+//
+//		mesh.attachToVAO();
+//	}
+//}
 #endif // RENDER_AABB
 
 AABB::AABB()
@@ -208,10 +208,10 @@ void AABB::reset()
 #ifdef RENDER_AABB
 void AABB::render(ShaderHandler& shaderHandler)
 {
-	generateMesh(m_left, m_right, m_back, m_forward, m_mesh);
+	//generateMesh(m_left, m_right, m_back, m_forward, m_mesh);
 
-	shaderHandler.setUniformVec3(eShaderType::Debug, "uColor", COLOR);
-	shaderHandler.setUniform1f(eShaderType::Debug, "uOpacity", OPACITY);
-	m_mesh.renderDebugMesh(shaderHandler);
+	//shaderHandler.setUniformVec3(eShaderType::Debug, "uColor", COLOR);
+	//shaderHandler.setUniform1f(eShaderType::Debug, "uOpacity", OPACITY);
+	//m_mesh.renderDebugMesh(shaderHandler);
 }
 #endif // RENDER_AABB

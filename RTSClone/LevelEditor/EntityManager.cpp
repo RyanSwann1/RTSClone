@@ -25,30 +25,30 @@ Entity* EntityManager::getSelectedEntity()
 		int selectedEntityID = m_selectedEntityID;
 		auto selectedEntity = std::find_if(m_entities.begin(), m_entities.end(), [selectedEntityID](const auto& entity)
 		{
-			return entity.getID() == selectedEntityID;
+			return entity->getID() == selectedEntityID;
 		});
 		
 		assert(selectedEntity != m_entities.end());
-		return &(*selectedEntity);
+		return (*selectedEntity).get();
 	}
 
 	return nullptr;
 }
 
-const std::vector<Entity>& EntityManager::getEntities() const
+const std::vector<std::unique_ptr<Entity>>& EntityManager::getEntities() const
 {
 	return m_entities;
 }
 
 void EntityManager::addEntity(const Model& model, const glm::vec3& position)
 {
-	auto entity = std::find_if(m_entities.cbegin(), m_entities.cend(), [&position](const auto& gameObject)
+	auto entity = std::find_if(m_entities.cbegin(), m_entities.cend(), [&position](const auto& entity)
 	{
-		return gameObject.getPosition() == position;
+		return entity->getPosition() == position;
 	});
 	if (entity == m_entities.cend())
 	{
-		m_entities.emplace_back(model, position);
+		m_entities.emplace_back(std::make_unique<Entity>(model, position));
 	}
 }
 
@@ -56,9 +56,9 @@ void EntityManager::removeAllSelectedEntities()
 {
 	for (auto entity = m_entities.begin(); entity != m_entities.end();)
 	{
-		if (entity->isSelected())
+		if ((*entity)->isSelected())
 		{
-			if (entity->getID() == m_selectedEntityID)
+			if ((*entity)->getID() == m_selectedEntityID)
 			{
 				m_selectedEntityID = Globals::INVALID_ENTITY_ID;
 			}
@@ -78,15 +78,15 @@ const Entity* EntityManager::selectEntityAtPosition(const glm::vec3& position)
 	m_selectedEntityID = Globals::INVALID_ENTITY_ID;
 	for (auto entity = m_entities.begin(); entity != m_entities.end(); ++entity)
 	{
-		if (entity->getAABB().contains(position))
+		if ((*entity)->getAABB().contains(position))
 		{
-			entity->setSelected(true);
-			m_selectedEntityID = entity->getID();
-			selectedEntity = &(*entity);
+			(*entity)->setSelected(true);
+			m_selectedEntityID = (*entity)->getID();
+			selectedEntity = (*entity).get();
 		}
 		else
 		{
-			entity->setSelected(false);
+			(*entity)->setSelected(false);
 		}
 	}
 
@@ -96,13 +96,13 @@ const Entity* EntityManager::selectEntityAtPosition(const glm::vec3& position)
 void EntityManager::selectEntities(const SelectionBox& selectionBox)
 {
 	int selectedEntityCount = 0;
-	for (auto& entity : m_entities)
+	for (const auto& entity : m_entities)
 	{
-		entity.setSelected(selectionBox.getAABB().contains(entity.getAABB()));
-		if (entity.isSelected())
+		entity->setSelected(selectionBox.getAABB().contains(entity->getAABB()));
+		if (entity->isSelected())
 		{
 			++selectedEntityCount;
-			m_selectedEntityID = entity.getID();
+			m_selectedEntityID = entity->getID();
 		}	
 	}
 
@@ -116,7 +116,7 @@ void EntityManager::render(ShaderHandler& shaderHandler) const
 {
 	for (const auto& entity : m_entities)
 	{
-		entity.render(shaderHandler);
+		entity->render(shaderHandler);
 	}
 
 	ModelManager::getInstance().getModel(TERRAIN_MODEL_NAME).render(shaderHandler, Globals::TERRAIN_POSITION);
@@ -125,9 +125,9 @@ void EntityManager::render(ShaderHandler& shaderHandler) const
 #ifdef RENDER_AABB
 void EntityManager::renderEntityAABB(ShaderHandler& shaderHandler)
 {
-	for (auto& entity : m_entities)
+	for (const auto& entity : m_entities)
 	{
-		entity.renderAABB(shaderHandler);	
+		entity->renderAABB(shaderHandler);	
 	}
 }
 #endif // RENDER_AABB
@@ -142,7 +142,7 @@ const std::ifstream& operator>>(std::ifstream& file, EntityManager& entityManage
 		glm::vec3 position;
 		stream >> modelName >> rotation.x >> rotation.y >> rotation.z >> position.x >> position.y >> position.z;
 
-		entityManager.m_entities.emplace_back(ModelManager::getInstance().getModel(modelName), position, rotation);
+		entityManager.m_entities.emplace_back(std::make_unique<Entity>(ModelManager::getInstance().getModel(modelName), position, rotation));
 	};
 
 	auto conditional = [](const std::string& line)
@@ -160,9 +160,9 @@ std::ostream& operator<<(std::ostream& ostream, const EntityManager& entityManag
 	ostream << Globals::TEXT_HEADER_SCENERY << "\n";
 	for (const auto& entity : entityManager.m_entities)
 	{
-		ostream << entity.getModel().modelName << " " <<
-			entity.getRotation().x << " " << entity.getRotation().y << " " << entity.getRotation().z << " " <<
-			entity.getPosition().x << " " << entity.getPosition().y << " " << entity.getPosition().z << "\n";
+		ostream << entity->getModel().modelName << " " <<
+			entity->getRotation().x << " " << entity->getRotation().y << " " << entity->getRotation().z << " " <<
+			entity->getPosition().x << " " << entity->getPosition().y << " " << entity->getPosition().z << "\n";
 	}
 	
 	return ostream;

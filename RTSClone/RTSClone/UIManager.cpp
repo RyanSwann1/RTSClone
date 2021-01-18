@@ -240,7 +240,7 @@ void UIManager::handleInput(const sf::Window& window, const FactionHandler& fact
 	if (currentSFMLEvent.type == sf::Event::MouseButtonPressed &&
 		currentSFMLEvent.mouseButton.button == sf::Mouse::Left)
 	{
-		glm::vec3 mouseToGroundPosition = camera.getMouseToGroundPosition(window);
+		glm::vec3 mouseToGroundPosition = camera.getRayToGroundPlaneIntersection(window);
 		const Entity* selectedEntity = nullptr;
 		for (const auto& faction : factionHandler.getFactions())
 		{

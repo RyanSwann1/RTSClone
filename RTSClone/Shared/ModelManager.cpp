@@ -155,47 +155,6 @@ namespace
 #endif // LEVEL_EDITOR
 }
 
-const Model& ModelManager::getModel(eEntityType entityType) const
-{
-	switch (entityType)
-	{
-	case eEntityType::SupplyDepot:
-		return ModelManager::getInstance().getModel(SUPPLY_DEPOT_MODEL_NAME);
-	case eEntityType::Barracks:
-		return ModelManager::getInstance().getModel(BARRACKS_MODEL_NAME);
-	case eEntityType::Turret:
-		return ModelManager::getInstance().getModel(TURRET_MODEL_NAME);
-	case eEntityType::Laboratory:
-		return ModelManager::getInstance().getModel(LABORATORY_MODEL_NAME);
-	default:
-		assert(false);
-	}
-}
-
-AABB ModelManager::getModelAABB(const glm::vec3& position, eEntityType entityType) const
-{
-	AABB modelAABB;
-	switch (entityType)
-	{
-	case eEntityType::Barracks:
-		modelAABB = { position,  ModelManager::getInstance().getModel(BARRACKS_MODEL_NAME) };
-		break;
-	case eEntityType::SupplyDepot:
-		modelAABB = { position, ModelManager::getInstance().getModel(SUPPLY_DEPOT_MODEL_NAME) };
-		break;
-	case eEntityType::Turret:
-		modelAABB = { position, ModelManager::getInstance().getModel(TURRET_MODEL_NAME) };
-		break;
-	case eEntityType::Laboratory:
-		modelAABB = { position, ModelManager::getInstance().getModel(LABORATORY_MODEL_NAME) };
-		break;
-	default:
-		assert(false);
-	}
-
-	return modelAABB;
-}
-
 const Model& ModelManager::getModel(const std::string& modelName) const
 {
 	auto model = std::find_if(m_models.cbegin(), m_models.cend(), [&modelName](const auto& model)
@@ -240,4 +199,45 @@ ModelManager::ModelManager()
 	: m_loadedAllModels(true),
 	m_models(loadGameModels(m_loadedAllModels))
 {}
+
+const Model& ModelManager::getModel(eEntityType entityType) const
+{
+	switch (entityType)
+	{
+	case eEntityType::SupplyDepot:
+		return ModelManager::getInstance().getModel(SUPPLY_DEPOT_MODEL_NAME);
+	case eEntityType::Barracks:
+		return ModelManager::getInstance().getModel(BARRACKS_MODEL_NAME);
+	case eEntityType::Turret:
+		return ModelManager::getInstance().getModel(TURRET_MODEL_NAME);
+	case eEntityType::Laboratory:
+		return ModelManager::getInstance().getModel(LABORATORY_MODEL_NAME);
+	default:
+		assert(false);
+	}
+}
+
+AABB ModelManager::getModelAABB(const glm::vec3& position, eEntityType entityType) const
+{
+	AABB modelAABB;
+	switch (entityType)
+	{
+	case eEntityType::Barracks:
+		modelAABB = { position,  ModelManager::getInstance().getModel(BARRACKS_MODEL_NAME) };
+		break;
+	case eEntityType::SupplyDepot:
+		modelAABB = { position, ModelManager::getInstance().getModel(SUPPLY_DEPOT_MODEL_NAME) };
+		break;
+	case eEntityType::Turret:
+		modelAABB = { position, ModelManager::getInstance().getModel(TURRET_MODEL_NAME) };
+		break;
+	case eEntityType::Laboratory:
+		modelAABB = { position, ModelManager::getInstance().getModel(LABORATORY_MODEL_NAME) };
+		break;
+	default:
+		assert(false);
+	}
+
+	return modelAABB;
+}
 #endif // GAME

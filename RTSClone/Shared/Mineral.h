@@ -1,18 +1,16 @@
 #pragma once
 
-
-#ifdef LEVEL_EDITOR
 #include "Entity.h"
+//#ifdef LEVEL_EDITOR
 
-class Mineral : public Entity
-{
-public:
-	Mineral(const glm::vec3& startingPosition, glm::vec3 startingRotation = glm::vec3(0.0f));
-	Mineral(Mineral&&) noexcept;
-	Mineral& operator=(Mineral&&) noexcept;
-	~Mineral();
-};
-#endif // LEVEL_EDITOR
+//
+//class Mineral : public Entity
+//{
+//public:
+//	Mineral(const glm::vec3& startingPosition, glm::vec3 startingRotation = glm::vec3(0.0f));
+//	~Mineral();
+//};
+//#endif // LEVEL_EDITOR
 
 #ifdef GAME
 #include "NonCopyable.h"

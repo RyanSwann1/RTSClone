@@ -2,6 +2,7 @@
 #include "Globals.h"
 #include "glm/gtc/matrix_transform.hpp"
 #include "glm/gtx/projection.hpp"
+#include <limits>
 
 namespace
 {
@@ -100,6 +101,40 @@ void Camera::update(float deltaTime, const sf::Window& window, glm::uvec2 window
 	moveByMouse(deltaTime, window, windowSize);
 }
 
+glm::vec3 Camera::getInfiniteForwardRay(const sf::Window& window) const
+{
+	glm::vec3 rayStartingPosition = position;
+	glm::vec3 rayDirection = calculatorMouseRayDirection(getProjection(glm::ivec2(window.getSize().x, window.getSize().y)), getView(), window,
+		{ sf::Mouse::getPosition(window).x, sf::Mouse::getPosition(window).y });
+
+	return rayStartingPosition + rayDirection * std::numeric_limits<float>::max();
+}
+
+void Camera::moveByMouse(float deltaTime, const sf::Window& window, glm::uvec2 windowSize)
+{
+	glm::vec2 mousePosition = { static_cast<float>(sf::Mouse::getPosition(window).x), static_cast<float>(sf::Mouse::getPosition(window).y) };
+	glm::vec2 mousePositionNDC = { (mousePosition.x / windowSize.x * 2.0f) - 1.0f, (mousePosition.y / windowSize.y * 2.0f) - 1.0f };
+
+	if (mousePositionNDC.x <= -MOUSE_MOVE_BOUNDARY)
+	{
+		position -= glm::normalize(glm::cross(front, up)) * MOUSE_MOVEMENT_SPEED * deltaTime;
+	}
+	if (mousePositionNDC.x >= MOUSE_MOVE_BOUNDARY)
+	{
+		position += glm::normalize(glm::cross(front, up)) * MOUSE_MOVEMENT_SPEED * deltaTime;
+	}
+	if (mousePositionNDC.y <= -MOUSE_MOVE_BOUNDARY)
+	{
+		position.x += glm::cos(glm::radians(rotation.y)) * MOUSE_MOVEMENT_SPEED * deltaTime;
+		position.z += glm::sin(glm::radians(rotation.y)) * MOUSE_MOVEMENT_SPEED * deltaTime;
+	}
+	if (mousePositionNDC.y >= MOUSE_MOVE_BOUNDARY)
+	{
+		position.x -= glm::cos(glm::radians(rotation.y)) * MOUSE_MOVEMENT_SPEED * deltaTime;
+		position.z -= glm::sin(glm::radians(rotation.y)) * MOUSE_MOVEMENT_SPEED * deltaTime;
+	}
+}
+
 glm::vec3 Camera::getRayToGroundPlaneIntersection(const sf::Window& window) const
 {
 	glm::vec3 planeNormal = { 0.0f, 1.0f, 0.0f };
@@ -116,27 +151,17 @@ glm::vec3 Camera::getRayToGroundPlaneIntersection(const sf::Window& window) cons
 #endif // GAME
 
 #ifdef LEVEL_EDITOR
-bool Camera::getMouseToGroundPosition(const sf::Window& window, glm::uvec2 windowSize, glm::vec3& mouseToGroundPosition) const
+bool Camera::getRayToGroundIntersection(const sf::Window& window, glm::uvec2 windowSize, glm::vec3& intersection) const
 {
-	assert(position.y >= MINIMUM_HEIGHT);
-
-	glm::vec3 rayPositionFromMouse = calculateMouseRay(getProjection(windowSize), getView(), window,
+	glm::vec3 planeNormal = { 0.0f, 1.0f, 0.0f };
+	glm::vec3 rayStartingPosition = position;
+	glm::vec3 rayDirection = calculatorMouseRayDirection(getProjection(glm::ivec2(window.getSize().x, window.getSize().y)), getView(), window,
 		{ sf::Mouse::getPosition(window).x, sf::Mouse::getPosition(window).y });
 
-	glm::vec3 rayPosition = position;
-	bool groundFound = false;
-	for (int i = 1; i < MAX_RAY_TO_GROUND_DISTANCE; ++i)
-	{
-		rayPosition = rayPositionFromMouse * static_cast<float>(i) + position;
-		if (rayPosition.y <= 0.0f)
-		{
-			groundFound = true;
-			mouseToGroundPosition = { rayPosition.x, Globals::GROUND_HEIGHT, rayPosition.z };
-			break;
-		}
-	}
+	float k = glm::dot(glm::proj(-rayStartingPosition, planeNormal), planeNormal) / glm::dot(glm::proj(rayDirection, planeNormal), planeNormal);
+	intersection = (rayStartingPosition + rayDirection * k);
 
-	return groundFound;
+	return glm::dot(rayDirection, planeNormal) < std::numeric_limits<float>::epsilon();
 }
 
 void Camera::onMouseMove(const sf::Window& window, float deltaTime)
@@ -274,30 +299,7 @@ void Camera::moveByArrowKeys(float deltaTime)
 	}
 }
 
-void Camera::moveByMouse(float deltaTime, const sf::Window& window, glm::uvec2 windowSize)
-{
-	glm::vec2 mousePosition = { static_cast<float>(sf::Mouse::getPosition(window).x), static_cast<float>(sf::Mouse::getPosition(window).y) };
-	glm::vec2 mousePositionNDC = { (mousePosition.x / windowSize.x * 2.0f) - 1.0f, (mousePosition.y / windowSize.y * 2.0f) - 1.0f };
 
-	if (mousePositionNDC.x <= -MOUSE_MOVE_BOUNDARY)
-	{
-		position -= glm::normalize(glm::cross(front, up)) * MOUSE_MOVEMENT_SPEED * deltaTime;
-	}
-	if (mousePositionNDC.x >= MOUSE_MOVE_BOUNDARY)
-	{
-		position += glm::normalize(glm::cross(front, up)) * MOUSE_MOVEMENT_SPEED * deltaTime;
-	}
-	if (mousePositionNDC.y <= -MOUSE_MOVE_BOUNDARY)
-	{
-		position.x += glm::cos(glm::radians(rotation.y)) * MOUSE_MOVEMENT_SPEED * deltaTime;
-		position.z += glm::sin(glm::radians(rotation.y)) * MOUSE_MOVEMENT_SPEED * deltaTime;
-	}
-	if (mousePositionNDC.y >= MOUSE_MOVE_BOUNDARY)
-	{
-		position.x -= glm::cos(glm::radians(rotation.y)) * MOUSE_MOVEMENT_SPEED * deltaTime;
-		position.z -= glm::sin(glm::radians(rotation.y)) * MOUSE_MOVEMENT_SPEED * deltaTime;
-	}
-}
 
 void Camera::setFront()
 {

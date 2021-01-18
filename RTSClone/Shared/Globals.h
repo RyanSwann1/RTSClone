@@ -38,6 +38,7 @@ namespace Globals
 	const glm::vec3 AI_2_MATERIAL_DIFFUSE = { 1.0f, 1.0f, 0.2f };
 	const glm::vec3 AI_3_MATERIAL_DIFFUSE = { 0.2f, 1.0f, 0.2f };
 	inline const std::string FACTION_MATERIAL_NAME_ID = "metal";
+	const glm::uvec2 WINDOW_SIZE(1600, 900);
 
 	const int HQ_STARTING_HEALTH = 25;
 	const int BARRACKS_STARTING_HEALTH = 10;
@@ -73,6 +74,7 @@ namespace Globals
 	const int TURRET_POPULATION_COST = 0;
 	const int LABORATORY_POPULATION_COST = 0;
 
+#ifdef GAME
 	inline const std::array<int, static_cast<size_t>(eEntityType::Max) + 1> ENTITY_RESOURCE_COSTS
 	{
 		UNIT_RESOURCE_COST,
@@ -94,6 +96,7 @@ namespace Globals
 		TURRET_POPULATION_COST,
 		LABORATORY_POPULATION_COST
 	};
+#endif // GAME
 
 	const int MAX_FACTION_SHIELD_AMOUNT = 5;
 	const int FACTION_SHIELD_INCREASE_COST = 100;

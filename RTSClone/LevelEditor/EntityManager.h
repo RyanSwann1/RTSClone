@@ -17,7 +17,7 @@ public:
 
 	bool isEntitySelected() const;
 	Entity* getSelectedEntity();
-	const std::vector<Entity>& getEntities() const;
+	const std::vector<std::unique_ptr<Entity>>& getEntities() const;
 	
 	void addEntity(const Model& model, const glm::vec3& position);
 	void removeAllSelectedEntities();
@@ -33,6 +33,6 @@ public:
 #endif // RENDER_AABB
 
 private:
-	std::vector<Entity> m_entities;
+	std::vector<std::unique_ptr<Entity>> m_entities;
 	int m_selectedEntityID;
 };

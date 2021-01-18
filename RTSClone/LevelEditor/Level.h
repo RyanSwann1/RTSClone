@@ -30,7 +30,7 @@ public:
 	int getFactionStartingResources() const;
 	int getFactionStartingPopulationCap() const;
 	const std::string& getName() const;
-	const std::vector<Player>& getPlayers() const;
+	const std::vector<std::unique_ptr<Player>>& getPlayers() const;
 	const glm::ivec2& getMapSize() const;
 	const EntityManager& getEntityManager() const;
 
@@ -57,7 +57,7 @@ private:
 	TranslateObject m_translateObject;
 	PlayableAreaDisplay m_playableAreaDisplay;
 	EntityManager m_entityManager;
-	std::vector<Player> m_players;
+	std::vector<std::unique_ptr<Player>> m_players;
 	Player* m_selectedPlayer;
 	glm::ivec2 m_mapSize;
 	int m_factionStartingResources;

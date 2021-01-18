@@ -7,12 +7,10 @@
 #include <string>
 #include <ostream>
 
-struct Player : private NonCopyable
+struct Player : private NonCopyable, private NonMovable
 {
 	Player(eFactionController factionController);
 	Player(eFactionController factionController, const glm::vec3& hqStartingPosition, const glm::vec3& startingMineralPosition);
-	Player(Player&&) noexcept;
-	Player& operator=(Player&&) noexcept;
 
 	void render(ShaderHandler& shaderHandler) const;
 
@@ -25,5 +23,5 @@ struct Player : private NonCopyable
 
 	eFactionController controller;
 	Entity HQ;
-	std::vector<Mineral> minerals;
+	std::vector<std::unique_ptr<Entity>> minerals;
 };
