@@ -16,8 +16,6 @@ namespace
 	const float MOUSE_MOVEMENT_SPEED = 90.0f;
 #endif // GAME
 
-	const int MAX_RAY_TO_GROUND_DISTANCE = 2500;
-	const float MINIMUM_HEIGHT = 5.0f;
 	const float SENSITIVITY = 4.0f;
 	const float NEAR_PLANE_DISTANCE = 0.1f;
 	const float FAR_PLANE_DISTANCE = 1750.0f;
@@ -26,43 +24,23 @@ namespace
 	const glm::vec3 STARTING_POSITION = { 0.0f, 72.0f, 43.0f };
 	const glm::vec3 STARTING_ROTATION = { -70.0f, 0.0f, 0.0f };
 
-	glm::vec2 getNormalizedDeviceCoords(const sf::Window& window, const glm::ivec2& mousePosition)
-	{
-		float x = (2.0f * mousePosition.x) / window.getSize().x - 1.0f;
-		float y = 1.0f - (2.0f * mousePosition.y) / window.getSize().y;
-
-		return glm::vec2(x, y);
-	}
-
-	glm::vec4 toEyeCoords(const glm::vec4& clipSpaceCoords, const glm::mat4& projection)
-	{
-		glm::vec4 rayEye = glm::inverse(projection) * clipSpaceCoords;
-		rayEye = glm::vec4(rayEye.x, rayEye.y, -1.0f, 0.0f);
-
-		return rayEye;
-	}
-
-	glm::vec3 toWorldCoords(const glm::mat4& view, const glm::vec4& eyeCoords)
-	{
-		glm::vec4 position = glm::vec4(glm::inverse(view) * eyeCoords);
-		glm::vec3 rayWorld = { position.x, position.y, position.z };
-		return glm::normalize(rayWorld);
-	}
-
-	glm::vec3 calculatorMouseRayDirection(const glm::mat4& projection, const glm::mat4& view, const sf::Window& window,
-		const glm::ivec2& mousePosition)
-	{
-		glm::vec2 normalizedMouseCoords = getNormalizedDeviceCoords(window, mousePosition);
-		glm::vec4 clipCoords = glm::vec4(normalizedMouseCoords.x, normalizedMouseCoords.y, -1.0f, 1.0f);
-		glm::vec4 eyeCoords = toEyeCoords(clipCoords, projection);
-		glm::vec3 worldRay = toWorldCoords(view, eyeCoords);
-
-		return worldRay;
-	}
-
 	const float ZOOM_STEP = 7.5f;
 	const float MAXIMUM_ZOOM_HEIGHT = 25.0f;
 	const float MINIMUM_ZOOM_HEIGHT = 150.0f;
+
+	glm::vec3 getRayDirectionFromCamera(const glm::mat4& projection, const glm::mat4& view,
+		const sf::Window& window, glm::ivec2 mousePosition)
+	{
+		//https://antongerdelan.net/opengl/raycasting.html
+
+		glm::uvec2 windowSize = { window.getSize().x, window.getSize().y };
+		glm::vec4 clipSpace = { (2.0f * mousePosition.x) / windowSize.x - 1.0f, 1.0f - (mousePosition.y * 2.0f) / windowSize.y,
+			-1.0f, 1.0f };
+		glm::vec4 viewSpace = glm::inverse(projection) * clipSpace;
+		glm::vec3 rayDirection = glm::inverse(view) * glm::vec4(viewSpace.x, viewSpace.y, -1.0f, 0.0f);
+
+		return glm::normalize(rayDirection);
+	}
 }
 
 Camera::Camera()
@@ -104,7 +82,7 @@ void Camera::update(float deltaTime, const sf::Window& window, glm::uvec2 window
 glm::vec3 Camera::getInfiniteForwardRay(const sf::Window& window) const
 {
 	glm::vec3 rayStartingPosition = position;
-	glm::vec3 rayDirection = calculatorMouseRayDirection(getProjection(glm::ivec2(window.getSize().x, window.getSize().y)), getView(), window,
+	glm::vec3 rayDirection = getRayDirectionFromCamera(getProjection(glm::ivec2(window.getSize().x, window.getSize().y)), getView(), window,
 		{ sf::Mouse::getPosition(window).x, sf::Mouse::getPosition(window).y });
 
 	return rayStartingPosition + rayDirection * std::numeric_limits<float>::max();
@@ -139,7 +117,7 @@ glm::vec3 Camera::getRayToGroundPlaneIntersection(const sf::Window& window) cons
 {
 	glm::vec3 planeNormal = { 0.0f, 1.0f, 0.0f };
 	glm::vec3 rayStartingPosition = position;
-	glm::vec3 rayDirection = calculatorMouseRayDirection(getProjection(glm::ivec2(window.getSize().x, window.getSize().y)), getView(), window,
+	glm::vec3 rayDirection = getRayDirectionFromCamera(getProjection(glm::ivec2(window.getSize().x, window.getSize().y)), getView(), window,
 		{ sf::Mouse::getPosition(window).x, sf::Mouse::getPosition(window).y });
 
 	float k = glm::dot(glm::proj(-rayStartingPosition, planeNormal), planeNormal) / glm::dot(glm::proj(rayDirection, planeNormal), planeNormal);
@@ -155,13 +133,18 @@ bool Camera::getRayToGroundIntersection(const sf::Window& window, glm::uvec2 win
 {
 	glm::vec3 planeNormal = { 0.0f, 1.0f, 0.0f };
 	glm::vec3 rayStartingPosition = position;
-	glm::vec3 rayDirection = calculatorMouseRayDirection(getProjection(glm::ivec2(window.getSize().x, window.getSize().y)), getView(), window,
+	glm::vec3 rayDirection = getRayDirectionFromCamera(getProjection(glm::ivec2(window.getSize().x, window.getSize().y)), getView(), window,
 		{ sf::Mouse::getPosition(window).x, sf::Mouse::getPosition(window).y });
 
-	float k = glm::dot(glm::proj(-rayStartingPosition, planeNormal), planeNormal) / glm::dot(glm::proj(rayDirection, planeNormal), planeNormal);
-	intersection = (rayStartingPosition + rayDirection * k);
+	if (glm::dot(rayDirection, planeNormal) > -std::numeric_limits<float>::epsilon())
+	{
+		return false;
+	}
 
-	return glm::dot(rayDirection, planeNormal) < std::numeric_limits<float>::epsilon();
+	float v = glm::dot(glm::proj(-rayStartingPosition, planeNormal), planeNormal) / glm::dot(glm::proj(rayDirection, planeNormal), planeNormal);
+	intersection = (rayStartingPosition + rayDirection * v);
+
+	return true;
 }
 
 void Camera::onMouseMove(const sf::Window& window, float deltaTime)
@@ -213,12 +196,7 @@ void Camera::update(float deltaTime, const sf::Window& window, glm::ivec2 lastMo
 		}	
 	}
 
-	
-	glm::vec3 newPosition = position + velocity * deltaTime;
-	if (newPosition.y >= MINIMUM_HEIGHT)
-	{
-		position = newPosition;
-	}
+	position += velocity * deltaTime;
 
 	velocity *= 0.9f;
 	setFront();
@@ -298,8 +276,6 @@ void Camera::moveByArrowKeys(float deltaTime)
 		position.z -= glm::sin(glm::radians(rotation.y)) * MOVEMENT_SPEED * deltaTime;
 	}
 }
-
-
 
 void Camera::setFront()
 {
