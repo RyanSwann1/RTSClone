@@ -190,7 +190,7 @@
     <ClInclude Include="..\Shared\NonCopyable.h" />
     <ClInclude Include="..\Shared\NonMovable.h" />
     <ClInclude Include="..\Shared\ShaderHandler.h" />
-    <ClInclude Include="..\Shared\UniqueEntityIDDistributer.h" />
+    <ClInclude Include="..\Shared\UniqueIDGenerator.h" />
     <ClInclude Include="GameObjectManager.h" />
     <ClInclude Include="GameObject.h" />
     <ClInclude Include="Level.h" />

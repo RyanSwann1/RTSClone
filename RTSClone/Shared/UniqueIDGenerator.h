@@ -3,16 +3,16 @@
 #include "NonCopyable.h"
 #include "NonMovable.h"
 
-class UniqueEntityIDDistributer : private NonCopyable, private NonMovable
+class UniqueIDGenerator : private NonCopyable, private NonMovable
 {
 public:
-	static UniqueEntityIDDistributer& getInstance()
+	static UniqueIDGenerator& getInstance()
 	{
-		static UniqueEntityIDDistributer instance;
+		static UniqueIDGenerator instance;
 		return instance;
 	}
 
-	int getUniqueEntityID()
+	int getUniqueID()
 	{
 		int ID = m_uniqueEntityIDCounter;
 		++m_uniqueEntityIDCounter;
@@ -20,7 +20,7 @@ public:
 	}
 
 private:
-	UniqueEntityIDDistributer()
+	UniqueIDGenerator()
 		: m_uniqueEntityIDCounter(0)
 	{}
 

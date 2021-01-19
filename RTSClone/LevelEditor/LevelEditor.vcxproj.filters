@@ -158,9 +158,6 @@
     <ClInclude Include="..\Shared\NonMovable.h">
       <Filter>src</Filter>
     </ClInclude>
-    <ClInclude Include="..\Shared\UniqueEntityIDDistributer.h">
-      <Filter>src</Filter>
-    </ClInclude>
     <ClInclude Include="Player.h">
       <Filter>src</Filter>
     </ClInclude>
@@ -180,6 +177,9 @@
       <Filter>src</Filter>
     </ClInclude>
     <ClInclude Include="GameObjectManager.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Shared\UniqueIDGenerator.h">
       <Filter>src</Filter>
     </ClInclude>
   </ItemGroup>

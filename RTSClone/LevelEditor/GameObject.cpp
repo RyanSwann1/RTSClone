@@ -1,5 +1,5 @@
 #include "GameObject.h"
-#include "UniqueEntityIDDistributer.h"
+#include "UniqueIDGenerator.h"
 #include "ShaderHandler.h"
 #include "Globals.h"
 #include "Model.h"
@@ -8,7 +8,7 @@ GameObject::GameObject(const Model& model, const glm::vec3& startingPosition, gl
 	: m_position(startingPosition),
 	m_rotation(startingRotation),
 	m_AABB(),
-	m_ID(UniqueEntityIDDistributer::getInstance().getUniqueEntityID()),
+	m_ID(UniqueIDGenerator::getInstance().getUniqueID()),
 	m_model(model),
 	m_selected(false)
 {
