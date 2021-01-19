@@ -156,7 +156,6 @@
     <ClCompile Include="..\Shared\imgui_impl\imgui_impl_sfml.cpp" />
     <ClCompile Include="..\Shared\LevelFileHandler.cpp" />
     <ClCompile Include="..\Shared\Mesh.cpp" />
-    <ClCompile Include="..\Shared\Mineral.cpp" />
     <ClCompile Include="..\Shared\Model.cpp" />
     <ClCompile Include="..\Shared\ModelLoader.cpp" />
     <ClCompile Include="..\Shared\ModelManager.cpp" />
@@ -188,7 +187,6 @@
     <ClInclude Include="..\Shared\khrplatform.h" />
     <ClInclude Include="..\Shared\LevelFileHandler.h" />
     <ClInclude Include="..\Shared\Mesh.h" />
-    <ClInclude Include="..\Shared\Mineral.h" />
     <ClInclude Include="..\Shared\Model.h" />
     <ClInclude Include="..\Shared\ModelLoader.h" />
     <ClInclude Include="..\Shared\ModelManager.h" />

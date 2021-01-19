@@ -96,9 +96,6 @@
     <ClCompile Include="TranslateObject.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="..\Shared\Mineral.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Shared\imgui\imstb_truetype.h">
@@ -189,9 +186,6 @@
       <Filter>src</Filter>
     </ClInclude>
     <ClInclude Include="TranslateObject.h">
-      <Filter>src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Shared\Mineral.h">
       <Filter>src</Filter>
     </ClInclude>
     <ClInclude Include="Notes.h">

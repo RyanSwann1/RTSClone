@@ -92,7 +92,7 @@ int main()
 	GameMessenger<GameMessages::UIDisplayWinner>::getInstance();
 
 	PathFinding::getInstance();
-
+	 
 	sf::Clock gameClock;
 	Camera camera;
 	UIManager uiManager;

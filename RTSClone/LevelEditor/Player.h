@@ -2,7 +2,7 @@
 
 #include "Globals.h"
 #include "FactionController.h"
-#include "Mineral.h"
+#include "Entity.h"
 #include <array>
 #include <string>
 #include <ostream>

@@ -1,7 +1,5 @@
 #include "Mineral.h"
 #include "ModelManager.h"
-
-#ifdef GAME
 #include "GameMessenger.h"
 #include "GameMessages.h"
 
@@ -47,4 +45,3 @@ void Mineral::render(ShaderHandler& shaderHandler) const
 {
 	m_model.get().render(shaderHandler, m_position);
 }
-#endif // GAME
