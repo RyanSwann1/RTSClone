@@ -23,7 +23,7 @@ GameObject* GameObjectManager::getSelectedGameObject()
 	{
 		auto selectedGameObject = std::find_if(m_gameObjects.begin(), m_gameObjects.end(), [this](const auto& gameObject)
 		{
-			return gameObject == m_selectedGameObjectID;
+			return gameObject.getID() == m_selectedGameObjectID;
 		});
 		
 		assert(selectedGameObject != m_gameObjects.end());
