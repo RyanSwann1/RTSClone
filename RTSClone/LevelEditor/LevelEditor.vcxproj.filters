@@ -69,9 +69,6 @@
     <ClCompile Include="..\Shared\ModelManager.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="PlayableAreaDisplay.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
     <ClCompile Include="..\Shared\SelectionBox.cpp">
       <Filter>src</Filter>
     </ClCompile>
@@ -162,9 +159,6 @@
       <Filter>src</Filter>
     </ClInclude>
     <ClInclude Include="..\Shared\NonMovable.h">
-      <Filter>src</Filter>
-    </ClInclude>
-    <ClInclude Include="PlayableAreaDisplay.h">
       <Filter>src</Filter>
     </ClInclude>
     <ClInclude Include="..\Shared\SelectionBox.h">

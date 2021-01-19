@@ -164,7 +164,6 @@
     <ClCompile Include="EntityManager.cpp" />
     <ClCompile Include="Level.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="PlayableAreaDisplay.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="TranslateObject.cpp" />
   </ItemGroup>
@@ -198,7 +197,6 @@
     <ClInclude Include="EntityManager.h" />
     <ClInclude Include="Level.h" />
     <ClInclude Include="Notes.h" />
-    <ClInclude Include="PlayableAreaDisplay.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="TranslateObject.h" />
   </ItemGroup>
