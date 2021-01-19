@@ -9,17 +9,17 @@
 
 GameObjectManager::GameObjectManager()
 	: m_gameObjects(),
-	m_selectedGameObjectID(Globals::INVALID_ENTITY_ID)
+	m_selectedGameObjectID(Globals::INVALID_GAMEOBJECT_ID)
 {}
 
 bool GameObjectManager::isGameObjectSelected() const
 {
-	return m_selectedGameObjectID != Globals::INVALID_ENTITY_ID;
+	return m_selectedGameObjectID != Globals::INVALID_GAMEOBJECT_ID;
 }
 
 GameObject* GameObjectManager::getSelectedGameObject()
 {
-	if(m_selectedGameObjectID != Globals::INVALID_ENTITY_ID)
+	if(m_selectedGameObjectID != Globals::INVALID_GAMEOBJECT_ID)
 	{
 		auto selectedGameObject = std::find_if(m_gameObjects.begin(), m_gameObjects.end(), [this](const auto& gameObject)
 		{
@@ -58,7 +58,7 @@ void GameObjectManager::removeAllSelectedEntities()
 		{
 			if (gameObject->getID() == m_selectedGameObjectID)
 			{
-				m_selectedGameObjectID = Globals::INVALID_ENTITY_ID;
+				m_selectedGameObjectID = Globals::INVALID_GAMEOBJECT_ID;
 			}
 
 			gameObject = m_gameObjects.erase(gameObject);
@@ -73,7 +73,7 @@ void GameObjectManager::removeAllSelectedEntities()
 const GameObject* GameObjectManager::selectGameObjectAtPosition(const glm::vec3& position)
 {
 	const GameObject* selectedGameObject = nullptr;
-	m_selectedGameObjectID = Globals::INVALID_ENTITY_ID;
+	m_selectedGameObjectID = Globals::INVALID_GAMEOBJECT_ID;
 	for (auto gameObject = m_gameObjects.begin(); gameObject != m_gameObjects.end(); ++gameObject)
 	{
 		if (gameObject->getAABB().contains(position))

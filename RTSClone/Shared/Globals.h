@@ -29,7 +29,13 @@ namespace Globals
 	const float GROUND_HEIGHT = 0.0f;
 	const int MAP_SIZE = 30;
 	const int NODE_SIZE = 6;
+#ifdef GAME
 	const int INVALID_ENTITY_ID = -1;
+#endif // GAME
+#ifdef LEVEL_EDITOR
+	const int INVALID_GAMEOBJECT_ID = -1;
+#endif // LEVEL_EDITOR
+
 	const size_t MAX_MINERALS_PER_FACTION = 5;
 	const int MIN_FACTIONS = 2;
 	const int MAX_FACTIONS = 4;

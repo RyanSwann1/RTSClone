@@ -23,7 +23,7 @@ GameObject::GameObject(GameObject&& rhs) noexcept
 	m_model(rhs.m_model),
 	m_selected(rhs.m_selected)
 {
-	rhs.m_ID = Globals::INVALID_ENTITY_ID;
+	rhs.m_ID = Globals::INVALID_GAMEOBJECT_ID;
 }
 
 GameObject& GameObject::operator=(GameObject&& rhs) noexcept
@@ -36,7 +36,7 @@ GameObject& GameObject::operator=(GameObject&& rhs) noexcept
 	m_model = rhs.m_model;
 	m_selected = rhs.m_selected;
 
-	rhs.m_ID = Globals::INVALID_ENTITY_ID;
+	rhs.m_ID = Globals::INVALID_GAMEOBJECT_ID;
 
 	return *this;
 }
