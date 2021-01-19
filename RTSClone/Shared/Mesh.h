@@ -42,8 +42,8 @@ struct Mesh : private NonCopyable
 	void renderDebugMesh(ShaderHandler& shaderHandler) const;
 #endif // defined RENDER_AABB || defined RENDER_PATHING
 
-	void render(ShaderHandler& shaderHandler, bool selected = false) const;
-	void render(ShaderHandler& shaderHandler, eFactionController owningFactionController, bool selected = false) const;
+	void render(ShaderHandler& shaderHandler, bool highlighted = false) const;
+	void render(ShaderHandler& shaderHandler, eFactionController owningFactionController, bool highlighted = false) const;
 
 	std::vector<Vertex> vertices;
 	std::vector<unsigned int> indices;
@@ -53,4 +53,6 @@ private:
 	unsigned int vaoID;
 	unsigned int vboID;
 	unsigned int indiciesID;
+
+	void onDestroy();
 };

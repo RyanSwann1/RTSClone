@@ -5,7 +5,7 @@
 
 namespace
 {
-	const float SELECTED_MESH_AMPLIFIER = 1.75f;
+	const float HIGHLIGHTED_MESH_AMPLIFIER = 1.75f;
 }
 
 Mesh::Mesh()
@@ -34,51 +34,43 @@ Mesh::Mesh(std::vector<Vertex>&& vertices, std::vector<unsigned int>&& indices, 
 	glGenBuffers(1, &indiciesID);
 }
 
-Mesh::Mesh(Mesh&& orig) noexcept
-	: vaoID(orig.vaoID),
-	vboID(orig.vboID),
-	indiciesID(orig.indiciesID),
-	vertices(std::move(orig.vertices)),
-	indices(std::move(orig.indices)),
-	material(orig.material)
+Mesh::Mesh(Mesh&& rhs) noexcept
+	: vaoID(rhs.vaoID),
+	vboID(rhs.vboID),
+	indiciesID(rhs.indiciesID),
+	vertices(std::move(rhs.vertices)),
+	indices(std::move(rhs.indices)),
+	material(rhs.material)
 {
-	orig.vaoID = Globals::INVALID_OPENGL_ID;
-	orig.vboID = Globals::INVALID_OPENGL_ID;
-	orig.indiciesID = Globals::INVALID_OPENGL_ID;
+	rhs.vaoID = Globals::INVALID_OPENGL_ID;
+	rhs.vboID = Globals::INVALID_OPENGL_ID;
+	rhs.indiciesID = Globals::INVALID_OPENGL_ID;
 }
 
-Mesh& Mesh::operator=(Mesh&& orig) noexcept
+Mesh& Mesh::operator=(Mesh&& rhs) noexcept
 {
-	vaoID = orig.vaoID;
-	vboID = orig.vboID;
-	indiciesID = orig.indiciesID;
-	vertices = std::move(orig.vertices);
-	indices = std::move(orig.indices);
-	material = orig.material;
+	assert(vaoID != Globals::INVALID_OPENGL_ID &&
+		vboID != Globals::INVALID_OPENGL_ID &&
+		indiciesID != Globals::INVALID_OPENGL_ID);
+	onDestroy();
 
-	orig.vaoID = Globals::INVALID_OPENGL_ID;
-	orig.vboID = Globals::INVALID_OPENGL_ID;
-	orig.indiciesID = Globals::INVALID_OPENGL_ID;
+	vaoID = rhs.vaoID;
+	vboID = rhs.vboID;
+	indiciesID = rhs.indiciesID;
+	vertices = std::move(rhs.vertices);
+	indices = std::move(rhs.indices);
+	material = rhs.material;
+
+	rhs.vaoID = Globals::INVALID_OPENGL_ID;
+	rhs.vboID = Globals::INVALID_OPENGL_ID;
+	rhs.indiciesID = Globals::INVALID_OPENGL_ID;
 
 	return *this;
 }
 
 Mesh::~Mesh()
 {
-	if (vaoID != Globals::INVALID_OPENGL_ID &&
-		vboID != Globals::INVALID_OPENGL_ID &&
-		indiciesID != Globals::INVALID_OPENGL_ID)
-	{
-		glDeleteVertexArrays(1, &vaoID);
-		glDeleteBuffers(1, &vboID);
-		glDeleteBuffers(1, &indiciesID);
-	}
-	else
-	{
-		assert(vaoID == Globals::INVALID_OPENGL_ID &&
-			vboID == Globals::INVALID_OPENGL_ID &&
-			indiciesID == Globals::INVALID_OPENGL_ID);
-	}
+	onDestroy();
 }
 
 void Mesh::bind() const
@@ -116,14 +108,14 @@ void Mesh::renderDebugMesh(ShaderHandler& shaderHandler) const
 }
 #endif // RENDER_AABB || defined RENDER_PATHING
 
-void Mesh::render(ShaderHandler& shaderHandler, bool selected) const
+void Mesh::render(ShaderHandler& shaderHandler, bool highlighted) const
 {
 	assert(!indices.empty());
 	bind();
 	shaderHandler.setUniformVec3(eShaderType::Default, "uMaterialColour", material.diffuse);
-	if (selected)
+	if (highlighted)
 	{
-		shaderHandler.setUniform1f(eShaderType::Default, "uSelectedAmplifier", SELECTED_MESH_AMPLIFIER);
+		shaderHandler.setUniform1f(eShaderType::Default, "uSelectedAmplifier", HIGHLIGHTED_MESH_AMPLIFIER);
 	}
 	else
 	{
@@ -133,7 +125,7 @@ void Mesh::render(ShaderHandler& shaderHandler, bool selected) const
 	glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(indices.size()), GL_UNSIGNED_INT, nullptr);
 }
 
-void Mesh::render(ShaderHandler& shaderHandler, eFactionController owningFactionController, bool selected) const
+void Mesh::render(ShaderHandler& shaderHandler, eFactionController owningFactionController, bool highlighted) const
 {
 	assert(!indices.empty());
 	bind();
@@ -166,9 +158,9 @@ void Mesh::render(ShaderHandler& shaderHandler, eFactionController owningFaction
 		shaderHandler.setUniformVec3(eShaderType::Default, "uMaterialColour", material.diffuse);
 	}
 	
-	if (selected)
+	if (highlighted)
 	{
-		shaderHandler.setUniform1f(eShaderType::Default, "uSelectedAmplifier", SELECTED_MESH_AMPLIFIER);
+		shaderHandler.setUniform1f(eShaderType::Default, "uSelectedAmplifier", HIGHLIGHTED_MESH_AMPLIFIER);
 	}
 	else
 	{
@@ -176,6 +168,18 @@ void Mesh::render(ShaderHandler& shaderHandler, eFactionController owningFaction
 	}
 
 	glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(indices.size()), GL_UNSIGNED_INT, nullptr);
+}
+
+void Mesh::onDestroy()
+{
+	if (vaoID != Globals::INVALID_OPENGL_ID &&
+		vboID != Globals::INVALID_OPENGL_ID &&
+		indiciesID != Globals::INVALID_OPENGL_ID)
+	{
+		glDeleteVertexArrays(1, &vaoID);
+		glDeleteBuffers(1, &vboID);
+		glDeleteBuffers(1, &indiciesID);
+	}
 }
 
 Vertex::Vertex(const glm::vec3& position)
