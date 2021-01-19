@@ -75,12 +75,6 @@
     <ClCompile Include="..\Shared\ShaderHandler.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="..\Shared\Entity.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="EntityManager.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
     <ClCompile Include="Player.cpp">
       <Filter>src</Filter>
     </ClCompile>
@@ -91,6 +85,15 @@
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="TranslateObject.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="GameObject.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="GameObjectManager.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Shared\Entity.cpp">
       <Filter>src</Filter>
     </ClCompile>
   </ItemGroup>
@@ -164,13 +167,7 @@
     <ClInclude Include="..\Shared\SelectionBox.h">
       <Filter>src</Filter>
     </ClInclude>
-    <ClInclude Include="..\Shared\Entity.h">
-      <Filter>src</Filter>
-    </ClInclude>
     <ClInclude Include="..\Shared\UniqueEntityIDDistributer.h">
-      <Filter>src</Filter>
-    </ClInclude>
-    <ClInclude Include="EntityManager.h">
       <Filter>src</Filter>
     </ClInclude>
     <ClInclude Include="Player.h">
@@ -186,6 +183,15 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Level.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="GameObject.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="GameObjectManager.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Shared\Entity.h">
       <Filter>src</Filter>
     </ClInclude>
   </ItemGroup>
