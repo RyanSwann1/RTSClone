@@ -14,7 +14,6 @@ enum class eAxisCollision
 	Z
 };
 
-class EntityManager;
 class ShaderHandler;
 class TranslateObject : private NonCopyable, private NonMovable
 {

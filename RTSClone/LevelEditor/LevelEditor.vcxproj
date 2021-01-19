@@ -145,7 +145,6 @@
   <ItemGroup>
     <ClCompile Include="..\Shared\AABB.cpp" />
     <ClCompile Include="..\Shared\Camera.cpp" />
-    <ClCompile Include="..\Shared\Entity.cpp" />
     <ClCompile Include="..\Shared\FactionController.cpp" />
     <ClCompile Include="..\Shared\glad.c" />
     <ClCompile Include="..\Shared\imgui\imgui.cpp" />
@@ -159,7 +158,6 @@
     <ClCompile Include="..\Shared\Model.cpp" />
     <ClCompile Include="..\Shared\ModelLoader.cpp" />
     <ClCompile Include="..\Shared\ModelManager.cpp" />
-    <ClCompile Include="..\Shared\SelectionBox.cpp" />
     <ClCompile Include="..\Shared\ShaderHandler.cpp" />
     <ClCompile Include="GameObjectManager.cpp" />
     <ClCompile Include="GameObject.cpp" />
@@ -171,7 +169,6 @@
   <ItemGroup>
     <ClInclude Include="..\Shared\AABB.h" />
     <ClInclude Include="..\Shared\Camera.h" />
-    <ClInclude Include="..\Shared\Entity.h" />
     <ClInclude Include="..\Shared\FactionController.h" />
     <ClInclude Include="..\Shared\glad.h" />
     <ClInclude Include="..\Shared\Globals.h" />
@@ -192,7 +189,6 @@
     <ClInclude Include="..\Shared\ModelManager.h" />
     <ClInclude Include="..\Shared\NonCopyable.h" />
     <ClInclude Include="..\Shared\NonMovable.h" />
-    <ClInclude Include="..\Shared\SelectionBox.h" />
     <ClInclude Include="..\Shared\ShaderHandler.h" />
     <ClInclude Include="..\Shared\UniqueEntityIDDistributer.h" />
     <ClInclude Include="GameObjectManager.h" />

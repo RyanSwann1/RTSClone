@@ -1,10 +1,12 @@
 #include "Model.h"
 #include "ShaderHandler.h"
 #include "ModelLoader.h"
-#include "Entity.h"
 #include "Globals.h"
 #include "glm/gtc/matrix_transform.hpp"
 #include "glm/gtx/transform.hpp"
+#ifdef GAME
+#include "Entity.h"
+#endif // GAME
 
 Model::Model(bool renderFromCentrePosition, const glm::vec3& AABBSizeFromCenter, const glm::vec3& scale,
 	const std::string& fileName, std::vector<Mesh>&& meshes)
@@ -17,24 +19,24 @@ Model::Model(bool renderFromCentrePosition, const glm::vec3& AABBSizeFromCenter,
 	attachMeshesToVAO();
 }
 
-void Model::render(ShaderHandler & shaderHandler, glm::vec3 entityPosition, bool entitySelected, const glm::vec3& rotation) const
+void Model::render(ShaderHandler & shaderHandler, glm::vec3 position, bool highlight, const glm::vec3& rotation) const
 {
-	setModelMatrix(shaderHandler, entityPosition, entitySelected, rotation);
+	setModelMatrix(shaderHandler, position, highlight, rotation);
 
 	for (const auto& mesh : meshes)
 	{
-		mesh.render(shaderHandler, entitySelected);
+		mesh.render(shaderHandler, highlight);
 	}
 }
 
-void Model::render(ShaderHandler& shaderHandler, glm::vec3 entityPosition, bool entitySelected, const glm::vec3& rotation, 
+void Model::render(ShaderHandler& shaderHandler, glm::vec3 position, bool highlight, const glm::vec3& rotation, 
 	eFactionController owningFactionController) const
 {
-	setModelMatrix(shaderHandler, entityPosition, entitySelected, rotation);
+	setModelMatrix(shaderHandler, position, highlight, rotation);
 
 	for (const auto& mesh : meshes)
 	{
-		mesh.render(shaderHandler, owningFactionController, entitySelected);
+		mesh.render(shaderHandler, owningFactionController, highlight);
 	}
 }
 
@@ -46,15 +48,15 @@ void Model::attachMeshesToVAO() const
 	}
 }
 
-void Model::setModelMatrix(ShaderHandler& shaderHandler, glm::vec3 entityPosition, bool entitySelected, const glm::vec3& rotation) const
+void Model::setModelMatrix(ShaderHandler& shaderHandler, glm::vec3 position, bool highlight, const glm::vec3& rotation) const
 {
 	glm::mat4 model = glm::mat4(1.0f);
 	if (renderFromCentrePosition)
 	{
-		entityPosition.x += AABBSizeFromCenter.x;
-		entityPosition.z -= AABBSizeFromCenter.z;
+		position.x += AABBSizeFromCenter.x;
+		position.z -= AABBSizeFromCenter.z;
 
-		model = glm::translate(model, entityPosition);
+		model = glm::translate(model, position);
 		model = glm::scale(model, scale);
 		model = glm::translate(model, glm::vec3(-AABBSizeFromCenter.x, 0.0f, AABBSizeFromCenter.z));
 		model = glm::rotate(model, glm::radians(rotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
@@ -62,7 +64,7 @@ void Model::setModelMatrix(ShaderHandler& shaderHandler, glm::vec3 entityPositio
 	}
 	else
 	{
-		model = glm::translate(model, entityPosition);
+		model = glm::translate(model, position);
 		model = glm::scale(model, scale);
 		model = glm::rotate(model, glm::radians(rotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
 	}
@@ -87,6 +89,7 @@ void Model::render(ShaderHandler& shaderHandler, const glm::vec3& position, glm:
 	render(shaderHandler, position, false, rotation);
 }
 
+#ifdef GAME
 void Model::render(ShaderHandler& shaderHandler, const glm::vec3& position, eFactionController owningFactionController, glm::vec3 rotation) const
 {
 	render(shaderHandler, position, false, rotation, owningFactionController);
@@ -113,3 +116,4 @@ void Model::render(ShaderHandler& shaderHandler, const Entity& entity, eFactionC
 		assert(false);
 	}
 }
+#endif // GAME

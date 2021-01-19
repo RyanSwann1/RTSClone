@@ -8,7 +8,6 @@
 #include <ostream>
 
 struct Model;
-class SelectionBox;
 class ShaderHandler;
 class GameObjectManager : private NonCopyable, private NonMovable
 {
@@ -22,7 +21,6 @@ public:
 	void addGameObject(const Model& model, const glm::vec3& position);
 	void removeAllSelectedEntities();
 	const GameObject* selectGameObjectAtPosition(const glm::vec3& position);
-	void selectGameObjects(const SelectionBox& selectionBox);
 	void render(ShaderHandler& shaderHandler) const;
 
 	friend const std::ifstream& operator>>(std::ifstream& file, GameObjectManager& entityManager);

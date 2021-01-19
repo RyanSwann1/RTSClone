@@ -69,9 +69,6 @@
     <ClCompile Include="..\Shared\ModelManager.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="..\Shared\SelectionBox.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
     <ClCompile Include="..\Shared\ShaderHandler.cpp">
       <Filter>src</Filter>
     </ClCompile>
@@ -91,9 +88,6 @@
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="GameObjectManager.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Shared\Entity.cpp">
       <Filter>src</Filter>
     </ClCompile>
   </ItemGroup>
@@ -164,9 +158,6 @@
     <ClInclude Include="..\Shared\NonMovable.h">
       <Filter>src</Filter>
     </ClInclude>
-    <ClInclude Include="..\Shared\SelectionBox.h">
-      <Filter>src</Filter>
-    </ClInclude>
     <ClInclude Include="..\Shared\UniqueEntityIDDistributer.h">
       <Filter>src</Filter>
     </ClInclude>
@@ -189,9 +180,6 @@
       <Filter>src</Filter>
     </ClInclude>
     <ClInclude Include="GameObjectManager.h">
-      <Filter>src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Shared\Entity.h">
       <Filter>src</Filter>
     </ClInclude>
   </ItemGroup>

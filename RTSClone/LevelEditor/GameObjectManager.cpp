@@ -2,7 +2,6 @@
 #include "ModelManager.h"
 #include "Globals.h"
 #include "LevelFileHandler.h"
-#include "SelectionBox.h"
 #include <assert.h>
 #include <imgui/imgui.h>
 #include <fstream>
@@ -24,7 +23,7 @@ GameObject* GameObjectManager::getSelectedGameObject()
 	{
 		auto selectedGameObject = std::find_if(m_gameObjects.begin(), m_gameObjects.end(), [this](const auto& gameObject)
 		{
-			return this->m_selectedGameObjectID == m_selectedGameObjectID;
+			return gameObject == m_selectedGameObjectID;
 		});
 		
 		assert(selectedGameObject != m_gameObjects.end());
@@ -90,25 +89,6 @@ const GameObject* GameObjectManager::selectGameObjectAtPosition(const glm::vec3&
 	}
 
 	return selectedGameObject;
-}
-
-void GameObjectManager::selectGameObjects(const SelectionBox& selectionBox)
-{
-	int selectedGameObjectCount = 0;
-	for (auto& gameObject : m_gameObjects)
-	{
-		gameObject.setSelected(selectionBox.getAABB().contains(gameObject.getAABB()));
-		if (gameObject.isSelected())
-		{
-			++selectedGameObjectCount;
-			m_selectedGameObjectID = gameObject.getID();
-		}	
-	}
-
-	if (selectedGameObjectCount > 1)
-	{
-		m_selectedGameObjectID = Globals::INVALID_ENTITY_ID;
-	}	
 }
 
 void GameObjectManager::render(ShaderHandler& shaderHandler) const
