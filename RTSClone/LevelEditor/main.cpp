@@ -5,7 +5,6 @@
 #include "glm/gtc/matrix_transform.hpp"
 #include "Camera.h"
 #include "Globals.h"
-#include "EntityManager.h"
 #include "LevelFileHandler.h"
 #include "Player.h"
 #include "Level.h"

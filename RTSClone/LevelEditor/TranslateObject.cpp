@@ -1,6 +1,5 @@
 #include "TranslateObject.h"
 #include "ModelManager.h"
-#include "EntityManager.h"
 
 namespace 
 {

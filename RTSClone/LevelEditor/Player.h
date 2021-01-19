@@ -2,7 +2,7 @@
 
 #include "Globals.h"
 #include "FactionController.h"
-#include "Entity.h"
+#include "GameObject.h"
 #include <array>
 #include <string>
 #include <ostream>
@@ -22,6 +22,6 @@ struct Player : private NonCopyable, private NonMovable
 	friend std::ostream& operator<<(std::ostream& ostream, const Player& player);
 
 	eFactionController controller;
-	Entity HQ;
-	std::vector<std::unique_ptr<Entity>> minerals;
+	GameObject HQ;
+	std::vector<GameObject> minerals;
 };

@@ -7,7 +7,7 @@
 
 Player::Player(eFactionController controller)
 	: controller(controller),
-	HQ(ModelManager::getInstance().getModel(HQ_MODEL_NAME)),
+	HQ(ModelManager::getInstance().getModel(HQ_MODEL_NAME), glm::vec3(0.0)),
 	minerals()
 {}
 
@@ -19,7 +19,7 @@ Player::Player(eFactionController factionController, const glm::vec3& hqStarting
 	glm::vec3 mineralSpawnPosition = Globals::convertToNodePosition(startingMineralPosition);
 	for (int i = 0; i < Globals::MAX_MINERALS_PER_FACTION; ++i)
 	{
-		minerals.emplace_back(std::make_unique<Entity>(ModelManager::getInstance().getModel(MINERALS_MODEL_NAME), mineralSpawnPosition));
+		minerals.emplace_back(ModelManager::getInstance().getModel(MINERALS_MODEL_NAME), mineralSpawnPosition);
 		mineralSpawnPosition.z += Globals::NODE_SIZE;
 	}
 }
@@ -28,7 +28,7 @@ void Player::render(ShaderHandler& shaderHandler) const
 {
 	for (const auto& mineral : minerals)
 	{
-		mineral->render(shaderHandler);
+		mineral.render(shaderHandler);
 	}
 
 	HQ.render(shaderHandler);
@@ -40,7 +40,7 @@ void Player::renderAABB(ShaderHandler& shaderHandler)
 	HQ.renderAABB(shaderHandler);
 	for (auto& mineral : minerals)
 	{
-		mineral->renderAABB(shaderHandler);
+		mineral.renderAABB(shaderHandler);
 	}
 }
 #endif // RENDER_AABB
@@ -62,8 +62,8 @@ const std::ifstream& operator>>(std::ifstream& file, Player& player)
 		}
 		else if (modelName == MINERALS_MODEL_NAME)
 		{
-			player.minerals.emplace_back(std::make_unique<Entity>(ModelManager::getInstance().getModel(MINERALS_MODEL_NAME), position, rotation));
-			player.minerals.back()->resetAABB();
+			player.minerals.emplace_back(ModelManager::getInstance().getModel(MINERALS_MODEL_NAME), position, rotation);
+			player.minerals.back().resetAABB();
 		}
 	};
 
@@ -88,13 +88,13 @@ std::ostream& operator<<(std::ostream& ostream, const Player& player)
 
 	for (const auto& mineral : player.minerals)
 	{
-		ostream << mineral->getModel().modelName << " " <<
+		ostream << mineral.getModel().modelName << " " <<
 
-		mineral->getRotation().x << " " << mineral->getRotation().y << " " <<
-		mineral->getRotation().z << " " <<
+		mineral.getRotation().x << " " << mineral.getRotation().y << " " <<
+		mineral.getRotation().z << " " <<
 
-		mineral->getPosition().x << " " << mineral->getPosition().y << " " <<
-		mineral->getPosition().z << " ";
+		mineral.getPosition().x << " " << mineral.getPosition().y << " " <<
+		mineral.getPosition().z << " ";
 	}
 
 	return ostream;

@@ -3,7 +3,7 @@
 #include "NonCopyable.h"
 #include "NonMovable.h"
 #include "Player.h"
-#include "EntityManager.h"
+#include "GameObjectManager.h"
 #include "TranslateObject.h"
 #include <string>
 #include <vector>
@@ -46,7 +46,7 @@ public:
 	int getFactionStartingPopulationCap() const;
 	const std::string& getName() const;
 	const std::vector<std::unique_ptr<Player>>& getPlayers() const;
-	const EntityManager& getEntityManager() const;
+	const GameObjectManager& getGameObjectManager() const;
 
 	void handleInput(const sf::Event& currentSFMLEvent, const Camera& camera, const sf::Window& window, float deltaTime, glm::uvec2 windowSize);
 	void handleModelNamesGUI();
@@ -70,7 +70,7 @@ private:
 	PlannedEntity m_plannedEntity;
 	TranslateObject m_translateObject;
 	PlayableArea m_playableArea;
-	EntityManager m_entityManager;
+	GameObjectManager m_gameObjectManager;
 	std::vector<std::unique_ptr<Player>> m_players;
 	Player* m_selectedPlayer;
 	int m_factionStartingResources;

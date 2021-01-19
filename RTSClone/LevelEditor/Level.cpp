@@ -87,7 +87,7 @@ Level::Level(const std::string& levelName)
 	m_plannedEntity(),
 	m_translateObject(),
 	m_playableArea(DEFAULT_MAP_SIZE),
-	m_entityManager(),
+	m_gameObjectManager(),
 	m_players(),
 	m_selectedPlayer(nullptr),
 	m_factionStartingResources(DEFAULT_STARTING_RESOURCES),
@@ -150,9 +150,9 @@ const std::vector<std::unique_ptr<Player>>& Level::getPlayers() const
 	return m_players;
 }
 
-const EntityManager& Level::getEntityManager() const
+const GameObjectManager& Level::getGameObjectManager() const
 {
-	return m_entityManager;
+	return m_gameObjectManager;
 }
 
 void Level::handleInput(const sf::Event& currentSFMLEvent, const Camera& camera, const sf::Window& window, float deltaTime, glm::uvec2 windowSize)
@@ -162,7 +162,7 @@ void Level::handleInput(const sf::Event& currentSFMLEvent, const Camera& camera,
 	case sf::Event::KeyPressed:
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Delete))
 		{
-			m_entityManager.removeAllSelectedEntities();
+			m_gameObjectManager.removeAllSelectedEntities();
 		}
 		break;
 	case sf::Event::MouseButtonReleased:
@@ -179,13 +179,13 @@ void Level::handleInput(const sf::Event& currentSFMLEvent, const Camera& camera,
 				{
 					m_translateObject.setSelected(mouseToGroundPosition);
 					if (m_translateObject.isSelected() &&
-						(m_entityManager.isEntitySelected() || m_selectedPlayer))
+						(m_gameObjectManager.isGameObjectSelected() || m_selectedPlayer))
 					{
 						sf::Mouse::setPosition(sf::Vector2i(window.getSize().x / 2, window.getSize().y / 2), window);
 					}
 					else
 					{
-						const Entity* entitySelected = m_entityManager.selectEntityAtPosition(mouseToGroundPosition);
+						const GameObject* entitySelected = m_gameObjectManager.selectGameObjectAtPosition(mouseToGroundPosition);
 						if (entitySelected)
 						{
 							m_translateObject.setPosition(entitySelected->getPosition());
@@ -195,7 +195,7 @@ void Level::handleInput(const sf::Event& currentSFMLEvent, const Camera& camera,
 						{
 							if (m_plannedEntity.model)
 							{
-								m_entityManager.addEntity(*m_plannedEntity.model, m_plannedEntity.position);
+								m_gameObjectManager.addGameObject(*m_plannedEntity.model, m_plannedEntity.position);
 							}
 							else
 							{
@@ -268,20 +268,20 @@ void Level::handleInput(const sf::Event& currentSFMLEvent, const Camera& camera,
 						break;
 					}
 
-					Entity* selectedEntity = m_entityManager.getSelectedEntity();
-					if (selectedEntity)
+					GameObject* selectedGameObject = m_gameObjectManager.getSelectedGameObject();
+					if (selectedGameObject)
 					{
 						glm::vec3 nodePosition = Globals::convertToNodePosition(m_translateObject.getPosition());
-						selectedEntity->setPosition(nodePosition);
-						selectedEntity->resetAABB();
+						selectedGameObject->setPosition(nodePosition);
+						selectedGameObject->resetAABB();
 					}
 					else if (m_selectedPlayer)
 					{
 						glm::vec3 nodePosition = Globals::convertToNodePosition(m_translateObject.getPosition());
 						for (auto& mineral : m_selectedPlayer->minerals)
 						{
-							mineral->setPosition(mineral->getPosition() + nodePosition - m_selectedPlayer->HQ.getPosition());
-							mineral->resetAABB();
+							mineral.setPosition(mineral.getPosition() + nodePosition - m_selectedPlayer->HQ.getPosition());
+							mineral.resetAABB();
 						}
 
 						m_selectedPlayer->HQ.setPosition(nodePosition);
@@ -367,9 +367,9 @@ void Level::handlePlayersGUI()
 			for (auto& mineral : m_players[i]->minerals)
 			{
 				glm::vec3 vDifference = playerPosition - m_players[i]->HQ.getPosition();
-				const glm::vec3& mineralPosition = mineral->getPosition();
-				mineral->setPosition({ mineralPosition.x + vDifference.x, mineralPosition.y + vDifference.y, mineralPosition.z + vDifference.z });
-				mineral->resetAABB();
+				const glm::vec3& mineralPosition = mineral.getPosition();
+				mineral.setPosition({ mineralPosition.x + vDifference.x, mineralPosition.y + vDifference.y, mineralPosition.z + vDifference.z });
+				mineral.resetAABB();
 			}
 
 			m_players[i]->HQ.setPosition(playerPosition);
@@ -382,29 +382,29 @@ void Level::handlePlayersGUI()
 
 void Level::handleSelectedEntityGUI()
 {
-	Entity* selectedEntity = m_entityManager.getSelectedEntity();
-	if (selectedEntity)
+	GameObject* selectedGameObject = m_gameObjectManager.getSelectedGameObject();
+	if (selectedGameObject)
 	{
 		ImGui::BeginChild("Selected Entity", ImVec2(175, 275), true);
 		ImGui::Text("Selected Entity");
 		
 		ImGui::NewLine();
 		ImGui::Text("Position");
-		if (ImGui::InputFloat("x", &selectedEntity->getPosition().x, Globals::NODE_SIZE) ||
-			ImGui::InputFloat("y", &selectedEntity->getPosition().y, 1.0f) ||
-			ImGui::InputFloat("z", &selectedEntity->getPosition().z, Globals::NODE_SIZE))
+		if (ImGui::InputFloat("x", &selectedGameObject->getPosition().x, Globals::NODE_SIZE) ||
+			ImGui::InputFloat("y", &selectedGameObject->getPosition().y, 1.0f) ||
+			ImGui::InputFloat("z", &selectedGameObject->getPosition().z, Globals::NODE_SIZE))
 		{
-			selectedEntity->resetAABB();
-			m_translateObject.setPosition(selectedEntity->getPosition());
+			selectedGameObject->resetAABB();
+			m_translateObject.setPosition(selectedGameObject->getPosition());
 		}
 
 		ImGui::NewLine();
 		ImGui::Text("Rotation");
-		if(ImGui::InputFloat("yy", &selectedEntity->getRotation().y, 90.0f))
+		if(ImGui::InputFloat("yy", &selectedGameObject->getRotation().y, 90.0f))
 		{
-			if (glm::abs(selectedEntity->getRotation().y) >= 360.0f)
+			if (glm::abs(selectedGameObject->getRotation().y) >= 360.0f)
 			{
-				selectedEntity->setRotation({ selectedEntity->getRotation().x, 0.0f, selectedEntity->getRotation().z });
+				selectedGameObject->setRotation({ selectedGameObject->getRotation().x, 0.0f, selectedGameObject->getRotation().z });
 			}
 		}
 
@@ -450,7 +450,7 @@ void Level::save() const
 
 void Level::render(ShaderHandler& shaderHandler) const
 {
-	m_entityManager.render(shaderHandler);
+	m_gameObjectManager.render(shaderHandler);
 
 	for (const auto& player : m_players)
 	{
@@ -462,7 +462,7 @@ void Level::render(ShaderHandler& shaderHandler) const
 		m_plannedEntity.model->render(shaderHandler, m_plannedEntity.position);
 	}
 
-	m_translateObject.render(shaderHandler, m_entityManager.isEntitySelected() || m_selectedPlayer);
+	m_translateObject.render(shaderHandler, m_gameObjectManager.isGameObjectSelected() || m_selectedPlayer);
 }
 
 void Level::renderPlayableArea(ShaderHandler& shaderHandler) const
@@ -473,8 +473,8 @@ void Level::renderPlayableArea(ShaderHandler& shaderHandler) const
 #ifdef RENDER_AABB
 void Level::renderAABB(ShaderHandler& shaderHandler)
 {
-	m_translateObject.renderAABB(shaderHandler, m_entityManager.isEntitySelected() || m_selectedPlayer);
-	m_entityManager.renderEntityAABB(shaderHandler);
+	m_translateObject.renderAABB(shaderHandler, m_gameObjectManager.isGameObjectSelected() || m_selectedPlayer);
+	m_gameObjectManager.renderEntityAABB(shaderHandler);
 
 	for (const auto& player : m_players)
 	{
@@ -517,7 +517,7 @@ const std::ifstream& operator>>(std::ifstream& file, Level& level)
 		file >> *player;
 	}
 
-	file >> level.m_entityManager;
+	file >> level.m_gameObjectManager;
 
 	return file;
 }

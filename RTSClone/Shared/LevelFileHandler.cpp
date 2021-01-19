@@ -1,6 +1,5 @@
 #include "LevelFileHandler.h"
 #ifdef LEVEL_EDITOR
-#include "EntityManager.h"
 #include "Player.h"
 #include "Level.h"
 #include <ostream>
@@ -112,7 +111,7 @@ bool LevelFileHandler::saveLevelToFile(const Level& level)
 	saveFactionStartingResources(file, level.getFactionStartingResources());
 	saveMapSizeToFile(file, level.getPlayableAreaSize());
 
-	file << level.getEntityManager();
+	file << level.getGameObjectManager();
 
 	return true;
 }
