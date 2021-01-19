@@ -6,8 +6,6 @@
 #include <vector>
 #include <string>
 
-//https://vulkan-tutorial.com/Loading_models
-
 struct Material 
 {
 	Material();
@@ -15,15 +13,6 @@ struct Material
 
 	glm::vec3 diffuse;
 	std::string name;
-};
-
-struct MeshTextureDetails
-{
-	MeshTextureDetails(unsigned int ID, const std::string& type, const std::string& path);
-
-	unsigned int ID;
-	std::string type;
-	std::string path; 
 };
 
 struct Vertex
@@ -41,7 +30,7 @@ class ShaderHandler;
 struct Mesh : private NonCopyable
 {
 	Mesh();
-	Mesh(std::vector<Vertex>&& vertices, std::vector<unsigned int>&& indices, std::vector<MeshTextureDetails>&& textures, const Material& material);
+	Mesh(std::vector<Vertex>&& vertices, std::vector<unsigned int>&& indices, const Material& material);
 	Mesh(Mesh&&) noexcept;
 	Mesh& operator=(Mesh&&) noexcept;
 	~Mesh();
@@ -58,7 +47,6 @@ struct Mesh : private NonCopyable
 
 	std::vector<Vertex> vertices;
 	std::vector<unsigned int> indices;
-	std::vector<MeshTextureDetails> textures;
 	Material material;
 
 private:

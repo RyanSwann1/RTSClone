@@ -24,7 +24,6 @@ namespace
 		while (getline(stream, line))
 		{
 			stringStream << line << "\n";
-			std::cout << line << "\n";
 		}
 
 		shaderSource = stringStream.str();

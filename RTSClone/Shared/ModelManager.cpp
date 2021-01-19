@@ -18,7 +18,7 @@ const std::string MINERALS_MODEL_NAME = "rocksOre.obj";
 const std::string UNIT_MODEL_NAME = "spaceCraft1.obj";
 const std::string WORKER_MODEL_NAME = "robot.obj";
 const std::string SUPPLY_DEPOT_MODEL_NAME = "satelliteDish.obj";
-const std::string BARRACKS_MODEL_NAME = "buildingOpen.obj";
+const std::string BARRACKS_MODEL_NAME = "hangar_smallB.obj";
 const std::string WAYPOINT_MODEL_NAME = "laserSabel.obj";
 const std::string PROJECTILE_MODEL_NAME = "laserSabel.obj";
 const std::string TRANSLATE_MODEL_NAME = "translate.obj";
@@ -33,7 +33,7 @@ namespace
 	const glm::vec3 WAYPOINT_SCALE{ 1.0f, 1.0f, 1.0f };
 	const glm::vec3 WORKER_SCALE{ 1.0f, 1.0f, 1.0f };
 	const glm::vec3 SUPPLY_DEPOT_SCALE{ 1.25f, 1.25f, 1.25f };
-	const glm::vec3 BARRACKS_SCALE{ 0.75f, 0.75f, 0.75f };
+	const glm::vec3 BARRACKS_SCALE{ 6.0f, 6.0f, 6.0f };
 	const glm::vec3 WORKER_MINERAL_SCALE = { 0.2f, 0.2f, 0.2f };
 	const glm::vec3 PROJECTILE_SCALE = { 0.75f, 0.75f, 0.75f };
 
@@ -116,7 +116,7 @@ namespace
 		loadModel("satelliteDish.obj", false, SUPPLY_DEPOT_AABB_SIZE_FROM_CENTER, SUPPLY_DEPOT_SCALE,
 			models, loadedAllModels);
 
-		loadModel("buildingOpen.obj", true, BARRACKS_AABB_SIZE_FROM_CENTER, BARRACKS_SCALE,
+		loadModel("hangar_smallB.obj", false, BARRACKS_AABB_SIZE_FROM_CENTER, BARRACKS_SCALE,
 			models, loadedAllModels);
 
 		return models;
