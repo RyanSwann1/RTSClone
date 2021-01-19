@@ -28,14 +28,12 @@ namespace
 	const float MAXIMUM_ZOOM_HEIGHT = 25.0f;
 	const float MINIMUM_ZOOM_HEIGHT = 150.0f;
 
-	glm::vec3 getRayDirectionFromCamera(const glm::mat4& projection, const glm::mat4& view,
-		const sf::Window& window, glm::ivec2 mousePosition)
+	glm::vec3 getRayDirectionFromCamera(const glm::mat4& projection, const glm::mat4& view, const sf::Window& window, glm::ivec2 mousePosition)
 	{
-		//https://antongerdelan.net/opengl/raycasting.html
-
-		glm::uvec2 windowSize = { window.getSize().x, window.getSize().y };
-		glm::vec4 clipSpace = { (2.0f * mousePosition.x) / windowSize.x - 1.0f, 1.0f - (mousePosition.y * 2.0f) / windowSize.y,
-			-1.0f, 1.0f };
+		glm::vec4 clipSpace = { (mousePosition.x * 2.0f) / window.getSize().x - 1.0f,
+			1.0f - (mousePosition.y * 2.0f) / window.getSize().y,
+			-1.0f,
+			1.0f };
 		glm::vec4 viewSpace = glm::inverse(projection) * clipSpace;
 		glm::vec3 rayDirection = glm::inverse(view) * glm::vec4(viewSpace.x, viewSpace.y, -1.0f, 0.0f);
 

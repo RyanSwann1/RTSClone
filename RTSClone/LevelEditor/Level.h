@@ -5,7 +5,6 @@
 #include "Player.h"
 #include "EntityManager.h"
 #include "TranslateObject.h"
-#include "PlayableAreaDisplay.h"
 #include <string>
 #include <vector>
 #include <SFML/Graphics.hpp>
@@ -19,19 +18,34 @@ struct PlannedEntity
 	const Model* model;
 };
 
-struct Camera;
 class ShaderHandler;
+struct PlayableArea : private NonCopyable, private NonMovable
+{
+	PlayableArea(glm::ivec2 startingSize);
+	~PlayableArea();
+
+	void setSize(glm::ivec2 size);
+	void render(ShaderHandler& shaderHandler) const;
+
+	glm::ivec2 size;
+
+private:
+	unsigned int m_vaoID;
+	unsigned int m_vboID;
+};
+
+struct Camera;
 class Level : private NonCopyable, private NonMovable
 {
 public:
 	static std::unique_ptr<Level> create(const std::string& levelName);
 	static std::unique_ptr<Level> load(const std::string& levelName);
 
+	glm::ivec2 getPlayableAreaSize() const;
 	int getFactionStartingResources() const;
 	int getFactionStartingPopulationCap() const;
 	const std::string& getName() const;
 	const std::vector<std::unique_ptr<Player>>& getPlayers() const;
-	const glm::ivec2& getMapSize() const;
 	const EntityManager& getEntityManager() const;
 
 	void handleInput(const sf::Event& currentSFMLEvent, const Camera& camera, const sf::Window& window, float deltaTime, glm::uvec2 windowSize);
@@ -55,11 +69,10 @@ private:
 	const std::string m_levelName;
 	PlannedEntity m_plannedEntity;
 	TranslateObject m_translateObject;
-	PlayableAreaDisplay m_playableAreaDisplay;
+	PlayableArea m_playableArea;
 	EntityManager m_entityManager;
 	std::vector<std::unique_ptr<Player>> m_players;
 	Player* m_selectedPlayer;
-	glm::ivec2 m_mapSize;
 	int m_factionStartingResources;
 	int m_factionStartingPopulationCap;
 };

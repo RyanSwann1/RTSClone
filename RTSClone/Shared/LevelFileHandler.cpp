@@ -110,7 +110,7 @@ bool LevelFileHandler::saveLevelToFile(const Level& level)
 
 	saveFactionStartingPopulation(file, level.getFactionStartingPopulationCap());
 	saveFactionStartingResources(file, level.getFactionStartingResources());
-	saveMapSizeToFile(file, level.getMapSize());
+	saveMapSizeToFile(file, level.getPlayableAreaSize());
 
 	file << level.getEntityManager();
 
