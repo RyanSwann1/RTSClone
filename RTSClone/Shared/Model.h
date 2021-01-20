@@ -18,12 +18,9 @@ struct Model : private NonMovable, private NonCopyable
 		const glm::vec3& AABBSizeFromCenter, const glm::vec3& scale);
 
 	void render(ShaderHandler& shaderHandler, const glm::vec3& position, glm::vec3 rotation = glm::vec3()) const;
-
 #ifdef GAME
-	void render(ShaderHandler& shaderHandler, const glm::vec3& position, eFactionController owningFactionController,
-		glm::vec3 rotation = glm::vec3()) const;
-	void render(ShaderHandler& shaderHandler, const Entity& entity) const;
-	void render(ShaderHandler& shaderHandler, const Entity& entity, eFactionController owningFactionController) const;
+	void render(ShaderHandler& shaderHandler, eFactionController owningFactionController, const glm::vec3& position,
+		glm::vec3 rotation, bool highlight = false) const;
 #endif // GAME
 
 	const std::string modelName;
@@ -36,10 +33,6 @@ private:
 	Model(bool renderFromCentrePosition, const glm::vec3& sizeFromCentre, const glm::vec3& scale,
 		const std::string& fileName, std::vector<Mesh>&& meshes);
 
-	void render(ShaderHandler& shaderHandler, glm::vec3 position, bool highlight, 
-		const glm::vec3& rotation) const;
-	void render(ShaderHandler& shaderHandler, glm::vec3 position, bool highlight,
-		const glm::vec3& rotation, eFactionController owningFaction) const;
 	void attachMeshesToVAO() const;
-	void setModelMatrix(ShaderHandler& shaderHandler, glm::vec3 position, bool highlight, const glm::vec3& rotation) const;
+	void setModelMatrix(ShaderHandler& shaderHandler, glm::vec3 position, const glm::vec3& rotation) const;
 };

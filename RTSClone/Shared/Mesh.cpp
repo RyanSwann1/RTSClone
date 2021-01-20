@@ -132,7 +132,7 @@ void Mesh::render(ShaderHandler& shaderHandler, eFactionController owningFaction
 
 	if (material.name == Globals::FACTION_MATERIAL_NAME_ID)
 	{
-		glm::vec3 diffuseMaterial = glm::vec3(1.0f, 1.0f, 1.0f);
+		glm::vec3 diffuseMaterial = glm::vec3(1.0f);
 		switch (owningFactionController)
 		{
 		case eFactionController::Player:

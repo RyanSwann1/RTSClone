@@ -150,16 +150,20 @@ void FactionPlayerPlannedBuilding::render(ShaderHandler& shaderHandler, eFaction
         switch (m_entityType)
         {
         case eEntityType::SupplyDepot:
-            ModelManager::getInstance().getModel(SUPPLY_DEPOT_MODEL_NAME).render(shaderHandler, m_position, owningFactionController);
+            ModelManager::getInstance().getModel(SUPPLY_DEPOT_MODEL_NAME).render(shaderHandler, owningFactionController,
+                m_position, glm::vec3(0.0f), false);
             break;
         case eEntityType::Barracks:
-            ModelManager::getInstance().getModel(BARRACKS_MODEL_NAME).render(shaderHandler, m_position, owningFactionController);
+            ModelManager::getInstance().getModel(BARRACKS_MODEL_NAME).render(shaderHandler, owningFactionController,
+                m_position, glm::vec3(0.0f), false);
             break;
         case eEntityType::Turret:
-            ModelManager::getInstance().getModel(TURRET_MODEL_NAME).render(shaderHandler, m_position, owningFactionController);
+            ModelManager::getInstance().getModel(TURRET_MODEL_NAME).render(shaderHandler, owningFactionController,
+                m_position, glm::vec3(0.0f), false);
             break;
         case eEntityType::Laboratory:
-            ModelManager::getInstance().getModel(LABORATORY_MODEL_NAME).render(shaderHandler, m_position, owningFactionController);
+            ModelManager::getInstance().getModel(LABORATORY_MODEL_NAME).render(shaderHandler, owningFactionController,
+                m_position, glm::vec3(0.0f), false);
             break;
         default:
             assert(false);

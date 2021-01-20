@@ -57,7 +57,6 @@ public:
 	bool isSelected() const;
 	
 	void setSelected(bool selected);
-	void render(ShaderHandler& shaderHandler) const;
 
 #ifdef RENDER_AABB
 	void renderAABB(ShaderHandler& shaderHandler);

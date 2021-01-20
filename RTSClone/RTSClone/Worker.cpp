@@ -358,7 +358,7 @@ void Worker::renderBuildingCommands(ShaderHandler& shaderHandler) const
 {
 	for (const auto& buildingCommand : m_buildingCommands)
 	{
-		buildingCommand.m_model.get().render(shaderHandler, buildingCommand.buildPosition, m_owningFaction.getController());
+		buildingCommand.m_model.get().render(shaderHandler, m_owningFaction.getController(), buildingCommand.buildPosition, glm::vec3(0.0f), false);
 	}
 }
 

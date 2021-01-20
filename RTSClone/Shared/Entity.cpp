@@ -225,7 +225,19 @@ void Entity::increaseMaximumShield(const Faction& owningFaction)
 
 void Entity::render(ShaderHandler& shaderHandler, eFactionController owningFactionController) const
 {
-	m_model.get().render(shaderHandler, *this, owningFactionController);
+	switch (owningFactionController)
+	{
+	case eFactionController::Player:
+		m_model.get().render(shaderHandler, owningFactionController, m_position, m_rotation, m_selected);
+		break;
+	case eFactionController::AI_1:
+	case eFactionController::AI_2:
+	case eFactionController::AI_3:
+		m_model.get().render(shaderHandler, owningFactionController, m_position, m_rotation, false);
+		break;
+	default:
+		assert(false);
+	}
 }
 
 void Entity::renderHealthBar(ShaderHandler& shaderHandler, const Camera& camera, glm::uvec2 windowSize) const
@@ -347,11 +359,6 @@ bool Entity::isSelected() const
 void Entity::setSelected(bool selected)
 {
 	m_selected = selected;
-}
-
-void Entity::render(ShaderHandler& shaderHandler) const
-{
-	m_model.get().render(shaderHandler, *this);
 }
 
 #ifdef RENDER_AABB
