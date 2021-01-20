@@ -10,7 +10,6 @@ Map::Map()
 	subscribeToMessenger<GameMessages::AddToMap>([this](const GameMessages::AddToMap& gameMessage) { return addEntityToMap(gameMessage); }, this);
 	subscribeToMessenger<GameMessages::RemoveFromMap>(
 		[this](const GameMessages::RemoveFromMap& gameMessage) { return removeEntityFromMap(gameMessage); }, this);
-
 	subscribeToMessenger<GameMessages::NewMapSize>(
 		[this](const GameMessages::NewMapSize& gameMessage) { return setSize(gameMessage); }, this);
 }
@@ -44,26 +43,26 @@ bool Map::isWithinBounds(const AABB& AABB) const
 bool Map::isWithinBounds(const glm::vec3& position) const
 {
 	return position.x >= 0 &&
-	position.x < m_size.x * Globals::NODE_SIZE &&
-	position.y >= 0 &&
-	position.y < m_size.y * Globals::NODE_SIZE &&
-	position.z >= 0 &&
-	position.z < m_size.y * Globals::NODE_SIZE;
+		position.x < m_size.x * Globals::NODE_SIZE &&
+		position.y >= 0 &&
+		position.y < m_size.y * Globals::NODE_SIZE &&
+		position.z >= 0 &&
+		position.z < m_size.y * Globals::NODE_SIZE;
 }
 
 bool Map::isWithinBounds(const glm::ivec2& position) const
 {
 	return position.x >= 0 &&
-	position.x < m_size.x &&
-	position.y >= 0 &&
-	position.y < m_size.y;
+		position.x < m_size.x &&
+		position.y >= 0 &&
+		position.y < m_size.y;
 }
 
 bool Map::isAABBOccupied(const AABB& AABB) const
 {
-	for (int x = static_cast<int>(AABB.getLeft()); x <= static_cast<int>(AABB.getRight()); ++x)
+	for (int x = static_cast<int>(AABB.getLeft()); x < static_cast<int>(AABB.getRight()); ++x)
 	{
-		for (int y = static_cast<int>(AABB.getBack()); y <= static_cast<int>(AABB.getForward()); ++y)
+		for (int y = static_cast<int>(AABB.getBack()); y < static_cast<int>(AABB.getForward()); ++y)
 		{
 			if (m_map[Globals::convertTo1D(Globals::convertToGridPosition({ x, Globals::GROUND_HEIGHT, y }), m_size)])
 			{
@@ -95,40 +94,34 @@ bool Map::isPositionOccupied(const glm::ivec2& position) const
 	return true;
 }
 
-void Map::addEntityToMap(const GameMessages::AddToMap& gameMessage)
+void Map::addEntityToMap(const GameMessages::AddToMap& message)
 {
-	for (int x = static_cast<int>(gameMessage.AABB.getLeft()); x < static_cast<int>(gameMessage.AABB.getRight()); ++x)
-	{
-		for (int y = static_cast<int>(gameMessage.AABB.getBack()); y < static_cast<int>(gameMessage.AABB.getForward()); ++y)
-		{
-			glm::ivec2 positionOnGrid = Globals::convertToGridPosition({ x, Globals::GROUND_HEIGHT, y });
-			assert(isWithinBounds(positionOnGrid));
-			if (isWithinBounds(positionOnGrid))
-			{
-				m_map[Globals::convertTo1D(positionOnGrid, m_size)] = true;
-			}
-		}
-	}
+	editMap(message.AABB, true);
 }
 
-void Map::removeEntityFromMap(const GameMessages::RemoveFromMap& gameMessage)
+void Map::removeEntityFromMap(const GameMessages::RemoveFromMap& message)
 {
-	for (int x = static_cast<int>(gameMessage.AABB.getLeft()); x < static_cast<int>(gameMessage.AABB.getRight()); ++x)
-	{
-		for (int y = static_cast<int>(gameMessage.AABB.getBack()); y < static_cast<int>(gameMessage.AABB.getForward()); ++y)
-		{
-			glm::ivec2 positionOnGrid = Globals::convertToGridPosition({ x, Globals::GROUND_HEIGHT, y });
-			assert(isWithinBounds(positionOnGrid));
-			if (isWithinBounds(positionOnGrid))
-			{
-				m_map[Globals::convertTo1D(positionOnGrid, m_size)] = false;
-			}
-		}
-	}
+	editMap(message.AABB, false);
 }
 
 void Map::setSize(const GameMessages::NewMapSize& gameMessage)
 {
 	m_size = gameMessage.mapSize;
-	m_map.resize(static_cast<size_t>(m_size.x * m_size.y), false);
+	m_map.resize(static_cast<size_t>(m_size.x) * static_cast<size_t>(m_size.y), false);
+}
+
+void Map::editMap(const AABB& AABB, bool occupyAABB)
+{
+	for (int x = static_cast<int>(AABB.getLeft()); x < static_cast<int>(AABB.getRight()); ++x)
+	{
+		for (int y = static_cast<int>(AABB.getBack()); y < static_cast<int>(AABB.getForward()); ++y)
+		{
+			glm::ivec2 positionOnGrid = Globals::convertToGridPosition({ x, Globals::GROUND_HEIGHT, y });
+			assert(isWithinBounds(positionOnGrid));
+			if (isWithinBounds(positionOnGrid))
+			{
+				m_map[Globals::convertTo1D(positionOnGrid, m_size)] = occupyAABB;
+			}
+		}
+	}
 }

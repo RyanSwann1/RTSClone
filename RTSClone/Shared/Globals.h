@@ -43,6 +43,14 @@ namespace Globals
 	const glm::vec3 AI_1_MATERIAL_DIFFUSE = { 0.2f, 0.2f, 1.0f };
 	const glm::vec3 AI_2_MATERIAL_DIFFUSE = { 1.0f, 1.0f, 0.2f };
 	const glm::vec3 AI_3_MATERIAL_DIFFUSE = { 0.2f, 1.0f, 0.2f };
+	inline std::array<glm::vec3, static_cast<size_t>(eFactionController::Max) + 1> FACTION_COLORS
+	{
+		PLAYER_MATERIAL_DIFFUSE,
+		AI_1_MATERIAL_DIFFUSE,
+		AI_2_MATERIAL_DIFFUSE,
+		AI_3_MATERIAL_DIFFUSE
+	};
+
 	inline const std::string FACTION_MATERIAL_NAME_ID = "metal";
 	const glm::uvec2 WINDOW_SIZE(1600, 900);
 
@@ -65,14 +73,25 @@ namespace Globals
 	const int POPULATION_INCREMENT = 5;
 	const int LABORATORY_RESOURCE_COST = 100;
 
-	const float WORKER_STAT_BAR_WIDTH = 60.0f;
 	const float UNIT_STAT_BAR_WIDTH = 75.0f;
+	const float WORKER_STAT_BAR_WIDTH = 60.0f;
 	const float HQ_STAT_BAR_WIDTH = 150.0f;
 	const float SUPPLY_DEPOT_STAT_BAR_WIDTH = 100.0f;
 	const float BARRACKS_STAT_BAR_WIDTH = 100.0f;
 	const float TURRET_STAT_BAR_WIDTH = 100.0f;
 	const float LABORATORY_STAT_BAR_WIDTH = 150.0f;
 	
+	inline const std::array<float, static_cast<size_t>(eEntityType::Max) + 1> ENTITIES_STAT_BAR_WIDTH
+	{
+		UNIT_STAT_BAR_WIDTH,
+		WORKER_STAT_BAR_WIDTH,
+		HQ_STAT_BAR_WIDTH,
+		SUPPLY_DEPOT_STAT_BAR_WIDTH,
+		BARRACKS_STAT_BAR_WIDTH,
+		TURRET_STAT_BAR_WIDTH,
+		LABORATORY_STAT_BAR_WIDTH
+	};
+
 	const int HQ_RESOURCES_COST = 100;
 	const int HQ_POPULATION_COST = 0;
 	const int SUPPLY_DEPOT_POPULATION_COST = 0;

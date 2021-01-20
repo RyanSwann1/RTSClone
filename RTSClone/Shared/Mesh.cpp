@@ -135,26 +135,8 @@ void Mesh::render(ShaderHandler& shaderHandler, eFactionController owningFaction
 
 	if (material.name == Globals::FACTION_MATERIAL_NAME_ID)
 	{
-		glm::vec3 diffuseMaterial = glm::vec3(1.0f);
-		switch (owningFactionController)
-		{
-		case eFactionController::Player:
-			diffuseMaterial = Globals::PLAYER_MATERIAL_DIFFUSE;
-			break;
-		case eFactionController::AI_1:
-			diffuseMaterial = Globals::AI_1_MATERIAL_DIFFUSE;
-			break;
-		case eFactionController::AI_2:
-			diffuseMaterial = Globals::AI_2_MATERIAL_DIFFUSE;
-			break;
-		case eFactionController::AI_3:
-			diffuseMaterial = Globals::AI_3_MATERIAL_DIFFUSE;
-			break;
-		default:
-			assert(false);
-		}
-
-		shaderHandler.setUniformVec3(eShaderType::Default, "uMaterialColour", diffuseMaterial);
+		shaderHandler.setUniformVec3(eShaderType::Default, "uMaterialColour", 
+			Globals::FACTION_COLORS[static_cast<int>(owningFactionController)]);
 	}
 	else
 	{

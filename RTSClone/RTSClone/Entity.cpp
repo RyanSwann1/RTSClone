@@ -12,7 +12,8 @@
 
 namespace
 {
-	const float DEFAULT_HEALTH_BAR_HEIGHT = 10.0f;
+	const float DEFAULT_STAT_BAR_HEIGHT = 10.0f;
+
 	const float WORKER_HEALTH_BAR_YOFFSET = 35.0f;
 	const float UNIT_HEALTH_BAR_YOFFSET = 50.0f;
 	const float HQ_HEALTH_BAR_YOFFSET = 225.0f;
@@ -21,14 +22,35 @@ namespace
 	const float TURRET_HEALTH_BAR_YOFFSET = 60.0f;
 	const float LABORATORY_HEALTH_BAR_YOFFSET = 130.0f;
 
-	const float DEFAULT_SHIELD_BAR_HEIGHT = 10.0f;
-	const float WORKER_SHIELD_BAR_YOFFSET = 45.0f;
 	const float UNIT_SHIELD_BAR_YOFFSET = 60.0f;
+	const float WORKER_SHIELD_BAR_YOFFSET = 45.0f;
 	const float HQ_SHIELD_BAR_YOFFSET = 235.0f;
 	const float SUPPLY_DEPOT_SHIELD_BAR_YOFFSET = 95.0f;
 	const float BARRACKS_SHIELD_BAR_YOFFSET = 95.0f;
 	const float TURRET_SHIELD_BAR_YOFFSET = 70.0f;
 	const float LABORATORY_SHIELD_BAR_YOFFSET = 140.0f;
+
+	const std::array<float, static_cast<size_t>(eEntityType::Max) + 1> ENTITIES_YOFFSET_HEALTH
+	{
+		UNIT_HEALTH_BAR_YOFFSET,
+		WORKER_HEALTH_BAR_YOFFSET,
+		HQ_HEALTH_BAR_YOFFSET,
+		SUPPLY_DEPOT_HEALTH_BAR_YOFFSET,
+		BARRACKS_HEALTH_BAR_YOFFSET,
+		TURRET_HEALTH_BAR_YOFFSET,
+		LABORATORY_HEALTH_BAR_YOFFSET
+	};
+
+	const std::array<float, static_cast<size_t>(eEntityType::Max) + 1> ENTITIES_YOFFSET_SHIELD
+	{
+		UNIT_SHIELD_BAR_YOFFSET,
+		WORKER_SHIELD_BAR_YOFFSET,
+		HQ_SHIELD_BAR_YOFFSET,
+		SUPPLY_DEPOT_SHIELD_BAR_YOFFSET,
+		BARRACKS_SHIELD_BAR_YOFFSET,
+		TURRET_SHIELD_BAR_YOFFSET,
+		LABORATORY_SHIELD_BAR_YOFFSET
+	};
 
 	const float SHIELD_REPLENISH_TIMER_EXPIRATION = 15.0f;
 }
@@ -185,47 +207,14 @@ void Entity::renderHealthBar(ShaderHandler& shaderHandler, const Camera& camera,
 {
 	if (isSelected())
 	{
-		float width = 0.0f;
-		float yOffset = 0.0f;
-		switch (getEntityType())
-		{
-		case eEntityType::Unit:
-			width = Globals::UNIT_STAT_BAR_WIDTH;
-			yOffset = UNIT_HEALTH_BAR_YOFFSET;
-			break;
-		case eEntityType::Worker:
-			width = Globals::WORKER_STAT_BAR_WIDTH;
-			yOffset = WORKER_HEALTH_BAR_YOFFSET;
-			break;
-		case eEntityType::HQ:
-			width = Globals::HQ_STAT_BAR_WIDTH;
-			yOffset = HQ_HEALTH_BAR_YOFFSET;
-			break;
-		case eEntityType::SupplyDepot:
-			width = Globals::SUPPLY_DEPOT_STAT_BAR_WIDTH;
-			yOffset = SUPPLY_DEPOT_HEALTH_BAR_YOFFSET;
-			break;
-		case eEntityType::Barracks:
-			width = Globals::BARRACKS_STAT_BAR_WIDTH;
-			yOffset = BARRACKS_HEALTH_BAR_YOFFSET;
-			break;
-		case eEntityType::Turret:
-			width = Globals::TURRET_STAT_BAR_WIDTH;
-			yOffset = TURRET_HEALTH_BAR_YOFFSET;
-			break;
-		case eEntityType::Laboratory:
-			width = Globals::LABORATORY_STAT_BAR_WIDTH;
-			yOffset = LABORATORY_HEALTH_BAR_YOFFSET;
-			break;
-		default:
-			assert(false);
-		}
+		float width = Globals::ENTITIES_STAT_BAR_WIDTH[static_cast<int>(getEntityType())];
+		float yOffset = ENTITIES_YOFFSET_HEALTH[static_cast<int>(getEntityType())];
 		
-		m_statbarSprite.render(m_position, windowSize, width, width, DEFAULT_HEALTH_BAR_HEIGHT, yOffset,
+		m_statbarSprite.render(m_position, windowSize, width, width, DEFAULT_STAT_BAR_HEIGHT, yOffset,
 			shaderHandler, camera, Globals::BACKGROUND_BAR_COLOR);
 		
 		float currentHealth = static_cast<float>(m_health) / static_cast<float>(m_maximumHealth);
-		m_statbarSprite.render(m_position, windowSize, width, width * currentHealth, DEFAULT_HEALTH_BAR_HEIGHT, yOffset,
+		m_statbarSprite.render(m_position, windowSize, width, width * currentHealth, DEFAULT_STAT_BAR_HEIGHT, yOffset,
 			shaderHandler, camera, Globals::HEALTH_BAR_COLOR);
 	}
 }
@@ -234,43 +223,10 @@ void Entity::renderShieldBar(ShaderHandler& shaderHandler, const Camera& camera,
 {
 	if (isSelected() && m_shield > 0)
 	{
-		float width = 0.0f;
-		float yOffset = 0.0f;
-		switch (getEntityType())
-		{
-		case eEntityType::Unit:
-			width = Globals::UNIT_STAT_BAR_WIDTH;
-			yOffset = UNIT_SHIELD_BAR_YOFFSET;
-			break;
-		case eEntityType::Worker:
-			width = Globals::WORKER_STAT_BAR_WIDTH;
-			yOffset = WORKER_SHIELD_BAR_YOFFSET;
-			break;
-		case eEntityType::HQ:
-			width = Globals::HQ_STAT_BAR_WIDTH;
-			yOffset = HQ_SHIELD_BAR_YOFFSET;
-			break;
-		case eEntityType::SupplyDepot:
-			width = Globals::SUPPLY_DEPOT_STAT_BAR_WIDTH;
-			yOffset = SUPPLY_DEPOT_SHIELD_BAR_YOFFSET;
-			break;
-		case eEntityType::Barracks:
-			width = Globals::BARRACKS_STAT_BAR_WIDTH;
-			yOffset = BARRACKS_SHIELD_BAR_YOFFSET;
-			break;
-		case eEntityType::Turret:
-			width = Globals::TURRET_STAT_BAR_WIDTH;
-			yOffset = TURRET_SHIELD_BAR_YOFFSET;
-			break;
-		case eEntityType::Laboratory:
-			width = Globals::LABORATORY_STAT_BAR_WIDTH;
-			yOffset = LABORATORY_SHIELD_BAR_YOFFSET;
-			break;
-		default:
-			assert(false);
-		}
+		float width = Globals::ENTITIES_STAT_BAR_WIDTH[static_cast<int>(getEntityType())];
+		float yOffset = ENTITIES_YOFFSET_SHIELD[static_cast<int>(getEntityType())];
 
-		m_statbarSprite.render(m_position, windowSize, width, width, DEFAULT_SHIELD_BAR_HEIGHT, yOffset,
+		m_statbarSprite.render(m_position, windowSize, width, width, DEFAULT_STAT_BAR_HEIGHT, yOffset,
 			shaderHandler, camera, Globals::SHIELD_BAR_COLOR);
 	}
 }

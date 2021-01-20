@@ -30,7 +30,8 @@ private:
 	glm::ivec2 m_size;
 	std::vector<bool> m_map;
 	
-	void addEntityToMap(const GameMessages::AddToMap& gameMessage);
-	void removeEntityFromMap(const GameMessages::RemoveFromMap& gameMessage);
-	void setSize(const GameMessages::NewMapSize& gameMessage);
+	void addEntityToMap(const GameMessages::AddToMap& message);
+	void removeEntityFromMap(const GameMessages::RemoveFromMap& message);
+	void setSize(const GameMessages::NewMapSize& message);
+	void editMap(const AABB& AABB, bool occupyAABB);
 };
