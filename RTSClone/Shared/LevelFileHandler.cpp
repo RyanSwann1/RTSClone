@@ -12,7 +12,6 @@
 #include "GameMessenger.h"
 #endif // GAME
 #include "Globals.h"
-#include "Entity.h"
 #include "ModelManager.h"
 #include <fstream>
 #include <sstream>

@@ -1,4 +1,4 @@
-#include "GameEvent.h"
+#include "GameEvents.h"
 #include "Globals.h"
 
 GameEvent_1::GameEvent_1(eEntityType entityType, int targetID)

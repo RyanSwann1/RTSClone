@@ -8,7 +8,7 @@
 #include "Mineral.h"
 #include "GameMessenger.h"
 #include "GameMessages.h"
-#include "GameEvent.h"
+#include "GameEvents.h"
 #include "GameEventHandler.h"
 #include "FactionHandler.h"
 #include <assert.h>

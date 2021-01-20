@@ -4,7 +4,7 @@
 #include "Globals.h"
 #include "PathFinding.h"
 #include "GameEventHandler.h"
-#include "GameEvent.h"
+#include "GameEvents.h"
 #include "GameMessages.h"
 #include "GameMessenger.h"
 

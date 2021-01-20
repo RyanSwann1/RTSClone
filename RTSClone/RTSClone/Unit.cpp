@@ -5,7 +5,7 @@
 #include "ModelManager.h"
 #include "Faction.h"
 #include "GameEventHandler.h"
-#include "GameEvent.h"
+#include "GameEvents.h"
 #include "FactionHandler.h"
 #include "PathFinding.h"
 #include "glm/gtx/vector_angle.hpp"

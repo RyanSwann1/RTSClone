@@ -6,7 +6,7 @@
 #include "UniqueIDGenerator.h"
 #include "FactionController.h"
 #include "Faction.h"
-#include "GameEvent.h"
+#include "GameEvents.h"
 #include "glm/gtc/matrix_transform.hpp"
 #include "Camera.h"
 

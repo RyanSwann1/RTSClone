@@ -7,7 +7,7 @@
 #include "Faction.h"
 #include "SupplyDepot.h"
 #include "GameEventHandler.h"
-#include "GameEvent.h"
+#include "GameEvents.h"
 #include "FactionHandler.h"
 #include "ShaderHandler.h"
 #include "Camera.h"

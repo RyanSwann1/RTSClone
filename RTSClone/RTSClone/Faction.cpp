@@ -1,7 +1,7 @@
 #include "Faction.h"
 #include "GameEventHandler.h"
 #include "ModelManager.h"
-#include "GameEvent.h"
+#include "GameEvents.h"
 #include "TypeComparison.h"
 #include "FactionHandler.h"
 

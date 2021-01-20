@@ -1,7 +1,7 @@
 #include "UIManager.h"
 #include "GameMessages.h"
 #include "GameMessenger.h"
-#include "GameEvent.h"
+#include "GameEvents.h"
 #include "GameEventHandler.h"
 #include "FactionHandler.h"
 #include "Globals.h"

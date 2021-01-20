@@ -49,9 +49,12 @@ Mesh::Mesh(Mesh&& rhs) noexcept
 
 Mesh& Mesh::operator=(Mesh&& rhs) noexcept
 {
+#ifdef GAME
 	assert(vaoID != Globals::INVALID_OPENGL_ID &&
 		vboID != Globals::INVALID_OPENGL_ID &&
 		indiciesID != Globals::INVALID_OPENGL_ID);
+#endif // GAME
+
 	onDestroy();
 
 	vaoID = rhs.vaoID;
