@@ -5,14 +5,11 @@
 #include "Globals.h"
 #include "UniqueIDGenerator.h"
 #include "FactionController.h"
-#ifdef GAME
 #include "Faction.h"
 #include "GameEvent.h"
 #include "glm/gtc/matrix_transform.hpp"
 #include "Camera.h"
-#endif // GAME
 
-#ifdef GAME
 namespace
 {
 	const float DEFAULT_HEALTH_BAR_HEIGHT = 10.0f;
@@ -35,9 +32,7 @@ namespace
 
 	const float SHIELD_REPLENISH_TIMER_EXPIRATION = 15.0f;
 }
-#endif // GAME
 
-#ifdef GAME
 Entity::Entity(const Model& model, const glm::vec3& startingPosition, eEntityType entityType, 
 	int health, int shield, glm::vec3 startingRotation)
 	: m_statbarSprite(),
@@ -94,59 +89,6 @@ void Entity::increaseShield()
 		++m_shield;
 	}
 }
-#endif // GAME
-
-#ifdef LEVEL_EDITOR
-Entity::Entity(const Model& model)
-	: m_position(),
-	m_rotation(),
-	m_AABB(),
-	m_ID(UniqueEntityIDDistributer::getInstance().getUniqueEntityID()),
-	m_model(model),
-	m_selected(false)
-{}
-
-Entity::Entity(const Model& model, const glm::vec3& startingPosition, glm::vec3 startingRotation)
-	: m_position(startingPosition),
-	m_rotation(startingRotation),
-	m_AABB(),
-	m_ID(UniqueEntityIDDistributer::getInstance().getUniqueEntityID()),
-	m_model(model),
-	m_selected(false)
-{
-	m_AABB.reset(m_position, m_model);
-}
-
-glm::vec3& Entity::getRotation()
-{
-	return m_rotation;
-}
-
-glm::vec3& Entity::getPosition()
-{
-	return m_position;
-}
-
-const Model& Entity::getModel() const
-{
-	return m_model;
-}
-
-void Entity::setPosition(const glm::vec3 & position)
-{
-	m_position = position;
-}
-
-void Entity::setRotation(const glm::vec3 rotation)
-{
-	m_rotation = rotation;
-}
-
-void Entity::resetAABB()
-{
-	m_AABB.reset(m_position, m_model);
-}
-#endif // LEVEL_EDITOR
 
 Entity::~Entity()
 {}
@@ -161,7 +103,6 @@ const glm::vec3& Entity::getRotation() const
 	return m_rotation;
 }
 
-#ifdef GAME
 eEntityType Entity::getEntityType() const
 {
 	return m_type;
@@ -339,7 +280,6 @@ void Entity::setPosition(const glm::vec3& position)
 	m_position = position;
 	m_AABB.update(position);
 }
-#endif // GAME
 
 const glm::vec3& Entity::getPosition() const
 {

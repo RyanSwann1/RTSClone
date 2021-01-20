@@ -7,9 +7,6 @@
 #include <memory>
 #include <vector>
 
-#ifdef GAME
-class Entity;
-#endif // GAME
 enum class eFactionController;
 class ShaderHandler;
 struct Model : private NonMovable, private NonCopyable

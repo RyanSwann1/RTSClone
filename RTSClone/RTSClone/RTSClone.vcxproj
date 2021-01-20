@@ -148,7 +148,6 @@
   <ItemGroup>
     <ClCompile Include="..\Shared\AABB.cpp" />
     <ClCompile Include="..\Shared\Camera.cpp" />
-    <ClCompile Include="..\Shared\Entity.cpp" />
     <ClCompile Include="..\Shared\FactionController.cpp" />
     <ClCompile Include="..\Shared\glad.c" />
     <ClCompile Include="..\Shared\imgui\imgui.cpp" />
@@ -166,6 +165,7 @@
     <ClCompile Include="..\Shared\SelectionBox.cpp" />
     <ClCompile Include="..\Shared\ShaderHandler.cpp" />
     <ClCompile Include="AdjacentPositions.cpp" />
+    <ClCompile Include="Entity.cpp" />
     <ClCompile Include="Faction.cpp" />
     <ClCompile Include="FactionAI.cpp" />
     <ClCompile Include="FactionHandler.cpp" />
@@ -196,7 +196,6 @@
   <ItemGroup>
     <ClInclude Include="..\Shared\AABB.h" />
     <ClInclude Include="..\Shared\Camera.h" />
-    <ClInclude Include="..\Shared\Entity.h" />
     <ClInclude Include="..\Shared\FactionController.h" />
     <ClInclude Include="..\Shared\glad.h" />
     <ClInclude Include="..\Shared\Globals.h" />
@@ -260,6 +259,7 @@
     <ClInclude Include="assimp\include\vector2.h" />
     <ClInclude Include="assimp\include\vector3.h" />
     <ClInclude Include="assimp\include\version.h" />
+    <ClInclude Include="Entity.h" />
     <ClInclude Include="EntityType.h" />
     <ClInclude Include="FactionHandler.h" />
     <ClInclude Include="Laboratory.h" />
