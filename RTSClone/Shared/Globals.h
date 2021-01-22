@@ -80,7 +80,15 @@ namespace Globals
 	const float BARRACKS_STAT_BAR_WIDTH = 100.0f;
 	const float TURRET_STAT_BAR_WIDTH = 100.0f;
 	const float LABORATORY_STAT_BAR_WIDTH = 150.0f;
-	
+
+	const int HQ_RESOURCES_COST = 100;
+	const int HQ_POPULATION_COST = 0;
+	const int SUPPLY_DEPOT_POPULATION_COST = 0;
+	const int BARRACKS_POPULATION_COST = 0;
+	const int TURRET_POPULATION_COST = 0;
+	const int LABORATORY_POPULATION_COST = 0;
+
+#ifdef GAME
 	inline const std::array<float, static_cast<size_t>(eEntityType::Max) + 1> ENTITIES_STAT_BAR_WIDTH
 	{
 		UNIT_STAT_BAR_WIDTH,
@@ -92,14 +100,6 @@ namespace Globals
 		LABORATORY_STAT_BAR_WIDTH
 	};
 
-	const int HQ_RESOURCES_COST = 100;
-	const int HQ_POPULATION_COST = 0;
-	const int SUPPLY_DEPOT_POPULATION_COST = 0;
-	const int BARRACKS_POPULATION_COST = 0;
-	const int TURRET_POPULATION_COST = 0;
-	const int LABORATORY_POPULATION_COST = 0;
-
-#ifdef GAME
 	inline const std::array<int, static_cast<size_t>(eEntityType::Max) + 1> ENTITY_RESOURCE_COSTS
 	{
 		UNIT_RESOURCE_COST,

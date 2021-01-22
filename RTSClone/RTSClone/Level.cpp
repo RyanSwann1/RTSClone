@@ -10,7 +10,7 @@
 
 namespace
 {
-	const float TIME_BETWEEN_UNIT_STATE = 0.2f;
+	const float TIME_BETWEEN_UNIT_STATE = 0.05f;
 
 	int getActiveFactionCount(const FactionsContainer& factions)
 	{
@@ -150,6 +150,11 @@ void Level::update(float deltaTime, const Map& map, UIManager& uiManager)
 	{
 		if (faction)
 		{
+			if (faction.get()->getController() == eFactionController::Player)
+			{
+				static_cast<FactionPlayer&>(*faction).updateSelectionBox();
+			}
+
 			faction->update(deltaTime, map, m_factionHandler, m_unitStateHandlerTimer);
 		}
 	}
@@ -157,11 +162,6 @@ void Level::update(float deltaTime, const Map& map, UIManager& uiManager)
 	if (m_unitStateHandlerTimer.isExpired())
 	{
 		m_unitStateHandlerTimer.resetElaspedTime();
-	}
-
-	if (isFactionActive(m_factions, eFactionController::Player))
-	{
-		getFactionPlayer(m_factions).updateSelectionBox();
 	}
 
 	m_projectileHandler.update(deltaTime, m_factionHandler);

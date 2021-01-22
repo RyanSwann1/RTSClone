@@ -9,6 +9,7 @@ struct Model;
 class GameObject : private NonCopyable
 {
 public:
+	GameObject(const Model& model);
 	GameObject(const Model& model, const glm::vec3& startingPosition, glm::vec3 startingRotation = glm::vec3(0.0f));
 	GameObject(GameObject&&) noexcept;
 	GameObject& operator=(GameObject&&) noexcept;

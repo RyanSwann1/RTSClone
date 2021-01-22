@@ -52,16 +52,8 @@ Mesh processMesh(aiMesh* mesh, const aiScene* scene, const std::string& director
     vertices.reserve(static_cast<size_t>(mesh->mNumVertices));
     for (unsigned int i = 0; i < mesh->mNumVertices; i++)
     {
-        glm::vec3 position = { mesh->mVertices[i].x, mesh->mVertices[i].y, mesh->mVertices[i].z };
-        glm::vec3 normal = { mesh->mNormals[i].x, mesh->mNormals[i].y, mesh->mNormals[i].z };
-        if (mesh->mTextureCoords[0]) 
-        {
-            vertices.emplace_back(position, normal, glm::vec2(mesh->mTextureCoords[0][i].x, mesh->mTextureCoords[0][i].y));
-        }
-        else
-        {
-            vertices.emplace_back(position, normal, glm::vec2(0.0f, 0.0f));
-        }
+        vertices.emplace_back(glm::vec3(mesh->mVertices[i].x, mesh->mVertices[i].y, mesh->mVertices[i].z), 
+            glm::vec3(mesh->mNormals[i].x, mesh->mNormals[i].y, mesh->mNormals[i].z));
     }
 
     std::vector<unsigned int> indices;

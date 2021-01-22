@@ -18,11 +18,10 @@ struct Material
 struct Vertex
 {
 	Vertex(const glm::vec3& position);
-	Vertex(const glm::vec3& position, const glm::vec3& normal, const glm::vec2& textCoords);
+	Vertex(const glm::vec3& position, const glm::vec3& normal);
 
 	glm::vec3 position;
 	glm::vec3 normal;
-	glm::vec2 textCoords;
 };
 
 enum class eFactionController;
@@ -42,8 +41,8 @@ struct Mesh : private NonCopyable
 	void renderDebugMesh(ShaderHandler& shaderHandler) const;
 #endif // defined RENDER_AABB || defined RENDER_PATHING
 
-	void render(ShaderHandler& shaderHandler, bool highlighted = false) const;
-	void render(ShaderHandler& shaderHandler, eFactionController owningFactionController, bool highlighted = false) const;
+	void render(ShaderHandler& shaderHandler, bool highlight = false) const;
+	void render(ShaderHandler& shaderHandler, eFactionController owningFactionController, bool highlight = false) const;
 
 	std::vector<Vertex> vertices;
 	std::vector<unsigned int> indices;

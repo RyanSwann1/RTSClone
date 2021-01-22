@@ -95,9 +95,6 @@ void Mesh::attachToVAO() const
 	glEnableVertexAttribArray(1);
 	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const void*)offsetof(Vertex, normal));
 
-	glEnableVertexAttribArray(2);
-	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const void*)offsetof(Vertex, textCoords));
-
 	assert(!indices.empty());
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indiciesID);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), indices.data(), GL_STATIC_DRAW);
@@ -111,12 +108,12 @@ void Mesh::renderDebugMesh(ShaderHandler& shaderHandler) const
 }
 #endif // RENDER_AABB || defined RENDER_PATHING
 
-void Mesh::render(ShaderHandler& shaderHandler, bool highlighted) const
+void Mesh::render(ShaderHandler& shaderHandler, bool highlight) const
 {
 	assert(!indices.empty());
 	bind();
 	shaderHandler.setUniformVec3(eShaderType::Default, "uMaterialColour", material.diffuse);
-	if (highlighted)
+	if (highlight)
 	{
 		shaderHandler.setUniform1f(eShaderType::Default, "uSelectedAmplifier", HIGHLIGHTED_MESH_AMPLIFIER);
 	}
@@ -128,7 +125,7 @@ void Mesh::render(ShaderHandler& shaderHandler, bool highlighted) const
 	glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(indices.size()), GL_UNSIGNED_INT, nullptr);
 }
 
-void Mesh::render(ShaderHandler& shaderHandler, eFactionController owningFactionController, bool highlighted) const
+void Mesh::render(ShaderHandler& shaderHandler, eFactionController owningFactionController, bool highlight) const
 {
 	assert(!indices.empty());
 	bind();
@@ -143,7 +140,7 @@ void Mesh::render(ShaderHandler& shaderHandler, eFactionController owningFaction
 		shaderHandler.setUniformVec3(eShaderType::Default, "uMaterialColour", material.diffuse);
 	}
 	
-	if (highlighted)
+	if (highlight)
 	{
 		shaderHandler.setUniform1f(eShaderType::Default, "uSelectedAmplifier", HIGHLIGHTED_MESH_AMPLIFIER);
 	}
@@ -169,14 +166,12 @@ void Mesh::onDestroy()
 
 Vertex::Vertex(const glm::vec3& position)
 	: position(position),
-	normal(),
-	textCoords()
+	normal()
 {}
 
-Vertex::Vertex(const glm::vec3& position, const glm::vec3& normal, const glm::vec2& textCoords)
+Vertex::Vertex(const glm::vec3& position, const glm::vec3& normal)
 	: position(position),
-	normal(normal),
-	textCoords(textCoords)
+	normal(normal)
 {}
 
 //Material

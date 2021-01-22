@@ -4,6 +4,15 @@
 #include "Globals.h"
 #include "Model.h"
 
+GameObject::GameObject(const Model& model)
+	: m_position(),
+	m_rotation(),
+	m_AABB(),
+	m_ID(UniqueIDGenerator::getInstance().getUniqueID()),
+	m_model(model),
+	m_selected(false)
+{}
+
 GameObject::GameObject(const Model& model, const glm::vec3& startingPosition, glm::vec3 startingRotation)
 	: m_position(startingPosition),
 	m_rotation(startingRotation),

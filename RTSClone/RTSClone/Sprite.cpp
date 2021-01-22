@@ -69,12 +69,12 @@ void Sprite::render(const glm::vec3& position, glm::uvec2 windowSize, float orig
 		glm::vec4(position, 1.0f);
 	positionNDC /= positionNDC.w;
 
-	float originalWidthNDC = originalWidth / windowSize.x * 2.0f;
+	float originalWidthNDC = (2.0f * originalWidth) / windowSize.x;
 	std::array<glm::vec2, QUAD_VERTEX_COUNT> quad = getQuadCoords(
-		glm::vec2(positionNDC.x - originalWidthNDC / 2.0f, positionNDC.y),
-		spriteWidth / windowSize.x * 2.0f,
-		height / windowSize.y * 2.0f,
-		yOffset / windowSize.y * 2.0f);
+		{ positionNDC.x - originalWidthNDC / 2.0f, positionNDC.y },
+		(2.0f * spriteWidth) / windowSize.x,
+		(2.0f * height) / windowSize.y,
+		(2.0f * yOffset) / windowSize.y);
 
 	shaderHandler.setUniformVec3(eShaderType::HealthBar, "uMaterialColor", materialColor);
 

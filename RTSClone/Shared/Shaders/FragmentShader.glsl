@@ -5,7 +5,6 @@ out vec4 color;
 uniform vec3 uMaterialColour;
 uniform float uSelectedAmplifier;
 uniform float uOpacity;
-in vec2 vTextCoords;
 in vec3 vNormal;
 
 const float ambientFactor = 0.4;
