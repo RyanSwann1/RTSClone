@@ -24,7 +24,7 @@ public:
 	bool isSelected() const;
 	const glm::vec3& getPosition() const;
 	
-	void setSelected(const glm::vec3& position);
+	void select(const glm::vec3& position);
 	void deselect();
 	void setPosition(const glm::vec3& position);
 	void render(ShaderHandler& shaderHandler, bool active) const;

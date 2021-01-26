@@ -35,7 +35,7 @@ const glm::vec3& TranslateObject::getPosition() const
 	return m_position;
 }
 
-void TranslateObject::setSelected(const glm::vec3& position)
+void TranslateObject::select(const glm::vec3& position)
 {
 	if (m_xAABB.contains(position))
 	{

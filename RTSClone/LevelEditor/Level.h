@@ -5,6 +5,7 @@
 #include "Player.h"
 #include "GameObjectManager.h"
 #include "TranslateObject.h"
+#include "Quad.h"
 #include <string>
 #include <vector>
 #include <SFML/Graphics.hpp>
@@ -16,22 +17,6 @@ struct PlannedEntity
 	int modelNameIDSelected;
 	glm::vec3 position;
 	const Model* model;
-};
-
-class ShaderHandler;
-struct PlayableArea : private NonCopyable, private NonMovable
-{
-	PlayableArea(glm::ivec2 startingSize);
-	~PlayableArea();
-
-	void setSize(glm::ivec2 size);
-	void render(ShaderHandler& shaderHandler) const;
-
-	glm::ivec2 size;
-
-private:
-	unsigned int m_vaoID;
-	unsigned int m_vboID;
 };
 
 struct Camera;
@@ -69,7 +54,8 @@ private:
 	const std::string m_levelName;
 	PlannedEntity m_plannedEntity;
 	TranslateObject m_translateObject;
-	PlayableArea m_playableArea;
+	glm::ivec2 m_size;
+	Quad m_playableArea;
 	GameObjectManager m_gameObjectManager;
 	std::vector<std::unique_ptr<Player>> m_players;
 	Player* m_selectedPlayer;

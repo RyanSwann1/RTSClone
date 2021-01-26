@@ -22,20 +22,8 @@ namespace
 	const int DEFAULT_STARTING_POPULATION_CAP = 5;
 	const glm::ivec2 DEFAULT_MAP_SIZE = { 30, 30 };
 	const float ENTITY_TRANSLATE_SPEED = 5.0f;
-
 	const glm::vec3 PLAYABLE_AREA_GROUND_COLOR = { 1.0f, 1.0f, 0.5f };
-	std::array<glm::vec3, 6> getPlayableAreaQuadCoords(const glm::ivec2& mapSize)
-	{
-		glm::vec2 size = { static_cast<float>(mapSize.x), static_cast<float>(mapSize.y) };
-		return {
-			glm::vec3(0.0f, 0.0f, 0.0f),
-			glm::vec3(Globals::NODE_SIZE * size.x, 0.0f, 0.0f),
-			glm::vec3(Globals::NODE_SIZE * size.x, 0.0f, Globals::NODE_SIZE * size.y),
-			glm::vec3(Globals::NODE_SIZE * size.x, 0.0f, Globals::NODE_SIZE * size.y),
-			glm::vec3(0.0f, 0.0f, Globals::NODE_SIZE * size.y),
-			glm::vec3(0.0f, 0.0f, 0.0f)
-		};
-	};
+	const float PLAYABLE_AREA_OPACITY = 0.1f;
 }
 
 //PlannedEntity
@@ -45,48 +33,13 @@ PlannedEntity::PlannedEntity()
 	model(nullptr)
 {}
 
-//Playable Area
-PlayableArea::PlayableArea(glm::ivec2 startingSize)
-	: size(startingSize),
-	m_vaoID(Globals::INVALID_OPENGL_ID),
-	m_vboID(Globals::INVALID_OPENGL_ID)
-{
-	glGenVertexArrays(1, &m_vaoID);
-	glGenBuffers(1, &m_vboID);
-}
-
-PlayableArea::~PlayableArea()
-{
-	glDeleteVertexArrays(1, &m_vaoID);
-	glDeleteBuffers(1, &m_vboID);
-}
-
-void PlayableArea::setSize(glm::ivec2 size)
-{
-	glBindVertexArray(m_vaoID);
-
-	std::array<glm::vec3, 6> quadCoords = getPlayableAreaQuadCoords(size);
-	glBindBuffer(GL_ARRAY_BUFFER, m_vboID);
-	glBufferData(GL_ARRAY_BUFFER, quadCoords.size() * sizeof(glm::vec3), quadCoords.data(), GL_STATIC_DRAW);
-
-	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(glm::vec3), (const void*)0);
-}
-
-void PlayableArea::render(ShaderHandler& shaderHandler) const
-{
-	shaderHandler.setUniformVec3(eShaderType::Debug, "uColor", PLAYABLE_AREA_GROUND_COLOR);
-	shaderHandler.setUniform1f(eShaderType::Debug, "uOpacity", 0.1f);
-	glBindVertexArray(m_vaoID);
-	glDrawArrays(GL_TRIANGLES, 0, 6);
-}
-
 //Level
 Level::Level(const std::string& levelName)
 	: m_levelName(levelName),
 	m_plannedEntity(),
 	m_translateObject(),
-	m_playableArea(DEFAULT_MAP_SIZE),
+	m_size(DEFAULT_MAP_SIZE),
+	m_playableArea(),
 	m_gameObjectManager(),
 	m_players(),
 	m_selectedPlayer(nullptr),
@@ -127,7 +80,7 @@ std::unique_ptr<Level> Level::load(const std::string& levelName)
 
 glm::ivec2 Level::getPlayableAreaSize() const
 {
-	return m_playableArea.size;
+	return m_size;
 }
 
 int Level::getFactionStartingResources() const
@@ -177,7 +130,7 @@ void Level::handleInput(const sf::Event& currentSFMLEvent, const Camera& camera,
 				glm::vec3 mouseToGroundPosition = { 0.0f, 0.0f, 0.0f };
 				if (camera.getRayToGroundIntersection(window, windowSize, mouseToGroundPosition))
 				{
-					m_translateObject.setSelected(mouseToGroundPosition);
+					m_translateObject.select(mouseToGroundPosition);
 					if (m_translateObject.isSelected() &&
 						(m_gameObjectManager.isGameObjectSelected() || m_selectedPlayer))
 					{
@@ -231,7 +184,7 @@ void Level::handleInput(const sf::Event& currentSFMLEvent, const Camera& camera,
 				{
 					glm::vec3 newPosition = Globals::convertToNodePosition(mouseToGroundPosition);
 					AABB AABB(newPosition, *m_plannedEntity.model);
-					if (Globals::isWithinMapBounds(AABB, m_playableArea.size))
+					if (Globals::isWithinMapBounds(AABB, m_size))
 					{
 						m_plannedEntity.position = newPosition;
 					}
@@ -415,11 +368,11 @@ void Level::handleSelectedEntityGUI()
 void Level::handleLevelDetailsGUI(bool& showGUIWindow)
 {
 	ImGui::Begin("Level Details", &showGUIWindow, ImGuiWindowFlags_None);
-	if (ImGui::InputInt("x", &m_playableArea.size.x, 1) ||
-		ImGui::InputInt("z", &m_playableArea.size.y, 1))
+	if (ImGui::InputInt("x", &m_size.x, 1) ||
+		ImGui::InputInt("z", &m_size.y, 1))
 	{
-		m_playableArea.size.x = glm::clamp(m_playableArea.size.x, 0, MAX_MAP_SIZE);
-		m_playableArea.size.y = glm::clamp(m_playableArea.size.y, 0, MAX_MAP_SIZE);
+		m_size.x = glm::clamp(m_size.x, 0, MAX_MAP_SIZE);
+		m_size.y = glm::clamp(m_size.y, 0, MAX_MAP_SIZE);
 	}
 	ImGui::Text("Starting Resources");
 	if (ImGui::InputInt("Resources", &m_factionStartingResources, 5))
@@ -467,7 +420,8 @@ void Level::render(ShaderHandler& shaderHandler) const
 
 void Level::renderPlayableArea(ShaderHandler& shaderHandler) const
 {
-	m_playableArea.render(shaderHandler);
+	m_playableArea.render(shaderHandler, glm::vec3(0.0f),
+		glm::vec3(m_size.x * Globals::NODE_SIZE, 0.0f, m_size.y * Globals::NODE_SIZE), PLAYABLE_AREA_GROUND_COLOR, PLAYABLE_AREA_OPACITY);
 }
 
 #ifdef RENDER_AABB
@@ -508,7 +462,7 @@ const std::ifstream& operator>>(std::ifstream& file, Level& level)
 		}
 	}
 
-	level.m_playableArea.setSize(LevelFileHandler::loadMapSizeFromFile(file));
+	level.m_size = LevelFileHandler::loadMapSizeFromFile(file);
 	level.m_factionStartingResources = LevelFileHandler::loadFactionStartingResources(file);
 	level.m_factionStartingPopulationCap = LevelFileHandler::loadFactionStartingPopulationCap(file);
 
