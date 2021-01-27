@@ -8,7 +8,6 @@ GameObject::GameObject(const Model& model)
 	: m_position(),
 	m_rotation(),
 	m_AABB(),
-	m_ID(UniqueIDGenerator::getInstance().getUniqueID()),
 	m_model(model)
 {}
 
@@ -16,7 +15,6 @@ GameObject::GameObject(const Model& model, const glm::vec3& startingPosition, gl
 	: m_position(startingPosition),
 	m_rotation(startingRotation),
 	m_AABB(),
-	m_ID(UniqueIDGenerator::getInstance().getUniqueID()),
 	m_model(model)
 {
 	m_AABB.reset(m_position, m_model);
@@ -26,10 +24,8 @@ GameObject::GameObject(GameObject&& rhs) noexcept
 	: m_position(rhs.m_position),
 	m_rotation(rhs.m_rotation),
 	m_AABB(std::move(rhs.m_AABB)),
-	m_ID(rhs.m_ID),
 	m_model(rhs.m_model)
 {
-	rhs.m_ID = Globals::INVALID_GAMEOBJECT_ID;
 }
 
 GameObject& GameObject::operator=(GameObject&& rhs) noexcept
@@ -38,10 +34,7 @@ GameObject& GameObject::operator=(GameObject&& rhs) noexcept
 	m_position = rhs.m_position;
 	m_rotation = rhs.m_rotation;
 	m_AABB = std::move(rhs.m_AABB);
-	m_ID = rhs.m_ID;
 	m_model = rhs.m_model;
-
-	rhs.m_ID = Globals::INVALID_GAMEOBJECT_ID;
 
 	return *this;
 }
@@ -76,11 +69,6 @@ void GameObject::resetAABB()
 	m_AABB.reset();
 }
 
-int GameObject::getID() const
-{
-	return m_ID;
-}
-
 const glm::vec3& GameObject::getRotation() const
 {
 	return m_rotation;
@@ -96,7 +84,7 @@ const AABB& GameObject::getAABB() const
 	return m_AABB;
 }
 
-void GameObject::render(ShaderHandler& shaderHandler) const
+void GameObject::render(ShaderHandler& shaderHandler, bool highlight) const
 {
 	m_model.get().render(shaderHandler, m_position, m_rotation);
 }

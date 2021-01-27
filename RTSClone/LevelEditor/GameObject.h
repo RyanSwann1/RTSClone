@@ -17,7 +17,6 @@ public:
 	glm::vec3& getRotation();
 	glm::vec3& getPosition();
 	const Model& getModel() const;
-	int getID() const;
 	const glm::vec3& getRotation() const;
 	const glm::vec3& getPosition() const;
 	const AABB& getAABB() const;
@@ -25,7 +24,7 @@ public:
 	void setPosition(const glm::vec3& position);
 	void setRotation(const glm::vec3 rotation);
 
-	void render(ShaderHandler& shaderHandler) const;
+	void render(ShaderHandler& shaderHandler, bool highlight = false) const;
 	void resetAABB();
 
 #ifdef RENDER_AABB
@@ -36,6 +35,5 @@ private:
 	glm::vec3 m_position;
 	glm::vec3 m_rotation;
 	AABB m_AABB;
-	int m_ID;
 	std::reference_wrapper<const Model> m_model;
 };
