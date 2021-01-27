@@ -14,6 +14,7 @@ enum class eAxisCollision
 	Z
 };
 
+struct Model;
 class ShaderHandler;
 class TranslateObject : private NonCopyable, private NonMovable
 {
@@ -34,6 +35,7 @@ public:
 #endif // RENDER_AABB
 
 private:
+	const Model& m_model;
 	eAxisCollision m_currentAxisSelected;
 	bool m_selected;
 	glm::vec3 m_position;

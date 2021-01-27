@@ -3,12 +3,13 @@
 
 namespace 
 {
-	constexpr glm::vec3 X_OFF_SET{ 15.0f, 0.0f, 0.0f };
-	constexpr glm::vec3 Z_OFF_SET{ 0.0f, 0.0f, -15.0f };
+	const glm::vec3 X_OFF_SET{ 15.0f, 0.0f, 0.0f };
+	const glm::vec3 Z_OFF_SET{ 0.0f, 0.0f, -15.0f };
 }
 
 TranslateObject::TranslateObject()
-	: m_currentAxisSelected(eAxisCollision::None),
+	: m_model(ModelManager::getInstance().getModel(TRANSLATE_MODEL_NAME)),
+	m_currentAxisSelected(eAxisCollision::None),
 	m_selected(false),
 	m_position(),
 	m_xAABB(),
@@ -76,7 +77,7 @@ void TranslateObject::render(ShaderHandler& shaderHandler, bool active) const
 {
 	if (active)
 	{
-		ModelManager::getInstance().getModel(TRANSLATE_MODEL_NAME).render(shaderHandler, m_position);
+		m_model.render(shaderHandler, m_position);
 	}
 }
 
