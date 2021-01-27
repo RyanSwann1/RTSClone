@@ -267,11 +267,12 @@ void Level::handleSelectedEntityGUI()
 		
 		ImGui::NewLine();
 		ImGui::Text("Position");
-		if (ImGui::InputFloat("x", &m_selectedGameObject->getPosition().x, Globals::NODE_SIZE) ||
-			ImGui::InputFloat("y", &m_selectedGameObject->getPosition().y, 1.0f) ||
-			ImGui::InputFloat("z", &m_selectedGameObject->getPosition().z, Globals::NODE_SIZE))
+		glm::vec3 position = m_selectedGameObject->getPosition();
+		if (ImGui::InputFloat("x", &position.x, Globals::NODE_SIZE) ||
+			ImGui::InputFloat("y", &position.y, 1.0f) ||
+			ImGui::InputFloat("z", &position.z, Globals::NODE_SIZE))
 		{
-			m_selectedGameObject->setPosition(m_selectedGameObject->getPosition());
+			m_selectedGameObject->setPosition(position);
 		}
 
 		ImGui::NewLine();

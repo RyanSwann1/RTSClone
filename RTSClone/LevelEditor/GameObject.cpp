@@ -42,11 +42,6 @@ glm::vec3& GameObject::getRotation()
 	return m_rotation;
 }
 
-glm::vec3& GameObject::getPosition()
-{
-	return m_position;
-}
-
 const Model& GameObject::getModel() const
 {
 	return m_model;

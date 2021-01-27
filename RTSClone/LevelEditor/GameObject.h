@@ -15,7 +15,6 @@ public:
 	GameObject& operator=(GameObject&&) noexcept;
 
 	glm::vec3& getRotation();
-	glm::vec3& getPosition();
 	const Model& getModel() const;
 	const glm::vec3& getRotation() const;
 	const glm::vec3& getPosition() const;
