@@ -26,7 +26,7 @@ GameObject* GameObjectManager::getGameObject(const glm::vec3 & position)
 	return nullptr;
 }
 
-const std::vector<GameObject>& GameObjectManager::getGameObjects() const
+const std::list<GameObject>& GameObjectManager::getGameObjects() const
 {
 	return m_gameObjects;
 }
@@ -54,11 +54,18 @@ void GameObjectManager::removeGameObject(const GameObject& removal)
 	m_gameObjects.erase(gameObject);
 }
 
-void GameObjectManager::render(ShaderHandler& shaderHandler) const
+void GameObjectManager::render(ShaderHandler& shaderHandler, const GameObject* selectedGameObject) const
 {
 	for (const auto& gameObject : m_gameObjects)
 	{
-		gameObject.render(shaderHandler);
+		if (selectedGameObject && &gameObject == &(*selectedGameObject))
+		{
+			gameObject.render(shaderHandler, true);
+		}
+		else
+		{
+			gameObject.render(shaderHandler);
+		}
 	}
 
 	ModelManager::getInstance().getModel(TERRAIN_MODEL_NAME).render(shaderHandler, Globals::TERRAIN_POSITION);

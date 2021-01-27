@@ -344,7 +344,7 @@ void Level::save() const
 
 void Level::render(ShaderHandler& shaderHandler) const
 {
-	m_gameObjectManager.render(shaderHandler);
+	m_gameObjectManager.render(shaderHandler, m_selectedGameObject);
 
 	//for (const auto& player : m_players)
 	//{
