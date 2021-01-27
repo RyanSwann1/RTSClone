@@ -176,9 +176,6 @@
     <ClInclude Include="GameObjectManager.h">
       <Filter>src</Filter>
     </ClInclude>
-    <ClInclude Include="..\Shared\UniqueIDGenerator.h">
-      <Filter>src</Filter>
-    </ClInclude>
     <ClInclude Include="..\Shared\Quad.h">
       <Filter>src</Filter>
     </ClInclude>

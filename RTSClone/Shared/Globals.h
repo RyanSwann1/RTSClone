@@ -2,12 +2,11 @@
 
 #ifdef GAME
 #include "EntityType.h"
+#include "TypeComparison.h"
 #endif // GAME
-
 #include "glm/glm.hpp"
 #include "AABB.h"
 #include "FactionController.h"
-#include "TypeComparison.h"
 #include <SFML/Graphics.hpp>
 #include <iostream>
 #include <array>

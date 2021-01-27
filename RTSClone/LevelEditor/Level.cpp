@@ -3,7 +3,6 @@
 #include "LevelFileHandler.h"
 #include "Camera.h"
 #include "imgui/imgui.h"
-#include "SelectionBox.h"
 #include "ModelManager.h"
 #include "glad.h"
 #include "ShaderHandler.h"
