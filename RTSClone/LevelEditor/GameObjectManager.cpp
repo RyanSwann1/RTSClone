@@ -8,26 +8,19 @@
 #include <sstream>
 
 GameObjectManager::GameObjectManager()
-	: m_gameObjects(),
-	m_selectedGameObjectID(Globals::INVALID_GAMEOBJECT_ID)
+	: m_gameObjects()
 {}
 
-bool GameObjectManager::isGameObjectSelected() const
+GameObject* GameObjectManager::getGameObject(const glm::vec3 & position)
 {
-	return m_selectedGameObjectID != Globals::INVALID_GAMEOBJECT_ID;
-}
-
-GameObject* GameObjectManager::getSelectedGameObject()
-{
-	if(m_selectedGameObjectID != Globals::INVALID_GAMEOBJECT_ID)
+	auto gameObject = std::find_if(m_gameObjects.begin(), m_gameObjects.end(), [&position](const auto& gameObject)
 	{
-		auto selectedGameObject = std::find_if(m_gameObjects.begin(), m_gameObjects.end(), [this](const auto& gameObject)
-		{
-			return gameObject.getID() == m_selectedGameObjectID;
-		});
-		
-		assert(selectedGameObject != m_gameObjects.end());
-		return &(*selectedGameObject);
+		return gameObject.getAABB().contains(position);
+	});
+
+	if (gameObject != m_gameObjects.end())
+	{
+		return &(*gameObject);
 	}
 
 	return nullptr;
@@ -50,45 +43,15 @@ void GameObjectManager::addGameObject(const Model& model, const glm::vec3& posit
 	}
 }
 
-void GameObjectManager::removeAllSelectedEntities()
+void GameObjectManager::removeGameObject(const GameObject& removal)
 {
-	for (auto gameObject = m_gameObjects.begin(); gameObject != m_gameObjects.end();)
+	auto gameObject = std::find_if(m_gameObjects.cbegin(), m_gameObjects.cend(), [&removal](const auto& gameObject)
 	{
-		if (gameObject->isSelected())
-		{
-			if (gameObject->getID() == m_selectedGameObjectID)
-			{
-				m_selectedGameObjectID = Globals::INVALID_GAMEOBJECT_ID;
-			}
+		return &gameObject == &removal;
+	});
 
-			gameObject = m_gameObjects.erase(gameObject);
-		}
-		else
-		{
-			++gameObject;
-		}
-	}
-}
-
-const GameObject* GameObjectManager::selectGameObjectAtPosition(const glm::vec3& position)
-{
-	const GameObject* selectedGameObject = nullptr;
-	m_selectedGameObjectID = Globals::INVALID_GAMEOBJECT_ID;
-	for (auto gameObject = m_gameObjects.begin(); gameObject != m_gameObjects.end(); ++gameObject)
-	{
-		if (gameObject->getAABB().contains(position))
-		{
-			gameObject->setSelected(true);
-			m_selectedGameObjectID = gameObject->getID();
-			selectedGameObject = &(*gameObject);
-		}
-		else
-		{
-			gameObject->setSelected(false);
-		}
-	}
-
-	return selectedGameObject;
+	assert(gameObject != m_gameObjects.cend());
+	m_gameObjects.erase(gameObject);
 }
 
 void GameObjectManager::render(ShaderHandler& shaderHandler) const
@@ -102,7 +65,7 @@ void GameObjectManager::render(ShaderHandler& shaderHandler) const
 }
 
 #ifdef RENDER_AABB
-void GameObjectManager::renderEntityAABB(ShaderHandler& shaderHandler)
+void GameObjectManager::renderGameObjectAABB(ShaderHandler& shaderHandler)
 {
 	for (auto& gameObject : m_gameObjects)
 	{
