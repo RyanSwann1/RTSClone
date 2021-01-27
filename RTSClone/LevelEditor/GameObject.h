@@ -21,9 +21,7 @@ public:
 	const glm::vec3& getRotation() const;
 	const glm::vec3& getPosition() const;
 	const AABB& getAABB() const;
-	bool isSelected() const;
 
-	void setSelected(bool selected);
 	void setPosition(const glm::vec3& position);
 	void setRotation(const glm::vec3 rotation);
 
@@ -40,5 +38,4 @@ private:
 	AABB m_AABB;
 	int m_ID;
 	std::reference_wrapper<const Model> m_model;
-	bool m_selected;
 };
