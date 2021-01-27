@@ -11,7 +11,9 @@
 namespace
 {
 	const glm::vec3 PLAYER_HQ_STARTING_POSITION =
-		glm::vec3(4.0f * static_cast<float>(Globals::NODE_SIZE), Globals::GROUND_HEIGHT, 3.0f * static_cast<float>(Globals::NODE_SIZE));
+		glm::vec3(4.0f * static_cast<float>(Globals::NODE_SIZE), 
+		Globals::GROUND_HEIGHT, 
+		3.0f * static_cast<float>(Globals::NODE_SIZE));
 
 	const glm::vec3 PLAYER_MINERAL_STARTING_POSITION =
 		glm::vec3(11.0f * static_cast<float>(Globals::NODE_SIZE), Globals::GROUND_HEIGHT, static_cast<float>(Globals::NODE_SIZE));
@@ -45,7 +47,7 @@ Level::Level(const std::string& levelName)
 	m_factionStartingResources(DEFAULT_STARTING_RESOURCES),
 	m_factionStartingPopulationCap(DEFAULT_STARTING_POPULATION_CAP)
 {
-	m_players.reserve(static_cast<size_t>(eFactionController::Max) + static_cast<size_t>(1));
+	m_players.reserve(static_cast<size_t>(eFactionController::Max) + 1);
 
 	if (!LevelFileHandler::loadLevelFromFile(*this))
 	{
@@ -121,14 +123,15 @@ void Level::handleInput(const sf::Event& currentSFMLEvent, const Camera& camera,
 		}
 		break;
 	case sf::Event::MouseButtonReleased:
+		m_selectedGameObject = nullptr;
 		break;
 	case sf::Event::MouseButtonPressed:
 		if (!ImGui::IsWindowHovered(ImGuiHoveredFlags_::ImGuiHoveredFlags_AnyWindow))
 		{
 			if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left))
 			{
-				glm::vec3 intersection(0.0f);
-				if (camera.getRayToGroundIntersection(window, windowSize, intersection))
+				glm::vec3 planeIntersection(0.0f);
+				if (camera.getRayToGroundIntersection(window, windowSize, planeIntersection))
 				{
 					if (m_plannedEntity.model)
 					{
@@ -136,7 +139,7 @@ void Level::handleInput(const sf::Event& currentSFMLEvent, const Camera& camera,
 					}
 					else
 					{
-						m_selectedGameObject = m_gameObjectManager.getGameObject(intersection);
+						m_selectedGameObject = m_gameObjectManager.getGameObject(planeIntersection);
 					}
 				}
 			}
@@ -150,38 +153,21 @@ void Level::handleInput(const sf::Event& currentSFMLEvent, const Camera& camera,
 	case sf::Event::MouseMoved:
 		if (!ImGui::IsWindowHovered(ImGuiHoveredFlags_::ImGuiHoveredFlags_AnyWindow))
 		{
-			glm::vec3 mouseToGroundPosition = { 0.0f, 0.0f, 0.0f };
-			if (camera.getRayToGroundIntersection(window, windowSize, mouseToGroundPosition))
+			glm::vec3 planeIntersection(0.0f);
+			if (camera.getRayToGroundIntersection(window, windowSize, planeIntersection))
 			{
 				if (m_plannedEntity.model)
 				{
-					glm::vec3 newPosition = Globals::convertToNodePosition(mouseToGroundPosition);
-					AABB AABB(newPosition, *m_plannedEntity.model);
-					if (Globals::isWithinMapBounds(AABB, m_size))
+					glm::vec3 newPosition = Globals::convertToNodePosition(planeIntersection);
+					if (Globals::isWithinMapBounds({ newPosition, *m_plannedEntity.model }, m_size))
 					{
 						m_plannedEntity.position = newPosition;
 					}
 				}
-
-				//GameObject* selectedGameObject = m_gameObjectManager.getSelectedGameObject();
-				//if (selectedGameObject)
-				//{
-				//	glm::vec3 nodePosition = Globals::convertToNodePosition(m_translateObject.getPosition());
-				//	selectedGameObject->setPosition(nodePosition);
-				//	selectedGameObject->resetAABB();
-				//}
-				//else if (m_selectedPlayer)
-				//{
-				//	glm::vec3 nodePosition = Globals::convertToNodePosition(m_translateObject.getPosition());
-				//	for (auto& mineral : m_selectedPlayer->minerals)
-				//	{
-				//		mineral.setPosition(mineral.getPosition() + nodePosition - m_selectedPlayer->HQ.getPosition());
-				//		mineral.resetAABB();
-				//	}
-
-				//	m_selectedPlayer->HQ.setPosition(nodePosition);
-				//	m_selectedPlayer->HQ.resetAABB();
-				//}
+				else if (m_selectedGameObject)
+				{
+					m_selectedGameObject->setPosition(Globals::convertToNodePosition(planeIntersection));
+				}
 			}
 		}
 		break;
@@ -263,11 +249,9 @@ void Level::handlePlayersGUI()
 				glm::vec3 vDifference = playerPosition - m_players[i]->HQ.getPosition();
 				const glm::vec3& mineralPosition = mineral.getPosition();
 				mineral.setPosition({ mineralPosition.x + vDifference.x, mineralPosition.y + vDifference.y, mineralPosition.z + vDifference.z });
-				mineral.resetAABB();
 			}
 
 			m_players[i]->HQ.setPosition(playerPosition);
-			m_players[i]->HQ.resetAABB();
 		}
 	}
 
@@ -276,7 +260,6 @@ void Level::handlePlayersGUI()
 
 void Level::handleSelectedEntityGUI()
 {
-	//GameObject* selectedGameObject = m_gameObjectManager.getSelectedGameObject();
 	if (m_selectedGameObject)
 	{
 		ImGui::BeginChild("Selected Entity", ImVec2(175, 275), true);
@@ -288,7 +271,7 @@ void Level::handleSelectedEntityGUI()
 			ImGui::InputFloat("y", &m_selectedGameObject->getPosition().y, 1.0f) ||
 			ImGui::InputFloat("z", &m_selectedGameObject->getPosition().z, Globals::NODE_SIZE))
 		{
-			m_selectedGameObject->resetAABB();
+			m_selectedGameObject->setPosition(m_selectedGameObject->getPosition());
 		}
 
 		ImGui::NewLine();

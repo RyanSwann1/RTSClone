@@ -25,7 +25,6 @@ public:
 	void setRotation(const glm::vec3 rotation);
 
 	void render(ShaderHandler& shaderHandler, bool highlight = false) const;
-	void resetAABB();
 
 #ifdef RENDER_AABB
 	void renderAABB(ShaderHandler& shaderHandler);

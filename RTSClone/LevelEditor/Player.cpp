@@ -58,12 +58,10 @@ const std::ifstream& operator>>(std::ifstream& file, Player& player)
 		{
 			player.HQ.setRotation(rotation);
 			player.HQ.setPosition(position);
-			player.HQ.resetAABB();
 		}
 		else if (modelName == MINERALS_MODEL_NAME)
 		{
 			player.minerals.emplace_back(ModelManager::getInstance().getModel(MINERALS_MODEL_NAME), position, rotation);
-			player.minerals.back().resetAABB();
 		}
 	};
 

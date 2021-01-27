@@ -87,17 +87,25 @@ void Mesh::attachToVAO() const
 
 	assert(!vertices.empty());
     glBindBuffer(GL_ARRAY_BUFFER, vboID);
-    glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex), vertices.data(), GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, 
+		static_cast<GLsizei>(vertices.size() * sizeof(Vertex)), 
+		vertices.data(), GL_STATIC_DRAW);
 
     glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const void*)offsetof(Vertex, position));
+    glVertexAttribPointer(0, glm::vec3::length(), GL_FLOAT, GL_FALSE, 
+		static_cast<GLsizei>(sizeof(Vertex)), 
+		reinterpret_cast<const void*>(offsetof(Vertex, position)));
 	
 	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const void*)offsetof(Vertex, normal));
+	glVertexAttribPointer(1, glm::vec3::length(), GL_FLOAT, GL_FALSE,
+		static_cast<GLsizei>(sizeof(Vertex)),
+		reinterpret_cast<const void*>(offsetof(Vertex, normal)));
 
 	assert(!indices.empty());
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indiciesID);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), indices.data(), GL_STATIC_DRAW);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, 
+		static_cast<GLsizei>(indices.size() * sizeof(unsigned int)), 
+		indices.data(), GL_STATIC_DRAW);
 }
 
 #if defined RENDER_AABB || defined RENDER_PATHING

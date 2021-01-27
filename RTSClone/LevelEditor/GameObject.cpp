@@ -24,8 +24,7 @@ GameObject::GameObject(GameObject&& rhs) noexcept
 	m_rotation(rhs.m_rotation),
 	m_AABB(std::move(rhs.m_AABB)),
 	m_model(rhs.m_model)
-{
-}
+{}
 
 GameObject& GameObject::operator=(GameObject&& rhs) noexcept
 {
@@ -56,16 +55,12 @@ const Model& GameObject::getModel() const
 void GameObject::setPosition(const glm::vec3& position)
 {
 	m_position = position;
+	m_AABB.update(position);
 }
 
 void GameObject::setRotation(const glm::vec3 rotation)
 {
 	m_rotation = rotation;
-}
-
-void GameObject::resetAABB()
-{
-	m_AABB.reset();
 }
 
 const glm::vec3& GameObject::getRotation() const
