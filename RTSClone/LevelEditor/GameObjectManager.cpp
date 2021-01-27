@@ -67,8 +67,6 @@ void GameObjectManager::render(ShaderHandler& shaderHandler, const GameObject* s
 			gameObject.render(shaderHandler);
 		}
 	}
-
-	ModelManager::getInstance().getModel(TERRAIN_MODEL_NAME).render(shaderHandler, Globals::TERRAIN_POSITION);
 }
 
 #ifdef RENDER_AABB

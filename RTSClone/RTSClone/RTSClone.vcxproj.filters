@@ -437,6 +437,12 @@
     <ClInclude Include="SelectionBox.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="TypeComparison.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="UniqueIDGenerator.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="assimp\include\color4.inl">

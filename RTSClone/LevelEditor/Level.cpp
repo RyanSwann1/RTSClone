@@ -119,14 +119,32 @@ void Level::handleInput(const sf::Event& currentSFMLEvent, const Camera& camera,
 			if (m_selectedGameObject)
 			{
 				m_gameObjectManager.removeGameObject(*m_selectedGameObject);
+				m_selectedGameObject = nullptr;
 			}
 		}
 		break;
 	case sf::Event::MouseButtonReleased:
-		m_selectedGameObject = nullptr;
+		if (!ImGui::IsWindowHovered(ImGuiHoveredFlags_::ImGuiHoveredFlags_AnyWindow) &&
+			!ImGui::IsAnyItemHovered())
+		{
+			glm::vec3 planeIntersection(0.0f);
+			if (camera.getRayToGroundIntersection(window, windowSize, planeIntersection))
+			{
+				if (m_selectedGameObject && 
+					m_gameObjectManager.getGameObject(planeIntersection) != m_selectedGameObject)
+				{
+					m_selectedGameObject = nullptr;
+				}
+			}
+			else
+			{
+				m_selectedGameObject = nullptr;
+			}
+		}
 		break;
 	case sf::Event::MouseButtonPressed:
-		if (!ImGui::IsWindowHovered(ImGuiHoveredFlags_::ImGuiHoveredFlags_AnyWindow))
+		if (!ImGui::IsWindowHovered(ImGuiHoveredFlags_::ImGuiHoveredFlags_AnyWindow) &&
+			!ImGui::IsAnyItemHovered())
 		{
 			if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left))
 			{
@@ -151,7 +169,8 @@ void Level::handleInput(const sf::Event& currentSFMLEvent, const Camera& camera,
 		}
 	break;
 	case sf::Event::MouseMoved:
-		if (!ImGui::IsWindowHovered(ImGuiHoveredFlags_::ImGuiHoveredFlags_AnyWindow))
+		if (!ImGui::IsWindowHovered(ImGuiHoveredFlags_::ImGuiHoveredFlags_AnyWindow) &&
+			!ImGui::IsAnyItemHovered())
 		{
 			glm::vec3 planeIntersection(0.0f);
 			if (camera.getRayToGroundIntersection(window, windowSize, planeIntersection))
@@ -164,7 +183,7 @@ void Level::handleInput(const sf::Event& currentSFMLEvent, const Camera& camera,
 						m_plannedEntity.position = newPosition;
 					}
 				}
-				else if (m_selectedGameObject)
+				else if (m_selectedGameObject && sf::Mouse::isButtonPressed(sf::Mouse::Button::Left))
 				{
 					m_selectedGameObject->setPosition(Globals::convertToNodePosition(planeIntersection));
 				}
@@ -338,6 +357,8 @@ void Level::render(ShaderHandler& shaderHandler) const
 	{
 		m_plannedEntity.model->render(shaderHandler, m_plannedEntity.position);
 	}
+
+	ModelManager::getInstance().getModel(TERRAIN_MODEL_NAME).render(shaderHandler, Globals::TERRAIN_POSITION);
 }
 
 void Level::renderPlayableArea(ShaderHandler& shaderHandler) const

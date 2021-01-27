@@ -65,8 +65,7 @@ Sprite::~Sprite()
 void Sprite::render(const glm::vec3& position, glm::uvec2 windowSize, float originalWidth, float spriteWidth, float height, float yOffset, 
 	ShaderHandler& shaderHandler, const Camera& camera, const glm::vec3& materialColor) const
 {
-	glm::vec4 positionNDC = camera.getProjection(glm::ivec2(windowSize.x, windowSize.y)) * camera.getView() * 
-		glm::vec4(position, 1.0f);
+	glm::vec4 positionNDC = camera.getProjection(glm::ivec2(windowSize.x, windowSize.y)) * camera.getView() * glm::vec4(position, 1.0f);
 	positionNDC /= positionNDC.w;
 
 	float originalWidthNDC = (2.0f * originalWidth) / windowSize.x;

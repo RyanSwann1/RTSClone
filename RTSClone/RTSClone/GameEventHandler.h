@@ -4,7 +4,6 @@
 #include "NonMovable.h"
 #include "GameEvents.h"
 #include <queue>
-#include <memory>
 
 class GameEventHandler : private NonCopyable, private NonMovable
 {

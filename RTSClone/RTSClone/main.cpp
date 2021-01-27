@@ -119,14 +119,7 @@ int main()
 			case sf::Event::KeyPressed:
 				if (currentSFMLEvent.key.code == sf::Keyboard::Escape)
 				{
-					if (level)
-					{
-						level.reset();
-					}
-					else
-					{
-						window.close();
-					}
+					(level ? level.reset() : window.close());
 				}
 				break;
 			}
@@ -150,7 +143,7 @@ int main()
 				level.reset();
 			}
 		}
-		if (!level)
+		else
 		{
 			ImGui::Begin("Level Selection");
 			for (const auto& levelName : levelNames)
@@ -173,10 +166,11 @@ int main()
 						}
 					}
 					break;
-				}	
+				}
 			}
 
 			ImGui::End();
+
 		}
 		
 		//Update
