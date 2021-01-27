@@ -4,7 +4,6 @@
 #include "NonMovable.h"
 #include "Player.h"
 #include "GameObjectManager.h"
-#include "TranslateObject.h"
 #include "Quad.h"
 #include <string>
 #include <vector>
@@ -53,10 +52,10 @@ private:
 
 	const std::string m_levelName;
 	PlannedEntity m_plannedEntity;
-	TranslateObject m_translateObject;
 	glm::ivec2 m_size;
 	Quad m_playableArea;
 	GameObjectManager m_gameObjectManager;
+	GameObject* m_selectedGameObject;
 	std::vector<std::unique_ptr<Player>> m_players;
 	Player* m_selectedPlayer;
 	int m_factionStartingResources;

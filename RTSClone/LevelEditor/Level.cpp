@@ -37,10 +37,10 @@ PlannedEntity::PlannedEntity()
 Level::Level(const std::string& levelName)
 	: m_levelName(levelName),
 	m_plannedEntity(),
-	m_translateObject(),
 	m_size(DEFAULT_MAP_SIZE),
 	m_playableArea(),
 	m_gameObjectManager(),
+	m_selectedGameObject(nullptr),
 	m_players(),
 	m_selectedPlayer(nullptr),
 	m_factionStartingResources(DEFAULT_STARTING_RESOURCES),
@@ -115,65 +115,39 @@ void Level::handleInput(const sf::Event& currentSFMLEvent, const Camera& camera,
 	case sf::Event::KeyPressed:
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Delete))
 		{
-			m_gameObjectManager.removeAllSelectedEntities();
+			if (m_selectedGameObject)
+			{
+				m_gameObjectManager.removeGameObject(*m_selectedGameObject);
+			}
 		}
 		break;
 	case sf::Event::MouseButtonReleased:
-		m_translateObject.deselect();
 		break;
 	case sf::Event::MouseButtonPressed:
-	{
 		if (!ImGui::IsWindowHovered(ImGuiHoveredFlags_::ImGuiHoveredFlags_AnyWindow))
 		{
 			if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left))
 			{
-				glm::vec3 mouseToGroundPosition = { 0.0f, 0.0f, 0.0f };
-				if (camera.getRayToGroundIntersection(window, windowSize, mouseToGroundPosition))
+				glm::vec3 intersection(0.0f);
+				if (camera.getRayToGroundIntersection(window, windowSize, intersection))
 				{
-					m_translateObject.select(mouseToGroundPosition);
-					if (m_translateObject.isSelected() &&
-						(m_gameObjectManager.isGameObjectSelected() || m_selectedPlayer))
+					if (m_plannedEntity.model)
 					{
-						sf::Mouse::setPosition(sf::Vector2i(window.getSize().x / 2, window.getSize().y / 2), window);
+						m_gameObjectManager.addGameObject(*m_plannedEntity.model, m_plannedEntity.position);
 					}
 					else
 					{
-						const GameObject* entitySelected = m_gameObjectManager.selectGameObjectAtPosition(mouseToGroundPosition);
-						if (entitySelected)
-						{
-							m_translateObject.setPosition(entitySelected->getPosition());
-							m_plannedEntity.model = nullptr;
-						}
-						else
-						{
-							if (m_plannedEntity.model)
-							{
-								m_gameObjectManager.addGameObject(*m_plannedEntity.model, m_plannedEntity.position);
-							}
-							else
-							{
-								m_selectedPlayer = nullptr;
-
-								auto player = std::find_if(m_players.begin(), m_players.end(), [&mouseToGroundPosition](const auto& player)
-								{
-									return player->HQ.getAABB().contains(mouseToGroundPosition);
-								});
-								if (player != m_players.cend())
-								{
-									m_translateObject.setPosition(player->get()->HQ.getPosition());
-									m_selectedPlayer = (*player).get();
-								}
-							}
-						}
+						m_selectedGameObject = m_gameObjectManager.getGameObject(intersection);
 					}
 				}
 			}
 			else if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Right))
 			{
 				m_plannedEntity.model = nullptr;
+				m_selectedGameObject = nullptr;
 			}
 		}
-	}
+	break;
 	case sf::Event::MouseMoved:
 		if (!ImGui::IsWindowHovered(ImGuiHoveredFlags_::ImGuiHoveredFlags_AnyWindow))
 		{
@@ -189,58 +163,26 @@ void Level::handleInput(const sf::Event& currentSFMLEvent, const Camera& camera,
 						m_plannedEntity.position = newPosition;
 					}
 				}
-				else if(m_translateObject.isSelected())
-				{
-					const glm::vec3& position = m_translateObject.getPosition();
-					switch (m_translateObject.getCurrentAxisSelected())
-					{
-					case eAxisCollision::X:
-					{
-						int xDifference = window.getSize().y / 2 - sf::Mouse::getPosition(window).y;
 
-						m_translateObject.setPosition({ position.x + static_cast<float>(xDifference) * ENTITY_TRANSLATE_SPEED * deltaTime, position.y, position.z });
-						sf::Mouse::setPosition(sf::Vector2i(window.getSize().x / 2, window.getSize().y / 2), window);
-					}
-						break;
-					case eAxisCollision::Y:
-					{
-						int xDifference = window.getSize().y / 2 - sf::Mouse::getPosition(window).y;
+				//GameObject* selectedGameObject = m_gameObjectManager.getSelectedGameObject();
+				//if (selectedGameObject)
+				//{
+				//	glm::vec3 nodePosition = Globals::convertToNodePosition(m_translateObject.getPosition());
+				//	selectedGameObject->setPosition(nodePosition);
+				//	selectedGameObject->resetAABB();
+				//}
+				//else if (m_selectedPlayer)
+				//{
+				//	glm::vec3 nodePosition = Globals::convertToNodePosition(m_translateObject.getPosition());
+				//	for (auto& mineral : m_selectedPlayer->minerals)
+				//	{
+				//		mineral.setPosition(mineral.getPosition() + nodePosition - m_selectedPlayer->HQ.getPosition());
+				//		mineral.resetAABB();
+				//	}
 
-						m_translateObject.setPosition({ position.x, position.y + static_cast<float>(xDifference) * ENTITY_TRANSLATE_SPEED * deltaTime, position.z });
-						sf::Mouse::setPosition(sf::Vector2i(window.getSize().x / 2, window.getSize().y / 2), window);
-					}
-
-						break;
-					case eAxisCollision::Z:
-					{
-						int zDifference = sf::Mouse::getPosition(window).x - window.getSize().x / 2;
-
-						m_translateObject.setPosition({ position.x, position.y, position.z + static_cast<float>(zDifference) * ENTITY_TRANSLATE_SPEED * deltaTime});
-						sf::Mouse::setPosition(sf::Vector2i(window.getSize().x / 2, window.getSize().y / 2), window);
-					}
-						break;
-					}
-
-					GameObject* selectedGameObject = m_gameObjectManager.getSelectedGameObject();
-					if (selectedGameObject)
-					{
-						glm::vec3 nodePosition = Globals::convertToNodePosition(m_translateObject.getPosition());
-						selectedGameObject->setPosition(nodePosition);
-						selectedGameObject->resetAABB();
-					}
-					else if (m_selectedPlayer)
-					{
-						glm::vec3 nodePosition = Globals::convertToNodePosition(m_translateObject.getPosition());
-						for (auto& mineral : m_selectedPlayer->minerals)
-						{
-							mineral.setPosition(mineral.getPosition() + nodePosition - m_selectedPlayer->HQ.getPosition());
-							mineral.resetAABB();
-						}
-
-						m_selectedPlayer->HQ.setPosition(nodePosition);
-						m_selectedPlayer->HQ.resetAABB();
-					}
-				}
+				//	m_selectedPlayer->HQ.setPosition(nodePosition);
+				//	m_selectedPlayer->HQ.resetAABB();
+				//}
 			}
 		}
 		break;
@@ -335,29 +277,28 @@ void Level::handlePlayersGUI()
 
 void Level::handleSelectedEntityGUI()
 {
-	GameObject* selectedGameObject = m_gameObjectManager.getSelectedGameObject();
-	if (selectedGameObject)
+	//GameObject* selectedGameObject = m_gameObjectManager.getSelectedGameObject();
+	if (m_selectedGameObject)
 	{
 		ImGui::BeginChild("Selected Entity", ImVec2(175, 275), true);
 		ImGui::Text("Selected Entity");
 		
 		ImGui::NewLine();
 		ImGui::Text("Position");
-		if (ImGui::InputFloat("x", &selectedGameObject->getPosition().x, Globals::NODE_SIZE) ||
-			ImGui::InputFloat("y", &selectedGameObject->getPosition().y, 1.0f) ||
-			ImGui::InputFloat("z", &selectedGameObject->getPosition().z, Globals::NODE_SIZE))
+		if (ImGui::InputFloat("x", &m_selectedGameObject->getPosition().x, Globals::NODE_SIZE) ||
+			ImGui::InputFloat("y", &m_selectedGameObject->getPosition().y, 1.0f) ||
+			ImGui::InputFloat("z", &m_selectedGameObject->getPosition().z, Globals::NODE_SIZE))
 		{
-			selectedGameObject->resetAABB();
-			m_translateObject.setPosition(selectedGameObject->getPosition());
+			m_selectedGameObject->resetAABB();
 		}
 
 		ImGui::NewLine();
 		ImGui::Text("Rotation");
-		if(ImGui::InputFloat("yy", &selectedGameObject->getRotation().y, 90.0f))
+		if(ImGui::InputFloat("yy", &m_selectedGameObject->getRotation().y, 90.0f))
 		{
-			if (glm::abs(selectedGameObject->getRotation().y) >= 360.0f)
+			if (glm::abs(m_selectedGameObject->getRotation().y) >= 360.0f)
 			{
-				selectedGameObject->setRotation({ selectedGameObject->getRotation().x, 0.0f, selectedGameObject->getRotation().z });
+				m_selectedGameObject->setRotation({ m_selectedGameObject->getRotation().x, 0.0f, m_selectedGameObject->getRotation().z });
 			}
 		}
 
@@ -405,17 +346,15 @@ void Level::render(ShaderHandler& shaderHandler) const
 {
 	m_gameObjectManager.render(shaderHandler);
 
-	for (const auto& player : m_players)
-	{
-		player->render(shaderHandler);
-	}
+	//for (const auto& player : m_players)
+	//{
+	//	player->render(shaderHandler);
+	//}
 
 	if (m_plannedEntity.model)
 	{
 		m_plannedEntity.model->render(shaderHandler, m_plannedEntity.position);
 	}
-
-	m_translateObject.render(shaderHandler, m_gameObjectManager.isGameObjectSelected() || m_selectedPlayer);
 }
 
 void Level::renderPlayableArea(ShaderHandler& shaderHandler) const
@@ -427,8 +366,7 @@ void Level::renderPlayableArea(ShaderHandler& shaderHandler) const
 #ifdef RENDER_AABB
 void Level::renderAABB(ShaderHandler& shaderHandler)
 {
-	m_translateObject.renderAABB(shaderHandler, m_gameObjectManager.isGameObjectSelected() || m_selectedPlayer);
-	m_gameObjectManager.renderEntityAABB(shaderHandler);
+	m_gameObjectManager.renderGameObjectAABB(shaderHandler);
 
 	for (const auto& player : m_players)
 	{
@@ -475,4 +413,3 @@ const std::ifstream& operator>>(std::ifstream& file, Level& level)
 
 	return file;
 }
-

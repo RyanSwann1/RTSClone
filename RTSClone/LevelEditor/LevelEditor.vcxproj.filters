@@ -81,13 +81,13 @@
     <ClCompile Include="Level.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="TranslateObject.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
     <ClCompile Include="GameObject.cpp">
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="GameObjectManager.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Shared\Quad.cpp">
       <Filter>src</Filter>
     </ClCompile>
   </ItemGroup>
@@ -164,9 +164,6 @@
     <ClInclude Include="..\Shared\FactionController.h">
       <Filter>src</Filter>
     </ClInclude>
-    <ClInclude Include="TranslateObject.h">
-      <Filter>src</Filter>
-    </ClInclude>
     <ClInclude Include="Notes.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -180,6 +177,9 @@
       <Filter>src</Filter>
     </ClInclude>
     <ClInclude Include="..\Shared\UniqueIDGenerator.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Shared\Quad.h">
       <Filter>src</Filter>
     </ClInclude>
   </ItemGroup>

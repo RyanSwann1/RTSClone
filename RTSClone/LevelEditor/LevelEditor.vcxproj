@@ -158,13 +158,13 @@
     <ClCompile Include="..\Shared\Model.cpp" />
     <ClCompile Include="..\Shared\ModelLoader.cpp" />
     <ClCompile Include="..\Shared\ModelManager.cpp" />
+    <ClCompile Include="..\Shared\Quad.cpp" />
     <ClCompile Include="..\Shared\ShaderHandler.cpp" />
     <ClCompile Include="GameObjectManager.cpp" />
     <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="Level.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Player.cpp" />
-    <ClCompile Include="TranslateObject.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Shared\AABB.h" />
@@ -189,6 +189,7 @@
     <ClInclude Include="..\Shared\ModelManager.h" />
     <ClInclude Include="..\Shared\NonCopyable.h" />
     <ClInclude Include="..\Shared\NonMovable.h" />
+    <ClInclude Include="..\Shared\Quad.h" />
     <ClInclude Include="..\Shared\ShaderHandler.h" />
     <ClInclude Include="..\Shared\UniqueIDGenerator.h" />
     <ClInclude Include="GameObjectManager.h" />
@@ -196,7 +197,6 @@
     <ClInclude Include="Level.h" />
     <ClInclude Include="Notes.h" />
     <ClInclude Include="Player.h" />
-    <ClInclude Include="TranslateObject.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\Shared\Shaders\DebugFragmentShader.glsl" />
