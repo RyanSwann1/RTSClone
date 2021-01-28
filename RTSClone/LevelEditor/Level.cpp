@@ -56,6 +56,22 @@ namespace
 
 		return nullptr;
 	}
+
+	Mineral* getBaseLocationMineral(std::list<BaseLocation>& baseLocations, const glm::vec3& position)
+	{
+		for (auto& baseLocation : baseLocations)
+		{
+			for (auto& mineral : baseLocation.minerals)
+			{
+				if (mineral.getAABB().contains(position))
+				{
+					return &mineral;
+				}
+			}
+		}
+
+		return nullptr;
+	}
 }
 
 //PlannedEntity
@@ -71,6 +87,16 @@ BaseLocation::BaseLocation(const glm::vec3& position)
 	minerals()
 {}
 
+void BaseLocation::setPosition(const glm::vec3 & position)
+{
+	quad.setPosition(position);
+
+	for (auto& mineral : minerals)
+	{
+		mineral.setPosition(position);
+	}
+}
+
 //Level
 Level::Level(const std::string& levelName)
 	: m_levelName(levelName),
@@ -81,6 +107,7 @@ Level::Level(const std::string& levelName)
 	m_gameObjectManager(),
 	m_selectedGameObject(nullptr),
 	m_selectedBaseLocation(nullptr),
+	m_selectedMineral(nullptr),
 	m_factionStartingResources(DEFAULT_STARTING_RESOURCES),
 	m_factionStartingPopulationCap(DEFAULT_STARTING_POPULATION_CAP),
 	m_factionCount(DEFAULT_FACTIONS_COUNT)
@@ -176,6 +203,10 @@ void Level::handleInput(const sf::Event& currentSFMLEvent, const Camera& camera,
 			{
 				m_selectedGameObject = nullptr;
 			}
+
+			m_selectedBaseLocation = nullptr;
+			m_selectedMineral = nullptr;
+			m_selectedGameObject = nullptr;
 		}
 		break;
 	case sf::Event::MouseButtonPressed:
@@ -197,6 +228,10 @@ void Level::handleInput(const sf::Event& currentSFMLEvent, const Camera& camera,
 						if (!m_selectedGameObject)
 						{
 							m_selectedBaseLocation = getBaseLocation(m_mainBaseLocations, planeIntersection);
+							if (!m_selectedBaseLocation)
+							{
+								m_selectedMineral = getBaseLocationMineral(m_mainBaseLocations, planeIntersection);
+							}
 						}
 					}
 				}
@@ -230,7 +265,11 @@ void Level::handleInput(const sf::Event& currentSFMLEvent, const Camera& camera,
 				}
 				else if (m_selectedBaseLocation && sf::Mouse::isButtonPressed(sf::Mouse::Button::Left))
 				{
-					m_selectedBaseLocation->quad.setPosition(Globals::convertToNodePosition(planeIntersection));
+					m_selectedBaseLocation->setPosition(Globals::convertToNodePosition(planeIntersection));
+				}
+				else if (m_selectedMineral && sf::Mouse::isButtonPressed(sf::Mouse::Button::Left))
+				{
+					m_selectedMineral->setPosition(Globals::convertToNodePosition(planeIntersection));
 				}
 			}
 		}
@@ -385,16 +424,10 @@ void Level::render(ShaderHandler& shaderHandler) const
 void Level::renderDebug(ShaderHandler& shaderHandler) const
 {
 	m_playableArea.render(shaderHandler);
-	//m_playableArea.render(shaderHandler, glm::vec3(0.0f),
-	//	glm::vec3(m_size.x * Globals::NODE_SIZE, 
-	//	0.0f, 
-	//	m_size.y * Globals::NODE_SIZE), PLAYABLE_AREA_GROUND_COLOR, PLAYABLE_AREA_OPACITY);
-
 	
 	for (const auto& baseLocation : m_mainBaseLocations)
 	{
 		baseLocation.quad.render(shaderHandler);
-		//baseLocation.m_quad.render(shaderHandler, baseLocation.m_position, MAIN_BASE_QUAD_SIZE, MAIN_BASE_QUAD_COLOR);
 	}
 }
 

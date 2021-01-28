@@ -14,6 +14,7 @@ public:
 	Quad& operator=(Quad&&) noexcept;
 	~Quad();
 
+	const glm::vec3& getPosition() const;
 	const AABB& getAABB() const;
 
 	void setSize(const glm::vec3& size);

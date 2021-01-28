@@ -22,6 +22,8 @@ struct BaseLocation
 {
 	BaseLocation(const glm::vec3& position);
 
+	void setPosition(const glm::vec3& position);
+
 	Quad quad;
 	std::array<Mineral, Globals::MAX_MINERALS_PER_FACTION> minerals;
 };
@@ -68,6 +70,7 @@ private:
 	GameObjectManager m_gameObjectManager;
 	GameObject* m_selectedGameObject;
 	BaseLocation* m_selectedBaseLocation;
+	Mineral* m_selectedMineral;
 	int m_factionStartingResources;
 	int m_factionStartingPopulationCap;
 	int m_factionCount;

@@ -84,6 +84,11 @@ Quad::~Quad()
 	onDestroy();
 }
 
+const glm::vec3& Quad::getPosition() const
+{
+	return m_position;
+}
+
 const AABB& Quad::getAABB() const
 {
 	return m_AABB;
@@ -97,7 +102,7 @@ void Quad::setSize(const glm::vec3& size)
 void Quad::setPosition(const glm::vec3& position)
 {
 	m_position = position;
-	m_AABB.update(position, m_size);
+	m_AABB.update(m_position, m_size);
 }
 
 void Quad::render(ShaderHandler& shaderHandler) const
