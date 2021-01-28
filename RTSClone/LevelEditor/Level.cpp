@@ -10,13 +10,24 @@
 
 namespace
 {
-	const glm::vec3 PLAYER_HQ_STARTING_POSITION =
-		glm::vec3(4.0f * static_cast<float>(Globals::NODE_SIZE), 
-		Globals::GROUND_HEIGHT, 
-		3.0f * static_cast<float>(Globals::NODE_SIZE));
+	const std::array<glm::vec3, static_cast<size_t>(eFactionController::Max) + 1> FACTION_STARTING_POSITIONS =
+	{
+		glm::vec3(4.0f * static_cast<float>(Globals::NODE_SIZE),
+		Globals::GROUND_HEIGHT,
+		3.0f * static_cast<float>(Globals::NODE_SIZE)),
 
-	const glm::vec3 PLAYER_MINERAL_STARTING_POSITION =
-		glm::vec3(11.0f * static_cast<float>(Globals::NODE_SIZE), Globals::GROUND_HEIGHT, static_cast<float>(Globals::NODE_SIZE));
+		glm::vec3(11.0f * static_cast<float>(Globals::NODE_SIZE), 
+		Globals::GROUND_HEIGHT, 
+		3.0f * static_cast<float>(Globals::NODE_SIZE)),
+
+		glm::vec3(4.0f * static_cast<float>(Globals::NODE_SIZE),
+		Globals::GROUND_HEIGHT,
+		13.0f * static_cast<float>(Globals::NODE_SIZE)),
+
+		glm::vec3(14.0f * static_cast<float>(Globals::NODE_SIZE),
+		Globals::GROUND_HEIGHT,
+		13.0f * static_cast<float>(Globals::NODE_SIZE)),
+	};
 
 	const int MAX_MAP_SIZE = 60 * Globals::NODE_SIZE;
 	const int DEFAULT_STARTING_RESOURCES = 100;
@@ -25,6 +36,11 @@ namespace
 	const float ENTITY_TRANSLATE_SPEED = 5.0f;
 	const glm::vec3 PLAYABLE_AREA_GROUND_COLOR = { 1.0f, 1.0f, 0.5f };
 	const float PLAYABLE_AREA_OPACITY = 0.1f;
+
+	const glm::vec3 MAIN_BASE_QUAD_COLOR = { 1.0f, 0.0f, 0.0f };
+	const glm::vec3 MAIN_BASE_QUAD_SIZE = { Globals::NODE_SIZE, 0.0f, Globals::NODE_SIZE };
+	const int MIN_FACTIONS = 2;
+	const int DEFAULT_FACTIONS_COUNT = 2;
 }
 
 //PlannedEntity
@@ -32,6 +48,13 @@ PlannedEntity::PlannedEntity()
 	: modelNameIDSelected(0),
 	position(),
 	model(nullptr)
+{}
+
+//BaseLocation
+BaseLocation::BaseLocation(const glm::vec3& position)
+	: position(position),
+	quad(),
+	minerals()
 {}
 
 //Level
@@ -42,20 +65,17 @@ Level::Level(const std::string& levelName)
 	m_playableArea(),
 	m_gameObjectManager(),
 	m_selectedGameObject(nullptr),
-	m_players(),
-	m_selectedPlayer(nullptr),
 	m_factionStartingResources(DEFAULT_STARTING_RESOURCES),
-	m_factionStartingPopulationCap(DEFAULT_STARTING_POPULATION_CAP)
+	m_factionStartingPopulationCap(DEFAULT_STARTING_POPULATION_CAP),
+	m_factionCount(DEFAULT_FACTIONS_COUNT)
 {
-	m_players.reserve(static_cast<size_t>(eFactionController::Max) + 1);
-
 	if (!LevelFileHandler::loadLevelFromFile(*this))
 	{
-		m_players.emplace_back(std::make_unique<Player>(eFactionController::Player, PLAYER_HQ_STARTING_POSITION, PLAYER_MINERAL_STARTING_POSITION));
-		m_players.emplace_back(std::make_unique<Player>(eFactionController::AI_1, PLAYER_HQ_STARTING_POSITION, PLAYER_MINERAL_STARTING_POSITION));
-
 		LevelFileHandler::saveLevelToFile(*this);
 	}
+
+	m_mainBaseLocations.emplace_back(FACTION_STARTING_POSITIONS[static_cast<int>(eFactionController::Player)]);
+	m_mainBaseLocations.emplace_back(FACTION_STARTING_POSITIONS[static_cast<int>(eFactionController::AI_1)]);
 }
 
 std::unique_ptr<Level> Level::create(const std::string& levelName)
@@ -84,6 +104,11 @@ glm::ivec2 Level::getPlayableAreaSize() const
 	return m_size;
 }
 
+int Level::getFactionCount() const
+{
+	return m_factionCount;
+}
+
 int Level::getFactionStartingResources() const
 {
 	return m_factionStartingResources;
@@ -97,11 +122,6 @@ int Level::getFactionStartingPopulationCap() const
 const std::string& Level::getName() const
 {
 	return m_levelName;
-}
-
-const std::vector<std::unique_ptr<Player>>& Level::getPlayers() const
-{
-	return m_players;
 }
 
 const GameObjectManager& Level::getGameObjectManager() const
@@ -214,65 +234,15 @@ void Level::handleModelNamesGUI()
 
 void Level::handlePlayersGUI()
 {
-	ImGui::BeginChild("Players Quantity", ImVec2(175, 40), true);
-
-	int newPlayerCount = static_cast<int>(m_players.size());
-	if (ImGui::InputInt("Player Amount", &newPlayerCount, 1, ImGuiInputTextFlags_ReadOnly))
+	ImGui::BeginChild("Faction Quantity", ImVec2(175, 40), true);
+	int newFactionCount = m_factionCount;
+	if (ImGui::InputInt("Faction Amount", &newFactionCount, 1, ImGuiInputTextFlags_ReadOnly))
 	{
-		if (newPlayerCount >= Globals::MIN_FACTIONS && newPlayerCount <= Globals::MAX_FACTIONS)
+		if (newFactionCount >= MIN_FACTIONS && newFactionCount <= static_cast<int>(eFactionController::Max) + 1)
 		{
-			if (newPlayerCount > static_cast<int>(m_players.size()))
-			{
-				eFactionController factionController;
-				switch (newPlayerCount)
-				{
-				case Globals::MAX_FACTIONS - Globals::MIN_FACTIONS / 2:
-					factionController = eFactionController::AI_2;
-					break;
-				case Globals::MAX_FACTIONS:
-					factionController = eFactionController::AI_3;
-					break;
-				default:
-					assert(false);
-				}
-
-				m_players.emplace_back(std::make_unique<Player>(factionController, PLAYER_HQ_STARTING_POSITION, PLAYER_MINERAL_STARTING_POSITION));
-			}
-			else if (newPlayerCount < static_cast<int>(m_players.size()))
-			{
-				m_players.pop_back();
-			}
+			m_factionCount = newFactionCount;
 		}
 	};
-
-	ImGui::EndChild();
-	
-	ImGui::BeginChild("Players Details", ImVec2(175, 275), true);
-	for (int i = 0; i < static_cast<int>(m_players.size()); ++i)
-	{
-		if (m_players[i]->controller == eFactionController::Player)
-		{
-			ImGui::Text(std::string("Player " + std::to_string(i)).c_str());
-		}
-		else
-		{
-			ImGui::Text(std::string("AI " + std::to_string(i)).c_str());
-		}
-
-		glm::vec3 playerPosition = m_players[i]->HQ.getPosition();
-		if (ImGui::InputFloat("x", &playerPosition.x, Globals::NODE_SIZE) ||
-			ImGui::InputFloat("z", &playerPosition.z, Globals::NODE_SIZE))
-		{
-			for (auto& mineral : m_players[i]->minerals)
-			{
-				glm::vec3 vDifference = playerPosition - m_players[i]->HQ.getPosition();
-				const glm::vec3& mineralPosition = mineral.getPosition();
-				mineral.setPosition({ mineralPosition.x + vDifference.x, mineralPosition.y + vDifference.y, mineralPosition.z + vDifference.z });
-			}
-
-			m_players[i]->HQ.setPosition(playerPosition);
-		}
-	}
 
 	ImGui::EndChild();
 }
@@ -336,6 +306,28 @@ void Level::handleLevelDetailsGUI(bool& showGUIWindow)
 	ImGui::End();
 }
 
+void Level::handleMainBasesGui()
+{
+	ImGui::BeginChild("Main Base Quantity", ImVec2(175, 40), true);
+	int newMainBaseQuantity = static_cast<int>(m_mainBaseLocations.size());
+	if (ImGui::InputInt("Main Bases", &newMainBaseQuantity, 1, ImGuiInputTextFlags_ReadOnly))
+	{
+		if (newMainBaseQuantity >= MIN_FACTIONS && newMainBaseQuantity <= static_cast<int>(eFactionController::Max) + 1)
+		{
+			if (newMainBaseQuantity > static_cast<int>(m_mainBaseLocations.size()))
+			{
+				m_mainBaseLocations.emplace_back(FACTION_STARTING_POSITIONS[newMainBaseQuantity - 1]);
+			}
+			else
+			{
+				m_mainBaseLocations.pop_back();
+			}
+		}
+	};
+
+	ImGui::EndChild();
+}
+
 void Level::save() const
 {
 	if (!LevelFileHandler::saveLevelToFile(*this))
@@ -348,10 +340,13 @@ void Level::render(ShaderHandler& shaderHandler) const
 {
 	m_gameObjectManager.render(shaderHandler, m_selectedGameObject);
 
-	//for (const auto& player : m_players)
-	//{
-	//	player->render(shaderHandler);
-	//}
+	for (const auto& baseLocation : m_mainBaseLocations)
+	{
+		for (const auto& mineral : baseLocation.minerals)
+		{
+			mineral.render(shaderHandler);
+		}
+	}
 
 	if (m_plannedEntity.model)
 	{
@@ -361,21 +356,23 @@ void Level::render(ShaderHandler& shaderHandler) const
 	ModelManager::getInstance().getModel(TERRAIN_MODEL_NAME).render(shaderHandler, Globals::TERRAIN_POSITION);
 }
 
-void Level::renderPlayableArea(ShaderHandler& shaderHandler) const
+void Level::renderDebug(ShaderHandler& shaderHandler) const
 {
 	m_playableArea.render(shaderHandler, glm::vec3(0.0f),
-		glm::vec3(m_size.x * Globals::NODE_SIZE, 0.0f, m_size.y * Globals::NODE_SIZE), PLAYABLE_AREA_GROUND_COLOR, PLAYABLE_AREA_OPACITY);
+		glm::vec3(m_size.x * Globals::NODE_SIZE, 
+		0.0f, 
+		m_size.y * Globals::NODE_SIZE), PLAYABLE_AREA_GROUND_COLOR, PLAYABLE_AREA_OPACITY);
+
+	for (const auto& baseLocation : m_mainBaseLocations)
+	{
+		baseLocation.quad.render(shaderHandler, baseLocation.position, MAIN_BASE_QUAD_SIZE, MAIN_BASE_QUAD_COLOR);
+	}
 }
 
 #ifdef RENDER_AABB
 void Level::renderAABB(ShaderHandler& shaderHandler)
 {
 	m_gameObjectManager.renderGameObjectAABB(shaderHandler);
-
-	for (const auto& player : m_players)
-	{
-		player->renderAABB(shaderHandler);
-	}
 }
 #endif // RENDER_AABB
 
@@ -383,35 +380,9 @@ const std::ifstream& operator>>(std::ifstream& file, Level& level)
 {
 	assert(file.is_open());
 
-	for (const auto& factionControllerDetails : FACTION_CONTROLLER_DETAILS)
-	{
-		switch (factionControllerDetails.controller)
-		{
-		case eFactionController::Player:
-		case eFactionController::AI_1:
-			assert(LevelFileHandler::isPlayerActive(file, factionControllerDetails.controller));
-			level.m_players.emplace_back(std::make_unique<Player>(factionControllerDetails.controller));
-			break;
-		case eFactionController::AI_2:
-		case eFactionController::AI_3:
-			if (LevelFileHandler::isPlayerActive(file, factionControllerDetails.controller))
-			{
-				level.m_players.emplace_back(std::make_unique<Player>(factionControllerDetails.controller));
-			}
-			break;
-		default:
-			assert(false);
-		}
-	}
-
 	level.m_size = LevelFileHandler::loadMapSizeFromFile(file);
 	level.m_factionStartingResources = LevelFileHandler::loadFactionStartingResources(file);
 	level.m_factionStartingPopulationCap = LevelFileHandler::loadFactionStartingPopulationCap(file);
-
-	for (const auto& player : level.m_players)
-	{
-		file >> *player;
-	}
 
 	file >> level.m_gameObjectManager;
 
