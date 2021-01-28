@@ -22,7 +22,6 @@ struct BaseLocation
 {
 	BaseLocation(const glm::vec3& position);
 
-	glm::vec3 position;
 	Quad quad;
 	std::array<Mineral, Globals::MAX_MINERALS_PER_FACTION> minerals;
 };
@@ -62,12 +61,13 @@ private:
 	Level(const std::string& levelName);
 
 	const std::string m_levelName;
-	std::vector<BaseLocation> m_mainBaseLocations;
+	std::list<BaseLocation> m_mainBaseLocations;
 	PlannedEntity m_plannedEntity;
 	glm::ivec2 m_size;
 	Quad m_playableArea;
 	GameObjectManager m_gameObjectManager;
 	GameObject* m_selectedGameObject;
+	BaseLocation* m_selectedBaseLocation;
 	int m_factionStartingResources;
 	int m_factionStartingPopulationCap;
 	int m_factionCount;

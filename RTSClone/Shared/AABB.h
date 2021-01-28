@@ -7,6 +7,8 @@
 #include "Mesh.h"
 #endif // RENDER_AABB
 
+//Min/Max
+
 struct Model;
 class ShaderHandler;
 #ifdef GAME
@@ -34,6 +36,7 @@ public:
 	bool contains(const AABB& other) const;
 	
 	void update(const glm::vec3& position);
+	void update(const glm::vec3& position, const glm::vec3& size);
 	void reset(const glm::vec3& position, const Model& model);
 	void reset(const glm::vec3& position, const glm::vec3& size);
 	void reset();

@@ -1,21 +1,31 @@
 #pragma once
 
 #include "NonCopyable.h"
+#include "AABB.h"
 #include "glm/glm.hpp"
 
 class ShaderHandler;
-class Quad : private NonCopyable
+struct Quad : private NonCopyable
 {
 public:
-	Quad();
+	Quad(const glm::vec3& size, const glm::vec3& color, float opacity = 1.0f);
+	Quad(const glm::vec3& position, const glm::vec3& size, const glm::vec3& color, float opacity = 1.0f);
 	Quad(Quad&&) noexcept;
 	Quad& operator=(Quad&&) noexcept;
 	~Quad();
 
-	void render(ShaderHandler& shaderHandler, const glm::vec3& position, const glm::vec3& size,
-		const glm::vec3& color, float opacity = 1.0f) const;
+	const AABB& getAABB() const;
+
+	void setSize(const glm::vec3& size);
+	void setPosition(const glm::vec3& position);
+	void render(ShaderHandler& shaderHandler) const;
 
 private:
+	float m_opacity;
+	glm::vec3 m_position;
+	glm::vec3 m_size;
+	glm::vec3 m_color;
+	AABB m_AABB;
 	unsigned int m_vaoID;
 	unsigned int m_vboID;
 

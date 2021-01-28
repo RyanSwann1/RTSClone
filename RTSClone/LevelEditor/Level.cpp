@@ -41,6 +41,21 @@ namespace
 	const glm::vec3 MAIN_BASE_QUAD_SIZE = { Globals::NODE_SIZE, 0.0f, Globals::NODE_SIZE };
 	const int MIN_FACTIONS = 2;
 	const int DEFAULT_FACTIONS_COUNT = 2;
+
+	BaseLocation* getBaseLocation(std::list<BaseLocation>& baseLocations, const glm::vec3& position)
+	{
+		auto baseLocation = std::find_if(baseLocations.begin(), baseLocations.end(), [&position](const auto& baseLocation)
+		{
+			return baseLocation.quad.getAABB().contains(position);
+		});
+
+		if (baseLocation != baseLocations.end())
+		{
+			return &(*baseLocation);
+		}
+
+		return nullptr;
+	}
 }
 
 //PlannedEntity
@@ -52,8 +67,7 @@ PlannedEntity::PlannedEntity()
 
 //BaseLocation
 BaseLocation::BaseLocation(const glm::vec3& position)
-	: position(position),
-	quad(),
+	: quad(position, MAIN_BASE_QUAD_SIZE, MAIN_BASE_QUAD_COLOR),
 	minerals()
 {}
 
@@ -62,9 +76,11 @@ Level::Level(const std::string& levelName)
 	: m_levelName(levelName),
 	m_plannedEntity(),
 	m_size(DEFAULT_MAP_SIZE),
-	m_playableArea(),
+	m_playableArea({ m_size.x * Globals::NODE_SIZE, 0.0f, m_size.y * Globals::NODE_SIZE }, 
+		PLAYABLE_AREA_GROUND_COLOR, PLAYABLE_AREA_OPACITY),
 	m_gameObjectManager(),
 	m_selectedGameObject(nullptr),
+	m_selectedBaseLocation(nullptr),
 	m_factionStartingResources(DEFAULT_STARTING_RESOURCES),
 	m_factionStartingPopulationCap(DEFAULT_STARTING_POPULATION_CAP),
 	m_factionCount(DEFAULT_FACTIONS_COUNT)
@@ -178,6 +194,10 @@ void Level::handleInput(const sf::Event& currentSFMLEvent, const Camera& camera,
 					else
 					{
 						m_selectedGameObject = m_gameObjectManager.getGameObject(planeIntersection);
+						if (!m_selectedGameObject)
+						{
+							m_selectedBaseLocation = getBaseLocation(m_mainBaseLocations, planeIntersection);
+						}
 					}
 				}
 			}
@@ -185,6 +205,7 @@ void Level::handleInput(const sf::Event& currentSFMLEvent, const Camera& camera,
 			{
 				m_plannedEntity.model = nullptr;
 				m_selectedGameObject = nullptr;
+				m_selectedBaseLocation = nullptr;
 			}
 		}
 	break;
@@ -206,6 +227,10 @@ void Level::handleInput(const sf::Event& currentSFMLEvent, const Camera& camera,
 				else if (m_selectedGameObject && sf::Mouse::isButtonPressed(sf::Mouse::Button::Left))
 				{
 					m_selectedGameObject->setPosition(Globals::convertToNodePosition(planeIntersection));
+				}
+				else if (m_selectedBaseLocation && sf::Mouse::isButtonPressed(sf::Mouse::Button::Left))
+				{
+					m_selectedBaseLocation->quad.setPosition(Globals::convertToNodePosition(planeIntersection));
 				}
 			}
 		}
@@ -286,6 +311,7 @@ void Level::handleLevelDetailsGUI(bool& showGUIWindow)
 	{
 		m_size.x = glm::clamp(m_size.x, 0, MAX_MAP_SIZE);
 		m_size.y = glm::clamp(m_size.y, 0, MAX_MAP_SIZE);
+		m_playableArea.setSize({ m_size.x * Globals::NODE_SIZE, 0.0f, m_size.y * Globals::NODE_SIZE});
 	}
 	ImGui::Text("Starting Resources");
 	if (ImGui::InputInt("Resources", &m_factionStartingResources, 5))
@@ -358,14 +384,17 @@ void Level::render(ShaderHandler& shaderHandler) const
 
 void Level::renderDebug(ShaderHandler& shaderHandler) const
 {
-	m_playableArea.render(shaderHandler, glm::vec3(0.0f),
-		glm::vec3(m_size.x * Globals::NODE_SIZE, 
-		0.0f, 
-		m_size.y * Globals::NODE_SIZE), PLAYABLE_AREA_GROUND_COLOR, PLAYABLE_AREA_OPACITY);
+	m_playableArea.render(shaderHandler);
+	//m_playableArea.render(shaderHandler, glm::vec3(0.0f),
+	//	glm::vec3(m_size.x * Globals::NODE_SIZE, 
+	//	0.0f, 
+	//	m_size.y * Globals::NODE_SIZE), PLAYABLE_AREA_GROUND_COLOR, PLAYABLE_AREA_OPACITY);
 
+	
 	for (const auto& baseLocation : m_mainBaseLocations)
 	{
-		baseLocation.quad.render(shaderHandler, baseLocation.position, MAIN_BASE_QUAD_SIZE, MAIN_BASE_QUAD_COLOR);
+		baseLocation.quad.render(shaderHandler);
+		//baseLocation.m_quad.render(shaderHandler, baseLocation.m_position, MAIN_BASE_QUAD_SIZE, MAIN_BASE_QUAD_COLOR);
 	}
 }
 

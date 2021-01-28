@@ -175,6 +175,11 @@ void AABB::update(const glm::vec3& position)
 	m_back = position.z - z;
 }
 
+void AABB::update(const glm::vec3& position, const glm::vec3& size)
+{
+	reset(position, size);
+}
+
 void AABB::reset(const glm::vec3& position, const Model& model)
 {
 	m_left = position.x - model.AABBSizeFromCenter.x;
