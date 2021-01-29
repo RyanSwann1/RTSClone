@@ -1,6 +1,5 @@
 #include "LevelFileHandler.h"
 #ifdef LEVEL_EDITOR
-#include "Player.h"
 #include "Level.h"
 #include <ostream>
 #endif // LEVEL_EDITOR
@@ -29,12 +28,6 @@ void loadInPlayer(std::ifstream& file, std::array<std::unique_ptr<Faction>, stat
 	const FactionControllerDetails& factionControllerDetails, int startingResources, int startingPopulation);
 void loadInScenery(std::ifstream& file, std::vector<SceneryGameObject>& scenery);
 #endif // GAME
-
-#ifdef LEVEL_EDITOR
-void saveMapSizeToFile(std::ostream& os, const glm::ivec2& mapSize);
-void saveFactionStartingResources(std::ostream& os, int factionStartingResources);
-void saveFactionStartingPopulation(std::ostream& os, int factionStartingPopulation);
-#endif // LEVEL_EDITOR
 
 void LevelFileHandler::loadFromFile(std::ifstream& file, const std::function<void(const std::string&)>& data, 
 	const std::function<bool(const std::string&)>& conditional)
@@ -101,16 +94,7 @@ bool LevelFileHandler::saveLevelToFile(const Level& level)
 		return false;
 	}
 
-	for (auto& player : level.getPlayers())
-	{
-		file << player;
-	}
-
-	saveFactionStartingPopulation(file, level.getFactionStartingPopulationCap());
-	saveFactionStartingResources(file, level.getFactionStartingResources());
-	saveMapSizeToFile(file, level.getPlayableAreaSize());
-
-	file << level.getGameObjectManager();
+	file << level;
 
 	return true;
 }
@@ -162,24 +146,6 @@ void LevelFileHandler::removeLevel(const std::string& fileName)
 	std::remove(std::string(Globals::SHARED_FILE_DIRECTORY + LEVELS_FILE_DIRECTORY + "temp.txt").c_str());
 
 	std::remove(std::string(Globals::SHARED_FILE_DIRECTORY + LEVELS_FILE_DIRECTORY + fileName).c_str());
-}
-
-void saveMapSizeToFile(std::ostream& os, const glm::ivec2& mapSize)
-{
-	os << Globals::TEXT_HEADER_MAP_SIZE << "\n";
-	os << mapSize.x << " " << mapSize.y << "\n";
-}
-
-void saveFactionStartingResources(std::ostream& os, int factionStartingResources)
-{
-	os << Globals::TEXT_HEADER_FACTION_STARTING_RESOURCE << "\n";
-	os << factionStartingResources << "\n";
-}
-
-void saveFactionStartingPopulation(std::ostream& os, int factionStartingPopulation)
-{
-	os << Globals::TEXT_HEADER_FACTION_STARTING_POPULATION << "\n";
-	os << factionStartingPopulation << "\n";
 }
 #endif // LEVEL_EDITOR
 

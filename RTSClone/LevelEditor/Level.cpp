@@ -42,7 +42,7 @@ namespace
 	const int MIN_FACTIONS = 2;
 	const int DEFAULT_FACTIONS_COUNT = 2;
 
-	BaseLocation* getBaseLocation(std::list<BaseLocation>& baseLocations, const glm::vec3& position)
+	BaseLocation* getBaseLocation(std::vector<BaseLocation>& baseLocations, const glm::vec3& position)
 	{
 		auto baseLocation = std::find_if(baseLocations.begin(), baseLocations.end(), [&position](const auto& baseLocation)
 		{
@@ -57,7 +57,7 @@ namespace
 		return nullptr;
 	}
 
-	Mineral* getBaseLocationMineral(std::list<BaseLocation>& baseLocations, const glm::vec3& position)
+	Mineral* getBaseLocationMineral(std::vector<BaseLocation>& baseLocations, const glm::vec3& position)
 	{
 		for (auto& baseLocation : baseLocations)
 		{
@@ -117,6 +117,7 @@ Level::Level(const std::string& levelName)
 		LevelFileHandler::saveLevelToFile(*this);
 	}
 
+	m_mainBaseLocations.reserve(static_cast<size_t>(eFactionController::Max) + 1);
 	m_mainBaseLocations.emplace_back(FACTION_STARTING_POSITIONS[static_cast<int>(eFactionController::Player)]);
 	m_mainBaseLocations.emplace_back(FACTION_STARTING_POSITIONS[static_cast<int>(eFactionController::AI_1)]);
 }
@@ -142,34 +143,9 @@ std::unique_ptr<Level> Level::load(const std::string& levelName)
 	return std::unique_ptr<Level>();
 }
 
-glm::ivec2 Level::getPlayableAreaSize() const
-{
-	return m_size;
-}
-
-int Level::getFactionCount() const
-{
-	return m_factionCount;
-}
-
-int Level::getFactionStartingResources() const
-{
-	return m_factionStartingResources;
-}
-
-int Level::getFactionStartingPopulationCap() const
-{
-	return m_factionStartingPopulationCap;
-}
-
 const std::string& Level::getName() const
 {
 	return m_levelName;
-}
-
-const GameObjectManager& Level::getGameObjectManager() const
-{
-	return m_gameObjectManager;
 }
 
 void Level::handleInput(const sf::Event& currentSFMLEvent, const Camera& camera, const sf::Window& window, float deltaTime, glm::uvec2 windowSize)
@@ -447,6 +423,37 @@ const std::ifstream& operator>>(std::ifstream& file, Level& level)
 	level.m_factionStartingPopulationCap = LevelFileHandler::loadFactionStartingPopulationCap(file);
 
 	file >> level.m_gameObjectManager;
+
+	return file;
+}
+
+std::ostream& operator<<(std::ostream& file, const Level& level)
+{
+	file << Globals::TEXT_HEADER_FACTION_COUNT << "\n";
+	file << level.m_factionCount << "\n";
+	
+	for(int i = 0; i < static_cast<int>(level.m_mainBaseLocations.size()); ++i)
+	{
+		file << Globals::TEXT_HEADER_MAIN_BASES[i] << "\n";
+		const glm::vec3& basePosition = level.m_mainBaseLocations[i].quad.getPosition();
+		file << basePosition.x << " " << basePosition.y << " " << basePosition.z << "\n";
+		file << static_cast<int>(level.m_mainBaseLocations[i].minerals.size()) << "\n";
+		for (const auto& mineral : level.m_mainBaseLocations[i].minerals)
+		{
+			file << mineral.getPosition().x << " " << mineral.getPosition().y << " " << mineral.getPosition().z << "\n";
+		}
+	}
+
+	file << Globals::TEXT_HEADER_FACTION_STARTING_POPULATION << "\n";
+	file << level.m_factionStartingPopulationCap << "\n";
+
+	file << Globals::TEXT_HEADER_FACTION_STARTING_RESOURCE << "\n";
+	file << level.m_factionStartingResources << "\n";
+
+	file << Globals::TEXT_HEADER_MAP_SIZE << "\n";
+	file << level.m_size.x << " " << level.m_size.y << "\n";
+	
+	file << level.m_gameObjectManager;
 
 	return file;
 }

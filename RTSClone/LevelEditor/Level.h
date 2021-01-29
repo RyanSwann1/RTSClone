@@ -35,12 +35,7 @@ public:
 	static std::unique_ptr<Level> create(const std::string& levelName);
 	static std::unique_ptr<Level> load(const std::string& levelName);
 
-	glm::ivec2 getPlayableAreaSize() const;
-	int getFactionCount() const;
-	int getFactionStartingResources() const;
-	int getFactionStartingPopulationCap() const;
 	const std::string& getName() const;
-	const GameObjectManager& getGameObjectManager() const;
 
 	void handleInput(const sf::Event& currentSFMLEvent, const Camera& camera, const sf::Window& window, float deltaTime, glm::uvec2 windowSize);
 	void handleModelNamesGUI();
@@ -58,12 +53,12 @@ public:
 #endif // RENDER_AABB
 
 	friend const std::ifstream& operator>>(std::ifstream& file, Level& level);
-
+	friend std::ostream& operator<<(std::ostream& file , const Level& level);
 private:
 	Level(const std::string& levelName);
 
 	const std::string m_levelName;
-	std::list<BaseLocation> m_mainBaseLocations;
+	std::vector<BaseLocation> m_mainBaseLocations;
 	PlannedEntity m_plannedEntity;
 	glm::ivec2 m_size;
 	Quad m_playableArea;
