@@ -434,10 +434,15 @@ std::ostream& operator<<(std::ostream& file, const Level& level)
 	
 	for(int i = 0; i < static_cast<int>(level.m_mainBaseLocations.size()); ++i)
 	{
-		file << Globals::TEXT_HEADER_MAIN_BASES[i] << "\n";
-		const glm::vec3& basePosition = level.m_mainBaseLocations[i].quad.getPosition();
-		file << basePosition.x << " " << basePosition.y << " " << basePosition.z << "\n";
-		file << static_cast<int>(level.m_mainBaseLocations[i].minerals.size()) << "\n";
+		file << Globals::TEXT_HEADER_MAIN_BASE_LOCATIONS[i] << "\n";
+		file << level.m_mainBaseLocations[i].quad.getPosition().x << " " << 
+			level.m_mainBaseLocations[i].quad.getPosition().y << " " << 
+			level.m_mainBaseLocations[i].quad.getPosition().z << "\n";
+	}
+
+	for (int i = 0; i < static_cast<int>(level.m_mainBaseLocations.size()); ++i)
+	{
+		file << Globals::TEXT_HEADER_MAIN_BASE_MINERALS[i] << "\n";
 		for (const auto& mineral : level.m_mainBaseLocations[i].minerals)
 		{
 			file << mineral.getPosition().x << " " << mineral.getPosition().y << " " << mineral.getPosition().z << "\n";

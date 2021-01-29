@@ -22,6 +22,22 @@ namespace Globals
 	inline const std::string TEXT_HEADER_MAP_SIZE = TEXT_HEADER_BEGINNING + "Map Size";
 	inline const std::string TEXT_HEADER_FACTION_STARTING_RESOURCE = TEXT_HEADER_BEGINNING + "Faction Starting Resources";
 	inline const std::string TEXT_HEADER_FACTION_STARTING_POPULATION = TEXT_HEADER_BEGINNING + "Faction Starting Population";
+	inline const std::string TEXT_HEADER_FACTION_COUNT = TEXT_HEADER_BEGINNING + "Faction Count";
+	const std::array<std::string, static_cast<size_t>(eFactionController::Max) + 1> TEXT_HEADER_MAIN_BASE_LOCATIONS
+	{
+		TEXT_HEADER_BEGINNING + "Main Base Location_1",
+		TEXT_HEADER_BEGINNING + "Main Base Location_2",
+		TEXT_HEADER_BEGINNING + "Main Base Location_3",
+		TEXT_HEADER_BEGINNING + "Main Base Location_4"
+	};
+	const std::array<std::string, static_cast<size_t>(eFactionController::Max) + 1> TEXT_HEADER_MAIN_BASE_MINERALS
+	{
+		TEXT_HEADER_BEGINNING + "Main Base Minerals_1",
+		TEXT_HEADER_BEGINNING + "Main Base Minerals_2",
+		TEXT_HEADER_BEGINNING + "Main Base Minerals_3",
+		TEXT_HEADER_BEGINNING + "Main Base Minerals_4"
+	};
+
 	const glm::vec3 TERRAIN_POSITION = { 0.0f, -0.01f, 0.0f };
 	const size_t MAX_LEVELS = 5;
 	const unsigned int INVALID_OPENGL_ID = 0;
@@ -35,9 +51,7 @@ namespace Globals
 	const int INVALID_GAMEOBJECT_ID = -1;
 #endif // LEVEL_EDITOR
 
-	const size_t MAX_MINERALS_PER_FACTION = 5;
-	const int MIN_FACTIONS = 2;
-	const int MAX_FACTIONS = 4;
+	const size_t MAX_MINERALS = 5;
 	const glm::vec3 PLAYER_MATERIAL_DIFFUSE = { 1.0f, 0.2f, 0.2f };
 	const glm::vec3 AI_1_MATERIAL_DIFFUSE = { 0.2f, 0.2f, 1.0f };
 	const glm::vec3 AI_2_MATERIAL_DIFFUSE = { 1.0f, 1.0f, 0.2f };

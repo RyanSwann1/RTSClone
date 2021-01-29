@@ -25,7 +25,7 @@ struct BaseLocation
 	void setPosition(const glm::vec3& position);
 
 	Quad quad;
-	std::array<Mineral, Globals::MAX_MINERALS_PER_FACTION> minerals;
+	std::array<Mineral, Globals::MAX_MINERALS> minerals;
 };
 
 struct Camera;
