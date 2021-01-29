@@ -2,13 +2,16 @@
 #include "ShaderHandler.h"
 #include "Globals.h"
 #include "Model.h"
+#include "ModelManager.h"
 
 GameObject::GameObject(const Model& model)
 	: m_position(),
 	m_rotation(),
 	m_AABB(),
 	m_model(model)
-{}
+{
+	m_AABB.reset(m_position, model);
+}
 
 GameObject::GameObject(const Model& model, const glm::vec3& startingPosition, glm::vec3 startingRotation)
 	: m_position(startingPosition),
@@ -84,3 +87,7 @@ void GameObject::renderAABB(ShaderHandler& shaderHandler)
 	m_AABB.render(shaderHandler);
 }
 #endif // RENDER_AABB
+
+Mineral::Mineral()
+	: GameObject(ModelManager::getInstance().getModel(MINERALS_MODEL_NAME))
+{}
