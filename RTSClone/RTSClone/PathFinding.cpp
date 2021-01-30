@@ -266,16 +266,8 @@ bool PathFinding::isBuildingSpawnAvailable(const glm::vec3& startingPosition, co
 				AABB buildingAABB(Globals::convertToWorldPosition(adjacentPosition.position), model);
 				if (!map.isAABBOccupied(buildingAABB))
 				{
-					const auto& owningFactionMinerals = owningFaction.getMinerals();
 					glm::vec3 adjacentWorldPosition = Globals::convertToWorldPosition(adjacentPosition.position);
-					auto mineral = std::find_if(owningFactionMinerals.cbegin(), owningFactionMinerals.cend(), 
-						[&adjacentWorldPosition, distanceFromMinerals](const auto& mineral)
-					{
-						return Globals::getSqrDistance(mineral.getPosition(), adjacentWorldPosition) < distanceFromMinerals * distanceFromMinerals;
-					});
-
 					if (!map.isPositionOccupied(adjacentPosition.position) &&
-						mineral == owningFactionMinerals.cend() &&
 						Globals::getSqrDistance(owningFaction.getHQPosition(), adjacentWorldPosition) >= minDistanceFromHQ * minDistanceFromHQ &&
 						Globals::getSqrDistance(owningFaction.getHQPosition(), adjacentWorldPosition) <= maxDistanceFromHQ * maxDistanceFromHQ)
 					{
