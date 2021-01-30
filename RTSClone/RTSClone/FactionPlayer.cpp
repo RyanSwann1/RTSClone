@@ -207,7 +207,10 @@ void FactionPlayer::handleInput(const sf::Event& currentSFMLEvent, const sf::Win
         {
             if (m_selectionBox.isActive() && m_selectionBox.isMinimumSize() && !m_selectedEntities.empty())
             {
-                m_HQ.setSelected(false);
+                for (auto& headquarters : m_headquarters)
+                {
+                    headquarters.setSelected(false);
+                }
                 deselectEntities<Barracks>(m_barracks);
                 deselectEntities<Turret>(m_turrets);
                 deselectEntities<SupplyDepot>(m_supplyDepots);
@@ -327,16 +330,15 @@ void FactionPlayer::onEntityRemoval(const Entity& entity)
     }
 }
 
-void FactionPlayer::instructWorkerReturnMinerals(const Map& map)
+void FactionPlayer::instructWorkerReturnMinerals(const Map& map, const Headquarters& headquarters)
 {
     for (auto& worker : m_workers)
     {
         if (worker.isSelected() && worker.isHoldingResources())
         {
-            glm::vec3 destination = 
-                PathFinding::getInstance().getClosestPositionToAABB(worker.getPosition(), m_HQ.getAABB(), map);
+            glm::vec3 destination = PathFinding::getInstance().getClosestPositionToAABB(worker.getPosition(), headquarters.getAABB(), map);
             worker.moveTo(destination, map, [&](const glm::ivec2& position) { return getAdjacentPositions(position, map); },
-                eWorkerState::ReturningMineralsToHQ);
+                eWorkerState::ReturningMineralsToHeadquarters);
         }
     }
 }
@@ -528,11 +530,15 @@ void FactionPlayer::onLeftClick(const sf::Window& window, const Camera& camera, 
         selectEntity<Barracks>(m_barracks, mouseToGroundPosition);
         selectEntity<Turret>(m_turrets, mouseToGroundPosition);
         selectEntity<SupplyDepot>(m_supplyDepots, mouseToGroundPosition);
+        for (auto& headquarters : m_headquarters)
+        {
+            headquarters.setSelected(headquarters.getAABB().contains(mouseToGroundPosition));
+        }
         if (m_laboratory)
         {
             m_laboratory->setSelected(m_laboratory->getAABB().contains(mouseToGroundPosition));
         }
-        m_HQ.setSelected(m_HQ.getAABB().contains(mouseToGroundPosition));
+        //m_HQ.setSelected(m_HQ.getAABB().contains(mouseToGroundPosition));
     }
 }
 
@@ -578,14 +584,25 @@ void FactionPlayer::onRightClick(const sf::Window& window, const Camera& camera,
     }
     else
     {
-        if (m_HQ.isSelected())
+        for (auto& headquarters : m_headquarters)
         {
-            m_HQ.setWaypointPosition(mouseToGroundPosition, map);
+            if (headquarters.isSelected())
+            {
+                headquarters.setWaypointPosition(mouseToGroundPosition, map);
+            }
+            else if (headquarters.getAABB().contains(mouseToGroundPosition))
+            {
+                instructWorkerReturnMinerals(map, headquarters);
+            }
         }
-        else if (m_HQ.getAABB().contains(mouseToGroundPosition))
-        {
-            instructWorkerReturnMinerals(map);
-        }
+        //if (m_HQ.isSelected())
+        //{
+        //    m_HQ.setWaypointPosition(mouseToGroundPosition, map);
+        //}
+        //else if (m_HQ.getAABB().contains(mouseToGroundPosition))
+        //{
+        //    instructWorkerReturnMinerals(map);
+        //}
 
         for (auto& barracks : m_barracks)
         {

@@ -73,10 +73,12 @@ FactionAI::FactionAI(eFactionController factionController, const glm::vec3& hqSt
 void FactionAI::setTargetFaction(FactionHandler& factionHandler)
 {
 	m_targetFaction = eFactionController::None;
+
 	float targetFactionDistance = std::numeric_limits<float>::max();
 	for (const auto& opposingFaction : factionHandler.getOpposingFactions(getController()))
 	{
-		float distance = Globals::getSqrDistance(opposingFaction.get().getHQPosition(), m_HQ.getPosition());
+		const Headquarters& opposingHeadquarters = opposingFaction.get().getClosestHeadquarters(m_currentBase.get().position);
+		float distance = Globals::getSqrDistance(opposingHeadquarters.getPosition(), m_currentBase.get().position);
 		if (distance < targetFactionDistance)
 		{
 			m_targetFaction = opposingFaction.get().getController();
@@ -114,8 +116,8 @@ void FactionAI::handleEvent(const GameEvent& gameEvent, const Map& map, FactionH
 			break;
 			case eEntityType::Barracks:
 			break;
-			case eEntityType::HQ:
-				instructWorkersToRepair(static_cast<HQ&>(*(*entity)), map);
+			case eEntityType::Headquarters:
+				instructWorkersToRepair(static_cast<Headquarters&>(*(*entity)), map);
 			break;
 			case eEntityType::Turret:
 			break;
@@ -150,7 +152,7 @@ void FactionAI::update(float deltaTime, const Map & map, FactionHandler& faction
 			switch (entityTypeToSpawn)
 			{
 			case eEntityType::Worker:
-				if (Faction::addUnitToSpawn(entityTypeToSpawn, map, m_HQ, factionHandler))
+				if (Faction::addUnitToSpawn(entityTypeToSpawn, map, m_headquarters.front(), factionHandler))
 				{
 					m_spawnQueue.pop();
 				}
@@ -210,7 +212,7 @@ void FactionAI::update(float deltaTime, const Map & map, FactionHandler& faction
 			{
 				if (unit.getCurrentState() == eUnitState::Idle)
 				{
-					unit.moveTo(targetFaction.getHQPosition(), map, [&](const glm::ivec2& position)
+					unit.moveTo(targetFaction.getClosestHeadquarters(unit.getPosition()).getPosition(), map, [&](const glm::ivec2& position)
 					{ return getAdjacentPositions(position, map, factionHandler, unit); }, factionHandler, eUnitState::AttackMoving);
 				}
 			}
@@ -228,7 +230,7 @@ bool FactionAI::instructWorkerToBuild(eEntityType entityType, const glm::vec3& p
 	return false;
 }
 
-void FactionAI::instructWorkersToRepair(const HQ& HQ, const Map& map)
+void FactionAI::instructWorkersToRepair(const Headquarters& HQ, const Map& map)
 {
 	int repairCount = 0;
 	for (auto& worker : m_workers)
@@ -349,9 +351,9 @@ void FactionAI::onBuild(const Map& map, eEntityType entityTypeToBuild, FactionHa
 	case eEntityType::SupplyDepot:
 		if (!m_workers.empty())
 		{
-			glm::vec3 buildPosition = { 0.0f, 0.0f, 0.0f };
+			glm::vec3 buildPosition(0.0f);
 			if (isEntityAffordable(entityTypeToBuild) &&
-				PathFinding::getInstance().isBuildingSpawnAvailable(m_HQ.getPosition(),
+				PathFinding::getInstance().isBuildingSpawnAvailable(m_headquarters.front().getPosition(),
 					ModelManager::getInstance().getModel(BARRACKS_MODEL_NAME), map, buildPosition,
 					MIN_DISTANCE_FROM_HQ, MAX_DISTANCE_FROM_HQ, DISTANCE_FROM_MINERALS, *this))
 			{
@@ -367,15 +369,15 @@ void FactionAI::onBuild(const Map& map, eEntityType entityTypeToBuild, FactionHa
 	case eEntityType::Turret:
 		if (!m_workers.empty() && isEntityAffordable(entityTypeToBuild))
 		{
-			glm::vec3 buildPosition{ 0.0f, 0.0f, 0.0f };
+			glm::vec3 buildPosition(0.0f);
 			if(isEntityAffordable(entityTypeToBuild) &&
-				PathFinding::getInstance().isBuildingSpawnAvailable(m_HQ.getPosition(), 
+				PathFinding::getInstance().isBuildingSpawnAvailable(m_headquarters.front().getPosition(), 
 				ModelManager::getInstance().getModel(TURRET_MODEL_NAME), map, buildPosition, 
 				MIN_DISTANCE_FROM_HQ, MAX_DISTANCE_FROM_HQ, DISTANCE_FROM_MINERALS, *this))
 			{
 				const Faction& opposingFaction = factionHandler.getRandomOpposingFaction(getController());
-				if (Globals::getSqrDistance(opposingFaction.getHQPosition(), buildPosition) <=
-					Globals::getSqrDistance(opposingFaction.getHQPosition(), getHQPosition()))
+				if (Globals::getSqrDistance(opposingFaction.getMainHeadquartersPosition(), buildPosition) <=
+					Globals::getSqrDistance(opposingFaction.getMainHeadquartersPosition(), m_headquarters.front().getPosition()))
 				{
 					Worker* availableWorker = getAvailableWorker(buildPosition);
 					assert(availableWorker);

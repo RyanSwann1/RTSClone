@@ -131,8 +131,7 @@ bool Worker::build(const std::function<const Entity*()>& buildingCommand, const 
 	return false;
 }
 
-void Worker::update(float deltaTime, const UnitSpawnerBuilding& HQ, const Map& map, FactionHandler& factionHandler,
-	const Timer& unitStateHandlerTimer)
+void Worker::update(float deltaTime, const Map& map, FactionHandler& factionHandler, const Timer& unitStateHandlerTimer)
 {
 	Entity::update(deltaTime);
 
@@ -165,7 +164,7 @@ void Worker::update(float deltaTime, const UnitSpawnerBuilding& HQ, const Map& m
 			switchTo(eWorkerState::Harvesting);
 		}
 		break;
-	case eWorkerState::ReturningMineralsToHQ:
+	case eWorkerState::ReturningMineralsToHeadquarters:
 		assert(isHoldingResources());
 		if (m_pathToPosition.empty())
 		{
@@ -195,9 +194,10 @@ void Worker::update(float deltaTime, const UnitSpawnerBuilding& HQ, const Map& m
 		}
 		else
 		{
-			glm::vec3 destination = PathFinding::getInstance().getClosestPositionToAABB(m_position, HQ.getAABB(), map);
+			const Headquarters& headquarters = m_owningFaction.getClosestHeadquarters(m_position);
+			glm::vec3 destination = PathFinding::getInstance().getClosestPositionToAABB(m_position, headquarters.getAABB(), map);
 			moveTo(destination, map, [&](const glm::ivec2& position) { return getAdjacentPositions(position, map); },
-				eWorkerState::ReturningMineralsToHQ);
+				eWorkerState::ReturningMineralsToHeadquarters);
 		}
 		break;
 	case eWorkerState::MovingToBuildingPosition:
@@ -376,10 +376,10 @@ void Worker::switchTo(eWorkerState newState, const Mineral* mineralToHarvest)
 	case eWorkerState::Moving:
 		break;
 	case eWorkerState::MovingToMinerals:
-	case eWorkerState::ReturningMineralsToHQ:
+	case eWorkerState::ReturningMineralsToHeadquarters:
 	case eWorkerState::Harvesting:
 		if (newState != eWorkerState::MovingToMinerals && 
-			newState != eWorkerState::ReturningMineralsToHQ &&
+			newState != eWorkerState::ReturningMineralsToHeadquarters &&
 			newState != eWorkerState::Harvesting)
 		{
 			m_mineralToHarvest = nullptr;
@@ -413,7 +413,7 @@ void Worker::switchTo(eWorkerState newState, const Mineral* mineralToHarvest)
 		m_pathToPosition.clear();
 		break;
 	case eWorkerState::Moving:
-	case eWorkerState::ReturningMineralsToHQ:
+	case eWorkerState::ReturningMineralsToHeadquarters:
 	case eWorkerState::MovingToBuildingPosition:
 	case eWorkerState::MovingToRepairPosition:
 		m_taskTimer.setActive(false);

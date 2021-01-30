@@ -268,8 +268,8 @@ bool PathFinding::isBuildingSpawnAvailable(const glm::vec3& startingPosition, co
 				{
 					glm::vec3 adjacentWorldPosition = Globals::convertToWorldPosition(adjacentPosition.position);
 					if (!map.isPositionOccupied(adjacentPosition.position) &&
-						Globals::getSqrDistance(owningFaction.getHQPosition(), adjacentWorldPosition) >= minDistanceFromHQ * minDistanceFromHQ &&
-						Globals::getSqrDistance(owningFaction.getHQPosition(), adjacentWorldPosition) <= maxDistanceFromHQ * maxDistanceFromHQ)
+						Globals::getSqrDistance(owningFaction.getMainHeadquartersPosition(), adjacentWorldPosition) >= minDistanceFromHQ * minDistanceFromHQ &&
+						Globals::getSqrDistance(owningFaction.getMainHeadquartersPosition(), adjacentWorldPosition) <= maxDistanceFromHQ * maxDistanceFromHQ)
 					{
 						foundBuildPosition = true;
 						buildPositionOnGrid = adjacentPosition.position;
