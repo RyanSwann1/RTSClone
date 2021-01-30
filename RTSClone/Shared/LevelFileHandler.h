@@ -20,13 +20,15 @@ struct Base;
 #endif // GAME
 namespace LevelFileHandler
 { 
+	int loadMainBaseQuantity(std::ifstream& file);
+	int loadFactionStartingPopulation(std::ifstream& file);
+	int loadFactionStartingResources(std::ifstream& file);
 	glm::ivec2 loadMapSizeFromFile(std::ifstream& file);
+
 	void loadFromFile(std::ifstream& file, const std::function<void(const std::string&)>& data,
 		const std::function<bool(const std::string&)>& conditional);
 
 #ifdef LEVEL_EDITOR
-	int loadFactionStartingResources(std::ifstream& file);
-	int loadFactionStartingPopulationCap(std::ifstream& file);
 	bool isLevelExists(const std::string& fileName);
 	void saveLevelName(const std::string& fileName);
 	bool saveLevelToFile(const Level& level);

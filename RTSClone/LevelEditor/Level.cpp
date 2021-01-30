@@ -423,7 +423,10 @@ const std::ifstream& operator>>(std::ifstream& file, Level& level)
 
 	level.m_size = LevelFileHandler::loadMapSizeFromFile(file);
 	level.m_factionStartingResources = LevelFileHandler::loadFactionStartingResources(file);
-	level.m_factionStartingPopulationCap = LevelFileHandler::loadFactionStartingPopulationCap(file);
+	level.m_factionStartingPopulationCap = LevelFileHandler::loadFactionStartingPopulation(file);
+
+	level.m_mainBases.clear();
+
 
 	file >> level.m_gameObjectManager;
 
@@ -440,7 +443,7 @@ std::ostream& operator<<(std::ostream& file, const Level& level)
 
 	for(int i = 0; i < static_cast<int>(level.m_mainBases.size()); ++i)
 	{
-		file << Globals::TEXT_HEADER_MAIN_BASE_LOCATIONS[i] << "\n";
+		file << Globals::TEXT_HEADER_MAIN_BASES[i] << "\n";
 		file << level.m_mainBases[i].quad.getPosition().x << " " << 
 			level.m_mainBases[i].quad.getPosition().y << " " << 
 			level.m_mainBases[i].quad.getPosition().z << "\n";
