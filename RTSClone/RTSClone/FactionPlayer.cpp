@@ -11,6 +11,7 @@
 #include "GameEvents.h"
 #include "GameEventHandler.h"
 #include "FactionHandler.h"
+#include "Level.h"
 #include <assert.h>
 #include <array>
 #include <algorithm>
@@ -171,12 +172,13 @@ void FactionPlayerPlannedBuilding::render(ShaderHandler& shaderHandler, eFaction
     }
 }
 
-FactionPlayer::FactionPlayer(eFactionController factionController, const glm::vec3& hqStartingPosition, 
-    const std::vector<glm::vec3>& mineralPositions, int startingResources, int startingPopulationCap)
-    : Faction(factionController, hqStartingPosition, mineralPositions, startingResources, startingPopulationCap),
+FactionPlayer::FactionPlayer(const glm::vec3& hqStartingPosition, int startingResources, int startingPopulationCap,
+    const BaseLocation& currentBase)
+    : Faction(eFactionController::Player, hqStartingPosition, startingResources, startingPopulationCap),
     m_selectionBox(),
     m_previousMouseToGroundPosition(),
-    m_attackMoveSelected(false)
+    m_attackMoveSelected(false),
+    m_currentBase(currentBase)
 {}
 
 const std::vector<Entity*>& FactionPlayer::getSelectedEntities() const
@@ -389,11 +391,11 @@ void FactionPlayer::moveSingularSelectedEntity(const glm::vec3& mouseToGroundPos
     {
         Worker& selectedWorker = static_cast<Worker&>(selectedEntity);
 
-        auto mineralToHarvest = std::find_if(m_minerals.cbegin(), m_minerals.cend(), [&mouseToGroundPosition](const auto& mineral)
+        auto mineralToHarvest = std::find_if(m_currentBase.minerals.cbegin(), m_currentBase.minerals.cend(), [&mouseToGroundPosition](const auto& mineral)
         {
             return mineral.getAABB().contains(mouseToGroundPosition);
         });
-        if (mineralToHarvest != m_minerals.cend())
+        if (mineralToHarvest != m_currentBase.minerals.cend())
         {
             selectedWorker.moveTo(PathFinding::getInstance().getClosestPositionToAABB(selectedWorker.getPosition(),
                 mineralToHarvest->getAABB(), map),
@@ -429,12 +431,12 @@ void FactionPlayer::moveMultipleSelectedEntities(const glm::vec3& mouseToGroundP
 {
     assert(!m_selectedEntities.empty());
 
-    auto mineralToHarvest = std::find_if(m_minerals.cbegin(), m_minerals.cend(), [&mouseToGroundPosition](const auto& mineral)
+    auto mineralToHarvest = std::find_if(m_currentBase.minerals.cbegin(), m_currentBase.minerals.cend(), [&mouseToGroundPosition](const auto& mineral)
     {
         return mineral.getAABB().contains(mouseToGroundPosition);
     });
 
-    if (mineralToHarvest != m_minerals.cend())
+    if (mineralToHarvest != m_currentBase.minerals.cend())
     {
         for (auto& selectedUnit : m_selectedEntities)
         {

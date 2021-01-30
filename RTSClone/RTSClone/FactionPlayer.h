@@ -27,12 +27,13 @@ private:
 	eEntityType m_entityType;
 };
 
+struct BaseLocation;
 struct Camera;
 class FactionPlayer : public Faction
 {
 public:
-	FactionPlayer(eFactionController factionController, const glm::vec3& hqStartingPosition, 
-		const std::vector<glm::vec3>& mineralPositions, int startingResources, int startingPopulationCap);
+	FactionPlayer(const glm::vec3& hqStartingPosition, int startingResources, int startingPopulationCap,
+		const BaseLocation& currentBase);
 
 	const std::vector<Entity*>& getSelectedEntities() const;
 
@@ -50,7 +51,8 @@ private:
 	glm::vec3 m_previousMouseToGroundPosition;
 	bool m_attackMoveSelected;
 	std::vector<Entity*> m_selectedEntities;
-	
+	const BaseLocation& m_currentBase;
+
 	void onEntityRemoval(const Entity& entity) override;
 
 	void instructWorkerReturnMinerals(const Map& map);

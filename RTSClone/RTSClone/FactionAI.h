@@ -3,6 +3,7 @@
 #include "Faction.h"
 #include "Graph.h"
 #include <queue>
+#include <functional>
 
 enum class eActionType
 {
@@ -20,12 +21,13 @@ struct AIAction
 	glm::vec3 position;
 };
 
+struct BaseLocation;
 class FactionHandler;
 class FactionAI : public Faction
 {
 public:
 	FactionAI(eFactionController factionController, const glm::vec3& hqStartingPosition, 
-		const std::vector<glm::vec3>& mineralPositions, int startingResources, int startingPopulationCap);
+		int startingResources, int startingPopulationCap, const BaseLocation& currentBase);
 
 	void setTargetFaction(FactionHandler& factionHandler);
 	void handleEvent(const GameEvent& gameEvent, const Map& map, FactionHandler& factionHandler) override;
@@ -38,6 +40,7 @@ private:
 	Timer m_idleTimer;
 	Timer m_spawnTimer;
 	const Faction* m_targetFaction;
+	std::reference_wrapper<const BaseLocation> m_currentBase;
 
 	bool instructWorkerToBuild(eEntityType entityType, const glm::vec3& position, const Map& map, Worker& worker);
 	void instructWorkersToRepair(const HQ& HQ, const Map& map);

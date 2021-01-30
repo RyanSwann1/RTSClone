@@ -3,7 +3,8 @@
 #include "ModelManager.h"
 #include "PathFinding.h"
 #include "FactionHandler.h"
-#include "GameEvent.h"
+#include "GameEvents.h"
+#include "Level.h"
 #include <limits>
 
 //Levels
@@ -23,7 +24,7 @@
 
 namespace
 {
-	const float DELAY_TIMER_EXPIRATION = 2.0f;
+	const float DELAY_TIMER_EXPIRATION = 5.0f;
 	const float IDLE_TIMER_EXPIRATION = 1.0f;
 	const float MIN_SPAWN_TIMER_EXPIRATION = 7.5f;
 	const float MAX_SPAWN_TIMER_EXPIRATION = 15.0f;
@@ -49,15 +50,15 @@ AIAction::AIAction(eActionType actionType, const glm::vec3& position)
 
 //FactionAI
 FactionAI::FactionAI(eFactionController factionController, const glm::vec3& hqStartingPosition,
-	const std::vector<glm::vec3>& mineralPositions, int startingResources,
-	int startingPopulationCap)
-	: Faction(factionController, hqStartingPosition, mineralPositions, startingResources, startingPopulationCap),
+	int startingResources, int startingPopulationCap, const BaseLocation& currentBase)
+	: Faction(factionController, hqStartingPosition, startingResources, startingPopulationCap),
 	m_spawnQueue(),
 	m_actionQueue(),
 	m_delayTimer(DELAY_TIMER_EXPIRATION, true),
 	m_idleTimer(IDLE_TIMER_EXPIRATION, true),
 	m_spawnTimer(Globals::getRandomNumber(MIN_SPAWN_TIMER_EXPIRATION, MAX_SPAWN_TIMER_EXPIRATION), true),
-	m_targetFaction(nullptr)
+	m_targetFaction(nullptr),
+	m_currentBase(currentBase)
 {
 	for (int i = 0; i < STARTING_WORKER_COUNT; ++i)
 	{
@@ -240,8 +241,8 @@ void FactionAI::instructWorkersToRepair(const HQ& HQ, const Map& map)
 
 const Mineral& FactionAI::getRandomMineral() const
 {
-	assert(!m_minerals.empty());
-	return m_minerals[Globals::getRandomNumber(0, static_cast<int>(m_minerals.size()) - 1)];
+	return m_currentBase.get().minerals[
+		Globals::getRandomNumber(0, static_cast<int>(m_currentBase.get().minerals.size()) - 1)];
 }
 
 Worker* FactionAI::getAvailableWorker(const glm::vec3& position)
