@@ -49,11 +49,11 @@ private:
 	void addUnitToSpawn(const std::function<const Entity* (const UnitSpawnerBuilding&)>& unitToSpawn);
 };
 
-class HQ : public UnitSpawnerBuilding
+class Headquarters : public UnitSpawnerBuilding
 {
 	friend class Faction;
 public:
-	HQ(const glm::vec3& startingPosition, const Faction& owningFaction);
+	Headquarters(const glm::vec3& startingPosition, const Faction& owningFaction);
 	void update(float deltaTime);
 	
 private:

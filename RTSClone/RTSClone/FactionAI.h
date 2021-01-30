@@ -44,7 +44,7 @@ private:
 	std::reference_wrapper<const Base> m_currentBase;
 
 	bool instructWorkerToBuild(eEntityType entityType, const glm::vec3& position, const Map& map, Worker& worker);
-	void instructWorkersToRepair(const HQ& HQ, const Map& map);
+	void instructWorkersToRepair(const Headquarters& HQ, const Map& map);
 	const Mineral& getRandomMineral() const;
 	Worker* getAvailableWorker(const glm::vec3& position);
 	

@@ -61,7 +61,7 @@ protected:
 	std::forward_list<Barracks> m_barracks;
 	std::forward_list<Turret> m_turrets;
 	std::unique_ptr<Laboratory> m_laboratory;
-	HQ m_HQ;
+	Headquarters m_HQ;
 
 	bool isExceedPopulationLimit(eEntityType entityType) const;
 	bool isEntityAffordable(eEntityType entityType) const;

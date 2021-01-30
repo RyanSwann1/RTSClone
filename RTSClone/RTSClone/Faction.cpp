@@ -609,7 +609,7 @@ bool Faction::addUnitToSpawn(eEntityType unitType, const Map& map, UnitSpawnerBu
             break;
         case eEntityType::Worker:
             assert(building.getEntityType() == eEntityType::HQ);
-            static_cast<HQ&>(building).addUnitToSpawn([this, &map, unitType](const UnitSpawnerBuilding& building)
+            static_cast<Headquarters&>(building).addUnitToSpawn([this, &map, unitType](const UnitSpawnerBuilding& building)
                 { return this->spawnWorker(map, building); });
             break;
         default:

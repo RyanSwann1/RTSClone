@@ -68,18 +68,18 @@ void Barracks::addUnitToSpawn(const std::function<const Entity* (const UnitSpawn
 }
 
 //HQ
-HQ::HQ(const glm::vec3& startingPosition, const Faction& owningFaction)
+Headquarters::Headquarters(const glm::vec3& startingPosition, const Faction& owningFaction)
 	: UnitSpawnerBuilding(startingPosition, eEntityType::HQ, TIME_BETWEEN_WORKER_SPAWN, 
 		Globals::HQ_STARTING_HEALTH, owningFaction,
 		ModelManager::getInstance().getModel(HQ_MODEL_NAME))
 {}
 
-void HQ::update(float deltaTime)
+void Headquarters::update(float deltaTime)
 {
 	UnitSpawnerBuilding::update(deltaTime, Globals::WORKER_RESOURCE_COST, Globals::WORKER_POPULATION_COST);
 }
 
-void HQ::addUnitToSpawn(const std::function<const Entity* (const UnitSpawnerBuilding&)>& unitToSpawn)
+void Headquarters::addUnitToSpawn(const std::function<const Entity* (const UnitSpawnerBuilding&)>& unitToSpawn)
 {
 	if (isUnitSpawnable(static_cast<int>(m_unitsToSpawn.size()), Globals::WORKER_RESOURCE_COST, Globals::WORKER_POPULATION_COST, m_owningFaction))
 	{
