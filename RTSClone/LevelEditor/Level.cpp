@@ -37,8 +37,7 @@ namespace
 	const glm::vec3 PLAYABLE_AREA_GROUND_COLOR = { 1.0f, 1.0f, 0.5f };
 	const float PLAYABLE_AREA_OPACITY = 0.1f;
 
-	const glm::vec3 MAIN_BASE_QUAD_COLOR = { 1.0f, 0.0f, 0.0f };
-	const glm::vec3 MAIN_BASE_QUAD_SIZE = { Globals::NODE_SIZE, 0.0f, Globals::NODE_SIZE };
+
 	const int MIN_FACTIONS = 2;
 	const int DEFAULT_FACTIONS_COUNT = 2;
 
@@ -80,22 +79,6 @@ PlannedEntity::PlannedEntity()
 	position(),
 	model(nullptr)
 {}
-
-//BaseLocation
-Base::Base(const glm::vec3& position)
-	: quad(position, MAIN_BASE_QUAD_SIZE, MAIN_BASE_QUAD_COLOR),
-	minerals(Globals::MAX_MINERALS)
-{}
-
-void Base::setPosition(const glm::vec3 & position)
-{
-	quad.setPosition(position);
-
-	for (auto& mineral : minerals)
-	{
-		mineral.setPosition(position);
-	}
-}
 
 //Level
 Level::Level(const std::string& levelName)

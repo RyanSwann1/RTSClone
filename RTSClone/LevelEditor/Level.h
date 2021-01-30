@@ -5,6 +5,7 @@
 #include "GameObjectManager.h"
 #include "Quad.h"
 #include "Globals.h"
+#include "Base.h"
 #include <string>
 #include <vector>
 #include <SFML/Graphics.hpp>
@@ -16,16 +17,6 @@ struct PlannedEntity
 	int modelNameIDSelected;
 	glm::vec3 position;
 	const Model* model;
-};
-
-struct Base
-{
-	Base(const glm::vec3& position);
-
-	void setPosition(const glm::vec3& position);
-
-	Quad quad;
-	std::vector<Mineral> minerals;
 };
 
 struct Camera;

@@ -51,12 +51,6 @@ namespace
 	}
 }
 
-//Base
-Base::Base(const glm::vec3& position, std::vector<Mineral>&& minerals)
-	: position(position),
-	minerals(std::move(minerals))
-{}
-
 //Level
 Level::Level(std::vector<SceneryGameObject>&& scenery, FactionsContainer&& factions, 
 	std::vector<Base>&& mainBaseLocations)

@@ -147,6 +147,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\Shared\AABB.cpp" />
+    <ClCompile Include="..\Shared\Base.cpp" />
     <ClCompile Include="..\Shared\Camera.cpp" />
     <ClCompile Include="..\Shared\FactionController.cpp" />
     <ClCompile Include="..\Shared\glad.c" />
@@ -195,6 +196,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Shared\AABB.h" />
+    <ClInclude Include="..\Shared\Base.h" />
     <ClInclude Include="..\Shared\Camera.h" />
     <ClInclude Include="..\Shared\FactionController.h" />
     <ClInclude Include="..\Shared\glad.h" />

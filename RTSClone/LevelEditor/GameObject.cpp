@@ -87,7 +87,3 @@ void GameObject::renderAABB(ShaderHandler& shaderHandler)
 	m_AABB.render(shaderHandler);
 }
 #endif // RENDER_AABB
-
-Mineral::Mineral()
-	: GameObject(ModelManager::getInstance().getModel(MINERALS_MODEL_NAME))
-{}

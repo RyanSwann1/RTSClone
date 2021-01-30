@@ -35,9 +35,3 @@ private:
 	AABB m_AABB;
 	std::reference_wrapper<const Model> m_model;
 };
-
-class Mineral : public GameObject
-{
-public:
-	Mineral();
-};

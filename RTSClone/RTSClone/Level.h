@@ -8,18 +8,11 @@
 #include "SceneryGameObject.h"
 #include "FactionHandler.h"
 #include "Timer.h"
+#include "Base.h"
 #include <string>
 #include <vector>
 #include <memory>
 #include <SFML/Graphics.hpp>
-
-struct Base
-{
-	Base(const glm::vec3& position, std::vector<Mineral>&& minerals);
-
-	glm::vec3 position;
-	std::vector<Mineral> minerals;
-};
 
 using FactionsContainer = std::array<std::unique_ptr<Faction>, static_cast<size_t>(eFactionController::Max) + 1>;
 

@@ -87,6 +87,12 @@
     <ClCompile Include="..\Shared\Quad.cpp">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="..\Shared\Mineral.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Shared\Base.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Shared\imgui\imstb_truetype.h">
@@ -171,6 +177,12 @@
       <Filter>src</Filter>
     </ClInclude>
     <ClInclude Include="..\Shared\Quad.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Shared\Mineral.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Shared\Base.h">
       <Filter>src</Filter>
     </ClInclude>
   </ItemGroup>
