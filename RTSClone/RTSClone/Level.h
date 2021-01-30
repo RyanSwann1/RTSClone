@@ -13,6 +13,14 @@
 #include <memory>
 #include <SFML/Graphics.hpp>
 
+struct BaseLocation
+{
+	BaseLocation(const glm::vec3& position, std::vector<Mineral>&& minerals);
+
+	const glm::vec3 position;
+	std::vector<Mineral> minerals;
+};
+
 using FactionsContainer = std::array<std::unique_ptr<Faction>, static_cast<size_t>(eFactionController::Max) + 1>;
 
 struct Camera;
@@ -44,9 +52,11 @@ public:
 #endif // RENDER_PATHING
 
 private:
-	Level(std::vector<SceneryGameObject>&& scenery, FactionsContainer&& factions);
+	Level(std::vector<SceneryGameObject>&& scenery, FactionsContainer&& factions, 
+		std::vector<BaseLocation>&& mainBaseLocations);
 
-	std::vector<SceneryGameObject> m_scenery;
+	const std::vector<BaseLocation> m_mainBaseLocations;
+	const std::vector<SceneryGameObject> m_scenery;
 	FactionsContainer m_factions;
 	Timer m_unitStateHandlerTimer;
 	FactionHandler m_factionHandler;
