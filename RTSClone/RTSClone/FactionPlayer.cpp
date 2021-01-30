@@ -166,6 +166,10 @@ void FactionPlayerPlannedBuilding::render(ShaderHandler& shaderHandler, eFaction
             ModelManager::getInstance().getModel(LABORATORY_MODEL_NAME).render(shaderHandler, owningFactionController,
                 m_position, glm::vec3(0.0f), false);
             break;
+        case eEntityType::Headquarters:
+            ModelManager::getInstance().getModel(HQ_MODEL_NAME).render(shaderHandler, owningFactionController,
+                m_position, glm::vec3(0.0f), false);
+            break;
         default:
             assert(false);
         }

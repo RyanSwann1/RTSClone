@@ -599,6 +599,10 @@ const Entity* Faction::spawnBuilding(const Map& map, glm::vec3 position, eEntity
             m_turrets.emplace_front(position, *this);
             addedBuilding = &m_turrets.front();
             break;
+        case eEntityType::Headquarters:
+            m_headquarters.emplace_back(position, *this);
+            addedBuilding = &m_headquarters.back();
+            break;
         case eEntityType::Laboratory:
             if (!m_laboratory)
             {

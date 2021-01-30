@@ -19,7 +19,7 @@ namespace
 	{
 		"Unit",
 		"Worker",
-		"HQ",
+		"Headquarters",
 		"SupplyDepot",
 		"Barracks",
 		"Turret",
@@ -143,6 +143,11 @@ void SelectedEntityWidget::render(const sf::Window& window)
 		case eEntityType::Worker:
 			if (m_receivedMessage.owningFaction == eFactionController::Player)
 			{
+				if (ImGui::Button("Headquarters"))
+				{
+					GameEventHandler::getInstance().gameEvents.push(GameEvent::createPlayerActivatePlannedBuilding(
+						eEntityType::Headquarters, m_receivedMessage.entityID));
+				}
 				if (ImGui::Button("Barracks"))
 				{
 					GameEventHandler::getInstance().gameEvents.push(GameEvent::createPlayerActivatePlannedBuilding(
