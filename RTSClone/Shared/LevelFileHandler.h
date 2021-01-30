@@ -16,7 +16,7 @@ class SceneryGameObject;
 class Level;
 #endif // LEVEL_EDITOR
 #ifdef GAME
-struct BaseLocation;
+struct Base;
 #endif // GAME
 namespace LevelFileHandler
 { 
@@ -36,7 +36,7 @@ namespace LevelFileHandler
 
 #ifdef GAME
 	bool loadLevelFromFile(const std::string& fileName, std::vector<SceneryGameObject>& scenery,
-		std::vector<BaseLocation>& mainBaseLocations, int& factionStartingResources,
+		std::vector<Base>& mainBases, int& factionStartingResources,
 		int& factionStartingPopulation);
 
 	std::array<std::string, Globals::MAX_LEVELS> loadLevelNames();

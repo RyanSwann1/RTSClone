@@ -25,8 +25,8 @@ namespace
 #ifdef GAME
 void loadInScenery(std::ifstream& file, std::vector<SceneryGameObject>& scenery);
 void loadInMainBaseQuantity(std::ifstream& file, int& mainBaseQuantity);
-void loadInMainBaseLocations(std::ifstream& file, std::vector<BaseLocation>& mainBaseLocations, int mainBaseQuantity);
-void loadInMainBaseLocation(std::ifstream& file, const std::string& textHeader, glm::vec3& position);
+void loadInAllMainBases(std::ifstream& file, std::vector<Base>& mainBases, int mainBaseQuantity);
+void loadInMainBase(std::ifstream& file, const std::string& textHeader, glm::vec3& position);
 void loadInMainBaseMinerals(std::ifstream& file, const std::string& textHeader, std::vector<Mineral>& minerals);
 void loadInFactionStartingResources(std::ifstream& file, int& factionStartingResources);
 void loadInFactionStartingPopulation(std::ifstream& file, int& factionStartingPopulation);
@@ -211,7 +211,7 @@ glm::ivec2 LevelFileHandler::loadMapSizeFromFile(std::ifstream& file)
 
 #ifdef GAME
 bool LevelFileHandler::loadLevelFromFile(const std::string& fileName, std::vector<SceneryGameObject>& scenery,
-	std::vector<BaseLocation>& mainBaseLocations, int& factionStartingResources,
+	std::vector<Base>& mainBases, int& factionStartingResources,
 	int& factionStartingPopulation)
 {
 	std::ifstream file(Globals::SHARED_FILE_DIRECTORY + LEVELS_FILE_DIRECTORY + fileName);
@@ -227,7 +227,7 @@ bool LevelFileHandler::loadLevelFromFile(const std::string& fileName, std::vecto
 
 	int mainBaseQuantity = 0;
 	loadInMainBaseQuantity(file, mainBaseQuantity);
-	loadInMainBaseLocations(file, mainBaseLocations, mainBaseQuantity);
+	loadInAllMainBases(file, mainBases, mainBaseQuantity);
 
 	return true;
 }
@@ -297,23 +297,23 @@ void loadInMainBaseQuantity(std::ifstream& file, int& mainBaseQuantity)
 	LevelFileHandler::loadFromFile(file, data, conditional);
 }
 
-void loadInMainBaseLocations(std::ifstream& file, std::vector<BaseLocation>& mainBaseLocations, int mainBaseQuantity)
+void loadInAllMainBases(std::ifstream& file, std::vector<Base>& mainBases, int mainBaseQuantity)
 {
 	assert(file.is_open());
 
 	for (int i = 0; i < mainBaseQuantity; ++i)
 	{
 		glm::vec3 mainBasePosition(0.0f);
-		loadInMainBaseLocation(file, Globals::TEXT_HEADER_MAIN_BASE_LOCATIONS[i], mainBasePosition);
+		loadInMainBase(file, Globals::TEXT_HEADER_MAIN_BASES[i], mainBasePosition);
 		
 		std::vector<Mineral> minerals;
 		loadInMainBaseMinerals(file, Globals::TEXT_HEADER_MAIN_BASE_MINERALS[i], minerals);
 
-		mainBaseLocations.emplace_back(mainBasePosition, std::move(minerals));
+		mainBases.emplace_back(mainBasePosition, std::move(minerals));
 	}
 }
 
-void loadInMainBaseLocation(std::ifstream& file, const std::string& textHeader, glm::vec3& position)
+void loadInMainBase(std::ifstream& file, const std::string& textHeader, glm::vec3& position)
 {
 	assert(file.is_open());
 

@@ -21,13 +21,13 @@ struct AIAction
 	glm::vec3 position;
 };
 
-struct BaseLocation;
+struct Base;
 class FactionHandler;
 class FactionAI : public Faction
 {
 public:
 	FactionAI(eFactionController factionController, const glm::vec3& hqStartingPosition, 
-		int startingResources, int startingPopulationCap, const BaseLocation& currentBase);
+		int startingResources, int startingPopulationCap, const Base& currentBase);
 
 	void setTargetFaction(FactionHandler& factionHandler);
 	void handleEvent(const GameEvent& gameEvent, const Map& map, FactionHandler& factionHandler) override;
@@ -40,7 +40,7 @@ private:
 	Timer m_idleTimer;
 	Timer m_spawnTimer;
 	const Faction* m_targetFaction;
-	std::reference_wrapper<const BaseLocation> m_currentBase;
+	std::reference_wrapper<const Base> m_currentBase;
 
 	bool instructWorkerToBuild(eEntityType entityType, const glm::vec3& position, const Map& map, Worker& worker);
 	void instructWorkersToRepair(const HQ& HQ, const Map& map);

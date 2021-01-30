@@ -27,13 +27,13 @@ private:
 	eEntityType m_entityType;
 };
 
-struct BaseLocation;
+struct Base;
 struct Camera;
 class FactionPlayer : public Faction
 {
 public:
 	FactionPlayer(const glm::vec3& hqStartingPosition, int startingResources, int startingPopulationCap,
-		const BaseLocation& currentBase);
+		const Base& currentBase);
 
 	const std::vector<Entity*>& getSelectedEntities() const;
 
@@ -51,7 +51,7 @@ private:
 	glm::vec3 m_previousMouseToGroundPosition;
 	bool m_attackMoveSelected;
 	std::vector<Entity*> m_selectedEntities;
-	const BaseLocation& m_currentBase;
+	const Base& m_currentBase;
 
 	void onEntityRemoval(const Entity& entity) override;
 

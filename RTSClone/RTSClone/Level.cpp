@@ -52,15 +52,15 @@ namespace
 }
 
 //BaseLocation
-BaseLocation::BaseLocation(const glm::vec3& position, std::vector<Mineral>&& minerals)
+Base::Base(const glm::vec3& position, std::vector<Mineral>&& minerals)
 	: position(position),
 	minerals(std::move(minerals))
 {}
 
 //Mineral
 Level::Level(std::vector<SceneryGameObject>&& scenery, FactionsContainer&& factions, 
-	std::vector<BaseLocation>&& mainBaseLocations)
-	: m_mainBaseLocations(std::move(mainBaseLocations)),
+	std::vector<Base>&& mainBaseLocations)
+	: m_mainBases(std::move(mainBaseLocations)),
 	m_scenery(std::move(scenery)),
 	m_factions(std::move(factions)),
 	m_unitStateHandlerTimer(TIME_BETWEEN_UNIT_STATE, true),
@@ -83,38 +83,38 @@ void Level::setAITargetFaction()
 
 std::unique_ptr<Level> Level::create(const std::string& levelName)
 {
-	std::vector<BaseLocation> mainBaseLocations;
+	std::vector<Base> mainBases;
 	std::vector<SceneryGameObject> scenery;
 	int factionStartingResources = 0;
 	int factionStartingPopulation = 0;
-	if (!LevelFileHandler::loadLevelFromFile(levelName, scenery, mainBaseLocations, 
+	if (!LevelFileHandler::loadLevelFromFile(levelName, scenery, mainBases, 
 		factionStartingResources, factionStartingPopulation))
 	{
 		return std::unique_ptr<Level>();
 	}
 
 	std::array<std::unique_ptr<Faction>, static_cast<size_t>(eFactionController::Max) + 1> factions;
-	assert(mainBaseLocations.size() <= static_cast<size_t>(eFactionController::Max) + 1);
-	for (int i = 0; i < static_cast<int>(mainBaseLocations.size()); ++i)
+	assert(mainBases.size() <= static_cast<size_t>(eFactionController::Max) + 1);
+	for (int i = 0; i < static_cast<int>(mainBases.size()); ++i)
 	{
 		switch (eFactionController(i))
 		{
 		case eFactionController::Player:
-			factions[i] = std::make_unique<FactionPlayer>(mainBaseLocations[i].position, 
-				factionStartingResources, factionStartingPopulation, mainBaseLocations[i]);
+			factions[i] = std::make_unique<FactionPlayer>(mainBases[i].position, 
+				factionStartingResources, factionStartingPopulation, mainBases[i]);
 			break;
 		case eFactionController::AI_1:
 		case eFactionController::AI_2:
 		case eFactionController::AI_3:
-			factions[i] = std::make_unique<FactionAI>(eFactionController(i), mainBaseLocations[i].position,
-				factionStartingResources, factionStartingPopulation, mainBaseLocations[i]);
+			factions[i] = std::make_unique<FactionAI>(eFactionController(i), mainBases[i].position,
+				factionStartingResources, factionStartingPopulation, mainBases[i]);
 			break;
 		default:
 			assert(false);
 		}
 	}
 
-	return std::unique_ptr<Level>(new Level(std::move(scenery), std::move(factions), std::move(mainBaseLocations)));
+	return std::unique_ptr<Level>(new Level(std::move(scenery), std::move(factions), std::move(mainBases)));
 }
 
 Level::~Level()
@@ -257,7 +257,7 @@ void Level::render(ShaderHandler& shaderHandler) const
 		}
 	}
 
-	for (const auto& base : m_mainBaseLocations)
+	for (const auto& base : m_mainBases)
 	{
 		for (const auto& mineral : base.minerals)
 		{

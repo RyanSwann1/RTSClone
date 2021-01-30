@@ -173,7 +173,7 @@ void FactionPlayerPlannedBuilding::render(ShaderHandler& shaderHandler, eFaction
 }
 
 FactionPlayer::FactionPlayer(const glm::vec3& hqStartingPosition, int startingResources, int startingPopulationCap,
-    const BaseLocation& currentBase)
+    const Base& currentBase)
     : Faction(eFactionController::Player, hqStartingPosition, startingResources, startingPopulationCap),
     m_selectionBox(),
     m_previousMouseToGroundPosition(),

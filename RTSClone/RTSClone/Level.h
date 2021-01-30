@@ -13,9 +13,9 @@
 #include <memory>
 #include <SFML/Graphics.hpp>
 
-struct BaseLocation
+struct Base
 {
-	BaseLocation(const glm::vec3& position, std::vector<Mineral>&& minerals);
+	Base(const glm::vec3& position, std::vector<Mineral>&& minerals);
 
 	const glm::vec3 position;
 	std::vector<Mineral> minerals;
@@ -53,9 +53,9 @@ public:
 
 private:
 	Level(std::vector<SceneryGameObject>&& scenery, FactionsContainer&& factions, 
-		std::vector<BaseLocation>&& mainBaseLocations);
+		std::vector<Base>&& mainBaseLocations);
 
-	const std::vector<BaseLocation> m_mainBaseLocations;
+	const std::vector<Base> m_mainBases;
 	const std::vector<SceneryGameObject> m_scenery;
 	FactionsContainer m_factions;
 	Timer m_unitStateHandlerTimer;

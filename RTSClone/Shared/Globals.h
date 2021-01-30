@@ -24,7 +24,7 @@ namespace Globals
 	inline const std::string TEXT_HEADER_FACTION_STARTING_POPULATION = TEXT_HEADER_BEGINNING + "Faction Starting Population";
 	inline const std::string TEXT_HEADER_FACTION_COUNT = TEXT_HEADER_BEGINNING + "Faction Count";
 	inline const std::string TEXT_HEADER_MAIN_BASE_QUANTITY = TEXT_HEADER_BEGINNING + "Main Base Quantity";
-	const std::array<std::string, static_cast<size_t>(eFactionController::Max) + 1> TEXT_HEADER_MAIN_BASE_LOCATIONS
+	const std::array<std::string, static_cast<size_t>(eFactionController::Max) + 1> TEXT_HEADER_MAIN_BASES
 	{
 		TEXT_HEADER_BEGINNING + "Main Base Location_1",
 		TEXT_HEADER_BEGINNING + "Main Base Location_2",
