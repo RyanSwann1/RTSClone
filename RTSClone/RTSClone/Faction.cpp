@@ -12,15 +12,17 @@ Faction::Faction(eFactionController factionController, const glm::vec3& hqStarti
     m_workers(),
     m_supplyDepots(),
     m_barracks(),
+    m_turrets(),
+    m_headquarters(),
     m_laboratory(),
-    m_HQ(Globals::convertToNodePosition(hqStartingPosition), *this),
     m_controller(factionController),
     m_currentResourceAmount(startingResources),
     m_currentPopulationAmount(0),
     m_currentPopulationLimit(startingPopulationCap),
     m_currentShieldAmount(0)
 {
-    m_allEntities.push_back(&m_HQ);
+    m_headquarters.emplace_front(Globals::convertToNodePosition(hqStartingPosition), *this);
+    m_allEntities.push_back(&m_headquarters.front());
 }
 
 int Faction::getCurrentShieldAmount() const
@@ -43,9 +45,28 @@ int Faction::getCurrentResourceAmount() const
     return m_currentResourceAmount;
 }
 
-const glm::vec3& Faction::getHQPosition() const
+const Headquarters& Faction::getClosestHeadquarters(const glm::vec3& position) const
 {
-    return m_HQ.getPosition();
+    const Headquarters* closestHeadquarters = nullptr;
+    float distance = std::numeric_limits<float>::max();
+    for (const auto& headquarters : m_headquarters)
+    {
+        float result = Globals::getSqrDistance(headquarters.getPosition(), position);
+        if (result < distance)
+        {
+            distance = result;
+            closestHeadquarters = &headquarters;
+        }
+    }
+
+    assert(closestHeadquarters);
+    return *closestHeadquarters;
+}
+
+const glm::vec3& Faction::getMainHeadquartersPosition() const
+{
+    assert(!m_headquarters.empty());
+    return m_headquarters.begin()->getPosition();
 }
 
 eFactionController Faction::getController() const
@@ -390,7 +411,7 @@ void Faction::update(float deltaTime, const Map& map, FactionHandler& factionHan
 
     for (auto& worker : m_workers)
     {
-        worker.update(deltaTime, m_HQ, map, factionHandler, unitStateHandlerTimer);
+        worker.update(deltaTime, map, factionHandler, unitStateHandlerTimer);
     }
 
     for (auto& barracks : m_barracks)
@@ -408,12 +429,15 @@ void Faction::update(float deltaTime, const Map& map, FactionHandler& factionHan
         supplyDepot.update(deltaTime);
     }
 
+    for (auto& headquarters : m_headquarters)
+    {
+        headquarters.update(deltaTime);
+    }
+
     if (m_laboratory)
     {
         m_laboratory->update(deltaTime);
     }
-
-    m_HQ.update(deltaTime);
 
     if (unitStateHandlerTimer.isExpired())
     {
@@ -424,8 +448,6 @@ void Faction::update(float deltaTime, const Map& map, FactionHandler& factionHan
 
 void Faction::render(ShaderHandler& shaderHandler) const
 {
-    m_HQ.render(shaderHandler, m_controller);
-
     for (const auto& unit : m_units)
     {
         unit.render(shaderHandler, m_controller);
@@ -449,6 +471,11 @@ void Faction::render(ShaderHandler& shaderHandler) const
     for (const auto& turret : m_turrets)
     {
         turret.render(shaderHandler, m_controller);
+    }
+
+    for (const auto& headquarters : m_headquarters)
+    {
+        headquarters.render(shaderHandler, m_controller);
     }
     
     if (m_laboratory)

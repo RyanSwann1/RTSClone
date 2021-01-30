@@ -10,6 +10,7 @@
 #include "Laboratory.h"
 #include <forward_list>
 #include <vector>
+#include <list>
 
 struct Camera;
 struct GameEvent;
@@ -26,7 +27,8 @@ public:
 	int getCurrentPopulationAmount() const;
 	int getMaximumPopulationAmount() const;
 	int getCurrentResourceAmount() const;
-	const glm::vec3& getHQPosition() const;
+	const Headquarters& getClosestHeadquarters(const glm::vec3& position) const;
+	const glm::vec3& getMainHeadquartersPosition() const;
 	eFactionController getController() const;
 	const std::forward_list<Unit>& getUnits() const;
 	const std::forward_list<Worker>& getWorkers() const;
@@ -60,8 +62,8 @@ protected:
 	std::forward_list<SupplyDepot> m_supplyDepots;
 	std::forward_list<Barracks> m_barracks;
 	std::forward_list<Turret> m_turrets;
+	std::list<Headquarters> m_headquarters;
 	std::unique_ptr<Laboratory> m_laboratory;
-	Headquarters m_HQ;
 
 	bool isExceedPopulationLimit(eEntityType entityType) const;
 	bool isEntityAffordable(eEntityType entityType) const;
