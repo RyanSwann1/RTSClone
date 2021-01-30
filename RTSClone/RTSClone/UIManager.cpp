@@ -256,6 +256,7 @@ void UIManager::handleInput(const sf::Window& window, const FactionHandler& fact
 		}
 
 		if (!selectedEntity && 
+			factionHandler.isFactionActive(eFactionController::Player) &&
 			static_cast<const FactionPlayer&>(factionHandler.getFaction(eFactionController::Player)).getSelectedEntities().size() != 1)
 		{
 			m_selectedEntity.reset();

@@ -162,7 +162,8 @@ int main()
 						const Faction* playerFaction = level->getPlayer();
 						if (playerFaction)
 						{
-							camera.position = glm::vec3(playerFaction->getHQPosition().x, camera.position.y, playerFaction->getHQPosition().z);
+							const glm::vec3& headquartersPosition = playerFaction->getMainHeadquartersPosition();
+							camera.position = glm::vec3(headquartersPosition.x, camera.position.y, headquartersPosition.z);
 						}
 					}
 					break;
