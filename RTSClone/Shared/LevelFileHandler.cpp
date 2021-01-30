@@ -23,13 +23,13 @@ namespace
 }
 
 #ifdef GAME
-void loadInScenery(std::ifstream& file, std::vector<SceneryGameObject>& scenery);
-void loadInMainBaseQuantity(std::ifstream& file, int& mainBaseQuantity);
-void loadInAllMainBases(std::ifstream& file, std::vector<Base>& mainBases, int mainBaseQuantity);
-void loadInMainBase(std::ifstream& file, const std::string& textHeader, glm::vec3& position);
-void loadInMainBaseMinerals(std::ifstream& file, const std::string& textHeader, std::vector<Mineral>& minerals);
-void loadInFactionStartingResources(std::ifstream& file, int& factionStartingResources);
-void loadInFactionStartingPopulation(std::ifstream& file, int& factionStartingPopulation);
+void loadScenery(std::ifstream& file, std::vector<SceneryGameObject>& scenery);
+int loadMainBaseQuantity(std::ifstream& file);
+void loadAllMainBases(std::ifstream& file, std::vector<Base>& mainBases);
+void loadMainBase(std::ifstream& file, const std::string& textHeader, glm::vec3& position);
+void loadMainBaseMinerals(std::ifstream& file, const std::string& textHeader, std::vector<Mineral>& minerals);
+void loadFactionStartingResources(std::ifstream& file, int& factionStartingResources);
+void loadFactionStartingPopulation(std::ifstream& file, int& factionStartingPopulation);
 #endif // GAME
 
 void LevelFileHandler::loadFromFile(std::ifstream& file, const std::function<void(const std::string&)>& data, 
@@ -150,7 +150,6 @@ void LevelFileHandler::removeLevel(const std::string& fileName)
 
 	std::remove(std::string(Globals::SHARED_FILE_DIRECTORY + LEVELS_FILE_DIRECTORY + fileName).c_str());
 }
-#endif // LEVEL_EDITOR
 
 int LevelFileHandler::loadFactionStartingResources(std::ifstream& file)
 {
@@ -189,6 +188,7 @@ int LevelFileHandler::loadFactionStartingPopulationCap(std::ifstream& file)
 
 	return factionStartingPopulation;
 }
+#endif // LEVEL_EDITOR
 
 glm::ivec2 LevelFileHandler::loadMapSizeFromFile(std::ifstream& file)
 {
@@ -221,13 +221,10 @@ bool LevelFileHandler::loadLevelFromFile(const std::string& fileName, std::vecto
 	}
 
 	broadcastToMessenger<GameMessages::NewMapSize>({ loadMapSizeFromFile(file) });
-	loadInScenery(file, scenery);
-	loadInFactionStartingResources(file, factionStartingResources);
-	loadInFactionStartingPopulation(file, factionStartingPopulation);
-
-	int mainBaseQuantity = 0;
-	loadInMainBaseQuantity(file, mainBaseQuantity);
-	loadInAllMainBases(file, mainBases, mainBaseQuantity);
+	loadScenery(file, scenery);
+	loadFactionStartingResources(file, factionStartingResources);
+	loadFactionStartingPopulation(file, factionStartingPopulation);
+	loadAllMainBases(file, mainBases);
 
 	return true;
 }
@@ -256,7 +253,7 @@ std::array<std::string, Globals::MAX_LEVELS> LevelFileHandler::loadLevelNames()
 	return levelNames;
 }
 
-void loadInScenery(std::ifstream& file, std::vector<SceneryGameObject>& scenery)
+void loadScenery(std::ifstream& file, std::vector<SceneryGameObject>& scenery)
 {
 	assert(file.is_open() && scenery.empty());
 
@@ -279,10 +276,11 @@ void loadInScenery(std::ifstream& file, std::vector<SceneryGameObject>& scenery)
 	LevelFileHandler::loadFromFile(file, data, conditional);
 }
 
-void loadInMainBaseQuantity(std::ifstream& file, int& mainBaseQuantity)
+int loadMainBaseQuantity(std::ifstream& file)
 {
 	assert(file.is_open());
 
+	int mainBaseQuantity = 0;
 	auto data = [&mainBaseQuantity](const std::string& line)
 	{
 		std::stringstream stream{ line };
@@ -295,25 +293,26 @@ void loadInMainBaseQuantity(std::ifstream& file, int& mainBaseQuantity)
 	};
 
 	LevelFileHandler::loadFromFile(file, data, conditional);
+	return mainBaseQuantity;
 }
 
-void loadInAllMainBases(std::ifstream& file, std::vector<Base>& mainBases, int mainBaseQuantity)
+void loadAllMainBases(std::ifstream& file, std::vector<Base>& mainBases)
 {
 	assert(file.is_open());
 
-	for (int i = 0; i < mainBaseQuantity; ++i)
+	for (int i = 0; i < loadMainBaseQuantity(file); ++i)
 	{
 		glm::vec3 mainBasePosition(0.0f);
-		loadInMainBase(file, Globals::TEXT_HEADER_MAIN_BASES[i], mainBasePosition);
+		loadMainBase(file, Globals::TEXT_HEADER_MAIN_BASES[i], mainBasePosition);
 		
 		std::vector<Mineral> minerals;
-		loadInMainBaseMinerals(file, Globals::TEXT_HEADER_MAIN_BASE_MINERALS[i], minerals);
+		loadMainBaseMinerals(file, Globals::TEXT_HEADER_MAIN_BASE_MINERALS[i], minerals);
 
 		mainBases.emplace_back(mainBasePosition, std::move(minerals));
 	}
 }
 
-void loadInMainBase(std::ifstream& file, const std::string& textHeader, glm::vec3& position)
+void loadMainBase(std::ifstream& file, const std::string& textHeader, glm::vec3& position)
 {
 	assert(file.is_open());
 
@@ -331,7 +330,7 @@ void loadInMainBase(std::ifstream& file, const std::string& textHeader, glm::vec
 	LevelFileHandler::loadFromFile(file, data, conditional);
 }
 
-void loadInMainBaseMinerals(std::ifstream& file, const std::string& textHeader, std::vector<Mineral>& minerals)
+void loadMainBaseMinerals(std::ifstream& file, const std::string& textHeader, std::vector<Mineral>& minerals)
 {
 	assert(file.is_open());
 
@@ -351,7 +350,7 @@ void loadInMainBaseMinerals(std::ifstream& file, const std::string& textHeader, 
 	LevelFileHandler::loadFromFile(file, data, conditional);
 }
 
-void loadInFactionStartingResources(std::ifstream& file, int& factionStartingResources)
+void loadFactionStartingResources(std::ifstream& file, int& factionStartingResources)
 {
 	assert(file.is_open());
 
@@ -370,7 +369,7 @@ void loadInFactionStartingResources(std::ifstream& file, int& factionStartingRes
 
 }
 
-void loadInFactionStartingPopulation(std::ifstream& file, int& factionStartingPopulation)
+void loadFactionStartingPopulation(std::ifstream& file, int& factionStartingPopulation)
 {
 	assert(file.is_open());
 

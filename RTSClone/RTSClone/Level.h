@@ -17,7 +17,7 @@ struct Base
 {
 	Base(const glm::vec3& position, std::vector<Mineral>&& minerals);
 
-	const glm::vec3 position;
+	glm::vec3 position;
 	std::vector<Mineral> minerals;
 };
 
