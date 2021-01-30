@@ -85,6 +85,14 @@ void FactionAI::setTargetFaction(FactionHandler& factionHandler)
 	}
 }
 
+void FactionAI::onFactionElimination(FactionHandler& factionHandler, eFactionController eliminatedFaction)
+{
+	if (m_targetFaction == eliminatedFaction)
+	{
+		setTargetFaction(factionHandler);
+	}
+}
+
 void FactionAI::handleEvent(const GameEvent& gameEvent, const Map& map, FactionHandler& factionHandler)
 {
 	switch (gameEvent.type)
@@ -114,6 +122,7 @@ void FactionAI::handleEvent(const GameEvent& gameEvent, const Map& map, FactionH
 			}	
 		}
 	}
+	break;
 	}
 
 	Faction::handleEvent(gameEvent, map, factionHandler);

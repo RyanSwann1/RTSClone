@@ -30,6 +30,7 @@ public:
 		int startingResources, int startingPopulationCap, const Base& currentBase);
 
 	void setTargetFaction(FactionHandler& factionHandler);
+	void onFactionElimination(FactionHandler& factionHandler, eFactionController eliminatedFaction);
 	void handleEvent(const GameEvent& gameEvent, const Map& map, FactionHandler& factionHandler) override;
 	void update(float deltaTime, const Map& map, FactionHandler& factionHandler, const Timer& unitStateHandlerTimer) override;
 

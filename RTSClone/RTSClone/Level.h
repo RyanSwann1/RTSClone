@@ -62,6 +62,5 @@ private:
 	FactionHandler m_factionHandler;
 	ProjectileHandler m_projectileHandler;
 
-	void setAITargetFaction();
 	void handleEvent(const GameEvent& gameEvent, const Map& map);
 };	

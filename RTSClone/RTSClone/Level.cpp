@@ -67,11 +67,6 @@ Level::Level(std::vector<SceneryGameObject>&& scenery, FactionsContainer&& facti
 	m_factionHandler(m_factions),
 	m_projectileHandler()
 {
-	setAITargetFaction();
-}
-
-void Level::setAITargetFaction()
-{
 	for (auto& faction : m_factions)
 	{
 		if (faction && faction->getController() != eFactionController::Player)
@@ -346,7 +341,14 @@ void Level::handleEvent(const GameEvent& gameEvent, const Map& map)
 		if (isFactionActive(m_factions, gameEvent.data.eliminateFaction.factionController))
 		{
 			m_factions[static_cast<int>(gameEvent.data.eliminateFaction.factionController)].reset();
-			setAITargetFaction();
+			for (auto& faction : m_factions)
+			{
+				if (faction->getController() != eFactionController::Player)
+				{
+					static_cast<FactionAI&>(*faction).onFactionElimination(
+						m_factionHandler, gameEvent.data.eliminateFaction.factionController);
+				}
+			}
 		}
 		break;
 	case eGameEventType::PlayerActivatePlannedBuilding:
