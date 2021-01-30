@@ -13,14 +13,13 @@
 class Faction;
 class SceneryGameObject;
 #ifdef LEVEL_EDITOR
-class LevelNameGenerator;
-class EntityManager;
 class Level;
 #endif // LEVEL_EDITOR
+#ifdef GAME
+struct BaseLocation;
+#endif // GAME
 namespace LevelFileHandler
 { 
-	bool isPlayerActive(std::ifstream& file, eFactionController factionController);
-
 	int loadFactionStartingResources(std::ifstream& file);
 	int loadFactionStartingPopulationCap(std::ifstream& file);
 	glm::ivec2 loadMapSizeFromFile(std::ifstream& file);
@@ -37,7 +36,8 @@ namespace LevelFileHandler
 
 #ifdef GAME
 	bool loadLevelFromFile(const std::string& fileName, std::vector<SceneryGameObject>& scenery,
-		std::array<std::unique_ptr<Faction>, static_cast<size_t>(eFactionController::Max) + 1>& factions);
+		std::vector<BaseLocation>& mainBaseLocations, int& factionStartingResources,
+		int& factionStartingPopulation);
 
 	std::array<std::string, Globals::MAX_LEVELS> loadLevelNames();
 #endif // GAME

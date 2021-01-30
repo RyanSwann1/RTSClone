@@ -9,6 +9,7 @@
 #include "SceneryGameObject.h"
 #include "GameMessages.h"
 #include "GameMessenger.h"
+#include "Level.h"
 #endif // GAME
 #include "Globals.h"
 #include "ModelManager.h"
@@ -22,11 +23,13 @@ namespace
 }
 
 #ifdef GAME
-void loadInPlayers(std::ifstream& file, std::array<std::unique_ptr<Faction>, static_cast<size_t>(eFactionController::Max) + 1>& factions,
-	int startingResources, int startingPopulation);
-void loadInPlayer(std::ifstream& file, std::array<std::unique_ptr<Faction>, static_cast<size_t>(eFactionController::Max) + 1>& factions,
-	const FactionControllerDetails& factionControllerDetails, int startingResources, int startingPopulation);
 void loadInScenery(std::ifstream& file, std::vector<SceneryGameObject>& scenery);
+void loadInMainBaseQuantity(std::ifstream& file, int& mainBaseQuantity);
+void loadInMainBaseLocations(std::ifstream& file, std::vector<BaseLocation>& mainBaseLocations, int mainBaseQuantity);
+void loadInMainBaseLocation(std::ifstream& file, const std::string& textHeader, glm::vec3& position);
+void loadInMainBaseMinerals(std::ifstream& file, const std::string& textHeader, std::vector<Mineral>& minerals);
+void loadInFactionStartingResources(std::ifstream& file, int& factionStartingResources);
+void loadInFactionStartingPopulation(std::ifstream& file, int& factionStartingPopulation);
 #endif // GAME
 
 void LevelFileHandler::loadFromFile(std::ifstream& file, const std::function<void(const std::string&)>& data, 
@@ -206,45 +209,26 @@ glm::ivec2 LevelFileHandler::loadMapSizeFromFile(std::ifstream& file)
 	return mapSize;
 }
 
-bool LevelFileHandler::isPlayerActive(std::ifstream& file, eFactionController factionController)
-{
-	assert(file.is_open());
-	bool playerFound = false;
-	std::string line;
-	while (getline(file, line))
-	{
-		if (line == FACTION_CONTROLLER_DETAILS[static_cast<int>(factionController)].text)
-		{
-			playerFound = true;
-			break;
-		}
-	}
-
-	file.clear();
-	file.seekg(0);
-
-	return playerFound;
-}
-
 #ifdef GAME
-bool LevelFileHandler::loadLevelFromFile(const std::string& fileName, std::vector<SceneryGameObject>& scenery, 
-	std::array<std::unique_ptr<Faction>, static_cast<size_t>(eFactionController::Max) + 1>& factions)
+bool LevelFileHandler::loadLevelFromFile(const std::string& fileName, std::vector<SceneryGameObject>& scenery,
+	std::vector<BaseLocation>& mainBaseLocations, int& factionStartingResources,
+	int& factionStartingPopulation)
 {
-	assert(scenery.empty());
-
 	std::ifstream file(Globals::SHARED_FILE_DIRECTORY + LEVELS_FILE_DIRECTORY + fileName);
 	if (!file.is_open())
 	{
 		return false;
 	}
 
-	glm::ivec2 mapSize = loadMapSizeFromFile(file);
-	broadcastToMessenger<GameMessages::NewMapSize>({ mapSize });
-	int factionStartingResources = loadFactionStartingResources(file);
-	int factionStartingPopulation = loadFactionStartingPopulationCap(file);
-	loadInPlayers(file, factions, factionStartingResources, factionStartingPopulation);
+	broadcastToMessenger<GameMessages::NewMapSize>({ loadMapSizeFromFile(file) });
 	loadInScenery(file, scenery);
-	
+	loadInFactionStartingResources(file, factionStartingResources);
+	loadInFactionStartingPopulation(file, factionStartingPopulation);
+
+	int mainBaseQuantity = 0;
+	loadInMainBaseQuantity(file, mainBaseQuantity);
+	loadInMainBaseLocations(file, mainBaseLocations, mainBaseQuantity);
+
 	return true;
 }
 
@@ -272,81 +256,6 @@ std::array<std::string, Globals::MAX_LEVELS> LevelFileHandler::loadLevelNames()
 	return levelNames;
 }
 
-void loadInPlayers(std::ifstream& file, std::array<std::unique_ptr<Faction>, static_cast<size_t>(eFactionController::Max) + 1>& factions,
-	int startingResources, int startingPopulation)
-{
-	for (const auto& factionControllerDetails : FACTION_CONTROLLER_DETAILS)
-	{
-		switch (factionControllerDetails.controller)
-		{
-		case eFactionController::Player:
-		case eFactionController::AI_1:
-			assert(LevelFileHandler::isPlayerActive(file, factionControllerDetails.controller));
-			loadInPlayer(file, factions, factionControllerDetails, startingResources, startingPopulation);
-			break;
-		case eFactionController::AI_2:
-		case eFactionController::AI_3:
-			if (LevelFileHandler::isPlayerActive(file, factionControllerDetails.controller))
-			{
-				loadInPlayer(file, factions, factionControllerDetails, startingResources, startingPopulation);
-			}
-			break;
-		default:
-			assert(false);
-		}
-	}
-}
-
-void loadInPlayer(std::ifstream& file, std::array<std::unique_ptr<Faction>, static_cast<size_t>(eFactionController::Max) + 1>& factions,
-	const FactionControllerDetails& factionControllerDetails, int startingResources, int startingPopulation)
-{
-	assert(file.is_open());
-	glm::vec3 hqStartingPosition = { 0.0f, 0.0f, 0.0f };
-	std::vector<glm::vec3> mineralPositions;
-	mineralPositions.reserve(Globals::MAX_MINERALS_PER_FACTION);
-
-	auto data = [&hqStartingPosition, &mineralPositions](const std::string& line)
-	{
-		std::stringstream stream{ line };
-		std::string modelName;
-		glm::vec3 rotation;
-		glm::vec3 position;
-		stream >> modelName >> rotation.x >> rotation.y >> rotation.z >> position.x >> position.y >> position.z;
-		if (modelName == HQ_MODEL_NAME)
-		{
-			hqStartingPosition = position;
-		}
-		else if (modelName == MINERALS_MODEL_NAME)
-		{
-			mineralPositions.push_back(position);
-		}
-	};
-
-	const std::string& text = factionControllerDetails.text;
-	auto conditional = [&text](const std::string& line)
-	{
-		return line == text;
-	};
-
-	LevelFileHandler::loadFromFile(file, data, conditional);
-
-	switch (factionControllerDetails.controller)
-	{
-	case eFactionController::Player:
-		factions[static_cast<int>(factionControllerDetails.controller)] = std::make_unique<FactionPlayer>(factionControllerDetails.controller,
-			hqStartingPosition, mineralPositions, startingResources, startingPopulation);
-		break;
-	case eFactionController::AI_1:
-	case eFactionController::AI_2:
-	case eFactionController::AI_3:
-		factions[static_cast<int>(factionControllerDetails.controller)] = std::make_unique<FactionAI>(factionControllerDetails.controller,
-			hqStartingPosition, mineralPositions, startingResources, startingPopulation);
-		break;
-	default:
-		assert(false);
-	}
-}
-
 void loadInScenery(std::ifstream& file, std::vector<SceneryGameObject>& scenery)
 {
 	assert(file.is_open() && scenery.empty());
@@ -365,6 +274,115 @@ void loadInScenery(std::ifstream& file, std::vector<SceneryGameObject>& scenery)
 	auto conditional = [](const std::string& line)
 	{
 		return line == Globals::TEXT_HEADER_SCENERY;
+	};
+
+	LevelFileHandler::loadFromFile(file, data, conditional);
+}
+
+void loadInMainBaseQuantity(std::ifstream& file, int& mainBaseQuantity)
+{
+	assert(file.is_open());
+
+	auto data = [&mainBaseQuantity](const std::string& line)
+	{
+		std::stringstream stream{ line };
+		stream >> mainBaseQuantity;
+	};
+
+	auto conditional = [](const std::string& line)
+	{
+		return line == Globals::TEXT_HEADER_MAIN_BASE_QUANTITY;
+	};
+
+	LevelFileHandler::loadFromFile(file, data, conditional);
+}
+
+void loadInMainBaseLocations(std::ifstream& file, std::vector<BaseLocation>& mainBaseLocations, int mainBaseQuantity)
+{
+	assert(file.is_open());
+
+	for (int i = 0; i < mainBaseQuantity; ++i)
+	{
+		glm::vec3 mainBasePosition(0.0f);
+		loadInMainBaseLocation(file, Globals::TEXT_HEADER_MAIN_BASE_LOCATIONS[i], mainBasePosition);
+		
+		std::vector<Mineral> minerals;
+		loadInMainBaseMinerals(file, Globals::TEXT_HEADER_MAIN_BASE_MINERALS[i], minerals);
+
+		mainBaseLocations.emplace_back(mainBasePosition, std::move(minerals));
+	}
+}
+
+void loadInMainBaseLocation(std::ifstream& file, const std::string& textHeader, glm::vec3& position)
+{
+	assert(file.is_open());
+
+	auto data = [&position](const std::string& line)
+	{
+		std::stringstream stream{ line };
+		stream >> position.x >> position.y >> position.z;
+	};
+
+	auto conditional = [&textHeader](const std::string& line)
+	{
+		return line == textHeader;
+	};
+
+	LevelFileHandler::loadFromFile(file, data, conditional);
+}
+
+void loadInMainBaseMinerals(std::ifstream& file, const std::string& textHeader, std::vector<Mineral>& minerals)
+{
+	assert(file.is_open());
+
+	auto data = [&minerals](const std::string& line)
+	{
+		std::stringstream stream{ line };
+		glm::vec3 position;
+		stream >> position.x >> position.y >> position.z;
+		minerals.emplace_back(position);
+	};
+
+	auto conditional = [textHeader](const std::string& line)
+	{
+		return line == textHeader;
+	};
+
+	LevelFileHandler::loadFromFile(file, data, conditional);
+}
+
+void loadInFactionStartingResources(std::ifstream& file, int& factionStartingResources)
+{
+	assert(file.is_open());
+
+	auto data = [&factionStartingResources](const std::string& line)
+	{
+		std::stringstream stream{ line };
+		stream >> factionStartingResources;
+	};
+
+	auto conditional = [](const std::string& line)
+	{
+		return line == Globals::TEXT_HEADER_FACTION_STARTING_RESOURCE;
+	};
+
+	LevelFileHandler::loadFromFile(file, data, conditional);
+
+}
+
+void loadInFactionStartingPopulation(std::ifstream& file, int& factionStartingPopulation)
+{
+	assert(file.is_open());
+
+	auto data = [&factionStartingPopulation](const std::string& line)
+	{
+		std::stringstream stream{ line };
+		stream >> factionStartingPopulation;
+	};
+
+	auto conditional = [](const std::string& line)
+	{
+		return line == Globals::TEXT_HEADER_FACTION_STARTING_POPULATION;
 	};
 
 	LevelFileHandler::loadFromFile(file, data, conditional);
