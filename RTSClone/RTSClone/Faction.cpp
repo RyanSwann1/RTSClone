@@ -6,9 +6,8 @@
 #include "FactionHandler.h"
 
 Faction::Faction(eFactionController factionController, const glm::vec3& hqStartingPosition, 
-    const std::vector<glm::vec3>& mineralPositions, int startingResources, int startingPopulationCap)
-    : m_minerals(mineralPositions.cbegin(), mineralPositions.cend()),
-    m_allEntities(),
+    int startingResources, int startingPopulationCap)
+    : m_allEntities(),
     m_units(),
     m_workers(),
     m_supplyDepots(),
@@ -168,11 +167,6 @@ const Entity* Faction::getEntity(const glm::vec3& position) const
     {
         return nullptr;
     }
-}
-
-const std::vector<Mineral>& Faction::getMinerals() const
-{
-    return m_minerals;
 }
 
 void Faction::handleEvent(const GameEvent& gameEvent, const Map& map, FactionHandler& factionHandler)
@@ -452,11 +446,6 @@ void Faction::render(ShaderHandler& shaderHandler) const
         barracks.render(shaderHandler, m_controller);
     }
 
-    for (const auto& minerals : m_minerals)
-    {
-        minerals.render(shaderHandler);
-    }
-
     for (const auto& turret : m_turrets)
     {
         turret.render(shaderHandler, m_controller);
@@ -542,11 +531,6 @@ void Faction::renderAABB(ShaderHandler& shaderHandler)
     for (auto& barracks : m_barracks)
     {
         barracks.renderAABB(shaderHandler);
-    }
-
-    for (auto& minerals : m_minerals)
-    {
-        minerals.renderAABB(shaderHandler);
     }
 
     m_HQ.renderAABB(shaderHandler);

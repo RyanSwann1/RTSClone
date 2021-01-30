@@ -34,7 +34,6 @@ public:
 	const Entity* getEntity(const AABB& AABB, int entityID) const;
 	const Entity* getEntity(int entityID) const;
 	const Entity* getEntity(const glm::vec3& position) const;
-	const std::vector<Mineral>& getMinerals() const;
 
 	virtual void handleEvent(const GameEvent& gameEvent, const Map& map, FactionHandler& factionHandler);
 	virtual void update(float deltaTime, const Map& map, FactionHandler& factionHandler, const Timer& unitStateHandlerTimer);
@@ -53,8 +52,8 @@ public:
 
 protected:
 	Faction(eFactionController factionController, const glm::vec3& hqStartingPosition, 
-		const std::vector<glm::vec3>& mineralPositions, int startingResources, int startingPopulationCap);
-	const std::vector<Mineral> m_minerals;
+		int startingResources, int startingPopulationCap);
+
 	std::vector<Entity*> m_allEntities;
 	std::forward_list<Unit> m_units;
 	std::forward_list<Worker> m_workers;
