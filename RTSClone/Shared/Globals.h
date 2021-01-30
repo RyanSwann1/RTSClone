@@ -147,7 +147,7 @@ namespace Globals
 	const float DEFAULT_PROGRESS_BAR_HEIGHT = 5.0f;
 
 #ifdef GAME
-	inline const TypeComparison<eEntityType> BUILDING_TYPES({ eEntityType::HQ, eEntityType::Barracks, 
+	inline const TypeComparison<eEntityType> BUILDING_TYPES({ eEntityType::Headquarters, eEntityType::Barracks, 
 		eEntityType::SupplyDepot, eEntityType::Turret });
 	inline const TypeComparison<eEntityType> UNIT_TYPES({ eEntityType::Unit, eEntityType::Worker });
 	inline const TypeComparison<eEntityType> ATTACKING_ENTITY_TYPES({ eEntityType::Unit, eEntityType::Turret });

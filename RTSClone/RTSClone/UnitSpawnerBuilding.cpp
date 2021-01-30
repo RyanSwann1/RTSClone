@@ -69,7 +69,7 @@ void Barracks::addUnitToSpawn(const std::function<const Entity* (const UnitSpawn
 
 //HQ
 Headquarters::Headquarters(const glm::vec3& startingPosition, const Faction& owningFaction)
-	: UnitSpawnerBuilding(startingPosition, eEntityType::HQ, TIME_BETWEEN_WORKER_SPAWN, 
+	: UnitSpawnerBuilding(startingPosition, eEntityType::Headquarters, TIME_BETWEEN_WORKER_SPAWN, 
 		Globals::HQ_STARTING_HEALTH, owningFaction,
 		ModelManager::getInstance().getModel(HQ_MODEL_NAME))
 {}
@@ -201,7 +201,7 @@ void UnitSpawnerBuilding::renderProgressBar(ShaderHandler& shaderHandler, const 
 		float yOffset = 0.0f;
 		switch (getEntityType())
 		{
-		case eEntityType::HQ:
+		case eEntityType::Headquarters:
 			width = HQ_PROGRESS_BAR_WIDTH;
 			yOffset = HQ_PROGRESS_BAR_YOFFSET;
 			break;

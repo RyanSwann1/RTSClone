@@ -316,7 +316,7 @@ void FactionPlayer::onEntityRemoval(const Entity& entity)
     case eEntityType::Unit:
         removeSelectEntity(m_selectedEntities, entity.getID());
         break;
-    case eEntityType::HQ:
+    case eEntityType::Headquarters:
     case eEntityType::SupplyDepot:
     case eEntityType::Barracks:
     case eEntityType::Turret:

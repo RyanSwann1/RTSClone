@@ -116,7 +116,7 @@ void SelectedEntityWidget::render(const sf::Window& window)
 		displayShield(m_receivedMessage.shield);
 		switch (m_receivedMessage.entityType)
 		{
-		case eEntityType::HQ:
+		case eEntityType::Headquarters:
 			if (m_receivedMessage.owningFaction == eFactionController::Player)
 			{
 				displaySpawnQueue(m_receivedMessage.queueSize);
@@ -292,7 +292,7 @@ void UIManager::update(const FactionHandler& factionHandler)
 		{
 			switch (targetEntity->getEntityType())
 			{
-			case eEntityType::HQ:
+			case eEntityType::Headquarters:
 			case eEntityType::Barracks:
 			{
 				const UnitSpawnerBuilding& unitSpawnerBuilding = static_cast<const UnitSpawnerBuilding&>(*targetEntity);

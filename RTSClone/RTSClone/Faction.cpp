@@ -214,7 +214,7 @@ void Faction::handleEvent(const GameEvent& gameEvent, const Map& map, FactionHan
                     removeEntity<Barracks>(m_barracks, targetID, entity);
                 }
                 break;
-            case eEntityType::HQ:
+            case eEntityType::Headquarters:
                 (*entity)->reduceHealth(gameEvent.data.takeDamage);
                 if ((*entity)->isDead())
                 {
@@ -476,7 +476,7 @@ void Faction::renderEntityStatusBars(ShaderHandler& shaderHandler, const Camera&
         switch (entity->getEntityType())
         {
         case eEntityType::Barracks:
-        case eEntityType::HQ:
+        case eEntityType::Headquarters:
             static_cast<UnitSpawnerBuilding&>(*(entity)).renderProgressBar(shaderHandler, camera, windowSize);
             break;
         case eEntityType::Worker:
@@ -608,7 +608,7 @@ bool Faction::addUnitToSpawn(eEntityType unitType, const Map& map, UnitSpawnerBu
                 { return this->spawnUnit(map, building, factionHandler); });
             break;
         case eEntityType::Worker:
-            assert(building.getEntityType() == eEntityType::HQ);
+            assert(building.getEntityType() == eEntityType::Headquarters);
             static_cast<Headquarters&>(building).addUnitToSpawn([this, &map, unitType](const UnitSpawnerBuilding& building)
                 { return this->spawnWorker(map, building); });
             break;

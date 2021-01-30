@@ -4,7 +4,7 @@ enum class eEntityType
 {
 	Unit = 0,
 	Worker,
-	HQ,
+	Headquarters,
 	SupplyDepot,
 	Barracks,
 	Turret,

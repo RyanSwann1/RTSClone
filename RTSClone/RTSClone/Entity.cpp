@@ -74,7 +74,7 @@ Entity::Entity(const Model& model, const glm::vec3& startingPosition, eEntityTyp
 	switch (m_type)
 	{
 	case eEntityType::Barracks:
-	case eEntityType::HQ:
+	case eEntityType::Headquarters:
 	case eEntityType::SupplyDepot:
 	case eEntityType::Unit:
 	case eEntityType::Turret:
