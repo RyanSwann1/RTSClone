@@ -18,14 +18,14 @@ struct PlannedEntity
 	const Model* model;
 };
 
-struct BaseLocation
+struct Base
 {
-	BaseLocation(const glm::vec3& position);
+	Base(const glm::vec3& position);
 
 	void setPosition(const glm::vec3& position);
 
 	Quad quad;
-	std::array<Mineral, Globals::MAX_MINERALS> minerals;
+	std::vector<Mineral> minerals;
 };
 
 struct Camera;
@@ -58,13 +58,13 @@ private:
 	Level(const std::string& levelName);
 
 	const std::string m_levelName;
-	std::vector<BaseLocation> m_mainBaseLocations;
+	std::vector<Base> m_mainBases;
 	PlannedEntity m_plannedEntity;
 	glm::ivec2 m_size;
 	Quad m_playableArea;
 	GameObjectManager m_gameObjectManager;
 	GameObject* m_selectedGameObject;
-	BaseLocation* m_selectedBaseLocation;
+	Base* m_selectedBase;
 	Mineral* m_selectedMineral;
 	int m_factionStartingResources;
 	int m_factionStartingPopulationCap;

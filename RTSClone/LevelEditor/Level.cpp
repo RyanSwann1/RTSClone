@@ -42,26 +42,26 @@ namespace
 	const int MIN_FACTIONS = 2;
 	const int DEFAULT_FACTIONS_COUNT = 2;
 
-	BaseLocation* getBaseLocation(std::vector<BaseLocation>& baseLocations, const glm::vec3& position)
+	Base* getBase(std::vector<Base>& bases, const glm::vec3& position)
 	{
-		auto baseLocation = std::find_if(baseLocations.begin(), baseLocations.end(), [&position](const auto& baseLocation)
+		auto base = std::find_if(bases.begin(), bases.end(), [&position](const auto& base)
 		{
-			return baseLocation.quad.getAABB().contains(position);
+			return base.quad.getAABB().contains(position);
 		});
 
-		if (baseLocation != baseLocations.end())
+		if (base != bases.end())
 		{
-			return &(*baseLocation);
+			return &(*base);
 		}
 
 		return nullptr;
 	}
 
-	Mineral* getBaseLocationMineral(std::vector<BaseLocation>& baseLocations, const glm::vec3& position)
+	Mineral* getBaseMineral(std::vector<Base>& bases, const glm::vec3& position)
 	{
-		for (auto& baseLocation : baseLocations)
+		for (auto& base : bases)
 		{
-			for (auto& mineral : baseLocation.minerals)
+			for (auto& mineral : base.minerals)
 			{
 				if (mineral.getAABB().contains(position))
 				{
@@ -82,12 +82,12 @@ PlannedEntity::PlannedEntity()
 {}
 
 //BaseLocation
-BaseLocation::BaseLocation(const glm::vec3& position)
+Base::Base(const glm::vec3& position)
 	: quad(position, MAIN_BASE_QUAD_SIZE, MAIN_BASE_QUAD_COLOR),
-	minerals()
+	minerals(Globals::MAX_MINERALS)
 {}
 
-void BaseLocation::setPosition(const glm::vec3 & position)
+void Base::setPosition(const glm::vec3 & position)
 {
 	quad.setPosition(position);
 
@@ -106,7 +106,7 @@ Level::Level(const std::string& levelName)
 		PLAYABLE_AREA_GROUND_COLOR, PLAYABLE_AREA_OPACITY),
 	m_gameObjectManager(),
 	m_selectedGameObject(nullptr),
-	m_selectedBaseLocation(nullptr),
+	m_selectedBase(nullptr),
 	m_selectedMineral(nullptr),
 	m_factionStartingResources(DEFAULT_STARTING_RESOURCES),
 	m_factionStartingPopulationCap(DEFAULT_STARTING_POPULATION_CAP),
@@ -117,9 +117,9 @@ Level::Level(const std::string& levelName)
 		LevelFileHandler::saveLevelToFile(*this);
 	}
 
-	m_mainBaseLocations.reserve(static_cast<size_t>(eFactionController::Max) + 1);
-	m_mainBaseLocations.emplace_back(FACTION_STARTING_POSITIONS[static_cast<int>(eFactionController::Player)]);
-	m_mainBaseLocations.emplace_back(FACTION_STARTING_POSITIONS[static_cast<int>(eFactionController::AI_1)]);
+	m_mainBases.reserve(static_cast<size_t>(eFactionController::Max) + 1);
+	m_mainBases.emplace_back(FACTION_STARTING_POSITIONS[static_cast<int>(eFactionController::Player)]);
+	m_mainBases.emplace_back(FACTION_STARTING_POSITIONS[static_cast<int>(eFactionController::AI_1)]);
 }
 
 std::unique_ptr<Level> Level::create(const std::string& levelName)
@@ -180,7 +180,7 @@ void Level::handleInput(const sf::Event& currentSFMLEvent, const Camera& camera,
 				m_selectedGameObject = nullptr;
 			}
 
-			m_selectedBaseLocation = nullptr;
+			m_selectedBase = nullptr;
 			m_selectedMineral = nullptr;
 			m_selectedGameObject = nullptr;
 		}
@@ -203,10 +203,10 @@ void Level::handleInput(const sf::Event& currentSFMLEvent, const Camera& camera,
 						m_selectedGameObject = m_gameObjectManager.getGameObject(planeIntersection);
 						if (!m_selectedGameObject)
 						{
-							m_selectedBaseLocation = getBaseLocation(m_mainBaseLocations, planeIntersection);
-							if (!m_selectedBaseLocation)
+							m_selectedBase = getBase(m_mainBases, planeIntersection);
+							if (!m_selectedBase)
 							{
-								m_selectedMineral = getBaseLocationMineral(m_mainBaseLocations, planeIntersection);
+								m_selectedMineral = getBaseMineral(m_mainBases, planeIntersection);
 							}
 						}
 					}
@@ -216,7 +216,7 @@ void Level::handleInput(const sf::Event& currentSFMLEvent, const Camera& camera,
 			{
 				m_plannedEntity.model = nullptr;
 				m_selectedGameObject = nullptr;
-				m_selectedBaseLocation = nullptr;
+				m_selectedBase = nullptr;
 			}
 		}
 	break;
@@ -240,10 +240,10 @@ void Level::handleInput(const sf::Event& currentSFMLEvent, const Camera& camera,
 					glm::vec3 position = Globals::convertToNodePosition(planeIntersection);
 					m_selectedGameObject->setPosition({ position.x, Globals::GROUND_HEIGHT, position.z });
 				}
-				else if (m_selectedBaseLocation && sf::Mouse::isButtonPressed(sf::Mouse::Button::Left))
+				else if (m_selectedBase && sf::Mouse::isButtonPressed(sf::Mouse::Button::Left))
 				{
 					glm::vec3 position = Globals::convertToNodePosition(planeIntersection);
-					m_selectedBaseLocation->setPosition({ position.x, Globals::GROUND_HEIGHT, position.z });
+					m_selectedBase->setPosition({ position.x, Globals::GROUND_HEIGHT, position.z });
 				}
 				else if (m_selectedMineral && sf::Mouse::isButtonPressed(sf::Mouse::Button::Left))
 				{
@@ -353,18 +353,18 @@ void Level::handleLevelDetailsGUI(bool& showGUIWindow)
 void Level::handleMainBasesGui()
 {
 	ImGui::BeginChild("Main Base Quantity", ImVec2(175, 40), true);
-	int newMainBaseQuantity = static_cast<int>(m_mainBaseLocations.size());
+	int newMainBaseQuantity = static_cast<int>(m_mainBases.size());
 	if (ImGui::InputInt("Main Bases", &newMainBaseQuantity, 1, ImGuiInputTextFlags_ReadOnly))
 	{
 		if (newMainBaseQuantity >= MIN_FACTIONS && newMainBaseQuantity <= static_cast<int>(eFactionController::Max) + 1)
 		{
-			if (newMainBaseQuantity > static_cast<int>(m_mainBaseLocations.size()))
+			if (newMainBaseQuantity > static_cast<int>(m_mainBases.size()))
 			{
-				m_mainBaseLocations.emplace_back(FACTION_STARTING_POSITIONS[newMainBaseQuantity - 1]);
+				m_mainBases.emplace_back(FACTION_STARTING_POSITIONS[newMainBaseQuantity - 1]);
 			}
 			else
 			{
-				m_mainBaseLocations.pop_back();
+				m_mainBases.pop_back();
 			}
 		}
 	};
@@ -384,7 +384,7 @@ void Level::render(ShaderHandler& shaderHandler) const
 {
 	m_gameObjectManager.render(shaderHandler, m_selectedGameObject);
 
-	for (const auto& baseLocation : m_mainBaseLocations)
+	for (const auto& baseLocation : m_mainBases)
 	{
 		for (const auto& mineral : baseLocation.minerals)
 		{
@@ -404,7 +404,7 @@ void Level::renderDebug(ShaderHandler& shaderHandler) const
 {
 	m_playableArea.render(shaderHandler);
 	
-	for (const auto& baseLocation : m_mainBaseLocations)
+	for (const auto& baseLocation : m_mainBases)
 	{
 		baseLocation.quad.render(shaderHandler);
 	}
@@ -436,20 +436,20 @@ std::ostream& operator<<(std::ostream& file, const Level& level)
 	file << level.m_factionCount << "\n";
 	
 	file << Globals::TEXT_HEADER_MAIN_BASE_QUANTITY << "\n";
-	file << static_cast<int>(level.m_mainBaseLocations.size()) << "\n";
+	file << static_cast<int>(level.m_mainBases.size()) << "\n";
 
-	for(int i = 0; i < static_cast<int>(level.m_mainBaseLocations.size()); ++i)
+	for(int i = 0; i < static_cast<int>(level.m_mainBases.size()); ++i)
 	{
 		file << Globals::TEXT_HEADER_MAIN_BASE_LOCATIONS[i] << "\n";
-		file << level.m_mainBaseLocations[i].quad.getPosition().x << " " << 
-			level.m_mainBaseLocations[i].quad.getPosition().y << " " << 
-			level.m_mainBaseLocations[i].quad.getPosition().z << "\n";
+		file << level.m_mainBases[i].quad.getPosition().x << " " << 
+			level.m_mainBases[i].quad.getPosition().y << " " << 
+			level.m_mainBases[i].quad.getPosition().z << "\n";
 	}
 
-	for (int i = 0; i < static_cast<int>(level.m_mainBaseLocations.size()); ++i)
+	for (int i = 0; i < static_cast<int>(level.m_mainBases.size()); ++i)
 	{
 		file << Globals::TEXT_HEADER_MAIN_BASE_MINERALS[i] << "\n";
-		for (const auto& mineral : level.m_mainBaseLocations[i].minerals)
+		for (const auto& mineral : level.m_mainBases[i].minerals)
 		{
 			file << mineral.getPosition().x << " " << mineral.getPosition().y << " " << mineral.getPosition().z << "\n";
 		}
