@@ -6,7 +6,6 @@
 #include "Camera.h"
 #include "Globals.h"
 #include "LevelFileHandler.h"
-#include "Player.h"
 #include "Level.h"
 #include <SFML/Graphics.hpp>
 #include <iostream>
@@ -90,7 +89,7 @@ int main()
 	std::unique_ptr<Level> level;
 	sf::Clock gameClock;
 	Camera camera;
-	bool showGUIWindow = false;
+	bool imguiWindow = false;
 	eWindowState currentWindowState = eWindowState::None;
 	glm::ivec2 lastMousePosition = { 0, 0 };
 	bool mouseMoved = false;
@@ -133,12 +132,10 @@ int main()
 				camera.zoom(currentSFMLEvent.mouseWheel.delta);
 				break;
 			case sf::Event::MouseMoved:
-			{
 				if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Right))
 				{
 					mouseMoved = true;
 				}
-			}
 				break;
 			}
 		}
@@ -149,9 +146,11 @@ int main()
 			mouseMoved = false;
 			camera.onMouseMove(window, deltaTime);
 			window.setMouseCursorVisible(false);
+			ImGui::SetMouseCursor(ImGuiMouseCursor_::ImGuiMouseCursor_None);
 		}
 		camera.update(deltaTime, window, lastMousePosition);
 		lastMousePosition = { sf::Mouse::getPosition(window).x, sf::Mouse::getPosition(window).y };
+
 		ImGui_SFML_OpenGL3::startFrame();
 		ImGui::SetNextWindowSize(ImVec2(175, static_cast<float>(windowSize.y)), ImGuiCond_FirstUseEver);
 		std::string titleName = "Level Editor";
@@ -167,22 +166,22 @@ int main()
 				{
 					if (level && ImGui::MenuItem("Level Details"))
 					{
-						showGUIWindow = true;
+						imguiWindow = true;
 						currentWindowState = eWindowState::LevelDetails;
 					}
 					if (ImGui::MenuItem("Create Level"))
 					{
-						showGUIWindow = true;
+						imguiWindow = true;
 						currentWindowState = eWindowState::CreateLevel;
 					}
 					if (ImGui::MenuItem("Load Level"))
 					{
-						showGUIWindow = true;
+						imguiWindow = true;
 						currentWindowState = eWindowState::LoadLevel;
 					}
 					if (ImGui::MenuItem("Remove Level"))
 					{
-						showGUIWindow = true;
+						imguiWindow = true;
 						currentWindowState = eWindowState::RemoveLevel;
 					}
 					if (ImGui::MenuItem("Save Level"))
@@ -206,12 +205,13 @@ int main()
 			{
 				level->handleModelNamesGUI();
 				level->handlePlayersGUI();
+				level->handleMainBasesGui();
 				level->handleSelectedEntityGUI();
 			}
 		}
 		ImGui::End();
 
-		if (showGUIWindow)
+		if (imguiWindow)
 		{
 			switch (currentWindowState)
 			{
@@ -220,12 +220,12 @@ int main()
 			case eWindowState::LevelDetails:
 				if (level)
 				{
-					level->handleLevelDetailsGUI(showGUIWindow);
+					level->handleLevelDetailsGUI(imguiWindow);
 				}
 				break;
 			case eWindowState::LoadLevel:
 			{
-				ImGui::Begin("Load Level", &showGUIWindow, ImGuiWindowFlags_None);
+				ImGui::Begin("Load Level", &imguiWindow, ImGuiWindowFlags_None);
 				for (const auto& levelName : levelNames)
 				{
 					if (LevelFileHandler::isLevelExists(levelName))
@@ -314,7 +314,8 @@ int main()
 
 		if (level)
 		{
-			level->renderPlayableArea(*shaderHandler);
+			level->renderDebug(*shaderHandler);
+			//level->renderPlayableArea(*shaderHandler);
 		}
 
 #ifdef RENDER_AABB

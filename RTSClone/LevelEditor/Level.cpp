@@ -237,15 +237,18 @@ void Level::handleInput(const sf::Event& currentSFMLEvent, const Camera& camera,
 				}
 				else if (m_selectedGameObject && sf::Mouse::isButtonPressed(sf::Mouse::Button::Left))
 				{
-					m_selectedGameObject->setPosition(Globals::convertToNodePosition(planeIntersection));
+					glm::vec3 position = Globals::convertToNodePosition(planeIntersection);
+					m_selectedGameObject->setPosition({ position.x, Globals::GROUND_HEIGHT, position.z });
 				}
 				else if (m_selectedBaseLocation && sf::Mouse::isButtonPressed(sf::Mouse::Button::Left))
 				{
-					m_selectedBaseLocation->setPosition(Globals::convertToNodePosition(planeIntersection));
+					glm::vec3 position = Globals::convertToNodePosition(planeIntersection);
+					m_selectedBaseLocation->setPosition({ position.x, Globals::GROUND_HEIGHT, position.z });
 				}
 				else if (m_selectedMineral && sf::Mouse::isButtonPressed(sf::Mouse::Button::Left))
 				{
-					m_selectedMineral->setPosition(Globals::convertToNodePosition(planeIntersection));
+					glm::vec3 position = Globals::convertToNodePosition(planeIntersection);
+					m_selectedMineral->setPosition({ position.x, Globals::GROUND_HEIGHT, position.z });
 				}
 			}
 		}
@@ -432,6 +435,9 @@ std::ostream& operator<<(std::ostream& file, const Level& level)
 	file << Globals::TEXT_HEADER_FACTION_COUNT << "\n";
 	file << level.m_factionCount << "\n";
 	
+	file << Globals::TEXT_HEADER_MAIN_BASE_QUANTITY << "\n";
+	file << static_cast<int>(level.m_mainBaseLocations.size()) << "\n";
+
 	for(int i = 0; i < static_cast<int>(level.m_mainBaseLocations.size()); ++i)
 	{
 		file << Globals::TEXT_HEADER_MAIN_BASE_LOCATIONS[i] << "\n";

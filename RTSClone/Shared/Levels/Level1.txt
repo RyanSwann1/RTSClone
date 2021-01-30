@@ -1,31 +1,23 @@
-#Player
-portal.obj 0 0 0 24 0 156
-rocksOre.obj 0 0 0 66 0 144 0
-rocksOre.obj 0 0 0 66 0 150 1
-rocksOre.obj 0 0 0 66 0 156 2
-rocksOre.obj 0 0 0 66 0 162 3
-rocksOre.obj 0 0 0 66 0 168 4
-#PlayerAI_1
-portal.obj 0 0 0 120 0 156
-rocksOre.obj 0 0 0 162 0 144 0
-rocksOre.obj 0 0 0 162 0 150 1
-rocksOre.obj 0 0 0 162 0 156 2
-rocksOre.obj 0 0 0 162 0 162 3
-rocksOre.obj 0 0 0 162 0 168 4
-#PlayerAI_2
-portal.obj 0 0 0 120 0 18
-rocksOre.obj 0 0 0 162 0 6 0
-rocksOre.obj 0 0 0 162 0 12 1
-rocksOre.obj 0 0 0 162 0 18 2
-rocksOre.obj 0 0 0 162 0 24 3
-rocksOre.obj 0 0 0 162 0 30 4
-#PlayerAI_3
-portal.obj 0 0 0 24 0 18
-rocksOre.obj 0 0 0 66 0 6 0
-rocksOre.obj 0 0 0 66 0 12 1
-rocksOre.obj 0 0 0 66 0 18 2
-rocksOre.obj 0 0 0 66 0 24 3
-rocksOre.obj 0 0 0 66 0 30 4
+#Faction Count
+2
+#Main Base Quantity
+2
+#Main Base Location_1
+36 0 36
+#Main Base Location_2
+132 0 138
+#Main Base Minerals_1
+30 0 6
+24 0 12
+18 0 18
+12 0 24
+6 0 30
+#Main Base Minerals_2
+168 0 150
+162 0 156
+156 0 162
+150 0 168
+144 0 174
 #Faction Starting Population
 40
 #Faction Starting Resources

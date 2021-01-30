@@ -72,9 +72,6 @@
     <ClCompile Include="..\Shared\ShaderHandler.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="Player.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
     <ClCompile Include="..\Shared\FactionController.cpp">
       <Filter>src</Filter>
     </ClCompile>
@@ -156,9 +153,6 @@
       <Filter>src</Filter>
     </ClInclude>
     <ClInclude Include="..\Shared\NonMovable.h">
-      <Filter>src</Filter>
-    </ClInclude>
-    <ClInclude Include="Player.h">
       <Filter>src</Filter>
     </ClInclude>
     <ClInclude Include="..\Shared\FactionController.h">
