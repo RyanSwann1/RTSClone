@@ -11,16 +11,15 @@
 #include <fstream>
 
 class Faction;
+struct Base;
 class SceneryGameObject;
 #ifdef LEVEL_EDITOR
 class Level;
 #endif // LEVEL_EDITOR
-#ifdef GAME
-struct Base;
-#endif // GAME
 namespace LevelFileHandler
 { 
-	int loadMainBaseQuantity(std::ifstream& file);
+	void loadAllMainBases(std::ifstream& file, std::vector<Base>& mainBases);
+	int loadFactionCount(std::ifstream& file);
 	int loadFactionStartingPopulation(std::ifstream& file);
 	int loadFactionStartingResources(std::ifstream& file);
 	glm::ivec2 loadMapSizeFromFile(std::ifstream& file);
@@ -39,7 +38,7 @@ namespace LevelFileHandler
 #ifdef GAME
 	bool loadLevelFromFile(const std::string& fileName, std::vector<SceneryGameObject>& scenery,
 		std::vector<Base>& mainBases, int& factionStartingResources,
-		int& factionStartingPopulation);
+		int& factionStartingPopulation, int& factionCount);
 
 	std::array<std::string, Globals::MAX_LEVELS> loadLevelNames();
 #endif // GAME

@@ -22,11 +22,12 @@ namespace
 	const std::string LEVELS_FILE_NAME = "Levels.txt";
 }
 
-#ifdef GAME
-void loadScenery(std::ifstream& file, std::vector<SceneryGameObject>& scenery);
-void loadAllMainBases(std::ifstream& file, std::vector<Base>& mainBases);
+int loadMainBaseQuantity(std::ifstream& file);
 void loadMainBase(std::ifstream& file, const std::string& textHeader, glm::vec3& position);
 void loadMainBaseMinerals(std::ifstream& file, const std::string& textHeader, std::vector<Mineral>& minerals);
+
+#ifdef GAME
+void loadScenery(std::ifstream& file, std::vector<SceneryGameObject>& scenery);
 #endif // GAME
 
 void LevelFileHandler::loadFromFile(std::ifstream& file, const std::function<void(const std::string&)>& data, 
@@ -97,24 +98,39 @@ int LevelFileHandler::loadFactionStartingPopulation(std::ifstream& file)
 	return factionStartingPopulation;
 }
 
-int LevelFileHandler::loadMainBaseQuantity(std::ifstream& file)
+void LevelFileHandler::loadAllMainBases(std::ifstream& file, std::vector<Base>& mainBases)
 {
 	assert(file.is_open());
 
-	int mainBaseQuantity = 0;
-	auto data = [&mainBaseQuantity](const std::string& line)
+	for (int i = 0; i < loadMainBaseQuantity(file); ++i)
+	{
+		glm::vec3 mainBasePosition(0.0f);
+		loadMainBase(file, Globals::TEXT_HEADER_MAIN_BASES[i], mainBasePosition);
+
+		std::vector<Mineral> minerals;
+		loadMainBaseMinerals(file, Globals::TEXT_HEADER_MAIN_BASE_MINERALS[i], minerals);
+
+		mainBases.emplace_back(mainBasePosition, std::move(minerals));
+	}
+}
+
+int LevelFileHandler::loadFactionCount(std::ifstream& file)
+{
+	int factionCount = 0;
+	auto data = [&factionCount](const std::string& line)
 	{
 		std::stringstream stream{ line };
-		stream >> mainBaseQuantity;
+		stream >> factionCount;
 	};
 
 	auto conditional = [](const std::string& line)
 	{
-		return line == Globals::TEXT_HEADER_MAIN_BASE_QUANTITY;
+		return line == Globals::TEXT_HEADER_FACTION_COUNT;
 	};
 
 	LevelFileHandler::loadFromFile(file, data, conditional);
-	return mainBaseQuantity;
+
+	return factionCount;
 }
 
 #ifdef LEVEL_EDITOR
@@ -228,7 +244,8 @@ glm::ivec2 LevelFileHandler::loadMapSizeFromFile(std::ifstream& file)
 
 #ifdef GAME
 bool LevelFileHandler::loadLevelFromFile(const std::string& fileName, std::vector<SceneryGameObject>& scenery,
-	std::vector<Base>& mainBases, int& factionStartingResources, int& factionStartingPopulation)
+	std::vector<Base>& mainBases, int& factionStartingResources, int& factionStartingPopulation,
+	int& factionCount)
 {
 	std::ifstream file(Globals::SHARED_FILE_DIRECTORY + LEVELS_FILE_DIRECTORY + fileName);
 	if (!file.is_open())
@@ -240,6 +257,7 @@ bool LevelFileHandler::loadLevelFromFile(const std::string& fileName, std::vecto
 	loadScenery(file, scenery);
 	factionStartingResources = loadFactionStartingResources(file);
 	factionStartingPopulation = loadFactionStartingPopulation(file);
+	factionCount = loadFactionCount(file);
 	loadAllMainBases(file, mainBases);
 
 	return true;
@@ -291,22 +309,7 @@ void loadScenery(std::ifstream& file, std::vector<SceneryGameObject>& scenery)
 
 	LevelFileHandler::loadFromFile(file, data, conditional);
 }
-
-void loadAllMainBases(std::ifstream& file, std::vector<Base>& mainBases)
-{
-	assert(file.is_open());
-
-	for (int i = 0; i < LevelFileHandler::loadMainBaseQuantity(file); ++i)
-	{
-		glm::vec3 mainBasePosition(0.0f);
-		loadMainBase(file, Globals::TEXT_HEADER_MAIN_BASES[i], mainBasePosition);
-		
-		std::vector<Mineral> minerals;
-		loadMainBaseMinerals(file, Globals::TEXT_HEADER_MAIN_BASE_MINERALS[i], minerals);
-
-		mainBases.emplace_back(mainBasePosition, std::move(minerals));
-	}
-}
+#endif // GAME
 
 void loadMainBase(std::ifstream& file, const std::string& textHeader, glm::vec3& position)
 {
@@ -345,4 +348,23 @@ void loadMainBaseMinerals(std::ifstream& file, const std::string& textHeader, st
 
 	LevelFileHandler::loadFromFile(file, data, conditional);
 }
-#endif // GAME
+
+int loadMainBaseQuantity(std::ifstream& file)
+{
+	assert(file.is_open());
+
+	int mainBaseQuantity = 0;
+	auto data = [&mainBaseQuantity](const std::string& line)
+	{
+		std::stringstream stream{ line };
+		stream >> mainBaseQuantity;
+	};
+
+	auto conditional = [](const std::string& line)
+	{
+		return line == Globals::TEXT_HEADER_MAIN_BASE_QUANTITY;
+	};
+
+	LevelFileHandler::loadFromFile(file, data, conditional);
+	return mainBaseQuantity;
+}

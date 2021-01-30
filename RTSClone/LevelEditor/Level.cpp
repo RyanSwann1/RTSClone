@@ -95,14 +95,15 @@ Level::Level(const std::string& levelName)
 	m_factionStartingPopulationCap(DEFAULT_STARTING_POPULATION_CAP),
 	m_factionCount(DEFAULT_FACTIONS_COUNT)
 {
+	m_mainBases.reserve(static_cast<size_t>(eFactionController::Max) + 1);
+	
 	if (!LevelFileHandler::loadLevelFromFile(*this))
 	{
+		m_mainBases.emplace_back(FACTION_STARTING_POSITIONS[static_cast<int>(eFactionController::Player)]);
+		m_mainBases.emplace_back(FACTION_STARTING_POSITIONS[static_cast<int>(eFactionController::AI_1)]);
+
 		LevelFileHandler::saveLevelToFile(*this);
 	}
-
-	m_mainBases.reserve(static_cast<size_t>(eFactionController::Max) + 1);
-	m_mainBases.emplace_back(FACTION_STARTING_POSITIONS[static_cast<int>(eFactionController::Player)]);
-	m_mainBases.emplace_back(FACTION_STARTING_POSITIONS[static_cast<int>(eFactionController::AI_1)]);
 }
 
 std::unique_ptr<Level> Level::create(const std::string& levelName)
@@ -407,9 +408,10 @@ const std::ifstream& operator>>(std::ifstream& file, Level& level)
 	level.m_size = LevelFileHandler::loadMapSizeFromFile(file);
 	level.m_factionStartingResources = LevelFileHandler::loadFactionStartingResources(file);
 	level.m_factionStartingPopulationCap = LevelFileHandler::loadFactionStartingPopulation(file);
+	level.m_factionCount = LevelFileHandler::loadFactionCount(file);
 
 	level.m_mainBases.clear();
-
+	LevelFileHandler::loadAllMainBases(file, level.m_mainBases);
 
 	file >> level.m_gameObjectManager;
 

@@ -15,11 +15,16 @@ Base::Base(const glm::vec3& position, std::vector<Mineral>&& minerals)
 #endif // GAME
 
 #ifdef LEVEL_EDITOR
-
 Base::Base(const glm::vec3& position)
 	: quad(position, MAIN_BASE_QUAD_SIZE, MAIN_BASE_QUAD_COLOR),
 	position(position),
 	minerals(Globals::MAX_MINERALS)
+{}
+
+Base::Base(const glm::vec3& position, std::vector<Mineral>&& minerals)
+	: quad(position, MAIN_BASE_QUAD_SIZE, MAIN_BASE_QUAD_COLOR),
+	position(position),
+	minerals(std::move(minerals))
 {}
 
 void Base::setPosition(const glm::vec3 & _position)

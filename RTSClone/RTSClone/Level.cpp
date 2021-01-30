@@ -76,15 +76,16 @@ std::unique_ptr<Level> Level::create(const std::string& levelName)
 	std::vector<SceneryGameObject> scenery;
 	int factionStartingResources = 0;
 	int factionStartingPopulation = 0;
+	int factionCount = 0;
 	if (!LevelFileHandler::loadLevelFromFile(levelName, scenery, mainBases, 
-		factionStartingResources, factionStartingPopulation))
+		factionStartingResources, factionStartingPopulation, factionCount))
 	{
 		return std::unique_ptr<Level>();
 	}
 
 	std::array<std::unique_ptr<Faction>, static_cast<size_t>(eFactionController::Max) + 1> factions;
-	assert(mainBases.size() <= static_cast<size_t>(eFactionController::Max) + 1);
-	for (int i = 0; i < static_cast<int>(mainBases.size()); ++i)
+	assert(factionCount < static_cast<int>(eFactionController::Max) + 1 && factionCount < static_cast<int>(mainBases.size()));
+	for (int i = 0; i < factionCount; ++i)
 	{
 		switch (eFactionController(i))
 		{
@@ -337,7 +338,7 @@ void Level::handleEvent(const GameEvent& gameEvent, const Map& map)
 			m_factions[static_cast<int>(gameEvent.data.eliminateFaction.factionController)].reset();
 			for (auto& faction : m_factions)
 			{
-				if (faction->getController() != eFactionController::Player)
+				if (faction && faction->getController() != eFactionController::Player)
 				{
 					static_cast<FactionAI&>(*faction).onFactionElimination(
 						m_factionHandler, gameEvent.data.eliminateFaction.factionController);

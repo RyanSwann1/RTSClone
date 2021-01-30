@@ -8,10 +8,10 @@
 
 struct Base
 {
-#ifdef GAME
-	Base(const glm::vec3& position, std::vector<Mineral>&& minerals);
-#endif // GAME
+#ifdef LEVEL_EDITOR
 	Base(const glm::vec3& position);
+#endif // LEVEL_EDITOR
+	Base(const glm::vec3& position, std::vector<Mineral>&& minerals);
 
 #ifdef LEVEL_EDITOR
 	void setPosition(const glm::vec3& position);
