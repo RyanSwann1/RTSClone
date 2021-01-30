@@ -9,7 +9,8 @@ enum class eFactionController
 	AI_1,
 	AI_2,
 	AI_3,
-	Max = AI_3
+	Max = AI_3,
+	None
 };
 
 struct FactionControllerDetails

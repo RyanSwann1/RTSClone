@@ -57,7 +57,7 @@ FactionAI::FactionAI(eFactionController factionController, const glm::vec3& hqSt
 	m_delayTimer(DELAY_TIMER_EXPIRATION, true),
 	m_idleTimer(IDLE_TIMER_EXPIRATION, true),
 	m_spawnTimer(Globals::getRandomNumber(MIN_SPAWN_TIMER_EXPIRATION, MAX_SPAWN_TIMER_EXPIRATION), true),
-	m_targetFaction(nullptr),
+	m_targetFaction(eFactionController::None),
 	m_currentBase(currentBase)
 {
 	for (int i = 0; i < STARTING_WORKER_COUNT; ++i)
@@ -72,14 +72,14 @@ FactionAI::FactionAI(eFactionController factionController, const glm::vec3& hqSt
 
 void FactionAI::setTargetFaction(FactionHandler& factionHandler)
 {
-	m_targetFaction = nullptr;
+	m_targetFaction = eFactionController::None;
 	float targetFactionDistance = std::numeric_limits<float>::max();
 	for (const auto& opposingFaction : factionHandler.getOpposingFactions(getController()))
 	{
 		float distance = Globals::getSqrDistance(opposingFaction.get().getHQPosition(), m_HQ.getPosition());
 		if (distance < targetFactionDistance)
 		{
-			m_targetFaction = &opposingFaction.get();
+			m_targetFaction = opposingFaction.get().getController();
 			targetFactionDistance = distance;
 		}
 	}
@@ -194,13 +194,14 @@ void FactionAI::update(float deltaTime, const Map & map, FactionHandler& faction
 			}
 		}
 
-		if (m_targetFaction)
+		if (m_targetFaction != eFactionController::None)
 		{
+			const Faction& targetFaction = factionHandler.getFaction(m_targetFaction);
 			for (auto& unit : m_units)
 			{
 				if (unit.getCurrentState() == eUnitState::Idle)
 				{
-					unit.moveTo(m_targetFaction->getHQPosition(), map, [&](const glm::ivec2& position)
+					unit.moveTo(targetFaction.getHQPosition(), map, [&](const glm::ivec2& position)
 					{ return getAdjacentPositions(position, map, factionHandler, unit); }, factionHandler, eUnitState::AttackMoving);
 				}
 			}
