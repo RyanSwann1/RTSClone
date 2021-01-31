@@ -30,39 +30,6 @@ namespace
 		return static_cast<int>(pathToPosition.size()) <= mapSize.x * mapSize.y;
 	}
 
-	void getPathFromVisitedNodes(const glm::ivec2& startingPosition, const glm::ivec2& destinationPositionOnGrid, 
-		std::vector<glm::vec3>& pathToPosition, Graph& graph, const Map& map)
-	{
-		pathToPosition.push_back(Globals::convertToWorldPosition(destinationPositionOnGrid));
-		glm::ivec2 position = graph.getPreviousPosition(destinationPositionOnGrid, map);
-
-		while (position != startingPosition)
-		{
-			pathToPosition.push_back(Globals::convertToWorldPosition(position));
-			position = graph.getPreviousPosition(position, map);
-
-			assert(isPathWithinSizeLimit(pathToPosition, map.getSize()));
-		}
-	}
-
-	void getPathFromVisitedNodes(const glm::ivec2& startingPosition, const glm::ivec2& destinationPositionOnGrid, const glm::vec3& destinationPosition, 
-		std::vector<glm::vec3>& pathToPosition, Graph& graph, const Map& map)
-	{
-		pathToPosition.push_back(destinationPosition);
-		glm::ivec2 positionOnGrid = graph.getPreviousPosition(destinationPositionOnGrid, map);
-
-		while (positionOnGrid != startingPosition)
-		{
-			glm::vec3 position = Globals::convertToWorldPosition(positionOnGrid);
-			position.x += static_cast<float>(Globals::NODE_SIZE) / 2.0f;
-			position.z -= static_cast<float>(Globals::NODE_SIZE) / 2.0f;
-			pathToPosition.push_back(Globals::convertToWorldPosition(positionOnGrid));
-			positionOnGrid = graph.getPreviousPosition(positionOnGrid, map);
-
-			assert(isPathWithinSizeLimit(pathToPosition, map.getSize()));
-		}
-	}
-
 	void getPathFromClosedQueue(std::vector<glm::vec3>& pathToPosition, const glm::ivec2& startingPositionOnGrid,
 		const PriorityQueueNode& startingNode, const PriorityQueue& closedQueue, const Map& map)
 	{
