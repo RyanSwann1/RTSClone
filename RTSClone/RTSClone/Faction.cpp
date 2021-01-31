@@ -239,7 +239,11 @@ void Faction::handleEvent(const GameEvent& gameEvent, const Map& map, FactionHan
                 (*entity)->reduceHealth(gameEvent.data.takeDamage);
                 if ((*entity)->isDead())
                 {
-                    GameEventHandler::getInstance().gameEvents.push(GameEvent::createEliminateFaction(m_controller));
+                    removeEntity<Headquarters>(m_headquarters, targetID, entity);
+                    if (m_headquarters.empty())
+                    {
+                        GameEventHandler::getInstance().gameEvents.push(GameEvent::createEliminateFaction(m_controller));
+                    }
                 }
                 break;
             case eEntityType::Turret:
