@@ -24,6 +24,18 @@ const std::string PROJECTILE_MODEL_NAME = "laserSabel.obj";
 const std::string TRANSLATE_MODEL_NAME = "translate.obj";
 const std::string TURRET_MODEL_NAME = "turret_single.obj";
 const std::string LABORATORY_MODEL_NAME = "hangar_largeB.obj";
+#ifdef GAME
+const std::array<std::string, static_cast<size_t>(eEntityType::Max) + 1> MODEL_NAMES =
+{
+	UNIT_MODEL_NAME,
+	WORKER_MODEL_NAME,
+	HQ_MODEL_NAME,
+	SUPPLY_DEPOT_MODEL_NAME,
+	BARRACKS_MODEL_NAME,
+	TURRET_MODEL_NAME,
+	LABORATORY_MODEL_NAME
+};
+#endif // GAME
 
 namespace 
 {
@@ -46,6 +58,8 @@ namespace
 	const glm::vec3 PROJECTILE_AABB_SIZE_FROM_CENTER = { 1.0f, 1.0f, 1.0f };
 	const glm::vec3 SUPPLY_DEPOT_AABB_SIZE_FROM_CENTER = { 3.0f, 1.0f, 3.0f };
 	const glm::vec3 BARRACKS_AABB_SIZE_FROM_CENTER = { 3.0f, 1.0f, 3.0f };
+
+	const 
 	
 	void loadModel(const std::string& fileName, bool renderFromCenterPosition, const glm::vec3& AABBSizeFromCenter,
 		const glm::vec3& scale, std::vector<std::unique_ptr<Model>>& models, bool& loadedAllModels)
@@ -212,6 +226,8 @@ const Model& ModelManager::getModel(eEntityType entityType) const
 		return ModelManager::getInstance().getModel(TURRET_MODEL_NAME);
 	case eEntityType::Laboratory:
 		return ModelManager::getInstance().getModel(LABORATORY_MODEL_NAME);
+	case eEntityType::Headquarters:
+		return ModelManager::getInstance().getModel(HQ_MODEL_NAME);
 	default:
 		assert(false);
 	}
@@ -219,25 +235,20 @@ const Model& ModelManager::getModel(eEntityType entityType) const
 
 AABB ModelManager::getModelAABB(const glm::vec3& position, eEntityType entityType) const
 {
-	AABB modelAABB;
 	switch (entityType)
 	{
 	case eEntityType::Barracks:
-		modelAABB = { position,  ModelManager::getInstance().getModel(BARRACKS_MODEL_NAME) };
-		break;
+		return { position,  ModelManager::getInstance().getModel(BARRACKS_MODEL_NAME) };
 	case eEntityType::SupplyDepot:
-		modelAABB = { position, ModelManager::getInstance().getModel(SUPPLY_DEPOT_MODEL_NAME) };
-		break;
+		return { position, ModelManager::getInstance().getModel(SUPPLY_DEPOT_MODEL_NAME) };
 	case eEntityType::Turret:
-		modelAABB = { position, ModelManager::getInstance().getModel(TURRET_MODEL_NAME) };
-		break;
+		return { position, ModelManager::getInstance().getModel(TURRET_MODEL_NAME) };
 	case eEntityType::Laboratory:
-		modelAABB = { position, ModelManager::getInstance().getModel(LABORATORY_MODEL_NAME) };
-		break;
+		return { position, ModelManager::getInstance().getModel(LABORATORY_MODEL_NAME) };
+	case eEntityType::Headquarters:
+		return { position, ModelManager::getInstance().getModel(HQ_MODEL_NAME) };
 	default:
 		assert(false);
 	}
-
-	return modelAABB;
 }
 #endif // GAME

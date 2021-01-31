@@ -1,6 +1,10 @@
 #pragma once
 
 #include "Model.h"
+#ifdef GAME
+#include "EntityType.h"
+#endif // GAME
+
 #include <memory>
 #include <array>
 
@@ -17,6 +21,9 @@ extern const std::string PROJECTILE_MODEL_NAME;
 extern const std::string TRANSLATE_MODEL_NAME;
 extern const std::string TURRET_MODEL_NAME;
 extern const std::string LABORATORY_MODEL_NAME;
+#ifdef GAME
+extern const std::array<std::string, static_cast<size_t>(eEntityType::Max) + 1> MODEL_NAMES;
+#endif // GAME
 
 #ifdef GAME
 enum class eEntityType;

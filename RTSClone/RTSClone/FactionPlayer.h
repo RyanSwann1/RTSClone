@@ -6,7 +6,7 @@
 
 struct PlayerActivatePlannedBuildingEvent;
 class FactionPlayerPlannedBuilding
-{
+{	
 public:
 	FactionPlayerPlannedBuilding();
 
@@ -21,7 +21,7 @@ public:
 	void render(ShaderHandler& shaderHandler, eFactionController owningFactionController) const;
 
 private:
-	bool m_active;
+	const Model* m_model;
 	int m_workerID;
 	glm::vec3 m_position;
 	eEntityType m_entityType;
