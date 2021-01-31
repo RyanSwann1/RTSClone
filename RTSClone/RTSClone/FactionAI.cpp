@@ -24,7 +24,7 @@
 
 namespace
 {
-	const float DELAY_TIMER_EXPIRATION = 5.0f;
+	const float DELAY_TIMER_EXPIRATION = 25.0f;
 	const float IDLE_TIMER_EXPIRATION = 1.0f;
 	const float MIN_SPAWN_TIMER_EXPIRATION = 7.5f;
 	const float MAX_SPAWN_TIMER_EXPIRATION = 15.0f;

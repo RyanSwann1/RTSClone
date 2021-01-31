@@ -32,13 +32,12 @@ struct Camera;
 class FactionPlayer : public Faction
 {
 public:
-	FactionPlayer(const glm::vec3& hqStartingPosition, int startingResources, int startingPopulationCap,
-		const Base& currentBase);
+	FactionPlayer(const glm::vec3& hqStartingPosition, int startingResources, int startingPopulation);
 
 	const std::vector<Entity*>& getSelectedEntities() const;
 
 	void handleInput(const sf::Event& currentSFMLEvent, const sf::Window& window, const Camera& camera, const Map& map, 
-		FactionHandler& factionHandler);
+		FactionHandler& factionHandler, const std::vector<Base>& bases);
 	void handleEvent(const GameEvent& gameEvent, const Map& map, FactionHandler& factionHandler) override;
 	void update(float deltaTime, const Map& map, FactionHandler& factionHandler, const Timer& unitStateHandlerTimer) override;
 	void updateSelectionBox();
@@ -51,17 +50,19 @@ private:
 	glm::vec3 m_previousPlaneIntersection;
 	bool m_attackMoveSelected;
 	std::vector<Entity*> m_selectedEntities;
-	const Base& m_currentBase;
 
 	void onEntityRemoval(const Entity& entity) override;
 
 	void instructWorkerReturnMinerals(const Map& map, const Headquarters& headquarters);
 	int instructWorkerToBuild(const Map& map);
-	void moveSingularSelectedEntity(const glm::vec3& mouseToGroundPosition, const Map& map, Entity& selectedEntity, FactionHandler& factionHandler) const;
-	void moveMultipleSelectedEntities(const glm::vec3& mouseToGroundPosition, const Map& map, FactionHandler& factionHandler);
+	void moveSingularSelectedEntity(const glm::vec3& mouseToGroundPosition, const Map& map, Entity& selectedEntity, 
+		FactionHandler& factionHandler, const std::vector<Base>& bases) const;
+	void moveMultipleSelectedEntities(const glm::vec3& mouseToGroundPosition, const Map& map, FactionHandler& factionHandler,
+		const std::vector<Base>& bases);
 
 	void onLeftClick(const sf::Window& window, const Camera& camera, const Map& map);
-	void onRightClick(const sf::Window& window, const Camera& camera, FactionHandler& factionHandler, const Map& map);
+	void onRightClick(const sf::Window& window, const Camera& camera, FactionHandler& factionHandler, const Map& map, 
+		const std::vector<Base>& bases);
 
 	template <class Entity>
 	void selectEntity(std::forward_list<Entity>& entities, const glm::vec3& mouseToGroundPosition, bool selectAllEntities = false,

@@ -91,7 +91,7 @@ std::unique_ptr<Level> Level::create(const std::string& levelName)
 		{
 		case eFactionController::Player:
 			factions[i] = std::make_unique<FactionPlayer>(mainBases[i].position, 
-				factionStartingResources, factionStartingPopulation, mainBases[i]);
+				factionStartingResources, factionStartingPopulation);
 			break;
 		case eFactionController::AI_1:
 		case eFactionController::AI_2:
@@ -150,7 +150,7 @@ void Level::handleInput(const sf::Window& window, const Camera& camera, const sf
 
 	if (isFactionActive(m_factions, eFactionController::Player))
 	{
-		getFactionPlayer(m_factions).handleInput(currentSFMLEvent, window, camera, map, m_factionHandler);
+		getFactionPlayer(m_factions).handleInput(currentSFMLEvent, window, camera, map, m_factionHandler, m_mainBases);
 	}
 
 	if (currentSFMLEvent.type == sf::Event::MouseButtonPressed)

@@ -92,6 +92,22 @@ namespace
             selectedEntities.erase(selectedUnit);
         }
     }
+
+    const Mineral* getMineral(const std::vector<Base>& bases, const glm::vec3& position)
+    {
+        for (const auto& base : bases)
+        {
+            for (const auto& mineral : base.minerals)
+            {
+                if (mineral.getAABB().contains(position))
+                {
+                    return &mineral;
+                }
+            }
+        }
+
+        return nullptr;
+    }
 }
 
 //FactionPlayerPlannedBuilding
@@ -154,13 +170,11 @@ void FactionPlayerPlannedBuilding::render(ShaderHandler& shaderHandler, eFaction
 }
 
 //FactionPlayer
-FactionPlayer::FactionPlayer(const glm::vec3& hqStartingPosition, int startingResources, int startingPopulationCap,
-    const Base& currentBase)
-    : Faction(eFactionController::Player, hqStartingPosition, startingResources, startingPopulationCap),
+FactionPlayer::FactionPlayer(const glm::vec3& hqStartingPosition, int startingResources, int startingPopulation)
+    : Faction(eFactionController::Player, hqStartingPosition, startingResources, startingPopulation),
     m_selectionBox(),
     m_previousPlaneIntersection(),
-    m_attackMoveSelected(false),
-    m_currentBase(currentBase)
+    m_attackMoveSelected(false)
 {}
 
 const std::vector<Entity*>& FactionPlayer::getSelectedEntities() const
@@ -169,7 +183,7 @@ const std::vector<Entity*>& FactionPlayer::getSelectedEntities() const
 }
 
 void FactionPlayer::handleInput(const sf::Event& currentSFMLEvent, const sf::Window& window, const Camera& camera, 
-    const Map& map, FactionHandler& factionHandler)
+    const Map& map, FactionHandler& factionHandler, const std::vector<Base>& bases)
 {
     switch (currentSFMLEvent.type)
     {
@@ -180,7 +194,7 @@ void FactionPlayer::handleInput(const sf::Event& currentSFMLEvent, const sf::Win
         }
         else if (currentSFMLEvent.mouseButton.button == sf::Mouse::Right)
         {
-            onRightClick(window, camera, factionHandler, map);
+            onRightClick(window, camera, factionHandler, map, bases);
         }
         break;
     case sf::Event::MouseButtonReleased:
@@ -358,7 +372,7 @@ int FactionPlayer::instructWorkerToBuild(const Map& map)
 }
 
 void FactionPlayer::moveSingularSelectedEntity(const glm::vec3& planeIntersection, const Map& map, Entity& selectedEntity, 
-    FactionHandler& factionHandler) const
+    FactionHandler& factionHandler, const std::vector<Base>& bases) const
 {
     switch (selectedEntity.getEntityType())
     {
@@ -374,12 +388,8 @@ void FactionPlayer::moveSingularSelectedEntity(const glm::vec3& planeIntersectio
     case eEntityType::Worker:
     {
         Worker& selectedWorker = static_cast<Worker&>(selectedEntity);
-
-        auto mineralToHarvest = std::find_if(m_currentBase.minerals.cbegin(), m_currentBase.minerals.cend(), [&planeIntersection](const auto& mineral)
-        {
-            return mineral.getAABB().contains(planeIntersection);
-        });
-        if (mineralToHarvest != m_currentBase.minerals.cend())
+        const Mineral* mineralToHarvest = getMineral(bases, planeIntersection);
+        if (mineralToHarvest)
         {
             selectedWorker.moveTo(PathFinding::getInstance().getClosestPositionToAABB(selectedWorker.getPosition(),
                 mineralToHarvest->getAABB(), map),
@@ -411,16 +421,12 @@ void FactionPlayer::moveSingularSelectedEntity(const glm::vec3& planeIntersectio
     }
 }
 
-void FactionPlayer::moveMultipleSelectedEntities(const glm::vec3& planeIntersection, const Map& map, FactionHandler& factionHandler)
+void FactionPlayer::moveMultipleSelectedEntities(const glm::vec3& planeIntersection, const Map& map, 
+    FactionHandler& factionHandler, const std::vector<Base>& bases)
 {
     assert(!m_selectedEntities.empty());
-
-    auto mineralToHarvest = std::find_if(m_currentBase.minerals.cbegin(), m_currentBase.minerals.cend(), [&planeIntersection](const auto& mineral)
-    {
-        return mineral.getAABB().contains(planeIntersection);
-    });
-
-    if (mineralToHarvest != m_currentBase.minerals.cend())
+    const Mineral* mineralToHarvest = getMineral(bases, planeIntersection);
+    if (mineralToHarvest)
     {
         for (auto& selectedUnit : m_selectedEntities)
         {
@@ -523,7 +529,8 @@ void FactionPlayer::onLeftClick(const sf::Window& window, const Camera& camera, 
     }
 }
 
-void FactionPlayer::onRightClick(const sf::Window& window, const Camera& camera, FactionHandler& factionHandler, const Map& map)
+void FactionPlayer::onRightClick(const sf::Window& window, const Camera& camera, FactionHandler& factionHandler, const Map& map,
+    const std::vector<Base>& bases)
 {
     m_plannedBuilding.deactivate();
     glm::vec3 planeIntersection = camera.getRayToGroundPlaneIntersection(window);
@@ -587,11 +594,11 @@ void FactionPlayer::onRightClick(const sf::Window& window, const Camera& camera,
 
         if (m_selectedEntities.size() == static_cast<size_t>(1))
         {
-            moveSingularSelectedEntity(planeIntersection, map, *m_selectedEntities.back(), factionHandler);
+            moveSingularSelectedEntity(planeIntersection, map, *m_selectedEntities.back(), factionHandler, bases);
         }
         else if (!m_selectedEntities.empty())
         {
-            moveMultipleSelectedEntities(planeIntersection, map, factionHandler);
+            moveMultipleSelectedEntities(planeIntersection, map, factionHandler, bases);
         }
     }
 }
