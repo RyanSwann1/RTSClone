@@ -50,7 +50,7 @@ public:
 
 protected:	
 	Entity(const Model& model, const glm::vec3& startingPosition, eEntityType entityType, 
-		int health, int shield, glm::vec3 startingRotation = glm::vec3());
+		int health, int shield, glm::vec3 startingRotation = glm::vec3(0.0f));
 	
 	void update(float deltaTime);
 	

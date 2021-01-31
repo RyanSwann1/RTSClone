@@ -338,7 +338,7 @@ void Faction::increaseShield()
 
 void Faction::handleUnitCollisions(const Map& map, FactionHandler& factionHandler)
 {
-    static std::vector<const Entity*> handledUnits;
+    std::vector<const Entity*> handledUnits;
     for (auto& unit : m_units)
     {
         if (unit.getCurrentState() == eUnitState::Idle)
@@ -373,7 +373,7 @@ void Faction::handleUnitCollisions(const Map& map, FactionHandler& factionHandle
 
 void Faction::handleWorkerCollisions(const Map& map)
 {
-    static std::vector<const Entity*> handledUnits;
+    std::vector<const Entity*> handledUnits;
     for (auto& worker : m_workers)
     {
         if (worker.getCurrentState() == eWorkerState::Idle)
@@ -742,7 +742,9 @@ const Entity* Faction::spawnUnit(const Map& map, const UnitSpawnerBuilding& buil
     {
         if (building.isWaypointActive())
         {
-            m_units.emplace_back(*this, Globals::convertToNodePosition(building.getUnitSpawnPosition()));
+            glm::vec3 startingPosition = Globals::convertToNodePosition(building.getUnitSpawnPosition());
+            glm::vec3 startingRotation = { 0.0f, Globals::getAngle(startingPosition, building.getPosition()), 0.0f };
+            m_units.emplace_back(*this, startingPosition, startingRotation);
             
             glm::vec3 destination = PathFinding::getInstance().getClosestAvailablePosition(building.getWaypointPosition(), m_units, m_workers, map);
             Unit& unit = m_units.back();
@@ -751,8 +753,10 @@ const Entity* Faction::spawnUnit(const Map& map, const UnitSpawnerBuilding& buil
         }
         else
         {
-            m_units.emplace_back(*this, Globals::convertToNodePosition(PathFinding::getInstance().getClosestAvailablePosition(building.getUnitSpawnPosition(),
-                m_units, m_workers, map)));
+            glm::vec3 startingPosition = Globals::convertToNodePosition(PathFinding::getInstance().getClosestAvailablePosition(building.getUnitSpawnPosition(),
+                m_units, m_workers, map));
+            glm::vec3 startingRotation = { 0.0f, Globals::getAngle(startingPosition, building.getPosition()), 0.0f };
+            m_units.emplace_back(*this, startingPosition, startingRotation);
         }
 
         reduceResources(eEntityType::Unit);

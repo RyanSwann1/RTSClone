@@ -13,7 +13,7 @@
 #include <queue>
 #include <array>
 #include <functional>
-#include <forward_list>
+#include <list>
 
 namespace GameMessages
 {

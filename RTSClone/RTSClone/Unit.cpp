@@ -22,9 +22,9 @@ namespace
 	const int DAMAGE = 1;
 }
 
-Unit::Unit(const Faction& owningFaction, const glm::vec3& startingPosition)
+Unit::Unit(const Faction& owningFaction, const glm::vec3& startingPosition, const glm::vec3& startingRotation)
 	: Entity(ModelManager::getInstance().getModel(UNIT_MODEL_NAME), startingPosition, eEntityType::Unit, 
-		Globals::UNIT_STARTING_HEALTH, owningFaction.getCurrentShieldAmount()),
+		Globals::UNIT_STARTING_HEALTH, owningFaction.getCurrentShieldAmount(), startingRotation),
 	m_owningFaction(owningFaction),
 	m_pathToPosition(),
 	m_currentState(eUnitState::Idle),
