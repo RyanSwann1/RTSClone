@@ -158,7 +158,7 @@ FactionPlayer::FactionPlayer(const glm::vec3& hqStartingPosition, int startingRe
     const Base& currentBase)
     : Faction(eFactionController::Player, hqStartingPosition, startingResources, startingPopulationCap),
     m_selectionBox(),
-    m_previousMouseToGroundPosition(),
+    m_previousPlaneIntersection(),
     m_attackMoveSelected(false),
     m_currentBase(currentBase)
 {}
@@ -357,7 +357,7 @@ int FactionPlayer::instructWorkerToBuild(const Map& map)
     return workerID;
 }
 
-void FactionPlayer::moveSingularSelectedEntity(const glm::vec3& mouseToGroundPosition, const Map& map, Entity& selectedEntity, 
+void FactionPlayer::moveSingularSelectedEntity(const glm::vec3& planeIntersection, const Map& map, Entity& selectedEntity, 
     FactionHandler& factionHandler) const
 {
     switch (selectedEntity.getEntityType())
@@ -366,7 +366,7 @@ void FactionPlayer::moveSingularSelectedEntity(const glm::vec3& mouseToGroundPos
     {
         Unit& selectedUnit = static_cast<Unit&>(selectedEntity);
         selectedUnit.resetTarget();
-        selectedUnit.moveTo(Globals::convertToNodePosition(mouseToGroundPosition), map,
+        selectedUnit.moveTo(Globals::convertToNodePosition(planeIntersection), map,
             [&](const glm::ivec2& position) { return getAdjacentPositions(position, map, factionHandler, selectedUnit); },
             factionHandler, (m_attackMoveSelected ? eUnitState::AttackMoving : eUnitState::Moving));
     }
@@ -375,9 +375,9 @@ void FactionPlayer::moveSingularSelectedEntity(const glm::vec3& mouseToGroundPos
     {
         Worker& selectedWorker = static_cast<Worker&>(selectedEntity);
 
-        auto mineralToHarvest = std::find_if(m_currentBase.minerals.cbegin(), m_currentBase.minerals.cend(), [&mouseToGroundPosition](const auto& mineral)
+        auto mineralToHarvest = std::find_if(m_currentBase.minerals.cbegin(), m_currentBase.minerals.cend(), [&planeIntersection](const auto& mineral)
         {
-            return mineral.getAABB().contains(mouseToGroundPosition);
+            return mineral.getAABB().contains(planeIntersection);
         });
         if (mineralToHarvest != m_currentBase.minerals.cend())
         {
@@ -389,9 +389,9 @@ void FactionPlayer::moveSingularSelectedEntity(const glm::vec3& mouseToGroundPos
         else
         {
             auto selectedEntity = std::find_if(m_allEntities.cbegin(), m_allEntities.cend(), 
-                [&mouseToGroundPosition, &selectedWorker](const auto& entity)
+                [&planeIntersection, &selectedWorker](const auto& entity)
             {
-                return entity->getAABB().contains(mouseToGroundPosition) && entity->getID() != selectedWorker.getID();
+                return entity->getAABB().contains(planeIntersection) && entity->getID() != selectedWorker.getID();
             });
             if (selectedEntity != m_allEntities.cend() &&
                 (*selectedEntity)->getHealth() < (*selectedEntity)->getMaximumHealth())
@@ -400,7 +400,7 @@ void FactionPlayer::moveSingularSelectedEntity(const glm::vec3& mouseToGroundPos
             }
             else
             {
-                selectedWorker.moveTo(mouseToGroundPosition, map, [&](const glm::ivec2& position) 
+                selectedWorker.moveTo(planeIntersection, map, [&](const glm::ivec2& position) 
                 { return getAdjacentPositions(position, map); });
             }
         }
@@ -411,13 +411,13 @@ void FactionPlayer::moveSingularSelectedEntity(const glm::vec3& mouseToGroundPos
     }
 }
 
-void FactionPlayer::moveMultipleSelectedEntities(const glm::vec3& mouseToGroundPosition, const Map& map, FactionHandler& factionHandler)
+void FactionPlayer::moveMultipleSelectedEntities(const glm::vec3& planeIntersection, const Map& map, FactionHandler& factionHandler)
 {
     assert(!m_selectedEntities.empty());
 
-    auto mineralToHarvest = std::find_if(m_currentBase.minerals.cbegin(), m_currentBase.minerals.cend(), [&mouseToGroundPosition](const auto& mineral)
+    auto mineralToHarvest = std::find_if(m_currentBase.minerals.cbegin(), m_currentBase.minerals.cend(), [&planeIntersection](const auto& mineral)
     {
-        return mineral.getAABB().contains(mouseToGroundPosition);
+        return mineral.getAABB().contains(planeIntersection);
     });
 
     if (mineralToHarvest != m_currentBase.minerals.cend())
@@ -437,9 +437,9 @@ void FactionPlayer::moveMultipleSelectedEntities(const glm::vec3& mouseToGroundP
     }
     else
     {
-        auto selectedEntity = std::find_if(m_allEntities.cbegin(), m_allEntities.cend(), [&mouseToGroundPosition](const auto& entity)
+        auto selectedEntity = std::find_if(m_allEntities.cbegin(), m_allEntities.cend(), [&planeIntersection](const auto& entity)
         {
-            return entity->getAABB().contains(mouseToGroundPosition);
+            return entity->getAABB().contains(planeIntersection);
         });
 
         if (selectedEntity != m_allEntities.cend())
@@ -469,7 +469,7 @@ void FactionPlayer::moveMultipleSelectedEntities(const glm::vec3& mouseToGroundP
                     Unit& selectedUnit = static_cast<Unit&>(*selectedEntity);
                     selectedUnit.resetTarget();
                     eUnitState state = (m_attackMoveSelected ? eUnitState::AttackMoving : eUnitState::Moving);
-                    glm::vec3 destination = Globals::convertToNodePosition(mouseToGroundPosition - (averagePosition - selectedEntity->getPosition()));
+                    glm::vec3 destination = Globals::convertToNodePosition(planeIntersection - (averagePosition - selectedEntity->getPosition()));
 
                     selectedUnit.moveTo(destination, map, [&](const glm::ivec2& position)
                     { return getAdjacentPositions(position, map, factionHandler, selectedUnit); }, factionHandler, state);
@@ -478,7 +478,7 @@ void FactionPlayer::moveMultipleSelectedEntities(const glm::vec3& mouseToGroundP
                 case eEntityType::Worker:
                 {
                     Worker& selectedWorker = static_cast<Worker&>(*selectedEntity);
-                    glm::vec3 destination = mouseToGroundPosition - (averagePosition - selectedEntity->getPosition());
+                    glm::vec3 destination = planeIntersection - (averagePosition - selectedEntity->getPosition());
                     static_cast<Worker*>(selectedEntity)->moveTo(destination, map,
                         [&](const glm::ivec2& position) { return getAdjacentPositions(position, map); });
                 }
@@ -493,47 +493,46 @@ void FactionPlayer::moveMultipleSelectedEntities(const glm::vec3& mouseToGroundP
 
 void FactionPlayer::onLeftClick(const sf::Window& window, const Camera& camera, const Map& map)
 {
-    glm::vec3 mouseToGroundPosition = camera.getRayToGroundPlaneIntersection(window);
+    glm::vec3 planeIntersection = camera.getRayToGroundPlaneIntersection(window);
 
-    m_selectionBox.setStartingPosition(window, mouseToGroundPosition);
+    m_selectionBox.setStartingPosition(window, planeIntersection);
     
     int workerIDSelected = instructWorkerToBuild(map);
-    selectEntity<Unit>(m_units, mouseToGroundPosition, mouseToGroundPosition == m_previousMouseToGroundPosition);
-    selectEntity<Worker>(m_workers, mouseToGroundPosition, mouseToGroundPosition == m_previousMouseToGroundPosition, workerIDSelected);
+    selectEntity<Unit>(m_units, planeIntersection, planeIntersection == m_previousPlaneIntersection);
+    selectEntity<Worker>(m_workers, planeIntersection, planeIntersection == m_previousPlaneIntersection, workerIDSelected);
     setSelectedEntities(m_selectedEntities, m_units, m_workers);
 
-    if (mouseToGroundPosition != m_previousMouseToGroundPosition)
+    if (planeIntersection != m_previousPlaneIntersection)
     {
-        m_previousMouseToGroundPosition = mouseToGroundPosition;
+        m_previousPlaneIntersection = planeIntersection;
     }
 
     if (m_selectedEntities.empty())
     {
-        selectEntity<Barracks>(m_barracks, mouseToGroundPosition);
-        selectEntity<Turret>(m_turrets, mouseToGroundPosition);
-        selectEntity<SupplyDepot>(m_supplyDepots, mouseToGroundPosition);
+        selectEntity<Barracks>(m_barracks, planeIntersection);
+        selectEntity<Turret>(m_turrets, planeIntersection);
+        selectEntity<SupplyDepot>(m_supplyDepots, planeIntersection);
         for (auto& headquarters : m_headquarters)
         {
-            headquarters.setSelected(headquarters.getAABB().contains(mouseToGroundPosition));
+            headquarters.setSelected(headquarters.getAABB().contains(planeIntersection));
         }
         if (m_laboratory)
         {
-            m_laboratory->setSelected(m_laboratory->getAABB().contains(mouseToGroundPosition));
+            m_laboratory->setSelected(m_laboratory->getAABB().contains(planeIntersection));
         }
-        //m_HQ.setSelected(m_HQ.getAABB().contains(mouseToGroundPosition));
     }
 }
 
 void FactionPlayer::onRightClick(const sf::Window& window, const Camera& camera, FactionHandler& factionHandler, const Map& map)
 {
     m_plannedBuilding.deactivate();
-    glm::vec3 mouseToGroundPosition = camera.getRayToGroundPlaneIntersection(window);
+    glm::vec3 planeIntersection = camera.getRayToGroundPlaneIntersection(window);
     const Faction* targetFaction = nullptr;
     const Entity* targetEntity = nullptr;
 
     for (const auto& opposingFactions : factionHandler.getOpposingFactions(getController()))
     {
-        targetEntity = opposingFactions.get().getEntity(mouseToGroundPosition);
+        targetEntity = opposingFactions.get().getEntity(planeIntersection);
         if (targetEntity)
         {
             targetFaction = &opposingFactions.get();
@@ -570,37 +569,29 @@ void FactionPlayer::onRightClick(const sf::Window& window, const Camera& camera,
         {
             if (headquarters.isSelected())
             {
-                headquarters.setWaypointPosition(mouseToGroundPosition, map);
+                headquarters.setWaypointPosition(planeIntersection, map);
             }
-            else if (headquarters.getAABB().contains(mouseToGroundPosition))
+            else if (headquarters.getAABB().contains(planeIntersection))
             {
                 instructWorkerReturnMinerals(map, headquarters);
             }
         }
-        //if (m_HQ.isSelected())
-        //{
-        //    m_HQ.setWaypointPosition(mouseToGroundPosition, map);
-        //}
-        //else if (m_HQ.getAABB().contains(mouseToGroundPosition))
-        //{
-        //    instructWorkerReturnMinerals(map);
-        //}
 
         for (auto& barracks : m_barracks)
         {
             if (barracks.isSelected())
             {
-                barracks.setWaypointPosition(mouseToGroundPosition, map);
+                barracks.setWaypointPosition(planeIntersection, map);
             }
         }
 
         if (m_selectedEntities.size() == static_cast<size_t>(1))
         {
-            moveSingularSelectedEntity(mouseToGroundPosition, map, *m_selectedEntities.back(), factionHandler);
+            moveSingularSelectedEntity(planeIntersection, map, *m_selectedEntities.back(), factionHandler);
         }
         else if (!m_selectedEntities.empty())
         {
-            moveMultipleSelectedEntities(mouseToGroundPosition, map, factionHandler);
+            moveMultipleSelectedEntities(planeIntersection, map, factionHandler);
         }
     }
 }

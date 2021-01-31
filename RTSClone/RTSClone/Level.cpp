@@ -155,10 +155,10 @@ void Level::handleInput(const sf::Window& window, const Camera& camera, const sf
 
 	if (currentSFMLEvent.type == sf::Event::MouseButtonPressed)
 	{
-		glm::vec3 mouseToGroundPosition = camera.getRayToGroundPlaneIntersection(window);
+		glm::vec3 planeIntersection = camera.getRayToGroundPlaneIntersection(window);
 		for (auto& opposingFaction : m_factionHandler.getOpposingFactions(eFactionController::Player))
 		{
-			opposingFaction.get().selectEntity(mouseToGroundPosition);
+			opposingFaction.get().selectEntity(planeIntersection);
 		}
 	}
 

@@ -48,7 +48,7 @@ public:
 private:
 	FactionPlayerPlannedBuilding m_plannedBuilding;
 	SelectionBox m_selectionBox;
-	glm::vec3 m_previousMouseToGroundPosition;
+	glm::vec3 m_previousPlaneIntersection;
 	bool m_attackMoveSelected;
 	std::vector<Entity*> m_selectedEntities;
 	const Base& m_currentBase;
