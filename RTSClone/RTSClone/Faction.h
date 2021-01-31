@@ -8,7 +8,6 @@
 #include "FactionController.h"
 #include "Turret.h"
 #include "Laboratory.h"
-#include <forward_list>
 #include <vector>
 #include <list>
 
@@ -30,8 +29,8 @@ public:
 	const Headquarters& getClosestHeadquarters(const glm::vec3& position) const;
 	const glm::vec3& getMainHeadquartersPosition() const;
 	eFactionController getController() const;
-	const std::forward_list<Unit>& getUnits() const;
-	const std::forward_list<Worker>& getWorkers() const;
+	const std::list<Unit>& getUnits() const;
+	const std::list<Worker>& getWorkers() const;
 	const Entity* getEntity(const glm::vec3& position, float maxDistance, bool prioritizeUnits = true) const;
 	const Entity* getEntity(const AABB& AABB, int entityID) const;
 	const Entity* getEntity(int entityID) const;
@@ -57,11 +56,11 @@ protected:
 		int startingResources, int startingPopulationCap);
 
 	std::vector<Entity*> m_allEntities;
-	std::forward_list<Unit> m_units;
-	std::forward_list<Worker> m_workers;
-	std::forward_list<SupplyDepot> m_supplyDepots;
-	std::forward_list<Barracks> m_barracks;
-	std::forward_list<Turret> m_turrets;
+	std::list<Unit> m_units;
+	std::list<Worker> m_workers;
+	std::list<SupplyDepot> m_supplyDepots;
+	std::list<Barracks> m_barracks;
+	std::list<Turret> m_turrets;
 	std::list<Headquarters> m_headquarters;
 	std::unique_ptr<Laboratory> m_laboratory;
 
@@ -95,7 +94,7 @@ private:
 
 	//Presumes entity already found in all entities container
 	template <class T>
-	void removeEntity(std::forward_list<T>& entityContainer, int entityID, std::vector<Entity*>::iterator entity)
+	void removeEntity(std::list<T>& entityContainer, int entityID, std::vector<Entity*>::iterator entity)
 	{
 		assert(entity != m_allEntities.cend());
 		onEntityRemoval(*(*entity));

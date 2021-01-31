@@ -424,8 +424,8 @@ const std::vector<glm::vec3>& PathFinding::getFormationPositions(const glm::vec3
 	return m_sharedPositionContainer;
 }
 
-glm::vec3 PathFinding::getClosestAvailablePosition(const glm::vec3& startingPosition, const std::forward_list<Unit>& units, 
-	const std::forward_list<Worker>& workers, const Map& map)
+glm::vec3 PathFinding::getClosestAvailablePosition(const glm::vec3& startingPosition, const std::list<Unit>& units, 
+	const std::list<Worker>& workers, const Map& map)
 {
 	m_graph.reset(m_frontier);
 	m_frontier.push(Globals::convertToGridPosition(startingPosition));

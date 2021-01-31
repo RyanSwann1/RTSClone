@@ -35,7 +35,7 @@ class Worker;
 class Map;
 class Unit;
 std::array<AdjacentPosition, ALL_DIRECTIONS_ON_GRID.size()> getAdjacentPositions(const glm::ivec2& position, const Map& map,
-	const std::forward_list<Unit>& units, const std::forward_list<Worker>& workers);
+	const std::list<Unit>& units, const std::list<Worker>& workers);
 
 std::array<AdjacentPosition, ALL_DIRECTIONS_ON_GRID.size()> getAllAdjacentPositions(const glm::ivec2& position, const Map& map);
 

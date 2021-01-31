@@ -38,7 +38,7 @@ public:
 	}
 
 	template <class Entity>
-	glm::vec3 getClosestAvailablePosition(const Entity& currentEntity, const std::forward_list<Entity>& entities, const Map& map) const
+	glm::vec3 getClosestAvailablePosition(const Entity& currentEntity, const std::list<Entity>& entities, const Map& map) const
 	{
 		constexpr float MAX_RAY_DISTANCE = static_cast<float>(Globals::NODE_SIZE) * 10.0f;
 		const std::array<glm::ivec2, 4> DIRECTIONS_ON_GRID =
@@ -116,8 +116,8 @@ public:
 	const std::vector<glm::vec3>& getFormationPositions(const glm::vec3& startingPosition, const std::vector<Unit*>& selectedUnits,
 		const Map& map);
 
-	glm::vec3 getClosestAvailablePosition(const glm::vec3& startingPosition, const std::forward_list<Unit>& units, 
-		const std::forward_list<Worker>& workers, const Map& map);
+	glm::vec3 getClosestAvailablePosition(const glm::vec3& startingPosition, const std::list<Unit>& units, 
+		const std::list<Worker>& workers, const Map& map);
 
 	glm::vec3 getRandomAvailablePositionOutsideAABB(const Entity& senderEntity, const Map& map);
 

@@ -43,7 +43,7 @@ namespace
         }
     }
 
-    void setSelectedEntities(std::vector<Entity*>& selectedUnits, std::forward_list<Unit>& units, std::forward_list<Worker>& workers)
+    void setSelectedEntities(std::vector<Entity*>& selectedUnits, std::list<Unit>& units, std::list<Worker>& workers)
     {
         selectedUnits.clear();
 
