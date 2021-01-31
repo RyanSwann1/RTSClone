@@ -106,7 +106,7 @@ private:
 	}
 
 	template <class Entity>
-	void selectUnits(std::list<Entity>& units, const SelectionBox& selectionBox)
+	void selectEntities(std::list<Entity>& units, const SelectionBox& selectionBox)
 	{
 		for (auto& unit : units)
 		{

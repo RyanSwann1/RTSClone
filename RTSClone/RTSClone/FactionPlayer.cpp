@@ -203,10 +203,7 @@ void FactionPlayer::handleInput(const sf::Event& currentSFMLEvent, const sf::Win
         {
             if (m_selectionBox.isActive() && m_selectionBox.isMinimumSize() && !m_selectedEntities.empty())
             {
-                for (auto& headquarters : m_headquarters)
-                {
-                    headquarters.setSelected(false);
-                }
+                deselectEntities<Headquarters>(m_headquarters);
                 deselectEntities<Barracks>(m_barracks);
                 deselectEntities<Turret>(m_turrets);
                 deselectEntities<SupplyDepot>(m_supplyDepots);
@@ -274,8 +271,8 @@ void FactionPlayer::updateSelectionBox()
 {
     if (m_selectionBox.isActive() && m_selectionBox.isMinimumSize())
     {
-        selectUnits<Unit>(m_units, m_selectionBox);
-        selectUnits<Worker>(m_workers, m_selectionBox);
+        selectEntities<Unit>(m_units, m_selectionBox);
+        selectEntities<Worker>(m_workers, m_selectionBox);
         setSelectedEntities(m_selectedEntities, m_units, m_workers);
 
         if (m_selectedEntities.size() == static_cast<size_t>(1))
@@ -518,10 +515,7 @@ void FactionPlayer::onLeftClick(const sf::Window& window, const Camera& camera, 
         selectEntity<Barracks>(m_barracks, planeIntersection);
         selectEntity<Turret>(m_turrets, planeIntersection);
         selectEntity<SupplyDepot>(m_supplyDepots, planeIntersection);
-        for (auto& headquarters : m_headquarters)
-        {
-            headquarters.setSelected(headquarters.getAABB().contains(planeIntersection));
-        }
+        selectEntity<Headquarters>(m_headquarters, planeIntersection);
         if (m_laboratory)
         {
             m_laboratory->setSelected(m_laboratory->getAABB().contains(planeIntersection));
