@@ -28,34 +28,32 @@ namespace
 	const float WORKER_PROGRESS_BAR_YOFFSET = 30.0f;
 }
 
-//BuildingCommand
-BuildingCommand::BuildingCommand(const std::function<const Entity*()>& command, const glm::vec3& buildPosition, eEntityType entityType)
-	: command(command),
-	buildPosition(buildPosition),
-	m_model(ModelManager::getInstance().getModel(entityType))
-{
-	assert(command);
-}
+//BuildingInWorkerQueue
+BuildingInWorkerQueue::BuildingInWorkerQueue(const glm::vec3& position, eEntityType entityType)
+	: position(position),
+	entityType(entityType),
+	model(ModelManager::getInstance().getModel(entityType))
+{}
 
 //Worker
-Worker::Worker(const Faction& owningFaction, const glm::vec3& startingPosition)
+Worker::Worker(Faction& owningFaction, const glm::vec3& startingPosition)
 	: Entity(ModelManager::getInstance().getModel(WORKER_MODEL_NAME), startingPosition, eEntityType::Worker, 
 		Globals::WORKER_STARTING_HEALTH, owningFaction.getCurrentShieldAmount()),
 	m_owningFaction(owningFaction),
 	m_currentState(eWorkerState::Idle),
-	m_buildingCommands(),
+	m_buildQueue(),
 	m_repairTargetEntityID(Globals::INVALID_ENTITY_ID),
 	m_currentResourceAmount(0),
 	m_taskTimer(0.0f, false),
 	m_mineralToHarvest(nullptr)
 {}
 
-Worker::Worker(const Faction& owningFaction, const glm::vec3 & startingPosition, const glm::vec3 & destination, const Map & map)
+Worker::Worker(Faction& owningFaction, const glm::vec3 & startingPosition, const glm::vec3 & destination, const Map & map)
 	: Entity(ModelManager::getInstance().getModel(WORKER_MODEL_NAME), startingPosition, eEntityType::Worker, Globals::WORKER_STARTING_HEALTH,
 		owningFaction.getCurrentShieldAmount()),
 	m_owningFaction(owningFaction),
 	m_currentState(eWorkerState::Idle),
-	m_buildingCommands(),
+	m_buildQueue(),
 	m_repairTargetEntityID(Globals::INVALID_ENTITY_ID),
 	m_currentResourceAmount(0),
 	m_taskTimer(0.0f, false),
@@ -70,9 +68,9 @@ const Mineral* Worker::getMineralToHarvest() const
 	return m_mineralToHarvest;
 }
 
-const std::deque<BuildingCommand>& Worker::getBuildingCommands() const
+const std::list<BuildingInWorkerQueue>& Worker::getBuildingCommands() const
 {
-	return m_buildingCommands;
+	return m_buildQueue;
 }
 
 const std::vector<glm::vec3>& Worker::getPathToPosition() const
@@ -113,13 +111,12 @@ void Worker::setEntityToRepair(const Entity& entity, const Map& map)
 	}
 }
 
-bool Worker::build(const std::function<const Entity*()>& buildingCommand, const glm::vec3& buildPosition, 
-	const Map& map, eEntityType entityType)
+bool Worker::build(const glm::vec3& buildPosition, const Map& map, eEntityType entityType)
 {
 	if (!map.isPositionOccupied(buildPosition))
 	{
-		m_buildingCommands.emplace_back(buildingCommand, Globals::convertToMiddleGridPosition(buildPosition), entityType);
-		if (m_buildingCommands.size() == 1)
+		m_buildQueue.emplace_back(Globals::convertToMiddleGridPosition(buildPosition), entityType);
+		if (m_buildQueue.size() == 1)
 		{
 			moveTo(Globals::convertToMiddleGridPosition(buildPosition), map,
 				[&](const glm::ivec2& position) { return getAdjacentPositions(position, map); }, eWorkerState::MovingToBuildingPosition);
@@ -201,7 +198,7 @@ void Worker::update(float deltaTime, const Map& map, FactionHandler& factionHand
 		}
 		break;
 	case eWorkerState::MovingToBuildingPosition:
-		assert(!m_buildingCommands.empty());
+		assert(!m_buildQueue.empty());
 		if (m_pathToPosition.empty())
 		{
 			switchTo(eWorkerState::Building);
@@ -209,34 +206,26 @@ void Worker::update(float deltaTime, const Map& map, FactionHandler& factionHand
 		break;
 	case eWorkerState::Building:
 	{
-		assert(m_pathToPosition.empty() && !m_buildingCommands.empty() && m_taskTimer.isActive());
-		if (!m_taskTimer.isExpired())
+		assert(m_pathToPosition.empty() && !m_buildQueue.empty() && m_taskTimer.isActive());
+		if (m_taskTimer.isExpired())
 		{
-			break;
-		}
-
-		const Entity* newBuilding = m_buildingCommands.front().command();
-		m_buildingCommands.pop_front();
-		if (!newBuilding)
-		{
-			m_buildingCommands.clear();
-		}
-
-		if (!m_buildingCommands.empty())
-		{
-			moveTo(m_buildingCommands.front().buildPosition, map,
-				[&](const glm::ivec2& position) { return getAdjacentPositions(position, map); }, eWorkerState::MovingToBuildingPosition);
-		}
-		else
-		{
-			if (newBuilding)
+			const Entity* building = m_owningFaction.spawnBuilding(
+				map, Globals::convertToNodePosition(m_buildQueue.front().position), m_buildQueue.front().entityType);
+			m_buildQueue.pop_front();
+			if (!building)
+			{
+				m_buildQueue.clear();
+				switchTo(eWorkerState::Idle);
+			}
+			else if (!m_buildQueue.empty())
+			{
+				moveTo(m_buildQueue.front().position, map,
+					[&](const glm::ivec2& position) { return getAdjacentPositions(position, map); }, eWorkerState::MovingToBuildingPosition);
+			}
+			else if(building)
 			{
 				moveTo(PathFinding::getInstance().getRandomAvailablePositionOutsideAABB(*this, map),
 					map, [&](const glm::ivec2& position) { return getAllAdjacentPositions(position, map); });
-			}
-			else
-			{
-				switchTo(eWorkerState::Idle);
 			}
 		}
 	}
@@ -356,9 +345,10 @@ void Worker::renderProgressBar(ShaderHandler& shaderHandler, const Camera& camer
 
 void Worker::renderBuildingCommands(ShaderHandler& shaderHandler) const
 {
-	for (const auto& buildingCommand : m_buildingCommands)
+	for (const auto& building : m_buildQueue)
 	{
-		buildingCommand.m_model.get().render(shaderHandler, m_owningFaction.getController(), buildingCommand.buildPosition, glm::vec3(0.0f), false);
+		building.model.get().render(
+			shaderHandler, m_owningFaction.getController(), building.position, glm::vec3(0.0f), false);
 	}
 }
 
@@ -390,7 +380,7 @@ void Worker::switchTo(eWorkerState newState, const Mineral* mineralToHarvest)
 		if (newState != eWorkerState::MovingToBuildingPosition &&
 			newState != eWorkerState::Building)
 		{
-			m_buildingCommands.clear();
+			m_buildQueue.clear();
 		}
 		break;
 	case eWorkerState::MovingToRepairPosition:
@@ -448,3 +438,4 @@ void Worker::switchTo(eWorkerState newState, const Mineral* mineralToHarvest)
 	m_taskTimer.resetElaspedTime();
 	m_currentState = newState;
 }
+

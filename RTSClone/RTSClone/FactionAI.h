@@ -29,6 +29,7 @@ public:
 	FactionAI(eFactionController factionController, const glm::vec3& hqStartingPosition, 
 		int startingResources, int startingPopulationCap, const Base& currentBase);
 
+	const Entity* spawnBuilding(const Map& map, glm::vec3 position, eEntityType entityType) override;
 	void setTargetFaction(FactionHandler& factionHandler);
 	void onFactionElimination(FactionHandler& factionHandler, eFactionController eliminatedFaction);
 	void handleEvent(const GameEvent& gameEvent, const Map& map, FactionHandler& factionHandler) override;
@@ -48,7 +49,6 @@ private:
 	const Mineral& getRandomMineral() const;
 	Worker* getAvailableWorker(const glm::vec3& position);
 	
-	const Entity* spawnBuilding(const Map& map, glm::vec3 position, eEntityType entityType) override;
 	const Entity* spawnUnit(const Map& map, const UnitSpawnerBuilding& building, FactionHandler& factionHandler) override;
 	const Entity* spawnWorker(const Map& map, const UnitSpawnerBuilding& building) override;
 

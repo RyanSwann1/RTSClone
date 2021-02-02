@@ -28,13 +28,13 @@ enum class eWorkerState
 	Max = Repairing
 };
 
-struct BuildingCommand
+struct BuildingInWorkerQueue
 {
-	BuildingCommand(const std::function<const Entity*()>& command, const glm::vec3& buildPosition, eEntityType entityType);
+	BuildingInWorkerQueue(const glm::vec3& position, eEntityType entityType);
 
-	std::function<const Entity*()> command; //Faction::AddBuilding
-	glm::vec3 buildPosition;
-	std::reference_wrapper<const Model> m_model;
+	const glm::vec3 position;
+	const eEntityType entityType;
+	const std::reference_wrapper<const Model> model;
 };
 
 class Faction;
@@ -42,19 +42,18 @@ class Mineral;
 class Worker : public Entity
 {
 public:
-	Worker(const Faction& owningFaction, const glm::vec3& startingPosition);
-	Worker(const Faction& owningFaction, const glm::vec3& startingPosition, const glm::vec3& destination, const Map& map);
+	Worker(Faction& owningFaction, const glm::vec3& startingPosition);
+	Worker(Faction& owningFaction, const glm::vec3& startingPosition, const glm::vec3& destination, const Map& map);
 	
 	const Mineral* getMineralToHarvest() const;
-	const std::deque<BuildingCommand>& getBuildingCommands() const;
+	const std::list<BuildingInWorkerQueue>& getBuildingCommands() const;
 	const std::vector<glm::vec3>& getPathToPosition() const;
 	eWorkerState getCurrentState() const;
 	bool isHoldingResources() const;
 	int extractResources();	
 
 	void setEntityToRepair(const Entity& entity, const Map& map);
-	bool build(const std::function<const Entity*()>& buildingCommand, const glm::vec3& buildPosition, 
-		const Map& map, eEntityType entityType);
+	bool build(const glm::vec3& buildPosition, const Map& map, eEntityType entityType);
 	void update(float deltaTime, const Map& map, FactionHandler& factionHandler, const Timer& unitStateHandlerTimer);
 	void moveTo(const glm::vec3& destination, const Map& map, const AdjacentPositions& adjacentPositions,
 		eWorkerState state = eWorkerState::Moving, const Mineral* mineralToHarvest = nullptr);
@@ -68,10 +67,10 @@ public:
 #endif // RENDER_PATHING
 
 private:
-	const Faction& m_owningFaction;
+	Faction& m_owningFaction;
 	eWorkerState m_currentState;
 	std::vector<glm::vec3> m_pathToPosition;
-	std::deque<BuildingCommand> m_buildingCommands;
+	std::list<BuildingInWorkerQueue> m_buildQueue;
 	int m_repairTargetEntityID;
 	int m_currentResourceAmount;
 	Timer m_taskTimer;

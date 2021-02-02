@@ -713,7 +713,7 @@ bool Faction::instructWorkerToBuild(eEntityType entityType, const glm::vec3& pos
             auto buildingCommand = std::find_if(worker.getBuildingCommands().cbegin(), worker.getBuildingCommands().cend(),
                 [&buildingAABB, &position](const auto& buildingCommand)
             {
-                return buildingAABB.contains(buildingCommand.buildPosition);
+                return buildingAABB.contains(buildingCommand.position);
             });
             if (buildingCommand != worker.getBuildingCommands().cend())
             {
@@ -724,12 +724,7 @@ bool Faction::instructWorkerToBuild(eEntityType entityType, const glm::vec3& pos
 
         if (!buildingCommandCollision)
         {
-            glm::vec3 buildPosition = Globals::convertToNodePosition(position);
-            if (worker.build([this, &map, buildPosition, entityType]()
-                { return spawnBuilding(map, buildPosition, entityType); }, buildPosition, map, entityType))
-            {
-                return true;
-            }
+            return worker.build(Globals::convertToNodePosition(position), map, entityType);
         }
     }
 
