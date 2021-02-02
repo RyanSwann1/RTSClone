@@ -233,20 +233,7 @@ namespace Globals
 
 	inline glm::vec3 convertToNodePosition(const glm::vec3& position)
 	{
-		glm::vec3 newPosition = { std::floor(position.x), std::floor(position.y), std::floor(position.z) };
-		int xDifference = static_cast<int>(position.x) % Globals::NODE_SIZE;
-		if (xDifference > 0)
-		{
-			newPosition.x -= xDifference;
-		}
-
-		int zDifference = static_cast<int>(position.z) % Globals::NODE_SIZE;
-		if (zDifference > 0)
-		{
-			newPosition.z -= zDifference;
-		}
-
-		return newPosition;
+		return position - glm::mod(position, static_cast<float>(Globals::NODE_SIZE));
 	}
 
 	inline glm::vec3 convertToMiddleGridPosition(const glm::vec3& position)
