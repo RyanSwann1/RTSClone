@@ -378,7 +378,7 @@ void Faction::handleWorkerCollisions(const Map& map)
     {
         if (worker.getCurrentState() == eWorkerState::Idle)
         {
-            if (map.isCollidable(worker.getPosition()))// currentMapNode.isCollidable() && currentMapNode.getEntityID() != worker.getID())
+            if (map.isCollidable(worker.getPosition()))
             {
                 worker.moveTo(PathFinding::getInstance().getClosestAvailablePosition<Worker>(worker, m_workers, map), map,
                     [&](const glm::ivec2& position) { return getAdjacentPositions(position, map); });
@@ -773,13 +773,18 @@ const Entity* Faction::spawnWorker(const Map& map, const UnitSpawnerBuilding& bu
     {
         if (building.isWaypointActive())
         {
-            m_workers.emplace_back(*this, building.getUnitSpawnPosition(), PathFinding::getInstance().getClosestAvailablePosition(
-                building.getWaypointPosition(), m_units, m_workers, map), map);
+            glm::vec3 startingPosition = building.getUnitSpawnPosition();
+            glm::vec3 destination = PathFinding::getInstance().getClosestAvailablePosition(
+                building.getWaypointPosition(), m_units, m_workers, map);
+
+            m_workers.emplace_back(*this, startingPosition, destination, map);
         }
         else
         {
-            m_workers.emplace_back(*this, PathFinding::getInstance().getClosestAvailablePosition(
-                building.getUnitSpawnPosition(), m_units, m_workers, map));
+            glm::vec3 startingPosition = PathFinding::getInstance().getClosestAvailablePosition(
+                building.getUnitSpawnPosition(), m_units, m_workers, map);
+
+            m_workers.emplace_back(*this, startingPosition);
         }
 
         reduceResources(eEntityType::Worker);

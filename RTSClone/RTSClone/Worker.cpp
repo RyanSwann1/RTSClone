@@ -50,7 +50,7 @@ Worker::Worker(const Faction& owningFaction, const glm::vec3& startingPosition)
 	m_mineralToHarvest(nullptr)
 {}
 
-Worker::Worker(const Faction& owningFaction, const glm::vec3 & startingPosition, const glm::vec3 & destinationPosition, const Map & map)
+Worker::Worker(const Faction& owningFaction, const glm::vec3 & startingPosition, const glm::vec3 & destination, const Map & map)
 	: Entity(ModelManager::getInstance().getModel(WORKER_MODEL_NAME), startingPosition, eEntityType::Worker, Globals::WORKER_STARTING_HEALTH,
 		owningFaction.getCurrentShieldAmount()),
 	m_owningFaction(owningFaction),
@@ -61,7 +61,7 @@ Worker::Worker(const Faction& owningFaction, const glm::vec3 & startingPosition,
 	m_taskTimer(0.0f, false),
 	m_mineralToHarvest(nullptr)
 {
-	moveTo(destinationPosition, map,
+	moveTo(destination, map,
 		[&](const glm::ivec2& position) { return getAdjacentPositions(position, map); });
 }
 
@@ -307,12 +307,12 @@ void Worker::update(float deltaTime, const Map& map, FactionHandler& factionHand
 	}
 }
 
-void Worker::moveTo(const glm::vec3& destinationPosition, const Map& map, const AdjacentPositions& adjacentPositions, 
+void Worker::moveTo(const glm::vec3& destination, const Map& map, const AdjacentPositions& adjacentPositions, 
 	eWorkerState state, const Mineral* mineralToHarvest)
 {
 	glm::vec3 previousDestination = Globals::getNextPathDestination(m_pathToPosition, m_position);
 
-	PathFinding::getInstance().getPathToPosition(*this, destinationPosition, m_pathToPosition, adjacentPositions,
+	PathFinding::getInstance().getPathToPosition(*this, destination, m_pathToPosition, adjacentPositions,
 		map, m_owningFaction);
 	if (!m_pathToPosition.empty())
 	{

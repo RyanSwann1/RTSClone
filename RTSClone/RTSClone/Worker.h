@@ -43,7 +43,7 @@ class Worker : public Entity
 {
 public:
 	Worker(const Faction& owningFaction, const glm::vec3& startingPosition);
-	Worker(const Faction& owningFaction, const glm::vec3& startingPosition, const glm::vec3& destinationPosition, const Map& map);
+	Worker(const Faction& owningFaction, const glm::vec3& startingPosition, const glm::vec3& destination, const Map& map);
 	
 	const Mineral* getMineralToHarvest() const;
 	const std::deque<BuildingCommand>& getBuildingCommands() const;
@@ -56,7 +56,7 @@ public:
 	bool build(const std::function<const Entity*()>& buildingCommand, const glm::vec3& buildPosition, 
 		const Map& map, eEntityType entityType);
 	void update(float deltaTime, const Map& map, FactionHandler& factionHandler, const Timer& unitStateHandlerTimer);
-	void moveTo(const glm::vec3& destinationPosition, const Map& map, const AdjacentPositions& adjacentPositions,
+	void moveTo(const glm::vec3& destination, const Map& map, const AdjacentPositions& adjacentPositions,
 		eWorkerState state = eWorkerState::Moving, const Mineral* mineralToHarvest = nullptr);
 
 	void render(ShaderHandler& shaderHandler, eFactionController owningFactionController) const;
