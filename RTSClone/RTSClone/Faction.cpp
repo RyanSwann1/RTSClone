@@ -752,8 +752,9 @@ const Entity* Faction::spawnWorker(const Map& map, const UnitSpawnerBuilding& bu
         {
             glm::vec3 startingPosition = PathFinding::getInstance().getClosestAvailablePosition(
                 building.getUnitSpawnPosition(), m_units, m_workers, map);
+            glm::vec3 startingRotation = { 0.0f, Globals::getAngle(startingPosition, building.getPosition()), 0.0f };
 
-            m_workers.emplace_back(*this, startingPosition);
+            m_workers.emplace_back(*this, startingPosition, startingRotation);
         }
 
         reduceResources(eEntityType::Worker);

@@ -42,7 +42,7 @@ class Mineral;
 class Worker : public Entity
 {
 public:
-	Worker(Faction& owningFaction, const glm::vec3& startingPosition);
+	Worker(Faction& owningFaction, const glm::vec3& startingPosition, const glm::vec3& startingRotation);
 	Worker(Faction& owningFaction, const glm::vec3& startingPosition, const glm::vec3& destination, const Map& map);
 	
 	const Mineral* getMineralToHarvest() const;
