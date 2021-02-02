@@ -31,11 +31,10 @@ Mineral::Mineral(Mineral&& rhs) noexcept
 #ifdef GAME
 Mineral::Mineral(const glm::vec3& startingPosition)
 	: m_active(true),
-	m_position(startingPosition),
+	m_position(Globals::convertToMiddleGridPosition(startingPosition)),
 	m_AABB(),
 	m_model(ModelManager::getInstance().getModel(MINERALS_MODEL_NAME))
 {
-	m_position = Globals::convertToMiddleGridPosition(startingPosition);
 	m_AABB.reset(m_position, m_model);
 	broadcastToMessenger<GameMessages::AddToMap>({ m_AABB });
 }

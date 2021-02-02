@@ -21,7 +21,7 @@ Faction::Faction(eFactionController factionController, const glm::vec3& hqStarti
     m_currentPopulationLimit(startingPopulationCap),
     m_currentShieldAmount(0)
 {
-    m_headquarters.emplace_back(Globals::convertToNodePosition(hqStartingPosition), *this);
+    m_headquarters.emplace_back(hqStartingPosition, *this);
     m_allEntities.push_back(&m_headquarters.back());
 }
 
@@ -698,7 +698,7 @@ bool Faction::instructWorkerToBuild(eEntityType entityType, const glm::vec3& pos
 
         if (!buildingCommandCollision)
         {
-            return worker.build(Globals::convertToNodePosition(position), map, entityType);
+            return worker.build(position, map, entityType);
         }
     }
 
@@ -711,7 +711,7 @@ const Entity* Faction::spawnUnit(const Map& map, const UnitSpawnerBuilding& buil
     {
         if (building.isWaypointActive())
         {
-            glm::vec3 startingPosition = Globals::convertToNodePosition(building.getUnitSpawnPosition());
+            glm::vec3 startingPosition = building.getUnitSpawnPosition();
             glm::vec3 startingRotation = { 0.0f, Globals::getAngle(startingPosition, building.getPosition()), 0.0f };
             glm::vec3 destination = PathFinding::getInstance().getClosestAvailablePosition(building.getWaypointPosition(), m_units, m_workers, map);
 
@@ -719,8 +719,8 @@ const Entity* Faction::spawnUnit(const Map& map, const UnitSpawnerBuilding& buil
         }
         else
         {
-            glm::vec3 startingPosition = Globals::convertToNodePosition(PathFinding::getInstance().getClosestAvailablePosition(building.getUnitSpawnPosition(),
-                m_units, m_workers, map));
+            glm::vec3 startingPosition = PathFinding::getInstance().getClosestAvailablePosition(building.getUnitSpawnPosition(),
+                m_units, m_workers, map);
             glm::vec3 startingRotation = { 0.0f, Globals::getAngle(startingPosition, building.getPosition()), 0.0f };
             
             m_units.emplace_back(*this, startingPosition, startingRotation);

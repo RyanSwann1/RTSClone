@@ -79,7 +79,8 @@ Entity::Entity(const Model& model, const glm::vec3& startingPosition, eEntityTyp
 	case eEntityType::Unit:
 	case eEntityType::Turret:
 	case eEntityType::Laboratory:
-		m_position = Globals::convertToMiddleGridPosition(startingPosition);
+		m_position = Globals::convertToNodePosition(m_position);
+		m_position = Globals::convertToMiddleGridPosition(m_position);
 		break;
 	case eEntityType::Worker:
 		break;

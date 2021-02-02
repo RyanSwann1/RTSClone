@@ -30,7 +30,7 @@ namespace
 
 //BuildingInWorkerQueue
 BuildingInWorkerQueue::BuildingInWorkerQueue(const glm::vec3& position, eEntityType entityType)
-	: position(position),
+	: position(Globals::convertToMiddleGridPosition(Globals::convertToNodePosition(position))),
 	entityType(entityType),
 	model(ModelManager::getInstance().getModel(entityType))
 {}
@@ -115,10 +115,10 @@ bool Worker::build(const glm::vec3& buildPosition, const Map& map, eEntityType e
 {
 	if (!map.isPositionOccupied(buildPosition))
 	{
-		m_buildQueue.emplace_back(Globals::convertToMiddleGridPosition(buildPosition), entityType);
+		m_buildQueue.emplace_back(buildPosition, entityType);
 		if (m_buildQueue.size() == 1)
 		{
-			moveTo(Globals::convertToMiddleGridPosition(buildPosition), map,
+			moveTo(m_buildQueue.back().position, map,
 				[&](const glm::ivec2& position) { return getAdjacentPositions(position, map); }, eWorkerState::MovingToBuildingPosition);
 		}
 
@@ -210,7 +210,7 @@ void Worker::update(float deltaTime, const Map& map, FactionHandler& factionHand
 		if (m_taskTimer.isExpired())
 		{
 			const Entity* building = m_owningFaction.spawnBuilding(
-				map, Globals::convertToNodePosition(m_buildQueue.front().position), m_buildQueue.front().entityType);
+				map, m_buildQueue.front().position, m_buildQueue.front().entityType);
 			m_buildQueue.pop_front();
 			if (!building)
 			{
@@ -403,9 +403,10 @@ void Worker::switchTo(eWorkerState newState, const Mineral* mineralToHarvest)
 		m_pathToPosition.clear();
 		break;
 	case eWorkerState::Moving:
-	case eWorkerState::ReturningMineralsToHeadquarters:
 	case eWorkerState::MovingToBuildingPosition:
+	case eWorkerState::ReturningMineralsToHeadquarters:
 	case eWorkerState::MovingToRepairPosition:
+		assert(!m_pathToPosition.empty());
 		m_taskTimer.setActive(false);
 		break;
 	case eWorkerState::MovingToMinerals:
