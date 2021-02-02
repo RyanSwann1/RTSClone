@@ -8,10 +8,11 @@ enum class eFactionController;
 struct Model;
 class Map;
 class Faction;
+class FactionHandler;
 class UnitSpawnerBuilding : public Entity
 {
 public:
-	~UnitSpawnerBuilding();
+	virtual ~UnitSpawnerBuilding();
 
 	const Timer& getSpawnTimer() const;
 	int getCurrentSpawnCount() const;
@@ -19,19 +20,20 @@ public:
 	const glm::vec3& getWaypointPosition() const;
 	glm::vec3 getUnitSpawnPosition() const;
 
+	virtual bool addToSpawn() = 0;
 	void setWaypointPosition(const glm::vec3& position, const Map& map);
 	void render(ShaderHandler& shaderHandler, eFactionController owningFactionController) const;
 	void renderProgressBar(ShaderHandler& shaderHandler, const Camera& camera, glm::uvec2 windowSize) const;
 
 protected:
 	UnitSpawnerBuilding(const glm::vec3& startingPosition, eEntityType entityType, float spawnTimerExpirationTime, int health, 
-		const Faction& owningFaction, const Model& model);
+		Faction& owningFaction, const Model& model);
 	
-	void update(float deltaTime, int resourceCost, int populationCost);
-	void addUnitToSpawn(const std::function<const Entity* (const UnitSpawnerBuilding&)>& unitToSpawn);
+	void update(float deltaTime, int resourceCost, int populationCost, 
+		const Map& map, FactionHandler& factionHandler);
 
-	const Faction& m_owningFaction;
-	std::vector<std::function<const Entity* (const UnitSpawnerBuilding&)>> m_unitsToSpawn;
+	Faction& m_owningFaction;
+	std::vector<eEntityType> m_spawnQueue;
 	Timer m_spawnTimer;
 
 private:
@@ -42,20 +44,20 @@ class Barracks : public UnitSpawnerBuilding
 {		
 	friend class Faction;
 public:
-	Barracks(const glm::vec3& startingPosition, const Faction& owningFaction);
-	void update(float deltaTime);
+	Barracks(const glm::vec3& startingPosition, Faction& owningFaction);
+	void update(float deltaTime, const Map& map, FactionHandler& factionHandler);
 	
 private:
-	void addUnitToSpawn(const std::function<const Entity* (const UnitSpawnerBuilding&)>& unitToSpawn);
+	bool addToSpawn() override;
 };
 
 class Headquarters : public UnitSpawnerBuilding
 {
 	friend class Faction;
 public:
-	Headquarters(const glm::vec3& startingPosition, const Faction& owningFaction);
-	void update(float deltaTime);
+	Headquarters(const glm::vec3& startingPosition, Faction& owningFaction);
+	void update(float deltaTime, const Map& map, FactionHandler& factionHandler);
 	
 private:
-	void addUnitToSpawn(const std::function<const Entity* (const UnitSpawnerBuilding&)>& unitToSpawn);
+	bool addToSpawn() override;
 };

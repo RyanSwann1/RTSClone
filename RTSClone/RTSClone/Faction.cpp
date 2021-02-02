@@ -420,7 +420,7 @@ void Faction::update(float deltaTime, const Map& map, FactionHandler& factionHan
 
     for (auto& barracks : m_barracks)
     {
-        barracks.update(deltaTime);
+        barracks.update(deltaTime, map, factionHandler);
     }
 
     for (auto& turret : m_turrets)
@@ -435,7 +435,7 @@ void Faction::update(float deltaTime, const Map& map, FactionHandler& factionHan
 
     for (auto& headquarters : m_headquarters)
     {
-        headquarters.update(deltaTime);
+        headquarters.update(deltaTime, map, factionHandler);
     }
 
     if (m_laboratory)
@@ -635,23 +635,7 @@ bool Faction::addUnitToSpawn(eEntityType unitType, const Map& map, UnitSpawnerBu
 {
     if (isEntityAffordable(unitType) && !isExceedPopulationLimit(unitType))
     {
-        switch (unitType)
-        {
-        case eEntityType::Unit:
-            assert(building.getEntityType() == eEntityType::Barracks);
-            static_cast<Barracks&>(building).addUnitToSpawn([this, &map, unitType, &factionHandler](const UnitSpawnerBuilding& building)
-                { return this->spawnUnit(map, building, factionHandler); });
-            break;
-        case eEntityType::Worker:
-            assert(building.getEntityType() == eEntityType::Headquarters);
-            static_cast<Headquarters&>(building).addUnitToSpawn([this, &map, unitType](const UnitSpawnerBuilding& building)
-                { return this->spawnWorker(map, building); });
-            break;
-        default:
-            assert(false);
-        }
-
-        return true;
+        return building.addToSpawn();
     }
 
     return false;

@@ -36,6 +36,8 @@ public:
 	const Entity* getEntity(int entityID) const;
 	const Entity* getEntity(const glm::vec3& position) const;
 
+	virtual const Entity* spawnUnit(const Map& map, const UnitSpawnerBuilding& building, FactionHandler& factionHandler);
+	virtual const Entity* spawnWorker(const Map& map, const UnitSpawnerBuilding& building);
 	virtual const Entity* spawnBuilding(const Map& map, glm::vec3 position, eEntityType entityType);
 	virtual void handleEvent(const GameEvent& gameEvent, const Map& map, FactionHandler& factionHandler);
 	virtual void update(float deltaTime, const Map& map, FactionHandler& factionHandler, const Timer& unitStateHandlerTimer);
@@ -71,8 +73,6 @@ protected:
 	bool addUnitToSpawn(eEntityType unitType, const Map& map, UnitSpawnerBuilding& building, FactionHandler& factionHandler);
 	bool instructWorkerToBuild(eEntityType entityType, const glm::vec3& position, const Map& map, Worker& worker);
 	virtual void onEntityRemoval(const Entity& entity) {}
-	virtual const Entity* spawnUnit(const Map& map, const UnitSpawnerBuilding& building, FactionHandler& factionHandler);
-	virtual const Entity* spawnWorker(const Map& map, const UnitSpawnerBuilding& building);
 
 private:
 	const eFactionController m_controller;

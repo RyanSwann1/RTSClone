@@ -13,7 +13,7 @@ namespace
 {
 	const float TIME_BETWEEN_WORKER_SPAWN = 2.0f;
 	const float TIME_BETWEEN_UNIT_SPAWN = 3.0f;
-	const int MAX_UNITS_SPAWNABLE = 5;
+	const size_t MAX_UNITS_SPAWNABLE = 5;
 
 	const float HQ_PROGRESS_BAR_WIDTH = 150.0f;
 	const float HQ_PROGRESS_BAR_YOFFSET = 220.0f;
@@ -48,43 +48,52 @@ namespace
 }
 
 //Barracks
-Barracks::Barracks(const glm::vec3& startingPosition, const Faction& owningFaction)
+Barracks::Barracks(const glm::vec3& startingPosition, Faction& owningFaction)
 	: UnitSpawnerBuilding(startingPosition, eEntityType::Barracks, TIME_BETWEEN_UNIT_SPAWN, 
 		Globals::BARRACKS_STARTING_HEALTH, owningFaction,
 		ModelManager::getInstance().getModel(BARRACKS_MODEL_NAME))
 {}
 
-void Barracks::update(float deltaTime)
+void Barracks::update(float deltaTime, const Map& map, FactionHandler& factionHandler)
 {
-	UnitSpawnerBuilding::update(deltaTime, Globals::UNIT_RESOURCE_COST, Globals::UNIT_POPULATION_COST);
+	UnitSpawnerBuilding::update(deltaTime, Globals::UNIT_RESOURCE_COST, Globals::UNIT_POPULATION_COST, 
+		map, factionHandler);
 }
 
-void Barracks::addUnitToSpawn(const std::function<const Entity* (const UnitSpawnerBuilding&)>& unitToSpawn)
+bool Barracks::addToSpawn()
 {
-	if (isUnitSpawnable(static_cast<int>(m_unitsToSpawn.size()), Globals::UNIT_RESOURCE_COST, Globals::UNIT_POPULATION_COST, m_owningFaction))
+	if (isUnitSpawnable(static_cast<int>(m_spawnQueue.size()), Globals::UNIT_RESOURCE_COST, Globals::UNIT_POPULATION_COST, m_owningFaction) &&
+		UnitSpawnerBuilding::addToSpawn())
 	{
-		UnitSpawnerBuilding::addUnitToSpawn(unitToSpawn);
+		m_spawnQueue.push_back(eEntityType::Unit);
+		return true;
 	}
+
+	return false;
 }
 
 //HQ
-Headquarters::Headquarters(const glm::vec3& startingPosition, const Faction& owningFaction)
+Headquarters::Headquarters(const glm::vec3& startingPosition, Faction& owningFaction)
 	: UnitSpawnerBuilding(startingPosition, eEntityType::Headquarters, TIME_BETWEEN_WORKER_SPAWN, 
-		Globals::HQ_STARTING_HEALTH, owningFaction,
-		ModelManager::getInstance().getModel(HQ_MODEL_NAME))
+		Globals::HQ_STARTING_HEALTH, owningFaction, ModelManager::getInstance().getModel(HQ_MODEL_NAME))
 {}
 
-void Headquarters::update(float deltaTime)
+void Headquarters::update(float deltaTime, const Map& map, FactionHandler& factionHandler)
 {
-	UnitSpawnerBuilding::update(deltaTime, Globals::WORKER_RESOURCE_COST, Globals::WORKER_POPULATION_COST);
+	UnitSpawnerBuilding::update(deltaTime, Globals::WORKER_RESOURCE_COST, Globals::WORKER_POPULATION_COST,
+		map, factionHandler);
 }
 
-void Headquarters::addUnitToSpawn(const std::function<const Entity* (const UnitSpawnerBuilding&)>& unitToSpawn)
+bool Headquarters::addToSpawn()
 {
-	if (isUnitSpawnable(static_cast<int>(m_unitsToSpawn.size()), Globals::WORKER_RESOURCE_COST, Globals::WORKER_POPULATION_COST, m_owningFaction))
+	if (isUnitSpawnable(static_cast<int>(m_spawnQueue.size()), Globals::WORKER_RESOURCE_COST, Globals::WORKER_POPULATION_COST, m_owningFaction) &&
+		UnitSpawnerBuilding::addToSpawn())
 	{
-		UnitSpawnerBuilding::addUnitToSpawn(unitToSpawn);
+		m_spawnQueue.push_back(eEntityType::Worker);
+		return true;
 	}
+
+	return false;
 }
 
 UnitSpawnerBuilding::~UnitSpawnerBuilding()
@@ -99,7 +108,7 @@ const Timer& UnitSpawnerBuilding::getSpawnTimer() const
 
 int UnitSpawnerBuilding::getCurrentSpawnCount() const
 {
-	return static_cast<int>(m_unitsToSpawn.size());
+	return static_cast<int>(m_spawnQueue.size());
 }
 
 bool UnitSpawnerBuilding::isWaypointActive() const
@@ -127,13 +136,15 @@ glm::vec3 UnitSpawnerBuilding::getUnitSpawnPosition() const
 	}
 }
 
-void UnitSpawnerBuilding::addUnitToSpawn(const std::function<const Entity* (const UnitSpawnerBuilding&)>& unitToSpawn)
+bool UnitSpawnerBuilding::addToSpawn()
 {
-	if (static_cast<int>(m_unitsToSpawn.size()) < MAX_UNITS_SPAWNABLE)
+	if (m_spawnQueue.size() < MAX_UNITS_SPAWNABLE)
 	{
-		m_unitsToSpawn.push_back(unitToSpawn);
 		m_spawnTimer.setActive(true);
+		return true;
 	}
+
+	return false;
 }
 
 void UnitSpawnerBuilding::setWaypointPosition(const glm::vec3& position, const Map& map)
@@ -151,31 +162,49 @@ void UnitSpawnerBuilding::setWaypointPosition(const glm::vec3& position, const M
 	}
 }
 
-void UnitSpawnerBuilding::update(float deltaTime, int resourceCost, int populationCost)
+void UnitSpawnerBuilding::update(float deltaTime, int resourceCost, int populationCost, 
+	const Map& map, FactionHandler& factionHandler)
 {
 	Entity::update(deltaTime);
 	m_spawnTimer.update(deltaTime);
-	if (m_spawnTimer.isExpired() && !m_unitsToSpawn.empty())
+	if (m_spawnTimer.isExpired() && !m_spawnQueue.empty())
 	{
 		m_spawnTimer.resetElaspedTime();
 		
-		auto& unitToSpawn = m_unitsToSpawn.back();
-		if (!unitToSpawn(*this))
+		eEntityType entityToSpawn = m_spawnQueue.back();
+		const Entity* spawnedEntity = nullptr;
+		switch (entityToSpawn)
 		{
-			m_unitsToSpawn.clear();
+		case eEntityType::Unit:
+			spawnedEntity = m_owningFaction.spawnUnit(map, *this, factionHandler);
+			break;
+		case eEntityType::Worker:
+			spawnedEntity = m_owningFaction.spawnWorker(map, *this);
+			break;
+		case eEntityType::Headquarters:
+		case eEntityType::SupplyDepot:
+		case eEntityType::Barracks:
+		case eEntityType::Turret:
+		case eEntityType::Laboratory:
+			assert(false);
+			break;
+		}
+
+		if (!spawnedEntity)
+		{
+			m_spawnQueue.clear();
 			m_spawnTimer.setActive(false);
 		}
 		else
 		{
-			m_unitsToSpawn.pop_back();
-
-			if (m_unitsToSpawn.empty())
+			m_spawnQueue.pop_back();
+			if (m_spawnQueue.empty())
 			{
 				m_spawnTimer.setActive(false);
 			}
 			else if (!isEntityAffordable(m_owningFaction, resourceCost, populationCost))
 			{
-				m_unitsToSpawn.clear();
+				m_spawnQueue.clear();
 				m_spawnTimer.setActive(false);
 			}
 		}
@@ -219,13 +248,13 @@ void UnitSpawnerBuilding::renderProgressBar(ShaderHandler& shaderHandler, const 
 }
 
 UnitSpawnerBuilding::UnitSpawnerBuilding(const glm::vec3& startingPosition, eEntityType entityType, 
-	float spawnTimerExpirationTime, int health, const Faction& owningFaction, const Model& model)
+	float spawnTimerExpirationTime, int health, Faction& owningFaction, const Model& model)
 	: Entity(model, startingPosition, entityType, health, owningFaction.getCurrentShieldAmount()),
 	m_owningFaction(owningFaction),
-	m_unitsToSpawn(),
+	m_spawnQueue(),
 	m_spawnTimer(spawnTimerExpirationTime, false),
 	m_waypointPosition(m_position)
 {
 	broadcastToMessenger<GameMessages::AddToMap>({ m_AABB });
-	m_unitsToSpawn.reserve(static_cast<size_t>(MAX_UNITS_SPAWNABLE));
+	m_spawnQueue.reserve(MAX_UNITS_SPAWNABLE);
 }
