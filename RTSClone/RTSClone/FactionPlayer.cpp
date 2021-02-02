@@ -252,7 +252,8 @@ void FactionPlayer::handleEvent(const GameEvent& gameEvent, const Map& map, Fact
         });
         if (entity != m_allEntities.end())
         {
-            addUnitToSpawn(gameEvent.data.playerSpawnUnit.entityType, map, static_cast<UnitSpawnerBuilding&>(*(*entity)), factionHandler);
+            assert(Globals::BUILDING_SPAWNER_TYPES.isMatch((*entity)->getEntityType()));
+            static_cast<UnitSpawnerBuilding&>(*(*entity)).addToSpawn();
         }
     }
     break;

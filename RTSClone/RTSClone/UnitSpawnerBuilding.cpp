@@ -138,7 +138,23 @@ glm::vec3 UnitSpawnerBuilding::getUnitSpawnPosition() const
 
 bool UnitSpawnerBuilding::addToSpawn()
 {
-	if (m_spawnQueue.size() < MAX_UNITS_SPAWNABLE)
+	eEntityType entityTypeToSpawn;
+	switch (getEntityType())
+	{
+	case eEntityType::Barracks:
+		entityTypeToSpawn = eEntityType::Unit;
+		break;
+	case eEntityType::Headquarters:
+		entityTypeToSpawn = eEntityType::Worker;
+		break;
+	default:
+		assert(false);
+		break;
+	}
+
+	if (m_spawnQueue.size() < MAX_UNITS_SPAWNABLE && 
+		m_owningFaction.isEntityAffordable(entityTypeToSpawn) &&
+		!m_owningFaction.isExceedPopulationLimit(entityTypeToSpawn))
 	{
 		m_spawnTimer.setActive(true);
 		return true;

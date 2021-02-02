@@ -42,22 +42,18 @@ private:
 
 class Barracks : public UnitSpawnerBuilding
 {		
-	friend class Faction;
 public:
 	Barracks(const glm::vec3& startingPosition, Faction& owningFaction);
+
 	void update(float deltaTime, const Map& map, FactionHandler& factionHandler);
-	
-private:
 	bool addToSpawn() override;
 };
 
 class Headquarters : public UnitSpawnerBuilding
 {
-	friend class Faction;
 public:
 	Headquarters(const glm::vec3& startingPosition, Faction& owningFaction);
+
 	void update(float deltaTime, const Map& map, FactionHandler& factionHandler);
-	
-private:
 	bool addToSpawn() override;
 };

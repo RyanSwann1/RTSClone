@@ -631,16 +631,6 @@ const Entity* Faction::spawnBuilding(const Map& map, glm::vec3 position, eEntity
     return nullptr;
 }
 
-bool Faction::addUnitToSpawn(eEntityType unitType, const Map& map, UnitSpawnerBuilding& building, FactionHandler& factionHandler)
-{
-    if (isEntityAffordable(unitType) && !isExceedPopulationLimit(unitType))
-    {
-        return building.addToSpawn();
-    }
-
-    return false;
-}
-
 void Faction::reduceResources(eEntityType addedEntityType)
 {
     m_currentResourceAmount -= Globals::ENTITY_RESOURCE_COSTS[static_cast<int>(addedEntityType)];

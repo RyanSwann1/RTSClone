@@ -21,6 +21,8 @@ class Faction : private NonCopyable, private NonMovable
 public:
 	virtual ~Faction() {}
 
+	bool isExceedPopulationLimit(eEntityType entityType) const;
+	bool isEntityAffordable(eEntityType entityType) const;
 	bool isAffordable(int resourceAmount) const;
 	int getCurrentShieldAmount() const;
 	int getCurrentPopulationAmount() const;
@@ -67,10 +69,6 @@ protected:
 	std::list<Headquarters> m_headquarters;
 	std::unique_ptr<Laboratory> m_laboratory;
 
-	bool isExceedPopulationLimit(eEntityType entityType) const;
-	bool isEntityAffordable(eEntityType entityType) const;
-
-	bool addUnitToSpawn(eEntityType unitType, const Map& map, UnitSpawnerBuilding& building, FactionHandler& factionHandler);
 	bool instructWorkerToBuild(eEntityType entityType, const glm::vec3& position, const Map& map, Worker& worker);
 	virtual void onEntityRemoval(const Entity& entity) {}
 
