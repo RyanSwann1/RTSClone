@@ -744,18 +744,16 @@ const Entity* Faction::spawnUnit(const Map& map, const UnitSpawnerBuilding& buil
         {
             glm::vec3 startingPosition = Globals::convertToNodePosition(building.getUnitSpawnPosition());
             glm::vec3 startingRotation = { 0.0f, Globals::getAngle(startingPosition, building.getPosition()), 0.0f };
-            m_units.emplace_back(*this, startingPosition, startingRotation);
-            
             glm::vec3 destination = PathFinding::getInstance().getClosestAvailablePosition(building.getWaypointPosition(), m_units, m_workers, map);
-            Unit& unit = m_units.back();
-            m_units.back().moveTo(destination, map, [&](const glm::ivec2& position)
-                { return getAdjacentPositions(position, map, factionHandler, unit); }, factionHandler);
+
+            m_units.emplace_back(*this, startingPosition, startingRotation, destination, factionHandler, map);
         }
         else
         {
             glm::vec3 startingPosition = Globals::convertToNodePosition(PathFinding::getInstance().getClosestAvailablePosition(building.getUnitSpawnPosition(),
                 m_units, m_workers, map));
             glm::vec3 startingRotation = { 0.0f, Globals::getAngle(startingPosition, building.getPosition()), 0.0f };
+            
             m_units.emplace_back(*this, startingPosition, startingRotation);
         }
 

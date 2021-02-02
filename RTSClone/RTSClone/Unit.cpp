@@ -32,6 +32,20 @@ Unit::Unit(const Faction& owningFaction, const glm::vec3& startingPosition, cons
 	m_targetEntity()
 {}
 
+Unit::Unit(const Faction & owningFaction, const glm::vec3 & startingPosition, const glm::vec3 & startingRotation, 
+	const glm::vec3 & destination, FactionHandler& factionHandler, const Map& map)
+	: Entity(ModelManager::getInstance().getModel(UNIT_MODEL_NAME), startingPosition, eEntityType::Unit,
+		Globals::UNIT_STARTING_HEALTH, owningFaction.getCurrentShieldAmount(), startingRotation),
+	m_owningFaction(owningFaction),
+	m_pathToPosition(),
+	m_currentState(eUnitState::Idle),
+	m_attackTimer(TIME_BETWEEN_ATTACK, true),
+	m_targetEntity()
+{
+	moveTo(destination, map, [&, this](const glm::ivec2& position)
+		{ return getAdjacentPositions(position, map, factionHandler, *this); }, factionHandler);
+}
+
 const Faction& Unit::getOwningFaction() const
 {
 	return m_owningFaction;

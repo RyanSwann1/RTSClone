@@ -31,6 +31,8 @@ class Unit : public Entity
 {
 public:
 	Unit(const Faction& owningFaction, const glm::vec3& startingPosition, const glm::vec3& startingRotation);
+	Unit(const Faction& owningFaction, const glm::vec3& startingPosition, const glm::vec3& startingRotation,
+		const glm::vec3& destination, FactionHandler& FactionHandler, const Map& map);
 
 	const Faction& getOwningFaction() const;
 	const std::vector<glm::vec3>& getPathToPosition() const;
