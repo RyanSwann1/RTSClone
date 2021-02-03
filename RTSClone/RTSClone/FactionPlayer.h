@@ -41,7 +41,7 @@ public:
 	void handleEvent(const GameEvent& gameEvent, const Map& map, FactionHandler& factionHandler) override;
 	void update(float deltaTime, const Map& map, FactionHandler& factionHandler, const Timer& unitStateHandlerTimer) override;
 	void render(ShaderHandler& shaderHandler) const override;
-	void renderSelectionBox(const sf::Window& window) const;
+	void renderSelectionBox(const sf::Window& window, ShaderHandler& shaderHandler) const;
 
 private:
 	FactionPlayerPlannedBuilding m_plannedBuilding;

@@ -9,6 +9,7 @@
 namespace
 {
 	const int QUAD_VERTEX_COUNT = 6;
+	const float OPACITY = 1.0f;
 
 	std::array<glm::vec2, QUAD_VERTEX_COUNT> getQuadCoords(glm::vec2 position, float width, float height, float yOffset)
 	{
@@ -75,7 +76,8 @@ void Sprite::render(const glm::vec3& position, glm::uvec2 windowSize, float orig
 		(2.0f * height) / windowSize.y,
 		(2.0f * yOffset) / windowSize.y);
 
-	shaderHandler.setUniformVec3(eShaderType::HealthBar, "uMaterialColor", materialColor);
+	shaderHandler.setUniformVec3(eShaderType::Widjet, "uColor", materialColor);
+	shaderHandler.setUniform1f(eShaderType::Widjet, "uOpacity", OPACITY);
 
 	glBindBuffer(GL_ARRAY_BUFFER, m_vboID);
 	glBufferData(GL_ARRAY_BUFFER, quad.size() * sizeof(glm::vec2), quad.data(), GL_STATIC_DRAW);

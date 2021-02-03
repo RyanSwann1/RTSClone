@@ -287,9 +287,9 @@ void FactionPlayer::render(ShaderHandler& shaderHandler) const
     m_plannedBuilding.render(shaderHandler, getController());
 }
 
-void FactionPlayer::renderSelectionBox(const sf::Window& window) const
+void FactionPlayer::renderSelectionBox(const sf::Window& window, ShaderHandler& shaderHandler) const
 {
-    m_selectionBox.render(window);
+    m_selectionBox.render(window, shaderHandler);
 }
 
 void FactionPlayer::onEntityRemoval(const Entity& entity)

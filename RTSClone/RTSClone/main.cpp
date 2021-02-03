@@ -78,10 +78,6 @@ int main()
 		return -1;
 	}
 
-	shaderHandler->switchToShader(eShaderType::SelectionBox);
-	shaderHandler->setUniformMat4f(eShaderType::SelectionBox, "uOrthographic",
-		glm::ortho(0.0f, static_cast<float>(windowSize.x), static_cast<float>(windowSize.y), 0.0f));
-
 	GameMessenger<GameMessages::UIClearDisplaySelectedEntity>::getInstance();
 	GameMessenger<GameMessages::UIClearWinner>::getInstance();
 	GameMessenger<GameMessages::AddToMap>::getInstance();
@@ -228,15 +224,11 @@ int main()
 		{
 			level->renderPlannedBuildings(*shaderHandler);
 
-			shaderHandler->switchToShader(eShaderType::HealthBar);
+			shaderHandler->switchToShader(eShaderType::Widjet);
 			level->renderEntityStatusBars(*shaderHandler, camera, windowSize);
+			level->renderSelectionBox(window, *shaderHandler);
 		}
 
-		shaderHandler->switchToShader(eShaderType::SelectionBox);
-		if (level)
-		{
-			level->renderSelectionBox(window);
-		}
 		glDisable(GL_BLEND);
 		glEnable(GL_DEPTH_TEST);
 		ImGui_SFML_OpenGL3::endFrame();
