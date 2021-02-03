@@ -173,11 +173,6 @@ void Level::update(float deltaTime, const Map& map, UIManager& uiManager)
 	{
 		if (faction)
 		{
-			if (faction.get()->getController() == eFactionController::Player)
-			{
-				static_cast<FactionPlayer&>(*faction).updateSelectionBox();
-			}
-
 			faction->update(deltaTime, map, m_factionHandler, m_unitStateHandlerTimer);
 		}
 	}

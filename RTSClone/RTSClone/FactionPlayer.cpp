@@ -260,12 +260,6 @@ void FactionPlayer::update(float deltaTime, const Map& map, FactionHandler& fact
 {
     Faction::update(deltaTime, map, factionHandler, unitStateHandlerTimer);
 
-    broadcastToMessenger<GameMessages::UIDisplayPlayerDetails>(
-        { getCurrentResourceAmount(), getCurrentPopulationAmount(), getMaximumPopulationAmount() });
-}
-
-void FactionPlayer::updateSelectionBox()
-{
     if (m_selectionBox.isActive())
     {
         selectEntities<Unit>(m_units, m_selectionBox);
@@ -276,11 +270,14 @@ void FactionPlayer::updateSelectionBox()
         {
             GameEventHandler::getInstance().gameEvents.push(GameEvent::createSetTargetEntityGUI(getController(), m_selectedEntities.back()->getID()));
         }
-        else if(!m_selectedEntities.empty())
+        else if (!m_selectedEntities.empty())
         {
             GameEventHandler::getInstance().gameEvents.push(GameEvent::createResetTargetEntityGUI());
         }
     }
+
+    broadcastToMessenger<GameMessages::UIDisplayPlayerDetails>(
+        { getCurrentResourceAmount(), getCurrentPopulationAmount(), getMaximumPopulationAmount() });
 }
 
 void FactionPlayer::render(ShaderHandler& shaderHandler) const
