@@ -1,6 +1,7 @@
 #include "SelectionBox.h"
 #include "glad.h"
 #include "Globals.h"
+#include "Camera.h"
 
 namespace
 {
@@ -64,21 +65,25 @@ void SelectionBox::setStartingPosition(const sf::Window& window, const glm::vec3
     m_active = true;
 }
 
-void SelectionBox::setSize(const glm::vec3& position)
+void SelectionBox::update(const Camera& camera, const sf::Window& window)
 {
-    glm::vec3 startingPosition = {
+    if (isActive())
+    {
+        glm::vec3 position = camera.getRayToGroundPlaneIntersection(window);
+
+        glm::vec3 startingPosition = {
         glm::min(m_worldStartingPosition.x, position.x),
         m_worldStartingPosition.y,
-        glm::min(m_worldStartingPosition.z, position.z) 
-    };
+        glm::min(m_worldStartingPosition.z, position.z) };
 
-    glm::vec3 size = {
-        std::abs(position.x - m_worldStartingPosition.x),
-        m_worldStartingPosition.y, 
-        std::abs(position.z - m_worldStartingPosition.z)
-    };
+        glm::vec3 size = {
+            std::abs(position.x - m_worldStartingPosition.x),
+            m_worldStartingPosition.y,
+            std::abs(position.z - m_worldStartingPosition.z)
+        };
 
-    m_AABB.reset(startingPosition, size);
+        m_AABB.reset(startingPosition, size);
+    }
 }
 
 void SelectionBox::reset()

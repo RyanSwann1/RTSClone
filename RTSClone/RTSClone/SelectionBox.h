@@ -5,6 +5,7 @@
 #include "AABB.h"
 #include <SFML/Graphics.hpp>
 
+struct Camera;
 class SelectionBox : private NonCopyable, private NonMovable
 {
 public:
@@ -16,7 +17,7 @@ public:
 	bool isMinimumSize() const;
 
 	void setStartingPosition(const sf::Window& window, const glm::vec3& position);
-	void setSize(const glm::vec3& position);
+	void update(const Camera& camera, const sf::Window& window);
 	void reset();
 	void render(const sf::Window& window) const;
 
