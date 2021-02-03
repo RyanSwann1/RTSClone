@@ -23,7 +23,7 @@ namespace
 
 SelectionBox::SelectionBox()
     : m_AABB(),
-    m_active(false),
+    m_enabled(false),
     m_screenStartingPosition(),
     m_worldStartingPosition(),
     m_vaoID(Globals::INVALID_OPENGL_ID),
@@ -49,7 +49,7 @@ const AABB& SelectionBox::getAABB() const
 
 bool SelectionBox::isActive() const
 {
-    return m_active;
+    return m_enabled && isMinimumSize();
 }
 
 bool SelectionBox::isMinimumSize() const
@@ -62,12 +62,12 @@ void SelectionBox::setStartingPosition(const sf::Window& window, const glm::vec3
 {
     m_worldStartingPosition = position;
     m_screenStartingPosition = { sf::Mouse::getPosition(window).x, sf::Mouse::getPosition(window).y };
-    m_active = true;
+    m_enabled = true;
 }
 
 void SelectionBox::update(const Camera& camera, const sf::Window& window)
 {
-    if (isActive())
+    if (m_enabled)
     {
         glm::vec3 position = camera.getRayToGroundPlaneIntersection(window);
 
@@ -88,13 +88,13 @@ void SelectionBox::update(const Camera& camera, const sf::Window& window)
 
 void SelectionBox::reset()
 {
-    m_active = false;
+    m_enabled = false;
     m_AABB.reset();
 }
 
 void SelectionBox::render(const sf::Window& window) const
 {
-    if (m_active && isMinimumSize())
+    if (isActive())
     {
         glm::vec2 endingPosition = { sf::Mouse::getPosition(window).x, sf::Mouse::getPosition(window).y };
         std::array<glm::ivec2, 6> quadCoords = getSelectionBoxQuadCoords(m_screenStartingPosition,
@@ -110,13 +110,3 @@ void SelectionBox::render(const sf::Window& window) const
         glDrawArrays(GL_TRIANGLES, 0, 6);
     }
 }
-
-#ifdef RENDER_AABB
-void SelectionBox::renderAABB(ShaderHandler& shaderHandler)
-{
-    if (m_active && isMinimumSize())
-    {
-        m_AABB.render(shaderHandler);
-    }
-}
-#endif // RENDER_AABB

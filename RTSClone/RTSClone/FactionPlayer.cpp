@@ -204,7 +204,7 @@ void FactionPlayer::handleInput(const sf::Event& currentSFMLEvent, const sf::Win
         m_attackMoveSelected = false;
         if (currentSFMLEvent.mouseButton.button == sf::Mouse::Left)
         {
-            if (m_selectionBox.isActive() && m_selectionBox.isMinimumSize() && !m_selectedEntities.empty())
+            if (m_selectionBox.isActive() && !m_selectedEntities.empty())
             {
                 deselectEntities<Headquarters>(m_headquarters);
                 deselectEntities<Barracks>(m_barracks);
@@ -266,13 +266,13 @@ void FactionPlayer::update(float deltaTime, const Map& map, FactionHandler& fact
 
 void FactionPlayer::updateSelectionBox()
 {
-    if (m_selectionBox.isActive() && m_selectionBox.isMinimumSize())
+    if (m_selectionBox.isActive())
     {
         selectEntities<Unit>(m_units, m_selectionBox);
         selectEntities<Worker>(m_workers, m_selectionBox);
         setSelectedEntities(m_selectedEntities, m_units, m_workers);
 
-        if (m_selectedEntities.size() == static_cast<size_t>(1))
+        if (m_selectedEntities.size() == 1)
         {
             GameEventHandler::getInstance().gameEvents.push(GameEvent::createSetTargetEntityGUI(getController(), m_selectedEntities.back()->getID()));
         }
