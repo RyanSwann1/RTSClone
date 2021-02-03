@@ -12,8 +12,7 @@
 enum class eShaderType
 {
 	Default = 0,
-	SelectionBox,
-	HealthBar,
+	Widjet,
 	Debug,
 	Max = Debug
 };
@@ -54,8 +53,7 @@ private:
 	std::array<Shader, static_cast<int>(eShaderType::Max) + 1> m_shaders =
 	{
 		eShaderType::Default,
-		eShaderType::SelectionBox,
-		eShaderType::HealthBar,
+		eShaderType::Widjet,
 		eShaderType::Debug
 	};
 };

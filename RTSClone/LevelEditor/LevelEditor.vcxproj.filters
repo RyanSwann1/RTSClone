@@ -199,16 +199,10 @@
     <None Include="..\Shared\Shaders\FragmentShader.glsl">
       <Filter>shaders</Filter>
     </None>
-    <None Include="..\Shared\Shaders\SelectionBoxFragmentShader.glsl">
+    <None Include="..\Shared\Shaders\WidgetVertexShader.glsl">
       <Filter>shaders</Filter>
     </None>
-    <None Include="..\Shared\Shaders\SelectionBoxVertexShader.glsl">
-      <Filter>shaders</Filter>
-    </None>
-    <None Include="..\Shared\Shaders\HealthBarFragmentShader.glsl">
-      <Filter>shaders</Filter>
-    </None>
-    <None Include="..\Shared\Shaders\HealthBarVertexShader.glsl">
+    <None Include="..\Shared\Shaders\WidgetFragmentShader.glsl">
       <Filter>shaders</Filter>
     </None>
   </ItemGroup>

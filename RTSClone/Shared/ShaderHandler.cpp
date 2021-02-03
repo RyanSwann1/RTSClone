@@ -119,14 +119,8 @@ std::unique_ptr<ShaderHandler> ShaderHandler::create()
 				++shaderLoadedCounter;
 			}
 			break;
-		case eShaderType::SelectionBox:
-			if (createShaderProgram(shader.getID(), "SelectionBoxVertexShader.glsl", "SelectionBoxFragmentShader.glsl"))
-			{
-				++shaderLoadedCounter;
-			}
-			break;
-		case eShaderType::HealthBar:
-			if (createShaderProgram(shader.getID(), "HealthBarVertexShader.glsl", "HealthBarFragmentShader.glsl"))
+		case eShaderType::Widjet:
+			if (createShaderProgram(shader.getID(), "WidgetVertexShader.glsl", "WidgetFragmentShader.glsl"))
 			{
 				++shaderLoadedCounter;
 			}

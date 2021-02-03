@@ -203,10 +203,8 @@
     <None Include="..\Shared\Shaders\DebugFragmentShader.glsl" />
     <None Include="..\Shared\Shaders\DebugVertexShader.glsl" />
     <None Include="..\Shared\Shaders\FragmentShader.glsl" />
-    <None Include="..\Shared\Shaders\HealthBarFragmentShader.glsl" />
-    <None Include="..\Shared\Shaders\HealthBarVertexShader.glsl" />
-    <None Include="..\Shared\Shaders\SelectionBoxFragmentShader.glsl" />
-    <None Include="..\Shared\Shaders\SelectionBoxVertexShader.glsl" />
+    <None Include="..\Shared\Shaders\WidgetFragmentShader.glsl" />
+    <None Include="..\Shared\Shaders\WidgetVertexShader.glsl" />
     <None Include="..\Shared\Shaders\VertexShader.glsl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
