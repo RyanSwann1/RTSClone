@@ -4,6 +4,7 @@
 #include "SelectionBox.h"
 #include <SFML/Graphics.hpp>
 
+struct Camera;
 struct PlayerActivatePlannedBuildingEvent;
 class FactionPlayerPlannedBuilding
 {	
@@ -16,7 +17,7 @@ public:
 	bool isActive() const;
 
 	void deactivate();
-	void setPosition(const glm::vec3& newPosition, const Map& map);
+	void update(const Camera& camera, const sf::Window& window, const Map& map);
 	void activate(const PlayerActivatePlannedBuildingEvent& gameEvent);
 	void render(ShaderHandler& shaderHandler, eFactionController owningFactionController) const;
 
@@ -28,7 +29,6 @@ private:
 };
 
 struct Base;
-struct Camera;
 class FactionPlayer : public Faction
 {
 public:

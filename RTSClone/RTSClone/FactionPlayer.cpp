@@ -144,13 +144,16 @@ void FactionPlayerPlannedBuilding::deactivate()
     m_workerID = Globals::INVALID_ENTITY_ID;
 }
 
-void FactionPlayerPlannedBuilding::setPosition(const glm::vec3& newPosition, const Map& map)
+void FactionPlayerPlannedBuilding::update(const Camera& camera, const sf::Window& window, const Map& map)
 {
-    assert(m_workerID != Globals::INVALID_ENTITY_ID);
-
-    if (map.isWithinBounds(newPosition) && !map.isPositionOccupied(newPosition))
+    if(isActive())
     {
-        m_position = Globals::convertToMiddleGridPosition(Globals::convertToNodePosition(newPosition));
+        assert(m_workerID != Globals::INVALID_ENTITY_ID);
+        glm::vec3 position = camera.getRayToGroundPlaneIntersection(window);
+        if (map.isWithinBounds(position) && !map.isPositionOccupied(position))
+        {
+            m_position = Globals::convertToMiddleGridPosition(Globals::convertToNodePosition(position));
+        }
     }
 }
 
@@ -213,15 +216,8 @@ void FactionPlayer::handleInput(const sf::Event& currentSFMLEvent, const sf::Win
         }
         break;
     case sf::Event::MouseMoved:
-        if (m_selectionBox.isActive())
-        {
-            m_selectionBox.setSize(camera.getRayToGroundPlaneIntersection(window));
-
-        }
-        else if (m_plannedBuilding.isActive())
-        {
-            m_plannedBuilding.setPosition(camera.getRayToGroundPlaneIntersection(window), map);
-        }
+        m_selectionBox.update(camera, window);
+        m_plannedBuilding.update(camera, window, map);
         break;
     case sf::Event::KeyPressed:
         switch (currentSFMLEvent.key.code)
