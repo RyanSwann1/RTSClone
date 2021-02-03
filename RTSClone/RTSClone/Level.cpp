@@ -197,11 +197,11 @@ void Level::update(float deltaTime, const Map& map, UIManager& uiManager)
 	uiManager.update(m_factionHandler);
 }
 
-void Level::renderSelectionBox(const sf::Window& window, ShaderHandler& shaderHandler) const
+void Level::renderEntitySelector(const sf::Window& window, ShaderHandler& shaderHandler) const
 {
 	if (isFactionActive(m_factions, eFactionController::Player))
 	{
-		c_getFactionPlayer(m_factions).renderSelectionBox(window, shaderHandler);
+		c_getFactionPlayer(m_factions).renderEntitySelector(window, shaderHandler);
 	}
 }
 

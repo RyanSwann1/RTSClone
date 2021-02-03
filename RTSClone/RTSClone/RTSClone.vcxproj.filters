@@ -150,10 +150,10 @@
     <ClCompile Include="GameEvents.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="SelectionBox.cpp">
+    <ClCompile Include="..\Shared\Base.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\Shared\Base.cpp">
+    <ClCompile Include="EntitySelector.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -437,9 +437,6 @@
     <ClInclude Include="GameEvents.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="SelectionBox.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="TypeComparison.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -447,6 +444,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\Shared\Base.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EntitySelector.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

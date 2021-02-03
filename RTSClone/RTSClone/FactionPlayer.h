@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Faction.h"
-#include "SelectionBox.h"
+#include "EntitySelector.h"
 #include <SFML/Graphics.hpp>
 
 struct Camera;
@@ -41,11 +41,11 @@ public:
 	void handleEvent(const GameEvent& gameEvent, const Map& map, FactionHandler& factionHandler) override;
 	void update(float deltaTime, const Map& map, FactionHandler& factionHandler, const Timer& unitStateHandlerTimer) override;
 	void render(ShaderHandler& shaderHandler) const override;
-	void renderSelectionBox(const sf::Window& window, ShaderHandler& shaderHandler) const;
+	void renderEntitySelector(const sf::Window& window, ShaderHandler& shaderHandler) const;
 
 private:
 	FactionPlayerPlannedBuilding m_plannedBuilding;
-	SelectionBox m_selectionBox;
+	EntitySelector m_entitySelector;
 	glm::vec3 m_previousPlaneIntersection;
 	bool m_attackMoveSelected;
 	std::vector<Entity*> m_selectedEntities;
@@ -105,11 +105,11 @@ private:
 	}
 
 	template <class Entity>
-	void selectEntities(std::list<Entity>& units, const SelectionBox& selectionBox)
+	void selectEntities(std::list<Entity>& units, const EntitySelector& selectionBox)
 	{
 		for (auto& unit : units)
 		{
-			unit.setSelected(m_selectionBox.getAABB().contains(unit.getAABB()));
+			unit.setSelected(m_entitySelector.getAABB().contains(unit.getAABB()));
 		}
 	}
 

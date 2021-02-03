@@ -175,7 +175,7 @@ void FactionPlayerPlannedBuilding::render(ShaderHandler& shaderHandler, eFaction
 //FactionPlayer
 FactionPlayer::FactionPlayer(const glm::vec3& hqStartingPosition, int startingResources, int startingPopulation)
     : Faction(eFactionController::Player, hqStartingPosition, startingResources, startingPopulation),
-    m_selectionBox(),
+    m_entitySelector(),
     m_previousPlaneIntersection(),
     m_attackMoveSelected(false)
 {}
@@ -204,7 +204,7 @@ void FactionPlayer::handleInput(const sf::Event& currentSFMLEvent, const sf::Win
         m_attackMoveSelected = false;
         if (currentSFMLEvent.mouseButton.button == sf::Mouse::Left)
         {
-            if (m_selectionBox.isActive() && !m_selectedEntities.empty())
+            if (m_entitySelector.isActive() && !m_selectedEntities.empty())
             {
                 deselectEntities<Headquarters>(m_headquarters);
                 deselectEntities<Barracks>(m_barracks);
@@ -212,11 +212,11 @@ void FactionPlayer::handleInput(const sf::Event& currentSFMLEvent, const sf::Win
                 deselectEntities<SupplyDepot>(m_supplyDepots);
             }
 
-            m_selectionBox.reset();
+            m_entitySelector.reset();
         }
         break;
     case sf::Event::MouseMoved:
-        m_selectionBox.update(camera, window);
+        m_entitySelector.update(camera, window);
         m_plannedBuilding.update(camera, window, map);
         break;
     case sf::Event::KeyPressed:
@@ -260,10 +260,10 @@ void FactionPlayer::update(float deltaTime, const Map& map, FactionHandler& fact
 {
     Faction::update(deltaTime, map, factionHandler, unitStateHandlerTimer);
 
-    if (m_selectionBox.isActive())
+    if (m_entitySelector.isActive())
     {
-        selectEntities<Unit>(m_units, m_selectionBox);
-        selectEntities<Worker>(m_workers, m_selectionBox);
+        selectEntities<Unit>(m_units, m_entitySelector);
+        selectEntities<Worker>(m_workers, m_entitySelector);
         setSelectedEntities(m_selectedEntities, m_units, m_workers);
 
         if (m_selectedEntities.size() == 1)
@@ -287,9 +287,9 @@ void FactionPlayer::render(ShaderHandler& shaderHandler) const
     m_plannedBuilding.render(shaderHandler, getController());
 }
 
-void FactionPlayer::renderSelectionBox(const sf::Window& window, ShaderHandler& shaderHandler) const
+void FactionPlayer::renderEntitySelector(const sf::Window& window, ShaderHandler& shaderHandler) const
 {
-    m_selectionBox.render(window, shaderHandler);
+    m_entitySelector.render(window, shaderHandler);
 }
 
 void FactionPlayer::onEntityRemoval(const Entity& entity)
@@ -492,7 +492,7 @@ void FactionPlayer::onLeftClick(const sf::Window& window, const Camera& camera, 
 {
     glm::vec3 planeIntersection = camera.getRayToGroundPlaneIntersection(window);
 
-    m_selectionBox.setStartingPosition(window, planeIntersection);
+    m_entitySelector.setStartingPosition(window, planeIntersection);
     
     int workerIDSelected = instructWorkerToBuild(map);
     selectEntity<Unit>(m_units, planeIntersection, planeIntersection == m_previousPlaneIntersection);

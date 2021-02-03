@@ -179,7 +179,7 @@
     <ClCompile Include="ProjectileHandler.cpp" />
     <ClCompile Include="RenderPathMesh.cpp" />
     <ClCompile Include="SceneryGameObject.cpp" />
-    <ClCompile Include="SelectionBox.cpp" />
+    <ClCompile Include="EntitySelector.cpp" />
     <ClCompile Include="Sprite.cpp" />
     <ClCompile Include="Turret.cpp" />
     <ClCompile Include="UIManager.cpp" />
@@ -267,7 +267,7 @@
     <ClInclude Include="RenderPathMesh.h" />
     <ClInclude Include="SceneryGameObject.h" />
     <ClInclude Include="Level.h" />
-    <ClInclude Include="SelectionBox.h" />
+    <ClInclude Include="EntitySelector.h" />
     <ClInclude Include="Sprite.h" />
     <ClInclude Include="Turret.h" />
     <ClInclude Include="TypeComparison.h" />

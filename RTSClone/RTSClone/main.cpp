@@ -226,7 +226,7 @@ int main()
 
 			shaderHandler->switchToShader(eShaderType::Widjet);
 			level->renderEntityStatusBars(*shaderHandler, camera, windowSize);
-			level->renderSelectionBox(window, *shaderHandler);
+			level->renderEntitySelector(window, *shaderHandler);
 		}
 
 		glDisable(GL_BLEND);

@@ -7,11 +7,11 @@
 
 class ShaderHandler;
 struct Camera;
-class SelectionBox : private NonCopyable, private NonMovable
+class EntitySelector : private NonCopyable, private NonMovable
 {
 public:
-	SelectionBox();
-	~SelectionBox();
+	EntitySelector();
+	~EntitySelector();
 
 	const AABB& getAABB() const;
 	bool isActive() const;

@@ -31,7 +31,7 @@ public:
 	void handleInput(const sf::Window& window, const Camera& camera, const sf::Event& currentSFMLEvent, const Map& map,
 		UIManager& uiManager);
 	void update(float deltaTime, const Map& map, UIManager& uiManager);
-	void renderSelectionBox(const sf::Window& window, ShaderHandler& shaderHandler) const;
+	void renderEntitySelector(const sf::Window& window, ShaderHandler& shaderHandler) const;
 	void renderPlannedBuildings(ShaderHandler& shaderHandler) const;
 	void renderEntityStatusBars(ShaderHandler& shaderHandler, const Camera& camera, glm::uvec2 windowSize) const;
 	void render(ShaderHandler& shaderHandler) const;

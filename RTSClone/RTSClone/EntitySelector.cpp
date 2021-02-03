@@ -1,4 +1,4 @@
-#include "SelectionBox.h"
+#include "EntitySelector.h"
 #include "glad.h"
 #include "Globals.h"
 #include "Camera.h"
@@ -33,7 +33,7 @@ namespace
     }
 };
 
-SelectionBox::SelectionBox()
+EntitySelector::EntitySelector()
     : m_AABB(),
     m_enabled(false),
     m_startingMousePosition(),
@@ -45,7 +45,7 @@ SelectionBox::SelectionBox()
     glGenBuffers(1, &m_vboID);
 }
 
-SelectionBox::~SelectionBox()
+EntitySelector::~EntitySelector()
 {
     assert(m_vaoID != Globals::INVALID_OPENGL_ID);
     glDeleteVertexArrays(1, &m_vaoID);
@@ -54,30 +54,30 @@ SelectionBox::~SelectionBox()
     glDeleteBuffers(1, &m_vboID);
 }
 
-const AABB& SelectionBox::getAABB() const
+const AABB& EntitySelector::getAABB() const
 {
     return m_AABB;
 }
 
-bool SelectionBox::isActive() const
+bool EntitySelector::isActive() const
 {
     return m_enabled && isMinimumSize();
 }
 
-bool SelectionBox::isMinimumSize() const
+bool EntitySelector::isMinimumSize() const
 {
     return (m_AABB.getRight() - m_AABB.getLeft() >= MINIMUM_SIZE) || 
         (m_AABB.getForward() - m_AABB.getBack() >= MINIMUM_SIZE);
 }
 
-void SelectionBox::setStartingPosition(const sf::Window& window, const glm::vec3& position)
+void EntitySelector::setStartingPosition(const sf::Window& window, const glm::vec3& position)
 {
     m_worldStartingPosition = position;
     m_startingMousePosition = convertMousePositionToNDC(window);
     m_enabled = true;
 }
 
-void SelectionBox::update(const Camera& camera, const sf::Window& window)
+void EntitySelector::update(const Camera& camera, const sf::Window& window)
 {
     if (m_enabled)
     {
@@ -98,13 +98,13 @@ void SelectionBox::update(const Camera& camera, const sf::Window& window)
     }
 }
 
-void SelectionBox::reset()
+void EntitySelector::reset()
 {
     m_enabled = false;
     m_AABB.reset();
 }
 
-void SelectionBox::render(const sf::Window& window, ShaderHandler& shaderHandler) const
+void EntitySelector::render(const sf::Window& window, ShaderHandler& shaderHandler) const
 {
     if (isActive())
     {
