@@ -132,15 +132,49 @@ void FactionPlayerPlannedBuilding::deactivate()
     m_workerID = Globals::INVALID_ENTITY_ID;
 }
 
-void FactionPlayerPlannedBuilding::update(const Camera& camera, const sf::Window& window, const Map& map)
+void FactionPlayerPlannedBuilding::handleInput(const sf::Event& event, const Camera& camera, const sf::Window& window, const Map& map,
+    const std::vector<Base>& bases)
 {
-    if(isActive())
+    if(event.type == sf::Event::MouseMoved && 
+        isActive())
     {
         assert(m_workerID != Globals::INVALID_ENTITY_ID);
         glm::vec3 position = camera.getRayToGroundPlaneIntersection(window);
         if (map.isWithinBounds(position) && !map.isPositionOccupied(position))
         {
-            m_position = Globals::convertToMiddleGridPosition(Globals::convertToNodePosition(position));
+            glm::vec3 newPosition = Globals::convertToMiddleGridPosition(Globals::convertToNodePosition(position));
+            switch (m_entityType)
+            {
+            case eEntityType::Headquarters:
+            {
+                bool positionValid = true;
+                for (const auto& base : bases)
+                {
+                    for (const auto& mineral : base.minerals)
+                    {
+                        if (Globals::getSqrDistance(mineral.getPosition(), newPosition) <=
+                            Globals::MINIMUM_HQ_DISTANCE_FROM_MINERALS)
+                        {
+                            positionValid = false;
+                            break;
+                        }
+                    }
+
+                    if (!positionValid)
+                    {
+                        break;
+                    }
+                }
+
+                if (positionValid)
+                {
+                    m_position = newPosition;
+                }
+            }
+                break;
+            default:
+                m_position = newPosition;
+            }
         }
     }
 }
@@ -205,7 +239,7 @@ void FactionPlayer::handleInput(const sf::Event& currentSFMLEvent, const sf::Win
         break;
     case sf::Event::MouseMoved:
         m_entitySelector.update(camera, window);
-        m_plannedBuilding.update(camera, window, map);
+        m_plannedBuilding.handleInput(currentSFMLEvent, camera, window, map, bases);
         break;
     case sf::Event::KeyPressed:
         switch (currentSFMLEvent.key.code)

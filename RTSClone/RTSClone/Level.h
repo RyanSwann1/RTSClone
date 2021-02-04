@@ -50,7 +50,7 @@ private:
 	Level(std::vector<SceneryGameObject>&& scenery, FactionsContainer&& factions, 
 		std::vector<Base>&& mainBaseLocations, const glm::vec3& size);
 
-	Quad m_playableArea;
+	const Quad m_playableArea;
 	const std::vector<Base> m_mainBases;
 	const std::vector<SceneryGameObject> m_scenery;
 	FactionsContainer m_factions;

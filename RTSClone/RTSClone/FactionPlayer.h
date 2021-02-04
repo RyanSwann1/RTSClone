@@ -4,6 +4,7 @@
 #include "EntitySelector.h"
 #include <SFML/Graphics.hpp>
 
+struct Base;
 struct Camera;
 struct PlayerActivatePlannedBuildingEvent;
 class FactionPlayerPlannedBuilding
@@ -17,7 +18,8 @@ public:
 	bool isActive() const;
 
 	void deactivate();
-	void update(const Camera& camera, const sf::Window& window, const Map& map);
+	void handleInput(const sf::Event& event, const Camera& camera, const sf::Window& window, const Map& map,
+		const std::vector<Base>& bases);
 	void activate(const PlayerActivatePlannedBuildingEvent& gameEvent);
 	void render(ShaderHandler& shaderHandler, eFactionController owningFactionController) const;
 
@@ -28,7 +30,6 @@ private:
 	eEntityType m_entityType;
 };
 
-struct Base;
 class FactionPlayer : public Faction
 {
 public:
