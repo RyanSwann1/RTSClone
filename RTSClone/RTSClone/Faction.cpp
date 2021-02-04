@@ -159,20 +159,6 @@ const Entity* Faction::getEntity(int entityID) const
     return nullptr;
 }
 
-void Faction::selectEntity(const glm::vec3& position) const
-{
-    const Entity* selectedEntity = nullptr;
-    for (const auto& entity : m_allEntities)
-    {
-        entity->setSelected(false);
-        if (!selectedEntity && entity->getAABB().contains(position))
-        {
-            selectedEntity = entity;
-            entity->setSelected(true);
-        }
-    }
-}
-
 const Entity* Faction::getEntity(const glm::vec3& position) const
 {
     auto entity = std::find_if(m_allEntities.cbegin(), m_allEntities.cend(), [&position](const auto& entity)

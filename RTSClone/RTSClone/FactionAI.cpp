@@ -130,6 +130,14 @@ void FactionAI::handleEvent(const GameEvent& gameEvent, const Map& map, FactionH
 	Faction::handleEvent(gameEvent, map, factionHandler);
 }
 
+void FactionAI::selectEntity(const glm::vec3& position)
+{
+	for (auto& entity : m_allEntities)
+	{
+		entity->setSelected(entity->getAABB().contains(position));
+	}
+}
+
 void FactionAI::update(float deltaTime, const Map & map, FactionHandler& factionHandler, const Timer& unitStateHandlerTimer)
 {
 	Faction::update(deltaTime, map, factionHandler, unitStateHandlerTimer);

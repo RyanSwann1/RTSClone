@@ -158,10 +158,23 @@ void Level::handleInput(const sf::Window& window, const Camera& camera, const sf
 
 	if (currentSFMLEvent.type == sf::Event::MouseButtonPressed)
 	{
-		glm::vec3 planeIntersection = camera.getRayToGroundPlaneIntersection(window);
-		for (auto& opposingFaction : m_factionHandler.getOpposingFactions(eFactionController::Player))
+		for (auto& faction : m_factions)
 		{
-			opposingFaction.get().selectEntity(planeIntersection);
+			if (faction)
+			{
+				switch (faction.get()->getController())
+				{
+				case eFactionController::AI_1:
+				case eFactionController::AI_2:					
+				case eFactionController::AI_3:
+					static_cast<FactionAI&>(*faction).selectEntity(camera.getRayToGroundPlaneIntersection(window));
+					break;
+				case eFactionController::Player:
+					break;
+				default:
+					assert(false);
+				}
+			}
 		}
 	}
 
