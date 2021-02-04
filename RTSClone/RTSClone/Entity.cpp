@@ -253,9 +253,11 @@ bool Entity::isSelected() const
 	return m_selected;
 }
 
-void Entity::setSelected(bool selected)
+bool Entity::setSelected(bool selected)
 {
 	m_selected = selected;
+
+	return m_selected;
 }
 
 #ifdef RENDER_AABB

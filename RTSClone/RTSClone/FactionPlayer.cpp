@@ -81,18 +81,6 @@ namespace
         return { total.x / selectedEntities.size(), total.y / selectedEntities.size(), total.z / selectedEntities.size() };
     }
 
-    void removeSelectEntity(std::vector<Entity*>& selectedEntities, int entityID)
-    {
-        auto selectedUnit = std::find_if(selectedEntities.begin(), selectedEntities.end(), [entityID](const auto& selectedUnit)
-        {
-            return selectedUnit->getID() == entityID;
-        });
-        if (selectedUnit != selectedEntities.end())
-        {
-            selectedEntities.erase(selectedUnit);
-        }
-    }
-
     const Mineral* getMineral(const std::vector<Base>& bases, const glm::vec3& position)
     {
         for (const auto& base : bases)
@@ -262,8 +250,8 @@ void FactionPlayer::update(float deltaTime, const Map& map, FactionHandler& fact
 
     if (m_entitySelector.isActive())
     {
-        selectEntities<Unit>(m_units, m_entitySelector);
-        selectEntities<Worker>(m_workers, m_entitySelector);
+        selectEntities<Unit>(m_units);
+        selectEntities<Worker>(m_workers);
         setSelectedEntities(m_selectedEntities, m_units, m_workers);
 
         if (m_selectedEntities.size() == 1)
@@ -294,26 +282,20 @@ void FactionPlayer::renderEntitySelector(const sf::Window& window, ShaderHandler
 
 void FactionPlayer::onEntityRemoval(const Entity& entity)
 {
-    switch (entity.getEntityType())
+    int entityID = entity.getID();
+    auto selectedUnit = std::find_if(m_selectedEntities.begin(), m_selectedEntities.end(), [entityID](const auto& selectedUnit)
     {
-    case eEntityType::Worker:
-        removeSelectEntity(m_selectedEntities, entity.getID());
-        if (m_plannedBuilding.getWorkerID() == entity.getID())
-        {
-            m_plannedBuilding.deactivate();
-        }
-        break;
-    case eEntityType::Unit:
-        removeSelectEntity(m_selectedEntities, entity.getID());
-        break;
-    case eEntityType::Headquarters:
-    case eEntityType::SupplyDepot:
-    case eEntityType::Barracks:
-    case eEntityType::Turret:
-    case eEntityType::Laboratory:
-        break;
-    default:
-        assert(false);
+        return selectedUnit->getID() == entityID;
+    });
+    if (selectedUnit != m_selectedEntities.end())
+    {
+        m_selectedEntities.erase(selectedUnit);
+    }
+
+    if (entity.getEntityType() == eEntityType::Worker && 
+        m_plannedBuilding.getWorkerID() == entity.getID())
+    {
+        m_plannedBuilding.deactivate();
     }
 }
 

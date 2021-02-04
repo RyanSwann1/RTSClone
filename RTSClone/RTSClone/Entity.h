@@ -42,7 +42,7 @@ public:
 	const AABB& getAABB() const;
 	bool isSelected() const;
 	
-	void setSelected(bool selected);
+	bool setSelected(bool selected);
 
 #ifdef RENDER_AABB
 	void renderAABB(ShaderHandler& shaderHandler);
