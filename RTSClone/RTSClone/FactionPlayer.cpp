@@ -179,8 +179,9 @@ void FactionPlayerPlannedBuilding::handleInput(const sf::Event& event, const Cam
     }
 }
 
-void FactionPlayerPlannedBuilding::activate(const PlayerActivatePlannedBuildingEvent& gameEvent)
+void FactionPlayerPlannedBuilding::activate(const PlayerActivatePlannedBuildingEvent& gameEvent, const glm::vec3& position)
 {
+    m_position = position;
     m_entityType = gameEvent.entityType;
     m_workerID = gameEvent.targetID;
     m_model = &ModelManager::getInstance().getModel(MODEL_NAMES[static_cast<int>(m_entityType)]);
@@ -259,7 +260,10 @@ void FactionPlayer::handleEvent(const GameEvent& gameEvent, const Map& map, Fact
     switch (gameEvent.type)
     {
     case eGameEventType::PlayerActivatePlannedBuilding:
-        m_plannedBuilding.activate(gameEvent.data.playerActivatePlannedBuilding);
+        assert(m_selectedEntities.size() == 1 && 
+            m_selectedEntities.front()->getEntityType() == eEntityType::Worker);
+
+        m_plannedBuilding.activate(gameEvent.data.playerActivatePlannedBuilding, m_selectedEntities.front()->getPosition());
         break;
     case eGameEventType::PlayerSpawnUnit:
     {

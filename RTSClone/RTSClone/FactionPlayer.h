@@ -20,7 +20,7 @@ public:
 	void deactivate();
 	void handleInput(const sf::Event& event, const Camera& camera, const sf::Window& window, const Map& map,
 		const std::vector<Base>& bases);
-	void activate(const PlayerActivatePlannedBuildingEvent& gameEvent);
+	void activate(const PlayerActivatePlannedBuildingEvent& gameEvent, const glm::vec3& position);
 	void render(ShaderHandler& shaderHandler, eFactionController owningFactionController) const;
 
 private:
