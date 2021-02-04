@@ -194,10 +194,21 @@ int main()
 			level->render(*shaderHandler);
 		}
 
+		glDisable(GL_CULL_FACE);
+		shaderHandler->switchToShader(eShaderType::Debug);
+		shaderHandler->setUniformMat4f(eShaderType::Debug, "uView", view);
+		shaderHandler->setUniformMat4f(eShaderType::Debug, "uProjection", projection);
+
+		if (level)
+		{
+			level->renderTerrain(*shaderHandler);
+		}
+		glEnable(GL_CULL_FACE);
+		glEnable(GL_BACK);
+
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		glDisable(GL_DEPTH_TEST);
-
 #ifdef RENDER_AABB
 		shaderHandler->switchToShader(eShaderType::Debug);
 		shaderHandler->setUniformMat4f(eShaderType::Debug, "uView", view);
@@ -209,9 +220,6 @@ int main()
 #endif // RENDER_AABB
 
 #ifdef RENDER_PATHING
-		shaderHandler->switchToShader(eShaderType::Debug);
-		shaderHandler->setUniformMat4f(eShaderType::Debug, "uView", view);
-		shaderHandler->setUniformMat4f(eShaderType::Debug, "uProjection", projection);
 		if (level)
 		{
 			level->renderPathing(*shaderHandler);

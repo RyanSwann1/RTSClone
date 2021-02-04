@@ -11,6 +11,7 @@
 namespace
 {
 	const float TIME_BETWEEN_UNIT_STATE = 0.05f;
+	const glm::vec3 TERRAIN_COLOR = { 0.9098039f, 0.5176471f, 0.3882353f };
 
 	int getActiveFactionCount(const FactionsContainer& factions)
 	{
@@ -53,8 +54,9 @@ namespace
 
 //Level
 Level::Level(std::vector<SceneryGameObject>&& scenery, FactionsContainer&& factions, 
-	std::vector<Base>&& mainBaseLocations)
-	: m_mainBases(std::move(mainBaseLocations)),
+	std::vector<Base>&& mainBaseLocations, const glm::vec3& size)
+	: m_playableArea(size, TERRAIN_COLOR),
+	m_mainBases(std::move(mainBaseLocations)),
 	m_scenery(std::move(scenery)),
 	m_factions(std::move(factions)),
 	m_unitStateHandlerTimer(TIME_BETWEEN_UNIT_STATE, true),
@@ -77,8 +79,9 @@ std::unique_ptr<Level> Level::create(const std::string& levelName)
 	int factionStartingResources = 0;
 	int factionStartingPopulation = 0;
 	int factionCount = 0;
+	glm::vec3 size(0.0f);
 	if (!LevelFileHandler::loadLevelFromFile(levelName, scenery, mainBases, 
-		factionStartingResources, factionStartingPopulation, factionCount))
+		factionStartingResources, factionStartingPopulation, factionCount, size))
 	{
 		return std::unique_ptr<Level>();
 	}
@@ -104,7 +107,7 @@ std::unique_ptr<Level> Level::create(const std::string& levelName)
 		}
 	}
 
-	return std::unique_ptr<Level>(new Level(std::move(scenery), std::move(factions), std::move(mainBases)));
+	return std::unique_ptr<Level>(new Level(std::move(scenery), std::move(factions), std::move(mainBases), size));
 }
 
 Level::~Level()
@@ -227,6 +230,11 @@ void Level::renderEntityStatusBars(ShaderHandler& shaderHandler, const Camera& c
 	}
 }
 
+void Level::renderTerrain(ShaderHandler& shaderHandler) const
+{
+	m_playableArea.render(shaderHandler);
+}
+
 void Level::render(ShaderHandler& shaderHandler) const
 {
 	for (const auto& gameObject : m_scenery)
@@ -251,7 +259,6 @@ void Level::render(ShaderHandler& shaderHandler) const
 	}
 
 	m_projectileHandler.render(shaderHandler);
-	ModelManager::getInstance().getModel(TERRAIN_MODEL_NAME).render(shaderHandler, Globals::TERRAIN_POSITION);
 }
 
 #ifdef RENDER_AABB

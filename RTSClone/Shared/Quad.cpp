@@ -6,7 +6,6 @@
 
 namespace
 {
-	const float DEFAULT_OPACITY = 1.0f;
 	const size_t QUAD_VERTEX_COUNT = 6;
 	std::array<glm::vec3, QUAD_VERTEX_COUNT> getQuad(const glm::vec3& position, const glm::vec3& size)
 	{
@@ -24,7 +23,7 @@ namespace
 
 Quad::Quad(const glm::vec3& size, const glm::vec3& color, float opacity)
 	: m_opacity(opacity),
-	m_position(),
+	m_position(0.0f),
 	m_size(size),
 	m_color(color),
 	m_AABB(m_position, m_size),

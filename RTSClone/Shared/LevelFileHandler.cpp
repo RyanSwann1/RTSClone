@@ -245,7 +245,7 @@ glm::ivec2 LevelFileHandler::loadMapSizeFromFile(std::ifstream& file)
 #ifdef GAME
 bool LevelFileHandler::loadLevelFromFile(const std::string& fileName, std::vector<SceneryGameObject>& scenery,
 	std::vector<Base>& mainBases, int& factionStartingResources, int& factionStartingPopulation,
-	int& factionCount)
+	int& factionCount, glm::vec3& size)
 {
 	std::ifstream file(Globals::SHARED_FILE_DIRECTORY + LEVELS_FILE_DIRECTORY + fileName);
 	if (!file.is_open())
@@ -253,7 +253,9 @@ bool LevelFileHandler::loadLevelFromFile(const std::string& fileName, std::vecto
 		return false;
 	}
 
-	broadcastToMessenger<GameMessages::NewMapSize>({ loadMapSizeFromFile(file) });
+	glm::ivec2 levelSize = loadMapSizeFromFile(file);
+	size = { levelSize.x * Globals::NODE_SIZE, 0.0f, levelSize.y * Globals::NODE_SIZE };
+	broadcastToMessenger<GameMessages::NewMapSize>({ levelSize });
 	loadScenery(file, scenery);
 	factionStartingResources = loadFactionStartingResources(file);
 	factionStartingPopulation = loadFactionStartingPopulation(file);

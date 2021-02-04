@@ -189,12 +189,9 @@ ShaderHandler::Shader::Shader(eShaderType shaderType)
 	: m_itemID(glCreateProgram()),
 	m_type(shaderType),
 	m_uniformLocations()
-{
-	//std::cout << m_itemID << "\n";
-	//std::cout << "HIHI\n";
-}
+{}
 
-ShaderHandler::Shader::~Shader()
+ShaderHandler::Shader::~Shader()		
 {
 	assert(m_itemID != Globals::INVALID_OPENGL_ID);
 	glDeleteProgram(m_itemID);

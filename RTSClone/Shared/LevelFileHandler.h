@@ -38,7 +38,7 @@ namespace LevelFileHandler
 #ifdef GAME
 	bool loadLevelFromFile(const std::string& fileName, std::vector<SceneryGameObject>& scenery,
 		std::vector<Base>& mainBases, int& factionStartingResources,
-		int& factionStartingPopulation, int& factionCount);
+		int& factionStartingPopulation, int& factionCount, glm::vec3& size);
 
 	std::array<std::string, Globals::MAX_LEVELS> loadLevelNames();
 #endif // GAME

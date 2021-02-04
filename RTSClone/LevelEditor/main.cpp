@@ -82,10 +82,6 @@ int main()
 		return -1;
 	}
 
-	shaderHandler->switchToShader(eShaderType::SelectionBox);
-	shaderHandler->setUniformMat4f(eShaderType::SelectionBox, "uOrthographic", glm::ortho(0.0f, static_cast<float>(windowSize.x),
-		static_cast<float>(windowSize.y), 0.0f));
-
 	std::unique_ptr<Level> level;
 	sf::Clock gameClock;
 	Camera camera;

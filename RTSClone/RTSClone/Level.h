@@ -9,6 +9,7 @@
 #include "FactionHandler.h"
 #include "Timer.h"
 #include "Base.h"
+#include "Quad.h"
 #include <string>
 #include <vector>
 #include <memory>
@@ -34,6 +35,7 @@ public:
 	void renderEntitySelector(const sf::Window& window, ShaderHandler& shaderHandler) const;
 	void renderPlannedBuildings(ShaderHandler& shaderHandler) const;
 	void renderEntityStatusBars(ShaderHandler& shaderHandler, const Camera& camera, glm::uvec2 windowSize) const;
+	void renderTerrain(ShaderHandler& shaderHandler) const;
 	void render(ShaderHandler& shaderHandler) const;
 
 #ifdef RENDER_AABB
@@ -46,8 +48,9 @@ public:
 
 private:
 	Level(std::vector<SceneryGameObject>&& scenery, FactionsContainer&& factions, 
-		std::vector<Base>&& mainBaseLocations);
+		std::vector<Base>&& mainBaseLocations, const glm::vec3& size);
 
+	Quad m_playableArea;
 	const std::vector<Base> m_mainBases;
 	const std::vector<SceneryGameObject> m_scenery;
 	FactionsContainer m_factions;
