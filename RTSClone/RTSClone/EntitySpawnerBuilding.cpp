@@ -10,21 +10,11 @@
 #include "ShaderHandler.h"
 
 namespace
-{
-	const float TIME_BETWEEN_WORKER_SPAWN = 2.0f;
-	const float TIME_BETWEEN_UNIT_SPAWN = 3.0f;
-	const size_t MAX_UNITS_SPAWNABLE = 5;
-
-	const float HQ_PROGRESS_BAR_WIDTH = 150.0f;
-	const float HQ_PROGRESS_BAR_YOFFSET = 220.0f;
-
-	const float BARRACKS_PROGRESS_BAR_WIDTH = 100.0f;
-	const float BARRACKS_PROGRESS_BAR_YOFFSET = 80.0f;
-	
+{	
 	glm::vec3 getSpawnPosition(const AABB& AABB, const glm::vec3& direction, const glm::vec3& startingPosition)
 	{
 		glm::vec3 position = startingPosition;
-		float distance = 1;
+		float distance = 1.0f;
 		while (AABB.contains(position))
 		{
 			position = position + direction * distance;
@@ -33,67 +23,6 @@ namespace
 		
 		return position;
 	}
-
-	bool isEntityAffordable(const Faction& owningFaction, int resourceCost, int populationCost)
-	{
-		return owningFaction.getCurrentResourceAmount() >= resourceCost &&
-			owningFaction.getCurrentPopulationAmount() + populationCost <= owningFaction.getMaximumPopulationAmount();
-	}
-
-	bool isUnitSpawnable(int unitToSpawnCount, int resourceCost, int populationCost, const Faction& owningFaction)
-	{
-		return unitToSpawnCount * resourceCost + resourceCost <= owningFaction.getCurrentResourceAmount() &&
-			unitToSpawnCount * populationCost + populationCost <= owningFaction.getMaximumPopulationAmount();
-	}
-}
-
-//Barracks
-Barracks::Barracks(const glm::vec3& startingPosition, Faction& owningFaction)
-	: EntitySpawnerBuilding(startingPosition, eEntityType::Barracks, TIME_BETWEEN_UNIT_SPAWN, 
-		Globals::BARRACKS_STARTING_HEALTH, owningFaction,
-		ModelManager::getInstance().getModel(BARRACKS_MODEL_NAME))
-{}
-
-void Barracks::update(float deltaTime, const Map& map, FactionHandler& factionHandler)
-{
-	EntitySpawnerBuilding::update(deltaTime, Globals::UNIT_RESOURCE_COST, Globals::UNIT_POPULATION_COST, 
-		map, factionHandler);
-}
-
-bool Barracks::addToSpawn()
-{
-	if (isUnitSpawnable(static_cast<int>(m_spawnQueue.size()), Globals::UNIT_RESOURCE_COST, Globals::UNIT_POPULATION_COST, m_owningFaction) &&
-		EntitySpawnerBuilding::addToSpawn())
-	{
-		m_spawnQueue.push_back(eEntityType::Unit);
-		return true;
-	}
-
-	return false;
-}
-
-//HQ
-Headquarters::Headquarters(const glm::vec3& startingPosition, Faction& owningFaction)
-	: EntitySpawnerBuilding(startingPosition, eEntityType::Headquarters, TIME_BETWEEN_WORKER_SPAWN, 
-		Globals::HQ_STARTING_HEALTH, owningFaction, ModelManager::getInstance().getModel(HQ_MODEL_NAME))
-{}
-
-void Headquarters::update(float deltaTime, const Map& map, FactionHandler& factionHandler)
-{
-	EntitySpawnerBuilding::update(deltaTime, Globals::WORKER_RESOURCE_COST, Globals::WORKER_POPULATION_COST,
-		map, factionHandler);
-}
-
-bool Headquarters::addToSpawn()
-{
-	if (isUnitSpawnable(static_cast<int>(m_spawnQueue.size()), Globals::WORKER_RESOURCE_COST, Globals::WORKER_POPULATION_COST, m_owningFaction) &&
-		EntitySpawnerBuilding::addToSpawn())
-	{
-		m_spawnQueue.push_back(eEntityType::Worker);
-		return true;
-	}
-
-	return false;
 }
 
 EntitySpawnerBuilding::~EntitySpawnerBuilding()
@@ -136,33 +65,6 @@ glm::vec3 EntitySpawnerBuilding::getUnitSpawnPosition() const
 	}
 }
 
-bool EntitySpawnerBuilding::addToSpawn()
-{
-	eEntityType entityTypeToSpawn;
-	switch (getEntityType())
-	{
-	case eEntityType::Barracks:
-		entityTypeToSpawn = eEntityType::Unit;
-		break;
-	case eEntityType::Headquarters:
-		entityTypeToSpawn = eEntityType::Worker;
-		break;
-	default:
-		assert(false);
-		break;
-	}
-
-	if (m_spawnQueue.size() < MAX_UNITS_SPAWNABLE && 
-		m_owningFaction.isEntityAffordable(entityTypeToSpawn) &&
-		!m_owningFaction.isExceedPopulationLimit(entityTypeToSpawn))
-	{
-		m_spawnTimer.setActive(true);
-		return true;
-	}
-
-	return false;
-}
-
 void EntitySpawnerBuilding::setWaypointPosition(const glm::vec3& position, const Map& map)
 {
 	if (map.isWithinBounds(position))
@@ -178,8 +80,21 @@ void EntitySpawnerBuilding::setWaypointPosition(const glm::vec3& position, const
 	}
 }
 
-void EntitySpawnerBuilding::update(float deltaTime, int resourceCost, int populationCost, 
-	const Map& map, FactionHandler& factionHandler)
+bool EntitySpawnerBuilding::isEntitySpawnable(int maxEntitiesInSpawnQueue, int resourceCost, int populationCost) const
+{
+	return m_spawnQueue.size() < maxEntitiesInSpawnQueue &&
+		m_owningFaction.isAffordable(static_cast<int>(m_spawnQueue.size()) * resourceCost + resourceCost) &&
+		m_owningFaction.isExceedPopulationLimit(static_cast<int>(m_spawnQueue.size()) * populationCost + populationCost);
+}
+
+void EntitySpawnerBuilding::addEntityToSpawnQueue(eEntityType entityType)
+{
+	m_spawnQueue.push_back(entityType);
+	m_spawnTimer.setActive(true);
+}
+
+void EntitySpawnerBuilding::update(float deltaTime, int resourceCost, int populationCost,
+	int maxEntityInSpawnQueue, const Map& map, FactionHandler& factionHandler)
 {
 	Entity::update(deltaTime);
 	m_spawnTimer.update(deltaTime);
@@ -187,25 +102,7 @@ void EntitySpawnerBuilding::update(float deltaTime, int resourceCost, int popula
 	{
 		m_spawnTimer.resetElaspedTime();
 		
-		eEntityType entityToSpawn = m_spawnQueue.back();
-		const Entity* spawnedEntity = nullptr;
-		switch (entityToSpawn)
-		{
-		case eEntityType::Unit:
-			spawnedEntity = m_owningFaction.spawnUnit(map, *this, factionHandler);
-			break;
-		case eEntityType::Worker:
-			spawnedEntity = m_owningFaction.spawnWorker(map, *this);
-			break;
-		case eEntityType::Headquarters:
-		case eEntityType::SupplyDepot:
-		case eEntityType::Barracks:
-		case eEntityType::Turret:
-		case eEntityType::Laboratory:
-			assert(false);
-			break;
-		}
-
+		const Entity* spawnedEntity = spawnEntity(map, factionHandler);
 		if (!spawnedEntity)
 		{
 			m_spawnQueue.clear();
@@ -218,7 +115,8 @@ void EntitySpawnerBuilding::update(float deltaTime, int resourceCost, int popula
 			{
 				m_spawnTimer.setActive(false);
 			}
-			else if (!isEntityAffordable(m_owningFaction, resourceCost, populationCost))
+			//Is next Entity in queue affordable
+			else if (!isEntitySpawnable(maxEntityInSpawnQueue, resourceCost, populationCost))
 			{
 				m_spawnQueue.clear();
 				m_spawnTimer.setActive(false);
@@ -237,34 +135,9 @@ void EntitySpawnerBuilding::render(ShaderHandler& shaderHandler, eFactionControl
 	Entity::render(shaderHandler, owningFactionController);
 }
 
-void EntitySpawnerBuilding::renderProgressBar(ShaderHandler& shaderHandler, const Camera& camera, glm::uvec2 windowSize) const
-{
-	if (m_spawnTimer.isActive())
-	{
-		float currentTime = m_spawnTimer.getElaspedTime() / m_spawnTimer.getExpiredTime();
-		float width = 0.0f;
-		float yOffset = 0.0f;
-		switch (getEntityType())
-		{
-		case eEntityType::Headquarters:
-			width = HQ_PROGRESS_BAR_WIDTH;
-			yOffset = HQ_PROGRESS_BAR_YOFFSET;
-			break;
-		case eEntityType::Barracks:
-			width = BARRACKS_PROGRESS_BAR_WIDTH;
-			yOffset = BARRACKS_PROGRESS_BAR_YOFFSET;
-			break;
-		default:
-			assert(false);
-		}
-
-		m_statbarSprite.render(m_position, windowSize, width, width * currentTime, Globals::DEFAULT_PROGRESS_BAR_HEIGHT, yOffset,
-			shaderHandler, camera, Globals::PROGRESS_BAR_COLOR);
-	}
-}
-
 EntitySpawnerBuilding::EntitySpawnerBuilding(const glm::vec3& startingPosition, eEntityType entityType, 
-	float spawnTimerExpirationTime, int health, Faction& owningFaction, const Model& model)
+	float spawnTimerExpirationTime, int health, Faction& owningFaction, const Model& model,
+	int maxEntityInSpawnQueue)
 	: Entity(model, startingPosition, entityType, health, owningFaction.getCurrentShieldAmount()),
 	m_owningFaction(owningFaction),
 	m_spawnQueue(),
@@ -272,5 +145,5 @@ EntitySpawnerBuilding::EntitySpawnerBuilding(const glm::vec3& startingPosition, 
 	m_waypointPosition(m_position)
 {
 	broadcastToMessenger<GameMessages::AddToMap>({ m_AABB });
-	m_spawnQueue.reserve(MAX_UNITS_SPAWNABLE);
+	m_spawnQueue.reserve(static_cast<size_t>(maxEntityInSpawnQueue));
 }
