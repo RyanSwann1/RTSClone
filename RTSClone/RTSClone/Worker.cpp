@@ -22,6 +22,7 @@ namespace
 	const float MOVEMENT_SPEED = 7.5f;
 	const int RESOURCE_CAPACITY = 30;
 	const int RESOURCE_INCREMENT = 10;
+	const int REPAIR_HEALTH_AMOUNT = 1;
 	const float REPAIR_DISTANCE = static_cast<float>(Globals::NODE_SIZE);
 	const float WORKER_PROGRESS_BAR_WIDTH = 60.0f;
 	const float WORKER_PROGRESS_BAR_YOFFSET = 30.0f;
@@ -103,11 +104,6 @@ void Worker::setEntityToRepair(const Entity& entity, const Map& map)
 		eWorkerState::MovingToRepairPosition);
 
 	m_repairTargetEntityID = entity.getID();
-
-	if (m_pathToPosition.empty())
-	{
-		switchTo(eWorkerState::Repairing);
-	}
 }
 
 bool Worker::build(const glm::vec3& buildPosition, const Map& map, eEntityType entityType)
@@ -251,7 +247,7 @@ void Worker::update(float deltaTime, const Map& map, FactionHandler& factionHand
 				{
 					setEntityToRepair(*targetEntity, map);
 				}
-				else if (targetEntity->getHealth() + 1 <= targetEntity->getMaximumHealth())
+				else if (targetEntity->getHealth() != targetEntity->getMaximumHealth())
 				{
 					m_rotation.y = Globals::getAngle(targetEntity->getPosition(), m_position);
 
@@ -406,9 +402,12 @@ void Worker::switchTo(eWorkerState newState, const Mineral* mineralToHarvest)
 	case eWorkerState::Moving:
 	case eWorkerState::MovingToBuildingPosition:
 	case eWorkerState::ReturningMineralsToHeadquarters:
+		m_taskTimer.setActive(false);
+		break;
 	case eWorkerState::MovingToRepairPosition:
 		assert(!m_pathToPosition.empty());
 		m_taskTimer.setActive(false);
+		m_taskTimer.resetElaspedTime();
 		break;
 	case eWorkerState::MovingToMinerals:
 		m_taskTimer.setActive(false);
