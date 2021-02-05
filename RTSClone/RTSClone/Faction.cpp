@@ -551,7 +551,7 @@ bool Faction::isExceedPopulationLimit(eEntityType entityType) const
     return m_currentPopulationAmount + Globals::ENTITY_POPULATION_COSTS[static_cast<int>(entityType)] > m_currentPopulationLimit;
 }
 
-bool Faction::isEntityAffordable(eEntityType entityType) const
+bool Faction::isAffordable(eEntityType entityType) const
 {
     return m_currentResourceAmount - Globals::ENTITY_RESOURCE_COSTS[static_cast<int>(entityType)] >= 0;
 }
@@ -563,7 +563,7 @@ bool Faction::isAffordable(int resourceAmount) const
 
 const Entity* Faction::spawnBuilding(const Map& map, glm::vec3 position, eEntityType entityType)
 {
-    if (isEntityAffordable(entityType) && !map.isPositionOccupied(position))
+    if (isAffordable(entityType) && !map.isPositionOccupied(position))
     {
         Entity* addedBuilding = nullptr;
         switch (entityType)
@@ -682,7 +682,7 @@ bool Faction::instructWorkerToBuild(eEntityType entityType, const glm::vec3& pos
 
 const Entity* Faction::spawnUnit(const Map& map, const EntitySpawnerBuilding& building, FactionHandler& factionHandler)
 {
-    if (isEntityAffordable(eEntityType::Unit) && !isExceedPopulationLimit(eEntityType::Unit))
+    if (isAffordable(eEntityType::Unit) && !isExceedPopulationLimit(eEntityType::Unit))
     {
         if (building.isWaypointActive())
         {
@@ -713,7 +713,7 @@ const Entity* Faction::spawnUnit(const Map& map, const EntitySpawnerBuilding& bu
 
 const Entity* Faction::spawnWorker(const Map& map, const EntitySpawnerBuilding& building)
 {
-    if (isEntityAffordable(eEntityType::Worker) && !isExceedPopulationLimit(eEntityType::Worker))
+    if (isAffordable(eEntityType::Worker) && !isExceedPopulationLimit(eEntityType::Worker))
     {
         if (building.isWaypointActive())
         {

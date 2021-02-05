@@ -368,7 +368,7 @@ int FactionPlayer::instructWorkerToBuild(const Map& map)
         workerID = m_plannedBuilding.getWorkerID();
         if (map.isWithinBounds(m_plannedBuilding.getPosition()) &&
             !map.isPositionOccupied(m_plannedBuilding.getPosition()) &&
-            isEntityAffordable(m_plannedBuilding.getEntityType()))
+            isAffordable(m_plannedBuilding.getEntityType()))
         {
             assert(m_plannedBuilding.getWorkerID() != Globals::INVALID_ENTITY_ID);
             auto selectedWorker = std::find_if(m_workers.begin(), m_workers.end(), [workerID](const auto& worker)
@@ -383,7 +383,7 @@ int FactionPlayer::instructWorkerToBuild(const Map& map)
                 m_plannedBuilding.deactivate();
             }
         }
-        else if (!isEntityAffordable(m_plannedBuilding.getEntityType()))
+        else if (!isAffordable(m_plannedBuilding.getEntityType()))
         {
             m_plannedBuilding.deactivate();
         }

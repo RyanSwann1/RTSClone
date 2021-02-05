@@ -307,7 +307,7 @@ Worker* FactionAI::getAvailableWorker(const glm::vec3& position)
 
 const Entity* FactionAI::spawnBuilding(const Map& map, glm::vec3 position, eEntityType entityType)
 {
-	if (isEntityAffordable(entityType) && !map.isPositionOccupied(position))
+	if (isAffordable(entityType) && !map.isPositionOccupied(position))
 	{
 		return Faction::spawnBuilding(map, position, entityType);
 	}
@@ -332,7 +332,7 @@ const Entity* FactionAI::spawnBuilding(const Map& map, glm::vec3 position, eEnti
 
 const Entity* FactionAI::spawnUnit(const Map& map, const EntitySpawnerBuilding& building, FactionHandler& factionHandler)
 {
-	if (isEntityAffordable(eEntityType::Unit) && !isExceedPopulationLimit(eEntityType::Unit))
+	if (isAffordable(eEntityType::Unit) && !isExceedPopulationLimit(eEntityType::Unit))
 	{
 		return Faction::spawnUnit(map, building, factionHandler);
 	}
@@ -343,7 +343,7 @@ const Entity* FactionAI::spawnUnit(const Map& map, const EntitySpawnerBuilding& 
 
 const Entity* FactionAI::spawnWorker(const Map& map, const EntitySpawnerBuilding& building)
 {
-	if (isEntityAffordable(eEntityType::Worker) && !isExceedPopulationLimit(eEntityType::Worker))
+	if (isAffordable(eEntityType::Worker) && !isExceedPopulationLimit(eEntityType::Worker))
 	{
 		return Faction::spawnWorker(map, building);
 	}
@@ -361,7 +361,7 @@ void FactionAI::onBuild(const Map& map, eEntityType entityTypeToBuild, FactionHa
 		if (!m_workers.empty())
 		{
 			glm::vec3 buildPosition(0.0f);
-			if (isEntityAffordable(entityTypeToBuild) &&
+			if (isAffordable(entityTypeToBuild) &&
 				PathFinding::getInstance().isBuildingSpawnAvailable(m_headquarters.front().getPosition(),
 					ModelManager::getInstance().getModel(BARRACKS_MODEL_NAME), map, buildPosition,
 					MIN_DISTANCE_FROM_HQ, MAX_DISTANCE_FROM_HQ, DISTANCE_FROM_MINERALS, *this))
@@ -376,10 +376,10 @@ void FactionAI::onBuild(const Map& map, eEntityType entityTypeToBuild, FactionHa
 		}
 		break;
 	case eEntityType::Turret:
-		if (!m_workers.empty() && isEntityAffordable(entityTypeToBuild))
+		if (!m_workers.empty() && isAffordable(entityTypeToBuild))
 		{
 			glm::vec3 buildPosition(0.0f);
-			if(isEntityAffordable(entityTypeToBuild) &&
+			if(isAffordable(entityTypeToBuild) &&
 				PathFinding::getInstance().isBuildingSpawnAvailable(m_headquarters.front().getPosition(), 
 				ModelManager::getInstance().getModel(TURRET_MODEL_NAME), map, buildPosition, 
 				MIN_DISTANCE_FROM_HQ, MAX_DISTANCE_FROM_HQ, DISTANCE_FROM_MINERALS, *this))

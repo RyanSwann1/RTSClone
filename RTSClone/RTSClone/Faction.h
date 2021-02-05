@@ -24,7 +24,7 @@ public:
 
 	bool isExceedPopulationLimit(int populationAmount) const;
 	bool isExceedPopulationLimit(eEntityType entityType) const;
-	bool isEntityAffordable(eEntityType entityType) const;
+	bool isAffordable(eEntityType entityType) const;
 	bool isAffordable(int resourceAmount) const;
 	int getCurrentShieldAmount() const;
 	int getCurrentPopulationAmount() const;
