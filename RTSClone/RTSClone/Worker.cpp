@@ -98,11 +98,11 @@ int Worker::extractResources()
 
 void Worker::setEntityToRepair(const Entity& entity, const Map& map)
 {
-	m_repairTargetEntityID = entity.getID();
-
 	glm::vec3 destination = PathFinding::getInstance().getClosestPositionToAABB(m_position, entity.getAABB(), map);
 	moveTo(destination, map, [&](const glm::ivec2& position) { return getAdjacentPositions(position, map); },
 		eWorkerState::MovingToRepairPosition);
+
+	m_repairTargetEntityID = entity.getID();
 
 	if (m_pathToPosition.empty())
 	{
@@ -179,7 +179,9 @@ void Worker::update(float deltaTime, const Map& map, FactionHandler& factionHand
 		}
 		break;
 	case eWorkerState::Harvesting:
-		assert(m_currentResourceAmount <= RESOURCE_CAPACITY && m_taskTimer.isActive());
+		assert(m_currentResourceAmount <= RESOURCE_CAPACITY && 
+			m_taskTimer.isActive() &&
+			m_mineralToHarvest);
 		if (m_currentResourceAmount < RESOURCE_CAPACITY)
 		{
 			if (m_taskTimer.isExpired())
@@ -417,6 +419,7 @@ void Worker::switchTo(eWorkerState newState, const Mineral* mineralToHarvest)
 		}
 		break;
 	case eWorkerState::Harvesting:
+		assert(m_mineralToHarvest);
 		m_taskTimer.resetExpirationTime(HARVEST_EXPIRATION_TIME);
 		m_taskTimer.setActive(true);
 		m_pathToPosition.clear();
@@ -427,6 +430,7 @@ void Worker::switchTo(eWorkerState newState, const Mineral* mineralToHarvest)
 		m_pathToPosition.clear();
 		break;
 	case eWorkerState::Repairing:
+		assert(m_repairTargetEntityID != Globals::INVALID_ENTITY_ID);
 		m_taskTimer.resetExpirationTime(REPAIR_EXPIRATION_TIME);
 		m_taskTimer.setActive(true);
 		m_pathToPosition.clear();
@@ -438,4 +442,3 @@ void Worker::switchTo(eWorkerState newState, const Mineral* mineralToHarvest)
 	m_taskTimer.resetElaspedTime();
 	m_currentState = newState;
 }
-

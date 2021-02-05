@@ -481,7 +481,6 @@ void Faction::renderEntityStatusBars(ShaderHandler& shaderHandler, const Camera&
             break;
         case eEntityType::Headquarters:
             static_cast<Headquarters&>(*(entity)).renderProgressBar(shaderHandler, camera, windowSize);
-            //static_cast<EntitySpawnerBuilding&>(*(entity)).renderProgressBar(shaderHandler, camera, windowSize);
             break;
         case eEntityType::Worker:
             static_cast<Worker&>(*(entity)).renderProgressBar(shaderHandler, camera, windowSize);
