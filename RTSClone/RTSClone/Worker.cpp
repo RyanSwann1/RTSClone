@@ -23,7 +23,7 @@ namespace
 	const int RESOURCE_CAPACITY = 30;
 	const int RESOURCE_INCREMENT = 10;
 	const int REPAIR_HEALTH_AMOUNT = 1;
-	const float REPAIR_DISTANCE = static_cast<float>(Globals::NODE_SIZE);
+	const float REPAIR_DISTANCE = static_cast<float>(Globals::NODE_SIZE) * 3.0f;
 	const float WORKER_PROGRESS_BAR_WIDTH = 60.0f;
 	const float WORKER_PROGRESS_BAR_YOFFSET = 30.0f;
 }
@@ -241,22 +241,18 @@ void Worker::update(float deltaTime, const Map& map, FactionHandler& factionHand
 		{
 			m_taskTimer.resetElaspedTime();
 			const Entity* targetEntity = m_owningFaction.getEntity(m_repairTargetEntityID);
-			if (targetEntity)
+			if (targetEntity && targetEntity->getHealth() != targetEntity->getMaximumHealth())
 			{
 				if (Globals::getSqrDistance(targetEntity->getPosition(), m_position) > REPAIR_DISTANCE * REPAIR_DISTANCE)
 				{
 					setEntityToRepair(*targetEntity, map);
 				}
-				else if (targetEntity->getHealth() != targetEntity->getMaximumHealth())
+				else
 				{
 					m_rotation.y = Globals::getAngle(targetEntity->getPosition(), m_position);
 
 					GameEventHandler::getInstance().gameEvents.push(GameEvent::createRepairEntity(
 						m_owningFaction.getController(), m_repairTargetEntityID));
-				}
-				else
-				{
-					switchTo(eWorkerState::Idle);
 				}
 			}
 			else
