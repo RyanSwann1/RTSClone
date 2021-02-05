@@ -274,8 +274,17 @@ void FactionPlayer::handleEvent(const GameEvent& gameEvent, const Map& map, Fact
         });
         if (entity != m_allEntities.end())
         {
-            assert(Globals::BUILDING_SPAWNER_TYPES.isMatch((*entity)->getEntityType()));
-            static_cast<EntitySpawnerBuilding&>(*(*entity)).addToSpawn();
+            switch ((*entity)->getEntityType())
+            {
+            case eEntityType::Barracks:
+                static_cast<Barracks&>(*(*entity)).addUnitToSpawnQueue();
+                break;
+            case eEntityType::Headquarters:
+                static_cast<Headquarters&>(*(*entity)).addWorkerToSpawnQueue();
+                break;
+            default:
+                assert(false);
+            }
         }
         break;
     }

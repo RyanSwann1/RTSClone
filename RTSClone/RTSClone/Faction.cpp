@@ -474,12 +474,14 @@ void Faction::renderEntityStatusBars(ShaderHandler& shaderHandler, const Camera&
         entity->renderHealthBar(shaderHandler, camera, windowSize);
         entity->renderShieldBar(shaderHandler, camera, windowSize);
 
-        //Rendering progress bars
         switch (entity->getEntityType())
         {
         case eEntityType::Barracks:
+            static_cast<Barracks&>(*(entity)).renderProgressBar(shaderHandler, camera, windowSize);
+            break;
         case eEntityType::Headquarters:
-            static_cast<EntitySpawnerBuilding&>(*(entity)).renderProgressBar(shaderHandler, camera, windowSize);
+            static_cast<Headquarters&>(*(entity)).renderProgressBar(shaderHandler, camera, windowSize);
+            //static_cast<EntitySpawnerBuilding&>(*(entity)).renderProgressBar(shaderHandler, camera, windowSize);
             break;
         case eEntityType::Worker:
             static_cast<Worker&>(*(entity)).renderProgressBar(shaderHandler, camera, windowSize);
@@ -538,6 +540,11 @@ void Faction::renderAABB(ShaderHandler& shaderHandler)
     m_HQ.renderAABB(shaderHandler);
 }
 #endif // RENDER_AABB
+
+bool Faction::isExceedPopulationLimit(int populationAmount) const
+{
+    return m_currentPopulationAmount + populationAmount <= m_currentPopulationLimit;
+}
 
 bool Faction::isExceedPopulationLimit(eEntityType entityType) const
 {

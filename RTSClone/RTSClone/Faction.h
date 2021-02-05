@@ -1,6 +1,7 @@
 #pragma once
 
-#include "EntitySpawnerBuilding.h"
+#include "Headquarters.h"
+#include "Barracks.h"
 #include "Worker.h"
 #include "PathFinding.h"
 #include "SupplyDepot.h"
@@ -21,6 +22,7 @@ class Faction : private NonCopyable, private NonMovable
 public:
 	virtual ~Faction() {}
 
+	bool isExceedPopulationLimit(int populationAmount) const;
 	bool isExceedPopulationLimit(eEntityType entityType) const;
 	bool isEntityAffordable(eEntityType entityType) const;
 	bool isAffordable(int resourceAmount) const;

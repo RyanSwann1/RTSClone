@@ -161,13 +161,13 @@ void FactionAI::update(float deltaTime, const Map & map, FactionHandler& faction
 			{
 			case eEntityType::Worker:
 				assert(!m_headquarters.empty());
-				if (m_headquarters.front().addToSpawn())
+				if (m_headquarters.front().addWorkerToSpawnQueue())
 				{
 					m_spawnQueue.pop();
 				}
 				break;
 			case eEntityType::Unit:
-				if (!m_barracks.empty() && m_barracks.front().addToSpawn())
+				if (!m_barracks.empty() && m_barracks.front().addUnitToSpawnQueue())
 				{
 					m_spawnQueue.pop();
 				}

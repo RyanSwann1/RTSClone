@@ -166,6 +166,7 @@
     <ClCompile Include="..\Shared\Quad.cpp" />
     <ClCompile Include="..\Shared\ShaderHandler.cpp" />
     <ClCompile Include="AdjacentPositions.cpp" />
+    <ClCompile Include="Barracks.cpp" />
     <ClCompile Include="Entity.cpp" />
     <ClCompile Include="Faction.cpp" />
     <ClCompile Include="FactionAI.cpp" />
@@ -174,6 +175,7 @@
     <ClCompile Include="GameEvents.cpp" />
     <ClCompile Include="GameMessages.cpp" />
     <ClCompile Include="Graph.cpp" />
+    <ClCompile Include="Headquarters.cpp" />
     <ClCompile Include="Laboratory.cpp" />
     <ClCompile Include="Level.cpp" />
     <ClCompile Include="Projectile.cpp" />
@@ -262,9 +264,11 @@
     <ClInclude Include="assimp\include\vector2.h" />
     <ClInclude Include="assimp\include\vector3.h" />
     <ClInclude Include="assimp\include\version.h" />
+    <ClInclude Include="Barracks.h" />
     <ClInclude Include="Entity.h" />
     <ClInclude Include="EntityType.h" />
     <ClInclude Include="FactionHandler.h" />
+    <ClInclude Include="Headquarters.h" />
     <ClInclude Include="Laboratory.h" />
     <ClInclude Include="RenderPathMesh.h" />
     <ClInclude Include="SceneryGameObject.h" />

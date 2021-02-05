@@ -159,6 +159,12 @@
     <ClCompile Include="EntitySpawnerBuilding.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Headquarters.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Barracks.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="assimp\include\Compiler\poppack1.h">
@@ -453,6 +459,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="EntitySpawnerBuilding.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Headquarters.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Barracks.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
