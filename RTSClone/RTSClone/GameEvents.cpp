@@ -64,11 +64,6 @@ GameEvent GameEvent::createIncreaseFactionShield(eFactionController factionContr
 	return { eGameEventType::IncreaseFactionShield, IncreaseFactionShieldEvent{factionController} };	
 }
 
-GameEvent GameEvent::createAddResources(eFactionController senderFaction, int senderID)
-{
-	return { eGameEventType::AddResources, AddResourcesEvent{senderFaction, senderID} };
-}
-
 GameEvent GameEvent::createRepairEntity(eFactionController senderFaction, int senderID)
 {
 	return { eGameEventType::RepairEntity, RepairEntityEvent{senderFaction, senderID} };

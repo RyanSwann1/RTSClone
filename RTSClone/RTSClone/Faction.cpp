@@ -254,19 +254,6 @@ void Faction::handleEvent(const GameEvent& gameEvent, const Map& map, FactionHan
         }
     }
         break;
-    case eGameEventType::AddResources:
-    {
-        int workerID = gameEvent.data.addResources.entityID;
-        auto worker = std::find_if(m_workers.begin(), m_workers.end(), [workerID](const auto& worker)
-        {
-            return worker.getID() == workerID;
-        });
-        if (worker != m_workers.end())
-        {
-            addResources(*worker);
-        }
-    }
-        break;
     case eGameEventType::RevalidateMovementPaths:
         revalidateExistingUnitPaths(map, factionHandler);
         break;

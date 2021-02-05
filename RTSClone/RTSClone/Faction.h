@@ -38,6 +38,7 @@ public:
 	const Entity* getEntity(int entityID) const;
 	const Entity* getEntity(const glm::vec3& position) const;
 
+	void addResources(Worker& worker);
 	virtual const Entity* spawnUnit(const Map& map, const UnitSpawnerBuilding& building, FactionHandler& factionHandler);
 	virtual const Entity* spawnWorker(const Map& map, const UnitSpawnerBuilding& building);
 	virtual const Entity* spawnBuilding(const Map& map, glm::vec3 position, eEntityType entityType);
@@ -83,7 +84,6 @@ private:
 	void decreaseCurrentPopulationAmount(const Entity& entity);
 	void increasePopulationLimit();
 	void revalidateExistingUnitPaths(const Map& map, FactionHandler& factionHandler);
-	void addResources(Worker& worker);
 	void increaseShield();
 
 	void handleUnitCollisions(const Map& map, FactionHandler& factionHandler);

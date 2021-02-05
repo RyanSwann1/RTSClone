@@ -7,7 +7,6 @@
 enum class eGameEventType
 {
 	TakeDamage = 0,
-	AddResources,
 	SpawnProjectile,
 	RevalidateMovementPaths,
 	EliminateFaction,
@@ -65,10 +64,6 @@ struct GameEvent_3
 	eFactionController factionController;
 	int entityID;
 };
-struct AddResourcesEvent : public GameEvent_3 {
-	AddResourcesEvent(eFactionController factionController, int senderID) :
-		GameEvent_3(factionController, senderID) {}
-};
 struct RepairEntityEvent : public GameEvent_3 {
 	RepairEntityEvent(eFactionController factionController, int senderID) :
 		GameEvent_3(factionController, senderID) {}
@@ -121,7 +116,6 @@ union GameEvents
 	PlayerActivatePlannedBuildingEvent		playerActivatePlannedBuilding;
 	EliminateFactionEvent					eliminateFaction;
 	IncreaseFactionShieldEvent				increaseFactionShield;
-	AddResourcesEvent						addResources;
 	RepairEntityEvent						repairEntity;
 	SetTargetEntityGUIEvent					setTargetEntityGUI;
 	TakeDamageEvent							takeDamage;
@@ -133,7 +127,6 @@ union GameEvents
 	GameEvents(PlayerSpawnUnitEvent gameEvent) :					playerSpawnUnit(gameEvent) {}
 	GameEvents(PlayerActivatePlannedBuildingEvent gameEvent) :		playerActivatePlannedBuilding(gameEvent) {}
 	GameEvents(EliminateFactionEvent gameEvent) :					eliminateFaction(gameEvent) {}
-	GameEvents(AddResourcesEvent gameEvent) :						addResources(gameEvent) {}
 	GameEvents(RepairEntityEvent gameEvent) :						repairEntity(gameEvent) {}
 	GameEvents(SetTargetEntityGUIEvent gameEvent) :					setTargetEntityGUI(gameEvent) {}
 	GameEvents(const TakeDamageEvent& gameEvent) :					takeDamage(gameEvent) {}
@@ -157,7 +150,6 @@ struct GameEvent
 	static GameEvent createIncreaseFactionShield(eFactionController factionController);
 	
 	//GameEvent_3
-	static GameEvent createAddResources(eFactionController senderFaction, int senderID);
 	static GameEvent createRepairEntity(eFactionController senderFaction, int senderID);
 	static GameEvent createSetTargetEntityGUI(eFactionController senderFaction, int senderID);
 

@@ -323,12 +323,6 @@ void Level::handleEvent(const GameEvent& gameEvent, const Map& map)
 			getFaction(m_factions, gameEvent.data.takeDamage.targetFaction).handleEvent(gameEvent, map, m_factionHandler);
 		}
 		break;
-	case eGameEventType::AddResources:
-		if (isFactionActive(m_factions, gameEvent.data.addResources.factionController))
-		{
-			getFaction(m_factions, gameEvent.data.addResources.factionController).handleEvent(gameEvent, map, m_factionHandler);
-		}
-		break;
 	case eGameEventType::RepairEntity:
 		if (isFactionActive(m_factions, gameEvent.data.repairEntity.factionController))
 		{

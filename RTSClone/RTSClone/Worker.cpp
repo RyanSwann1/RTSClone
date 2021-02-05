@@ -165,7 +165,7 @@ void Worker::update(float deltaTime, const Map& map, FactionHandler& factionHand
 		assert(isHoldingResources());
 		if (m_pathToPosition.empty())
 		{
-			GameEventHandler::getInstance().gameEvents.push(GameEvent::createAddResources(m_owningFaction.getController(), getID()));
+			m_owningFaction.addResources(*this);
 			if (m_mineralToHarvest)
 			{
 				glm::vec3 destination = PathFinding::getInstance().getClosestPositionToAABB(m_position, 
