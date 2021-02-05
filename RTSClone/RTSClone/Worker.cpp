@@ -202,7 +202,6 @@ void Worker::update(float deltaTime, const Map& map, FactionHandler& factionHand
 		}
 		break;
 	case eWorkerState::Building:
-	{
 		assert(m_pathToPosition.empty() && !m_buildQueue.empty() && m_taskTimer.isActive());
 		if (m_taskTimer.isExpired())
 		{
@@ -225,7 +224,6 @@ void Worker::update(float deltaTime, const Map& map, FactionHandler& factionHand
 					map, [&](const glm::ivec2& position) { return getAllAdjacentPositions(position, map); });
 			}
 		}
-	}
 		break;
 	case eWorkerState::MovingToRepairPosition:
 		if (m_pathToPosition.empty())
@@ -360,12 +358,21 @@ void Worker::switchTo(eWorkerState newState, const Mineral* mineralToHarvest)
 		break;
 	case eWorkerState::MovingToMinerals:
 	case eWorkerState::ReturningMineralsToHeadquarters:
+		if (newState != eWorkerState::MovingToMinerals &&
+			newState != eWorkerState::ReturningMineralsToHeadquarters &&
+			newState != eWorkerState::Harvesting)
+		{
+			m_mineralToHarvest = nullptr;
+		}
+		break;
 	case eWorkerState::Harvesting:
 		if (newState != eWorkerState::MovingToMinerals && 
 			newState != eWorkerState::ReturningMineralsToHeadquarters &&
 			newState != eWorkerState::Harvesting)
 		{
 			m_mineralToHarvest = nullptr;
+			m_taskTimer.setActive(false);
+			m_taskTimer.resetElaspedTime();
 		}
 		break;
 	case eWorkerState::MovingToBuildingPosition:
@@ -377,11 +384,18 @@ void Worker::switchTo(eWorkerState newState, const Mineral* mineralToHarvest)
 		}
 		break;
 	case eWorkerState::MovingToRepairPosition:
+		if (newState != eWorkerState::MovingToRepairPosition &&
+			newState != eWorkerState::Repairing)
+		{
+			m_repairTargetEntityID = Globals::INVALID_ENTITY_ID;
+		}
+		break;
 	case eWorkerState::Repairing:
 		if (newState != eWorkerState::MovingToRepairPosition &&
 			newState != eWorkerState::Repairing)
 		{
 			m_repairTargetEntityID = Globals::INVALID_ENTITY_ID;
+			m_taskTimer.setActive(false);
 			m_taskTimer.resetElaspedTime();
 		}
 		break;
