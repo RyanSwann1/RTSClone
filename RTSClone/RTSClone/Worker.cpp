@@ -263,7 +263,7 @@ void Worker::update(float deltaTime, const Map& map, FactionHandler& factionHand
 		else if (unitStateHandlerTimer.isExpired())
 		{
 			const Entity* targetEntity = m_owningFaction.getEntity(m_repairTargetEntityID);
-			if (targetEntity)
+			if (targetEntity && targetEntity->getHealth() != targetEntity->getMaximumHealth())
 			{
 				if (Globals::getSqrDistance(targetEntity->getPosition(), m_position) > REPAIR_DISTANCE * REPAIR_DISTANCE)
 				{
@@ -382,6 +382,7 @@ void Worker::switchTo(eWorkerState newState, const Mineral* mineralToHarvest)
 			newState != eWorkerState::Repairing)
 		{
 			m_repairTargetEntityID = Globals::INVALID_ENTITY_ID;
+			m_taskTimer.resetElaspedTime();
 		}
 		break;
 	default:
