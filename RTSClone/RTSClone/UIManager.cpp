@@ -301,7 +301,7 @@ void UIManager::update(const FactionHandler& factionHandler)
 			case eEntityType::Headquarters:
 			case eEntityType::Barracks:
 			{
-				const UnitSpawnerBuilding& unitSpawnerBuilding = static_cast<const UnitSpawnerBuilding&>(*targetEntity);
+				const EntitySpawnerBuilding& unitSpawnerBuilding = static_cast<const EntitySpawnerBuilding&>(*targetEntity);
 				m_selectedEntityWidget.set({ m_selectedEntity.getFactionController(), m_selectedEntity.getID(), targetEntity->getEntityType(),
 					unitSpawnerBuilding.getHealth(), unitSpawnerBuilding.getShield(), unitSpawnerBuilding.getCurrentSpawnCount() });
 			}

@@ -9,10 +9,10 @@ struct Model;
 class Map;
 class Faction;
 class FactionHandler;
-class UnitSpawnerBuilding : public Entity
+class EntitySpawnerBuilding : public Entity
 {
 public:
-	virtual ~UnitSpawnerBuilding();
+	virtual ~EntitySpawnerBuilding();
 
 	const Timer& getSpawnTimer() const;
 	int getCurrentSpawnCount() const;
@@ -26,7 +26,7 @@ public:
 	void renderProgressBar(ShaderHandler& shaderHandler, const Camera& camera, glm::uvec2 windowSize) const;
 
 protected:
-	UnitSpawnerBuilding(const glm::vec3& startingPosition, eEntityType entityType, float spawnTimerExpirationTime, int health, 
+	EntitySpawnerBuilding(const glm::vec3& startingPosition, eEntityType entityType, float spawnTimerExpirationTime, int health, 
 		Faction& owningFaction, const Model& model);
 	
 	void update(float deltaTime, int resourceCost, int populationCost, 
@@ -40,7 +40,7 @@ private:
 	glm::vec3 m_waypointPosition;
 };
 
-class Barracks : public UnitSpawnerBuilding
+class Barracks : public EntitySpawnerBuilding
 {		
 public:
 	Barracks(const glm::vec3& startingPosition, Faction& owningFaction);
@@ -49,7 +49,7 @@ public:
 	bool addToSpawn() override;
 };
 
-class Headquarters : public UnitSpawnerBuilding
+class Headquarters : public EntitySpawnerBuilding
 {
 public:
 	Headquarters(const glm::vec3& startingPosition, Faction& owningFaction);

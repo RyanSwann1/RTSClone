@@ -1,4 +1,4 @@
-#include "UnitSpawnerBuilding.h"
+#include "EntitySpawnerBuilding.h"
 #include "Camera.h"
 #include "GameMessenger.h"
 #include "GameMessages.h"
@@ -49,21 +49,21 @@ namespace
 
 //Barracks
 Barracks::Barracks(const glm::vec3& startingPosition, Faction& owningFaction)
-	: UnitSpawnerBuilding(startingPosition, eEntityType::Barracks, TIME_BETWEEN_UNIT_SPAWN, 
+	: EntitySpawnerBuilding(startingPosition, eEntityType::Barracks, TIME_BETWEEN_UNIT_SPAWN, 
 		Globals::BARRACKS_STARTING_HEALTH, owningFaction,
 		ModelManager::getInstance().getModel(BARRACKS_MODEL_NAME))
 {}
 
 void Barracks::update(float deltaTime, const Map& map, FactionHandler& factionHandler)
 {
-	UnitSpawnerBuilding::update(deltaTime, Globals::UNIT_RESOURCE_COST, Globals::UNIT_POPULATION_COST, 
+	EntitySpawnerBuilding::update(deltaTime, Globals::UNIT_RESOURCE_COST, Globals::UNIT_POPULATION_COST, 
 		map, factionHandler);
 }
 
 bool Barracks::addToSpawn()
 {
 	if (isUnitSpawnable(static_cast<int>(m_spawnQueue.size()), Globals::UNIT_RESOURCE_COST, Globals::UNIT_POPULATION_COST, m_owningFaction) &&
-		UnitSpawnerBuilding::addToSpawn())
+		EntitySpawnerBuilding::addToSpawn())
 	{
 		m_spawnQueue.push_back(eEntityType::Unit);
 		return true;
@@ -74,20 +74,20 @@ bool Barracks::addToSpawn()
 
 //HQ
 Headquarters::Headquarters(const glm::vec3& startingPosition, Faction& owningFaction)
-	: UnitSpawnerBuilding(startingPosition, eEntityType::Headquarters, TIME_BETWEEN_WORKER_SPAWN, 
+	: EntitySpawnerBuilding(startingPosition, eEntityType::Headquarters, TIME_BETWEEN_WORKER_SPAWN, 
 		Globals::HQ_STARTING_HEALTH, owningFaction, ModelManager::getInstance().getModel(HQ_MODEL_NAME))
 {}
 
 void Headquarters::update(float deltaTime, const Map& map, FactionHandler& factionHandler)
 {
-	UnitSpawnerBuilding::update(deltaTime, Globals::WORKER_RESOURCE_COST, Globals::WORKER_POPULATION_COST,
+	EntitySpawnerBuilding::update(deltaTime, Globals::WORKER_RESOURCE_COST, Globals::WORKER_POPULATION_COST,
 		map, factionHandler);
 }
 
 bool Headquarters::addToSpawn()
 {
 	if (isUnitSpawnable(static_cast<int>(m_spawnQueue.size()), Globals::WORKER_RESOURCE_COST, Globals::WORKER_POPULATION_COST, m_owningFaction) &&
-		UnitSpawnerBuilding::addToSpawn())
+		EntitySpawnerBuilding::addToSpawn())
 	{
 		m_spawnQueue.push_back(eEntityType::Worker);
 		return true;
@@ -96,33 +96,33 @@ bool Headquarters::addToSpawn()
 	return false;
 }
 
-UnitSpawnerBuilding::~UnitSpawnerBuilding()
+EntitySpawnerBuilding::~EntitySpawnerBuilding()
 {
 	broadcastToMessenger<GameMessages::RemoveFromMap>({ m_AABB });
 }
 
-const Timer& UnitSpawnerBuilding::getSpawnTimer() const
+const Timer& EntitySpawnerBuilding::getSpawnTimer() const
 {
 	return m_spawnTimer;
 }
 
-int UnitSpawnerBuilding::getCurrentSpawnCount() const
+int EntitySpawnerBuilding::getCurrentSpawnCount() const
 {
 	return static_cast<int>(m_spawnQueue.size());
 }
 
-bool UnitSpawnerBuilding::isWaypointActive() const
+bool EntitySpawnerBuilding::isWaypointActive() const
 {
 	return m_waypointPosition != m_position;
 }
 
-const glm::vec3& UnitSpawnerBuilding::getWaypointPosition() const
+const glm::vec3& EntitySpawnerBuilding::getWaypointPosition() const
 {
 	assert(isWaypointActive());
 	return m_waypointPosition;
 }
 
-glm::vec3 UnitSpawnerBuilding::getUnitSpawnPosition() const
+glm::vec3 EntitySpawnerBuilding::getUnitSpawnPosition() const
 {
 	if (isWaypointActive())
 	{
@@ -136,7 +136,7 @@ glm::vec3 UnitSpawnerBuilding::getUnitSpawnPosition() const
 	}
 }
 
-bool UnitSpawnerBuilding::addToSpawn()
+bool EntitySpawnerBuilding::addToSpawn()
 {
 	eEntityType entityTypeToSpawn;
 	switch (getEntityType())
@@ -163,7 +163,7 @@ bool UnitSpawnerBuilding::addToSpawn()
 	return false;
 }
 
-void UnitSpawnerBuilding::setWaypointPosition(const glm::vec3& position, const Map& map)
+void EntitySpawnerBuilding::setWaypointPosition(const glm::vec3& position, const Map& map)
 {
 	if (map.isWithinBounds(position))
 	{
@@ -178,7 +178,7 @@ void UnitSpawnerBuilding::setWaypointPosition(const glm::vec3& position, const M
 	}
 }
 
-void UnitSpawnerBuilding::update(float deltaTime, int resourceCost, int populationCost, 
+void EntitySpawnerBuilding::update(float deltaTime, int resourceCost, int populationCost, 
 	const Map& map, FactionHandler& factionHandler)
 {
 	Entity::update(deltaTime);
@@ -227,7 +227,7 @@ void UnitSpawnerBuilding::update(float deltaTime, int resourceCost, int populati
 	}
 }
 
-void UnitSpawnerBuilding::render(ShaderHandler& shaderHandler, eFactionController owningFactionController) const
+void EntitySpawnerBuilding::render(ShaderHandler& shaderHandler, eFactionController owningFactionController) const
 {
 	if (isSelected() && isWaypointActive())
 	{
@@ -237,7 +237,7 @@ void UnitSpawnerBuilding::render(ShaderHandler& shaderHandler, eFactionControlle
 	Entity::render(shaderHandler, owningFactionController);
 }
 
-void UnitSpawnerBuilding::renderProgressBar(ShaderHandler& shaderHandler, const Camera& camera, glm::uvec2 windowSize) const
+void EntitySpawnerBuilding::renderProgressBar(ShaderHandler& shaderHandler, const Camera& camera, glm::uvec2 windowSize) const
 {
 	if (m_spawnTimer.isActive())
 	{
@@ -263,7 +263,7 @@ void UnitSpawnerBuilding::renderProgressBar(ShaderHandler& shaderHandler, const 
 	}
 }
 
-UnitSpawnerBuilding::UnitSpawnerBuilding(const glm::vec3& startingPosition, eEntityType entityType, 
+EntitySpawnerBuilding::EntitySpawnerBuilding(const glm::vec3& startingPosition, eEntityType entityType, 
 	float spawnTimerExpirationTime, int health, Faction& owningFaction, const Model& model)
 	: Entity(model, startingPosition, entityType, health, owningFaction.getCurrentShieldAmount()),
 	m_owningFaction(owningFaction),

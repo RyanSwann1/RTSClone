@@ -479,7 +479,7 @@ void Faction::renderEntityStatusBars(ShaderHandler& shaderHandler, const Camera&
         {
         case eEntityType::Barracks:
         case eEntityType::Headquarters:
-            static_cast<UnitSpawnerBuilding&>(*(entity)).renderProgressBar(shaderHandler, camera, windowSize);
+            static_cast<EntitySpawnerBuilding&>(*(entity)).renderProgressBar(shaderHandler, camera, windowSize);
             break;
         case eEntityType::Worker:
             static_cast<Worker&>(*(entity)).renderProgressBar(shaderHandler, camera, windowSize);
@@ -673,7 +673,7 @@ bool Faction::instructWorkerToBuild(eEntityType entityType, const glm::vec3& pos
     return false;
 }
 
-const Entity* Faction::spawnUnit(const Map& map, const UnitSpawnerBuilding& building, FactionHandler& factionHandler)
+const Entity* Faction::spawnUnit(const Map& map, const EntitySpawnerBuilding& building, FactionHandler& factionHandler)
 {
     if (isEntityAffordable(eEntityType::Unit) && !isExceedPopulationLimit(eEntityType::Unit))
     {
@@ -704,7 +704,7 @@ const Entity* Faction::spawnUnit(const Map& map, const UnitSpawnerBuilding& buil
     return nullptr;
 }
 
-const Entity* Faction::spawnWorker(const Map& map, const UnitSpawnerBuilding& building)
+const Entity* Faction::spawnWorker(const Map& map, const EntitySpawnerBuilding& building)
 {
     if (isEntityAffordable(eEntityType::Worker) && !isExceedPopulationLimit(eEntityType::Worker))
     {

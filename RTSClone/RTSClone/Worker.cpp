@@ -1,6 +1,5 @@
 #include "Worker.h"
 #include "Map.h"
-#include "UnitSpawnerBuilding.h"
 #include "Mineral.h"
 #include "ModelManager.h"
 #include "PathFinding.h"

@@ -186,7 +186,7 @@
     <ClCompile Include="UIManager.cpp" />
     <ClCompile Include="TargetEntity.cpp" />
     <ClCompile Include="Worker.cpp" />
-    <ClCompile Include="UnitSpawnerBuilding.cpp" />
+    <ClCompile Include="EntitySpawnerBuilding.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Map.cpp" />
     <ClCompile Include="PathFinding.cpp" />
@@ -287,7 +287,7 @@
     <ClInclude Include="ProjectileHandler.h" />
     <ClInclude Include="UniqueIDGenerator.h" />
     <ClInclude Include="Worker.h" />
-    <ClInclude Include="UnitSpawnerBuilding.h" />
+    <ClInclude Include="EntitySpawnerBuilding.h" />
     <ClInclude Include="Map.h" />
     <ClInclude Include="PathFinding.h" />
     <ClInclude Include="PriorityQueue.h" />
