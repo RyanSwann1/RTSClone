@@ -228,7 +228,7 @@ void Worker::update(float deltaTime, const Map& map, FactionHandler& factionHand
 			}
 		}
 	}
-	break;
+		break;
 	case eWorkerState::MovingToRepairPosition:
 		if (m_pathToPosition.empty())
 		{

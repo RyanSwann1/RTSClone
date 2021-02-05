@@ -356,7 +356,7 @@ void Level::handleEvent(const GameEvent& gameEvent, const Map& map)
 		}
 		break;
 	case eGameEventType::PlayerActivatePlannedBuilding:
-	case eGameEventType::PlayerSpawnUnit:
+	case eGameEventType::PlayerSpawnEntity:
 		if (isFactionActive(m_factions, eFactionController::Player))
 		{
 			getFaction(m_factions, eFactionController::Player).handleEvent(gameEvent, map, m_factionHandler);

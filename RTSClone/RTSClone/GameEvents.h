@@ -10,7 +10,7 @@ enum class eGameEventType
 	SpawnProjectile,
 	RevalidateMovementPaths,
 	EliminateFaction,
-	PlayerSpawnUnit,
+	PlayerSpawnEntity,
 	PlayerActivatePlannedBuilding,
 	RepairEntity,
 	SetTargetEntityGUI,
@@ -32,8 +32,8 @@ struct GameEvent_1
 	eEntityType entityType;
 	int targetID;
 };
-struct PlayerSpawnUnitEvent : public GameEvent_1 {
-	PlayerSpawnUnitEvent(eEntityType entityType, int targetID) :
+struct PlayerSpawnEntity : public GameEvent_1 {
+	PlayerSpawnEntity(eEntityType entityType, int targetID) :
 		GameEvent_1(entityType, targetID) {}
 };
 struct PlayerActivatePlannedBuildingEvent : public GameEvent_1 {
@@ -112,7 +112,7 @@ union GameEvents
 {
 	RevalidateMovementPathsEvent			revalidateMovementPaths;
 	ResetTargetEntityGUIEvent				resetTargetEntityGUI;
-	PlayerSpawnUnitEvent					playerSpawnUnit;
+	PlayerSpawnEntity						playerSpawnEntity;
 	PlayerActivatePlannedBuildingEvent		playerActivatePlannedBuilding;
 	EliminateFactionEvent					eliminateFaction;
 	IncreaseFactionShieldEvent				increaseFactionShield;
@@ -124,7 +124,7 @@ union GameEvents
 	GameEvents(RevalidateMovementPathsEvent gameEvent) :			revalidateMovementPaths(gameEvent) {}
 	GameEvents(ResetTargetEntityGUIEvent gameEvent) :				resetTargetEntityGUI(gameEvent) {}
 	GameEvents(IncreaseFactionShieldEvent gameEvent) :				increaseFactionShield(gameEvent) {}
-	GameEvents(PlayerSpawnUnitEvent gameEvent) :					playerSpawnUnit(gameEvent) {}
+	GameEvents(PlayerSpawnEntity gameEvent) :					playerSpawnEntity(gameEvent) {}
 	GameEvents(PlayerActivatePlannedBuildingEvent gameEvent) :		playerActivatePlannedBuilding(gameEvent) {}
 	GameEvents(EliminateFactionEvent gameEvent) :					eliminateFaction(gameEvent) {}
 	GameEvents(RepairEntityEvent gameEvent) :						repairEntity(gameEvent) {}

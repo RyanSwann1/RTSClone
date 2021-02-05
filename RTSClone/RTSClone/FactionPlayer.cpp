@@ -265,9 +265,9 @@ void FactionPlayer::handleEvent(const GameEvent& gameEvent, const Map& map, Fact
 
         m_plannedBuilding.activate(gameEvent.data.playerActivatePlannedBuilding, m_selectedEntities.front()->getPosition());
         break;
-    case eGameEventType::PlayerSpawnUnit:
+    case eGameEventType::PlayerSpawnEntity:
     {
-        int targetEntityID = gameEvent.data.playerSpawnUnit.targetID;
+        int targetEntityID = gameEvent.data.playerSpawnEntity.targetID;
         auto entity = std::find_if(m_allEntities.begin(), m_allEntities.end(), [targetEntityID](const auto& entity)
         {
             return entity->getID() == targetEntityID;
@@ -277,6 +277,7 @@ void FactionPlayer::handleEvent(const GameEvent& gameEvent, const Map& map, Fact
             assert(Globals::BUILDING_SPAWNER_TYPES.isMatch((*entity)->getEntityType()));
             static_cast<EntitySpawnerBuilding&>(*(*entity)).addToSpawn();
         }
+        break;
     }
     break;
     }

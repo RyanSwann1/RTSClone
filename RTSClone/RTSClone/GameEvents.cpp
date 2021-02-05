@@ -46,7 +46,7 @@ GameEvent GameEvent::createResetTargetEntityGUI()
 
 GameEvent GameEvent::createPlayerSpawnUnit(eEntityType entityType, int targetID)
 {
-	return { eGameEventType::PlayerSpawnUnit, PlayerSpawnUnitEvent{entityType, targetID} };
+	return { eGameEventType::PlayerSpawnEntity, PlayerSpawnEntity{entityType, targetID} };
 }
 
 GameEvent GameEvent::createPlayerActivatePlannedBuilding(eEntityType entityType, int targetID)
