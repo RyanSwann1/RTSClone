@@ -67,7 +67,7 @@ protected:
 	std::list<Barracks> m_barracks;
 	std::list<Turret> m_turrets;
 	std::list<Headquarters> m_headquarters;
-	std::unique_ptr<Laboratory> m_laboratory;
+	std::list<Laboratory> m_laboratories;
 
 	bool instructWorkerToBuild(eEntityType entityType, const glm::vec3& position, const Map& map, Worker& worker);
 	virtual void onEntityRemoval(const Entity& entity) {}

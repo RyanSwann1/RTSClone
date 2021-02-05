@@ -530,9 +530,10 @@ void FactionPlayer::onLeftClick(const sf::Window& window, const Camera& camera, 
         selectEntity<Turret>(m_turrets, planeIntersection);
         selectEntity<SupplyDepot>(m_supplyDepots, planeIntersection);
         selectEntity<Headquarters>(m_headquarters, planeIntersection);
-        if (m_laboratory)
+        if (!m_laboratories.empty())
         {
-            m_laboratory->setSelected(m_laboratory->getAABB().contains(planeIntersection));
+            assert(m_laboratories.size() == 1);
+            m_laboratories.front().setSelected(m_laboratories.front().getAABB().contains(planeIntersection));
         }
     }
 }
