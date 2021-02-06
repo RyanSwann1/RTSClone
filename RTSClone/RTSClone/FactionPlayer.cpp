@@ -100,6 +100,22 @@ namespace
 
         return nullptr;
     }
+
+    const Base* getBaseAtMineral(const std::vector<Base>& bases, const glm::vec3& position)
+    {
+        for (const auto& base : bases)
+        {
+            for (const auto& mineral : base.minerals)
+            {
+                if (mineral.getAABB().contains(position))
+                {
+                    return &base;
+                }
+            }
+        }
+
+        return nullptr;
+    }
 }
 
 //FactionPlayerPlannedBuilding
@@ -455,19 +471,25 @@ void FactionPlayer::moveMultipleSelectedEntities(const glm::vec3& planeIntersect
     FactionHandler& factionHandler, const std::vector<Base>& bases)
 {
     assert(!m_selectedEntities.empty());
-    const Mineral* mineralToHarvest = getMineral(bases, planeIntersection);
-    if (mineralToHarvest)
+    const Base* base = getBaseAtMineral(bases, planeIntersection);
+    if (base)
     {
         for (auto& selectedUnit : m_selectedEntities)
         {
             if (selectedUnit->getEntityType() == eEntityType::Worker)
             {
-                glm::vec3 destination = PathFinding::getInstance().getClosestPositionToAABB(selectedUnit->getPosition(),
-                    mineralToHarvest->getAABB(), map);
+                for (const auto& mineral : base->minerals)
+                {
+                    if (!isMineralInUse(mineral))
+                    {
+                        glm::vec3 destination = PathFinding::getInstance().getClosestPositionToAABB(selectedUnit->getPosition(),
+                            mineral.getAABB(), map);
 
-                static_cast<Worker&>(*selectedUnit).moveTo(destination, map,
-                    [&](const glm::ivec2& position) { return getAdjacentPositions(position, map); },
-                    eWorkerState::MovingToMinerals, &(*mineralToHarvest));
+                        static_cast<Worker&>(*selectedUnit).moveTo(destination, map,
+                            [&](const glm::ivec2& position) { return getAdjacentPositions(position, map); },
+                            eWorkerState::MovingToMinerals, &mineral);
+                    }
+                }
             }
         }
     }
