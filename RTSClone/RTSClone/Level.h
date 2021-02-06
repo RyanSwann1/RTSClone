@@ -36,6 +36,7 @@ public:
 	void renderPlannedBuildings(ShaderHandler& shaderHandler) const;
 	void renderEntityStatusBars(ShaderHandler& shaderHandler, const Camera& camera, glm::uvec2 windowSize) const;
 	void renderTerrain(ShaderHandler& shaderHandler) const;
+	void renderPlayerPlannedBuilding(ShaderHandler& shaderHandler, const Map& map) const;
 	void render(ShaderHandler& shaderHandler) const;
 
 #ifdef RENDER_AABB

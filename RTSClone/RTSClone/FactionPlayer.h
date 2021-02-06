@@ -7,21 +7,22 @@
 struct Base;
 struct Camera;
 struct PlayerActivatePlannedBuildingEvent;
-class FactionPlayerPlannedBuilding
+class FactionPlayerPlannedBuilding : private NonCopyable, private NonMovable
 {	
 public:
 	FactionPlayerPlannedBuilding();
 
+	bool isOnValidPosition(const std::vector<Base>& bases, const Map& map) const;
 	const glm::vec3& getPosition() const;
 	int getWorkerID() const;
 	eEntityType getEntityType() const;
 	bool isActive() const;
 
 	void deactivate();
+	void activate(const PlayerActivatePlannedBuildingEvent& gameEvent, const glm::vec3& position);
 	void handleInput(const sf::Event& event, const Camera& camera, const sf::Window& window, const Map& map,
 		const std::vector<Base>& bases);
-	void activate(const PlayerActivatePlannedBuildingEvent& gameEvent, const glm::vec3& position);
-	void render(ShaderHandler& shaderHandler, eFactionController owningFactionController) const;
+	void render(ShaderHandler& shaderHandler, const std::vector<Base>& bases, const Map& map) const;
 
 private:
 	const Model* m_model;
@@ -42,6 +43,7 @@ public:
 	void handleEvent(const GameEvent& gameEvent, const Map& map, FactionHandler& factionHandler) override;
 	void update(float deltaTime, const Map& map, FactionHandler& factionHandler, const Timer& unitStateHandlerTimer) override;
 	void render(ShaderHandler& shaderHandler) const override;
+	void renderPlannedBuilding(ShaderHandler& shaderHandler, const std::vector<Base>& bases, const Map& map) const;
 	void renderEntitySelector(const sf::Window& window, ShaderHandler& shaderHandler) const;
 
 private:
@@ -54,13 +56,13 @@ private:
 	void onEntityRemoval(const Entity& entity) override;
 
 	void instructWorkerReturnMinerals(const Map& map, const Headquarters& headquarters);
-	int instructWorkerToBuild(const Map& map);
+	int instructWorkerToBuild(const Map& map, const std::vector<Base>& bases);
 	void moveSingularSelectedEntity(const glm::vec3& mouseToGroundPosition, const Map& map, Entity& selectedEntity, 
 		FactionHandler& factionHandler, const std::vector<Base>& bases) const;
 	void moveMultipleSelectedEntities(const glm::vec3& mouseToGroundPosition, const Map& map, FactionHandler& factionHandler,
 		const std::vector<Base>& bases);
 
-	void onLeftClick(const sf::Window& window, const Camera& camera, const Map& map);
+	void onLeftClick(const sf::Window& window, const Camera& camera, const Map& map, const std::vector<Base>& bases);
 	void onRightClick(const sf::Window& window, const Camera& camera, FactionHandler& factionHandler, const Map& map, 
 		const std::vector<Base>& bases);
 

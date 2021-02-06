@@ -230,7 +230,10 @@ int main()
 		shaderHandler->setUniform1f(eShaderType::Default, "uOpacity", 0.35f);
 		if (level)
 		{
+			glDisable(GL_CULL_FACE);
+			level->renderPlayerPlannedBuilding(*shaderHandler, map);
 			level->renderPlannedBuildings(*shaderHandler);
+			glEnable(GL_CULL_FACE);
 
 			shaderHandler->switchToShader(eShaderType::Widjet);
 			level->renderEntityStatusBars(*shaderHandler, camera, windowSize);

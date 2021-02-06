@@ -115,7 +115,6 @@ void EntitySpawnerBuilding::update(float deltaTime, int resourceCost, int popula
 			{
 				m_spawnTimer.setActive(false);
 			}
-			//Is next Entity in queue Spawnable
 			else if (!m_owningFaction.isAffordable(static_cast<int>(m_spawnQueue.size()) * resourceCost) ||
 				m_owningFaction.isExceedPopulationLimit(static_cast<int>(m_spawnQueue.size()) * populationCost))
 			{

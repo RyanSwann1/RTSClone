@@ -33,7 +33,7 @@ namespace
 		return factions[static_cast<int>(factionController)].get();
 	}
 
-	FactionPlayer& getFactionPlayer(FactionsContainer& factions)
+	FactionPlayer& getFactionPlayer(const FactionsContainer& factions)
 	{
 		assert(isFactionActive(factions, eFactionController::Player));
 		return static_cast<FactionPlayer&>(*factions[static_cast<int>(eFactionController::Player)]);
@@ -246,6 +246,14 @@ void Level::renderEntityStatusBars(ShaderHandler& shaderHandler, const Camera& c
 void Level::renderTerrain(ShaderHandler& shaderHandler) const
 {
 	m_playableArea.render(shaderHandler);
+}
+
+void Level::renderPlayerPlannedBuilding(ShaderHandler& shaderHandler, const Map& map) const
+{
+	if (m_factionHandler.isFactionActive(eFactionController::Player))
+	{
+		getFactionPlayer(m_factions).renderPlannedBuilding(shaderHandler, m_mainBases, map);
+	}
 }
 
 void Level::render(ShaderHandler& shaderHandler) const

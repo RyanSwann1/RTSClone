@@ -18,6 +18,10 @@
 
 namespace
 {
+    const float PLANNED_BUILDING_OPACITY = 0.3f;
+    const glm::vec3 VALID_PLANNED_BUILDING_COLOR{ 0.0f, 1.0f, 0.0f };
+    const glm::vec3 INVALID_PLANNED_BUILDING_COLOR{ 1.0f, 0.0f, 0.0f };
+
     void moveSelectedEntitiesToAttackPosition(std::vector<Entity*>& selectedEntities, const Entity& targetEntity, 
         const Faction& targetFaction, const Map& map, FactionHandler& factionHandler)
     {
@@ -140,62 +144,60 @@ void FactionPlayerPlannedBuilding::handleInput(const sf::Event& event, const Cam
     {
         assert(m_workerID != Globals::INVALID_ENTITY_ID);
         glm::vec3 position = camera.getRayToGroundPlaneIntersection(window);
-        if (map.isWithinBounds(position) && !map.isPositionOccupied(position))
+        if (map.isWithinBounds(position))
         {
-            glm::vec3 newPosition = Globals::convertToMiddleGridPosition(Globals::convertToNodePosition(position));
-            switch (m_entityType)
-            {
-            case eEntityType::Headquarters:
-            {
-                bool positionValid = true;
-                for (const auto& base : bases)
-                {
-                    for (const auto& mineral : base.minerals)
-                    {
-                        if (Globals::getSqrDistance(mineral.getPosition(), newPosition) <=
-                            Globals::MINIMUM_HQ_DISTANCE_FROM_MINERALS)
-                        {
-                            positionValid = false;
-                            break;
-                        }
-                    }
-
-                    if (!positionValid)
-                    {
-                        break;
-                    }
-                }
-
-                if (positionValid)
-                {
-                    m_position = newPosition;
-                }
-            }
-                break;
-            default:
-                m_position = newPosition;
-            }
+            m_position = Globals::convertToMiddleGridPosition(Globals::convertToNodePosition(position));
         }
     }
 }
 
 void FactionPlayerPlannedBuilding::activate(const PlayerActivatePlannedBuildingEvent& gameEvent, const glm::vec3& position)
 {
-    m_position = position;
+    m_position = Globals::convertToMiddleGridPosition(Globals::convertToNodePosition(position));
     m_entityType = gameEvent.entityType;
     m_workerID = gameEvent.targetID;
     m_model = &ModelManager::getInstance().getModel(MODEL_NAMES[static_cast<int>(m_entityType)]);
 }
 
-void FactionPlayerPlannedBuilding::render(ShaderHandler& shaderHandler, eFactionController owningFactionController) const
+void FactionPlayerPlannedBuilding::render(ShaderHandler& shaderHandler, const std::vector<Base>& bases, const Map& map) const
 {
     if (m_model)
     {
-        m_model->render(shaderHandler, owningFactionController, m_position, glm::vec3(0.0f), false);
+        glm::vec3 color = (isOnValidPosition(bases, map) ? VALID_PLANNED_BUILDING_COLOR : INVALID_PLANNED_BUILDING_COLOR);
+        m_model->render(shaderHandler, m_position, color, PLANNED_BUILDING_OPACITY);
     }
 }
 
-//FactionPlayer
+bool FactionPlayerPlannedBuilding::isOnValidPosition(const std::vector<Base>& bases, const Map& map) const
+{
+    assert(map.isWithinBounds(m_position) && Globals::isOnMiddlePosition(m_position));
+    if (!map.isPositionOccupied(m_position))
+    {
+        switch (m_entityType)
+        {
+        case eEntityType::Headquarters:
+        {
+            for (const auto& base : bases)
+            {
+                for (const auto& mineral : base.minerals)
+                {
+                    if (Globals::getSqrDistance(mineral.getPosition(), m_position) <=
+                        Globals::MINIMUM_HQ_DISTANCE_FROM_MINERALS)
+                    {
+                        return false;
+                    }
+                }
+            }
+        }
+        default:
+            return true;
+        }
+    }
+
+    return false;
+}
+
+//factionPlayer
 FactionPlayer::FactionPlayer(const glm::vec3& hqStartingPosition, int startingResources, int startingPopulation)
     : Faction(eFactionController::Player, hqStartingPosition, startingResources, startingPopulation),
     m_entitySelector(),
@@ -216,7 +218,7 @@ void FactionPlayer::handleInput(const sf::Event& currentSFMLEvent, const sf::Win
     case sf::Event::MouseButtonPressed:
         if (currentSFMLEvent.mouseButton.button == sf::Mouse::Left)
         {
-            onLeftClick(window, camera, map);
+            onLeftClick(window, camera, map, bases);
         }
         else if (currentSFMLEvent.mouseButton.button == sf::Mouse::Right)
         {
@@ -319,8 +321,11 @@ void FactionPlayer::update(float deltaTime, const Map& map, FactionHandler& fact
 void FactionPlayer::render(ShaderHandler& shaderHandler) const
 {
     Faction::render(shaderHandler);
+}
 
-    m_plannedBuilding.render(shaderHandler, getController());
+void FactionPlayer::renderPlannedBuilding(ShaderHandler& shaderHandler, const std::vector<Base>& bases, const Map& map) const
+{
+    m_plannedBuilding.render(shaderHandler, bases, map);
 }
 
 void FactionPlayer::renderEntitySelector(const sf::Window& window, ShaderHandler& shaderHandler) const
@@ -360,13 +365,14 @@ void FactionPlayer::instructWorkerReturnMinerals(const Map& map, const Headquart
     }
 }
 
-int FactionPlayer::instructWorkerToBuild(const Map& map)
+int FactionPlayer::instructWorkerToBuild(const Map& map, const std::vector<Base>& bases)
 {
     int workerID = Globals::INVALID_ENTITY_ID;
     if (m_plannedBuilding.isActive())
     {
         workerID = m_plannedBuilding.getWorkerID();
-        if (map.isWithinBounds(m_plannedBuilding.getPosition()) &&
+        if (m_plannedBuilding.isOnValidPosition(bases, map) &&
+            map.isWithinBounds(m_plannedBuilding.getPosition()) &&
             !map.isPositionOccupied(m_plannedBuilding.getPosition()) &&
             isAffordable(m_plannedBuilding.getEntityType()))
         {
@@ -518,13 +524,13 @@ void FactionPlayer::moveMultipleSelectedEntities(const glm::vec3& planeIntersect
     }
 }
 
-void FactionPlayer::onLeftClick(const sf::Window& window, const Camera& camera, const Map& map)
+void FactionPlayer::onLeftClick(const sf::Window& window, const Camera& camera, const Map& map, const std::vector<Base>& bases)
 {
     glm::vec3 planeIntersection = camera.getRayToGroundPlaneIntersection(window);
 
     m_entitySelector.setStartingPosition(window, planeIntersection);
     
-    int workerIDSelected = instructWorkerToBuild(map);
+    int workerIDSelected = instructWorkerToBuild(map, bases);
     selectEntity<Unit>(m_units, planeIntersection, planeIntersection == m_previousPlaneIntersection);
     selectEntity<Worker>(m_workers, planeIntersection, planeIntersection == m_previousPlaneIntersection, workerIDSelected);
     setSelectedEntities(m_selectedEntities, m_units, m_workers);
