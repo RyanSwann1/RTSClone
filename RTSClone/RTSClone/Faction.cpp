@@ -552,12 +552,12 @@ bool Faction::isExceedPopulationLimit(eEntityType entityType) const
 
 bool Faction::isAffordable(eEntityType entityType) const
 {
-    return m_currentResourceAmount - Globals::ENTITY_RESOURCE_COSTS[static_cast<int>(entityType)] >= 0;
+    return Globals::ENTITY_RESOURCE_COSTS[static_cast<int>(entityType)] <= m_currentResourceAmount;
 }
 
 bool Faction::isAffordable(int resourceAmount) const
 {
-    return m_currentResourceAmount - resourceAmount >= 0;
+    return resourceAmount <= m_currentResourceAmount;
 }
 
 const Entity* Faction::spawnBuilding(const Map& map, glm::vec3 position, eEntityType entityType)
