@@ -6,7 +6,7 @@
 namespace
 {
 	const float TIME_BETWEEN_UNIT_SPAWN = 3.0f;
-	const int MAX_UNITS_SPAWNABLE = 5;
+	const int MAX_UNITS_IN_SPAWN_QUEUE = 5;
 	const float BARRACKS_PROGRESS_BAR_WIDTH = 100.0f;
 	const float BARRACKS_PROGRESS_BAR_YOFFSET = 80.0f;
 }
@@ -14,18 +14,18 @@ namespace
 Barracks::Barracks(const glm::vec3& startingPosition, Faction& owningFaction)
 	: EntitySpawnerBuilding(startingPosition, eEntityType::Barracks, TIME_BETWEEN_UNIT_SPAWN,
 		Globals::BARRACKS_STARTING_HEALTH, owningFaction, ModelManager::getInstance().getModel(BARRACKS_MODEL_NAME), 
-		MAX_UNITS_SPAWNABLE)
+		MAX_UNITS_IN_SPAWN_QUEUE)
 {}
 
 void Barracks::update(float deltaTime, const Map& map, FactionHandler& factionHandler)
 {
 	EntitySpawnerBuilding::update(deltaTime, Globals::UNIT_RESOURCE_COST, Globals::UNIT_POPULATION_COST,
-		MAX_UNITS_SPAWNABLE, map, factionHandler);
+		MAX_UNITS_IN_SPAWN_QUEUE, map, factionHandler);
 }
 
 bool Barracks::addUnitToSpawnQueue()
 {
-	if (isEntitySpawnable(MAX_UNITS_SPAWNABLE, Globals::UNIT_RESOURCE_COST, Globals::UNIT_POPULATION_COST))
+	if (isEntityAddableToSpawnQueue(MAX_UNITS_IN_SPAWN_QUEUE, Globals::UNIT_RESOURCE_COST, Globals::UNIT_POPULATION_COST))
 	{
 		addEntityToSpawnQueue(eEntityType::Worker);
 		return true;

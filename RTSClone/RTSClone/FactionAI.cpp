@@ -24,7 +24,7 @@
 
 namespace
 {
-	const float DELAY_TIMER_EXPIRATION = 25.0f;
+	const float DELAY_TIMER_EXPIRATION = 15.0f;
 	const float IDLE_TIMER_EXPIRATION = 1.0f;
 	const float MIN_SPAWN_TIMER_EXPIRATION = 7.5f;
 	const float MAX_SPAWN_TIMER_EXPIRATION = 15.0f;
@@ -146,7 +146,7 @@ void FactionAI::update(float deltaTime, const Map & map, FactionHandler& faction
 	if (m_spawnTimer.isExpired())
 	{
 		m_spawnTimer.resetElaspedTime();
-		m_spawnQueue.push(eEntityType::Unit);
+		//m_spawnQueue.push(eEntityType::Unit);
 	}
 
 	m_delayTimer.update(deltaTime);
@@ -166,12 +166,12 @@ void FactionAI::update(float deltaTime, const Map & map, FactionHandler& faction
 					m_spawnQueue.pop();
 				}
 				break;
-			case eEntityType::Unit:
-				if (!m_barracks.empty() && m_barracks.front().addUnitToSpawnQueue())
-				{
-					m_spawnQueue.pop();
-				}
-				break;
+			//case eEntityType::Unit:
+			//	if (!m_barracks.empty() && m_barracks.front().addUnitToSpawnQueue())
+			//	{
+			//		m_spawnQueue.pop();
+			//	}
+			//	break;
 			default:
 				assert(false);
 			}

@@ -6,7 +6,7 @@
 namespace
 {
 	const float TIME_BETWEEN_WORKER_SPAWN = 2.0f;
-	const int MAX_WORKERS_SPAWNABLE = 5;
+	const int MAX_WORKERS_IN_SPAWN_QUEUE = 5;
 	const float HQ_PROGRESS_BAR_WIDTH = 150.0f;
 	const float HQ_PROGRESS_BAR_YOFFSET = 220.0f;
 }
@@ -14,18 +14,18 @@ namespace
 Headquarters::Headquarters(const glm::vec3& startingPosition, Faction& owningFaction)
 	: EntitySpawnerBuilding(startingPosition, eEntityType::Headquarters, TIME_BETWEEN_WORKER_SPAWN,
 		Globals::HQ_STARTING_HEALTH, owningFaction, ModelManager::getInstance().getModel(HQ_MODEL_NAME),
-		MAX_WORKERS_SPAWNABLE)
+		MAX_WORKERS_IN_SPAWN_QUEUE)
 {}
 
 void Headquarters::update(float deltaTime, const Map& map, FactionHandler& factionHandler)
 {
 	EntitySpawnerBuilding::update(deltaTime, Globals::WORKER_RESOURCE_COST, Globals::WORKER_POPULATION_COST,
-		MAX_WORKERS_SPAWNABLE, map, factionHandler);
+		MAX_WORKERS_IN_SPAWN_QUEUE, map, factionHandler);
 }
 
 bool Headquarters::addWorkerToSpawnQueue()
 {
-	if (isEntitySpawnable(MAX_WORKERS_SPAWNABLE, Globals::WORKER_RESOURCE_COST, Globals::WORKER_POPULATION_COST))
+	if (isEntityAddableToSpawnQueue(MAX_WORKERS_IN_SPAWN_QUEUE, Globals::WORKER_RESOURCE_COST, Globals::WORKER_POPULATION_COST))
 	{
 		addEntityToSpawnQueue(eEntityType::Worker);
 		return true;
