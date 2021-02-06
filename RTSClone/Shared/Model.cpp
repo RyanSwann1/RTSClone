@@ -63,6 +63,17 @@ std::unique_ptr<Model> Model::create(const std::string & fileName, bool renderFr
 	return std::unique_ptr<Model>(new Model(renderFromCentrePosition, AABBSizeFromCenter, scale, fileName, std::move(meshes)));
 }
 
+void Model::render(ShaderHandler& shaderHandler, const glm::vec3& position, const glm::vec3& additionalColour, float opacity,
+	glm::vec3 rotation) const
+{
+	setModelMatrix(shaderHandler, position, rotation);
+
+	for (const auto& mesh : meshes)
+	{
+		mesh.render(shaderHandler, additionalColour, opacity);
+	}
+}
+
 void Model::render(ShaderHandler& shaderHandler, const glm::vec3& position, glm::vec3 rotation) const
 {	
 	setModelMatrix(shaderHandler, position, rotation);

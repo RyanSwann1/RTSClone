@@ -116,11 +116,23 @@ void Mesh::renderDebugMesh(ShaderHandler& shaderHandler) const
 }
 #endif // RENDER_AABB || defined RENDER_PATHING
 
+void Mesh::render(ShaderHandler& shaderHandler, const glm::vec3& additionalColor, float opacity) const
+{
+	assert(!indices.empty());
+	bind();
+	shaderHandler.setUniformVec3(eShaderType::Default, "uMaterialColour", material.diffuse);
+	shaderHandler.setUniformVec3(eShaderType::Default, "uAdditionalColour", additionalColor);
+	shaderHandler.setUniform1f(eShaderType::Default, "uOpacity", opacity);
+
+	glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(indices.size()), GL_UNSIGNED_INT, nullptr);
+}
+
 void Mesh::render(ShaderHandler& shaderHandler, bool highlight) const
 {
 	assert(!indices.empty());
 	bind();
 	shaderHandler.setUniformVec3(eShaderType::Default, "uMaterialColour", material.diffuse);
+	shaderHandler.setUniformVec3(eShaderType::Default, "uAdditionalColour", glm::vec3(1.0f));
 	if (highlight)
 	{
 		shaderHandler.setUniform1f(eShaderType::Default, "uSelectedAmplifier", HIGHLIGHTED_MESH_AMPLIFIER);
@@ -138,6 +150,7 @@ void Mesh::render(ShaderHandler& shaderHandler, eFactionController owningFaction
 	assert(!indices.empty());
 	bind();
 
+	shaderHandler.setUniformVec3(eShaderType::Default, "uAdditionalColour", glm::vec3(1.0f));
 	if (material.name == Globals::FACTION_MATERIAL_NAME_ID)
 	{
 		shaderHandler.setUniformVec3(eShaderType::Default, "uMaterialColour", 

@@ -41,6 +41,7 @@ struct Mesh : private NonCopyable
 	void renderDebugMesh(ShaderHandler& shaderHandler) const;
 #endif // defined RENDER_AABB || defined RENDER_PATHING
 
+	void render(ShaderHandler& shaderHandler, const glm::vec3& additionalColor, float opacity) const;
 	void render(ShaderHandler& shaderHandler, bool highlight = false) const;
 	void render(ShaderHandler& shaderHandler, eFactionController owningFactionController, bool highlight = false) const;
 

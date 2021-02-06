@@ -14,7 +14,9 @@ struct Model : private NonMovable, private NonCopyable
 	static std::unique_ptr<Model> create(const std::string& fileName, bool renderFromCentrePosition, 
 		const glm::vec3& AABBSizeFromCenter, const glm::vec3& scale);
 
-	void render(ShaderHandler& shaderHandler, const glm::vec3& position, glm::vec3 rotation = glm::vec3()) const;
+	void render(ShaderHandler& shaderHandler, const glm::vec3& position, const glm::vec3& additionalColor, float opacity,
+		glm::vec3 rotation = glm::vec3(0.0f)) const;
+	void render(ShaderHandler& shaderHandler, const glm::vec3& position, glm::vec3 rotation = glm::vec3(0.0f)) const;
 #ifdef GAME
 	void render(ShaderHandler& shaderHandler, eFactionController owningFactionController, const glm::vec3& position,
 		glm::vec3 rotation, bool highlight = false) const;
