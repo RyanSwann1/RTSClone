@@ -71,6 +71,7 @@ protected:
 	std::list<Headquarters> m_headquarters;
 	std::list<Laboratory> m_laboratories;
 
+	bool isMineralInUse(const Mineral& mineral) const;
 	bool instructWorkerToBuild(eEntityType entityType, const glm::vec3& position, const Map& map, Worker& worker);
 	virtual void onEntityRemoval(const Entity& entity) {}
 

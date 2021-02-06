@@ -418,10 +418,13 @@ void FactionPlayer::moveSingularSelectedEntity(const glm::vec3& planeIntersectio
         const Mineral* mineralToHarvest = getMineral(bases, planeIntersection);
         if (mineralToHarvest)
         {
-            selectedWorker.moveTo(PathFinding::getInstance().getClosestPositionToAABB(selectedWorker.getPosition(),
-                mineralToHarvest->getAABB(), map),
-                map, [&](const glm::ivec2& position) { return getAdjacentPositions(position, map); },
-                eWorkerState::MovingToMinerals, &(*mineralToHarvest));
+            if (!isMineralInUse(*mineralToHarvest))
+            {
+                selectedWorker.moveTo(PathFinding::getInstance().getClosestPositionToAABB(selectedWorker.getPosition(),
+                    mineralToHarvest->getAABB(), map),
+                    map, [&](const glm::ivec2& position) { return getAdjacentPositions(position, map); },
+                    eWorkerState::MovingToMinerals, &(*mineralToHarvest));
+            }
         }
         else
         {
@@ -576,7 +579,7 @@ void FactionPlayer::onRightClick(const sf::Window& window, const Camera& camera,
     {
         assert(targetFaction);
 
-        if (m_selectedEntities.size() == static_cast<size_t>(1))
+        if (m_selectedEntities.size() == 1)
         {
             switch (m_selectedEntities.back()->getEntityType())
             {
@@ -617,9 +620,9 @@ void FactionPlayer::onRightClick(const sf::Window& window, const Camera& camera,
             }
         }
 
-        if (m_selectedEntities.size() == static_cast<size_t>(1))
+        if (m_selectedEntities.size() == 1)
         {
-            moveSingularSelectedEntity(planeIntersection, map, *m_selectedEntities.back(), factionHandler, bases);
+            moveSingularSelectedEntity(planeIntersection, map, *m_selectedEntities.front(), factionHandler, bases);
         }
         else if (!m_selectedEntities.empty())
         {

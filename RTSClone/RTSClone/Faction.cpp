@@ -648,6 +648,20 @@ void Faction::revalidateExistingUnitPaths(const Map& map, FactionHandler& factio
     }
 }
 
+bool Faction::isMineralInUse(const Mineral& mineral) const
+{
+    for (const auto& worker : m_workers)
+    {
+        if (worker.getMineralToHarvest() && 
+            worker.getMineralToHarvest()->getPosition() == mineral.getPosition())
+        {
+            return true;
+        }
+    }
+
+    return false;
+}
+
 bool Faction::instructWorkerToBuild(eEntityType entityType, const glm::vec3& position, const Map& map, Worker& worker)
 {
     assert(map.isWithinBounds(position) && !map.isPositionOccupied(position));
