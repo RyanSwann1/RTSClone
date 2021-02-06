@@ -542,7 +542,7 @@ void Faction::renderAABB(ShaderHandler& shaderHandler)
 
 bool Faction::isExceedPopulationLimit(int populationAmount) const
 {
-    return m_currentPopulationAmount + populationAmount <= m_currentPopulationLimit;
+    return m_currentPopulationAmount + populationAmount > m_currentPopulationLimit;
 }
 
 bool Faction::isExceedPopulationLimit(eEntityType entityType) const
