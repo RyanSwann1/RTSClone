@@ -97,7 +97,7 @@ int Worker::extractResources()
 	return resources;
 }
 
-void Worker::setEntityToRepair(const Entity& entity, const Map& map)
+void Worker::repairEntity(const Entity& entity, const Map& map)
 {
 	glm::vec3 destination = PathFinding::getInstance().getClosestPositionToAABB(m_position, entity.getAABB(), map);
 	moveTo(destination, map, [&](const glm::ivec2& position) { return getAdjacentPositions(position, map); },
@@ -243,7 +243,7 @@ void Worker::update(float deltaTime, const Map& map, FactionHandler& factionHand
 			{
 				if (Globals::getSqrDistance(targetEntity->getPosition(), m_position) > REPAIR_DISTANCE * REPAIR_DISTANCE)
 				{
-					setEntityToRepair(*targetEntity, map);
+					repairEntity(*targetEntity, map);
 				}
 				else
 				{
@@ -265,7 +265,7 @@ void Worker::update(float deltaTime, const Map& map, FactionHandler& factionHand
 			{
 				if (Globals::getSqrDistance(targetEntity->getPosition(), m_position) > REPAIR_DISTANCE * REPAIR_DISTANCE)
 				{
-					setEntityToRepair(*targetEntity, map);
+					repairEntity(*targetEntity, map);
 					break;
 				}
 				else

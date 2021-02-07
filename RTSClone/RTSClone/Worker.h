@@ -52,7 +52,7 @@ public:
 	bool isHoldingResources() const;
 	int extractResources();	
 
-	void setEntityToRepair(const Entity& entity, const Map& map);
+	void repairEntity(const Entity& entity, const Map& map);
 	bool build(const glm::vec3& buildPosition, const Map& map, eEntityType entityType);
 	void update(float deltaTime, const Map& map, FactionHandler& factionHandler, const Timer& unitStateHandlerTimer);
 	void moveTo(const glm::vec3& destination, const Map& map, const AdjacentPositions& adjacentPositions,

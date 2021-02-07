@@ -430,7 +430,7 @@ void FactionPlayer::moveSingularSelectedEntity(const glm::vec3& planeIntersectio
             if (selectedEntity != m_allEntities.cend() &&
                 (*selectedEntity)->getHealth() < (*selectedEntity)->getMaximumHealth())
             {
-                selectedWorker.setEntityToRepair(*(*selectedEntity), map);
+                selectedWorker.repairEntity(*(*selectedEntity), map);
             }
             else
             {
@@ -487,7 +487,7 @@ void FactionPlayer::moveMultipleSelectedEntities(const glm::vec3& planeIntersect
                     glm::vec3 destination = PathFinding::getInstance().getClosestPositionToAABB(selectedUnit->getPosition(),
                         (*selectedEntity)->getAABB(), map);
 
-                    static_cast<Worker&>(*selectedUnit).setEntityToRepair(*(*selectedEntity), map);
+                    static_cast<Worker&>(*selectedUnit).repairEntity(*(*selectedEntity), map);
                 }
             }
         }
