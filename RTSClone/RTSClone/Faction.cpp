@@ -351,8 +351,8 @@ void Faction::handleWorkerCollisions(const Map& map)
         {
             if (map.isCollidable(worker.getPosition()))
             {
-                worker.moveTo(PathFinding::getInstance().getClosestAvailablePosition<Worker>(worker, m_workers, map), map,
-                    [&](const glm::ivec2& position) { return getAdjacentPositions(position, map); });
+                glm::vec3 destination = PathFinding::getInstance().getClosestAvailablePosition<Worker>(worker, m_workers, map);
+                worker.moveTo(destination, map);
             }
             else
             {
@@ -363,8 +363,8 @@ void Faction::handleWorkerCollisions(const Map& map)
                         otherWorker.getCurrentState() == eWorkerState::Idle &&
                         worker.getAABB().contains(otherWorker.getAABB()))
                     {
-                        worker.moveTo(PathFinding::getInstance().getClosestAvailablePosition<Worker>(worker, m_workers, map), map,
-                            [&](const glm::ivec2& position) { return getAdjacentPositions(position, map); });
+                        glm::vec3 destination = PathFinding::getInstance().getClosestAvailablePosition<Worker>(worker, m_workers, map);
+                        worker.moveTo(destination, map);
                         break;
                     }
                 }
@@ -641,9 +641,27 @@ void Faction::revalidateExistingUnitPaths(const Map& map, FactionHandler& factio
     {
         if (!worker.getPathToPosition().empty())
         {
-            worker.moveTo(worker.getPathToPosition().front(), map,
-                [&](const glm::ivec2& position) { return getAdjacentPositions(position, map); }, worker.getCurrentState(),
-                worker.getMineralToHarvest());
+            switch (worker.getCurrentState())
+            {
+            case eWorkerState::Moving:
+            case eWorkerState::ReturningMineralsToHeadquarters:
+            case eWorkerState::MovingToBuildingPosition:
+                assert(!worker.getPathToPosition().empty());
+                worker.moveTo(worker.getPathToPosition().front(), map);
+                break;
+            case eWorkerState::MovingToMinerals:
+                assert(worker.getMineralToHarvest());
+                worker.moveTo(*worker.getMineralToHarvest(), map);
+                break;
+            case eWorkerState::Idle:
+            case eWorkerState::Harvesting:
+            case eWorkerState::Building:
+            case eWorkerState::MovingToRepairPosition:
+            case eWorkerState::Repairing:
+                break;
+            default:
+                assert(false);
+            }
         }
     }
 }

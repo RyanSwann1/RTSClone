@@ -57,8 +57,7 @@ public:
 	void update(float deltaTime, const Map& map, FactionHandler& factionHandler, const Timer& unitStateHandlerTimer);
 	void moveTo(const Mineral& mineral, const Map& map);
 	void moveTo(const Entity& target, const Map& map, eWorkerState state);
-	void moveTo(const glm::vec3& destination, const Map& map, const AdjacentPositions& adjacentPositions,
-		eWorkerState state = eWorkerState::Moving, const Mineral* mineralToHarvest = nullptr);
+	void moveTo(const glm::vec3& destination, const Map& map, eWorkerState state = eWorkerState::Moving);
 
 	void render(ShaderHandler& shaderHandler, eFactionController owningFactionController) const;
 	void renderProgressBar(ShaderHandler& shaderHandler, const Camera& camera, glm::uvec2 windowSize) const;

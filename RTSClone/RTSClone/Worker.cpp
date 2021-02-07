@@ -59,8 +59,7 @@ Worker::Worker(Faction& owningFaction, const glm::vec3 & startingPosition, const
 	m_taskTimer(0.0f, false),
 	m_mineralToHarvest(nullptr)
 {
-	moveTo(destination, map,
-		[&](const glm::ivec2& position) { return getAdjacentPositions(position, map); });
+	moveTo(destination, map);
 }
 
 const Mineral* Worker::getMineralToHarvest() const
@@ -110,8 +109,7 @@ bool Worker::build(const glm::vec3& buildPosition, const Map& map, eEntityType e
 		m_buildQueue.emplace_back(buildPosition, entityType);
 		if (m_buildQueue.size() == 1)
 		{
-			moveTo(m_buildQueue.back().position, map,
-				[&](const glm::ivec2& position) { return getAdjacentPositions(position, map); }, eWorkerState::MovingToBuildingPosition);
+			moveTo(m_buildQueue.back().position, map, eWorkerState::MovingToBuildingPosition);
 		}
 
 		return true;
@@ -207,13 +205,12 @@ void Worker::update(float deltaTime, const Map& map, FactionHandler& factionHand
 			}
 			else if (!m_buildQueue.empty())
 			{
-				moveTo(m_buildQueue.front().position, map,
-					[&](const glm::ivec2& position) { return getAdjacentPositions(position, map); }, eWorkerState::MovingToBuildingPosition);
+				moveTo(m_buildQueue.front().position, map, eWorkerState::MovingToBuildingPosition);
 			}
 			else if(building)
 			{
-				moveTo(PathFinding::getInstance().getRandomAvailablePositionOutsideAABB(*this, map),
-					map, [&](const glm::ivec2& position) { return getAllAdjacentPositions(position, map); });
+				glm::vec3 destination = PathFinding::getInstance().getRandomAvailablePositionOutsideAABB(*this, map);
+				moveTo(destination, map);
 			}
 		}
 		break;
@@ -329,16 +326,15 @@ void Worker::moveTo(const Entity& target, const Map& map, eWorkerState state)
 	}
 }
 
-void Worker::moveTo(const glm::vec3& destination, const Map& map, const AdjacentPositions& adjacentPositions, 
-	eWorkerState state, const Mineral* mineralToHarvest)
+void Worker::moveTo(const glm::vec3& destination, const Map& map, eWorkerState state)
 {
 	glm::vec3 previousDestination = Globals::getNextPathDestination(m_pathToPosition, m_position);
 
-	PathFinding::getInstance().getPathToPosition(*this, destination, m_pathToPosition, adjacentPositions,
-		map, m_owningFaction);
+	PathFinding::getInstance().getPathToPosition(*this, destination, m_pathToPosition,
+		[&](const glm::ivec2& position) { return getAdjacentPositions(position, map); }, map, m_owningFaction); 
 	if (!m_pathToPosition.empty())
 	{
-		switchTo(state, mineralToHarvest);
+		switchTo(state);
 	}
 	else
 	{

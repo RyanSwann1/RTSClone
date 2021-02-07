@@ -429,8 +429,7 @@ void FactionPlayer::moveSingularSelectedEntity(const glm::vec3& planeIntersectio
             }
             else
             {
-                selectedWorker.moveTo(planeIntersection, map, [&](const glm::ivec2& position) 
-                { return getAdjacentPositions(position, map); });
+                selectedWorker.moveTo(planeIntersection, map);
             }
         }
     }
@@ -502,9 +501,7 @@ void FactionPlayer::moveMultipleSelectedEntities(const glm::vec3& planeIntersect
                 case eEntityType::Worker:
                 {
                     glm::vec3 destination = planeIntersection - (averagePosition - selectedEntity->getPosition());
-
-                    static_cast<Worker*>(selectedEntity)->moveTo(destination, map,
-                        [&](const glm::ivec2& position) { return getAdjacentPositions(position, map); });
+                    static_cast<Worker*>(selectedEntity)->moveTo(destination, map);
                 }
                 break;
                 default:
