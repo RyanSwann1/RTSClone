@@ -24,11 +24,11 @@
 
 namespace
 {
-	const float DELAY_TIMER_EXPIRATION = 15.0f;
+	const float DELAY_TIMER_EXPIRATION = 7.5f;
 	const float IDLE_TIMER_EXPIRATION = 1.0f;
 	const float MIN_SPAWN_TIMER_EXPIRATION = 7.5f;
 	const float MAX_SPAWN_TIMER_EXPIRATION = 15.0f;
-	const int STARTING_WORKER_COUNT = 2;
+	const int STARTING_WORKER_COUNT = 5;
 	const int STARTING_UNIT_COUNT = 1;
 	const float MAX_DISTANCE_FROM_HQ = static_cast<float>(Globals::NODE_SIZE) * 18.0f;
 	const float MIN_DISTANCE_FROM_HQ = static_cast<float>(Globals::NODE_SIZE) * 3.0f;
@@ -97,6 +97,8 @@ void FactionAI::onFactionElimination(FactionHandler& factionHandler, eFactionCon
 
 void FactionAI::handleEvent(const GameEvent& gameEvent, const Map& map, FactionHandler& factionHandler)
 {
+	Faction::handleEvent(gameEvent, map, factionHandler);
+
 	switch (gameEvent.type)
 	{
 	case eGameEventType::TakeDamage:
@@ -108,26 +110,14 @@ void FactionAI::handleEvent(const GameEvent& gameEvent, const Map& map, FactionH
 			return entity->getID() == targetID;
 		});
 
-		if (entity != m_allEntities.end())
+		if (entity != m_allEntities.end() &&
+			(*entity)->getEntityType() == eEntityType::Headquarters)
 		{
-			switch ((*entity)->getEntityType())
-			{
-			case eEntityType::SupplyDepot:
-			break;
-			case eEntityType::Barracks:
-			break;
-			case eEntityType::Headquarters:
-				instructWorkersToRepair(static_cast<Headquarters&>(*(*entity)), map);
-			break;
-			case eEntityType::Turret:
-			break;
-			}	
+			instructWorkersToRepair(static_cast<Headquarters&>(*(*entity)), map);
 		}
 	}
 	break;
 	}
-
-	Faction::handleEvent(gameEvent, map, factionHandler);
 }
 
 void FactionAI::selectEntity(const glm::vec3& position)
@@ -146,7 +136,7 @@ void FactionAI::update(float deltaTime, const Map & map, FactionHandler& faction
 	if (m_spawnTimer.isExpired())
 	{
 		m_spawnTimer.resetElaspedTime();
-		//m_spawnQueue.push(eEntityType::Unit);
+		m_spawnQueue.push(eEntityType::Unit);
 	}
 
 	m_delayTimer.update(deltaTime);
@@ -156,8 +146,7 @@ void FactionAI::update(float deltaTime, const Map & map, FactionHandler& faction
 
 		if (!m_spawnQueue.empty())
 		{
-			eEntityType entityTypeToSpawn = m_spawnQueue.front();
-			switch (entityTypeToSpawn)
+			switch (m_spawnQueue.front())
 			{
 			case eEntityType::Worker:
 				assert(!m_headquarters.empty());
@@ -166,12 +155,12 @@ void FactionAI::update(float deltaTime, const Map & map, FactionHandler& faction
 					m_spawnQueue.pop();
 				}
 				break;
-			//case eEntityType::Unit:
-			//	if (!m_barracks.empty() && m_barracks.front().addUnitToSpawnQueue())
-			//	{
-			//		m_spawnQueue.pop();
-			//	}
-			//	break;
+			case eEntityType::Unit:
+				if (!m_barracks.empty() && m_barracks.front().addUnitToSpawnQueue())
+				{
+					m_spawnQueue.pop();
+				}
+				break;
 			default:
 				assert(false);
 			}
@@ -332,9 +321,10 @@ const Entity* FactionAI::spawnBuilding(const Map& map, glm::vec3 position, eEnti
 
 const Entity* FactionAI::spawnUnit(const Map& map, const EntitySpawnerBuilding& building, FactionHandler& factionHandler)
 {
-	if (isAffordable(eEntityType::Unit) && !isExceedPopulationLimit(eEntityType::Unit))
+	const Entity* spawnedUnit = Faction::spawnUnit(map, building, factionHandler);
+	if (spawnedUnit)
 	{
-		return Faction::spawnUnit(map, building, factionHandler);
+		return spawnedUnit;
 	}
 
 	m_spawnQueue.push(eEntityType::Unit);
@@ -343,9 +333,10 @@ const Entity* FactionAI::spawnUnit(const Map& map, const EntitySpawnerBuilding& 
 
 const Entity* FactionAI::spawnWorker(const Map& map, const EntitySpawnerBuilding& building)
 {
-	if (isAffordable(eEntityType::Worker) && !isExceedPopulationLimit(eEntityType::Worker))
+	const Entity* spawnedWorker = Faction::spawnWorker(map, building);
+	if (spawnedWorker)
 	{
-		return Faction::spawnWorker(map, building);
+		return spawnedWorker;
 	}
 
 	m_spawnQueue.push(eEntityType::Worker);
