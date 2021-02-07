@@ -49,10 +49,10 @@ public:
 
 private:
 	Level(std::vector<SceneryGameObject>&& scenery, FactionsContainer&& factions, 
-		std::vector<Base>&& mainBaseLocations, const glm::vec3& size);
+		std::unique_ptr<BaseHandler>&& baseHandler, const glm::vec3& size);
 
 	const Quad m_playableArea;
-	const BaseHandler m_baseHandler;
+	const std::unique_ptr<BaseHandler> m_baseHandler;
 	const std::vector<SceneryGameObject> m_scenery;
 	FactionsContainer m_factions;
 	Timer m_unitStateHandlerTimer;

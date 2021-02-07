@@ -54,9 +54,9 @@ namespace
 
 //Level
 Level::Level(std::vector<SceneryGameObject>&& scenery, FactionsContainer&& factions, 
-	std::vector<Base>&& mainBaseLocations, const glm::vec3& size)
+	std::unique_ptr<BaseHandler>&& baseHandler, const glm::vec3& size)
 	: m_playableArea(size, TERRAIN_COLOR),
-	m_baseHandler(std::move(mainBaseLocations)),
+	m_baseHandler(std::move(baseHandler)),
 	m_scenery(std::move(scenery)),
 	m_factions(std::move(factions)),
 	m_unitStateHandlerTimer(TIME_BETWEEN_UNIT_STATE, true),
@@ -86,28 +86,31 @@ std::unique_ptr<Level> Level::create(const std::string& levelName)
 		return std::unique_ptr<Level>();
 	}
 
+	std::unique_ptr<BaseHandler> baseHandler = std::make_unique<BaseHandler>(std::move(mainBases));
 	std::array<std::unique_ptr<Faction>, static_cast<size_t>(eFactionController::Max) + 1> factions;
-	assert(factionCount < static_cast<int>(eFactionController::Max) + 1 && factionCount < static_cast<int>(mainBases.size()));
+	
+	assert(factionCount < static_cast<int>(eFactionController::Max) + 1 && 
+		factionCount < static_cast<int>(baseHandler->bases.size()));
 	for (int i = 0; i < factionCount; ++i)
 	{
 		switch (eFactionController(i))
 		{
 		case eFactionController::Player:
-			factions[i] = std::make_unique<FactionPlayer>(mainBases[i].position, 
+			factions[i] = std::make_unique<FactionPlayer>(baseHandler->bases[i].position, 
 				factionStartingResources, factionStartingPopulation);
 			break;
 		case eFactionController::AI_1:
 		case eFactionController::AI_2:
 		case eFactionController::AI_3:
-			factions[i] = std::make_unique<FactionAI>(eFactionController(i), mainBases[i].position,
-				factionStartingResources, factionStartingPopulation, mainBases[i]);
+			factions[i] = std::make_unique<FactionAI>(eFactionController(i), baseHandler->bases[i].position,
+				factionStartingResources, factionStartingPopulation, baseHandler->bases[i], *baseHandler);
 			break;
 		default:
 			assert(false);
 		}
 	}
 
-	return std::unique_ptr<Level>(new Level(std::move(scenery), std::move(factions), std::move(mainBases), size));
+	return std::unique_ptr<Level>(new Level(std::move(scenery), std::move(factions), std::move(baseHandler), size));
 }
 
 Level::~Level()
@@ -153,7 +156,7 @@ void Level::handleInput(const sf::Window& window, const Camera& camera, const sf
 
 	if (isFactionActive(m_factions, eFactionController::Player))
 	{
-		getFactionPlayer(m_factions).handleInput(currentSFMLEvent, window, camera, map, m_factionHandler, m_baseHandler);
+		getFactionPlayer(m_factions).handleInput(currentSFMLEvent, window, camera, map, m_factionHandler, *m_baseHandler);
 	}
 
 	if (currentSFMLEvent.type == sf::Event::MouseButtonPressed)
@@ -252,7 +255,7 @@ void Level::renderPlayerPlannedBuilding(ShaderHandler& shaderHandler, const Map&
 {
 	if (m_factionHandler.isFactionActive(eFactionController::Player))
 	{
-		getFactionPlayer(m_factions).renderPlannedBuilding(shaderHandler, m_baseHandler, map);
+		getFactionPlayer(m_factions).renderPlannedBuilding(shaderHandler, *m_baseHandler, map);
 	}
 }
 
@@ -271,7 +274,7 @@ void Level::render(ShaderHandler& shaderHandler) const
 		}
 	}
 
-	m_baseHandler.render(shaderHandler);
+	m_baseHandler->render(shaderHandler);
 	m_projectileHandler.render(shaderHandler);
 }
 
