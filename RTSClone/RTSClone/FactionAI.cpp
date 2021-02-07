@@ -340,7 +340,7 @@ Entity* FactionAI::spawnWorker(const Map& map, const EntitySpawnerBuilding& buil
 	{
 		Worker& worker = static_cast<Worker&>((*spawnedWorker));
 		const Base& nearestBase = m_baseHandler.getNearestBase(building.getPosition());
-		const Mineral* nearestMineral = m_baseHandler.getNearestAvailableMineralAtBase(*this, nearestBase, worker);
+		const Mineral* nearestMineral = m_baseHandler.getNearestAvailableMineralAtBase(*this, nearestBase, worker.getPosition());
 		if (nearestMineral)
 		{
 			glm::vec3 destination = PathFinding::getInstance().getClosestPositionToAABB(worker.getPosition(),

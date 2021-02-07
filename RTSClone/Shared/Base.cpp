@@ -86,9 +86,10 @@ BaseHandler::BaseHandler(std::vector<Base>&& bases)
 	: bases(std::move(bases))
 {}
 
-const Mineral* BaseHandler::getNearestAvailableMineralAtBase(const Faction& faction, const Base& base, const Worker& worker) const
+const Mineral* BaseHandler::getNearestAvailableMineralAtBase(const Faction& faction, const Base& base, 
+	const glm::vec3& position) const
 {
-	std::array<const Mineral*, Globals::MAX_MINERALS> minerals = getClosestMinerals(base.minerals, worker.getPosition());
+	std::array<const Mineral*, Globals::MAX_MINERALS> minerals = getClosestMinerals(base.minerals, position);
 	for (const auto& mineral : minerals)
 	{
 		assert(mineral);
@@ -102,10 +103,10 @@ const Mineral* BaseHandler::getNearestAvailableMineralAtBase(const Faction& fact
 }
 
 const Mineral* BaseHandler::getNearestAvailableMineralAtBase(const Faction& faction, const Mineral& _mineral,
-	const Worker& worker) const
+	const glm::vec3& position) const
 {
 	assert(faction.isMineralInUse(_mineral));
-	std::array<const Mineral*, Globals::MAX_MINERALS> minerals = getClosestMinerals(getBase(bases, _mineral).minerals, worker.getPosition());
+	std::array<const Mineral*, Globals::MAX_MINERALS> minerals = getClosestMinerals(getBase(bases, _mineral).minerals, position);
 	for (const auto& mineral : minerals)
 	{
 		assert(mineral);

@@ -26,13 +26,12 @@ struct Base
 #include "NonMovable.h"
 class ShaderHandler;
 class Faction;
-class Worker;
 struct BaseHandler : private NonCopyable, private NonMovable
 {
 	BaseHandler(std::vector<Base>&& bases);
 
-	const Mineral* getNearestAvailableMineralAtBase(const Faction& faction, const Base& base, const Worker& worker) const;
-	const Mineral* getNearestAvailableMineralAtBase(const Faction& faction, const Mineral& mineral, const Worker& worker) const;
+	const Mineral* getNearestAvailableMineralAtBase(const Faction& faction, const Base& base, const glm::vec3& position) const;
+	const Mineral* getNearestAvailableMineralAtBase(const Faction& faction, const Mineral& mineral, const glm::vec3& position) const;
 	const Mineral* getMineral(const glm::vec3& position) const;
 	const Base* getBaseAtMineral(const glm::vec3& position) const;
 	const Base& getNearestBase(const glm::vec3& position) const;

@@ -408,7 +408,7 @@ void FactionPlayer::moveSingularSelectedEntity(const glm::vec3& planeIntersectio
             }
             else
             {
-                mineralToHarvest = baseHandler.getNearestAvailableMineralAtBase(*this, *mineralToHarvest, selectedWorker);
+                mineralToHarvest = baseHandler.getNearestAvailableMineralAtBase(*this, *mineralToHarvest, selectedWorker.getPosition());
                 mineralValid = mineralToHarvest;
             }
 
@@ -456,7 +456,7 @@ void FactionPlayer::moveMultipleSelectedEntities(const glm::vec3& planeIntersect
         {
             if (selectedUnit->getEntityType() == eEntityType::Worker)
             {
-                const Mineral* mineral = baseHandler.getNearestAvailableMineralAtBase(*this, *base, static_cast<Worker&>(*selectedUnit));
+                const Mineral* mineral = baseHandler.getNearestAvailableMineralAtBase(*this, *base, selectedUnit->getPosition());
                 if (mineral)
                 {
                     glm::vec3 destination = PathFinding::getInstance().getClosestPositionToAABB(selectedUnit->getPosition(),
