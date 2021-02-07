@@ -752,3 +752,99 @@ void PathFinding::getPathToPosition(const Entity& entity, const glm::vec3& desti
 
 	convertPathToWaypoints(pathToPosition, entity, map);
 }
+
+void PathFinding::getPathToPosition(const Entity& entity, const Entity& target, std::vector<glm::vec3>& pathToPosition, 
+	const AdjacentPositions& adjacentPositions, const Map& map, const Faction& owningFaction)
+{
+	glm::vec3 destination = PathFinding::getInstance().getClosestPositionToAABB(entity.getPosition(),
+		target.getAABB(), map);
+
+	assert(adjacentPositions);
+
+	pathToPosition.clear();
+	if (entity.getPosition() == destination)
+	{
+		return;
+	}
+
+	m_openQueue.clear();
+	m_closedQueue.clear();
+
+	bool destinationReached = false;
+	glm::ivec2 startingPositionOnGrid = Globals::convertToGridPosition(entity.getPosition());
+	glm::ivec2 destinationOnGrid = Globals::convertToGridPosition(destination);
+	float shortestDistance = Globals::getSqrDistance(destination, entity.getPosition());
+	glm::ivec2 closestAvailablePosition = { 0, 0 };
+	m_openQueue.add({ startingPositionOnGrid, startingPositionOnGrid, 0.0f,
+		Globals::getSqrDistance(destinationOnGrid, startingPositionOnGrid) });
+
+	while (!m_openQueue.isEmpty() && !destinationReached)
+	{
+		PriorityQueueNode currentNode = m_openQueue.getTop();
+		m_openQueue.popTop();
+
+		if (currentNode.position == destinationOnGrid)
+		{
+			switch (entity.getEntityType())
+			{
+			case eEntityType::Unit:
+				break;
+			case eEntityType::Worker:
+				pathToPosition.push_back(destination);
+				break;
+			default:
+				assert(false);
+			}
+
+			destinationReached = true;
+			if (Globals::convertToWorldPosition(currentNode.position) != entity.getPosition())
+			{
+				getPathFromClosedQueue(pathToPosition, startingPositionOnGrid, currentNode, m_closedQueue, map);
+			}
+		}
+		else
+		{
+			for (const auto& adjacentPosition : adjacentPositions(currentNode.position))
+			{
+				if (!adjacentPosition.valid || m_closedQueue.contains(adjacentPosition.position))
+				{
+					continue;
+				}
+				else
+				{
+					float sqrDistance = Globals::getSqrDistance(destinationOnGrid, adjacentPosition.position);
+					if (sqrDistance < shortestDistance)
+					{
+						closestAvailablePosition = adjacentPosition.position;
+						shortestDistance = sqrDistance;
+					}
+
+					PriorityQueueNode adjacentNode(adjacentPosition.position, currentNode.position,
+						currentNode.g + Globals::getSqrDistance(adjacentPosition.position, currentNode.position),
+						sqrDistance);
+
+					if (m_openQueue.isSuccessorNodeValid(adjacentNode))
+					{
+						m_openQueue.changeNode(adjacentNode);
+					}
+					else if (!m_openQueue.contains(adjacentPosition.position))
+					{
+						m_openQueue.add(adjacentNode);
+					}
+				}
+			}
+		}
+
+		m_closedQueue.add(currentNode);
+
+		assert(isPriorityQueueWithinSizeLimit(m_openQueue, map.getSize()) &&
+			isPriorityQueueWithinSizeLimit(m_closedQueue, map.getSize()));
+	}
+
+	if (pathToPosition.empty() && shortestDistance != Globals::getSqrDistance(destination, entity.getPosition()))
+	{
+		getPathFromClosedQueue(pathToPosition, startingPositionOnGrid, closestAvailablePosition, m_closedQueue, map);
+	}
+
+	convertPathToWaypoints(pathToPosition, entity, map);
+}

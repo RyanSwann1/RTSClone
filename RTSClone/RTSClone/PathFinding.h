@@ -133,6 +133,9 @@ public:
 	void getPathToPosition(const Entity& entity, const glm::vec3& destination, std::vector<glm::vec3>& pathToPosition,
 		const AdjacentPositions& adjacentPositions, const Map& map, const Faction& owningFaction);
 
+	void getPathToPosition(const Entity& entity, const Entity& target, std::vector<glm::vec3>& pathToPosition,
+		const AdjacentPositions& adjacentPositions, const Map& map, const Faction& owningFaction);
+
 private:
 	PathFinding();
 	std::vector<glm::vec3> m_sharedPositionContainer;

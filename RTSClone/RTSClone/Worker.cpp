@@ -99,10 +99,7 @@ int Worker::extractResources()
 
 void Worker::repairEntity(const Entity& entity, const Map& map)
 {
-	glm::vec3 destination = PathFinding::getInstance().getClosestPositionToAABB(m_position, entity.getAABB(), map);
-	moveTo(destination, map, [&](const glm::ivec2& position) { return getAdjacentPositions(position, map); },
-		eWorkerState::MovingToRepairPosition);
-
+	moveTo(entity, map, eWorkerState::MovingToRepairPosition);
 	m_repairTargetEntityID = entity.getID();
 }
 
@@ -189,9 +186,7 @@ void Worker::update(float deltaTime, const Map& map, FactionHandler& factionHand
 		else
 		{
 			const Headquarters& headquarters = m_owningFaction.getClosestHeadquarters(m_position);
-			glm::vec3 destination = PathFinding::getInstance().getClosestPositionToAABB(m_position, headquarters.getAABB(), map);
-			moveTo(destination, map, [&](const glm::ivec2& position) { return getAdjacentPositions(position, map); },
-				eWorkerState::ReturningMineralsToHeadquarters);
+			moveTo(headquarters, map, eWorkerState::ReturningMineralsToHeadquarters);
 		}
 		break;
 	case eWorkerState::MovingToBuildingPosition:
@@ -284,6 +279,30 @@ void Worker::update(float deltaTime, const Map& map, FactionHandler& factionHand
 	if (m_taskTimer.isActive())
 	{
 		m_taskTimer.update(deltaTime);
+	}
+}
+
+void Worker::moveTo(const Entity& target, const Map& map, eWorkerState state)
+{
+	glm::vec3 previousDestination = Globals::getNextPathDestination(m_pathToPosition, m_position);
+
+	PathFinding::getInstance().getPathToPosition(*this, target, m_pathToPosition, 
+		[&](const glm::ivec2& position) { return getAdjacentPositions(position, map); }, map, m_owningFaction);
+	if (!m_pathToPosition.empty())
+	{
+		switchTo(state);
+	}
+	else
+	{
+		if (previousDestination != m_position)
+		{
+			m_pathToPosition.push_back(previousDestination);
+			switchTo(state);
+		}
+		else
+		{
+			switchTo(eWorkerState::Idle);
+		}
 	}
 }
 

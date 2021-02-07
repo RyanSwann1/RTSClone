@@ -341,9 +341,7 @@ void FactionPlayer::instructWorkerReturnMinerals(const Map& map, const Headquart
     {
         if (worker.isSelected() && worker.isHoldingResources())
         {
-            glm::vec3 destination = PathFinding::getInstance().getClosestPositionToAABB(worker.getPosition(), headquarters.getAABB(), map);
-            worker.moveTo(destination, map, [&](const glm::ivec2& position) { return getAdjacentPositions(position, map); },
-                eWorkerState::ReturningMineralsToHeadquarters);
+            worker.moveTo(headquarters, map, eWorkerState::ReturningMineralsToHeadquarters);
         }
     }
 }
