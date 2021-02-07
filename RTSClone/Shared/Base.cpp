@@ -38,3 +38,52 @@ void Base::setPosition(const glm::vec3 & _position)
 	}
 }
 #endif // LEVEL_EDITOR
+
+#ifdef GAME
+BaseHandler::BaseHandler(std::vector<Base>&& bases)
+	: bases(std::move(bases))
+{}
+
+const Mineral* BaseHandler::getMineral(const glm::vec3 & position) const
+{
+	for (const auto& base : bases)
+	{
+		for (const auto& mineral : base.minerals)
+		{
+			if (mineral.getAABB().contains(position))
+			{
+				return &mineral;
+			}
+		}
+	}
+
+	return nullptr;
+}
+
+const Base* BaseHandler::getBaseAtMineral(const glm::vec3& position) const
+{
+	for (const auto& base : bases)
+	{
+		for (const auto& mineral : base.minerals)
+		{
+			if (mineral.getAABB().contains(position))
+			{
+				return &base;
+			}
+		}
+	}
+
+	return nullptr;
+}
+
+void BaseHandler::render(ShaderHandler& shaderHandler) const
+{
+	for (const auto& base : bases)
+	{
+		for (const auto& mineral : base.minerals)
+		{
+			mineral.render(shaderHandler);
+		}
+	}
+}
+#endif // GAME

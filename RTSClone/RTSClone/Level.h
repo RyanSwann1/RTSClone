@@ -52,7 +52,7 @@ private:
 		std::vector<Base>&& mainBaseLocations, const glm::vec3& size);
 
 	const Quad m_playableArea;
-	const std::vector<Base> m_mainBases;
+	const BaseHandler m_baseHandler;
 	const std::vector<SceneryGameObject> m_scenery;
 	FactionsContainer m_factions;
 	Timer m_unitStateHandlerTimer;

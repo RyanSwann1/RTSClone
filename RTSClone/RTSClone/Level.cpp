@@ -56,7 +56,7 @@ namespace
 Level::Level(std::vector<SceneryGameObject>&& scenery, FactionsContainer&& factions, 
 	std::vector<Base>&& mainBaseLocations, const glm::vec3& size)
 	: m_playableArea(size, TERRAIN_COLOR),
-	m_mainBases(std::move(mainBaseLocations)),
+	m_baseHandler(std::move(mainBaseLocations)),
 	m_scenery(std::move(scenery)),
 	m_factions(std::move(factions)),
 	m_unitStateHandlerTimer(TIME_BETWEEN_UNIT_STATE, true),
@@ -153,7 +153,7 @@ void Level::handleInput(const sf::Window& window, const Camera& camera, const sf
 
 	if (isFactionActive(m_factions, eFactionController::Player))
 	{
-		getFactionPlayer(m_factions).handleInput(currentSFMLEvent, window, camera, map, m_factionHandler, m_mainBases);
+		getFactionPlayer(m_factions).handleInput(currentSFMLEvent, window, camera, map, m_factionHandler, m_baseHandler);
 	}
 
 	if (currentSFMLEvent.type == sf::Event::MouseButtonPressed)
@@ -252,7 +252,7 @@ void Level::renderPlayerPlannedBuilding(ShaderHandler& shaderHandler, const Map&
 {
 	if (m_factionHandler.isFactionActive(eFactionController::Player))
 	{
-		getFactionPlayer(m_factions).renderPlannedBuilding(shaderHandler, m_mainBases, map);
+		getFactionPlayer(m_factions).renderPlannedBuilding(shaderHandler, m_baseHandler, map);
 	}
 }
 
@@ -271,14 +271,7 @@ void Level::render(ShaderHandler& shaderHandler) const
 		}
 	}
 
-	for (const auto& base : m_mainBases)
-	{
-		for (const auto& mineral : base.minerals)
-		{
-			mineral.render(shaderHandler);
-		}
-	}
-
+	m_baseHandler.render(shaderHandler);
 	m_projectileHandler.render(shaderHandler);
 }
 

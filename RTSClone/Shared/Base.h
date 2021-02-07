@@ -21,3 +21,18 @@ struct Base
 	glm::vec3 position;
 	std::vector<Mineral> minerals;
 };
+
+#ifdef GAME
+#include "NonMovable.h"
+class ShaderHandler;
+struct BaseHandler : private NonCopyable, private NonMovable
+{
+	BaseHandler(std::vector<Base>&& bases);
+
+	const Mineral* getMineral(const glm::vec3& position) const;
+	const Base* getBaseAtMineral(const glm::vec3& position) const;
+	void render(ShaderHandler& shaderHandler) const;
+
+	const std::vector<Base> bases;
+};
+#endif // GAME

@@ -4,7 +4,7 @@
 #include "EntitySelector.h"
 #include <SFML/Graphics.hpp>
 
-struct Base;
+struct BaseHandler;
 struct Camera;
 struct PlayerActivatePlannedBuildingEvent;
 class FactionPlayerPlannedBuilding : private NonCopyable, private NonMovable
@@ -12,7 +12,7 @@ class FactionPlayerPlannedBuilding : private NonCopyable, private NonMovable
 public:
 	FactionPlayerPlannedBuilding();
 
-	bool isOnValidPosition(const std::vector<Base>& bases, const Map& map) const;
+	bool isOnValidPosition(const BaseHandler& baseHandler, const Map& map) const;
 	const glm::vec3& getPosition() const;
 	int getWorkerID() const;
 	eEntityType getEntityType() const;
@@ -20,9 +20,8 @@ public:
 
 	void deactivate();
 	void activate(const PlayerActivatePlannedBuildingEvent& gameEvent, const glm::vec3& position);
-	void handleInput(const sf::Event& event, const Camera& camera, const sf::Window& window, const Map& map,
-		const std::vector<Base>& bases);
-	void render(ShaderHandler& shaderHandler, const std::vector<Base>& bases, const Map& map) const;
+	void handleInput(const sf::Event& event, const Camera& camera, const sf::Window& window, const Map& map);
+	void render(ShaderHandler& shaderHandler, const BaseHandler& baseHandler, const Map& map) const;
 
 private:
 	const Model* m_model;
@@ -39,11 +38,11 @@ public:
 	const std::vector<Entity*>& getSelectedEntities() const;
 
 	void handleInput(const sf::Event& currentSFMLEvent, const sf::Window& window, const Camera& camera, const Map& map, 
-		FactionHandler& factionHandler, const std::vector<Base>& bases);
+		FactionHandler& factionHandler, const BaseHandler& baseHandler);
 	void handleEvent(const GameEvent& gameEvent, const Map& map, FactionHandler& factionHandler) override;
 	void update(float deltaTime, const Map& map, FactionHandler& factionHandler, const Timer& unitStateHandlerTimer) override;
 	void render(ShaderHandler& shaderHandler) const override;
-	void renderPlannedBuilding(ShaderHandler& shaderHandler, const std::vector<Base>& bases, const Map& map) const;
+	void renderPlannedBuilding(ShaderHandler& shaderHandler, const BaseHandler& baseHandler, const Map& map) const;
 	void renderEntitySelector(const sf::Window& window, ShaderHandler& shaderHandler) const;
 
 private:
@@ -56,15 +55,15 @@ private:
 	void onEntityRemoval(const Entity& entity) override;
 
 	void instructWorkerReturnMinerals(const Map& map, const Headquarters& headquarters);
-	int instructWorkerToBuild(const Map& map, const std::vector<Base>& bases);
+	int instructWorkerToBuild(const Map& map, const BaseHandler& baseHandler);
 	void moveSingularSelectedEntity(const glm::vec3& mouseToGroundPosition, const Map& map, Entity& selectedEntity, 
-		FactionHandler& factionHandler, const std::vector<Base>& bases) const;
+		FactionHandler& factionHandler, const BaseHandler& baseHandler) const;
 	void moveMultipleSelectedEntities(const glm::vec3& mouseToGroundPosition, const Map& map, FactionHandler& factionHandler,
-		const std::vector<Base>& bases);
+		const BaseHandler& baseHandler);
 
-	void onLeftClick(const sf::Window& window, const Camera& camera, const Map& map, const std::vector<Base>& bases);
+	void onLeftClick(const sf::Window& window, const Camera& camera, const Map& map, const BaseHandler& baseHandler);
 	void onRightClick(const sf::Window& window, const Camera& camera, FactionHandler& factionHandler, const Map& map, 
-		const std::vector<Base>& bases);
+		const BaseHandler& baseHandler);
 
 	template <class Entity>
 	void selectEntity(std::list<Entity>& entities, const glm::vec3& mouseToGroundPosition, bool selectAllEntities = false,
