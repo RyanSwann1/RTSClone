@@ -408,7 +408,7 @@ void FactionPlayer::moveSingularSelectedEntity(const glm::vec3& planeIntersectio
             }
             else
             {
-                mineralToHarvest = baseHandler.getAvailableMineralAtBase(*this, *mineralToHarvest);
+                mineralToHarvest = baseHandler.getNearestAvailableMineralAtBase(*this, *mineralToHarvest, selectedWorker);
                 mineralValid = mineralToHarvest;
             }
 

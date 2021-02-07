@@ -60,20 +60,43 @@ namespace
 
 		assert(false);
 	}
+
+	std::array<const Mineral*, Globals::MAX_MINERALS> getClosestMinerals(const std::vector<Mineral>& minerals, const glm::vec3& position)
+	{
+		assert(static_cast<int>(minerals.size()) == Globals::MAX_MINERALS);
+		std::array<const Mineral*, Globals::MAX_MINERALS> sortedMinerals;
+		for (int i = 0; i < static_cast<int>(minerals.size()); ++i)
+		{
+			sortedMinerals[i] = &minerals[i];
+		}
+
+		std::sort(sortedMinerals.begin(), sortedMinerals.end(), [&position](const auto& mineralA, const auto& mineralB)
+		{
+			assert(mineralA && mineralB);
+			return Globals::getSqrDistance(mineralA->getPosition(), position) <
+				Globals::getSqrDistance(mineralB->getPosition(), position);
+		});
+
+		return sortedMinerals;
+	}
 }
 
 BaseHandler::BaseHandler(std::vector<Base>&& bases)
 	: bases(std::move(bases))
 {}
 
-const Mineral* BaseHandler::getAvailableMineralAtBase(const Faction& faction, const Mineral& _mineral) const
+const Mineral* BaseHandler::getNearestAvailableMineralAtBase(const Faction& faction, const Mineral& _mineral, 
+	const Worker& worker) const
 {
 	assert(faction.isMineralInUse(_mineral));
-	for (const auto& mineral : getBase(bases, _mineral).minerals)
+	std::array<const Mineral*, Globals::MAX_MINERALS> minerals = getClosestMinerals(getBase(bases, _mineral).minerals, worker.getPosition());
+	for (const auto& mineral : minerals)
 	{
-		if (&mineral != &_mineral && !faction.isMineralInUse(mineral))
+		assert(mineral);
+		if (&(*mineral) != &_mineral &&
+			!faction.isMineralInUse(*mineral))
 		{
-			return &mineral;
+			return mineral;
 		}
 	}
 
