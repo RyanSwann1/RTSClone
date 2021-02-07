@@ -22,12 +22,14 @@ struct AIAction
 };
 
 struct Base;
+struct BaseHandler;
 class FactionHandler;
 class FactionAI : public Faction
 {
 public:
 	FactionAI(eFactionController factionController, const glm::vec3& hqStartingPosition, 
-		int startingResources, int startingPopulationCap, const Base& currentBase);
+		int startingResources, int startingPopulationCap, const Base& currentBase, 
+		const BaseHandler& baseHandler);
 
 	const Entity* spawnBuilding(const Map& map, glm::vec3 position, eEntityType entityType) override;
 	void setTargetFaction(FactionHandler& factionHandler);
@@ -37,6 +39,7 @@ public:
 	void update(float deltaTime, const Map& map, FactionHandler& factionHandler, const Timer& unitStateHandlerTimer) override;
 
 private:
+	const BaseHandler& m_baseHandler;
 	std::queue<eEntityType> m_spawnQueue;
 	std::queue<AIAction> m_actionQueue;
 	Timer m_delayTimer;

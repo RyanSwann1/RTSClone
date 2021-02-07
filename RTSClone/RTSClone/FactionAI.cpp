@@ -50,8 +50,10 @@ AIAction::AIAction(eActionType actionType, const glm::vec3& position)
 
 //FactionAI
 FactionAI::FactionAI(eFactionController factionController, const glm::vec3& hqStartingPosition,
-	int startingResources, int startingPopulationCap, const Base& currentBase)
+	int startingResources, int startingPopulationCap, const Base& currentBase,
+	const BaseHandler& baseHandler)
 	: Faction(factionController, hqStartingPosition, startingResources, startingPopulationCap),
+	m_baseHandler(baseHandler),
 	m_spawnQueue(),
 	m_actionQueue(),
 	m_delayTimer(DELAY_TIMER_EXPIRATION, true),
