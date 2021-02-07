@@ -456,17 +456,15 @@ void FactionPlayer::moveMultipleSelectedEntities(const glm::vec3& planeIntersect
         {
             if (selectedUnit->getEntityType() == eEntityType::Worker)
             {
-                for (const auto& mineral : base->minerals)
+                const Mineral* mineral = baseHandler.getNearestAvailableMineralAtBase(*this, *base, static_cast<Worker&>(*selectedUnit));
+                if (mineral)
                 {
-                    if (!isMineralInUse(mineral))
-                    {
-                        glm::vec3 destination = PathFinding::getInstance().getClosestPositionToAABB(selectedUnit->getPosition(),
-                            mineral.getAABB(), map);
+                    glm::vec3 destination = PathFinding::getInstance().getClosestPositionToAABB(selectedUnit->getPosition(),
+                        mineral->getAABB(), map);
 
-                        static_cast<Worker&>(*selectedUnit).moveTo(destination, map,
-                            [&](const glm::ivec2& position) { return getAdjacentPositions(position, map); },
-                            eWorkerState::MovingToMinerals, &mineral);
-                    }
+                    static_cast<Worker&>(*selectedUnit).moveTo(destination, map,
+                        [&](const glm::ivec2& position) { return getAdjacentPositions(position, map); },
+                        eWorkerState::MovingToMinerals, &(*mineral));
                 }
             }
         }
