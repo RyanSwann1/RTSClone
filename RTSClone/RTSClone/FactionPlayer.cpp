@@ -386,10 +386,8 @@ void FactionPlayer::moveSingularSelectedEntity(const glm::vec3& planeIntersectio
     {
     case eEntityType::Unit:
     {
-        Unit& selectedUnit = static_cast<Unit&>(selectedEntity);
-        selectedUnit.resetTarget();
-        selectedUnit.moveTo(planeIntersection, map,
-            [&](const glm::ivec2& position) { return getAdjacentPositions(position, map, factionHandler, selectedUnit); },
+        static_cast<Unit&>(selectedEntity).resetTarget();
+        static_cast<Unit&>(selectedEntity).moveTo(planeIntersection, map,
             factionHandler, (m_attackMoveSelected ? eUnitState::AttackMoving : eUnitState::Moving));
     }
         break;
@@ -494,8 +492,7 @@ void FactionPlayer::moveMultipleSelectedEntities(const glm::vec3& planeIntersect
                     eUnitState state = (m_attackMoveSelected ? eUnitState::AttackMoving : eUnitState::Moving);
                     glm::vec3 destination = planeIntersection - (averagePosition - selectedEntity->getPosition());
 
-                    selectedUnit.moveTo(destination, map, [&](const glm::ivec2& position)
-                        { return getAdjacentPositions(position, map, factionHandler, selectedUnit); }, factionHandler, state);
+                    selectedUnit.moveTo(destination, map, factionHandler, state);
                 }
                 break;
                 case eEntityType::Worker:

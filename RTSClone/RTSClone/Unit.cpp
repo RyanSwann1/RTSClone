@@ -42,8 +42,7 @@ Unit::Unit(const Faction & owningFaction, const glm::vec3 & startingPosition, co
 	m_attackTimer(TIME_BETWEEN_ATTACK, true),
 	m_targetEntity()
 {
-	moveTo(destination, map, [&, this](const glm::ivec2& position)
-		{ return getAdjacentPositions(position, map, factionHandler, *this); }, factionHandler);
+	moveTo(destination, map, factionHandler);
 }
 
 const Faction& Unit::getOwningFaction() const
@@ -122,11 +121,11 @@ void Unit::moveToAttackPosition(const Entity& targetEntity, const Faction& targe
 	}
 }
 
-void Unit::moveTo(const glm::vec3& destination, const Map& map, const AdjacentPositions& adjacentPositions, 
-	FactionHandler& factionHandler, eUnitState state)
+void Unit::moveTo(const glm::vec3& destination, const Map& map, FactionHandler& factionHandler, eUnitState state)
 {
 	glm::vec3 previousDestination = Globals::getNextPathDestination(m_pathToPosition, m_position);
-	PathFinding::getInstance().getPathToPosition(*this, destination, m_pathToPosition, adjacentPositions,
+	PathFinding::getInstance().getPathToPosition(*this, destination, m_pathToPosition, 
+		[&, this](const glm::ivec2& position) { return getAdjacentPositions(position, map, factionHandler, *this); },
 		map, factionHandler, m_owningFaction);
 
 	if (!m_pathToPosition.empty())
@@ -205,8 +204,7 @@ void Unit::update(float deltaTime, FactionHandler& factionHandler, const Map& ma
 				{
 					if (!m_pathToPosition.empty())
 					{
-						moveTo(m_pathToPosition.front(), map, [&, this](const glm::ivec2& position)
-							{ return getAdjacentPositions(position, map, factionHandler, *this); }, factionHandler, eUnitState::Moving);
+						moveTo(m_pathToPosition.front(), map, factionHandler, eUnitState::Moving);
 					}
 					else
 					{

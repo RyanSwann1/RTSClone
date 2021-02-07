@@ -316,8 +316,8 @@ void Faction::handleUnitCollisions(const Map& map, FactionHandler& factionHandle
         {
             if (map.isCollidable(unit.getPosition()))
             {
-                unit.moveTo(PathFinding::getInstance().getClosestAvailablePosition<Unit>(unit, m_units, map), map,
-                    [&](const glm::ivec2& position) { return getAdjacentPositions(position, map, factionHandler, unit); }, factionHandler);
+                glm::vec3 destination = PathFinding::getInstance().getClosestAvailablePosition<Unit>(unit, m_units, map);
+                unit.moveTo(destination, map, factionHandler);
             }
             else
             {
@@ -328,8 +328,8 @@ void Faction::handleUnitCollisions(const Map& map, FactionHandler& factionHandle
                         otherUnit.getCurrentState() == eUnitState::Idle &&
                         unit.getAABB().contains(otherUnit.getAABB()))
                     {
-                        unit.moveTo(PathFinding::getInstance().getClosestAvailablePosition<Unit>(unit, m_units, map), map,
-                            [&](const glm::ivec2& position) { return getAdjacentPositions(position, map, factionHandler, unit); }, factionHandler);
+                        glm::vec3 destination = PathFinding::getInstance().getClosestAvailablePosition<Unit>(unit, m_units, map);
+                        unit.moveTo(destination, map, factionHandler);
                         break;
                     }
                 }
@@ -632,8 +632,7 @@ void Faction::revalidateExistingUnitPaths(const Map& map, FactionHandler& factio
     {
         if (!unit.getPathToPosition().empty())
         {
-            unit.moveTo(unit.getPathToPosition().front(), map, [&](const glm::ivec2& position)
-                { return getAdjacentPositions(position, map, factionHandler, unit); }, factionHandler, unit.getCurrentState());
+            unit.moveTo(unit.getPathToPosition().front(), map, factionHandler, unit.getCurrentState());
         }
     }
 

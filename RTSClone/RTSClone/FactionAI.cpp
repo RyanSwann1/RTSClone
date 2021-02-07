@@ -207,8 +207,8 @@ void FactionAI::update(float deltaTime, const Map & map, FactionHandler& faction
 			{
 				if (unit.getCurrentState() == eUnitState::Idle)
 				{
-					unit.moveTo(targetFaction.getClosestHeadquarters(unit.getPosition()).getPosition(), map, [&](const glm::ivec2& position)
-					{ return getAdjacentPositions(position, map, factionHandler, unit); }, factionHandler, eUnitState::AttackMoving);
+					glm::vec3 destination = targetFaction.getClosestHeadquarters(unit.getPosition()).getPosition();
+					unit.moveTo(destination, map, factionHandler, eUnitState::AttackMoving);
 				}
 			}
 		}
