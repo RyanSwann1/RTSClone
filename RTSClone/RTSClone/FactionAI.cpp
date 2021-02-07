@@ -196,12 +196,7 @@ void FactionAI::update(float deltaTime, const Map & map, FactionHandler& faction
 		{
 			if (worker.getCurrentState() == eWorkerState::Idle)
 			{
-				const Mineral& mineralToHarvest = getRandomMineral();
-				glm::vec3 destination = PathFinding::getInstance().getClosestPositionToAABB(worker.getPosition(),
-					mineralToHarvest.getAABB(), map);
-
-				worker.moveTo(destination, map, [&](const glm::ivec2& position) { return getAdjacentPositions(position, map); },
-					eWorkerState::MovingToMinerals, &mineralToHarvest);
+				worker.moveTo(getRandomMineral(), map);
 			}
 		}
 
@@ -343,12 +338,7 @@ Entity* FactionAI::spawnWorker(const Map& map, const EntitySpawnerBuilding& buil
 		const Mineral* nearestMineral = m_baseHandler.getNearestAvailableMineralAtBase(*this, nearestBase, worker.getPosition());
 		if (nearestMineral)
 		{
-			glm::vec3 destination = PathFinding::getInstance().getClosestPositionToAABB(worker.getPosition(),
-				nearestMineral->getAABB(), map);
-
-			worker.moveTo(destination, map,
-				[&](const glm::ivec2& position) { return getAdjacentPositions(position, map); },
-				eWorkerState::MovingToMinerals, nearestMineral);
+			worker.moveTo(*nearestMineral, map);
 		}
 
 		return spawnedWorker;

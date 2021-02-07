@@ -412,10 +412,7 @@ void FactionPlayer::moveSingularSelectedEntity(const glm::vec3& planeIntersectio
 
             if (mineralValid)
             {
-                selectedWorker.moveTo(PathFinding::getInstance().getClosestPositionToAABB(selectedWorker.getPosition(),
-                    mineralToHarvest->getAABB(), map),
-                    map, [&](const glm::ivec2& position) { return getAdjacentPositions(position, map); },
-                    eWorkerState::MovingToMinerals, &(*mineralToHarvest));
+                selectedWorker.moveTo(*mineralToHarvest, map);
             }
         }
         else
@@ -457,12 +454,7 @@ void FactionPlayer::moveMultipleSelectedEntities(const glm::vec3& planeIntersect
                 const Mineral* mineral = baseHandler.getNearestAvailableMineralAtBase(*this, *base, selectedUnit->getPosition());
                 if (mineral)
                 {
-                    glm::vec3 destination = PathFinding::getInstance().getClosestPositionToAABB(selectedUnit->getPosition(),
-                        mineral->getAABB(), map);
-
-                    static_cast<Worker&>(*selectedUnit).moveTo(destination, map,
-                        [&](const glm::ivec2& position) { return getAdjacentPositions(position, map); },
-                        eWorkerState::MovingToMinerals, &(*mineral));
+                    static_cast<Worker&>(*selectedUnit).moveTo(*mineral, map);
                 }
             }
         }
@@ -504,13 +496,13 @@ void FactionPlayer::moveMultipleSelectedEntities(const glm::vec3& planeIntersect
                     glm::vec3 destination = planeIntersection - (averagePosition - selectedEntity->getPosition());
 
                     selectedUnit.moveTo(destination, map, [&](const glm::ivec2& position)
-                    { return getAdjacentPositions(position, map, factionHandler, selectedUnit); }, factionHandler, state);
+                        { return getAdjacentPositions(position, map, factionHandler, selectedUnit); }, factionHandler, state);
                 }
                 break;
                 case eEntityType::Worker:
                 {
-                    Worker& selectedWorker = static_cast<Worker&>(*selectedEntity);
                     glm::vec3 destination = planeIntersection - (averagePosition - selectedEntity->getPosition());
+
                     static_cast<Worker*>(selectedEntity)->moveTo(destination, map,
                         [&](const glm::ivec2& position) { return getAdjacentPositions(position, map); });
                 }

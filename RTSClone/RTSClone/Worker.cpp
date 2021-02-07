@@ -160,10 +160,7 @@ void Worker::update(float deltaTime, const Map& map, FactionHandler& factionHand
 			m_owningFaction.addResources(*this);
 			if (m_mineralToHarvest)
 			{
-				glm::vec3 destination = PathFinding::getInstance().getClosestPositionToAABB(m_position, 
-					m_mineralToHarvest->getAABB(), map);
-				moveTo(destination, map, [&](const glm::ivec2& position) { return getAdjacentPositions(position, map); },
-					eWorkerState::MovingToMinerals, m_mineralToHarvest);
+				moveTo(*m_mineralToHarvest, map);
 			}
 			else
 			{
@@ -279,6 +276,32 @@ void Worker::update(float deltaTime, const Map& map, FactionHandler& factionHand
 	if (m_taskTimer.isActive())
 	{
 		m_taskTimer.update(deltaTime);
+	}
+}
+
+void Worker::moveTo(const Mineral& mineral, const Map& map)
+{
+	glm::vec3 previousDestination = Globals::getNextPathDestination(m_pathToPosition, m_position);
+	glm::vec3 destination = PathFinding::getInstance().getClosestPositionToAABB(m_position,
+		mineral.getAABB(), map);
+
+	PathFinding::getInstance().getPathToPosition(*this, destination, m_pathToPosition,
+		[&](const glm::ivec2& position) { return getAdjacentPositions(position, map); }, map, m_owningFaction);
+	if (!m_pathToPosition.empty())
+	{
+		switchTo(eWorkerState::MovingToMinerals, &mineral);
+	}
+	else
+	{
+		if (previousDestination != m_position)
+		{
+			m_pathToPosition.push_back(previousDestination);
+			switchTo(eWorkerState::Moving);
+		}
+		else
+		{
+			switchTo(eWorkerState::Idle);
+		}
 	}
 }
 
