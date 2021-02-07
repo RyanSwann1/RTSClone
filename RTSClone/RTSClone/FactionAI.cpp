@@ -333,11 +333,24 @@ const Entity* FactionAI::spawnUnit(const Map& map, const EntitySpawnerBuilding& 
 	return nullptr;
 }
 
-const Entity* FactionAI::spawnWorker(const Map& map, const EntitySpawnerBuilding& building)
+Entity* FactionAI::spawnWorker(const Map& map, const EntitySpawnerBuilding& building)
 {
-	const Entity* spawnedWorker = Faction::spawnWorker(map, building);
+	Entity* spawnedWorker = Faction::spawnWorker(map, building);
 	if (spawnedWorker)
 	{
+		Worker& worker = static_cast<Worker&>((*spawnedWorker));
+		const Base& nearestBase = m_baseHandler.getNearestBase(building.getPosition());
+		const Mineral* nearestMineral = m_baseHandler.getNearestAvailableMineralAtBase(*this, nearestBase, worker);
+		if (nearestMineral)
+		{
+			glm::vec3 destination = PathFinding::getInstance().getClosestPositionToAABB(worker.getPosition(),
+				nearestMineral->getAABB(), map);
+
+			worker.moveTo(destination, map,
+				[&](const glm::ivec2& position) { return getAdjacentPositions(position, map); },
+				eWorkerState::MovingToMinerals, nearestMineral);
+		}
+
 		return spawnedWorker;
 	}
 

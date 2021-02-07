@@ -724,7 +724,7 @@ const Entity* Faction::spawnUnit(const Map& map, const EntitySpawnerBuilding& bu
     return nullptr;
 }
 
-const Entity* Faction::spawnWorker(const Map& map, const EntitySpawnerBuilding& building)
+Entity* Faction::spawnWorker(const Map& map, const EntitySpawnerBuilding& building)
 {
     if (isAffordable(eEntityType::Worker) && !isExceedPopulationLimit(eEntityType::Worker))
     {

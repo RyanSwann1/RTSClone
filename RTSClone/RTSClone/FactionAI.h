@@ -54,7 +54,7 @@ private:
 	Worker* getAvailableWorker(const glm::vec3& position);
 	
 	const Entity* spawnUnit(const Map& map, const EntitySpawnerBuilding& building, FactionHandler& factionHandler) override;
-	const Entity* spawnWorker(const Map& map, const EntitySpawnerBuilding& building) override;
+	Entity* spawnWorker(const Map& map, const EntitySpawnerBuilding& building) override;
 
 	void onBuild(const Map& map, eEntityType entityTypeToBuild, FactionHandler& factionHandler);
 };
