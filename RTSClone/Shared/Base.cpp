@@ -1,5 +1,8 @@
 #include "Base.h"
 #include "Globals.h"
+#ifdef GAME
+#include "Faction.h"
+#endif // GAME
 
 namespace
 {
@@ -40,9 +43,42 @@ void Base::setPosition(const glm::vec3 & _position)
 #endif // LEVEL_EDITOR
 
 #ifdef GAME
+namespace
+{
+	const Base& getBase(const std::vector<Base>& bases, const Mineral& _mineral)
+	{
+		for (const auto& base : bases)
+		{
+			for (const auto& mineral : base.minerals)
+			{
+				if (&mineral == &_mineral)
+				{
+					return base;
+				}
+			}
+		}
+
+		assert(false);
+	}
+}
+
 BaseHandler::BaseHandler(std::vector<Base>&& bases)
 	: bases(std::move(bases))
 {}
+
+const Mineral* BaseHandler::getAvailableMineralAtBase(const Faction& faction, const Mineral& _mineral) const
+{
+	assert(faction.isMineralInUse(_mineral));
+	for (const auto& mineral : getBase(bases, _mineral).minerals)
+	{
+		if (&mineral != &_mineral && !faction.isMineralInUse(mineral))
+		{
+			return &mineral;
+		}
+	}
+
+	return nullptr;
+}
 
 const Mineral* BaseHandler::getMineral(const glm::vec3 & position) const
 {

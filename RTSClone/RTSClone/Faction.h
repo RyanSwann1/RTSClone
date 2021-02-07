@@ -22,6 +22,7 @@ class Faction : private NonCopyable, private NonMovable
 public:
 	virtual ~Faction() {}
 
+	bool isMineralInUse(const Mineral& mineral) const;
 	bool isExceedPopulationLimit(int populationAmount) const;
 	bool isExceedPopulationLimit(eEntityType entityType) const;
 	bool isAffordable(eEntityType entityType) const;
@@ -71,7 +72,6 @@ protected:
 	std::list<Headquarters> m_headquarters;
 	std::list<Laboratory> m_laboratories;
 
-	bool isMineralInUse(const Mineral& mineral) const;
 	bool instructWorkerToBuild(eEntityType entityType, const glm::vec3& position, const Map& map, Worker& worker);
 	virtual void onEntityRemoval(const Entity& entity) {}
 

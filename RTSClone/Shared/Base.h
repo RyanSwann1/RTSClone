@@ -24,11 +24,14 @@ struct Base
 
 #ifdef GAME
 #include "NonMovable.h"
+#include <list>
 class ShaderHandler;
+class Faction;
 struct BaseHandler : private NonCopyable, private NonMovable
 {
 	BaseHandler(std::vector<Base>&& bases);
 
+	const Mineral* getAvailableMineralAtBase(const Faction& faction, const Mineral& mineral) const;
 	const Mineral* getMineral(const glm::vec3& position) const;
 	const Base* getBaseAtMineral(const glm::vec3& position) const;
 	void render(ShaderHandler& shaderHandler) const;

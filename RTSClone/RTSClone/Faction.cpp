@@ -653,7 +653,7 @@ bool Faction::isMineralInUse(const Mineral& mineral) const
     for (const auto& worker : m_workers)
     {
         if (worker.getMineralToHarvest() && 
-            worker.getMineralToHarvest()->getPosition() == mineral.getPosition())
+            &(*worker.getMineralToHarvest()) == &mineral)
         {
             return true;
         }
