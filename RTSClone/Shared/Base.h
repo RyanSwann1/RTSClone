@@ -35,6 +35,8 @@ struct BaseHandler : private NonCopyable, private NonMovable
 	const Mineral* getNearestAvailableMineralAtBase(const Faction& faction, const Mineral& mineral, const Worker& worker) const;
 	const Mineral* getMineral(const glm::vec3& position) const;
 	const Base* getBaseAtMineral(const glm::vec3& position) const;
+	const Base& getNearestBase(const glm::vec3& position) const;
+
 	void render(ShaderHandler& shaderHandler) const;
 
 	const std::vector<Base> bases;

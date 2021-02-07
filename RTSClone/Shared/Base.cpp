@@ -2,6 +2,7 @@
 #include "Globals.h"
 #ifdef GAME
 #include "Faction.h"
+#include <limits>
 #endif // GAME
 
 namespace
@@ -148,6 +149,24 @@ const Base* BaseHandler::getBaseAtMineral(const glm::vec3& position) const
 	}
 
 	return nullptr;
+}
+
+const Base& BaseHandler::getNearestBase(const glm::vec3& position) const
+{
+	float closestDistance = std::numeric_limits<float>::max();
+	const Base* closestBase = nullptr;
+	for (const auto& base : bases)
+	{
+		float distance = Globals::getSqrDistance(base.position, position);
+		if (distance < closestDistance)
+		{
+			closestBase = &base;
+			closestDistance = distance;
+		}
+	}
+
+	assert(closestBase);
+	return *closestBase;
 }
 
 void BaseHandler::render(ShaderHandler& shaderHandler) const
