@@ -41,10 +41,6 @@ struct PlayerActivatePlannedBuildingEvent : public GameEvent_1 {
 	PlayerActivatePlannedBuildingEvent(eEntityType entityType, int targetID) :
 		GameEvent_1(entityType, targetID) {}
 };
-struct OnEnteredIdleStateEvent : public GameEvent_1 {
-	OnEnteredIdleStateEvent(eEntityType entityType, int targetID) :
-		GameEvent_1(entityType, targetID) {}
-};
 
 struct GameEvent_2
 {
@@ -113,6 +109,20 @@ struct SpawnProjectileEvent : public GameEvent_5 {
 		: GameEvent_5(senderFaction, senderID, targetFaction, targetID, damage, startingPosition, endingPosition) {}
 };
 
+struct GameEvent_6
+{
+	GameEvent_6(eFactionController factionController, eEntityType entityType, int entityID);
+
+	eFactionController factionController;
+	eEntityType entityType;
+	int entityID;
+};
+struct OnEnteredIdleStateEvent : public GameEvent_6
+{
+	OnEnteredIdleStateEvent(eFactionController factionController, eEntityType entityType, int entityID) :
+		GameEvent_6(factionController, entityType, entityID) {}
+};
+
 union GameEvents
 {
 	RevalidateMovementPathsEvent			revalidateMovementPaths;
@@ -137,7 +147,7 @@ union GameEvents
 	GameEvents(SetTargetEntityGUIEvent gameEvent) :					setTargetEntityGUI(gameEvent) {}
 	GameEvents(const TakeDamageEvent& gameEvent) :					takeDamage(gameEvent) {}
 	GameEvents(const SpawnProjectileEvent& gameEvent) :				spawnProjectile(gameEvent) {}
-	GameEvents(OnEnteredIdleStateEvent gameEvent) :					onEnteredIdleState(gameEvent) {}
+	GameEvents(const OnEnteredIdleStateEvent& gameEvent) :			onEnteredIdleState(gameEvent) {}
 };
 
 struct GameEvent
@@ -151,8 +161,7 @@ struct GameEvent
 	//GameEvent_1
 	static GameEvent createPlayerSpawnUnit(eEntityType entityType, int targetID);
 	static GameEvent createPlayerActivatePlannedBuilding(eEntityType, int targetID);
-	static GameEvent createOnEnteredIdleState(eEntityType entityType, int targetID);
-	
+
 	//GameEvent_2
 	static GameEvent createEliminateFaction(eFactionController factionController);
 	static GameEvent createIncreaseFactionShield(eFactionController factionController);
@@ -168,6 +177,9 @@ struct GameEvent
 	//GameEvent_5
 	static GameEvent createSpawnProjectile(eFactionController senderFaction, int senderID, eFactionController targetFaction,
 		int targetID, int damage, const glm::vec3& startingPosition, const glm::vec3& endingPosition);
+
+	//GameEvent_6
+	static GameEvent createOnEnteredIdleState(eFactionController factionController, eEntityType entityType, int targetID);
 
 	eGameEventType type;
 	GameEvents data;

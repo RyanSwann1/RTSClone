@@ -54,9 +54,9 @@ GameEvent GameEvent::createPlayerActivatePlannedBuilding(eEntityType entityType,
 	return { eGameEventType::PlayerActivatePlannedBuilding, PlayerActivatePlannedBuildingEvent{entityType, targetID} };
 }
 
-GameEvent GameEvent::createOnEnteredIdleState(eEntityType entityType, int targetID)
+GameEvent GameEvent::createOnEnteredIdleState(eFactionController factionController, eEntityType entityType, int targetID)
 {
-	return { eGameEventType::OnEnteredIdleState, OnEnteredIdleStateEvent{entityType, targetID} };
+	return { eGameEventType::OnEnteredIdleState, OnEnteredIdleStateEvent{factionController, entityType, targetID} };
 }
 
 GameEvent GameEvent::createEliminateFaction(eFactionController factionController)
@@ -91,3 +91,9 @@ GameEvent GameEvent::createSpawnProjectile(eFactionController senderFaction, int
 	return { eGameEventType::SpawnProjectile,
 		SpawnProjectileEvent{senderFaction, senderID, targetFaction, targetID, damage, startingPosition, endingPosition} };
 }
+
+GameEvent_6::GameEvent_6(eFactionController factionController, eEntityType entityType, int entityID)
+	: factionController(factionController),
+	entityType(entityType),
+	entityID(entityID)
+{}

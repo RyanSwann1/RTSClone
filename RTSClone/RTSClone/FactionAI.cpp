@@ -68,8 +68,8 @@ FactionAI::FactionAI(eFactionController factionController, const glm::vec3& hqSt
 	}
 
 	m_actionQueue.emplace(eActionType::BuildTurret);
-	m_actionQueue.emplace(eActionType::BuildBarracks);
-	m_actionQueue.emplace(eActionType::BuildSupplyDepot);
+	//m_actionQueue.emplace(eActionType::BuildBarracks);
+	//m_actionQueue.emplace(eActionType::BuildSupplyDepot);
 }
 
 void FactionAI::setTargetFaction(FactionHandler& factionHandler)
@@ -120,7 +120,7 @@ void FactionAI::handleEvent(const GameEvent& gameEvent, const Map& map, FactionH
 	}
 	break;
 	case eGameEventType::OnEnteredIdleState:
-		int entityID = gameEvent.data.onEnteredIdleState.targetID;
+		int entityID = gameEvent.data.onEnteredIdleState.entityID;
 		switch (gameEvent.data.onEnteredIdleState.entityType)
 		{
 		case eEntityType::Worker:
@@ -164,7 +164,7 @@ void FactionAI::update(float deltaTime, const Map & map, FactionHandler& faction
 	if (m_spawnTimer.isExpired())
 	{
 		m_spawnTimer.resetElaspedTime();
-		m_spawnQueue.push(eEntityType::Unit);
+		//m_spawnQueue.push(eEntityType::Unit);
 	}
 
 	m_delayTimer.update(deltaTime);

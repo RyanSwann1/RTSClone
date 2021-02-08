@@ -336,7 +336,6 @@ void Level::handleEvent(const GameEvent& gameEvent, const Map& map)
 	case eGameEventType::SpawnProjectile:
 		m_projectileHandler.addProjectile(gameEvent);
 		break;
-	case eGameEventType::OnEnteredIdleState:
 	case eGameEventType::RevalidateMovementPaths:
 		for (auto& faction : m_factions)
 		{
@@ -365,6 +364,13 @@ void Level::handleEvent(const GameEvent& gameEvent, const Map& map)
 		if (isFactionActive(m_factions, eFactionController::Player))
 		{
 			getFaction(m_factions, eFactionController::Player).handleEvent(gameEvent, map, m_factionHandler);
+		}
+		break;
+	case eGameEventType::OnEnteredIdleState:
+		if (isFactionActive(m_factions, gameEvent.data.onEnteredIdleState.factionController))
+		{
+			m_factions[static_cast<int>(gameEvent.data.onEnteredIdleState.factionController)]->
+				handleEvent(gameEvent, map, m_factionHandler);
 		}
 		break;
 	}
