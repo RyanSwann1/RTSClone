@@ -15,7 +15,8 @@ enum class eGameEventType
 	RepairEntity,
 	SetTargetEntityGUI,
 	ResetTargetEntityGUI,
-	IncreaseFactionShield
+	IncreaseFactionShield,
+	OnEnteredIdleState
 };
 
 struct GameEvent_0
@@ -38,6 +39,10 @@ struct PlayerSpawnEntity : public GameEvent_1 {
 };
 struct PlayerActivatePlannedBuildingEvent : public GameEvent_1 {
 	PlayerActivatePlannedBuildingEvent(eEntityType entityType, int targetID) :
+		GameEvent_1(entityType, targetID) {}
+};
+struct OnEnteredIdleStateEvent : public GameEvent_1 {
+	OnEnteredIdleStateEvent(eEntityType entityType, int targetID) :
 		GameEvent_1(entityType, targetID) {}
 };
 
@@ -120,17 +125,19 @@ union GameEvents
 	SetTargetEntityGUIEvent					setTargetEntityGUI;
 	TakeDamageEvent							takeDamage;
 	SpawnProjectileEvent					spawnProjectile;
+	OnEnteredIdleStateEvent					onEnteredIdleState;
 
 	GameEvents(RevalidateMovementPathsEvent gameEvent) :			revalidateMovementPaths(gameEvent) {}
 	GameEvents(ResetTargetEntityGUIEvent gameEvent) :				resetTargetEntityGUI(gameEvent) {}
 	GameEvents(IncreaseFactionShieldEvent gameEvent) :				increaseFactionShield(gameEvent) {}
-	GameEvents(PlayerSpawnEntity gameEvent) :					playerSpawnEntity(gameEvent) {}
+	GameEvents(PlayerSpawnEntity gameEvent) :						playerSpawnEntity(gameEvent) {}
 	GameEvents(PlayerActivatePlannedBuildingEvent gameEvent) :		playerActivatePlannedBuilding(gameEvent) {}
 	GameEvents(EliminateFactionEvent gameEvent) :					eliminateFaction(gameEvent) {}
 	GameEvents(RepairEntityEvent gameEvent) :						repairEntity(gameEvent) {}
 	GameEvents(SetTargetEntityGUIEvent gameEvent) :					setTargetEntityGUI(gameEvent) {}
 	GameEvents(const TakeDamageEvent& gameEvent) :					takeDamage(gameEvent) {}
 	GameEvents(const SpawnProjectileEvent& gameEvent) :				spawnProjectile(gameEvent) {}
+	GameEvents(OnEnteredIdleStateEvent gameEvent) :					onEnteredIdleState(gameEvent) {}
 };
 
 struct GameEvent
@@ -144,6 +151,7 @@ struct GameEvent
 	//GameEvent_1
 	static GameEvent createPlayerSpawnUnit(eEntityType entityType, int targetID);
 	static GameEvent createPlayerActivatePlannedBuilding(eEntityType, int targetID);
+	static GameEvent createOnEnteredIdleState(eEntityType entityType, int targetID);
 	
 	//GameEvent_2
 	static GameEvent createEliminateFaction(eFactionController factionController);

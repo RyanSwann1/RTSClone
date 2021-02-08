@@ -54,6 +54,11 @@ GameEvent GameEvent::createPlayerActivatePlannedBuilding(eEntityType entityType,
 	return { eGameEventType::PlayerActivatePlannedBuilding, PlayerActivatePlannedBuildingEvent{entityType, targetID} };
 }
 
+GameEvent GameEvent::createOnEnteredIdleState(eEntityType entityType, int targetID)
+{
+	return { eGameEventType::OnEnteredIdleState, OnEnteredIdleStateEvent{entityType, targetID} };
+}
+
 GameEvent GameEvent::createEliminateFaction(eFactionController factionController)
 {
 	return { eGameEventType::EliminateFaction, EliminateFactionEvent{factionController} };
