@@ -28,8 +28,7 @@ class FactionAI : public Faction
 {
 public:
 	FactionAI(eFactionController factionController, const glm::vec3& hqStartingPosition, 
-		int startingResources, int startingPopulationCap, const Base& currentBase, 
-		const BaseHandler& baseHandler);
+		int startingResources, int startingPopulationCap, const Base& currentBase, const BaseHandler& baseHandler);
 
 	const Entity* spawnBuilding(const Map& map, glm::vec3 position, eEntityType entityType) override;
 	void setTargetFaction(FactionHandler& factionHandler);

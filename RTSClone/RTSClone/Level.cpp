@@ -336,6 +336,7 @@ void Level::handleEvent(const GameEvent& gameEvent, const Map& map)
 	case eGameEventType::SpawnProjectile:
 		m_projectileHandler.addProjectile(gameEvent);
 		break;
+	case eGameEventType::OnEnteredIdleState:
 	case eGameEventType::RevalidateMovementPaths:
 		for (auto& faction : m_factions)
 		{

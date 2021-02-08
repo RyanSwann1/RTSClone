@@ -445,6 +445,7 @@ void Worker::switchTo(eWorkerState newState, const Mineral* mineralToHarvest)
 	switch (newState)
 	{
 	case eWorkerState::Idle:
+		GameEventHandler::getInstance().gameEvents.push(GameEvent::createOnEnteredIdleState(getEntityType(), getID()));
 		m_taskTimer.setActive(false);
 		m_pathToPosition.clear();
 		break;

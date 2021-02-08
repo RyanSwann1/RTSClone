@@ -119,6 +119,32 @@ void FactionAI::handleEvent(const GameEvent& gameEvent, const Map& map, FactionH
 		}
 	}
 	break;
+	case eGameEventType::OnEnteredIdleState:
+		int entityID = gameEvent.data.onEnteredIdleState.targetID;
+		switch (gameEvent.data.onEnteredIdleState.entityType)
+		{
+		case eEntityType::Worker:
+		{
+			auto worker = std::find_if(m_workers.begin(), m_workers.end(), [entityID](const auto& worker)
+			{
+				return worker.getID() == entityID;
+			});
+			if (worker == m_workers.end())
+			{
+				break;
+			}
+		
+ 			const Base& nearestBase = m_baseHandler.getNearestBase(getClosestHeadquarters(worker->getPosition()).getPosition());
+			const Mineral* nearestMinreal = m_baseHandler.getNearestAvailableMineralAtBase(*this, nearestBase, worker->getPosition());
+			if (nearestMinreal)
+			{
+				worker->moveTo(*nearestMinreal, map);
+			}
+		}
+			break;
+		default:
+			assert(false);
+		}
 	}
 }
 
@@ -191,14 +217,6 @@ void FactionAI::update(float deltaTime, const Map & map, FactionHandler& faction
 	if (m_idleTimer.isExpired())
 	{
 		m_idleTimer.resetElaspedTime();
-
-		for (auto& worker : m_workers)
-		{
-			if (worker.getCurrentState() == eWorkerState::Idle)
-			{
-				worker.moveTo(getRandomMineral(), map);
-			}
-		}
 
 		if (m_targetFaction != eFactionController::None)
 		{
