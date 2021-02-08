@@ -42,7 +42,6 @@ private:
 	std::queue<eEntityType> m_spawnQueue;
 	std::queue<AIAction> m_actionQueue;
 	Timer m_delayTimer;
-	Timer m_idleTimer;
 	Timer m_spawnTimer;
 	eFactionController m_targetFaction;
 	std::reference_wrapper<const Base> m_currentBase;

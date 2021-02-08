@@ -46,7 +46,9 @@ Worker::Worker(Faction& owningFaction, const glm::vec3& startingPosition, const 
 	m_currentResourceAmount(0),
 	m_taskTimer(0.0f, false),
 	m_mineralToHarvest(nullptr)
-{}
+{
+	switchTo(eWorkerState::Idle);
+}
 
 Worker::Worker(Faction& owningFaction, const glm::vec3 & startingPosition, const glm::vec3 & destination, const Map & map)
 	: Entity(ModelManager::getInstance().getModel(WORKER_MODEL_NAME), startingPosition, eEntityType::Worker, Globals::WORKER_STARTING_HEALTH,
@@ -445,7 +447,8 @@ void Worker::switchTo(eWorkerState newState, const Mineral* mineralToHarvest)
 	switch (newState)
 	{
 	case eWorkerState::Idle:
-		GameEventHandler::getInstance().gameEvents.push(GameEvent::createOnEnteredIdleState(m_owningFaction.getController(), getEntityType(), getID()));
+		GameEventHandler::getInstance().gameEvents.push(
+			GameEvent::createOnEnteredIdleState(m_owningFaction.getController(), getEntityType(), getID()));
 		m_taskTimer.setActive(false);
 		m_pathToPosition.clear();
 		break;

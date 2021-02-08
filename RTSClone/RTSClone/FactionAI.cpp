@@ -57,7 +57,6 @@ FactionAI::FactionAI(eFactionController factionController, const glm::vec3& hqSt
 	m_spawnQueue(),
 	m_actionQueue(),
 	m_delayTimer(DELAY_TIMER_EXPIRATION, true),
-	m_idleTimer(IDLE_TIMER_EXPIRATION, true),
 	m_spawnTimer(Globals::getRandomNumber(MIN_SPAWN_TIMER_EXPIRATION, MAX_SPAWN_TIMER_EXPIRATION), true),
 	m_targetFaction(eFactionController::None),
 	m_currentBase(currentBase)
@@ -68,8 +67,8 @@ FactionAI::FactionAI(eFactionController factionController, const glm::vec3& hqSt
 	}
 
 	m_actionQueue.emplace(eActionType::BuildTurret);
-	//m_actionQueue.emplace(eActionType::BuildBarracks);
-	//m_actionQueue.emplace(eActionType::BuildSupplyDepot);
+	m_actionQueue.emplace(eActionType::BuildBarracks);
+	m_actionQueue.emplace(eActionType::BuildSupplyDepot);
 }
 
 void FactionAI::setTargetFaction(FactionHandler& factionHandler)
@@ -120,9 +119,28 @@ void FactionAI::handleEvent(const GameEvent& gameEvent, const Map& map, FactionH
 	}
 	break;
 	case eGameEventType::OnEnteredIdleState:
+	{
 		int entityID = gameEvent.data.onEnteredIdleState.entityID;
 		switch (gameEvent.data.onEnteredIdleState.entityType)
 		{
+		case eEntityType::Unit:
+		{
+			auto unit = std::find_if(m_units.begin(), m_units.end(), [entityID](const auto& unit)
+			{
+				return unit.getID() == entityID;
+			});
+			if (unit == m_units.end())
+			{
+				break;
+			}
+
+			if (m_targetFaction != eFactionController::None)
+			{
+				glm::vec3 destination = factionHandler.getFaction(m_targetFaction).getClosestHeadquarters(unit->getPosition()).getPosition();
+				unit->moveTo(destination, map, factionHandler, eUnitState::AttackMoving);
+			}
+		}
+		break;
 		case eEntityType::Worker:
 		{
 			auto worker = std::find_if(m_workers.begin(), m_workers.end(), [entityID](const auto& worker)
@@ -133,18 +151,20 @@ void FactionAI::handleEvent(const GameEvent& gameEvent, const Map& map, FactionH
 			{
 				break;
 			}
-		
- 			const Base& nearestBase = m_baseHandler.getNearestBase(getClosestHeadquarters(worker->getPosition()).getPosition());
+
+			const Base& nearestBase = m_baseHandler.getNearestBase(getClosestHeadquarters(worker->getPosition()).getPosition());
 			const Mineral* nearestMinreal = m_baseHandler.getNearestAvailableMineralAtBase(*this, nearestBase, worker->getPosition());
 			if (nearestMinreal)
 			{
 				worker->moveTo(*nearestMinreal, map);
 			}
 		}
-			break;
+		break;
 		default:
 			assert(false);
 		}
+	}
+		break;
 	}
 }
 
@@ -164,7 +184,7 @@ void FactionAI::update(float deltaTime, const Map & map, FactionHandler& faction
 	if (m_spawnTimer.isExpired())
 	{
 		m_spawnTimer.resetElaspedTime();
-		//m_spawnQueue.push(eEntityType::Unit);
+		m_spawnQueue.push(eEntityType::Unit);
 	}
 
 	m_delayTimer.update(deltaTime);
@@ -209,25 +229,6 @@ void FactionAI::update(float deltaTime, const Map & map, FactionHandler& faction
 				break;
 			default:
 				assert(false);
-			}
-		}
-	}
-
-	m_idleTimer.update(deltaTime);
-	if (m_idleTimer.isExpired())
-	{
-		m_idleTimer.resetElaspedTime();
-
-		if (m_targetFaction != eFactionController::None)
-		{
-			const Faction& targetFaction = factionHandler.getFaction(m_targetFaction);
-			for (auto& unit : m_units)
-			{
-				if (unit.getCurrentState() == eUnitState::Idle)
-				{
-					glm::vec3 destination = targetFaction.getClosestHeadquarters(unit.getPosition()).getPosition();
-					unit.moveTo(destination, map, factionHandler, eUnitState::AttackMoving);
-				}
 			}
 		}
 	}

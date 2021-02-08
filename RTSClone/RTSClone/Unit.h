@@ -64,5 +64,5 @@ private:
 	Mesh m_renderPathMesh;
 #endif // RENDER_PATHING
 
-	void switchToState(eUnitState newState, const Map& map, const Entity* targetEntity = nullptr, const Faction* targetFaction = nullptr);
+	void switchToState(eUnitState newState, const Entity* targetEntity = nullptr, const Faction* targetFaction = nullptr);
 };
