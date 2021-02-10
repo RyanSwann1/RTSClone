@@ -312,11 +312,12 @@ Worker* FactionAI::getAvailableWorker(const glm::vec3& position)
 
 const Entity* FactionAI::spawnBuilding(const Map& map, glm::vec3 position, eEntityType entityType)
 {
-	if (isAffordable(entityType) && !map.isPositionOccupied(position))
+	const Entity* spawnedBuilding = Faction::spawnBuilding(map, position, entityType);
+	if (spawnedBuilding)
 	{
-		return Faction::spawnBuilding(map, position, entityType);
+		return spawnedBuilding;
 	}
-	
+
 	switch (entityType)
 	{
 	case eEntityType::SupplyDepot:
@@ -331,7 +332,7 @@ const Entity* FactionAI::spawnBuilding(const Map& map, glm::vec3 position, eEnti
 	default:
 		assert(false);
 	}
-	
+
 	return nullptr;
 }
 
