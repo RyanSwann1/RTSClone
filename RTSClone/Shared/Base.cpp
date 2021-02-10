@@ -9,12 +9,16 @@ namespace
 {
 	const glm::vec3 MAIN_BASE_QUAD_COLOR = { 1.0f, 0.0f, 0.0f };
 	const glm::vec3 MAIN_BASE_QUAD_SIZE = { Globals::NODE_SIZE, 0.0f, Globals::NODE_SIZE };
+#ifdef GAME
+	const float QUAD_OPACITY = 0.25f;
+#endif // GAME
 }
 
 #ifdef GAME
 Base::Base(const glm::vec3& position, std::vector<Mineral>&& minerals)
 	: position(position),
-	minerals(std::move(minerals))
+	minerals(std::move(minerals)),
+	quad(position, MAIN_BASE_QUAD_SIZE, MAIN_BASE_QUAD_COLOR, QUAD_OPACITY)
 {}
 #endif // GAME
 
@@ -170,7 +174,7 @@ const Base& BaseHandler::getNearestBase(const glm::vec3& position) const
 	return *closestBase;
 }
 
-void BaseHandler::render(ShaderHandler& shaderHandler) const
+void BaseHandler::renderMinerals(ShaderHandler& shaderHandler) const
 {
 	for (const auto& base : bases)
 	{
@@ -178,6 +182,14 @@ void BaseHandler::render(ShaderHandler& shaderHandler) const
 		{
 			mineral.render(shaderHandler);
 		}
+	}
+}
+
+void BaseHandler::renderBasePositions(ShaderHandler& shaderHandler) const
+{
+	for (const auto& base : bases)
+	{
+		base.quad.render(shaderHandler);
 	}
 }
 #endif // GAME

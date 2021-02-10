@@ -255,6 +255,11 @@ void Level::renderPlayerPlannedBuilding(ShaderHandler& shaderHandler, const Map&
 	}
 }
 
+void Level::renderBasePositions(ShaderHandler& shaderHandler) const
+{
+	m_baseHandler->renderBasePositions(shaderHandler);
+}
+
 void Level::render(ShaderHandler& shaderHandler) const
 {
 	for (const auto& gameObject : m_scenery)
@@ -270,7 +275,7 @@ void Level::render(ShaderHandler& shaderHandler) const
 		}
 	}
 
-	m_baseHandler->render(shaderHandler);
+	m_baseHandler->renderMinerals(shaderHandler);
 	m_projectileHandler.render(shaderHandler);
 }
 

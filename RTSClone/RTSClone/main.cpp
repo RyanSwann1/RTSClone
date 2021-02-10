@@ -215,13 +215,15 @@ int main()
 		}
 #endif // RENDER_PATHING
 
-		shaderHandler->switchToShader(eShaderType::Default);
-		shaderHandler->setUniform1f(eShaderType::Default, "uOpacity", 0.35f);
 		if (level)
 		{
 			glDisable(GL_CULL_FACE);
+			shaderHandler->switchToShader(eShaderType::Default);
+			shaderHandler->setUniform1f(eShaderType::Default, "uOpacity", 0.35f);
 			level->renderPlayerPlannedBuilding(*shaderHandler, map);
 			level->renderPlannedBuildings(*shaderHandler);
+			shaderHandler->switchToShader(eShaderType::Debug);
+			level->renderBasePositions(*shaderHandler);
 			glEnable(GL_CULL_FACE);
 
 			shaderHandler->switchToShader(eShaderType::Widjet);

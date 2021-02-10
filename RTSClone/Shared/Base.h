@@ -2,9 +2,7 @@
 
 #include "Mineral.h"
 #include <vector>
-#ifdef LEVEL_EDITOR
 #include "Quad.h"
-#endif // LEVEL_EDITOR
 
 struct Base
 {
@@ -20,6 +18,9 @@ struct Base
 
 	glm::vec3 position;
 	std::vector<Mineral> minerals;
+#ifdef GAME
+	Quad quad;
+#endif // GAME
 };
 
 #ifdef GAME
@@ -36,7 +37,8 @@ struct BaseHandler : private NonCopyable, private NonMovable
 	const Base* getBaseAtMineral(const glm::vec3& position) const;
 	const Base& getNearestBase(const glm::vec3& position) const;
 
-	void render(ShaderHandler& shaderHandler) const;
+	void renderMinerals(ShaderHandler& shaderHandler) const;
+	void renderBasePositions(ShaderHandler& shaderHandler) const;
 
 	const std::vector<Base> bases;
 };
