@@ -679,7 +679,7 @@ bool Faction::isMineralInUse(const Mineral& mineral) const
     return false;
 }
 
-bool Faction::instructWorkerToBuild(eEntityType entityType, const glm::vec3& position, const Map& map, Worker& worker)
+bool Faction::build(eEntityType entityType, const glm::vec3& position, const Map& map, Worker& worker)
 {
     assert(map.isWithinBounds(position) && !map.isPositionOccupied(position));
 

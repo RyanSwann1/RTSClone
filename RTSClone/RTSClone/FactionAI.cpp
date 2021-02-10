@@ -238,7 +238,7 @@ bool FactionAI::instructWorkerToBuild(eEntityType entityType, const glm::vec3& p
 {
 	if (map.isWithinBounds(position) && !map.isPositionOccupied(position) && !m_workers.empty())
 	{
-		return Faction::instructWorkerToBuild(entityType, position, map, worker);
+		return Faction::build(entityType, position, map, worker);
 	}
 
 	return false;

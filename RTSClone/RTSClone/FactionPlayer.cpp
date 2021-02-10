@@ -158,20 +158,20 @@ bool FactionPlayerPlannedBuilding::isOnValidPosition(const BaseHandler& baseHand
     {
         switch (m_entityType)
         {
-        case eEntityType::Headquarters:
-        {
-            for (const auto& base : baseHandler.bases)
-            {
-                for (const auto& mineral : base.minerals)
-                {
-                    if (Globals::getSqrDistance(mineral.getPosition(), m_position) <=
-                        Globals::MINIMUM_HQ_DISTANCE_FROM_MINERALS)
-                    {
-                        return false;
-                    }
-                }
-            }
-        }
+        //case eEntityType::Headquarters:
+        //{
+        //    for (const auto& base : baseHandler.bases)
+        //    {
+        //        for (const auto& mineral : base.minerals)
+        //        {
+        //            if (Globals::getSqrDistance(mineral.getPosition(), m_position) <=
+        //                Globals::MINIMUM_HQ_DISTANCE_FROM_MINERALS)
+        //            {
+        //                return false;
+        //            }
+        //        }
+        //    }
+        //}
         default:
             return true;
         }
@@ -365,7 +365,7 @@ int FactionPlayer::instructWorkerToBuild(const Map& map, const BaseHandler& base
 
             assert(selectedWorker != m_workers.cend());
             if (selectedWorker != m_workers.end() &&
-                Faction::instructWorkerToBuild(m_plannedBuilding.getEntityType(), m_plannedBuilding.getPosition(), map, *selectedWorker))
+                Faction::build(m_plannedBuilding.getEntityType(), m_plannedBuilding.getPosition(), map, *selectedWorker))
             {
                 m_plannedBuilding.deactivate();
             }
