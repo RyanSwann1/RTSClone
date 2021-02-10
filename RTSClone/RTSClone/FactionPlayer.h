@@ -10,22 +10,19 @@ struct PlayerActivatePlannedBuildingEvent;
 class FactionPlayerPlannedBuilding : private NonCopyable, private NonMovable
 {	
 public:
-	FactionPlayerPlannedBuilding();
+	FactionPlayerPlannedBuilding(const PlayerActivatePlannedBuildingEvent& gameEvent, const glm::vec3& position);
 
 	bool isOnValidPosition(const BaseHandler& baseHandler, const Map& map) const;
 	const glm::vec3& getPosition() const;
-	int getWorkerID() const;
+	int getBuilderID() const;
 	eEntityType getEntityType() const;
-	bool isActive() const;
 
-	void deactivate();
-	void activate(const PlayerActivatePlannedBuildingEvent& gameEvent, const glm::vec3& position);
 	void handleInput(const sf::Event& event, const Camera& camera, const sf::Window& window, const Map& map);
 	void render(ShaderHandler& shaderHandler, const BaseHandler& baseHandler, const Map& map) const;
 
 private:
-	const Model* m_model;
-	int m_workerID;
+	const Model& m_model;
+	int m_builderID;
 	glm::vec3 m_position;
 	eEntityType m_entityType;
 };
@@ -46,7 +43,7 @@ public:
 	void renderEntitySelector(const sf::Window& window, ShaderHandler& shaderHandler) const;
 
 private:
-	FactionPlayerPlannedBuilding m_plannedBuilding;
+	std::unique_ptr<FactionPlayerPlannedBuilding> m_plannedBuilding;
 	EntitySelector m_entitySelector;
 	glm::vec3 m_previousPlaneIntersection;
 	bool m_attackMoveSelected;
