@@ -236,9 +236,9 @@ void FactionAI::update(float deltaTime, const Map & map, FactionHandler& faction
 
 bool FactionAI::instructWorkerToBuild(eEntityType entityType, const glm::vec3& position, const Map& map, Worker& worker)
 {
-	if (map.isWithinBounds(position) && !map.isPositionOccupied(position) && !m_workers.empty())
+	if (map.isWithinBounds(position) && !map.isPositionOccupied(position))
 	{
-		return Faction::build(entityType, position, map, worker);
+		return worker.build(position, map, entityType);
 	}
 
 	return false;

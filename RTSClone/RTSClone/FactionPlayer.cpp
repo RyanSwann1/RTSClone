@@ -343,10 +343,9 @@ int FactionPlayer::instructWorkerToBuild(const Map& map, const BaseHandler& base
             {
                 return worker.getID() == workerID;
             });
-
             assert(selectedWorker != m_workers.cend());
             if (selectedWorker != m_workers.end() &&
-                Faction::build(m_plannedBuilding->getEntityType(), m_plannedBuilding->getPosition(), map, *selectedWorker))
+                selectedWorker->build(m_plannedBuilding->getPosition(), map, m_plannedBuilding->getEntityType()))
             {
                 m_plannedBuilding.reset();
             }

@@ -106,7 +106,8 @@ void Worker::repairEntity(const Entity& entity, const Map& map)
 
 bool Worker::build(const glm::vec3& buildPosition, const Map& map, eEntityType entityType)
 {
-	if (!map.isPositionOccupied(buildPosition))
+	assert(map.isWithinBounds(buildPosition) && !map.isPositionOccupied(buildPosition));
+	if (!m_owningFaction.isCollidingWithWorkerBuildQueue(ModelManager::getInstance().getModelAABB(buildPosition, entityType)))
 	{
 		m_buildQueue.emplace_back(buildPosition, entityType);
 		if (m_buildQueue.size() == 1)

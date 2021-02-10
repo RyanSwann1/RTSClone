@@ -27,6 +27,7 @@ public:
 	bool isExceedPopulationLimit(eEntityType entityType) const;
 	bool isAffordable(eEntityType entityType) const;
 	bool isAffordable(int resourceAmount) const;
+	bool isCollidingWithWorkerBuildQueue(const AABB& AABB) const;
 	int getCurrentShieldAmount() const;
 	int getCurrentPopulationAmount() const;
 	int getMaximumPopulationAmount() const;
@@ -35,7 +36,6 @@ public:
 	const glm::vec3& getMainHeadquartersPosition() const;
 	eFactionController getController() const;
 	const std::list<Unit>& getUnits() const;
-	const std::list<Worker>& getWorkers() const;
 	const Entity* getEntity(const glm::vec3& position, float maxDistance, bool prioritizeUnits = true) const;
 	const Entity* getEntity(const AABB& AABB, int entityID) const;
 	const Entity* getEntity(int entityID) const;
@@ -72,7 +72,6 @@ protected:
 	std::list<Headquarters> m_headquarters;
 	std::list<Laboratory> m_laboratories;
 
-	bool build(eEntityType entityType, const glm::vec3& position, const Map& map, Worker& worker);
 	virtual void onEntityRemoval(const Entity& entity) {}
 
 private:

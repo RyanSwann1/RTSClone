@@ -79,11 +79,6 @@ const std::list<Unit>& Faction::getUnits() const
     return m_units;
 }
 
-const std::list<Worker>& Faction::getWorkers() const
-{
-    return m_workers;
-}
-
 const Entity* Faction::getEntity(const glm::vec3& position, float maxDistance, bool prioritizeUnits) const
 {
     const Entity* closestEntity = nullptr;
@@ -560,6 +555,24 @@ bool Faction::isAffordable(int resourceAmount) const
     return resourceAmount <= m_currentResourceAmount;
 }
 
+bool Faction::isCollidingWithWorkerBuildQueue(const AABB& AABB) const
+{
+    for (const auto& worker : m_workers)
+    {
+        auto buildingCommand = std::find_if(worker.getBuildingCommands().cbegin(), worker.getBuildingCommands().cend(),
+            [&AABB](const auto& buildingCommand)
+        {
+            return AABB.contains(buildingCommand.position);
+        });
+        if (buildingCommand != worker.getBuildingCommands().cend())
+        {
+            return true;
+        }
+    }
+
+    return false;
+}
+
 const Entity* Faction::spawnBuilding(const Map& map, glm::vec3 position, eEntityType entityType)
 {
     if (isAffordable(entityType) && !map.isPositionOccupied(position))
@@ -673,37 +686,6 @@ bool Faction::isMineralInUse(const Mineral& mineral) const
             &(*worker.getMineralToHarvest()) == &mineral)
         {
             return true;
-        }
-    }
-
-    return false;
-}
-
-bool Faction::build(eEntityType entityType, const glm::vec3& position, const Map& map, Worker& worker)
-{
-    assert(map.isWithinBounds(position) && !map.isPositionOccupied(position));
-
-    AABB buildingAABB = ModelManager::getInstance().getModelAABB(position, entityType);
-    if (map.isWithinBounds(buildingAABB))
-    {
-        bool buildingCommandCollision = false;
-        for (const auto& worker : m_workers)
-        {
-            auto buildingCommand = std::find_if(worker.getBuildingCommands().cbegin(), worker.getBuildingCommands().cend(),
-                [&buildingAABB, &position](const auto& buildingCommand)
-            {
-                return buildingAABB.contains(buildingCommand.position);
-            });
-            if (buildingCommand != worker.getBuildingCommands().cend())
-            {
-                buildingCommandCollision = true;
-                break;
-            }
-        }
-
-        if (!buildingCommandCollision)
-        {
-            return worker.build(position, map, entityType);
         }
     }
 
