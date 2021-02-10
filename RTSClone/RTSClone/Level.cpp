@@ -72,7 +72,7 @@ Level::Level(std::vector<SceneryGameObject>&& scenery, FactionsContainer&& facti
 	}
 }
 
-std::unique_ptr<Level> Level::create(const std::string& levelName)
+std::unique_ptr<Level> Level::create(const std::string& levelName, Camera& camera)
 {
 	std::vector<Base> mainBases;
 	std::vector<SceneryGameObject> scenery;
@@ -93,11 +93,17 @@ std::unique_ptr<Level> Level::create(const std::string& levelName)
 		factionCount < static_cast<int>(baseHandler->bases.size()));
 	for (int i = 0; i < factionCount; ++i)
 	{
+		assert(!factions[i]);
 		switch (eFactionController(i))
 		{
 		case eFactionController::Player:
-			factions[i] = std::make_unique<FactionPlayer>(baseHandler->bases[i].position, 
+		{
+			factions[i] = std::make_unique<FactionPlayer>(baseHandler->bases[i].position,
 				factionStartingResources, factionStartingPopulation);
+
+			const glm::vec3& headquartersPosition = factions[i]->getMainHeadquartersPosition();
+			camera.position = glm::vec3(headquartersPosition.x - 25.f, camera.position.y, headquartersPosition.z);
+		}
 			break;
 		case eFactionController::AI_1:
 		case eFactionController::AI_2:
@@ -116,16 +122,6 @@ std::unique_ptr<Level> Level::create(const std::string& levelName)
 Level::~Level()
 {
 	broadcastToMessenger<GameMessages::UIClearDisplaySelectedEntity>({});
-}
-
-const Faction* Level::getPlayer() const
-{
-	if (m_factionHandler.isFactionActive(eFactionController::Player))
-	{
-		return &m_factionHandler.getFaction(eFactionController::Player);
-	}
-
-	return nullptr;
 }
 
 const Faction* Level::getWinningFaction() const

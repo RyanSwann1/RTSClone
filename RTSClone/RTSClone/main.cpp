@@ -135,7 +135,6 @@ int main()
 			if (winningFaction)
 			{
 				broadcastToMessenger<GameMessages::UIDisplayWinner>({ winningFaction->getController() });
-
 				level.reset();
 			}
 		}
@@ -147,27 +146,17 @@ int main()
 				if (!levelName.empty() && ImGui::Button(levelName.c_str()))
 				{
 					broadcastToMessenger<GameMessages::UIClearWinner>({});
-					level = Level::create(levelName);
+					level = Level::create(levelName, camera);
 					assert(level);
 					if (!level)
 					{
 						std::cout << "Unable to load " << levelName << "\n";
-					}
-					else
-					{
-						const Faction* playerFaction = level->getPlayer();
-						if (playerFaction)
-						{
-							const glm::vec3& headquartersPosition = playerFaction->getMainHeadquartersPosition();
-							camera.position = glm::vec3(headquartersPosition.x, camera.position.y, headquartersPosition.z);
-						}
 					}
 					break;
 				}
 			}
 
 			ImGui::End();
-
 		}
 		
 		//Update

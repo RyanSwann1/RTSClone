@@ -23,10 +23,9 @@ class ShaderHandler;
 class Level : private NonCopyable, private NonMovable
 {
 public:
-	static std::unique_ptr<Level> create(const std::string& levelName);
+	static std::unique_ptr<Level> create(const std::string& levelName, Camera& camera);
 	~Level();
 
-	const Faction* getPlayer() const;
 	const Faction* getWinningFaction() const;
 
 	void handleInput(const sf::Window& window, const Camera& camera, const sf::Event& currentSFMLEvent, const Map& map,
