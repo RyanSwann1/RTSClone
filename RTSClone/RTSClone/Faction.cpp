@@ -573,9 +573,14 @@ bool Faction::isCollidingWithWorkerBuildQueue(const AABB& AABB) const
     return false;
 }
 
-const Entity* Faction::spawnBuilding(const Map& map, glm::vec3 position, eEntityType entityType)
+const Entity* Faction::createBuilding(const Map& map, const Worker& worker)
 {
-    if (isAffordable(entityType) && !map.isPositionOccupied(position))
+    assert(worker.getCurrentState() == eWorkerState::Building && !worker.getBuildingCommands().empty());
+
+    eEntityType entityType = worker.getBuildingCommands().front().entityType;
+    const glm::vec3& position = worker.getBuildingCommands().front().position;
+    if (isAffordable(entityType) && 
+        !map.isPositionOccupied(position))
     {
         Entity* addedBuilding = nullptr;
         switch (entityType)

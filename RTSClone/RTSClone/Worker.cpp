@@ -198,8 +198,7 @@ void Worker::update(float deltaTime, const Map& map, FactionHandler& factionHand
 		assert(m_pathToPosition.empty() && !m_buildQueue.empty() && m_taskTimer.isActive());
 		if (m_taskTimer.isExpired())
 		{
-			const Entity* building = m_owningFaction.spawnBuilding(
-				map, m_buildQueue.front().position, m_buildQueue.front().entityType);
+			const Entity* building = m_owningFaction.createBuilding(map, *this);
 			m_buildQueue.pop_front();
 			if (!building)
 			{

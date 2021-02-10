@@ -310,15 +310,15 @@ Worker* FactionAI::getAvailableWorker(const glm::vec3& position)
 	return selectedWorker;
 }
 
-const Entity* FactionAI::spawnBuilding(const Map& map, glm::vec3 position, eEntityType entityType)
+const Entity* FactionAI::createBuilding(const Map& map, const Worker& worker)
 {
-	const Entity* spawnedBuilding = Faction::spawnBuilding(map, position, entityType);
+	const Entity* spawnedBuilding = Faction::createBuilding(map, worker);
 	if (spawnedBuilding)
 	{
 		return spawnedBuilding;
 	}
 
-	switch (entityType)
+	switch (worker.getBuildingCommands().front().entityType)
 	{
 	case eEntityType::SupplyDepot:
 		m_actionQueue.push(eActionType::BuildSupplyDepot);
