@@ -6,6 +6,7 @@ class Headquarters : public EntitySpawnerBuilding
 {
 public:
 	Headquarters(const glm::vec3& startingPosition, Faction& owningFaction);
+	~Headquarters();
 
 	void update(float deltaTime, const Map& map, FactionHandler& factionHandler);
 	bool addWorkerToSpawnQueue();

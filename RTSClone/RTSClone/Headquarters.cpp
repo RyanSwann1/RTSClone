@@ -21,6 +21,12 @@ Headquarters::Headquarters(const glm::vec3& startingPosition, Faction& owningFac
 		GameEvent::createAttachFactionToBase(owningFaction.getController(), m_position));
 }
 
+Headquarters::~Headquarters()
+{
+	GameEventHandler::getInstance().gameEvents.emplace(
+		GameEvent::createDetachFactionFromBase(m_owningFaction.getController(), m_position));
+}
+
 void Headquarters::update(float deltaTime, const Map& map, FactionHandler& factionHandler)
 {
 	EntitySpawnerBuilding::update(deltaTime, Globals::WORKER_RESOURCE_COST, Globals::WORKER_POPULATION_COST,
