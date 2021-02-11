@@ -3,8 +3,10 @@
 #include "ModelManager.h"
 #include "PathFinding.h"
 #include "FactionHandler.h"
-#include "GameEvents.h"
 #include "Level.h"
+#include "GameMessages.h"
+#include "GameMessenger.h"
+#include "GameEventHandler.h"
 #include <limits>
 
 //Levels
@@ -24,15 +26,15 @@
 
 namespace
 {
-	const float DELAY_TIMER_EXPIRATION = 7.5f;
+	const float DELAY_TIMER_EXPIRATION =  2.f;
 	const float IDLE_TIMER_EXPIRATION = 1.0f;
 	const float MIN_SPAWN_TIMER_EXPIRATION = 7.5f;
 	const float MAX_SPAWN_TIMER_EXPIRATION = 15.0f;
-	const int STARTING_WORKER_COUNT = 5;
+	const int STARTING_WORKER_COUNT = 1;
 	const int STARTING_UNIT_COUNT = 1;
 	const float MAX_DISTANCE_FROM_HQ = static_cast<float>(Globals::NODE_SIZE) * 18.0f;
-	const float MIN_DISTANCE_FROM_HQ = static_cast<float>(Globals::NODE_SIZE) * 3.0f;
-	const float DISTANCE_FROM_MINERALS = static_cast<float>(Globals::NODE_SIZE) * 6.0f;
+	const float MIN_DISTANCE_FROM_HQ = static_cast<float>(Globals::NODE_SIZE) * 5.0f;
+	const float DISTANCE_FROM_MINERALS = static_cast<float>(Globals::NODE_SIZE) * 7.0f;
 
 	const int MAX_WORKERS_REPAIR_BUILDING = 2;
 }
@@ -129,15 +131,11 @@ void FactionAI::handleEvent(const GameEvent& gameEvent, const Map& map, FactionH
 			{
 				return unit.getID() == entityID;
 			});
-			if (unit == m_units.end())
+			if (unit != m_units.end() && m_targetFaction != eFactionController::None)
 			{
-				break;
-			}
-
-			if (m_targetFaction != eFactionController::None)
-			{
+				assert(unit->getCurrentState() == eUnitState::Idle);
 				glm::vec3 destination = factionHandler.getFaction(m_targetFaction).getClosestHeadquarters(unit->getPosition()).getPosition();
-				unit->moveTo(destination, map, factionHandler, eUnitState::AttackMoving);
+				unit->moveTo(destination, map, factionHandler, eUnitState::AttackMoving);	
 			}
 		}
 		break;
@@ -147,16 +145,49 @@ void FactionAI::handleEvent(const GameEvent& gameEvent, const Map& map, FactionH
 			{
 				return worker.getID() == entityID;
 			});
-			if (worker == m_workers.end())
+			if (worker == m_workers.end() || worker->getCurrentState() != eWorkerState::Idle)
 			{
 				break;
 			}
-
-			const Base& nearestBase = m_baseHandler.getNearestBase(getClosestHeadquarters(worker->getPosition()).getPosition());
-			const Mineral* nearestMinreal = m_baseHandler.getNearestAvailableMineralAtBase(*this, nearestBase, worker->getPosition());
-			if (nearestMinreal)
+			bool actionCompleted = false;
+			if (!m_actionQueue.empty())
 			{
-				worker->moveTo(*nearestMinreal, map);
+				switch (m_actionQueue.front().actionType)
+				{
+				case eActionType::BuildBarracks:
+					if (build(map, eEntityType::Barracks, *worker))
+					{
+						m_actionQueue.pop();
+						actionCompleted = true;
+					}
+					break;
+				case eActionType::BuildSupplyDepot:
+					if (build(map, eEntityType::SupplyDepot, *worker))
+					{
+						m_actionQueue.pop();
+						actionCompleted = true;
+					}
+					break;
+				case eActionType::BuildTurret:
+					if (build(map, eEntityType::Turret, *worker))
+					{
+						m_actionQueue.pop();
+						actionCompleted = true;
+					}
+					break;
+				default:
+					assert(false);
+				}
+			}
+			if (!actionCompleted)
+			{
+				const Base& nearestBase = m_baseHandler.getNearestBase(getClosestHeadquarters(worker->getPosition()).getPosition());
+				const Mineral* nearestMineral = m_baseHandler.getNearestAvailableMineralAtBase(*this, nearestBase, worker->getPosition());
+				assert(nearestMineral);
+				if (nearestMineral)
+				{
+					worker->moveTo(*nearestMineral, map);
+				}
 			}
 		}
 		break;
@@ -194,38 +225,41 @@ void FactionAI::update(float deltaTime, const Map & map, FactionHandler& faction
 
 		if (!m_spawnQueue.empty())
 		{
+			if (!m_actionQueue.empty())
+			{
+				switch (m_actionQueue.front().actionType)
+				{
+				case eActionType::BuildBarracks:
+					if (build(map, eEntityType::Barracks))
+					{
+						m_actionQueue.pop();
+					}
+					break;
+				case eActionType::BuildSupplyDepot:
+					if (build(map, eEntityType::SupplyDepot))
+					{
+						m_actionQueue.pop();
+					}
+					break;
+				case eActionType::BuildTurret:
+					if (build(map, eEntityType::Turret))
+					{
+						m_actionQueue.pop();
+					}
+					break;
+				default:
+					assert(false);
+				}
+			}
+
 			switch (m_spawnQueue.front())
 			{
-			case eEntityType::Worker:
-				assert(!m_headquarters.empty());
-				if (m_headquarters.front().addWorkerToSpawnQueue())
-				{
-					m_spawnQueue.pop();
-				}
-				break;
 			case eEntityType::Unit:
-				if (!m_barracks.empty() && m_barracks.front().addUnitToSpawnQueue())
+			case eEntityType::Worker:
+				if (build(map, m_spawnQueue.front()))
 				{
 					m_spawnQueue.pop();
 				}
-				break;
-			default:
-				assert(false);
-			}
-		}
-
-		if (!m_actionQueue.empty())
-		{
-			switch (m_actionQueue.front().actionType)
-			{
-			case eActionType::BuildBarracks:
-				onBuild(map, eEntityType::Barracks, factionHandler);
-				break;
-			case eActionType::BuildSupplyDepot:
-				onBuild(map, eEntityType::SupplyDepot, factionHandler);
-				break;
-			case eActionType::BuildTurret:
-				onBuild(map, eEntityType::Turret, factionHandler);
 				break;
 			default:
 				assert(false);
@@ -263,12 +297,6 @@ void FactionAI::instructWorkersToRepair(const Headquarters& HQ, const Map& map)
 			worker.repairEntity(HQ, map);
 		}
 	}
-}
-
-const Mineral& FactionAI::getRandomMineral() const
-{
-	return m_currentBase.get().minerals[
-		Globals::getRandomNumber(0, static_cast<int>(m_currentBase.get().minerals.size()) - 1)];
 }
 
 Worker* FactionAI::getAvailableWorker(const glm::vec3& position)
@@ -313,108 +341,111 @@ Worker* FactionAI::getAvailableWorker(const glm::vec3& position)
 const Entity* FactionAI::createBuilding(const Map& map, const Worker& worker)
 {
 	const Entity* spawnedBuilding = Faction::createBuilding(map, worker);
-	if (spawnedBuilding)
+	if (!spawnedBuilding)
 	{
-		return spawnedBuilding;
+		switch (worker.getBuildingCommands().front().entityType)
+		{
+		case eEntityType::SupplyDepot:
+			m_actionQueue.push(eActionType::BuildSupplyDepot);
+			break;
+		case eEntityType::Barracks:
+			m_actionQueue.push(eActionType::BuildBarracks);
+			break;
+		case eEntityType::Turret:
+			m_actionQueue.push(eActionType::BuildTurret);
+			break;
+		default:
+			assert(false);
+		}
 	}
 
-	switch (worker.getBuildingCommands().front().entityType)
-	{
-	case eEntityType::SupplyDepot:
-		m_actionQueue.push(eActionType::BuildSupplyDepot);
-		break;
-	case eEntityType::Barracks:
-		m_actionQueue.push(eActionType::BuildBarracks);
-		break;
-	case eEntityType::Turret:
-		m_actionQueue.push(eActionType::BuildTurret);
-		break;
-	default:
-		assert(false);
-	}
-
-	return nullptr;
+	return spawnedBuilding;
 }
 
 const Entity* FactionAI::createUnit(const Map& map, const EntitySpawnerBuilding& building, FactionHandler& factionHandler)
 {
 	const Entity* spawnedUnit = Faction::createUnit(map, building, factionHandler);
-	if (spawnedUnit)
+	if (!spawnedUnit)
 	{
-		return spawnedUnit;
+		m_spawnQueue.push(eEntityType::Unit);
 	}
 
-	m_spawnQueue.push(eEntityType::Unit);
-	return nullptr;
+	return spawnedUnit;
 }
 
 Entity* FactionAI::createWorker(const Map& map, const EntitySpawnerBuilding& building)
 {
 	Entity* spawnedWorker = Faction::createWorker(map, building);
-	if (spawnedWorker)
+	if (!spawnedWorker)
 	{
-		Worker& worker = static_cast<Worker&>((*spawnedWorker));
-		const Base& nearestBase = m_baseHandler.getNearestBase(building.getPosition());
-		const Mineral* nearestMineral = m_baseHandler.getNearestAvailableMineralAtBase(*this, nearestBase, worker.getPosition());
-		if (nearestMineral)
-		{
-			worker.moveTo(*nearestMineral, map);
-		}
-
-		return spawnedWorker;
+		m_spawnQueue.push(eEntityType::Worker);
 	}
 
-	m_spawnQueue.push(eEntityType::Worker);
-	return nullptr;
+	return spawnedWorker;
 }
 
-void FactionAI::onBuild(const Map& map, eEntityType entityTypeToBuild, FactionHandler& factionHandler)
+bool FactionAI::build(const Map& map, eEntityType entityType)
 {
-	switch (entityTypeToBuild)
+	assert(!m_headquarters.empty());
+	if (!isAffordable(entityType))
+	{
+		return false;
+	}
+
+	switch (entityType)
 	{
 	case eEntityType::Barracks:
 	case eEntityType::SupplyDepot:
-		if (!m_workers.empty())
-		{
-			glm::vec3 buildPosition(0.0f);
-			if (isAffordable(entityTypeToBuild) &&
-				PathFinding::getInstance().isBuildingSpawnAvailable(m_headquarters.front().getPosition(),
-					ModelManager::getInstance().getModel(BARRACKS_MODEL_NAME), map, buildPosition,
-					MIN_DISTANCE_FROM_HQ, MAX_DISTANCE_FROM_HQ, DISTANCE_FROM_MINERALS, *this))
-			{
-				Worker* availableWorker = getAvailableWorker(buildPosition);
-				assert(availableWorker);
-				if (availableWorker && instructWorkerToBuild(entityTypeToBuild, buildPosition, map, *availableWorker))
-				{
-					m_actionQueue.pop();
-				}
-			}
-		}
-		break;
 	case eEntityType::Turret:
-		if (!m_workers.empty() && isAffordable(entityTypeToBuild))
+	{
+		glm::vec3 buildPosition(0.0f);
+		if (PathFinding::getInstance().isBuildingSpawnAvailable(m_headquarters.front().getPosition(),
+			entityType, map, buildPosition, *this))
 		{
-			glm::vec3 buildPosition(0.0f);
-			if(isAffordable(entityTypeToBuild) &&
-				PathFinding::getInstance().isBuildingSpawnAvailable(m_headquarters.front().getPosition(), 
-				ModelManager::getInstance().getModel(TURRET_MODEL_NAME), map, buildPosition, 
-				MIN_DISTANCE_FROM_HQ, MAX_DISTANCE_FROM_HQ, DISTANCE_FROM_MINERALS, *this))
+			Worker* availableWorker = getAvailableWorker(buildPosition);
+			if (availableWorker)
 			{
-				const Faction& opposingFaction = factionHandler.getRandomOpposingFaction(getController());
-				if (Globals::getSqrDistance(opposingFaction.getMainHeadquartersPosition(), buildPosition) <=
-					Globals::getSqrDistance(opposingFaction.getMainHeadquartersPosition(), m_headquarters.front().getPosition()))
-				{
-					Worker* availableWorker = getAvailableWorker(buildPosition);
-					assert(availableWorker);
-					if (availableWorker && instructWorkerToBuild(entityTypeToBuild, buildPosition, map, *availableWorker))
-					{
-						m_actionQueue.pop();
-					}
-				}
+				return instructWorkerToBuild(entityType, buildPosition, map, *availableWorker);
 			}
 		}
+	}
 		break;
+	case eEntityType::Unit:
+		return !m_barracks.empty() && m_barracks.front().addUnitToSpawnQueue();
+	case eEntityType::Worker:
+		return m_headquarters.front().addWorkerToSpawnQueue();
 	default:
 		assert(false);
 	}
+
+	return false;
+}
+
+bool FactionAI::build(const Map& map, eEntityType entityType, Worker& worker)
+{
+	assert(!m_headquarters.empty());
+	if (!isAffordable(entityType))
+	{
+		return false;
+	}
+
+	switch (entityType)
+	{
+	case eEntityType::Barracks:
+	case eEntityType::SupplyDepot:
+	case eEntityType::Turret:
+	{
+		glm::vec3 buildPosition(0.0f);
+		if (PathFinding::getInstance().isBuildingSpawnAvailable(m_headquarters.front().getPosition(),
+			entityType, map, buildPosition, *this))
+		{
+			return instructWorkerToBuild(entityType, buildPosition, map, worker);
+		}
+	}
+	break;
+	default:
+		assert(false);
+	}
+
+	return false;
 }

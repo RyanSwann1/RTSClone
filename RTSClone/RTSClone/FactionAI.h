@@ -48,11 +48,10 @@ private:
 
 	bool instructWorkerToBuild(eEntityType entityType, const glm::vec3& position, const Map& map, Worker& worker);
 	void instructWorkersToRepair(const Headquarters& HQ, const Map& map);
-	const Mineral& getRandomMineral() const;
 	Worker* getAvailableWorker(const glm::vec3& position);
-	
 	const Entity* createUnit(const Map& map, const EntitySpawnerBuilding& building, FactionHandler& factionHandler) override;
 	Entity* createWorker(const Map& map, const EntitySpawnerBuilding& building) override;
 
-	void onBuild(const Map& map, eEntityType entityTypeToBuild, FactionHandler& factionHandler);
+	bool build(const Map& map, eEntityType entityType);
+	bool build(const Map& map, eEntityType entityType, Worker& worker);
 };
