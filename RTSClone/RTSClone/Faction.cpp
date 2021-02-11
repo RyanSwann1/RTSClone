@@ -715,7 +715,7 @@ const Entity* Faction::createUnit(const Map& map, const EntitySpawnerBuilding& b
                 m_units, m_workers, map);
             glm::vec3 startingRotation = { 0.0f, Globals::getAngle(startingPosition, building.getPosition()), 0.0f };
             
-            m_units.emplace_back(*this, startingPosition, startingRotation);
+            m_units.emplace_back(*this, startingPosition, startingRotation, map);
         }
 
         reduceResources(eEntityType::Unit);
@@ -746,7 +746,7 @@ Entity* Faction::createWorker(const Map& map, const EntitySpawnerBuilding& build
                 building.getUnitSpawnPosition(), m_units, m_workers, map);
             glm::vec3 startingRotation = { 0.0f, Globals::getAngle(startingPosition, building.getPosition()), 0.0f };
 
-            m_workers.emplace_back(*this, startingPosition, startingRotation);
+            m_workers.emplace_back(*this, map, startingPosition, startingRotation);
         }
 
         reduceResources(eEntityType::Worker);

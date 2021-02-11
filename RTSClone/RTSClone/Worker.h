@@ -42,7 +42,7 @@ class Mineral;
 class Worker : public Entity
 {
 public:
-	Worker(Faction& owningFaction, const glm::vec3& startingPosition, const glm::vec3& startingRotation);
+	Worker(Faction& owningFaction, const Map& map, const glm::vec3& startingPosition, const glm::vec3& startingRotation);
 	Worker(Faction& owningFaction, const glm::vec3& startingPosition, const glm::vec3& destination, const Map& map);
 	
 	const Mineral* getMineralToHarvest() const;
@@ -80,5 +80,5 @@ private:
 	Mesh m_renderPathMesh;
 #endif // RENDER_PATHING
 
-	void switchTo(eWorkerState newState, const Mineral* mineralToHarvest = nullptr);
+	void switchTo(eWorkerState newState, const Map& map, const Mineral* mineralToHarvest = nullptr);
 };

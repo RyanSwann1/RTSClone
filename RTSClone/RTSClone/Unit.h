@@ -30,7 +30,7 @@ class FactionHandler;
 class Unit : public Entity
 {
 public:
-	Unit(const Faction& owningFaction, const glm::vec3& startingPosition, const glm::vec3& startingRotation);
+	Unit(const Faction& owningFaction, const glm::vec3& startingPosition, const glm::vec3& startingRotation, const Map& map);
 	Unit(const Faction& owningFaction, const glm::vec3& startingPosition, const glm::vec3& startingRotation,
 		const glm::vec3& destination, FactionHandler& FactionHandler, const Map& map);
 
@@ -64,5 +64,6 @@ private:
 	Mesh m_renderPathMesh;
 #endif // RENDER_PATHING
 
-	void switchToState(eUnitState newState, const Entity* targetEntity = nullptr, const Faction* targetFaction = nullptr);
+	void switchToState(eUnitState newState, const Map& map, 
+		const Entity* targetEntity = nullptr, const Faction* targetFaction = nullptr);
 };

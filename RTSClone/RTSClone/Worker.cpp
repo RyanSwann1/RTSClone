@@ -10,6 +10,8 @@
 #include "FactionHandler.h"
 #include "ShaderHandler.h"
 #include "Camera.h"
+#include "GameMessenger.h"
+#include "GameMessages.h"
 #ifdef RENDER_PATHING
 #include "RenderPathMesh.h"
 #endif // RENDER_PATHING
@@ -36,7 +38,7 @@ BuildingInWorkerQueue::BuildingInWorkerQueue(const glm::vec3& position, eEntityT
 {}
 
 //Worker
-Worker::Worker(Faction& owningFaction, const glm::vec3& startingPosition, const glm::vec3& startingRotation)
+Worker::Worker(Faction& owningFaction, const Map& map, const glm::vec3& startingPosition, const glm::vec3& startingRotation)
 	: Entity(ModelManager::getInstance().getModel(WORKER_MODEL_NAME), startingPosition, eEntityType::Worker, 
 		Globals::WORKER_STARTING_HEALTH, owningFaction.getCurrentShieldAmount(), startingRotation),
 	m_owningFaction(owningFaction),
@@ -47,7 +49,7 @@ Worker::Worker(Faction& owningFaction, const glm::vec3& startingPosition, const 
 	m_taskTimer(0.0f, false),
 	m_mineralToHarvest(nullptr)
 {
-	switchTo(eWorkerState::Idle);
+	switchTo(eWorkerState::Idle, map);
 }
 
 Worker::Worker(Faction& owningFaction, const glm::vec3 & startingPosition, const glm::vec3 & destination, const Map & map)
@@ -109,13 +111,16 @@ bool Worker::build(const glm::vec3& buildPosition, const Map& map, eEntityType e
 	assert(map.isWithinBounds(buildPosition) && !map.isPositionOccupied(buildPosition));
 	if (!m_owningFaction.isCollidingWithWorkerBuildQueue(ModelManager::getInstance().getModelAABB(buildPosition, entityType)))
 	{
-		m_buildQueue.emplace_back(buildPosition, entityType);
-		if (m_buildQueue.size() == 1)
+		if (m_buildQueue.empty())
 		{
-			moveTo(m_buildQueue.back().position, map, eWorkerState::MovingToBuildingPosition);
+			moveTo(buildPosition, map, eWorkerState::MovingToBuildingPosition);
 		}
 
-		return true;
+		if (m_currentState == eWorkerState::MovingToBuildingPosition)
+		{
+			m_buildQueue.emplace_back(buildPosition, entityType);
+			return true;
+		}
 	}
 
 	return false;
@@ -140,18 +145,19 @@ void Worker::update(float deltaTime, const Map& map, FactionHandler& factionHand
 	switch (m_currentState)
 	{
 	case eWorkerState::Idle:
-		assert(m_pathToPosition.empty());
+		assert(m_pathToPosition.empty() &&
+			m_owningFaction.getController() == eFactionController::Player);
 		break;
 	case eWorkerState::Moving:
 		if (m_pathToPosition.empty())
 		{
-			switchTo(eWorkerState::Idle);
+			switchTo(eWorkerState::Idle, map);
 		}
 		break;
 	case eWorkerState::MovingToMinerals:
 		if (m_pathToPosition.empty())
 		{
-			switchTo(eWorkerState::Harvesting);
+			switchTo(eWorkerState::Harvesting, map);
 		}
 		break;
 	case eWorkerState::ReturningMineralsToHeadquarters:
@@ -165,7 +171,7 @@ void Worker::update(float deltaTime, const Map& map, FactionHandler& factionHand
 			}
 			else
 			{
-				switchTo(eWorkerState::Idle);
+				switchTo(eWorkerState::Idle, map);
 			}
 		}
 		break;
@@ -191,7 +197,7 @@ void Worker::update(float deltaTime, const Map& map, FactionHandler& factionHand
 		assert(!m_buildQueue.empty());
 		if (m_pathToPosition.empty())
 		{
-			switchTo(eWorkerState::Building);
+			switchTo(eWorkerState::Building, map);
 		}
 		break;
 	case eWorkerState::Building:
@@ -203,7 +209,7 @@ void Worker::update(float deltaTime, const Map& map, FactionHandler& factionHand
 			if (!building)
 			{
 				m_buildQueue.clear();
-				switchTo(eWorkerState::Idle);
+				switchTo(eWorkerState::Idle, map);
 			}
 			else if (!m_buildQueue.empty())
 			{
@@ -219,7 +225,7 @@ void Worker::update(float deltaTime, const Map& map, FactionHandler& factionHand
 	case eWorkerState::MovingToRepairPosition:
 		if (m_pathToPosition.empty())
 		{
-			switchTo(eWorkerState::Repairing);
+			switchTo(eWorkerState::Repairing, map);
 		}
 		break;
 	case eWorkerState::Repairing:
@@ -246,7 +252,7 @@ void Worker::update(float deltaTime, const Map& map, FactionHandler& factionHand
 			}
 			else
 			{
-				switchTo(eWorkerState::Idle);
+				switchTo(eWorkerState::Idle, map);
 			}
 		}
 		else if (unitStateHandlerTimer.isExpired())
@@ -266,7 +272,7 @@ void Worker::update(float deltaTime, const Map& map, FactionHandler& factionHand
 			}
 			else
 			{
-				switchTo(eWorkerState::Idle);
+				switchTo(eWorkerState::Idle, map);
 			}
 		}
 		break;
@@ -288,18 +294,18 @@ void Worker::moveTo(const Mineral& mineral, const Map& map)
 		[&](const glm::ivec2& position) { return getAdjacentPositions(position, map); }, map, m_owningFaction);
 	if (!m_pathToPosition.empty())
 	{
-		switchTo(eWorkerState::MovingToMinerals, &mineral);
+		switchTo(eWorkerState::MovingToMinerals, map, &mineral);
 	}
 	else
 	{
 		if (previousDestination != m_position)
 		{
 			m_pathToPosition.push_back(previousDestination);
-			switchTo(eWorkerState::Moving);
+			switchTo(eWorkerState::Moving, map);
 		}
 		else
 		{
-			switchTo(eWorkerState::Idle);
+			switchTo(eWorkerState::Idle, map);
 		}
 	}
 }
@@ -312,18 +318,18 @@ void Worker::moveTo(const Entity& target, const Map& map, eWorkerState state)
 		[&](const glm::ivec2& position) { return getAdjacentPositions(position, map); }, map, m_owningFaction);
 	if (!m_pathToPosition.empty())
 	{
-		switchTo(state);
+		switchTo(state, map);
 	}
 	else
 	{
 		if (previousDestination != m_position)
 		{
 			m_pathToPosition.push_back(previousDestination);
-			switchTo(state);
+			switchTo(state, map);
 		}
 		else
 		{
-			switchTo(eWorkerState::Idle);
+			switchTo(eWorkerState::Idle, map);
 		}
 	}
 }
@@ -336,18 +342,18 @@ void Worker::moveTo(const glm::vec3& destination, const Map& map, eWorkerState s
 		[&](const glm::ivec2& position) { return getAdjacentPositions(position, map); }, map, m_owningFaction); 
 	if (!m_pathToPosition.empty())
 	{
-		switchTo(state);
+		switchTo(state, map);
 	}
 	else
 	{
 		if (previousDestination != m_position)
 		{
 			m_pathToPosition.push_back(previousDestination);
-			switchTo(state);
+			switchTo(state, map);
 		}
 		else
 		{
-			switchTo(eWorkerState::Idle);
+			switchTo(eWorkerState::Idle, map);
 		}
 	}
 }
@@ -388,7 +394,7 @@ void Worker::renderPathMesh(ShaderHandler& shaderHandler)
 	RenderPathMesh::render(shaderHandler, m_pathToPosition, m_renderPathMesh);
 }
 
-void Worker::switchTo(eWorkerState newState, const Mineral* mineralToHarvest)
+void Worker::switchTo(eWorkerState newState, const Map& map, const Mineral* mineralToHarvest)
 {
 	//On Exit Current State
 	switch (m_currentState)
@@ -443,10 +449,12 @@ void Worker::switchTo(eWorkerState newState, const Mineral* mineralToHarvest)
 		assert(false);
 	}
 
+	
 	//On Enter New State
 	switch (newState)
 	{
 	case eWorkerState::Idle:
+		assert(m_buildQueue.empty());
 		GameEventHandler::getInstance().gameEvents.push(
 			GameEvent::createOnEnteredIdleState(m_owningFaction.getController(), getEntityType(), getID()));
 		m_taskTimer.setActive(false);
