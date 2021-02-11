@@ -2,6 +2,7 @@
 #include "Globals.h"
 #ifdef GAME
 #include "Faction.h"
+#include "GameEventHandler.h"
 #include <limits>
 #endif // GAME
 
@@ -18,8 +19,14 @@ namespace
 Base::Base(const glm::vec3& position, std::vector<Mineral>&& minerals)
 	: position(position),
 	minerals(std::move(minerals)),
-	quad(position, MAIN_BASE_QUAD_SIZE, MAIN_BASE_QUAD_COLOR, QUAD_OPACITY)
+	quad(position, MAIN_BASE_QUAD_SIZE, MAIN_BASE_QUAD_COLOR, QUAD_OPACITY),
+	owningFactionController(eFactionController::None)
 {}
+
+glm::vec3 Base::getConvertedPosition() const
+{
+	return Globals::convertToMiddleGridPosition(Globals::convertToNodePosition(position));
+}
 #endif // GAME
 
 #ifdef LEVEL_EDITOR
@@ -83,6 +90,17 @@ namespace
 		});
 
 		return sortedMinerals;
+	}
+
+	Base& getBase(std::vector<Base>& bases, const glm::vec3& position)
+	{
+		auto base = std::find_if(bases.begin(), bases.end(), [&position](const auto& base)
+		{
+			return base.getConvertedPosition() == position;
+		});
+		assert(base != bases.end());
+
+		return (*base);
 	}
 }
 
@@ -172,6 +190,20 @@ const Base& BaseHandler::getNearestBase(const glm::vec3& position) const
 
 	assert(closestBase);
 	return *closestBase;
+}
+
+void BaseHandler::handleEvent(const GameEvent& gameEvent)
+{
+	switch (gameEvent.type)
+	{
+	case eGameEventType::AttachFactionToBase:
+	{
+		Base& base = getBase(bases, gameEvent.data.attachFactionToBase.position);
+		assert(base.owningFactionController == eFactionController::None);
+		base.owningFactionController = gameEvent.data.attachFactionToBase.factionController;
+	}
+		break;
+	}
 }
 
 void BaseHandler::renderMinerals(ShaderHandler& shaderHandler) const

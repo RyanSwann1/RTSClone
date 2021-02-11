@@ -3,6 +3,9 @@
 #include "Mineral.h"
 #include <vector>
 #include "Quad.h"
+#ifdef GAME
+#include "FactionController.h"
+#endif // GAME
 
 struct Base
 {
@@ -10,6 +13,10 @@ struct Base
 	Base(const glm::vec3& position);
 #endif // LEVEL_EDITOR
 	Base(const glm::vec3& position, std::vector<Mineral>&& minerals);
+
+#ifdef GAME
+	glm::vec3 getConvertedPosition() const;
+#endif // GAME
 
 #ifdef LEVEL_EDITOR
 	void setPosition(const glm::vec3& position);
@@ -20,6 +27,7 @@ struct Base
 	std::vector<Mineral> minerals;
 #ifdef GAME
 	Quad quad;
+	eFactionController owningFactionController;
 #endif // GAME
 };
 
@@ -27,6 +35,7 @@ struct Base
 #include "NonMovable.h"
 class ShaderHandler;
 class Faction;
+struct GameEvent;
 struct BaseHandler : private NonCopyable, private NonMovable
 {
 	BaseHandler(std::vector<Base>&& bases);
@@ -37,9 +46,10 @@ struct BaseHandler : private NonCopyable, private NonMovable
 	const Base* getBaseAtMineral(const glm::vec3& position) const;
 	const Base& getNearestBase(const glm::vec3& position) const;
 
+	void handleEvent(const GameEvent& gameEvent);
 	void renderMinerals(ShaderHandler& shaderHandler) const;
 	void renderBasePositions(ShaderHandler& shaderHandler) const;
 
-	const std::vector<Base> bases;
+	std::vector<Base> bases;
 };
 #endif // GAME
