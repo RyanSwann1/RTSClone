@@ -34,6 +34,17 @@ GameEvent_5::GameEvent_5(eFactionController senderFaction, int senderID, eFactio
 	destination(endingPosition)
 {}
 
+GameEvent_6::GameEvent_6(eFactionController factionController, eEntityType entityType, int entityID)
+	: factionController(factionController),
+	entityType(entityType),
+	entityID(entityID)
+{}
+
+GameEvent_7::GameEvent_7(eFactionController factionController, const glm::vec3& position)
+	: factionController(factionController),
+	position(position)
+{}
+
 GameEvent GameEvent::createRevalidateMovementPaths()
 {
 	return { eGameEventType::RevalidateMovementPaths, RevalidateMovementPathsEvent{} };
@@ -57,6 +68,11 @@ GameEvent GameEvent::createPlayerActivatePlannedBuilding(eEntityType entityType,
 GameEvent GameEvent::createOnEnteredIdleState(eFactionController factionController, eEntityType entityType, int targetID)
 {
 	return { eGameEventType::OnEnteredIdleState, OnEnteredIdleStateEvent{factionController, entityType, targetID} };
+}
+
+GameEvent GameEvent::createAttachFactionToBase(eFactionController factionController, const glm::vec3& position)
+{
+	return { eGameEventType::AttachFactionToBase, AttachFactionToBaseEvent{factionController, position} };
 }
 
 GameEvent GameEvent::createEliminateFaction(eFactionController factionController)
@@ -91,9 +107,3 @@ GameEvent GameEvent::createSpawnProjectile(eFactionController senderFaction, int
 	return { eGameEventType::SpawnProjectile,
 		SpawnProjectileEvent{senderFaction, senderID, targetFaction, targetID, damage, startingPosition, endingPosition} };
 }
-
-GameEvent_6::GameEvent_6(eFactionController factionController, eEntityType entityType, int entityID)
-	: factionController(factionController),
-	entityType(entityType),
-	entityID(entityID)
-{}
