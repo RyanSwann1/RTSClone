@@ -204,6 +204,7 @@ void Level::update(float deltaTime, const Map& map, UIManager& uiManager)
 	{
 		const GameEvent& gameEvent = gameEvents.front();
 		handleEvent(gameEvent, map);
+		m_baseHandler->handleEvent(gameEvent);
 		uiManager.handleEvent(gameEvent);
 
 		gameEvents.pop();

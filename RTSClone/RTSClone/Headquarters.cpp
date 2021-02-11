@@ -2,6 +2,7 @@
 #include "ModelManager.h"
 #include "Globals.h"
 #include "Faction.h"
+#include "GameEventHandler.h"
 
 namespace
 {
@@ -15,7 +16,10 @@ Headquarters::Headquarters(const glm::vec3& startingPosition, Faction& owningFac
 	: EntitySpawnerBuilding(startingPosition, eEntityType::Headquarters, TIME_BETWEEN_WORKER_SPAWN,
 		Globals::HQ_STARTING_HEALTH, owningFaction, ModelManager::getInstance().getModel(HQ_MODEL_NAME),
 		MAX_WORKERS_IN_SPAWN_QUEUE)
-{}
+{
+	GameEventHandler::getInstance().gameEvents.emplace(
+		GameEvent::createAttachFactionToBase(owningFaction.getController(), m_position));
+}
 
 void Headquarters::update(float deltaTime, const Map& map, FactionHandler& factionHandler)
 {
