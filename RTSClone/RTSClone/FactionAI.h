@@ -22,7 +22,7 @@ struct AIAction
 };
 
 struct Base;
-struct BaseHandler;
+class BaseHandler;
 class FactionHandler;
 class FactionAI : public Faction
 {

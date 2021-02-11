@@ -36,10 +36,12 @@ struct Base
 class ShaderHandler;
 class Faction;
 struct GameEvent;
-struct BaseHandler : private NonCopyable, private NonMovable
+class BaseHandler : private NonCopyable, private NonMovable
 {
-	BaseHandler(std::vector<Base>&& bases);
+public:
+	BaseHandler(std::vector<Base>&& m_bases);
 
+	const std::vector<Base>& getBases() const;
 	const Mineral* getNearestAvailableMineralAtBase(const Faction& faction, const Base& base, const glm::vec3& position) const;
 	const Mineral* getNearestAvailableMineralAtBase(const Faction& faction, const Mineral& mineral, const glm::vec3& position) const;
 	const Mineral* getMineral(const glm::vec3& position) const;
@@ -50,6 +52,7 @@ struct BaseHandler : private NonCopyable, private NonMovable
 	void renderMinerals(ShaderHandler& shaderHandler) const;
 	void renderBasePositions(ShaderHandler& shaderHandler) const;
 
-	std::vector<Base> bases;
+private:
+	std::vector<Base> m_bases;
 };
 #endif // GAME

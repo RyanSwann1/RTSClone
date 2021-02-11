@@ -57,9 +57,9 @@ void Base::setPosition(const glm::vec3 & _position)
 #ifdef GAME
 namespace
 {
-	const Base& getBase(const std::vector<Base>& bases, const Mineral& _mineral)
+	const Base& getBase(const std::vector<Base>& m_bases, const Mineral& _mineral)
 	{
-		for (const auto& base : bases)
+		for (const auto& base : m_bases)
 		{
 			for (const auto& mineral : base.minerals)
 			{
@@ -92,23 +92,28 @@ namespace
 		return sortedMinerals;
 	}
 
-	Base& getBase(std::vector<Base>& bases, const glm::vec3& position)
+	Base& getBase(std::vector<Base>& m_bases, const glm::vec3& position)
 	{
-		auto base = std::find_if(bases.begin(), bases.end(), [&position](const auto& base)
+		auto base = std::find_if(m_bases.begin(), m_bases.end(), [&position](const auto& base)
 		{
 			return base.getConvertedPosition() == position;
 		});
-		assert(base != bases.end());
+		assert(base != m_bases.end());
 
 		return (*base);
 	}
 }
 
-BaseHandler::BaseHandler(std::vector<Base>&& bases)
-	: bases(std::move(bases))
+BaseHandler::BaseHandler(std::vector<Base>&& m_bases)
+	: m_bases(std::move(m_bases))
 {}
 
-const Mineral* BaseHandler::getNearestAvailableMineralAtBase(const Faction& faction, const Base& base, 
+const std::vector<Base>& BaseHandler::getBases() const
+{
+	return m_bases;
+}
+
+const Mineral* BaseHandler::getNearestAvailableMineralAtBase(const Faction& faction, const Base& base,
 	const glm::vec3& position) const
 {
 	std::array<const Mineral*, Globals::MAX_MINERALS> minerals = getClosestMinerals(base.minerals, position);
@@ -128,7 +133,7 @@ const Mineral* BaseHandler::getNearestAvailableMineralAtBase(const Faction& fact
 	const glm::vec3& position) const
 {
 	assert(faction.isMineralInUse(_mineral));
-	std::array<const Mineral*, Globals::MAX_MINERALS> minerals = getClosestMinerals(getBase(bases, _mineral).minerals, position);
+	std::array<const Mineral*, Globals::MAX_MINERALS> minerals = getClosestMinerals(getBase(m_bases, _mineral).minerals, position);
 	for (const auto& mineral : minerals)
 	{
 		assert(mineral);
@@ -144,7 +149,7 @@ const Mineral* BaseHandler::getNearestAvailableMineralAtBase(const Faction& fact
 
 const Mineral* BaseHandler::getMineral(const glm::vec3 & position) const
 {
-	for (const auto& base : bases)
+	for (const auto& base : m_bases)
 	{
 		for (const auto& mineral : base.minerals)
 		{
@@ -160,7 +165,7 @@ const Mineral* BaseHandler::getMineral(const glm::vec3 & position) const
 
 const Base* BaseHandler::getBaseAtMineral(const glm::vec3& position) const
 {
-	for (const auto& base : bases)
+	for (const auto& base : m_bases)
 	{
 		for (const auto& mineral : base.minerals)
 		{
@@ -178,7 +183,7 @@ const Base& BaseHandler::getNearestBase(const glm::vec3& position) const
 {
 	float closestDistance = std::numeric_limits<float>::max();
 	const Base* closestBase = nullptr;
-	for (const auto& base : bases)
+	for (const auto& base : m_bases)
 	{
 		float distance = Globals::getSqrDistance(base.position, position);
 		if (distance < closestDistance)
@@ -198,14 +203,14 @@ void BaseHandler::handleEvent(const GameEvent& gameEvent)
 	{
 	case eGameEventType::AttachFactionToBase:
 	{
-		Base& base = getBase(bases, gameEvent.data.attachFactionToBase.position);
+		Base& base = getBase(m_bases, gameEvent.data.attachFactionToBase.position);
 		assert(base.owningFactionController == eFactionController::None);
 		base.owningFactionController = gameEvent.data.attachFactionToBase.factionController;
 	}
 		break;
 	case eGameEventType::DetachFactionFromBase:
 	{
-		Base& base = getBase(bases, gameEvent.data.attachFactionToBase.position);
+		Base& base = getBase(m_bases, gameEvent.data.attachFactionToBase.position);
 		assert(base.owningFactionController == gameEvent.data.detachFactionFromBase.factionController);
 		base.owningFactionController = eFactionController::None;
 	}
@@ -215,7 +220,7 @@ void BaseHandler::handleEvent(const GameEvent& gameEvent)
 
 void BaseHandler::renderMinerals(ShaderHandler& shaderHandler) const
 {
-	for (const auto& base : bases)
+	for (const auto& base : m_bases)
 	{
 		for (const auto& mineral : base.minerals)
 		{
@@ -226,9 +231,12 @@ void BaseHandler::renderMinerals(ShaderHandler& shaderHandler) const
 
 void BaseHandler::renderBasePositions(ShaderHandler& shaderHandler) const
 {
-	for (const auto& base : bases)
+	for (const auto& base : m_bases)
 	{
-		base.quad.render(shaderHandler);
+		if (base.owningFactionController == eFactionController::None)
+		{
+			base.quad.render(shaderHandler);
+		}
 	}
 }
 #endif // GAME

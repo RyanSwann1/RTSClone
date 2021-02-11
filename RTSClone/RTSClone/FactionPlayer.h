@@ -4,7 +4,7 @@
 #include "EntitySelector.h"
 #include <SFML/Graphics.hpp>
 
-struct BaseHandler;
+class BaseHandler;
 struct Camera;
 struct PlayerActivatePlannedBuildingEvent;
 class FactionPlayerPlannedBuilding : private NonCopyable, private NonMovable

@@ -90,7 +90,7 @@ std::unique_ptr<Level> Level::create(const std::string& levelName, Camera& camer
 	std::array<std::unique_ptr<Faction>, static_cast<size_t>(eFactionController::Max) + 1> factions;
 	
 	assert(factionCount < static_cast<int>(eFactionController::Max) + 1 && 
-		factionCount < static_cast<int>(baseHandler->bases.size()));
+		factionCount < static_cast<int>(baseHandler->getBases().size()));
 	for (int i = 0; i < factionCount; ++i)
 	{
 		assert(!factions[i]);
@@ -98,7 +98,7 @@ std::unique_ptr<Level> Level::create(const std::string& levelName, Camera& camer
 		{
 		case eFactionController::Player:
 		{
-			factions[i] = std::make_unique<FactionPlayer>(baseHandler->bases[i].position,
+			factions[i] = std::make_unique<FactionPlayer>(baseHandler->getBases()[i].position,
 				factionStartingResources, factionStartingPopulation);
 
 			const glm::vec3& headquartersPosition = factions[i]->getMainHeadquartersPosition();
@@ -108,8 +108,8 @@ std::unique_ptr<Level> Level::create(const std::string& levelName, Camera& camer
 		case eFactionController::AI_1:
 		case eFactionController::AI_2:
 		case eFactionController::AI_3:
-			factions[i] = std::make_unique<FactionAI>(eFactionController(i), baseHandler->bases[i].position,
-				factionStartingResources, factionStartingPopulation, baseHandler->bases[i], *baseHandler);
+			factions[i] = std::make_unique<FactionAI>(eFactionController(i), baseHandler->getBases()[i].position,
+				factionStartingResources, factionStartingPopulation, baseHandler->getBases()[i], *baseHandler);
 			break;
 		default:
 			assert(false);

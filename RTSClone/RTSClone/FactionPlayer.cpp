@@ -137,7 +137,7 @@ bool FactionPlayerPlannedBuilding::isOnValidPosition(const BaseHandler& baseHand
         {
         case eEntityType::Headquarters:
         {
-            for (const auto& base : baseHandler.bases)
+            for (const auto& base : baseHandler.getBases())
             {
                 if (base.getConvertedPosition() == m_position)
                 {
