@@ -139,15 +139,13 @@ bool FactionPlayerPlannedBuilding::isOnValidPosition(const BaseHandler& baseHand
         {
             for (const auto& base : baseHandler.bases)
             {
-                for (const auto& mineral : base.minerals)
+                if (base.getConvertedPosition() == m_position)
                 {
-                    if (Globals::getSqrDistance(mineral.getPosition(), m_position) <=
-                        Globals::MINIMUM_HQ_DISTANCE_FROM_MINERALS)
-                    {
-                        return false;
-                    }
+                    return true;
                 }
             }
+            
+            return false;
         }
         default:
             return true;
