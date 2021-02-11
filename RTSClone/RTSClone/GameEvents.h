@@ -17,7 +17,8 @@ enum class eGameEventType
 	ResetTargetEntityGUI,
 	IncreaseFactionShield,
 	OnEnteredIdleState,
-	AttachFactionToBase
+	AttachFactionToBase,
+	DetachFactionFromBase
 };
 
 struct GameEvent_0
@@ -136,6 +137,11 @@ struct AttachFactionToBaseEvent : public GameEvent_7
 	AttachFactionToBaseEvent(eFactionController factionController, const glm::vec3& position)
 		: GameEvent_7(factionController, position) {}
 };
+struct DetachFactionFromBaseEvent : public GameEvent_7
+{
+	DetachFactionFromBaseEvent(eFactionController factionController, const glm::vec3& position)
+		: GameEvent_7(factionController, position) {}
+};
 
 union GameEvents
 {
@@ -151,6 +157,7 @@ union GameEvents
 	SpawnProjectileEvent					spawnProjectile;
 	OnEnteredIdleStateEvent					onEnteredIdleState;
 	AttachFactionToBaseEvent				attachFactionToBase;
+	DetachFactionFromBaseEvent				detachFactionFromBase;
 
 	GameEvents(RevalidateMovementPathsEvent gameEvent) :			revalidateMovementPaths(gameEvent) {}
 	GameEvents(ResetTargetEntityGUIEvent gameEvent) :				resetTargetEntityGUI(gameEvent) {}
@@ -164,6 +171,7 @@ union GameEvents
 	GameEvents(const SpawnProjectileEvent& gameEvent) :				spawnProjectile(gameEvent) {}
 	GameEvents(const OnEnteredIdleStateEvent& gameEvent) :			onEnteredIdleState(gameEvent) {}
 	GameEvents(const AttachFactionToBaseEvent& gameEvent) :			attachFactionToBase(gameEvent) {}
+	GameEvents(const DetachFactionFromBaseEvent& gameEvent) :		detachFactionFromBase(gameEvent) {}
 };
 
 struct GameEvent
@@ -199,6 +207,7 @@ struct GameEvent
 
 	//GameEvent_7
 	static GameEvent createAttachFactionToBase(eFactionController factionController, const glm::vec3& position);
+	static GameEvent createDetachFactionFromBase(eFactionController factionController, const glm::vec3& position);
 
 	eGameEventType type;
 	GameEvents data;

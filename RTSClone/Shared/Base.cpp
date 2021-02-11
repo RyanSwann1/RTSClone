@@ -203,6 +203,13 @@ void BaseHandler::handleEvent(const GameEvent& gameEvent)
 		base.owningFactionController = gameEvent.data.attachFactionToBase.factionController;
 	}
 		break;
+	case eGameEventType::DetachFactionFromBase:
+	{
+		Base& base = getBase(bases, gameEvent.data.attachFactionToBase.position);
+		assert(base.owningFactionController == gameEvent.data.detachFactionFromBase.factionController);
+		base.owningFactionController = eFactionController::None;
+	}
+		break;
 	}
 }
 

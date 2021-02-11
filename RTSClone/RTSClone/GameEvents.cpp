@@ -75,6 +75,11 @@ GameEvent GameEvent::createAttachFactionToBase(eFactionController factionControl
 	return { eGameEventType::AttachFactionToBase, AttachFactionToBaseEvent{factionController, position} };
 }
 
+GameEvent GameEvent::createDetachFactionFromBase(eFactionController factionController, const glm::vec3& position)
+{
+	return { eGameEventType::DetachFactionFromBase, AttachFactionToBaseEvent{factionController, position} };
+}
+
 GameEvent GameEvent::createEliminateFaction(eFactionController factionController)
 {
 	return { eGameEventType::EliminateFaction, EliminateFactionEvent{factionController} };
