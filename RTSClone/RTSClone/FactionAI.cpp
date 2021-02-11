@@ -336,9 +336,9 @@ const Entity* FactionAI::createBuilding(const Map& map, const Worker& worker)
 	return nullptr;
 }
 
-const Entity* FactionAI::spawnUnit(const Map& map, const EntitySpawnerBuilding& building, FactionHandler& factionHandler)
+const Entity* FactionAI::createUnit(const Map& map, const EntitySpawnerBuilding& building, FactionHandler& factionHandler)
 {
-	const Entity* spawnedUnit = Faction::spawnUnit(map, building, factionHandler);
+	const Entity* spawnedUnit = Faction::createUnit(map, building, factionHandler);
 	if (spawnedUnit)
 	{
 		return spawnedUnit;
@@ -348,9 +348,9 @@ const Entity* FactionAI::spawnUnit(const Map& map, const EntitySpawnerBuilding& 
 	return nullptr;
 }
 
-Entity* FactionAI::spawnWorker(const Map& map, const EntitySpawnerBuilding& building)
+Entity* FactionAI::createWorker(const Map& map, const EntitySpawnerBuilding& building)
 {
-	Entity* spawnedWorker = Faction::spawnWorker(map, building);
+	Entity* spawnedWorker = Faction::createWorker(map, building);
 	if (spawnedWorker)
 	{
 		Worker& worker = static_cast<Worker&>((*spawnedWorker));

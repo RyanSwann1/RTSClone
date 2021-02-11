@@ -663,8 +663,9 @@ void Faction::revalidateExistingUnitPaths(const Map& map, FactionHandler& factio
             case eWorkerState::Moving:
             case eWorkerState::ReturningMineralsToHeadquarters:
             case eWorkerState::MovingToBuildingPosition:
+            case eWorkerState::MovingToRepairPosition:
                 assert(!worker.getPathToPosition().empty());
-                worker.moveTo(worker.getPathToPosition().front(), map);
+                worker.moveTo(worker.getPathToPosition().front(), map, worker.getCurrentState());
                 break;
             case eWorkerState::MovingToMinerals:
                 assert(worker.getMineralToHarvest());
@@ -673,7 +674,6 @@ void Faction::revalidateExistingUnitPaths(const Map& map, FactionHandler& factio
             case eWorkerState::Idle:
             case eWorkerState::Harvesting:
             case eWorkerState::Building:
-            case eWorkerState::MovingToRepairPosition:
             case eWorkerState::Repairing:
                 break;
             default:
@@ -697,7 +697,7 @@ bool Faction::isMineralInUse(const Mineral& mineral) const
     return false;
 }
 
-const Entity* Faction::spawnUnit(const Map& map, const EntitySpawnerBuilding& building, FactionHandler& factionHandler)
+const Entity* Faction::createUnit(const Map& map, const EntitySpawnerBuilding& building, FactionHandler& factionHandler)
 {
     if (isAffordable(eEntityType::Unit) && !isExceedPopulationLimit(eEntityType::Unit))
     {
@@ -728,7 +728,7 @@ const Entity* Faction::spawnUnit(const Map& map, const EntitySpawnerBuilding& bu
     return nullptr;
 }
 
-Entity* Faction::spawnWorker(const Map& map, const EntitySpawnerBuilding& building)
+Entity* Faction::createWorker(const Map& map, const EntitySpawnerBuilding& building)
 {
     if (isAffordable(eEntityType::Worker) && !isExceedPopulationLimit(eEntityType::Worker))
     {

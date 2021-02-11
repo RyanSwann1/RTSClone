@@ -51,8 +51,8 @@ private:
 	const Mineral& getRandomMineral() const;
 	Worker* getAvailableWorker(const glm::vec3& position);
 	
-	const Entity* spawnUnit(const Map& map, const EntitySpawnerBuilding& building, FactionHandler& factionHandler) override;
-	Entity* spawnWorker(const Map& map, const EntitySpawnerBuilding& building) override;
+	const Entity* createUnit(const Map& map, const EntitySpawnerBuilding& building, FactionHandler& factionHandler) override;
+	Entity* createWorker(const Map& map, const EntitySpawnerBuilding& building) override;
 
 	void onBuild(const Map& map, eEntityType entityTypeToBuild, FactionHandler& factionHandler);
 };

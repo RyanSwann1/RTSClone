@@ -49,5 +49,5 @@ void Barracks::renderProgressBar(ShaderHandler& shaderHandler, const Camera& cam
 
 const Entity* Barracks::spawnEntity(const Map& map, FactionHandler& factionHandler) const
 {
-	return m_owningFaction.spawnUnit(map, *this, factionHandler);
+	return m_owningFaction.createUnit(map, *this, factionHandler);
 }

@@ -49,5 +49,5 @@ void Headquarters::renderProgressBar(ShaderHandler& shaderHandler, const Camera&
 
 const Entity* Headquarters::spawnEntity(const Map& map, FactionHandler& factionHandler) const
 {
-	return m_owningFaction.spawnWorker(map, *this);
+	return m_owningFaction.createWorker(map, *this);
 }

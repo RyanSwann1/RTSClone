@@ -42,8 +42,8 @@ public:
 	const Entity* getEntity(const glm::vec3& position) const;
 
 	void addResources(Worker& worker);
-	virtual const Entity* spawnUnit(const Map& map, const EntitySpawnerBuilding& building, FactionHandler& factionHandler);
-	virtual Entity* spawnWorker(const Map& map, const EntitySpawnerBuilding& building);
+	virtual const Entity* createUnit(const Map& map, const EntitySpawnerBuilding& building, FactionHandler& factionHandler);
+	virtual Entity* createWorker(const Map& map, const EntitySpawnerBuilding& building);
 	virtual const Entity* createBuilding(const Map& map, const Worker& worker);
 	virtual void handleEvent(const GameEvent& gameEvent, const Map& map, FactionHandler& factionHandler);
 	virtual void update(float deltaTime, const Map& map, FactionHandler& factionHandler, const Timer& unitStateHandlerTimer);
