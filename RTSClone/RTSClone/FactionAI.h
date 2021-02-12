@@ -21,7 +21,7 @@ struct AIAction
 	glm::vec3 position;
 };
 
-struct Base;
+
 class BaseHandler;
 class FactionHandler;
 class FactionAI : public Faction

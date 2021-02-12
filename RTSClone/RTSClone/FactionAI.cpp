@@ -130,9 +130,10 @@ void FactionAI::handleEvent(const GameEvent& gameEvent, const Map& map, FactionH
 			{
 				return unit.getID() == entityID;
 			});
-			if (unit != m_units.end() && m_targetFaction != eFactionController::None)
+			if (unit != m_units.end() && 
+				unit->getCurrentState() == eUnitState::Idle &&
+				m_targetFaction != eFactionController::None)
 			{
-				assert(unit->getCurrentState() == eUnitState::Idle);
 				glm::vec3 destination = factionHandler.getFaction(m_targetFaction).getClosestHeadquarters(unit->getPosition()).getPosition();
 				unit->moveTo(destination, map, factionHandler, eUnitState::AttackMoving);	
 			}
