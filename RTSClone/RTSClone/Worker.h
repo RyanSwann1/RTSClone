@@ -81,4 +81,5 @@ private:
 #endif // RENDER_PATHING
 
 	void switchTo(eWorkerState newState, const Map& map, const Mineral* mineralToHarvest = nullptr);
+	void moveTo(const glm::vec3& destination, const Map& map, const AABB& ignoreAABB, eWorkerState state = eWorkerState::Moving);
 };

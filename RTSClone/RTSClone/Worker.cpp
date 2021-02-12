@@ -211,14 +211,17 @@ void Worker::update(float deltaTime, const Map& map, FactionHandler& factionHand
 				m_buildQueue.clear();
 				switchTo(eWorkerState::Idle, map);
 			}
-			else if (!m_buildQueue.empty())
+			else 
 			{
-				moveTo(m_buildQueue.front().position, map, eWorkerState::MovingToBuildingPosition);
-			}
-			else if(building)
-			{
-				glm::vec3 destination = PathFinding::getInstance().getRandomAvailablePositionOutsideAABB(*this, map);
-				moveTo(destination, map);
+				if (!m_buildQueue.empty())
+				{
+					moveTo(m_buildQueue.front().position, map, building->getAABB(), eWorkerState::MovingToBuildingPosition);
+				}
+				else
+				{
+					glm::vec3 destination = PathFinding::getInstance().getRandomAvailablePositionOutsideAABB(*this, map);
+					moveTo(destination, map, building->getAABB());
+				}
 			}
 		}
 		break;
@@ -501,4 +504,29 @@ void Worker::switchTo(eWorkerState newState, const Map& map, const Mineral* mine
 
 	m_taskTimer.resetElaspedTime();
 	m_currentState = newState;
+}
+
+void Worker::moveTo(const glm::vec3& destination, const Map& map, const AABB& ignoreAABB, eWorkerState state)
+{
+	assert(m_currentState == eWorkerState::Building);
+	glm::vec3 previousDestination = Globals::getNextPathDestination(m_pathToPosition, m_position);
+
+	PathFinding::getInstance().getPathToPosition(*this, destination, m_pathToPosition,
+		[&](const glm::ivec2& position) { return getAdjacentPositions(position, map, ignoreAABB); }, map, m_owningFaction);
+	if (!m_pathToPosition.empty())
+	{
+		switchTo(state, map);
+	}
+	else
+	{
+		if (previousDestination != m_position)
+		{
+			m_pathToPosition.push_back(previousDestination);
+			switchTo(state, map);
+		}
+		else
+		{
+			switchTo(eWorkerState::Idle, map);
+		}
+	}
 }
