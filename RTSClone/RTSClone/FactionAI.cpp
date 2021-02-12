@@ -184,8 +184,6 @@ void FactionAI::handleEvent(const GameEvent& gameEvent, const Map& map, FactionH
 						actionCompleted = true;
 					}
 					break;
-				default:
-					assert(false);
 				}
 			}
 			if (!actionCompleted)
@@ -261,6 +259,10 @@ void FactionAI::update(float deltaTime, const Map & map, FactionHandler& faction
 					{
 						m_actionQueue.pop();
 					}
+					break;
+				case eActionType::IncreaseShield:
+					GameEventHandler::getInstance().gameEvents.push(GameEvent::createIncreaseFactionShield(getController()));
+					m_actionQueue.pop();
 					break;
 				default:
 					assert(false);
@@ -388,10 +390,30 @@ bool FactionAI::isWithinDistanceOfBuildings(const glm::vec3& position, float dis
 	return false;
 }
 
+bool FactionAI::increaseShield(const Laboratory& laboratory)
+{
+	if (!Faction::increaseShield(laboratory))
+	{
+		m_actionQueue.push(eActionType::IncreaseShield);
+		return false;
+	}
+
+	return true;
+}
+
 const Entity* FactionAI::createBuilding(const Map& map, const Worker& worker)
 {
 	const Entity* spawnedBuilding = Faction::createBuilding(map, worker);
-	if (!spawnedBuilding)
+	if (spawnedBuilding)
+	{
+		switch (spawnedBuilding->getEntityType())
+		{
+		case eEntityType::Laboratory:
+			GameEventHandler::getInstance().gameEvents.push(GameEvent::createIncreaseFactionShield(getController()));
+			break;
+		}
+	}
+	else
 	{
 		switch (worker.getBuildingCommands().front().entityType)
 		{

@@ -10,7 +10,8 @@ enum class eActionType
 	BuildSupplyDepot,
 	BuildBarracks,
 	BuildTurret,
-	BuildLaboratory
+	BuildLaboratory,
+	IncreaseShield
 };
 
 struct AIAction
@@ -31,6 +32,8 @@ public:
 		int startingResources, int startingPopulationCap, const BaseHandler& baseHandler);
 
 	bool isWithinDistanceOfBuildings(const glm::vec3& position, float distance) const;
+
+	bool increaseShield(const Laboratory& laboratory) override;
 	const Entity* createBuilding(const Map& map, const Worker& worker) override;
 	void setTargetFaction(FactionHandler& factionHandler);
 	void onFactionElimination(FactionHandler& factionHandler, eFactionController eliminatedFaction);
