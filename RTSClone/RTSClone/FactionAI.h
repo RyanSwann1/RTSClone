@@ -28,7 +28,7 @@ class FactionAI : public Faction
 {
 public:
 	FactionAI(eFactionController factionController, const glm::vec3& hqStartingPosition, 
-		int startingResources, int startingPopulationCap, const Base& currentBase, const BaseHandler& baseHandler);
+		int startingResources, int startingPopulationCap, const BaseHandler& baseHandler);
 
 	const Entity* createBuilding(const Map& map, const Worker& worker) override;
 	void setTargetFaction(FactionHandler& factionHandler);
@@ -44,7 +44,6 @@ private:
 	Timer m_delayTimer;
 	Timer m_spawnTimer;
 	eFactionController m_targetFaction;
-	std::reference_wrapper<const Base> m_currentBase;
 
 	bool instructWorkerToBuild(eEntityType entityType, const glm::vec3& position, const Map& map, Worker& worker);
 	void instructWorkersToRepair(const Headquarters& HQ, const Map& map);

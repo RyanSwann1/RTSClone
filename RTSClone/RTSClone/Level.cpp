@@ -109,7 +109,7 @@ std::unique_ptr<Level> Level::create(const std::string& levelName, Camera& camer
 		case eFactionController::AI_2:
 		case eFactionController::AI_3:
 			factions[i] = std::make_unique<FactionAI>(eFactionController(i), baseHandler->getBases()[i].position,
-				factionStartingResources, factionStartingPopulation, baseHandler->getBases()[i], *baseHandler);
+				factionStartingResources, factionStartingPopulation, *baseHandler);
 			break;
 		default:
 			assert(false);

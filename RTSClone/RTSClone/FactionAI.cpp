@@ -52,16 +52,14 @@ AIAction::AIAction(eActionType actionType, const glm::vec3& position)
 
 //FactionAI
 FactionAI::FactionAI(eFactionController factionController, const glm::vec3& hqStartingPosition,
-	int startingResources, int startingPopulationCap, const Base& currentBase,
-	const BaseHandler& baseHandler)
+	int startingResources, int startingPopulationCap, const BaseHandler& baseHandler)
 	: Faction(factionController, hqStartingPosition, startingResources, startingPopulationCap),
 	m_baseHandler(baseHandler),
 	m_spawnQueue(),
 	m_actionQueue(),
 	m_delayTimer(DELAY_TIMER_EXPIRATION, true),
 	m_spawnTimer(Globals::getRandomNumber(MIN_SPAWN_TIMER_EXPIRATION, MAX_SPAWN_TIMER_EXPIRATION), true),
-	m_targetFaction(eFactionController::None),
-	m_currentBase(currentBase)
+	m_targetFaction(eFactionController::None)
 {
 	for (int i = 0; i < STARTING_WORKER_COUNT; ++i)
 	{
@@ -77,11 +75,12 @@ void FactionAI::setTargetFaction(FactionHandler& factionHandler)
 {
 	m_targetFaction = eFactionController::None;
 
+	assert(!m_headquarters.empty());
 	float targetFactionDistance = std::numeric_limits<float>::max();
 	for (const auto& opposingFaction : factionHandler.getOpposingFactions(getController()))
 	{
-		const Headquarters& opposingHeadquarters = opposingFaction.get().getClosestHeadquarters(m_currentBase.get().position);
-		float distance = Globals::getSqrDistance(opposingHeadquarters.getPosition(), m_currentBase.get().position);
+		const Headquarters& opposingHeadquarters = opposingFaction.get().getClosestHeadquarters(m_headquarters.front().getPosition());
+		float distance = Globals::getSqrDistance(opposingHeadquarters.getPosition(), m_headquarters.front().getPosition());
 		if (distance < targetFactionDistance)
 		{
 			m_targetFaction = opposingFaction.get().getController();
