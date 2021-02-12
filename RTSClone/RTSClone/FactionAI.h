@@ -9,7 +9,8 @@ enum class eActionType
 {
 	BuildSupplyDepot,
 	BuildBarracks,
-	BuildTurret
+	BuildTurret,
+	BuildLaboratory
 };
 
 struct AIAction

@@ -30,7 +30,7 @@ namespace
 	const float IDLE_TIMER_EXPIRATION = 1.0f;
 	const float MIN_SPAWN_TIMER_EXPIRATION = 7.5f;
 	const float MAX_SPAWN_TIMER_EXPIRATION = 15.0f;
-	const int STARTING_WORKER_COUNT = 5;
+	const int STARTING_WORKER_COUNT = 3;
 	const int STARTING_UNIT_COUNT = 1;
 	const float MAX_DISTANCE_FROM_HQ = static_cast<float>(Globals::NODE_SIZE) * 18.0f;
 	const float MIN_DISTANCE_FROM_HQ = static_cast<float>(Globals::NODE_SIZE) * 5.0f;
@@ -66,9 +66,11 @@ FactionAI::FactionAI(eFactionController factionController, const glm::vec3& hqSt
 		m_spawnQueue.push(eEntityType::Worker);
 	}
 
-	m_actionQueue.emplace(eActionType::BuildTurret);
 	m_actionQueue.emplace(eActionType::BuildBarracks);
 	m_actionQueue.emplace(eActionType::BuildSupplyDepot);
+	m_actionQueue.emplace(eActionType::BuildLaboratory);
+	m_actionQueue.emplace(eActionType::BuildTurret);
+	m_actionQueue.emplace(eActionType::BuildTurret);
 }
 
 void FactionAI::setTargetFaction(FactionHandler& factionHandler)
@@ -175,6 +177,13 @@ void FactionAI::handleEvent(const GameEvent& gameEvent, const Map& map, FactionH
 						actionCompleted = true;
 					}
 					break;
+				case eActionType::BuildLaboratory:
+					if (build(map, eEntityType::Laboratory, *worker))
+					{
+						m_actionQueue.pop();
+						actionCompleted = true;
+					}
+					break;
 				default:
 					assert(false);
 				}
@@ -243,6 +252,12 @@ void FactionAI::update(float deltaTime, const Map & map, FactionHandler& faction
 					break;
 				case eActionType::BuildTurret:
 					if (build(map, eEntityType::Turret))
+					{
+						m_actionQueue.pop();
+					}
+					break;
+				case eActionType::BuildLaboratory:
+					if (build(map, eEntityType::Laboratory))
 					{
 						m_actionQueue.pop();
 					}
@@ -389,6 +404,9 @@ const Entity* FactionAI::createBuilding(const Map& map, const Worker& worker)
 		case eEntityType::Turret:
 			m_actionQueue.push(eActionType::BuildTurret);
 			break;
+		case eEntityType::Laboratory:
+			m_actionQueue.push(eActionType::BuildLaboratory);
+			break;
 		default:
 			assert(false);
 		}
@@ -432,6 +450,7 @@ bool FactionAI::build(const Map& map, eEntityType entityType)
 	case eEntityType::Barracks:
 	case eEntityType::SupplyDepot:
 	case eEntityType::Turret:
+	case eEntityType::Laboratory:
 	{
 		glm::vec3 buildPosition(0.0f);
 		if (PathFinding::getInstance().isBuildingSpawnAvailable(m_headquarters.front().getPosition(),
@@ -458,7 +477,6 @@ bool FactionAI::build(const Map& map, eEntityType entityType)
 
 bool FactionAI::build(const Map& map, eEntityType entityType, Worker& worker)
 {
-	assert(!m_headquarters.empty());
 	if (!isAffordable(entityType))
 	{
 		return false;
@@ -469,8 +487,10 @@ bool FactionAI::build(const Map& map, eEntityType entityType, Worker& worker)
 	case eEntityType::Barracks:
 	case eEntityType::SupplyDepot:
 	case eEntityType::Turret:
+	case eEntityType::Laboratory:
 	{
 		glm::vec3 buildPosition(0.0f);
+		assert(!m_headquarters.empty());
 		if (PathFinding::getInstance().isBuildingSpawnAvailable(m_headquarters.front().getPosition(),
 			entityType, map, buildPosition, *this, m_baseHandler))
 		{
