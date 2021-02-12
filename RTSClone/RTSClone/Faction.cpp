@@ -265,9 +265,10 @@ void Faction::handleEvent(const GameEvent& gameEvent, const Map& map, FactionHan
         break;
     case eGameEventType::IncreaseFactionShield:
         if (m_currentShieldAmount < Globals::MAX_FACTION_SHIELD_AMOUNT &&
-            isAffordable(Globals::FACTION_SHIELD_INCREASE_COST))
+            isAffordable(Globals::FACTION_SHIELD_INCREASE_COST) &&
+            m_laboratories.size() == 1)
         {
-            increaseShield();
+            m_laboratories.front().handleEvent(gameEvent.data.increaseFactionShield);
         }
         break;
     }
@@ -276,30 +277,6 @@ void Faction::handleEvent(const GameEvent& gameEvent, const Map& map, FactionHan
 void Faction::addResources(Worker& worker)
 {
     m_currentResourceAmount += worker.extractResources();
-}
-
-void Faction::increaseShield()
-{
-    assert(m_laboratories.size() == 1 && m_currentShieldAmount < Globals::MAX_FACTION_SHIELD_AMOUNT);
-    if (isAffordable(Globals::FACTION_SHIELD_INCREASE_COST))
-    {
-        std::vector<Entity*>& allEntities = m_allEntities;
-        int& currentResourcesAmount = m_currentResourceAmount;
-        int& currentShieldAmount = m_currentShieldAmount;
-        m_laboratories.front().addIncreaseShieldCommand([&allEntities, &currentResourcesAmount, &currentShieldAmount, this]()
-        {
-            if (this->isAffordable(Globals::FACTION_SHIELD_INCREASE_COST))
-            {
-                ++currentShieldAmount;
-                currentResourcesAmount -= Globals::FACTION_SHIELD_INCREASE_COST;
-
-                for (auto& entity : allEntities)
-                {
-                    entity->increaseMaximumShield(*this);
-                }
-            }
-        });
-    }
 }
 
 void Faction::handleUnitCollisions(const Map& map, FactionHandler& factionHandler)
@@ -621,6 +598,25 @@ const Entity* Faction::createBuilding(const Map& map, const Worker& worker)
     }
 
     return nullptr;
+}
+
+bool Faction::increaseShield(const Laboratory& laboratory)
+{
+    assert(laboratory.getShieldUpgradeCounter() > 0);
+    if (isAffordable(Globals::FACTION_SHIELD_INCREASE_COST))
+    {
+        ++m_currentShieldAmount;
+        m_currentResourceAmount -= Globals::FACTION_SHIELD_INCREASE_COST;
+
+        for (auto& entity : m_allEntities)
+        {
+            entity->increaseMaximumShield(*this);
+        }
+
+        return true;
+    }
+    
+    return false;
 }
 
 void Faction::reduceResources(eEntityType addedEntityType)

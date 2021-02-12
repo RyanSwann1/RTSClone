@@ -45,6 +45,7 @@ public:
 	virtual const Entity* createUnit(const Map& map, const EntitySpawnerBuilding& building, FactionHandler& factionHandler);
 	virtual Entity* createWorker(const Map& map, const EntitySpawnerBuilding& building);
 	virtual const Entity* createBuilding(const Map& map, const Worker& worker);
+	virtual bool increaseShield(const Laboratory& laboratory);
 	virtual void handleEvent(const GameEvent& gameEvent, const Map& map, FactionHandler& factionHandler);
 	virtual void update(float deltaTime, const Map& map, FactionHandler& factionHandler, const Timer& unitStateHandlerTimer);
 	virtual void render(ShaderHandler& shaderHandler) const;
@@ -86,7 +87,6 @@ private:
 	void decreaseCurrentPopulationAmount(const Entity& entity);
 	void increasePopulationLimit();
 	void revalidateExistingUnitPaths(const Map& map, FactionHandler& factionHandler);
-	void increaseShield();
 
 	void handleUnitCollisions(const Map& map, FactionHandler& factionHandler);
 	void handleWorkerCollisions(const Map& map);

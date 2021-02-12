@@ -6,6 +6,7 @@
 #include "Faction.h"
 #include "ShaderHandler.h"
 #include "Camera.h"
+#include "GameEvents.h"
 
 namespace
 {
@@ -13,10 +14,11 @@ namespace
 	const float PROGRESS_BAR_YOFFSET = 125.0f;
 }
 
-Laboratory::Laboratory(const glm::vec3& startingPosition, const Faction& owningFaction)
+Laboratory::Laboratory(const glm::vec3& startingPosition, Faction& owningFaction)
 	: Entity(ModelManager::getInstance().getModel(LABORATORY_MODEL_NAME), startingPosition, eEntityType::Laboratory,
 		Globals::LABORATORY_STARTING_HEALTH, owningFaction.getCurrentShieldAmount()),
-	m_increaseShieldCommands(),
+	m_owningFaction(owningFaction),
+	m_shieldUpgradeCounter(0),
 	m_increaseShieldTimer(INCREASE_SHIELD_TIMER_EXPIRATION, false)
 {
 	broadcastToMessenger<GameMessages::AddToMap>({ m_AABB });
@@ -27,15 +29,23 @@ Laboratory::~Laboratory()
 	broadcastToMessenger<GameMessages::RemoveFromMap>({ m_AABB });	
 }
 
-void Laboratory::addIncreaseShieldCommand(const std::function<void()>& command)
+int Laboratory::getShieldUpgradeCounter() const
 {
-	if (m_increaseShieldCommands.empty())
+	return m_shieldUpgradeCounter;
+}
+
+void Laboratory::handleEvent(IncreaseFactionShieldEvent gameEvent)
+{
+	assert(m_owningFaction.getCurrentShieldAmount() < Globals::MAX_FACTION_SHIELD_AMOUNT &&
+		m_owningFaction.isAffordable(Globals::FACTION_SHIELD_INCREASE_COST));
+
+	if (m_shieldUpgradeCounter == 0)
 	{
 		m_increaseShieldTimer.resetElaspedTime();
 		m_increaseShieldTimer.setActive(true);
 	}
-	
-	m_increaseShieldCommands.push(command);
+
+	++m_shieldUpgradeCounter;
 }
 
 void Laboratory::update(float deltaTime)
@@ -44,15 +54,21 @@ void Laboratory::update(float deltaTime)
 
 	if (m_increaseShieldTimer.isActive())
 	{
-		assert(!m_increaseShieldCommands.empty());
+		assert(m_shieldUpgradeCounter > 0);
 
 		m_increaseShieldTimer.update(deltaTime);
 		if (m_increaseShieldTimer.isExpired())
 		{
-			m_increaseShieldCommands.front()(); //Function pointer
-			m_increaseShieldCommands.pop();
+			if (m_owningFaction.increaseShield(*this))
+			{
+				--m_shieldUpgradeCounter;
+			}
+			else
+			{
+				m_shieldUpgradeCounter = 0;
+			}
 
-			m_increaseShieldTimer.setActive(!m_increaseShieldCommands.empty());
+			m_increaseShieldTimer.setActive(m_shieldUpgradeCounter > 0);
 			m_increaseShieldTimer.resetElaspedTime();
 		}
 	}
@@ -62,7 +78,7 @@ void Laboratory::renderProgressBar(ShaderHandler& shaderHandler, const Camera& c
 {
 	if (m_increaseShieldTimer.isActive())
 	{
-		assert(!m_increaseShieldCommands.empty());
+		assert(m_shieldUpgradeCounter > 0);
 
 		float currentTime = m_increaseShieldTimer.getElaspedTime() / m_increaseShieldTimer.getExpiredTime();
 		m_statbarSprite.render(m_position, windowSize, Globals::LABORATORY_STAT_BAR_WIDTH, 

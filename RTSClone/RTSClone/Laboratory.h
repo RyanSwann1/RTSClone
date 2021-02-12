@@ -5,17 +5,21 @@
 #include <queue>
 #include <functional>
 
+struct IncreaseFactionShieldEvent;
 class Laboratory : public Entity
 {
 public:
-	Laboratory(const glm::vec3& startingPosition, const Faction& owningFaction);
+	Laboratory(const glm::vec3& startingPosition, Faction& owningFaction);
 	~Laboratory();
 
-	void addIncreaseShieldCommand(const std::function<void()>& command);
+	int getShieldUpgradeCounter() const;
+
+	void handleEvent(IncreaseFactionShieldEvent gameEvent);
 	void update(float deltaTime);
 	void renderProgressBar(ShaderHandler& shaderHandler, const Camera& camera, glm::uvec2 windowSize) const;
 
 private:
-	std::queue<std::function<void()>> m_increaseShieldCommands; //Faction::increaseShield
+	Faction& m_owningFaction;
+	int m_shieldUpgradeCounter;
 	Timer m_increaseShieldTimer;
 };
