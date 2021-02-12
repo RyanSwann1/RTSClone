@@ -26,6 +26,8 @@ class Worker;
 class Unit;
 class Map;
 class FactionHandler;
+class FactionAI;
+class BaseHandler;
 class PathFinding : private NonCopyable, private NonMovable
 {
 public:
@@ -104,8 +106,8 @@ public:
 		return shortestDistancePosition;
 	}
 
-	bool isBuildingSpawnAvailable(const glm::vec3& startingPosition, const Model& model, const Map& map,
-		glm::vec3& buildPosition, float minDistanceFromHQ, float maxDistanceFromHQ, float distanceFromMinerals, const Faction& owningFaction);
+	bool isBuildingSpawnAvailable(const glm::vec3& startingPosition, eEntityType buildingEntityType, const Map& map,
+		glm::vec3& buildPosition, const FactionAI& owningFaction, const BaseHandler& baseHandler);
 
 	bool isUnitPositionAvailable(const glm::vec3& position, const Entity& entity, FactionHandler& factionHandler, 
 		const Faction& owningFaction) const;

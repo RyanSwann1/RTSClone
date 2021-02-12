@@ -21,7 +21,6 @@ struct AIAction
 	glm::vec3 position;
 };
 
-
 class BaseHandler;
 class FactionHandler;
 class FactionAI : public Faction
@@ -30,6 +29,7 @@ public:
 	FactionAI(eFactionController factionController, const glm::vec3& hqStartingPosition, 
 		int startingResources, int startingPopulationCap, const BaseHandler& baseHandler);
 
+	bool isWithinDistanceOfBuildings(const glm::vec3& position, float distance) const;
 	const Entity* createBuilding(const Map& map, const Worker& worker) override;
 	void setTargetFaction(FactionHandler& factionHandler);
 	void onFactionElimination(FactionHandler& factionHandler, eFactionController eliminatedFaction);

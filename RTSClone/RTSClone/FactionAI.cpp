@@ -26,11 +26,11 @@
 
 namespace
 {
-	const float DELAY_TIMER_EXPIRATION =  2.f;
+	const float DELAY_TIMER_EXPIRATION =  10.f;
 	const float IDLE_TIMER_EXPIRATION = 1.0f;
 	const float MIN_SPAWN_TIMER_EXPIRATION = 7.5f;
 	const float MAX_SPAWN_TIMER_EXPIRATION = 15.0f;
-	const int STARTING_WORKER_COUNT = 1;
+	const int STARTING_WORKER_COUNT = 5;
 	const int STARTING_UNIT_COUNT = 1;
 	const float MAX_DISTANCE_FROM_HQ = static_cast<float>(Globals::NODE_SIZE) * 18.0f;
 	const float MIN_DISTANCE_FROM_HQ = static_cast<float>(Globals::NODE_SIZE) * 5.0f;
@@ -338,6 +338,41 @@ Worker* FactionAI::getAvailableWorker(const glm::vec3& position)
 	return selectedWorker;
 }
 
+bool FactionAI::isWithinDistanceOfBuildings(const glm::vec3& position, float distance) const
+{
+	for (const auto& entity : m_allEntities)
+	{
+		switch (entity->getEntityType())
+		{
+		case eEntityType::Headquarters:
+		case eEntityType::SupplyDepot:
+		case eEntityType::Barracks:
+		case eEntityType::Turret:
+		case eEntityType::Laboratory:
+			if (Globals::getSqrDistance(entity->getPosition(), position) <= distance * distance)
+			{
+				return true;
+			}
+			break;
+		case eEntityType::Unit:
+			break;
+		case eEntityType::Worker:
+			for (const auto& buildingCommand : static_cast<Worker&>((*entity)).getBuildingCommands())
+			{
+				if (Globals::getSqrDistance(buildingCommand.position, position) <= distance * distance)
+				{
+					return true;
+				}
+			}
+			break;
+		default:
+			assert(false);
+		}
+	}
+
+	return false;
+}
+
 const Entity* FactionAI::createBuilding(const Map& map, const Worker& worker)
 {
 	const Entity* spawnedBuilding = Faction::createBuilding(map, worker);
@@ -400,7 +435,7 @@ bool FactionAI::build(const Map& map, eEntityType entityType)
 	{
 		glm::vec3 buildPosition(0.0f);
 		if (PathFinding::getInstance().isBuildingSpawnAvailable(m_headquarters.front().getPosition(),
-			entityType, map, buildPosition, *this))
+			entityType, map, buildPosition, *this, m_baseHandler))
 		{
 			Worker* availableWorker = getAvailableWorker(buildPosition);
 			if (availableWorker)
@@ -437,7 +472,7 @@ bool FactionAI::build(const Map& map, eEntityType entityType, Worker& worker)
 	{
 		glm::vec3 buildPosition(0.0f);
 		if (PathFinding::getInstance().isBuildingSpawnAvailable(m_headquarters.front().getPosition(),
-			entityType, map, buildPosition, *this))
+			entityType, map, buildPosition, *this, m_baseHandler))
 		{
 			return instructWorkerToBuild(entityType, buildPosition, map, worker);
 		}

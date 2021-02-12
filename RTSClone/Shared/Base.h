@@ -41,6 +41,7 @@ class BaseHandler : private NonCopyable, private NonMovable
 public:
 	BaseHandler(std::vector<Base>&& m_bases);
 
+	bool isWithinDistanceOfMinerals(const glm::vec3& position, float distance) const;
 	const std::vector<Base>& getBases() const;
 	const Mineral* getNearestAvailableMineralAtBase(const Faction& faction, const Base& base, const glm::vec3& position) const;
 	const Mineral* getNearestAvailableMineralAtBase(const Faction& faction, const Mineral& mineral, const glm::vec3& position) const;

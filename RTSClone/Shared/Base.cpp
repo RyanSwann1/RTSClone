@@ -108,6 +108,22 @@ BaseHandler::BaseHandler(std::vector<Base>&& m_bases)
 	: m_bases(std::move(m_bases))
 {}
 
+bool BaseHandler::isWithinDistanceOfMinerals(const glm::vec3& position, float distance) const
+{
+	for (const auto& base : m_bases)
+	{
+		for (const auto& mineral : base.minerals)
+		{
+			if (Globals::getSqrDistance(mineral.getPosition(), position) <= distance * distance)
+			{
+				return true;
+			}
+		}
+	}
+	
+	return false;
+}
+
 const std::vector<Base>& BaseHandler::getBases() const
 {
 	return m_bases;
