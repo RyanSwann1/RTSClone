@@ -285,16 +285,6 @@ void FactionAI::update(float deltaTime, const Map & map, FactionHandler& faction
 	}
 }
 
-bool FactionAI::instructWorkerToBuild(eEntityType entityType, const glm::vec3& position, const Map& map, Worker& worker)
-{
-	if (map.isWithinBounds(position) && !map.isPositionOccupied(position))
-	{
-		return worker.build(position, map, entityType);
-	}
-
-	return false;
-}
-
 void FactionAI::instructWorkersToRepair(const Headquarters& HQ, const Map& map)
 {
 	int repairCount = 0;
@@ -481,7 +471,7 @@ bool FactionAI::build(const Map& map, eEntityType entityType)
 			Worker* availableWorker = getAvailableWorker(buildPosition);
 			if (availableWorker)
 			{
-				return instructWorkerToBuild(entityType, buildPosition, map, *availableWorker);
+				return availableWorker->build(buildPosition, map, entityType);
 			}
 		}
 	}
@@ -516,7 +506,7 @@ bool FactionAI::build(const Map& map, eEntityType entityType, Worker& worker)
 		if (PathFinding::getInstance().isBuildingSpawnAvailable(m_headquarters.front().getPosition(),
 			entityType, map, buildPosition, *this, m_baseHandler))
 		{
-			return instructWorkerToBuild(entityType, buildPosition, map, worker);
+			return worker.build(buildPosition, map, entityType);
 		}
 	}
 	break;

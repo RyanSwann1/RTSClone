@@ -49,7 +49,6 @@ private:
 	Timer m_spawnTimer;
 	eFactionController m_targetFaction;
 
-	bool instructWorkerToBuild(eEntityType entityType, const glm::vec3& position, const Map& map, Worker& worker);
 	void instructWorkersToRepair(const Headquarters& HQ, const Map& map);
 	Worker* getAvailableWorker(const glm::vec3& position);
 	const Entity* createUnit(const Map& map, const EntitySpawnerBuilding& building, FactionHandler& factionHandler) override;
