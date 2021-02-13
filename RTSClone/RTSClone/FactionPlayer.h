@@ -22,9 +22,9 @@ public:
 
 private:
 	const Model& m_model;
-	int m_builderID;
+	const int m_builderID;
+	const eEntityType m_entityType;
 	glm::vec3 m_position;
-	eEntityType m_entityType;
 };
 
 class FactionPlayer : public Faction
