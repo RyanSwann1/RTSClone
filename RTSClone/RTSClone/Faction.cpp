@@ -695,6 +695,7 @@ bool Faction::isMineralInUse(const Mineral& mineral) const
 
 const Entity* Faction::createUnit(const Map& map, const EntitySpawnerBuilding& building, FactionHandler& factionHandler)
 {
+    assert(building.getCurrentSpawnCount() > 0);
     if (isAffordable(eEntityType::Unit) && !isExceedPopulationLimit(eEntityType::Unit))
     {
         if (building.isWaypointActive())
@@ -726,6 +727,7 @@ const Entity* Faction::createUnit(const Map& map, const EntitySpawnerBuilding& b
 
 Entity* Faction::createWorker(const Map& map, const EntitySpawnerBuilding& building)
 {
+    assert(building.getCurrentSpawnCount() > 0);
     if (isAffordable(eEntityType::Worker) && !isExceedPopulationLimit(eEntityType::Worker))
     {
         if (building.isWaypointActive())

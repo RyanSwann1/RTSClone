@@ -131,7 +131,8 @@ void FactionPlayerPlannedBuilding::render(ShaderHandler& shaderHandler, const Ba
 bool FactionPlayerPlannedBuilding::isOnValidPosition(const BaseHandler& baseHandler, const Map& map) const
 {
     assert(map.isWithinBounds(m_position) && Globals::isOnMiddlePosition(m_position));
-    if (!map.isPositionOccupied(m_position))
+    AABB buildingAABB(m_position, ModelManager::getInstance().getModel(m_entityType));
+    if (!map.isAABBOccupied(buildingAABB))
     {
         switch (m_entityType)
         {
