@@ -186,7 +186,7 @@ void Faction::handleEvent(const GameEvent& gameEvent, const Map& map, FactionHan
 
         if (entity != m_allEntities.end())
         {
-            (*entity)->reduceHealth(gameEvent.data.takeDamage);
+            (*entity)->takeDamage(gameEvent.data.takeDamage, map, factionHandler);
             switch ((*entity)->getEntityType())
             {
             case eEntityType::Worker:

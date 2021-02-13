@@ -33,6 +33,7 @@ public:
 
 	bool isWithinDistanceOfBuildings(const glm::vec3& position, float distance) const;
 
+	void onUnitTakenDamage(const TakeDamageEvent& gameEvent, Unit& unit, const Map& map, FactionHandler& factionHandler) override;
 	bool increaseShield(const Laboratory& laboratory) override;
 	const Entity* createBuilding(const Map& map, const Worker& worker) override;
 	void setTargetFaction(FactionHandler& factionHandler);

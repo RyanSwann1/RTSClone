@@ -380,6 +380,48 @@ bool FactionAI::isWithinDistanceOfBuildings(const glm::vec3& position, float dis
 	return false;
 }
 
+void FactionAI::onUnitTakenDamage(const TakeDamageEvent& gameEvent, Unit& unit, const Map& map, FactionHandler& factionHandler)
+{
+	assert(!unit.isDead());
+	bool changeTargetEntity = false;
+
+	if (!factionHandler.isFactionActive(gameEvent.senderFaction))
+	{
+		return;
+	}
+
+	if(unit.getTargetEntity().getID() != Globals::INVALID_ENTITY_ID &&
+		gameEvent.senderID != unit.getTargetEntity().getID() &&
+		factionHandler.isFactionActive(unit.getTargetEntity().getFactionController()))
+	{
+		const Faction& opposingFaction = factionHandler.getFaction(unit.getTargetEntity().getFactionController());
+		const Entity* targetEntity = opposingFaction.getEntity(unit.getTargetEntity().getID());
+		if (!targetEntity)
+		{
+			changeTargetEntity = true;
+		}
+		else if(Globals::getSqrDistance(targetEntity->getPosition(), unit.getPosition()) >= Globals::UNIT_ATTACK_RANGE * Globals::UNIT_ATTACK_RANGE ||
+			!Globals::ATTACKING_ENTITY_TYPES.isMatch(targetEntity->getEntityType()))
+		{
+			changeTargetEntity = true;
+		}
+	}
+	else
+	{
+		changeTargetEntity = true;
+	}
+
+	if (changeTargetEntity)
+	{
+		const Faction& opposingFaction = factionHandler.getFaction(gameEvent.senderFaction);
+		const Entity* targetEntity = opposingFaction.getEntity(gameEvent.senderID);
+		if (targetEntity)
+		{
+			unit.moveToAttackPosition(*targetEntity, opposingFaction, map, factionHandler);
+		}	
+	}
+}
+
 bool FactionAI::increaseShield(const Laboratory& laboratory)
 {
 	if (!Faction::increaseShield(laboratory))
