@@ -30,10 +30,11 @@ class FactionHandler;
 class Unit : public Entity
 {
 public:
-	Unit(const Faction& owningFaction, const glm::vec3& startingPosition, const glm::vec3& startingRotation, const Map& map);
-	Unit(const Faction& owningFaction, const glm::vec3& startingPosition, const glm::vec3& startingRotation,
+	Unit(Faction& owningFaction, const glm::vec3& startingPosition, const glm::vec3& startingRotation, const Map& map);
+	Unit(Faction& owningFaction, const glm::vec3& startingPosition, const glm::vec3& startingRotation,
 		const glm::vec3& destination, FactionHandler& FactionHandler, const Map& map);
 
+	TargetEntity getTargetEntity() const;
 	const Faction& getOwningFaction() const;
 	const std::vector<glm::vec3>& getPathToPosition() const;
 	float getGridAttackRange() const;
@@ -48,14 +49,14 @@ public:
 		eUnitState state = eUnitState::Moving);
 	void update(float deltaTime, FactionHandler& factionHandler, const Map& map,
 		const Timer& unitStateHandlerTimer);
-	void reduceHealth(const TakeDamageEvent& gameEvent) override;
+	void takeDamage(const TakeDamageEvent& gameEvent, const Map& map, FactionHandler& factionHandler) override;
 
 #ifdef RENDER_PATHING
 	void renderPathMesh(ShaderHandler& shaderHandler);
 #endif // RENDER_PATHING
 
 private:
-	const Faction& m_owningFaction;
+	Faction& m_owningFaction;
 	std::vector<glm::vec3> m_pathToPosition;
 	eUnitState m_currentState;
 	Timer m_attackTimer;

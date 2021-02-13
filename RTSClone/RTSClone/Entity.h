@@ -28,7 +28,7 @@ public:
 	int getShield() const;
 	bool isDead() const;
 	
-	virtual void reduceHealth(const TakeDamageEvent& gameEvent);
+	virtual void takeDamage(const TakeDamageEvent& gameEvent, const Map& map, FactionHandler& factionHandler);
 	void repair();
 	void increaseMaximumShield(const Faction& owningFaction);
 	void render(ShaderHandler& shaderHandler, eFactionController owningFactionController) const;

@@ -16,13 +16,11 @@
 namespace
 {
 	const float MOVEMENT_SPEED = 7.5f;
-	const float UNIT_GRID_ATTACK_RANGE = 5.0f;
-	const float UNIT_ATTACK_RANGE = UNIT_GRID_ATTACK_RANGE * static_cast<float>(Globals::NODE_SIZE);
 	const float TIME_BETWEEN_ATTACK = 1.0f;
 	const int DAMAGE = 1;
 }
 
-Unit::Unit(const Faction& owningFaction, const glm::vec3& startingPosition, const glm::vec3& startingRotation, const Map& map)
+Unit::Unit(Faction& owningFaction, const glm::vec3& startingPosition, const glm::vec3& startingRotation, const Map& map)
 	: Entity(ModelManager::getInstance().getModel(UNIT_MODEL_NAME), startingPosition, eEntityType::Unit, 
 		Globals::UNIT_STARTING_HEALTH, owningFaction.getCurrentShieldAmount(), startingRotation),
 	m_owningFaction(owningFaction),
@@ -34,7 +32,7 @@ Unit::Unit(const Faction& owningFaction, const glm::vec3& startingPosition, cons
 	switchToState(m_currentState, map);
 }
 
-Unit::Unit(const Faction & owningFaction, const glm::vec3 & startingPosition, const glm::vec3 & startingRotation, 
+Unit::Unit(Faction & owningFaction, const glm::vec3 & startingPosition, const glm::vec3 & startingRotation, 
 	const glm::vec3 & destination, FactionHandler& factionHandler, const Map& map)
 	: Entity(ModelManager::getInstance().getModel(UNIT_MODEL_NAME), startingPosition, eEntityType::Unit,
 		Globals::UNIT_STARTING_HEALTH, owningFaction.getCurrentShieldAmount(), startingRotation),
@@ -45,6 +43,11 @@ Unit::Unit(const Faction & owningFaction, const glm::vec3 & startingPosition, co
 	m_targetEntity()
 {
 	moveTo(destination, map, factionHandler);
+}
+
+TargetEntity Unit::getTargetEntity() const
+{
+	return m_targetEntity;
 }
 
 const Faction& Unit::getOwningFaction() const
@@ -59,12 +62,12 @@ const std::vector<glm::vec3>& Unit::getPathToPosition() const
 
 float Unit::getGridAttackRange() const
 {
-	return UNIT_GRID_ATTACK_RANGE;
+	return Globals::UNIT_GRID_ATTACK_RANGE;
 }
 
 float Unit::getAttackRange() const
 {
-	return UNIT_ATTACK_RANGE;
+	return Globals::UNIT_ATTACK_RANGE;
 }
 
 eFactionController Unit::getOwningFactionController() const
@@ -175,7 +178,7 @@ void Unit::update(float deltaTime, FactionHandler& factionHandler, const Map& ma
 		{
 			for (const auto& opposingFaction : factionHandler.getOpposingFactions(m_owningFaction.getController()))
 			{
-				const Entity* targetEntity = opposingFaction.get().getEntity(m_position, UNIT_ATTACK_RANGE, true);
+				const Entity* targetEntity = opposingFaction.get().getEntity(m_position, Globals::UNIT_ATTACK_RANGE, true);
 				if (targetEntity)
 				{
 					moveToAttackPosition(*targetEntity, opposingFaction, map, factionHandler);
@@ -196,7 +199,7 @@ void Unit::update(float deltaTime, FactionHandler& factionHandler, const Map& ma
 
 				if (targetEntity)
 				{
-					if (Globals::getSqrDistance(targetEntity->getPosition(), m_position) <= UNIT_ATTACK_RANGE * UNIT_ATTACK_RANGE ||
+					if (Globals::getSqrDistance(targetEntity->getPosition(), m_position) <= Globals::UNIT_ATTACK_RANGE * Globals::UNIT_ATTACK_RANGE ||
 						m_pathToPosition.empty())
 					{
 						moveToAttackPosition(*targetEntity, factionHandler.getFaction(m_targetEntity.getFactionController()), map, factionHandler);
@@ -226,7 +229,7 @@ void Unit::update(float deltaTime, FactionHandler& factionHandler, const Map& ma
 		{
 			for (const auto& opposingFaction : factionHandler.getOpposingFactions(m_owningFaction.getController()))
 			{
-				const Entity* targetEntity = opposingFaction.get().getEntity(m_position, UNIT_ATTACK_RANGE);
+				const Entity* targetEntity = opposingFaction.get().getEntity(m_position, Globals::UNIT_ATTACK_RANGE);
 				if (targetEntity && PathFinding::getInstance().isTargetInLineOfSight(m_position, *targetEntity, map))
 				{
 					moveToAttackPosition(*targetEntity, opposingFaction, map, factionHandler);
@@ -248,7 +251,7 @@ void Unit::update(float deltaTime, FactionHandler& factionHandler, const Map& ma
 				const Entity* targetEntity = targetFaction.getEntity(m_targetEntity.getID());
 				if (!targetEntity)
 				{
-					targetEntity = targetFaction.getEntity(m_position, UNIT_ATTACK_RANGE);
+					targetEntity = targetFaction.getEntity(m_position, Globals::UNIT_ATTACK_RANGE);
 					if (!targetEntity)
 					{
 						switchToState(eUnitState::Idle, map);
@@ -260,12 +263,12 @@ void Unit::update(float deltaTime, FactionHandler& factionHandler, const Map& ma
 				}
 				else
 				{
-					if (Globals::getSqrDistance(targetEntity->getPosition(), m_position) > UNIT_ATTACK_RANGE * UNIT_ATTACK_RANGE ||
+					if (Globals::getSqrDistance(targetEntity->getPosition(), m_position) > Globals::UNIT_ATTACK_RANGE * Globals::UNIT_ATTACK_RANGE ||
 						!PathFinding::getInstance().isTargetInLineOfSight(m_position, *targetEntity, map))
 					{
 						moveToAttackPosition(*targetEntity, targetFaction, map, factionHandler);
 					}
-					else if (Globals::getSqrDistance(targetEntity->getPosition(), m_position) <= UNIT_ATTACK_RANGE * UNIT_ATTACK_RANGE)
+					else if (Globals::getSqrDistance(targetEntity->getPosition(), m_position) <= Globals::UNIT_ATTACK_RANGE * Globals::UNIT_ATTACK_RANGE)
 					{
 						m_rotation.y = Globals::getAngle(targetEntity->getPosition(), m_position);
 					}
@@ -281,7 +284,7 @@ void Unit::update(float deltaTime, FactionHandler& factionHandler, const Map& ma
 		{
 			const Faction& targetFaction = factionHandler.getFaction(m_targetEntity.getFactionController());
 			const Entity* targetEntity = targetFaction.getEntity(m_targetEntity.getID());
-			if (targetEntity && Globals::getSqrDistance(targetEntity->getPosition(), m_position) <= UNIT_ATTACK_RANGE * UNIT_ATTACK_RANGE)
+			if (targetEntity && Globals::getSqrDistance(targetEntity->getPosition(), m_position) <= Globals::UNIT_ATTACK_RANGE * Globals::UNIT_ATTACK_RANGE)
 			{
 				GameEventHandler::getInstance().gameEvents.push(GameEvent::createSpawnProjectile(m_owningFaction.getController(), getID(),
 					targetFaction.getController(), targetEntity->getID(), DAMAGE, m_position, targetEntity->getPosition()));
@@ -296,55 +299,13 @@ void Unit::update(float deltaTime, FactionHandler& factionHandler, const Map& ma
 	m_attackTimer.update(deltaTime);
 }
 
-void Unit::reduceHealth(const TakeDamageEvent& gameEvent)
+void Unit::takeDamage(const TakeDamageEvent& gameEvent, const Map& map, FactionHandler& factionHandler)
 {
-	Entity::reduceHealth(gameEvent);
-	std::cout << "Unit Damaged\n";
-	
-	//-- Kept for later use 
-
-	//if (!isDead() && m_owningFaction.getController() != eFactionController::Player)
-	//{
-	//	bool changeTargetEntity = false;
-	//	if(m_targetEntity.getID() != Globals::INVALID_ENTITY_ID &&
-	//		factionHandler.isFactionActive(m_targetEntity.getFactionController()))
-	//	{
-	//		const Faction& opposingFaction = factionHandler.getFaction(m_targetEntity.getFactionController());
-	//		const Entity* targetEntity = opposingFaction.getEntity(m_targetEntity.getID());
-	//		if (!targetEntity)
-	//		{
-	//			if (gameEvent.senderID != m_targetEntity.getID())
-	//			{
-	//				changeTargetEntity = true;
-	//			}
-	//			else
-	//			{
-	//				m_targetEntity.reset();
-	//			}
-	//		}
-	//		else if(Globals::getSqrDistance(targetEntity->getPosition(), m_position) > glm::pow(UNIT_ATTACK_RANGE, 2))
-	//		{
-	//			changeTargetEntity = true;
-	//		}
-	//		else if(!Globals::ATTACKING_ENTITY_TYPES.isMatch(targetEntity->getEntityType()))
-	//		{
-	//			changeTargetEntity = true;
-	//		}
-	//	}
-	//	else
-	//	{
-	//		changeTargetEntity = true;
-	//	}
-	//	if (changeTargetEntity && factionHandler.isFactionActive(gameEvent.senderFaction))
-	//	{
-	//		const Faction& opposingFaction = factionHandler.getFaction(gameEvent.senderFaction);
-	//		const Entity* targetEntity = opposingFaction.getEntity(gameEvent.senderID);
-	//		if (targetEntity)
-	//		{
-	//			moveToAttackPosition(*targetEntity, opposingFaction, map, factionHandler);
-	//		}	
-	//	}
-	//}
+	Entity::takeDamage(gameEvent, map, factionHandler);	
+	if (!isDead())
+	{
+		m_owningFaction.onUnitTakenDamage(gameEvent, *this, map, factionHandler);
+	}
 }
 
 void Unit::switchToState(eUnitState newState, const Map& map, const Entity* targetEntity, const Faction* targetFaction)

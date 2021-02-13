@@ -146,7 +146,7 @@ int Entity::getShield() const
 	return m_shield;
 }
 
-void Entity::reduceHealth(const TakeDamageEvent& gameEvent)
+void Entity::takeDamage(const TakeDamageEvent& gameEvent, const Map& map, FactionHandler& factionHandler)
 {
 	if (m_shield > 0)
 	{
