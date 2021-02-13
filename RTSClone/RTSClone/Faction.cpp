@@ -186,38 +186,34 @@ void Faction::handleEvent(const GameEvent& gameEvent, const Map& map, FactionHan
 
         if (entity != m_allEntities.end())
         {
+            (*entity)->reduceHealth(gameEvent.data.takeDamage);
             switch ((*entity)->getEntityType())
             {
             case eEntityType::Worker:
-                (*entity)->reduceHealth(gameEvent.data.takeDamage);
                 if ((*entity)->isDead())
                 {
                     removeEntity<Worker>(m_workers, targetID, entity);
                 }
                 break;
             case eEntityType::Unit:
-                static_cast<Unit&>(*(*entity)).reduceHealth(gameEvent.data.takeDamage, factionHandler, map);
                 if ((*entity)->isDead())
                 {
                     removeEntity<Unit>(m_units, targetID, entity);
                 }
                 break;
             case eEntityType::SupplyDepot:
-                (*entity)->reduceHealth(gameEvent.data.takeDamage);
                 if ((*entity)->isDead())
                 {
                     removeEntity<SupplyDepot>(m_supplyDepots, targetID, entity);
                 }
                 break;
             case eEntityType::Barracks:
-                (*entity)->reduceHealth(gameEvent.data.takeDamage);
                 if ((*entity)->isDead())
                 {
                     removeEntity<Barracks>(m_barracks, targetID, entity);
                 }
                 break;
             case eEntityType::Headquarters:
-                (*entity)->reduceHealth(gameEvent.data.takeDamage);
                 if ((*entity)->isDead())
                 {
                     removeEntity<Headquarters>(m_headquarters, targetID, entity);
@@ -228,14 +224,12 @@ void Faction::handleEvent(const GameEvent& gameEvent, const Map& map, FactionHan
                 }
                 break;
             case eEntityType::Turret:
-                (*entity)->reduceHealth(gameEvent.data.takeDamage);
                 if ((*entity)->isDead())
                 {
                     removeEntity<Turret>(m_turrets, targetID, entity);
                 }
                 break;
             case eEntityType::Laboratory:
-                (*entity)->reduceHealth(gameEvent.data.takeDamage);
                 if ((*entity)->isDead())
                 {
                     removeEntity<Laboratory>(m_laboratories, targetID, entity);
