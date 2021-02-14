@@ -89,7 +89,7 @@ void Turret::update(float deltaTime, FactionHandler& factionHandler, const Map& 
 			{
 				m_rotation.y = Globals::getAngle(targetEntity->getPosition(), m_position, 270.0f);
 				GameEventHandler::getInstance().gameEvents.push(GameEvent::createSpawnProjectile(m_owningFaction.getController(), getID(),
-					opposingFaction.getController(), targetEntity->getID(), TURRET_DAMAGE, m_position, targetEntity->getPosition()));
+					getEntityType(), opposingFaction.getController(), targetEntity->getID(), TURRET_DAMAGE, m_position, targetEntity->getPosition()));
 				
 				m_attackTimer.resetElaspedTime();
 			}

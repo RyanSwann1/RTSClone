@@ -287,7 +287,7 @@ void Unit::update(float deltaTime, FactionHandler& factionHandler, const Map& ma
 			if (targetEntity && Globals::getSqrDistance(targetEntity->getPosition(), m_position) <= Globals::UNIT_ATTACK_RANGE * Globals::UNIT_ATTACK_RANGE)
 			{
 				GameEventHandler::getInstance().gameEvents.push(GameEvent::createSpawnProjectile(m_owningFaction.getController(), getID(),
-					targetFaction.getController(), targetEntity->getID(), DAMAGE, m_position, targetEntity->getPosition()));
+					getEntityType(), targetFaction.getController(), targetEntity->getID(), DAMAGE, m_position, targetEntity->getPosition()));
 
 				m_attackTimer.resetElaspedTime();
 			}

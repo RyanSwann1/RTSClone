@@ -6,7 +6,7 @@
 
 namespace
 {
-	const float MOVEMENT_SPEED = 90.0f;
+	const float MOVEMENT_SPEED = 100.0f;
 }
 
 Projectile::Projectile(const SpawnProjectileEvent& gameEvent)
