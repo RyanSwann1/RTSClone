@@ -78,27 +78,29 @@ struct SetTargetEntityGUIEvent : public GameEvent_3 {
 
 struct GameEvent_4
 {
-	GameEvent_4(eFactionController senderFaction, int senderID, eFactionController targetFaction, 
-		int targetID, int damage);
+	GameEvent_4(eFactionController senderFaction, int senderID, eEntityType senderEntityType,
+		eFactionController targetFaction, int targetID, int damage);
 
 	eFactionController senderFaction;
 	int senderID;
+	eEntityType senderEntityType;
 	eFactionController targetFaction;
 	int targetID;
 	int damage;
 };
 struct TakeDamageEvent : public GameEvent_4 {
-	TakeDamageEvent(eFactionController senderFaction, int senderID, eFactionController targetFaction,
-		int targetID, int damage) : GameEvent_4(senderFaction, senderID, targetFaction, targetID, damage) {}
-};
+	TakeDamageEvent(eFactionController senderFaction, int senderID, eEntityType senderEntityType, eFactionController targetFaction,
+		int targetID, int damage) : GameEvent_4(senderFaction, senderID, senderEntityType, targetFaction, targetID, damage) {}
+}; 
 
 struct GameEvent_5
 {
-	GameEvent_5(eFactionController senderFaction, int senderID, eFactionController targetFaction, 
-		int targetID, int damage, const glm::vec3& startingPosition, const glm::vec3& endingPosition);
+	GameEvent_5(eFactionController senderFaction, int senderID, eEntityType senderEntityType, 
+		eFactionController targetFaction, int targetID, int damage, const glm::vec3& startingPosition, const glm::vec3& endingPosition);
 
 	eFactionController senderFaction;
 	int senderID;
+	eEntityType senderEntityType;
 	eFactionController targetFaction;
 	int targetID;
 	int damage;
@@ -106,9 +108,9 @@ struct GameEvent_5
 	glm::vec3 destination;
 };
 struct SpawnProjectileEvent : public GameEvent_5 {
-	SpawnProjectileEvent(eFactionController senderFaction, int senderID, eFactionController targetFaction,
+	SpawnProjectileEvent(eFactionController senderFaction, int senderID, eEntityType senderEntityType, eFactionController targetFaction,
 		int targetID, int damage, const glm::vec3& startingPosition, const glm::vec3& endingPosition)
-		: GameEvent_5(senderFaction, senderID, targetFaction, targetID, damage, startingPosition, endingPosition) {}
+		: GameEvent_5(senderFaction, senderID, senderEntityType, targetFaction, targetID, damage, startingPosition, endingPosition) {}
 };
 
 struct GameEvent_6
@@ -195,12 +197,12 @@ struct GameEvent
 	static GameEvent createSetTargetEntityGUI(eFactionController senderFaction, int senderID);
 
 	//GameEvent_4
-	static GameEvent createTakeDamage(eFactionController senderFaction, int senderID, eFactionController targetFaction,
-		int targetID, int damage);
+	static GameEvent createTakeDamage(eFactionController senderFaction, int senderID, eEntityType senderEntityType, 
+		eFactionController targetFaction, int targetID, int damage);
 
 	//GameEvent_5
-	static GameEvent createSpawnProjectile(eFactionController senderFaction, int senderID, eFactionController targetFaction,
-		int targetID, int damage, const glm::vec3& startingPosition, const glm::vec3& endingPosition);
+	static GameEvent createSpawnProjectile(eFactionController senderFaction, int senderID, eEntityType senderEntityType,
+		eFactionController targetFaction, int targetID, int damage, const glm::vec3& startingPosition, const glm::vec3& endingPosition);
 
 	//GameEvent_6
 	static GameEvent createOnEnteredIdleState(eFactionController factionController, eEntityType entityType, int targetID);
