@@ -26,7 +26,7 @@
 
 namespace
 {
-	const float DELAY_TIMER_EXPIRATION =  10.f;
+	const float DELAY_TIMER_EXPIRATION =  10.0f;
 	const float IDLE_TIMER_EXPIRATION = 1.0f;
 	const float MIN_SPAWN_TIMER_EXPIRATION = 7.5f;
 	const float MAX_SPAWN_TIMER_EXPIRATION = 15.0f;
@@ -69,7 +69,6 @@ FactionAI::FactionAI(eFactionController factionController, const glm::vec3& hqSt
 	m_actionQueue.emplace(eActionType::BuildBarracks);
 	m_actionQueue.emplace(eActionType::BuildSupplyDepot);
 	m_actionQueue.emplace(eActionType::BuildLaboratory);
-	m_actionQueue.emplace(eActionType::BuildTurret);
 	m_actionQueue.emplace(eActionType::BuildTurret);
 }
 
@@ -383,27 +382,27 @@ bool FactionAI::isWithinDistanceOfBuildings(const glm::vec3& position, float dis
 void FactionAI::onUnitTakenDamage(const TakeDamageEvent& gameEvent, Unit& unit, const Map& map, FactionHandler& factionHandler)
 {
 	assert(!unit.isDead());
-	bool changeTargetEntity = false;
-
 	if (!factionHandler.isFactionActive(gameEvent.senderFaction))
 	{
 		return;
 	}
-
-	if(unit.getTargetEntity().getID() != Globals::INVALID_ENTITY_ID &&
-		gameEvent.senderID != unit.getTargetEntity().getID() &&
-		factionHandler.isFactionActive(unit.getTargetEntity().getFactionController()))
+	
+	bool changeTargetEntity = false;
+	if(unit.getTargetEntity().getID() != Globals::INVALID_ENTITY_ID)
 	{
-		const Faction& opposingFaction = factionHandler.getFaction(unit.getTargetEntity().getFactionController());
-		const Entity* targetEntity = opposingFaction.getEntity(unit.getTargetEntity().getID());
-		if (!targetEntity)
+		if (factionHandler.isFactionActive(unit.getTargetEntity().getFactionController()))
 		{
-			changeTargetEntity = true;
-		}
-		else if(Globals::getSqrDistance(targetEntity->getPosition(), unit.getPosition()) >= Globals::UNIT_ATTACK_RANGE * Globals::UNIT_ATTACK_RANGE ||
-			!Globals::ATTACKING_ENTITY_TYPES.isMatch(targetEntity->getEntityType()))
-		{
-			changeTargetEntity = true;
+			const Faction& opposingFaction = factionHandler.getFaction(unit.getTargetEntity().getFactionController());
+			const Entity* targetEntity = opposingFaction.getEntity(unit.getTargetEntity().getID());
+			if (!targetEntity)
+			{
+				changeTargetEntity = true;
+			}
+			else if (!Globals::ATTACKING_ENTITY_TYPES.isMatch(targetEntity->getEntityType()) &&
+				Globals::ATTACKING_ENTITY_TYPES.isMatch(gameEvent.senderEntityType))
+			{
+				changeTargetEntity = true;
+			}
 		}
 	}
 	else
