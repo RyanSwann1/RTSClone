@@ -480,9 +480,9 @@ const Entity* FactionAI::createUnit(const Map& map, const EntitySpawnerBuilding&
 	return spawnedUnit;
 }
 
-Entity* FactionAI::createWorker(const Map& map, const EntitySpawnerBuilding& building)
+Entity* FactionAI::createWorker(const Map& map, const Headquarters& headquarters)
 {
-	Entity* spawnedWorker = Faction::createWorker(map, building);
+	Entity* spawnedWorker = Faction::createWorker(map, headquarters);
 	if (!spawnedWorker)
 	{
 		m_spawnQueue.push(eEntityType::Worker);

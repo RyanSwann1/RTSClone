@@ -719,24 +719,24 @@ const Entity* Faction::createUnit(const Map& map, const EntitySpawnerBuilding& b
     return nullptr;
 }
 
-Entity* Faction::createWorker(const Map& map, const EntitySpawnerBuilding& building)
+Entity* Faction::createWorker(const Map& map, const Headquarters& headquarters)
 {
-    assert(building.getCurrentSpawnCount() > 0);
+    assert(headquarters.getCurrentSpawnCount() > 0);
     if (isAffordable(eEntityType::Worker) && !isExceedPopulationLimit(eEntityType::Worker))
     {
-        if (building.isWaypointActive())
+        if (headquarters.isWaypointActive())
         {
-            glm::vec3 startingPosition = building.getUnitSpawnPosition();
+            glm::vec3 startingPosition = headquarters.getUnitSpawnPosition();
             glm::vec3 destination = PathFinding::getInstance().getClosestAvailablePosition(
-                building.getWaypointPosition(), m_units, m_workers, map);
+                headquarters.getWaypointPosition(), m_units, m_workers, map);
 
             m_workers.emplace_back(*this, startingPosition, destination, map);
         }
         else
         {
             glm::vec3 startingPosition = PathFinding::getInstance().getClosestAvailablePosition(
-                building.getUnitSpawnPosition(), m_units, m_workers, map);
-            glm::vec3 startingRotation = { 0.0f, Globals::getAngle(startingPosition, building.getPosition()), 0.0f };
+                headquarters.getUnitSpawnPosition(), m_units, m_workers, map);
+            glm::vec3 startingRotation = { 0.0f, Globals::getAngle(startingPosition, headquarters.getPosition()), 0.0f };
 
             m_workers.emplace_back(*this, map, startingPosition, startingRotation);
         }
