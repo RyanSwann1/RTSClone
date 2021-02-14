@@ -469,9 +469,9 @@ const Entity* FactionAI::createBuilding(const Map& map, const Worker& worker)
 	return spawnedBuilding;
 }
 
-const Entity* FactionAI::createUnit(const Map& map, const EntitySpawnerBuilding& building, FactionHandler& factionHandler)
+const Entity* FactionAI::createUnit(const Map& map, const Barracks& barracks, FactionHandler& factionHandler)
 {
-	const Entity* spawnedUnit = Faction::createUnit(map, building, factionHandler);
+	const Entity* spawnedUnit = Faction::createUnit(map, barracks, factionHandler);
 	if (!spawnedUnit)
 	{
 		m_spawnQueue.push(eEntityType::Unit);

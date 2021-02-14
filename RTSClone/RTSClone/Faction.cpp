@@ -687,24 +687,24 @@ bool Faction::isMineralInUse(const Mineral& mineral) const
     return false;
 }
 
-const Entity* Faction::createUnit(const Map& map, const EntitySpawnerBuilding& building, FactionHandler& factionHandler)
+const Entity* Faction::createUnit(const Map& map, const Barracks& barracks, FactionHandler& factionHandler)
 {
-    assert(building.getCurrentSpawnCount() > 0);
+    assert(barracks.getCurrentSpawnCount() > 0);
     if (isAffordable(eEntityType::Unit) && !isExceedPopulationLimit(eEntityType::Unit))
     {
-        if (building.isWaypointActive())
+        if (barracks.isWaypointActive())
         {
-            glm::vec3 startingPosition = building.getUnitSpawnPosition();
-            glm::vec3 startingRotation = { 0.0f, Globals::getAngle(startingPosition, building.getPosition()), 0.0f };
-            glm::vec3 destination = PathFinding::getInstance().getClosestAvailablePosition(building.getWaypointPosition(), m_units, m_workers, map);
+            glm::vec3 startingPosition = barracks.getUnitSpawnPosition();
+            glm::vec3 startingRotation = { 0.0f, Globals::getAngle(startingPosition, barracks.getPosition()), 0.0f };
+            glm::vec3 destination = PathFinding::getInstance().getClosestAvailablePosition(barracks.getWaypointPosition(), m_units, m_workers, map);
 
             m_units.emplace_back(*this, startingPosition, startingRotation, destination, factionHandler, map);
         }
         else
         {
-            glm::vec3 startingPosition = PathFinding::getInstance().getClosestAvailablePosition(building.getUnitSpawnPosition(),
+            glm::vec3 startingPosition = PathFinding::getInstance().getClosestAvailablePosition(barracks.getUnitSpawnPosition(),
                 m_units, m_workers, map);
-            glm::vec3 startingRotation = { 0.0f, Globals::getAngle(startingPosition, building.getPosition()), 0.0f };
+            glm::vec3 startingRotation = { 0.0f, Globals::getAngle(startingPosition, barracks.getPosition()), 0.0f };
             
             m_units.emplace_back(*this, startingPosition, startingRotation, map);
         }

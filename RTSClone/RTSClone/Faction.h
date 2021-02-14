@@ -43,7 +43,7 @@ public:
 
 	void addResources(Worker& worker);
 	virtual void onUnitTakenDamage(const TakeDamageEvent& gameEvent, Unit& unit, const Map& map, FactionHandler& factionHandler) {}
-	virtual const Entity* createUnit(const Map& map, const EntitySpawnerBuilding& building, FactionHandler& factionHandler);
+	virtual const Entity* createUnit(const Map& map, const Barracks& barracks, FactionHandler& factionHandler);
 	virtual Entity* createWorker(const Map& map, const Headquarters& headquarters);
 	virtual const Entity* createBuilding(const Map& map, const Worker& worker);
 	virtual bool increaseShield(const Laboratory& laboratory);
