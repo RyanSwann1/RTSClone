@@ -289,35 +289,42 @@ void UIManager::update(const FactionHandler& factionHandler)
 {
 	if (m_selectedEntityWidget)
 	{
-		const Entity* targetEntity = 
-			factionHandler.getFaction(m_selectedEntityWidget->factionController).getEntity(m_selectedEntityWidget->ID);
-		if (!targetEntity)
+		if (factionHandler.isFactionActive(m_selectedEntityWidget->factionController))
 		{
-			m_selectedEntityWidget.reset();
+			const Entity* targetEntity =
+				factionHandler.getFaction(m_selectedEntityWidget->factionController).getEntity(m_selectedEntityWidget->ID);
+			if (!targetEntity)
+			{
+				m_selectedEntityWidget.reset();
+			}
+			else
+			{
+				switch (targetEntity->getEntityType())
+				{
+				case eEntityType::Headquarters:
+				case eEntityType::Barracks:
+				{
+					const EntitySpawnerBuilding& unitSpawnerBuilding = static_cast<const EntitySpawnerBuilding&>(*targetEntity);
+					m_selectedEntityWidget->set({ m_selectedEntityWidget->factionController, m_selectedEntityWidget->ID, targetEntity->getEntityType(),
+						unitSpawnerBuilding.getHealth(), unitSpawnerBuilding.getShield(), unitSpawnerBuilding.getCurrentSpawnCount() });
+				}
+				break;
+				case eEntityType::Unit:
+				case eEntityType::SupplyDepot:
+				case eEntityType::Turret:
+				case eEntityType::Laboratory:
+				case eEntityType::Worker:
+					m_selectedEntityWidget->set({ m_selectedEntityWidget->factionController, m_selectedEntityWidget->ID, targetEntity->getEntityType(),
+						targetEntity->getHealth(), targetEntity->getShield() });
+					break;
+				default:
+					assert(false);
+				}
+			}
 		}
 		else
 		{
-			switch (targetEntity->getEntityType())
-			{
-			case eEntityType::Headquarters:
-			case eEntityType::Barracks:
-			{
-				const EntitySpawnerBuilding& unitSpawnerBuilding = static_cast<const EntitySpawnerBuilding&>(*targetEntity);
-				m_selectedEntityWidget->set({ m_selectedEntityWidget->factionController, m_selectedEntityWidget->ID, targetEntity->getEntityType(),
-					unitSpawnerBuilding.getHealth(), unitSpawnerBuilding.getShield(), unitSpawnerBuilding.getCurrentSpawnCount() });
-			}
-			break;
-			case eEntityType::Unit:
-			case eEntityType::SupplyDepot:
-			case eEntityType::Turret:
-			case eEntityType::Laboratory:
-			case eEntityType::Worker:
-				m_selectedEntityWidget->set({ m_selectedEntityWidget->factionController, m_selectedEntityWidget->ID, targetEntity->getEntityType(),
-					targetEntity->getHealth(), targetEntity->getShield() });
-				break;
-			default:
-				assert(false);
-			}
+			m_selectedEntityWidget.reset();
 		}
 	}
 }
