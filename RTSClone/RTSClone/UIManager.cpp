@@ -98,8 +98,10 @@ void PlayerDetailsWidget::render(const sf::Window& window)
 }
 
 //SelectedEntityWidget
-SelectedEntityWidget::SelectedEntityWidget()
-	: Widget()
+SelectedEntityWidget::SelectedEntityWidget(eFactionController factionController, int ID)
+	: Widget(),
+	factionController(factionController),
+	ID(ID)
 {}
 
 void SelectedEntityWidget::render(const sf::Window& window)
@@ -209,8 +211,7 @@ void WinningFactionWidget::render(const sf::Window& window)
 
 //UIManager
 UIManager::UIManager()
-	: m_selectedEntity(),
-	m_playerDetailsWidget(),	
+	: m_playerDetailsWidget(),	
 	m_selectedEntityWidget(),
 	m_winningFactionWidget()
 {
@@ -254,7 +255,7 @@ void UIManager::handleInput(const sf::Window& window, const FactionHandler& fact
 				selectedEntity = faction->getEntity(mouseToGroundPosition);
 				if (selectedEntity)
 				{
-					m_selectedEntity.set(faction->getController(), selectedEntity->getID());
+					m_selectedEntityWidget = std::make_unique<SelectedEntityWidget>(faction->getController(), selectedEntity->getID());
 					break;
 				}
 			}
@@ -264,7 +265,7 @@ void UIManager::handleInput(const sf::Window& window, const FactionHandler& fact
 			factionHandler.isFactionActive(eFactionController::Player) &&
 			static_cast<const FactionPlayer&>(factionHandler.getFaction(eFactionController::Player)).getSelectedEntities().size() != 1)
 		{
-			m_selectedEntity.reset();
+			m_selectedEntityWidget.reset();
 		}
 	}
 }
@@ -274,25 +275,25 @@ void UIManager::handleEvent(const GameEvent& gameEvent)
 	switch (gameEvent.type)
 	{
 	case eGameEventType::SetTargetEntityGUI:
-		m_selectedEntity.set(gameEvent.data.setTargetEntityGUI.factionController,
+		m_selectedEntityWidget = std::make_unique<SelectedEntityWidget>(
+			gameEvent.data.setTargetEntityGUI.factionController,
 			gameEvent.data.setTargetEntityGUI.entityID);
 		break;
 	case eGameEventType::ResetTargetEntityGUI:
-		m_selectedEntity.reset();
+		m_selectedEntityWidget.reset();
 		break;
 	}
 }
 
 void UIManager::update(const FactionHandler& factionHandler)
 {
-	if (m_selectedEntity.getID() != Globals::INVALID_ENTITY_ID &&
-		factionHandler.isFactionActive(m_selectedEntity.getFactionController()))
+	if (m_selectedEntityWidget)
 	{
-		const Entity* targetEntity = factionHandler.getFaction(m_selectedEntity.getFactionController()).getEntity(m_selectedEntity.getID());
+		const Entity* targetEntity = 
+			factionHandler.getFaction(m_selectedEntityWidget->factionController).getEntity(m_selectedEntityWidget->ID);
 		if (!targetEntity)
 		{
-			m_selectedEntity.reset();
-			m_selectedEntityWidget.deactivate();
+			m_selectedEntityWidget.reset();
 		}
 		else
 		{
@@ -302,7 +303,7 @@ void UIManager::update(const FactionHandler& factionHandler)
 			case eEntityType::Barracks:
 			{
 				const EntitySpawnerBuilding& unitSpawnerBuilding = static_cast<const EntitySpawnerBuilding&>(*targetEntity);
-				m_selectedEntityWidget.set({ m_selectedEntity.getFactionController(), m_selectedEntity.getID(), targetEntity->getEntityType(),
+				m_selectedEntityWidget->set({ m_selectedEntityWidget->factionController, m_selectedEntityWidget->ID, targetEntity->getEntityType(),
 					unitSpawnerBuilding.getHealth(), unitSpawnerBuilding.getShield(), unitSpawnerBuilding.getCurrentSpawnCount() });
 			}
 			break;
@@ -311,26 +312,23 @@ void UIManager::update(const FactionHandler& factionHandler)
 			case eEntityType::Turret:
 			case eEntityType::Laboratory:
 			case eEntityType::Worker:
-				m_selectedEntityWidget.set({ m_selectedEntity.getFactionController(), m_selectedEntity.getID(), targetEntity->getEntityType(),
+				m_selectedEntityWidget->set({ m_selectedEntityWidget->factionController, m_selectedEntityWidget->ID, targetEntity->getEntityType(),
 					targetEntity->getHealth(), targetEntity->getShield() });
 				break;
-			break;
 			default:
 				assert(false);
 			}
 		}
-	}
-	else
-	{
-		m_selectedEntity.reset();
-		m_selectedEntityWidget.deactivate();
 	}
 }
 
 void UIManager::render(const sf::Window& window)
 {
 	m_playerDetailsWidget.render(window);
-	m_selectedEntityWidget.render(window);	
+	if (m_selectedEntityWidget)
+	{
+		m_selectedEntityWidget->render(window);
+	}
 	m_winningFactionWidget.render(window);
 }
 
@@ -341,12 +339,12 @@ void UIManager::onDisplayPlayerDetails(const GameMessages::UIDisplayPlayerDetail
 
 void UIManager::onDisplayEntity(const GameMessages::UIDisplaySelectedEntity& gameMessage)
 {
-	m_selectedEntityWidget.set(gameMessage);
+	m_selectedEntityWidget = std::make_unique<SelectedEntityWidget>(gameMessage.owningFaction, gameMessage.entityID);
 }
 
 void UIManager::onClearDisplayEntity(GameMessages::UIClearDisplaySelectedEntity)
 {
-	m_selectedEntityWidget.deactivate();
+	m_selectedEntityWidget.reset();
 }
 
 void UIManager::onClearDisplayWinner(GameMessages::UIClearWinner)

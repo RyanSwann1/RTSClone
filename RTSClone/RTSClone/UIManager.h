@@ -7,6 +7,7 @@
 #include "GameMessages.h"
 #include "TargetEntity.h"
 #include <SFML/Graphics.hpp>
+#include <memory>
 
 //https://eliasdaler.github.io/using-imgui-with-sfml-pt2/#getting-back-to-the-context-of-the-window-tree-etc
 
@@ -41,8 +42,12 @@ struct PlayerDetailsWidget : public Widget<GameMessages::UIDisplayPlayerDetails>
 
 struct SelectedEntityWidget : public Widget<GameMessages::UIDisplaySelectedEntity>
 {
-	SelectedEntityWidget();
+	SelectedEntityWidget(eFactionController factionController, int ID);
+
 	void render(const sf::Window& window);
+
+	const eFactionController factionController; 
+	const int ID;
 };
 
 struct WinningFactionWidget : public Widget<GameMessages::UIDisplayWinner>
@@ -67,9 +72,8 @@ public:
 	void render(const sf::Window& window);
 
 private:
-	TargetEntity m_selectedEntity;
 	PlayerDetailsWidget m_playerDetailsWidget;
-	SelectedEntityWidget m_selectedEntityWidget;
+	std::unique_ptr<SelectedEntityWidget> m_selectedEntityWidget;
 	WinningFactionWidget m_winningFactionWidget;
 
 	void onDisplayPlayerDetails(const GameMessages::UIDisplayPlayerDetails& gameMessage);
