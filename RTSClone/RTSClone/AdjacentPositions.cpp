@@ -20,7 +20,17 @@ AdjacentPosition::AdjacentPosition(const glm::ivec2 & position, bool valid)
 	position(position)
 {}
 
-std::array<AdjacentPosition, ALL_DIRECTIONS_ON_GRID.size()> getAdjacentPositions(const glm::ivec2 & position, 
+AdjacentPositions createAdjacentPositions(const Map& map, const AABB& ignoreAABB)
+{
+	return [&](const glm::ivec2& position) { return getAdjacentPositions(position, map, ignoreAABB); };
+}
+
+AdjacentPositions createAdjacentPositions(const Map& map)
+{
+	return [&](const glm::ivec2& position) { return getAdjacentPositions(position, map); };
+}
+
+std::array<AdjacentPosition, ALL_DIRECTIONS_ON_GRID.size()> getAdjacentPositions(const glm::ivec2 & position,
 	const Map & map, const std::list<Unit> & units, const std::list<Worker>& workers)
 {
 	std::array<AdjacentPosition, ALL_DIRECTIONS_ON_GRID.size()> adjacentPositions;

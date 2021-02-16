@@ -28,13 +28,17 @@ struct AdjacentPosition
 	glm::ivec2 position;
 };
 
-using AdjacentPositions = const std::function<std::array<AdjacentPosition, ALL_DIRECTIONS_ON_GRID.size()>(const glm::ivec2&)>&;
+using AdjacentPositions = std::function<std::array<AdjacentPosition, ALL_DIRECTIONS_ON_GRID.size()>(const glm::ivec2&)>;
 
 class AABB;
 class FactionHandler;
 class Worker;
 class Map;
 class Unit;
+
+AdjacentPositions createAdjacentPositions(const Map& map, const AABB& ignoreAABB);
+AdjacentPositions createAdjacentPositions(const Map& map);
+
 std::array<AdjacentPosition, ALL_DIRECTIONS_ON_GRID.size()> getAdjacentPositions(const glm::ivec2& position, const Map& map,
 	const std::list<Unit>& units, const std::list<Worker>& workers);
 
