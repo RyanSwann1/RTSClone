@@ -42,7 +42,6 @@ public:
 	eFactionController getOwningFactionController() const;
 	eUnitState getCurrentState() const;
 
-	void resetTarget();
 	void moveToAttackPosition(const Entity& targetEntity, const Faction& targetFaction, const Map& map, 
 		FactionHandler& factionHandler);
 	void moveTo(const glm::vec3& destination, const Map& map, FactionHandler& factionHandler, 

@@ -80,11 +80,6 @@ eUnitState Unit::getCurrentState() const
 	return m_currentState;
 }
 
-void Unit::resetTarget()
-{
-	m_targetEntity.reset();
-}
-
 void Unit::moveToAttackPosition(const Entity& targetEntity, const Faction& targetFaction, const Map& map, FactionHandler& factionHandler)
 {
 	glm::vec3 previousDestination = Globals::getNextPathDestination(m_pathToPosition, m_position);
