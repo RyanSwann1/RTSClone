@@ -145,27 +145,27 @@ void SelectedEntityWidget::render(const sf::Window& window)
 		case eEntityType::Worker:
 			if (m_receivedMessage.owningFaction == eFactionController::Player)
 			{
-				if (ImGui::Button("Headquarters"))
+				if (ImGui::Button(ENTITY_NAME_CONVERSIONS[static_cast<int>(eEntityType::Headquarters)].c_str()))
 				{
 					GameEventHandler::getInstance().gameEvents.push(GameEvent::createPlayerActivatePlannedBuilding(
 						eEntityType::Headquarters, m_receivedMessage.entityID));
 				}
-				if (ImGui::Button("Barracks"))
+				if (ImGui::Button(ENTITY_NAME_CONVERSIONS[static_cast<int>(eEntityType::Barracks)].c_str()))
 				{
 					GameEventHandler::getInstance().gameEvents.push(GameEvent::createPlayerActivatePlannedBuilding(
 						eEntityType::Barracks, m_receivedMessage.entityID));
 				}
-				if (ImGui::Button("Supply Depot"))
+				if (ImGui::Button(ENTITY_NAME_CONVERSIONS[static_cast<int>(eEntityType::SupplyDepot)].c_str()))
 				{
 					GameEventHandler::getInstance().gameEvents.push(GameEvent::createPlayerActivatePlannedBuilding(
 						eEntityType::SupplyDepot, m_receivedMessage.entityID));
 				}
-				if (ImGui::Button("Turret"))
+				if (ImGui::Button(ENTITY_NAME_CONVERSIONS[static_cast<int>(eEntityType::Turret)].c_str()))
 				{
 					GameEventHandler::getInstance().gameEvents.push(GameEvent::createPlayerActivatePlannedBuilding(
 						eEntityType::Turret, m_receivedMessage.entityID));
 				}
-				if (ImGui::Button("Laboratory"))
+				if (ImGui::Button(ENTITY_NAME_CONVERSIONS[static_cast<int>(eEntityType::Laboratory)].c_str()))
 				{
 					GameEventHandler::getInstance().gameEvents.push(GameEvent::createPlayerActivatePlannedBuilding(
 						eEntityType::Laboratory, m_receivedMessage.entityID));
