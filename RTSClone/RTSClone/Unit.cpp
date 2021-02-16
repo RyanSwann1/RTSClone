@@ -85,8 +85,7 @@ void Unit::resetTarget()
 	m_targetEntity.reset();
 }
 
-void Unit::moveToAttackPosition(const Entity& targetEntity, const Faction& targetFaction, const Map& map,
-	FactionHandler& factionHandler)
+void Unit::moveToAttackPosition(const Entity& targetEntity, const Faction& targetFaction, const Map& map, FactionHandler& factionHandler)
 {
 	glm::vec3 previousDestination = Globals::getNextPathDestination(m_pathToPosition, m_position);
 	bool attackPositionFound = PathFinding::getInstance().setUnitAttackPosition(*this, targetEntity, m_pathToPosition, map, factionHandler);
@@ -98,9 +97,7 @@ void Unit::moveToAttackPosition(const Entity& targetEntity, const Faction& targe
 		}
 		else if(previousDestination != m_position)
 		{
-			PathFinding::getInstance().getPathToPosition(*this, previousDestination, m_pathToPosition, [&](const glm::ivec2& position)
-				{ return getAdjacentPositions(position, map, factionHandler, *this); }, map, factionHandler, m_owningFaction);
-			
+			PathFinding::getInstance().getPathToPosition(*this, previousDestination, m_pathToPosition, map, factionHandler, m_owningFaction);
 			switchToState(eUnitState::Moving, map, &targetEntity, &targetFaction);
 		}
 		else
@@ -114,8 +111,7 @@ void Unit::moveToAttackPosition(const Entity& targetEntity, const Faction& targe
 		{
 			if (previousDestination != m_position)
 			{
-				PathFinding::getInstance().getPathToPosition(*this, previousDestination, m_pathToPosition, [&](const glm::ivec2& position)
-					{ return getAdjacentPositions(position, map, factionHandler, *this); }, map, factionHandler, m_owningFaction);
+				PathFinding::getInstance().getPathToPosition(*this, previousDestination, m_pathToPosition, map, factionHandler, m_owningFaction);
 				switchToState(eUnitState::Moving, map);
 			}
 		}
@@ -129,9 +125,7 @@ void Unit::moveToAttackPosition(const Entity& targetEntity, const Faction& targe
 void Unit::moveTo(const glm::vec3& destination, const Map& map, FactionHandler& factionHandler, eUnitState state)
 {
 	glm::vec3 previousDestination = Globals::getNextPathDestination(m_pathToPosition, m_position);
-	PathFinding::getInstance().getPathToPosition(*this, destination, m_pathToPosition, 
-		[&, this](const glm::ivec2& position) { return getAdjacentPositions(position, map, factionHandler, *this); },
-		map, factionHandler, m_owningFaction);
+	PathFinding::getInstance().getPathToPosition(*this, destination, m_pathToPosition, map, factionHandler, m_owningFaction);
 
 	if (!m_pathToPosition.empty())
 	{
@@ -141,8 +135,7 @@ void Unit::moveTo(const glm::vec3& destination, const Map& map, FactionHandler& 
 	{
 		if (previousDestination != m_position)
 		{
-			PathFinding::getInstance().getPathToPosition(*this, previousDestination, m_pathToPosition, [&](const glm::ivec2& position)
-				{ return getAdjacentPositions(position, map, factionHandler, *this); }, map, factionHandler, m_owningFaction);
+			PathFinding::getInstance().getPathToPosition(*this, previousDestination, m_pathToPosition, map, factionHandler, m_owningFaction);
 
 			switchToState(state, map);
 		}

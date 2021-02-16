@@ -128,9 +128,8 @@ public:
 	bool setUnitAttackPosition(const Unit& unit, const Entity& targetEntity, std::vector<glm::vec3>& pathToPosition,
 		const Map& map, FactionHandler& factionHandler);
 
-	void getPathToPosition(const Entity& entity, const glm::vec3& destination, std::vector<glm::vec3>& pathToPosition,
-		const AdjacentPositions& adjacentPositions, const Map& map, FactionHandler& factionHandler,
-		const Faction& owningFaction);
+	void getPathToPosition(const Unit& unit, const glm::vec3& destination, std::vector<glm::vec3>& pathToPosition,
+		const Map& map, FactionHandler& factionHandler, const Faction& owningFaction);
 
 	void getPathToPosition(const Entity& entity, const glm::vec3& destination, std::vector<glm::vec3>& pathToPosition,
 		const AdjacentPositions& adjacentPositions, const Map& map, const Faction& owningFaction);

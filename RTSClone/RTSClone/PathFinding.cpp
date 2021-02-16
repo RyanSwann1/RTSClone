@@ -557,13 +557,11 @@ bool PathFinding::setUnitAttackPosition(const Unit& unit, const Entity& targetEn
 	return positionFound;
 }
 
-void PathFinding::getPathToPosition(const Entity& entity, const glm::vec3& destination, std::vector<glm::vec3>& pathToPosition, 
-	const AdjacentPositions& adjacentPositions, const Map& map, FactionHandler& factionHandler, const Faction& owningFaction)
+void PathFinding::getPathToPosition(const Unit& unit, const glm::vec3& destination, std::vector<glm::vec3>& pathToPosition, 
+	const Map& map, FactionHandler& factionHandler, const Faction& owningFaction)
 {
-	assert(adjacentPositions);
-
 	pathToPosition.clear();
-	if (entity.getPosition() == destination)
+	if (unit.getPosition() == destination)
 	{
 		return;
 	}
@@ -572,9 +570,9 @@ void PathFinding::getPathToPosition(const Entity& entity, const glm::vec3& desti
 	m_closedQueue.clear();
 
 	bool destinationReached = false;
-	glm::ivec2 startingPositionOnGrid = Globals::convertToGridPosition(entity.getPosition());
+	glm::ivec2 startingPositionOnGrid = Globals::convertToGridPosition(unit.getPosition());
 	glm::ivec2 destinationOnGrid = Globals::convertToGridPosition(destination);
-	float shortestDistance = Globals::getSqrDistance(destination, entity.getPosition());
+	float shortestDistance = Globals::getSqrDistance(destination, unit.getPosition());
 	glm::ivec2 closestAvailablePosition = { 0, 0 };
 	m_openQueue.add({ startingPositionOnGrid, startingPositionOnGrid, 0.0f, 
 		Globals::getSqrDistance(destinationOnGrid, startingPositionOnGrid) });
@@ -586,7 +584,7 @@ void PathFinding::getPathToPosition(const Entity& entity, const glm::vec3& desti
 
 		if (currentNode.position == destinationOnGrid)
 		{
-			switch (entity.getEntityType())
+			switch (unit.getEntityType())
 			{
 			case eEntityType::Unit:
 				break;
@@ -599,10 +597,10 @@ void PathFinding::getPathToPosition(const Entity& entity, const glm::vec3& desti
 
 			if (currentNode.position == startingPositionOnGrid)
 			{
-				if (isUnitPositionAvailable(Globals::convertToWorldPosition(startingPositionOnGrid), entity, factionHandler, owningFaction))
+				if (isUnitPositionAvailable(Globals::convertToWorldPosition(startingPositionOnGrid), unit, factionHandler, owningFaction))
 				{
 					destinationReached = true;
-					if (Globals::convertToWorldPosition(currentNode.position) != entity.getPosition())
+					if (Globals::convertToWorldPosition(currentNode.position) != unit.getPosition())
 					{
 						pathToPosition.push_back(Globals::convertToWorldPosition(startingPositionOnGrid));
 					}
@@ -611,7 +609,7 @@ void PathFinding::getPathToPosition(const Entity& entity, const glm::vec3& desti
 			else
 			{
 				destinationReached = true;
-				if (Globals::convertToWorldPosition(currentNode.position) != entity.getPosition())
+				if (Globals::convertToWorldPosition(currentNode.position) != unit.getPosition())
 				{
 					getPathFromClosedQueue(pathToPosition, startingPositionOnGrid, currentNode, m_closedQueue, map);
 				}
@@ -619,7 +617,7 @@ void PathFinding::getPathToPosition(const Entity& entity, const glm::vec3& desti
 		}
 		else
 		{
-			for (const auto& adjacentPosition : adjacentPositions(currentNode.position))
+			for (const auto& adjacentPosition : getAdjacentPositions(currentNode.position, map, factionHandler, unit))
 			{
 				if (!adjacentPosition.valid || m_closedQueue.contains(adjacentPosition.position))
 				{
@@ -656,12 +654,12 @@ void PathFinding::getPathToPosition(const Entity& entity, const glm::vec3& desti
 			isPriorityQueueWithinSizeLimit(m_closedQueue, map.getSize()));
 	}
 
-	if (pathToPosition.empty() && shortestDistance != Globals::getSqrDistance(destination, entity.getPosition()))
+	if (pathToPosition.empty() && shortestDistance != Globals::getSqrDistance(destination, unit.getPosition()))
 	{	
 		getPathFromClosedQueue(pathToPosition, startingPositionOnGrid, closestAvailablePosition, m_closedQueue, map);
 	}
 
-	convertPathToWaypoints(pathToPosition, entity, factionHandler, map, owningFaction);
+	convertPathToWaypoints(pathToPosition, unit, factionHandler, map, owningFaction);
 }
 
 void PathFinding::getPathToPosition(const Entity& entity, const glm::vec3& destination, std::vector<glm::vec3>& pathToPosition, 
