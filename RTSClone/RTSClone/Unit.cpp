@@ -60,11 +60,6 @@ const std::vector<glm::vec3>& Unit::getPathToPosition() const
 	return m_pathToPosition;
 }
 
-float Unit::getGridAttackRange() const
-{
-	return Globals::UNIT_GRID_ATTACK_RANGE;
-}
-
 float Unit::getAttackRange() const
 {
 	return Globals::UNIT_ATTACK_RANGE;

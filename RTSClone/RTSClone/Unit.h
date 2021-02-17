@@ -37,7 +37,6 @@ public:
 	TargetEntity getTargetEntity() const;
 	const Faction& getOwningFaction() const;
 	const std::vector<glm::vec3>& getPathToPosition() const;
-	float getGridAttackRange() const;
 	float getAttackRange() const;
 	eFactionController getOwningFactionController() const;
 	eUnitState getCurrentState() const;
