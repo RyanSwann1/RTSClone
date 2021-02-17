@@ -488,15 +488,15 @@ bool PathFinding::setUnitAttackPosition(const Unit& unit, const Entity& targetEn
 	bool positionFound = false;
 
 	m_openQueue.add({ startingPositionOnGrid, startingPositionOnGrid, 0.0f,
-		Globals::getSqrDistance(targetPositionOnGrid, startingPositionOnGrid) });
+		Globals::getSqrDistance(targetEntity.getPosition(), unit.getPosition()) });
 
 	while (!positionFound && !m_openQueue.isEmpty())
 	{
 		PriorityQueueNode currentNode = m_openQueue.getTop();
 		m_openQueue.popTop();
 
-		if (Globals::getSqrDistance(targetPositionOnGrid, currentNode.position) <=
-			unit.getGridAttackRange() * unit.getGridAttackRange() && 
+		if (Globals::getSqrDistance(targetEntity.getPosition(), Globals::convertToWorldPosition(currentNode.position)) <=
+			unit.getAttackRange() * unit.getAttackRange() && 
 			isTargetInLineOfSight(Globals::convertToWorldPosition(currentNode.position), targetEntity, map))
 		{
 			if (currentNode.position == startingPositionOnGrid)
