@@ -355,48 +355,6 @@ bool PathFinding::isTargetInLineOfSight(const glm::vec3& startingPosition, const
 	return targetEntityVisible;
 }
 
-const std::vector<glm::vec3>& PathFinding::getFormationPositions(const glm::vec3& startingPosition,
-	const std::vector<Unit*>& selectedUnits, const Map& map)
-{
-	//TODO: Sort by closest
-	assert(!selectedUnits.empty() && std::find(selectedUnits.cbegin(), selectedUnits.cend(), nullptr) == selectedUnits.cend());
-	m_graph.reset(m_frontier);
-	m_sharedPositionContainer.clear();
-
-	int selectedUnitIndex = 0;
-	m_frontier.push(Globals::convertToGridPosition(startingPosition));
-
-	while (!m_frontier.empty() && m_sharedPositionContainer.size() < selectedUnits.size())
-	{
-		glm::ivec2 position = m_frontier.front();
-		m_frontier.pop();
-
-		std::array<AdjacentPosition, ALL_DIRECTIONS_ON_GRID.size()> adjacentPositions = getAdjacentPositions(position, map);
-		for (const auto& adjacentPosition : adjacentPositions)
-		{
-			if (adjacentPosition.valid)
-			{
-				if (!m_graph.isPositionVisited(adjacentPosition.position, map))
-				{
-					m_graph.addToGraph(adjacentPosition.position, position, map);
-					m_frontier.push(adjacentPosition.position);
-
-					assert(selectedUnitIndex < selectedUnits.size());
-					m_sharedPositionContainer.emplace_back(Globals::convertToWorldPosition(adjacentPosition.position));
-					++selectedUnitIndex;
-					
-					if (m_sharedPositionContainer.size() == selectedUnits.size())
-					{
-						break;
-					}
-				}
-			}
-		}
-	}
-
-	return m_sharedPositionContainer;
-}
-
 glm::vec3 PathFinding::getClosestAvailablePosition(const glm::vec3& startingPosition, const std::list<Unit>& units, 
 	const std::list<Worker>& workers, const Map& map)
 {
