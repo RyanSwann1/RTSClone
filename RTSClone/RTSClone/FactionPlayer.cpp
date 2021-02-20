@@ -467,14 +467,19 @@ void FactionPlayer::moveMultipleSelectedEntities(const glm::vec3& planeIntersect
                 {
                     eUnitState state = (m_attackMoveSelected ? eUnitState::AttackMoving : eUnitState::Moving);
                     glm::vec3 destination = planeIntersection - (averagePosition - selectedEntity->getPosition());
-
-                    static_cast<Unit&>(*selectedEntity).moveTo(destination, map, factionHandler, state);
+                    if (map.isWithinBounds(destination))
+                    {
+                        static_cast<Unit&>(*selectedEntity).moveTo(destination, map, factionHandler, state);
+                    }
                 }
                 break;
                 case eEntityType::Worker:
                 {
                     glm::vec3 destination = planeIntersection - (averagePosition - selectedEntity->getPosition());
-                    static_cast<Worker*>(selectedEntity)->moveTo(destination, map);
+                    if (map.isWithinBounds(destination))
+                    {
+                        static_cast<Worker*>(selectedEntity)->moveTo(destination, map);
+                    }
                 }
                 break;
                 default:
