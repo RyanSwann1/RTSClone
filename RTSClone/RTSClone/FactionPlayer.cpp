@@ -488,6 +488,10 @@ void FactionPlayer::moveMultipleSelectedEntities(const glm::vec3& planeIntersect
 void FactionPlayer::onLeftClick(const sf::Window& window, const Camera& camera, const Map& map, const BaseHandler& baseHandler)
 {
     glm::vec3 planeIntersection = camera.getRayToGroundPlaneIntersection(window);
+    if (!map.isWithinBounds(planeIntersection))
+    {
+        return;
+    }
 
     m_entitySelector.setStartingPosition(window, planeIntersection);
     
@@ -520,6 +524,10 @@ void FactionPlayer::onRightClick(const sf::Window& window, const Camera& camera,
 {
     m_plannedBuilding.reset();
     glm::vec3 planeIntersection = camera.getRayToGroundPlaneIntersection(window);
+    if (!map.isWithinBounds(planeIntersection))
+    {
+        return;
+    }
     const Faction* targetFaction = nullptr;
     const Entity* targetEntity = nullptr;
 
