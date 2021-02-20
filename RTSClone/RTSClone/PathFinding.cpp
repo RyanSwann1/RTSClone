@@ -78,14 +78,14 @@ namespace
 			positionIndex < pathToPosition.size())
 		{
 			glm::vec3 targetPosition = pathToPosition[positionIndex];
+			glm::vec3 direction = glm::normalize(targetPosition - startingPosition);
 			glm::vec3 position = startingPosition;
 			float distance = glm::distance(targetPosition, startingPosition);
-			constexpr float step = Globals::NODE_SIZE;
 			bool collision = false;
 
-			for (int ray = step; ray <= static_cast<int>(distance); ray += step)
+			for (int ray = Globals::NODE_SIZE; ray <= static_cast<int>(glm::ceil(distance)); ray += Globals::NODE_SIZE)
 			{
-				position = position + glm::normalize(targetPosition - startingPosition) * step;
+				position = position + direction * static_cast<float>(Globals::NODE_SIZE);
 				if (map.isPositionOccupied(position))
 				{
 					collision = true;
@@ -99,11 +99,7 @@ namespace
 				startingPosition = pathToPosition[positionIndex];
 				positionIndex = 0;
 
-				//TODO: Due to duplications - need to investigate
-				if (positionsToKeep.size() > pathToPosition.size())
-				{
-					return;
-				}
+				assert(positionsToKeep.size() <= pathToPosition.size());
 			}
 			else
 			{
@@ -136,20 +132,19 @@ namespace
 		std::queue<glm::vec3> positionsToKeep;
 		int positionIndex = 0;
 		glm::vec3 startingPosition = Globals::convertToMiddleGridPosition(Globals::convertToNodePosition(entity.getPosition()));
-		while (startingPosition != pathToPosition.front() && 
-			positionIndex < pathToPosition.size())
+		while (startingPosition != pathToPosition.front() && positionIndex < pathToPosition.size())
 		{
 			glm::vec3 targetPosition = pathToPosition[positionIndex];
 			glm::vec3 position = startingPosition;
+			glm::vec3 direction = glm::normalize(targetPosition - startingPosition);
 			float distance = glm::distance(targetPosition, startingPosition);
-			constexpr float step = Globals::NODE_SIZE;
 			bool collision = false;
 
-			for (int ray = step; ray <= static_cast<int>(glm::ceil(distance)); ray += step)
+			for (int ray = Globals::NODE_SIZE; ray <= static_cast<int>(glm::ceil(distance)); ray += Globals::NODE_SIZE)
 			{
-				position = position + glm::normalize(targetPosition - startingPosition) * step;
-
-				if (!PathFinding::getInstance().isUnitPositionAvailable(position, entity, factionHandler, owningFaction) || map.isPositionOccupied(position))
+				position = position + direction * static_cast<float>(Globals::NODE_SIZE);
+				if (!PathFinding::getInstance().isUnitPositionAvailable(position, entity, factionHandler, owningFaction) || 
+					map.isPositionOccupied(position))
 				{
 					collision = true;
 					break;
@@ -162,11 +157,7 @@ namespace
 				startingPosition = pathToPosition[positionIndex];
 				positionIndex = 0;
 
-				//TODO: Due to duplications - need to investigate
-				if (positionsToKeep.size() > pathToPosition.size())
-				{
-					return;
-				}
+				assert(positionsToKeep.size() <= pathToPosition.size());
 			}
 			else
 			{
@@ -186,6 +177,8 @@ namespace
 
 			std::reverse(pathToPosition.begin(), pathToPosition.end());
 		}
+
+		std::reverse(pathToPosition.begin(), pathToPosition.end());
 	}
 }
 
