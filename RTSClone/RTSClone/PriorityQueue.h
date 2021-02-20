@@ -3,6 +3,8 @@
 #define GLM_ENABLE_EXPERIMENTAL
 #include "glm/gtx/hash.hpp"
 #include "glm/glm.hpp"
+#include "NonCopyable.h"
+#include "NonMovable.h"
 #include <vector>
 #include <queue>
 #include <unordered_set>
@@ -27,7 +29,8 @@ namespace GameMessages
 	struct NewMapSize;
 };
 const auto nodeCompare = [](const auto& a, const auto& b) -> bool { return b.getF() < a.getF(); };
-class PriorityQueue : private std::priority_queue<PriorityQueueNode, std::vector<PriorityQueueNode>, decltype(nodeCompare)>
+class PriorityQueue : private std::priority_queue<PriorityQueueNode, std::vector<PriorityQueueNode>, decltype(nodeCompare)>,
+	private NonCopyable, private NonMovable
 {
 public:
 	PriorityQueue();

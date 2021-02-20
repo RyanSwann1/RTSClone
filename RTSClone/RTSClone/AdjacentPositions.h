@@ -6,7 +6,7 @@
 #include <functional>
 #include <forward_list>
 
-constexpr std::array<glm::ivec2, 8> ALL_DIRECTIONS_ON_GRID =
+const std::array<glm::ivec2, 8> ALL_DIRECTIONS_ON_GRID =
 {
 	glm::ivec2(0, 1),
 	glm::ivec2(1, 1),

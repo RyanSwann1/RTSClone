@@ -307,12 +307,13 @@ bool PathFinding::isUnitPositionAvailable(const glm::vec3& position, const Entit
 
 bool PathFinding::isTargetInLineOfSight(const glm::vec3& startingPosition, const Entity& targetEntity, const Map& map) const
 {
-	glm::vec3 direction = glm::normalize(targetEntity.getPosition() - startingPosition);
-	constexpr float step = 0.5f;
-	float distanceSqr = Globals::getSqrDistance(targetEntity.getPosition(), startingPosition); 
+	glm::vec3 startingCenteredPosition = Globals::convertToMiddleGridPosition(Globals::convertToNodePosition(startingPosition));
+	glm::vec3 endingCenteredPosition = Globals::convertToMiddleGridPosition(Globals::convertToNodePosition(targetEntity.getPosition()));
+	glm::vec3 direction = glm::normalize(endingCenteredPosition - startingCenteredPosition);
+	float distance = glm::distance(endingCenteredPosition, startingCenteredPosition); 
 	bool targetEntityVisible = true;
 
-	for (int i = 1; i < std::ceil(distanceSqr / (step * step)); ++i)
+	for (int i = Globals::NODE_SIZE; i < static_cast<int>(glm::ceil(distance)); i += Globals::NODE_SIZE)
 	{
 		glm::vec3 position = startingPosition + direction * static_cast<float>(i);
 		if (targetEntity.getAABB().contains(position))
@@ -331,12 +332,13 @@ bool PathFinding::isTargetInLineOfSight(const glm::vec3& startingPosition, const
 
 bool PathFinding::isTargetInLineOfSight(const glm::vec3& startingPosition, const Entity& targetEntity, const Map& map, const AABB& senderAABB) const
 {
-	glm::vec3 direction = glm::normalize(targetEntity.getPosition() - startingPosition);
-	constexpr float step = 0.5f;
-	float distanceSqr = Globals::getSqrDistance(targetEntity.getPosition(), startingPosition);
+	glm::vec3 startingCenteredPosition = Globals::convertToMiddleGridPosition(Globals::convertToNodePosition(startingPosition));
+	glm::vec3 endingCenteredPosition = Globals::convertToMiddleGridPosition(Globals::convertToNodePosition(targetEntity.getPosition()));
+	glm::vec3 direction = glm::normalize(endingCenteredPosition - startingCenteredPosition);
+	float distance = glm::distance(endingCenteredPosition, startingCenteredPosition);
 	bool targetEntityVisible = true;
 
-	for (int i = 1; i < std::ceil(distanceSqr / step * step); ++i)
+	for (int i = Globals::NODE_SIZE; i < static_cast<int>(glm::ceil(distance)); i += Globals::NODE_SIZE)
 	{
 		glm::vec3 position = startingPosition + direction * static_cast<float>(i);
 		if (targetEntity.getAABB().contains(position))
