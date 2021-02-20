@@ -74,8 +74,7 @@ namespace
 		std::queue<glm::vec3> positionsToKeep;
 		int positionIndex = 0;
 		glm::vec3 startingPosition = Globals::convertToMiddleGridPosition(Globals::convertToNodePosition(entity.getPosition()));
-		while (startingPosition != pathToPosition.front() &&
-			positionIndex < pathToPosition.size())
+		while (startingPosition != pathToPosition.front() && positionIndex < pathToPosition.size())
 		{
 			glm::vec3 targetPosition = pathToPosition[positionIndex];
 			glm::vec3 direction = glm::normalize(targetPosition - startingPosition);
@@ -95,7 +94,29 @@ namespace
 
 			if (!collision)
 			{
-				positionsToKeep.push(pathToPosition[positionIndex]);
+				//positionsToKeep.push(pathToPosition[positionIndex]);
+				bool beginDeletion = false;
+				for (auto iter = pathToPosition.begin() + 1; iter != pathToPosition.end();)
+				{
+					if (*iter == targetPosition)
+					{
+						beginDeletion = true;
+					}
+					else if (*iter == startingPosition)
+					{
+						beginDeletion = false;
+					}
+
+					if (beginDeletion)
+					{
+						iter = pathToPosition.erase(iter);
+					}
+					else
+					{
+						++iter;
+					}
+				}
+
 				startingPosition = pathToPosition[positionIndex];
 				positionIndex = 0;
 
@@ -105,20 +126,22 @@ namespace
 			{
 				++positionIndex;
 			}
+
+			assert(!pathToPosition.empty());
 		}
 
-		if (!positionsToKeep.empty())
-		{
-			pathToPosition.clear();
-			while (!positionsToKeep.empty())
-			{
-				const glm::vec3& positionToKeep = positionsToKeep.front();
-				pathToPosition.push_back(positionToKeep);
-				positionsToKeep.pop();
-			}
+		//if (!positionsToKeep.empty())
+		//{
+		//	pathToPosition.clear();
+		//	while (!positionsToKeep.empty())
+		//	{
+		//		const glm::vec3& positionToKeep = positionsToKeep.front();
+		//		pathToPosition.push_back(positionToKeep);
+		//		positionsToKeep.pop();
+		//	}
 
-			std::reverse(pathToPosition.begin(), pathToPosition.end());
-		}
+		//	std::reverse(pathToPosition.begin(), pathToPosition.end());
+		//}
 	}
 
 	void convertPathToWaypoints(std::vector<glm::vec3>& pathToPosition, const Entity& entity, FactionHandler& factionHandler,
@@ -153,8 +176,12 @@ namespace
 
 			if (!collision)
 			{
-				positionsToKeep.push(pathToPosition[positionIndex]);
+				//positionsToKeep.push(pathToPosition[positionIndex]);
 				startingPosition = pathToPosition[positionIndex];
+				if (positionIndex > 0)
+				{
+					pathToPosition.erase(pathToPosition.begin() + positionIndex);
+				}
 				positionIndex = 0;
 
 				assert(positionsToKeep.size() <= pathToPosition.size());
@@ -165,20 +192,30 @@ namespace
 			}
 		}
 
-		if (!positionsToKeep.empty())
+		//if (!positionsToKeep.empty())
+		//{
+		//	pathToPosition.clear();
+		//	while (!positionsToKeep.empty())
+		//	{
+		//		const glm::vec3& positionToKeep = positionsToKeep.front();
+		//		pathToPosition.push_back(positionToKeep);
+		//		positionsToKeep.pop();
+		//	}
+
+		//	std::reverse(pathToPosition.begin(), pathToPosition.end());
+		//}
+	}
+
+	void addToOpenQueue(PriorityQueue& openQueue, const PriorityQueueNode& node)
+	{
+		if (openQueue.isSuccessorNodeValid(node))
 		{
-			pathToPosition.clear();
-			while (!positionsToKeep.empty())
-			{
-				const glm::vec3& positionToKeep = positionsToKeep.front();
-				pathToPosition.push_back(positionToKeep);
-				positionsToKeep.pop();
-			}
-
-			std::reverse(pathToPosition.begin(), pathToPosition.end());
+			openQueue.changeNode(node);
 		}
-
-		std::reverse(pathToPosition.begin(), pathToPosition.end());
+		else if (!openQueue.contains(node.position))
+		{
+			openQueue.add(node);
+		}
 	}
 }
 
@@ -296,6 +333,27 @@ bool PathFinding::isUnitPositionAvailable(const glm::vec3& position, const Entit
 	}
 
 	return true;
+}
+
+bool PathFinding::isPositionInLineOfSight(const glm::vec3& startingPosition, const glm::vec3& targetPosition, const Map& map) const
+{
+	glm::vec3 startingCenteredPosition = Globals::convertToMiddleGridPosition(Globals::convertToNodePosition(startingPosition));
+	glm::vec3 endingCenteredPosition = Globals::convertToMiddleGridPosition(Globals::convertToNodePosition(targetPosition));
+	glm::vec3 direction = glm::normalize(endingCenteredPosition - startingCenteredPosition);
+	float distance = glm::distance(endingCenteredPosition, startingCenteredPosition);
+	bool targetEntityVisible = true;
+
+	for (int i = Globals::NODE_SIZE; i < static_cast<int>(glm::ceil(distance)); i += Globals::NODE_SIZE)
+	{
+		glm::vec3 position = startingPosition + direction * static_cast<float>(i);
+		if (map.isPositionOccupied(position))
+		{
+			targetEntityVisible = false;
+			break;
+		}
+	}
+
+	return targetEntityVisible;
 }
 
 bool PathFinding::isTargetInLineOfSight(const glm::vec3& startingPosition, const Entity& targetEntity, const Map& map) const
@@ -635,6 +693,7 @@ void PathFinding::getPathToPosition(const Worker& worker, const glm::vec3& desti
 	m_openQueue.add({ startingPositionOnGrid, startingPositionOnGrid, 0.0f,
 		Globals::getSqrDistance(destinationOnGrid, startingPositionOnGrid) });
 
+	PriorityQueueNode parentNode = m_openQueue.getTop();
 	while (!m_openQueue.isEmpty() && !destinationReached)
 	{
 		PriorityQueueNode currentNode = m_openQueue.getTop();
@@ -676,17 +735,23 @@ void PathFinding::getPathToPosition(const Worker& worker, const glm::vec3& desti
 						shortestDistance = sqrDistance;
 					}
 
-					PriorityQueueNode adjacentNode(adjacentPosition.position, currentNode.position,
-						currentNode.g + Globals::getSqrDistance(adjacentPosition.position, currentNode.position),
-						sqrDistance);
+					if (isPositionInLineOfSight(Globals::convertToWorldPosition(adjacentPosition.position),
+						Globals::convertToWorldPosition(parentNode.position), map))
+					{
+						PriorityQueueNode adjacentNode(adjacentPosition.position, parentNode.position,
+							parentNode.g + Globals::getSqrDistance(adjacentPosition.position, parentNode.position),
+							sqrDistance);
 
-					if (m_openQueue.isSuccessorNodeValid(adjacentNode))
-					{
-						m_openQueue.changeNode(adjacentNode);
+						addToOpenQueue(m_openQueue, adjacentNode);
 					}
-					else if (!m_openQueue.contains(adjacentPosition.position))
+					else
 					{
-						m_openQueue.add(adjacentNode);
+						PriorityQueueNode adjacentNode(adjacentPosition.position, currentNode.position,
+							currentNode.g + Globals::getSqrDistance(adjacentPosition.position, currentNode.position),
+							sqrDistance);
+
+						parentNode = currentNode;
+						addToOpenQueue(m_openQueue, adjacentNode);
 					}
 				}
 			}
@@ -702,8 +767,6 @@ void PathFinding::getPathToPosition(const Worker& worker, const glm::vec3& desti
 	{
 		getPathFromClosedQueue(pathToPosition, startingPositionOnGrid, closestAvailablePosition, m_closedQueue, map);
 	}
-
-	convertPathToWaypoints(pathToPosition, worker, map);
 }
 
 void PathFinding::getPathToPosition(const Worker& worker, const Entity& target, std::vector<glm::vec3>& pathToPosition, 
@@ -729,6 +792,7 @@ void PathFinding::getPathToPosition(const Worker& worker, const Entity& target, 
 	m_openQueue.add({ startingPositionOnGrid, startingPositionOnGrid, 0.0f,
 		Globals::getSqrDistance(destinationOnGrid, startingPositionOnGrid) });
 
+	PriorityQueueNode parentNode = m_openQueue.getTop();
 	while (!m_openQueue.isEmpty() && !destinationReached)
 	{
 		PriorityQueueNode currentNode = m_openQueue.getTop();
@@ -755,7 +819,7 @@ void PathFinding::getPathToPosition(const Worker& worker, const Entity& target, 
 		}
 		else
 		{
-			for (const auto& adjacentPosition : getAdjacentPositions(currentNode.position, map))// adjacentPositions(currentNode.position))
+			for (const auto& adjacentPosition : getAdjacentPositions(currentNode.position, map))
 			{
 				if (!adjacentPosition.valid || m_closedQueue.contains(adjacentPosition.position))
 				{
@@ -770,17 +834,23 @@ void PathFinding::getPathToPosition(const Worker& worker, const Entity& target, 
 						shortestDistance = sqrDistance;
 					}
 
-					PriorityQueueNode adjacentNode(adjacentPosition.position, currentNode.position,
-						currentNode.g + Globals::getSqrDistance(adjacentPosition.position, currentNode.position),
-						sqrDistance);
+					if (isPositionInLineOfSight(Globals::convertToWorldPosition(adjacentPosition.position),
+						Globals::convertToWorldPosition(parentNode.position), map))
+					{
+						PriorityQueueNode adjacentNode(adjacentPosition.position, parentNode.position,
+							parentNode.g + Globals::getSqrDistance(adjacentPosition.position, parentNode.position),
+							sqrDistance);
 
-					if (m_openQueue.isSuccessorNodeValid(adjacentNode))
-					{
-						m_openQueue.changeNode(adjacentNode);
+						addToOpenQueue(m_openQueue, adjacentNode);
 					}
-					else if (!m_openQueue.contains(adjacentPosition.position))
+					else
 					{
-						m_openQueue.add(adjacentNode);
+						PriorityQueueNode adjacentNode(adjacentPosition.position, currentNode.position,
+							currentNode.g + Globals::getSqrDistance(adjacentPosition.position, currentNode.position),
+							sqrDistance);
+
+						parentNode = currentNode;
+						addToOpenQueue(m_openQueue, adjacentNode);
 					}
 				}
 			}
@@ -796,6 +866,4 @@ void PathFinding::getPathToPosition(const Worker& worker, const Entity& target, 
 	{
 		getPathFromClosedQueue(pathToPosition, startingPositionOnGrid, closestAvailablePosition, m_closedQueue, map);
 	}
-
-	convertPathToWaypoints(pathToPosition, worker, map);
 }
