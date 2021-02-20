@@ -501,6 +501,7 @@ bool PathFinding::setUnitAttackPosition(const Unit& unit, const Entity& targetEn
 	m_openQueue.add({ startingPositionOnGrid, startingPositionOnGrid, 0.0f,
 		Globals::getSqrDistance(targetEntity.getPosition(), unit.getPosition()) });
 
+	PriorityQueueNode parentNode = m_openQueue.getTop();
 	while (!positionFound && !m_openQueue.isEmpty())
 	{
 		PriorityQueueNode currentNode = m_openQueue.getTop();
@@ -541,17 +542,23 @@ bool PathFinding::setUnitAttackPosition(const Unit& unit, const Entity& targetEn
 				else
 				{
 					float sqrDistance = Globals::getSqrDistance(targetPositionOnGrid, adjacentPosition.position);
-					PriorityQueueNode adjacentNode(adjacentPosition.position, currentNode.position,
-						currentNode.g + Globals::getSqrDistance(adjacentPosition.position, currentNode.position),
-						sqrDistance);
+					if (isPositionInLineOfSight(Globals::convertToWorldPosition(adjacentPosition.position),
+						Globals::convertToWorldPosition(parentNode.position), map))
+					{
+						PriorityQueueNode adjacentNode(adjacentPosition.position, parentNode.position,
+							parentNode.g + Globals::getSqrDistance(adjacentPosition.position, parentNode.position),
+							sqrDistance);
 
-					if (m_openQueue.isSuccessorNodeValid(adjacentNode))
-					{
-						m_openQueue.changeNode(adjacentNode);
+						addToOpenQueue(m_openQueue, adjacentNode);
 					}
-					else if (!m_openQueue.contains(adjacentPosition.position))
+					else
 					{
-						m_openQueue.add(adjacentNode);
+						PriorityQueueNode adjacentNode(adjacentPosition.position, currentNode.position,
+							currentNode.g + Globals::getSqrDistance(adjacentPosition.position, currentNode.position),
+							sqrDistance);
+
+						parentNode = currentNode;
+						addToOpenQueue(m_openQueue, adjacentNode);
 					}
 				}
 			}
@@ -562,8 +569,6 @@ bool PathFinding::setUnitAttackPosition(const Unit& unit, const Entity& targetEn
 		assert(isPriorityQueueWithinSizeLimit(m_openQueue, map.getSize()) &&
 			isPriorityQueueWithinSizeLimit(m_closedQueue, map.getSize()));
 	}
-
-	convertPathToWaypoints(pathToPosition, unit, factionHandler, map, unit.getOwningFaction());
 	
 	return positionFound;
 }
@@ -588,6 +593,7 @@ void PathFinding::getPathToPosition(const Unit& unit, const glm::vec3& destinati
 	m_openQueue.add({ startingPositionOnGrid, startingPositionOnGrid, 0.0f, 
 		Globals::getSqrDistance(destinationOnGrid, startingPositionOnGrid) });
 
+	PriorityQueueNode parentNode = m_openQueue.getTop();
 	while (!m_openQueue.isEmpty() && !destinationReached)
 	{
 		PriorityQueueNode currentNode = m_openQueue.getTop();
@@ -643,17 +649,23 @@ void PathFinding::getPathToPosition(const Unit& unit, const glm::vec3& destinati
 						shortestDistance = sqrDistance;
 					}
 					
-					PriorityQueueNode adjacentNode(adjacentPosition.position, currentNode.position,
-						currentNode.g + Globals::getSqrDistance(adjacentPosition.position, currentNode.position),
-						sqrDistance);
+					if (isPositionInLineOfSight(Globals::convertToWorldPosition(adjacentPosition.position),
+						Globals::convertToWorldPosition(parentNode.position), map))
+					{
+						PriorityQueueNode adjacentNode(adjacentPosition.position, parentNode.position,
+							parentNode.g + Globals::getSqrDistance(adjacentPosition.position, parentNode.position),
+							sqrDistance);
 
-					if (m_openQueue.isSuccessorNodeValid(adjacentNode))
-					{
-						m_openQueue.changeNode(adjacentNode);
+						addToOpenQueue(m_openQueue, adjacentNode);
 					}
-					else if (!m_openQueue.contains(adjacentPosition.position))
+					else
 					{
-						m_openQueue.add(adjacentNode);
+						PriorityQueueNode adjacentNode(adjacentPosition.position, currentNode.position,
+							currentNode.g + Globals::getSqrDistance(adjacentPosition.position, currentNode.position),
+							sqrDistance);
+
+						parentNode = currentNode;
+						addToOpenQueue(m_openQueue, adjacentNode);
 					}
 				}
 			}
@@ -669,8 +681,6 @@ void PathFinding::getPathToPosition(const Unit& unit, const glm::vec3& destinati
 	{	
 		getPathFromClosedQueue(pathToPosition, startingPositionOnGrid, closestAvailablePosition, m_closedQueue, map);
 	}
-
-	convertPathToWaypoints(pathToPosition, unit, factionHandler, map, owningFaction);
 }
 
 void PathFinding::getPathToPosition(const Worker& worker, const glm::vec3& destination, std::vector<glm::vec3>& pathToPosition, 
