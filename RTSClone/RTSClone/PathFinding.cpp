@@ -73,7 +73,7 @@ namespace
 
 		std::queue<glm::vec3> positionsToKeep;
 		int positionIndex = 0;
-		glm::vec3 startingPosition = entity.getPosition();
+		glm::vec3 startingPosition = Globals::convertToMiddleGridPosition(Globals::convertToNodePosition(entity.getPosition()));
 		while (startingPosition != pathToPosition.front() &&
 			positionIndex < pathToPosition.size())
 		{
@@ -135,7 +135,7 @@ namespace
 
 		std::queue<glm::vec3> positionsToKeep;
 		int positionIndex = 0;
-		glm::vec3 startingPosition = entity.getPosition();
+		glm::vec3 startingPosition = Globals::convertToMiddleGridPosition(Globals::convertToNodePosition(entity.getPosition()));
 		while (startingPosition != pathToPosition.front() && 
 			positionIndex < pathToPosition.size())
 		{
@@ -145,7 +145,7 @@ namespace
 			constexpr float step = Globals::NODE_SIZE;
 			bool collision = false;
 
-			for (int ray = step; ray <= static_cast<int>(distance); ray += step)
+			for (int ray = step; ray <= static_cast<int>(glm::ceil(distance)); ray += step)
 			{
 				position = position + glm::normalize(targetPosition - startingPosition) * step;
 
