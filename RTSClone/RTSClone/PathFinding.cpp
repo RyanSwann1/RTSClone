@@ -446,7 +446,7 @@ void PathFinding::getPathToPosition(const Unit& unit, const glm::vec3& destinati
 	const Map& map, FactionHandler& factionHandler, const Faction& owningFaction)
 {
 	pathToPosition.clear();
-	if (unit.getPosition() == destination)
+	if (unit.getPosition() == destination || !map.isWithinBounds(destination))
 	{
 		return;
 	}
@@ -545,7 +545,7 @@ void PathFinding::getPathToPosition(const Worker& worker, const glm::vec3& desti
 	AdjacentPositions adjacentPositions, const Map& map, const Faction& owningFaction)
 {
 	pathToPosition.clear();
-	if (worker.getPosition() == destination)
+	if (worker.getPosition() == destination || !map.isWithinBounds(destination))
 	{
 		return;
 	}
@@ -636,7 +636,7 @@ void PathFinding::getPathToPosition(const Worker& worker, const Entity& target, 
 		target.getAABB(), map);
 
 	pathToPosition.clear();
-	if (worker.getPosition() == destination)
+	if (worker.getPosition() == destination || !map.isWithinBounds(destination))
 	{
 		return;
 	}

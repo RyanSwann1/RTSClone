@@ -467,19 +467,13 @@ void FactionPlayer::moveMultipleSelectedEntities(const glm::vec3& planeIntersect
                 {
                     eUnitState state = (m_attackMoveSelected ? eUnitState::AttackMoving : eUnitState::Moving);
                     glm::vec3 destination = planeIntersection - (averagePosition - selectedEntity->getPosition());
-                    if (map.isWithinBounds(destination))
-                    {
-                        static_cast<Unit&>(*selectedEntity).moveTo(destination, map, factionHandler, state);
-                    }
+                    static_cast<Unit&>(*selectedEntity).moveTo(destination, map, factionHandler, state);
                 }
                 break;
                 case eEntityType::Worker:
                 {
                     glm::vec3 destination = planeIntersection - (averagePosition - selectedEntity->getPosition());
-                    if (map.isWithinBounds(destination))
-                    {
-                        static_cast<Worker*>(selectedEntity)->moveTo(destination, map);
-                    }
+                    static_cast<Worker&>(*selectedEntity).moveTo(destination, map);
                 }
                 break;
                 default:
@@ -524,10 +518,6 @@ void FactionPlayer::onRightClick(const sf::Window& window, const Camera& camera,
 {
     m_plannedBuilding.reset();
     glm::vec3 planeIntersection = camera.getRayToGroundPlaneIntersection(window);
-    if (!map.isWithinBounds(planeIntersection))
-    {
-        return;
-    }
     const Faction* targetFaction = nullptr;
     const Entity* targetEntity = nullptr;
 
