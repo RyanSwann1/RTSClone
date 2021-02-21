@@ -459,17 +459,6 @@ void PathFinding::getPathToPosition(const Unit& unit, const glm::vec3& destinati
 
 		if (currentNode.position == destinationOnGrid)
 		{
-			switch (unit.getEntityType())
-			{
-			case eEntityType::Unit:
-				break;
-			case eEntityType::Worker:
-				pathToPosition.push_back(destination);
-				break;
-			default:
-				assert(false);
-			}
-
 			if (currentNode.position == startingPositionOnGrid)
 			{
 				if (isUnitPositionAvailable(Globals::convertToWorldPosition(startingPositionOnGrid), unit, factionHandler, owningFaction))
@@ -569,22 +558,14 @@ void PathFinding::getPathToPosition(const Worker& worker, const glm::vec3& desti
 
 		if (currentNode.position == destinationOnGrid)
 		{
-			switch (worker.getEntityType())
-			{
-			case eEntityType::Unit:
-				break;
-			case eEntityType::Worker:
-				pathToPosition.push_back(destination);
-				break;
-			default:
-				assert(false);
-			}
-
 			destinationReached = true;
 			if (Globals::convertToWorldPosition(currentNode.position) != worker.getPosition())
 			{
 				getPathFromClosedQueue(pathToPosition, startingPositionOnGrid, currentNode, m_closedQueue, map);
 			}
+
+			assert(!pathToPosition.empty());
+			*pathToPosition.begin() = destination;
 		}
 		else
 		{
@@ -668,22 +649,14 @@ void PathFinding::getPathToPosition(const Worker& worker, const Entity& target, 
 
 		if (currentNode.position == destinationOnGrid)
 		{
-			switch (worker.getEntityType())
-			{
-			case eEntityType::Unit:
-				break;
-			case eEntityType::Worker:
-				pathToPosition.push_back(destination);
-				break;
-			default:
-				assert(false);
-			}
-
 			destinationReached = true;
 			if (Globals::convertToWorldPosition(currentNode.position) != worker.getPosition())
 			{
 				getPathFromClosedQueue(pathToPosition, startingPositionOnGrid, currentNode, m_closedQueue, map);
 			}
+
+			assert(!pathToPosition.empty());
+			*pathToPosition.begin() = destination;
 		}
 		else
 		{
