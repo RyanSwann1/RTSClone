@@ -37,7 +37,6 @@ namespace
 	const glm::vec3 PLAYABLE_AREA_GROUND_COLOR = { 1.0f, 1.0f, 0.5f };
 	const float PLAYABLE_AREA_OPACITY = 0.1f;
 
-
 	const int MIN_FACTIONS = 2;
 	const int DEFAULT_FACTIONS_COUNT = 2;
 

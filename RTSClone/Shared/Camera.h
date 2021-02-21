@@ -13,6 +13,8 @@ struct Camera : private NonCopyable, private NonMovable
 	glm::mat4 getProjection(glm::ivec2 windowSize) const;
 
 #ifdef LEVEL_EDITOR
+	bool isRayIntersectingAABB(const glm::vec3& B1, const glm::vec3& B2, const glm::vec3& L1, const glm::vec3& L2, glm::vec3& Hit) const;
+	glm::vec3 getRayDirectionFromMouse(const sf::Window& window) const;
 	//Return false if ground not found
 	bool getRayToGroundIntersection(const sf::Window& window, glm::uvec2 windowSize, glm::vec3& intersection) const;
 	void onMouseMove(const sf::Window& window, float deltaTime);
