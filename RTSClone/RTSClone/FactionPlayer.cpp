@@ -493,13 +493,8 @@ void FactionPlayer::moveMultipleSelectedEntities(const glm::vec3& planeIntersect
 void FactionPlayer::onLeftClick(const sf::Window& window, const Camera& camera, const Map& map, const BaseHandler& baseHandler)
 {
     glm::vec3 planeIntersection = camera.getRayToGroundPlaneIntersection(window);
-    if (!map.isWithinBounds(planeIntersection))
-    {
-        return;
-    }
-
     m_entitySelector.setStartingPosition(window, planeIntersection);
-    
+
     int workerIDSelected = instructWorkerToBuild(map, baseHandler);
     selectEntity<Unit>(m_units, planeIntersection, planeIntersection == m_previousPlaneIntersection);
     selectEntity<Worker>(m_workers, planeIntersection, planeIntersection == m_previousPlaneIntersection, workerIDSelected);
