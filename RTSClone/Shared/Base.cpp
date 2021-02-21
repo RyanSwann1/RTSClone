@@ -108,7 +108,7 @@ BaseHandler::BaseHandler(std::vector<Base>&& m_bases)
 	: m_bases(std::move(m_bases))
 {}
 
-bool BaseHandler::isWithinDistanceOfMinerals(const glm::vec3& position, float distance) const
+bool BaseHandler::isWithinRangeOfMinerals(const glm::vec3& position, float distance) const
 {
 	for (const auto& base : m_bases)
 	{

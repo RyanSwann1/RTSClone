@@ -75,6 +75,8 @@ namespace
 			openQueue.add(node);
 		}
 	}
+
+
 }
 
 PathFinding::PathFinding()
@@ -107,7 +109,7 @@ bool PathFinding::isBuildingSpawnAvailable(const glm::vec3& startingPosition, eE
 {
 	std::vector<glm::vec3> buildPositions;
 	AABB buildingAABB(startingPosition, ModelManager::getInstance().getModel(buildingEntityType));
-	for (int i = 0; i < 15; ++i)
+	for (int i = 0; i < 5; ++i)
 	{
 		m_graph.reset(m_frontier);
 		m_frontier = std::queue<glm::ivec2>();
@@ -124,8 +126,8 @@ bool PathFinding::isBuildingSpawnAvailable(const glm::vec3& startingPosition, eE
 				{
 					buildingAABB.update(Globals::convertToWorldPosition(adjacentPosition.position));
 					if (!map.isAABBOccupied(buildingAABB) &&
-						!owningFaction.isWithinDistanceOfBuildings(Globals::convertToWorldPosition(adjacentPosition.position), Globals::NODE_SIZE * 3.0f) && 
-						!baseHandler.isWithinDistanceOfMinerals(Globals::convertToWorldPosition(adjacentPosition.position), Globals::NODE_SIZE * 6.0f))
+						!owningFaction.isWithinRangeOfBuildings(Globals::convertToWorldPosition(adjacentPosition.position), Globals::NODE_SIZE * 3.0f) && 
+						!baseHandler.isWithinRangeOfMinerals(Globals::convertToWorldPosition(adjacentPosition.position), Globals::NODE_SIZE * 6.0f))
 					{
 						buildPositionFound = true;
 						buildPositions.emplace_back(Globals::convertToWorldPosition(adjacentPosition.position));

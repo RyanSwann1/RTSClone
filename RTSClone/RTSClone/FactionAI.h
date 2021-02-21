@@ -31,7 +31,7 @@ public:
 	FactionAI(eFactionController factionController, const glm::vec3& hqStartingPosition, 
 		int startingResources, int startingPopulationCap, const BaseHandler& baseHandler);
 
-	bool isWithinDistanceOfBuildings(const glm::vec3& position, float distance) const;
+	bool isWithinRangeOfBuildings(const glm::vec3& position, float distance) const;
 
 	void onUnitTakenDamage(const TakeDamageEvent& gameEvent, Unit& unit, const Map& map, FactionHandler& factionHandler) override;
 	bool increaseShield(const Laboratory& laboratory) override;

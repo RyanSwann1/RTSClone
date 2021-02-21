@@ -26,7 +26,7 @@
 
 namespace
 {
-	const float DELAY_TIMER_EXPIRATION =  10.0f;
+	const float DELAY_TIMER_EXPIRATION = 10.0f;
 	const float IDLE_TIMER_EXPIRATION = 1.0f;
 	const float MIN_SPAWN_TIMER_EXPIRATION = 7.5f;
 	const float MAX_SPAWN_TIMER_EXPIRATION = 15.0f;
@@ -344,7 +344,7 @@ Worker* FactionAI::getAvailableWorker(const glm::vec3& position)
 	return selectedWorker;
 }
 
-bool FactionAI::isWithinDistanceOfBuildings(const glm::vec3& position, float distance) const
+bool FactionAI::isWithinRangeOfBuildings(const glm::vec3& position, float distance) const
 {
 	for (const auto& entity : m_allEntities)
 	{
