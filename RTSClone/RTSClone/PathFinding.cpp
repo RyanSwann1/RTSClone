@@ -76,7 +76,15 @@ namespace
 		}
 	}
 
+	bool isWithinBuildingPositionsRange(const std::vector<glm::vec3>& buildPositions, const glm::vec3& position)
+	{
+		auto buildPosition = std::find_if(buildPositions.cbegin(), buildPositions.cend(), [&position](const auto& buildPosition)
+		{
+			return Globals::getSqrDistance(buildPosition, position) < static_cast<float>(Globals::NODE_SIZE) * 4.0f;
+		});
 
+		return buildPosition != buildPositions.cend();
+	}
 }
 
 PathFinding::PathFinding()
@@ -127,7 +135,8 @@ bool PathFinding::isBuildingSpawnAvailable(const glm::vec3& startingPosition, eE
 					buildingAABB.update(Globals::convertToWorldPosition(adjacentPosition.position));
 					if (!map.isAABBOccupied(buildingAABB) &&
 						!owningFaction.isWithinRangeOfBuildings(Globals::convertToWorldPosition(adjacentPosition.position), Globals::NODE_SIZE * 3.0f) && 
-						!baseHandler.isWithinRangeOfMinerals(Globals::convertToWorldPosition(adjacentPosition.position), Globals::NODE_SIZE * 6.0f))
+						!baseHandler.isWithinRangeOfMinerals(Globals::convertToWorldPosition(adjacentPosition.position), Globals::NODE_SIZE * 6.0f) &&
+						!isWithinBuildingPositionsRange(buildPositions, Globals::convertToWorldPosition(adjacentPosition.position)))
 					{
 						buildPositionFound = true;
 						buildPositions.emplace_back(Globals::convertToWorldPosition(adjacentPosition.position));
