@@ -24,6 +24,8 @@ public:
 	AABB(const std::vector<Unit*>& selectedUnits);
 #endif // GAME
 	
+	glm::vec3 getMax() const;
+	glm::vec3 getMin() const;
 	glm::vec3 getCenterPosition() const;
 	float getLeft() const;
 	float getRight() const;

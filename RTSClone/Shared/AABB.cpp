@@ -108,6 +108,16 @@ AABB::AABB(const std::vector<Unit*>& selectedUnits)
 }
 #endif // GAME
 
+glm::vec3 AABB::getMax() const
+{
+	return { m_right, m_top, m_forward };
+}
+
+glm::vec3 AABB::getMin() const
+{
+	return { m_left, m_bottom, m_back };
+}
+
 glm::vec3 AABB::getCenterPosition() const
 {
 	float width = getRight() - getLeft();
