@@ -114,10 +114,11 @@ void FactionPlayerPlannedBuilding::handleInput(const sf::Event& event, const Cam
     if(event.type == sf::Event::MouseMoved)
     {
         assert(m_builderID != Globals::INVALID_ENTITY_ID);
-        glm::vec3 position = camera.getRayToGroundPlaneIntersection(window);
-        if (map.isWithinBounds(position))
+        glm::vec3 position = 
+            Globals::convertToMiddleGridPosition(Globals::convertToNodePosition(camera.getRayToGroundPlaneIntersection(window)));
+        if (map.isWithinBounds(AABB(position, ModelManager::getInstance().getModel(m_entityType))))
         {
-            m_position = Globals::convertToMiddleGridPosition(Globals::convertToNodePosition(position));
+            m_position = position;
         }
     }
 }
@@ -131,8 +132,8 @@ void FactionPlayerPlannedBuilding::render(ShaderHandler& shaderHandler, const Ba
 bool FactionPlayerPlannedBuilding::isOnValidPosition(const BaseHandler& baseHandler, const Map& map) const
 {
     AABB buildingAABB(m_position, ModelManager::getInstance().getModel(m_entityType));
-    assert(Globals::isOnMiddlePosition(m_position));
-    if (map.isWithinBounds(buildingAABB) && !map.isAABBOccupied(buildingAABB))
+    assert(Globals::isOnMiddlePosition(m_position) && map.isWithinBounds(buildingAABB));
+    if (!map.isAABBOccupied(buildingAABB))
     {
         switch (m_entityType)
         {
