@@ -573,10 +573,9 @@ void PathFinding::getPathToPosition(const Worker& worker, const glm::vec3& desti
 			if (Globals::convertToWorldPosition(currentNode.position) != worker.getPosition())
 			{
 				getPathFromClosedQueue(pathToPosition, startingPositionOnGrid, currentNode, m_closedQueue, map);
+				assert(!pathToPosition.empty());
+				*pathToPosition.begin() = destination;
 			}
-
-			assert(!pathToPosition.empty());
-			*pathToPosition.begin() = destination;
 		}
 		else
 		{
@@ -664,10 +663,9 @@ void PathFinding::getPathToPosition(const Worker& worker, const Entity& target, 
 			if (Globals::convertToWorldPosition(currentNode.position) != worker.getPosition())
 			{
 				getPathFromClosedQueue(pathToPosition, startingPositionOnGrid, currentNode, m_closedQueue, map);
+				assert(!pathToPosition.empty());
+				*pathToPosition.begin() = destination;
 			}
-
-			assert(!pathToPosition.empty());
-			*pathToPosition.begin() = destination;
 		}
 		else
 		{
