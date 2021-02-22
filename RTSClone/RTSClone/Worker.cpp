@@ -116,12 +116,11 @@ bool Worker::build(const glm::vec3& buildPosition, const Map& map, eEntityType e
 		if (m_buildQueue.empty())
 		{
 			moveTo(buildPosition, map, eWorkerState::MovingToBuildingPosition);
-		}
-
-		if (m_currentState == eWorkerState::MovingToBuildingPosition)
-		{
-			m_buildQueue.emplace_back(buildPosition, entityType);
-			return true;
+			if (m_currentState == eWorkerState::MovingToBuildingPosition)
+			{
+				m_buildQueue.emplace_back(buildPosition, entityType);
+				return true;
+			}
 		}
 	}
 

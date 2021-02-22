@@ -402,7 +402,7 @@ bool PathFinding::setUnitAttackPosition(const Unit& unit, const Entity& targetEn
 		}
 		else
 		{
-			for (const auto& adjacentPosition : getAdjacentPositions(currentNode.position, map, factionHandler, unit))
+			for (const auto& adjacentPosition : getAdjacentPositions(currentNode.position, map, factionHandler, unit, targetEntity.getAABB()))
 			{
 				if (!adjacentPosition.valid || m_closedQueue.contains(adjacentPosition.position))
 				{

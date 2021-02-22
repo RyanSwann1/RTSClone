@@ -28,6 +28,7 @@ namespace
 	const float MAXIMUM_ZOOM_HEIGHT = 25.0f;
 	const float MINIMUM_ZOOM_HEIGHT = 150.0f;
 
+	//RAY TO AABB http://www.3dkingdoms.com/weekly/weekly.php?a=3
 	glm::vec3 getRayDirectionFromCamera(const glm::mat4& projection, const glm::mat4& view, const sf::Window& window, glm::ivec2 mousePosition)
 	{
 		glm::vec4 clipSpace = { (mousePosition.x * 2.0f) / window.getSize().x - 1.0f,

@@ -51,3 +51,6 @@ std::array<AdjacentPosition, ALL_DIRECTIONS_ON_GRID.size()> getAdjacentPositions
 
 std::array<AdjacentPosition, ALL_DIRECTIONS_ON_GRID.size()> getAdjacentPositions(const glm::ivec2& position, const Map& map,
 	FactionHandler& factionHandler, const Unit& unit);
+
+std::array<AdjacentPosition, ALL_DIRECTIONS_ON_GRID.size()> getAdjacentPositions(const glm::ivec2& position, const Map& map,
+	FactionHandler& factionHandler, const Unit& unit, const AABB& ignoreAABB);
