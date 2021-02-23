@@ -26,7 +26,10 @@ Laboratory::Laboratory(const glm::vec3& startingPosition, Faction& owningFaction
 
 Laboratory::~Laboratory()
 {
-	broadcastToMessenger<GameMessages::RemoveFromMap>({ m_AABB });	
+	if (m_status.isActive())
+	{
+		broadcastToMessenger<GameMessages::RemoveFromMap>({ m_AABB });
+	}
 }
 
 int Laboratory::getShieldUpgradeCounter() const

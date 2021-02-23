@@ -17,7 +17,7 @@ private:
 };
 
 //glGenVertexArrays
-struct OpenGLResourceVertexArrayID : private NonCopyable
+struct OpenGLResourceVertexArrayID
 {
 	OpenGLResourceVertexArrayID();
 	OpenGLResourceVertexArrayID(const OpenGLResourceVertexArrayID&) = delete;

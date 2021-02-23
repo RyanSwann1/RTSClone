@@ -27,7 +27,10 @@ namespace
 
 EntitySpawnerBuilding::~EntitySpawnerBuilding()
 {
-	broadcastToMessenger<GameMessages::RemoveFromMap>({ m_AABB });
+	if (m_status.isActive())
+	{
+		broadcastToMessenger<GameMessages::RemoveFromMap>({ m_AABB });
+	}
 }
 
 const Timer& EntitySpawnerBuilding::getSpawnTimer() const

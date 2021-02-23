@@ -14,7 +14,10 @@ SupplyDepot::SupplyDepot(const glm::vec3& startingPosition, const Faction& ownin
 
 SupplyDepot::~SupplyDepot()
 {
-	broadcastToMessenger<GameMessages::RemoveFromMap>({ m_AABB });
+	if (m_status.isActive())
+	{
+		broadcastToMessenger<GameMessages::RemoveFromMap>({ m_AABB });
+	}
 }
 
 void SupplyDepot::update(float deltaTime)

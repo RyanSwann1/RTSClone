@@ -9,6 +9,21 @@
 #include "Sprite.h"
 #include "Timer.h"
 
+class EntityStatus
+{
+public:
+	EntityStatus();
+	EntityStatus(const EntityStatus&) = delete;
+	EntityStatus& operator=(const EntityStatus&) = delete;
+	EntityStatus(EntityStatus&&) noexcept;
+	EntityStatus& operator=(EntityStatus&&) noexcept;
+
+	bool isActive() const;
+
+private:
+	bool active;
+};
+
 struct TakeDamageEvent;
 class FactionHandler;
 struct Camera;
@@ -17,9 +32,13 @@ enum class eFactionController;
 struct Model;
 class ShaderHandler;
 class Map;
-class Entity : private NonCopyable, private NonMovable
+class Entity
 {
 public:
+	Entity(const Entity&) = delete;
+	Entity& operator=(const Entity&) = delete;
+	Entity(Entity&&) = default;
+	Entity& operator=(Entity&&) = default;
 	virtual ~Entity();
 
 	eEntityType getEntityType() const;
@@ -54,6 +73,7 @@ protected:
 	
 	void update(float deltaTime);
 	
+	EntityStatus m_status;
 	Sprite m_statbarSprite;
 	glm::vec3 m_position;
 	glm::vec3 m_rotation;

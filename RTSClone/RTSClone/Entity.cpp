@@ -55,9 +55,37 @@ namespace
 	const float SHIELD_REPLENISH_TIMER_EXPIRATION = 15.0f;
 }
 
+//EntityStatus
+EntityStatus::EntityStatus()
+	: active(true)
+{}
+
+EntityStatus::EntityStatus(EntityStatus&& rhs) noexcept
+	: active(rhs.active)
+{
+	assert(false);
+	rhs.active = false;
+}
+
+EntityStatus& EntityStatus::operator=(EntityStatus&& rhs) noexcept
+{
+	assert(false);
+	active = rhs.active;
+	rhs.active = false;
+
+	return *this;
+}
+
+bool EntityStatus::isActive() const
+{
+	return active;
+}
+
+//Entity
 Entity::Entity(const Model& model, const glm::vec3& startingPosition, eEntityType entityType, 
 	int health, int shield, glm::vec3 startingRotation)
-	: m_statbarSprite(),
+	: m_status(),
+	m_statbarSprite(),
 	m_position(startingPosition),
 	m_rotation(startingRotation),
 	m_AABB(),
@@ -266,3 +294,4 @@ void Entity::renderAABB(ShaderHandler& shaderHandler)
 	m_AABB.render(shaderHandler);
 }
 #endif // RENDER_AABB
+

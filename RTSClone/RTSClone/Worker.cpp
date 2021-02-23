@@ -223,6 +223,7 @@ void Worker::update(float deltaTime, const Map& map, FactionHandler& factionHand
 					glm::vec3 destination = PathFinding::getInstance().getRandomAvailablePositionOutsideAABB(*this, map);
 					moveTo(destination, map, building->getAABB());
 				}
+				assert(m_currentState != eWorkerState::Idle);
 			}
 		}
 		break;

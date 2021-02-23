@@ -31,7 +31,10 @@ Turret::Turret(const glm::vec3& startingPosition, const Faction& owningFaction)
 
 Turret::~Turret()
 {
-	broadcastToMessenger<GameMessages::RemoveFromMap>({ m_AABB });
+	if (m_status.isActive())
+	{
+		broadcastToMessenger<GameMessages::RemoveFromMap>({ m_AABB });
+	}
 }
 
 void Turret::update(float deltaTime, FactionHandler& factionHandler, const Map& map)
