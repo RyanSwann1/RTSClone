@@ -212,7 +212,7 @@ bool PathFinding::isPositionInLineOfSight(const glm::vec3& startingPosition, con
 	float distance = glm::distance(endingCenteredPosition, startingCenteredPosition);
 	bool targetEntityVisible = true;
 
-	for (int i = Globals::NODE_SIZE; i < static_cast<int>(glm::ceil(distance)); i += Globals::NODE_SIZE)
+	for (int i = Globals::NODE_SIZE; i <= static_cast<int>(glm::ceil(distance)); i += Globals::NODE_SIZE)
 	{
 		glm::vec3 position = startingPosition + direction * static_cast<float>(i);
 		if (map.isPositionOccupied(position))
@@ -233,7 +233,7 @@ bool PathFinding::isTargetInLineOfSight(const glm::vec3& startingPosition, const
 	float distance = glm::distance(endingCenteredPosition, startingCenteredPosition); 
 	bool targetEntityVisible = true;
 
-	for (int i = Globals::NODE_SIZE; i < static_cast<int>(glm::ceil(distance)); i += Globals::NODE_SIZE)
+	for (int i = Globals::NODE_SIZE; i <= static_cast<int>(glm::ceil(distance)); i += Globals::NODE_SIZE)
 	{
 		glm::vec3 position = startingPosition + direction * static_cast<float>(i);
 		if (targetEntity.getAABB().contains(position))
@@ -258,7 +258,7 @@ bool PathFinding::isTargetInLineOfSight(const glm::vec3& startingPosition, const
 	float distance = glm::distance(endingCenteredPosition, startingCenteredPosition);
 	bool targetEntityVisible = true;
 
-	for (int i = Globals::NODE_SIZE; i < static_cast<int>(glm::ceil(distance)); i += Globals::NODE_SIZE)
+	for (int i = Globals::NODE_SIZE; i <= static_cast<int>(glm::ceil(distance)); i += Globals::NODE_SIZE)
 	{
 		glm::vec3 position = startingPosition + direction * static_cast<float>(i);
 		if (targetEntity.getAABB().contains(position))
@@ -363,12 +363,11 @@ bool PathFinding::setUnitAttackPosition(const Unit& unit, const Entity& targetEn
 	m_openQueue.clear();
 	m_closedQueue.clear();
 
-	glm::ivec2 startingPositionOnGrid = Globals::convertToGridPosition(unit.getPosition());
-	glm::ivec2 targetPositionOnGrid = Globals::convertToGridPosition(targetEntity.getPosition());
+	glm::ivec2 startingPosition = Globals::convertToGridPosition(unit.getPosition());
+	glm::ivec2 targetPosition = Globals::convertToGridPosition(targetEntity.getPosition());
 	bool positionFound = false;
 
-	m_openQueue.add({ startingPositionOnGrid, startingPositionOnGrid, 0.0f,
-		Globals::getSqrDistance(targetEntity.getPosition(), unit.getPosition()) });
+	m_openQueue.add({ startingPosition, startingPosition, 0.0f, Globals::getSqrDistance(targetEntity.getPosition(), unit.getPosition()) });
 
 	PriorityQueueNode parentNode = m_openQueue.getTop();
 	while (!positionFound && !m_openQueue.isEmpty())
@@ -380,14 +379,14 @@ bool PathFinding::setUnitAttackPosition(const Unit& unit, const Entity& targetEn
 			unit.getAttackRange() * unit.getAttackRange() && 
 			isTargetInLineOfSight(Globals::convertToWorldPosition(currentNode.position), targetEntity, map))
 		{
-			if (currentNode.position == startingPositionOnGrid)
+			if (currentNode.position == startingPosition)
 			{
-				if (isUnitPositionAvailable(Globals::convertToWorldPosition(startingPositionOnGrid), unit, factionHandler, unit.getOwningFaction()))
+				if (isUnitPositionAvailable(Globals::convertToWorldPosition(startingPosition), unit, factionHandler, unit.getOwningFaction()))
 				{
 					positionFound = true;
 					if (Globals::convertToWorldPosition(currentNode.position) != unit.getPosition())
 					{
-						pathToPosition.push_back(Globals::convertToWorldPosition(startingPositionOnGrid));
+						pathToPosition.push_back(Globals::convertToWorldPosition(startingPosition));
 					}
 				}
 			}
@@ -396,7 +395,7 @@ bool PathFinding::setUnitAttackPosition(const Unit& unit, const Entity& targetEn
 				positionFound = true;
 				if (Globals::convertToWorldPosition(currentNode.position) != unit.getPosition())
 				{
-					getPathFromClosedQueue(pathToPosition, startingPositionOnGrid, currentNode, m_closedQueue, map);
+					getPathFromClosedQueue(pathToPosition, startingPosition, currentNode, m_closedQueue, map);
 				}
 			}
 		}
@@ -410,7 +409,7 @@ bool PathFinding::setUnitAttackPosition(const Unit& unit, const Entity& targetEn
 				}
 				else
 				{
-					float sqrDistance = Globals::getSqrDistance(targetPositionOnGrid, adjacentPosition.position);
+					float sqrDistance = Globals::getSqrDistance(targetPosition, adjacentPosition.position);
 					if (isPositionInLineOfSight(Globals::convertToWorldPosition(adjacentPosition.position),
 						Globals::convertToWorldPosition(parentNode.position), map))
 					{
