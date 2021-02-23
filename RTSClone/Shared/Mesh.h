@@ -3,6 +3,7 @@
 #include "NonCopyable.h"
 #include "NonMovable.h"
 #include "glm/glm.hpp"
+#include "OpenGLResourceID.h"
 #include <vector>
 #include <string>
 
@@ -26,13 +27,14 @@ struct Vertex
 
 enum class eFactionController;
 class ShaderHandler;
-struct Mesh : private NonCopyable
+struct Mesh
 {
 	Mesh();
 	Mesh(std::vector<Vertex>&& vertices, std::vector<unsigned int>&& indices, const Material& material);
-	Mesh(Mesh&&) noexcept;
-	Mesh& operator=(Mesh&&) noexcept;
-	~Mesh();
+	Mesh(const Mesh&) = delete;
+	Mesh& operator=(const Mesh&) = delete;
+	Mesh(Mesh&&) = default;
+	Mesh& operator=(Mesh&&) = default;
 
 	void bind() const;
 	void attachToVAO() const;
@@ -50,9 +52,7 @@ struct Mesh : private NonCopyable
 	Material material;
 
 private:
-	unsigned int vaoID;
-	unsigned int vboID;
-	unsigned int indiciesID;
-
-	void onDestroy();
+	OpenGLResourceVertexArrayID vaoID;
+	OpenGLResourceBufferID vboID;
+	OpenGLResourceBufferID indiciesID;
 };

@@ -8,77 +8,57 @@ namespace
 	const float HIGHLIGHTED_MESH_AMPLIFIER = 1.75f;
 }
 
+//Vertex
+Vertex::Vertex(const glm::vec3& position)
+	: position(position),
+	normal()
+{}
+
+Vertex::Vertex(const glm::vec3& position, const glm::vec3& normal)
+	: position(position),
+	normal(normal)
+{}
+
+//Material
+Material::Material()
+	: diffuse(),
+	name()
+{}
+
+Material::Material(const glm::vec3& diffuse, const std::string& name)
+	: diffuse(diffuse),
+	name(name)
+{}
+
 Mesh::Mesh()
-	: vaoID(Globals::INVALID_OPENGL_ID),
-	vboID(Globals::INVALID_OPENGL_ID),
-	indiciesID(Globals::INVALID_OPENGL_ID),
+	: vaoID(),
+	vboID(),
+	indiciesID(),
 	vertices(),
 	indices(),
 	material()
 {
-	glGenVertexArrays(1, &vaoID);
-	glGenBuffers(1, &vboID);
-	glGenBuffers(1, &indiciesID);
+	glGenVertexArrays(1, &vaoID.ID);
+	glGenBuffers(1, &vboID.ID);
+	glGenBuffers(1, &indiciesID.ID);
 }
 
 Mesh::Mesh(std::vector<Vertex>&& vertices, std::vector<unsigned int>&& indices, const Material& material)
-	: vaoID(Globals::INVALID_OPENGL_ID),
-	vboID(Globals::INVALID_OPENGL_ID),
-	indiciesID(Globals::INVALID_OPENGL_ID),
+	: vaoID(),
+	vboID(),
+	indiciesID(),
 	vertices(std::move(vertices)),
 	indices(std::move(indices)),
 	material(material)
 {
-	glGenVertexArrays(1, &vaoID);
-	glGenBuffers(1, &vboID);
-	glGenBuffers(1, &indiciesID);
-}
-
-Mesh::Mesh(Mesh&& rhs) noexcept
-	: vaoID(rhs.vaoID),
-	vboID(rhs.vboID),
-	indiciesID(rhs.indiciesID),
-	vertices(std::move(rhs.vertices)),
-	indices(std::move(rhs.indices)),
-	material(rhs.material)
-{
-	rhs.vaoID = Globals::INVALID_OPENGL_ID;
-	rhs.vboID = Globals::INVALID_OPENGL_ID;
-	rhs.indiciesID = Globals::INVALID_OPENGL_ID;
-}
-
-Mesh& Mesh::operator=(Mesh&& rhs) noexcept
-{
-#ifdef GAME
-	assert(vaoID != Globals::INVALID_OPENGL_ID &&
-		vboID != Globals::INVALID_OPENGL_ID &&
-		indiciesID != Globals::INVALID_OPENGL_ID);
-#endif // GAME
-
-	onDestroy();
-
-	vaoID = rhs.vaoID;
-	vboID = rhs.vboID;
-	indiciesID = rhs.indiciesID;
-	vertices = std::move(rhs.vertices);
-	indices = std::move(rhs.indices);
-	material = rhs.material;
-
-	rhs.vaoID = Globals::INVALID_OPENGL_ID;
-	rhs.vboID = Globals::INVALID_OPENGL_ID;
-	rhs.indiciesID = Globals::INVALID_OPENGL_ID;
-
-	return *this;
-}
-
-Mesh::~Mesh()
-{
-	onDestroy();
+	glGenVertexArrays(1, &vaoID.ID);
+	glGenBuffers(1, &vboID.ID);
+	glGenBuffers(1, &indiciesID.ID);
 }
 
 void Mesh::bind() const
 {
-    glBindVertexArray(vaoID);
+    glBindVertexArray(vaoID.ID);
 }
 
 void Mesh::attachToVAO() const
@@ -86,7 +66,7 @@ void Mesh::attachToVAO() const
     bind();
 
 	assert(!vertices.empty());
-    glBindBuffer(GL_ARRAY_BUFFER, vboID);
+    glBindBuffer(GL_ARRAY_BUFFER, vboID.ID);
     glBufferData(GL_ARRAY_BUFFER, 
 		static_cast<GLsizei>(vertices.size() * sizeof(Vertex)), 
 		vertices.data(), GL_STATIC_DRAW);
@@ -102,7 +82,7 @@ void Mesh::attachToVAO() const
 		reinterpret_cast<const void*>(offsetof(Vertex, normal)));
 
 	assert(!indices.empty());
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indiciesID);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indiciesID.ID);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, 
 		static_cast<GLsizei>(indices.size() * sizeof(unsigned int)), 
 		indices.data(), GL_STATIC_DRAW);
@@ -172,36 +152,3 @@ void Mesh::render(ShaderHandler& shaderHandler, eFactionController owningFaction
 
 	glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(indices.size()), GL_UNSIGNED_INT, nullptr);
 }
-
-void Mesh::onDestroy()
-{
-	if (vaoID != Globals::INVALID_OPENGL_ID &&
-		vboID != Globals::INVALID_OPENGL_ID &&
-		indiciesID != Globals::INVALID_OPENGL_ID)
-	{
-		glDeleteVertexArrays(1, &vaoID);
-		glDeleteBuffers(1, &vboID);
-		glDeleteBuffers(1, &indiciesID);
-	}
-}
-
-Vertex::Vertex(const glm::vec3& position)
-	: position(position),
-	normal()
-{}
-
-Vertex::Vertex(const glm::vec3& position, const glm::vec3& normal)
-	: position(position),
-	normal(normal)
-{}
-
-//Material
-Material::Material()
-	: diffuse(),
-	name()
-{}
-
-Material::Material(const glm::vec3 & diffuse, const std::string & name)
-	: diffuse(diffuse),
-	name(name)
-{}
