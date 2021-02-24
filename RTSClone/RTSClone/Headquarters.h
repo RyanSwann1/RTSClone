@@ -6,6 +6,8 @@ class Headquarters : public EntitySpawnerBuilding
 {
 public:
 	Headquarters(const glm::vec3& startingPosition, Faction& owningFaction);
+	Headquarters(Headquarters&&) = default;
+	Headquarters& operator=(Headquarters&&) = default;
 	~Headquarters();
 
 	void update(float deltaTime, const Map& map, FactionHandler& factionHandler);

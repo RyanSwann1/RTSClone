@@ -54,7 +54,7 @@ public:
 #endif // RENDER_PATHING
 
 private:
-	Faction& m_owningFaction;
+	std::reference_wrapper<Faction> m_owningFaction;
 	std::vector<glm::vec3> m_pathToPosition;
 	eUnitState m_currentState;
 	Timer m_attackTimer;

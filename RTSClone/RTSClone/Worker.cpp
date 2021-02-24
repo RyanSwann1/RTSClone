@@ -111,7 +111,7 @@ bool Worker::build(const glm::vec3& buildPosition, const Map& map, eEntityType e
 	assert(map.isWithinBounds(AABB(buildPosition, ModelManager::getInstance().getModel(entityType))) &&
 		!map.isAABBOccupied(AABB(buildPosition, ModelManager::getInstance().getModel(entityType))));
 
-	if (!m_owningFaction.isCollidingWithWorkerBuildQueue(ModelManager::getInstance().getModelAABB(buildPosition, entityType)))
+	if (!m_owningFaction.get().isCollidingWithWorkerBuildQueue(ModelManager::getInstance().getModelAABB(buildPosition, entityType)))
 	{
 		if (m_buildQueue.empty())
 		{
@@ -147,7 +147,7 @@ void Worker::update(float deltaTime, const Map& map, FactionHandler& factionHand
 	{
 	case eWorkerState::Idle:
 		assert(m_pathToPosition.empty() &&
-			m_owningFaction.getController() == eFactionController::Player);
+			m_owningFaction.get().getController() == eFactionController::Player);
 		break;
 	case eWorkerState::Moving:
 		if (m_pathToPosition.empty())
@@ -165,7 +165,7 @@ void Worker::update(float deltaTime, const Map& map, FactionHandler& factionHand
 		assert(isHoldingResources());
 		if (m_pathToPosition.empty())
 		{
-			m_owningFaction.addResources(*this);
+			m_owningFaction.get().addResources(*this);
 			if (m_mineralToHarvest)
 			{
 				moveTo(*m_mineralToHarvest, map);
@@ -190,7 +190,7 @@ void Worker::update(float deltaTime, const Map& map, FactionHandler& factionHand
 		}
 		else
 		{
-			const Headquarters& headquarters = m_owningFaction.getClosestHeadquarters(m_position);
+			const Headquarters& headquarters = m_owningFaction.get().getClosestHeadquarters(m_position);
 			moveTo(headquarters, map, eWorkerState::ReturningMineralsToHeadquarters);
 		}
 		break;
@@ -205,7 +205,7 @@ void Worker::update(float deltaTime, const Map& map, FactionHandler& factionHand
 		assert(m_pathToPosition.empty() && !m_buildQueue.empty() && m_taskTimer.isActive());
 		if (m_taskTimer.isExpired())
 		{
-			const Entity* building = m_owningFaction.createBuilding(map, *this);
+			const Entity* building = m_owningFaction.get().createBuilding(map, *this);
 			m_buildQueue.pop_front();
 			if (!building)
 			{
@@ -240,7 +240,7 @@ void Worker::update(float deltaTime, const Map& map, FactionHandler& factionHand
 		if (m_taskTimer.isExpired())
 		{
 			m_taskTimer.resetElaspedTime();
-			const Entity* targetEntity = m_owningFaction.getEntity(m_repairTargetEntityID);
+			const Entity* targetEntity = m_owningFaction.get().getEntity(m_repairTargetEntityID);
 			if (targetEntity && targetEntity->getHealth() != targetEntity->getMaximumHealth())
 			{
 				if (Globals::getSqrDistance(targetEntity->getPosition(), m_position) > REPAIR_DISTANCE * REPAIR_DISTANCE)
@@ -252,7 +252,7 @@ void Worker::update(float deltaTime, const Map& map, FactionHandler& factionHand
 					m_rotation.y = Globals::getAngle(targetEntity->getPosition(), m_position);
 
 					GameEventHandler::getInstance().gameEvents.push(GameEvent::createRepairEntity(
-						m_owningFaction.getController(), m_repairTargetEntityID));
+						m_owningFaction.get().getController(), m_repairTargetEntityID));
 				}
 			}
 			else
@@ -262,7 +262,7 @@ void Worker::update(float deltaTime, const Map& map, FactionHandler& factionHand
 		}
 		else if (unitStateHandlerTimer.isExpired())
 		{
-			const Entity* targetEntity = m_owningFaction.getEntity(m_repairTargetEntityID);
+			const Entity* targetEntity = m_owningFaction.get().getEntity(m_repairTargetEntityID);
 			if (targetEntity && targetEntity->getHealth() != targetEntity->getMaximumHealth())
 			{
 				if (Globals::getSqrDistance(targetEntity->getPosition(), m_position) > REPAIR_DISTANCE * REPAIR_DISTANCE)
@@ -386,7 +386,7 @@ void Worker::renderBuildingCommands(ShaderHandler& shaderHandler) const
 	for (const auto& building : m_buildQueue)
 	{
 		building.model.get().render(
-			shaderHandler, m_owningFaction.getController(), building.position, glm::vec3(0.0f), false);
+			shaderHandler, m_owningFaction.get().getController(), building.position, glm::vec3(0.0f), false);
 	}
 }
 
@@ -457,7 +457,7 @@ void Worker::switchTo(eWorkerState newState, const Map& map, const Mineral* mine
 	case eWorkerState::Idle:
 		assert(m_buildQueue.empty());
 		GameEventHandler::getInstance().gameEvents.push(
-			GameEvent::createOnEnteredIdleState(m_owningFaction.getController(), getEntityType(), getID()));
+			GameEvent::createOnEnteredIdleState(m_owningFaction.get().getController(), getEntityType(), getID()));
 		m_taskTimer.setActive(false);
 		m_pathToPosition.clear();
 		break;

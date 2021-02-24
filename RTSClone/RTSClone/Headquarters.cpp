@@ -24,7 +24,7 @@ Headquarters::Headquarters(const glm::vec3& startingPosition, Faction& owningFac
 Headquarters::~Headquarters()
 {
 	GameEventHandler::getInstance().gameEvents.emplace(
-		GameEvent::createDetachFactionFromBase(m_owningFaction.getController(), m_position));
+		GameEvent::createDetachFactionFromBase(m_owningFaction.get().getController(), m_position));
 }
 
 void Headquarters::update(float deltaTime, const Map& map, FactionHandler& factionHandler)
@@ -59,5 +59,5 @@ void Headquarters::renderProgressBar(ShaderHandler& shaderHandler, const Camera&
 
 const Entity* Headquarters::spawnEntity(const Map& map, FactionHandler& factionHandler) const
 {
-	return m_owningFaction.createWorker(map, *this);
+	return m_owningFaction.get().createWorker(map, *this);
 }

@@ -12,6 +12,8 @@ class FactionHandler;
 class EntitySpawnerBuilding : public Entity
 {
 public:
+	EntitySpawnerBuilding(EntitySpawnerBuilding&&) = default;
+	EntitySpawnerBuilding& operator=(EntitySpawnerBuilding&&) = default;
 	virtual ~EntitySpawnerBuilding();
 
 	const Timer& getSpawnTimer() const;
@@ -34,7 +36,7 @@ protected:
 	void update(float deltaTime, int resourceCost, int populationCost, 
 		int maxEntityInSpawnQueue, const Map& map, FactionHandler& factionHandler);
 
-	Faction& m_owningFaction;
+	std::reference_wrapper<Faction> m_owningFaction;
 	std::vector<eEntityType> m_spawnQueue;
 	Timer m_spawnTimer;
 

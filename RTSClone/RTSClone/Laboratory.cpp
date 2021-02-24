@@ -39,8 +39,8 @@ int Laboratory::getShieldUpgradeCounter() const
 
 void Laboratory::handleEvent(IncreaseFactionShieldEvent gameEvent)
 {
-	assert(m_owningFaction.getCurrentShieldAmount() < Globals::MAX_FACTION_SHIELD_AMOUNT &&
-		m_owningFaction.isAffordable(Globals::FACTION_SHIELD_INCREASE_COST));
+	assert(m_owningFaction.get().getCurrentShieldAmount() < Globals::MAX_FACTION_SHIELD_AMOUNT &&
+		m_owningFaction.get().isAffordable(Globals::FACTION_SHIELD_INCREASE_COST));
 
 	if (m_shieldUpgradeCounter == 0)
 	{
@@ -62,7 +62,7 @@ void Laboratory::update(float deltaTime)
 		m_increaseShieldTimer.update(deltaTime);
 		if (m_increaseShieldTimer.isExpired())
 		{
-			if (m_owningFaction.increaseShield(*this))
+			if (m_owningFaction.get().increaseShield(*this))
 			{
 				--m_shieldUpgradeCounter;
 			}

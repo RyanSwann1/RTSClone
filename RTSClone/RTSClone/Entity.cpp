@@ -63,13 +63,11 @@ EntityStatus::EntityStatus()
 EntityStatus::EntityStatus(EntityStatus&& rhs) noexcept
 	: active(rhs.active)
 {
-	assert(false);
 	rhs.active = false;
 }
 
 EntityStatus& EntityStatus::operator=(EntityStatus&& rhs) noexcept
 {
-	assert(false);
 	active = rhs.active;
 	rhs.active = false;
 

@@ -67,7 +67,7 @@ float Unit::getAttackRange() const
 
 eFactionController Unit::getOwningFactionController() const
 {
-	return m_owningFaction.getController();
+	return m_owningFaction.get().getController();
 }
 
 eUnitState Unit::getCurrentState() const
@@ -159,7 +159,7 @@ void Unit::update(float deltaTime, FactionHandler& factionHandler, const Map& ma
 		assert(m_pathToPosition.empty() && m_targetEntity.getID() == Globals::INVALID_ENTITY_ID);
 		if (unitStateHandlerTimer.isExpired())
 		{
-			for (const auto& opposingFaction : factionHandler.getOpposingFactions(m_owningFaction.getController()))
+			for (const auto& opposingFaction : factionHandler.getOpposingFactions(m_owningFaction.get().getController()))
 			{
 				const Entity* targetEntity = opposingFaction.get().getEntity(m_position, Globals::UNIT_ATTACK_RANGE, true);
 				if (targetEntity)
@@ -211,7 +211,7 @@ void Unit::update(float deltaTime, FactionHandler& factionHandler, const Map& ma
 		assert(m_targetEntity.getID() == Globals::INVALID_ENTITY_ID);
 		if (unitStateHandlerTimer.isExpired())
 		{
-			for (const auto& opposingFaction : factionHandler.getOpposingFactions(m_owningFaction.getController()))
+			for (const auto& opposingFaction : factionHandler.getOpposingFactions(m_owningFaction.get().getController()))
 			{
 				const Entity* targetEntity = opposingFaction.get().getEntity(m_position, Globals::UNIT_ATTACK_RANGE);
 				if (targetEntity && PathFinding::getInstance().isTargetInLineOfSight(m_position, *targetEntity, map))
@@ -275,7 +275,7 @@ void Unit::update(float deltaTime, FactionHandler& factionHandler, const Map& ma
 			const Entity* targetEntity = targetFaction.getEntity(m_targetEntity.getID());
 			if (targetEntity && Globals::getSqrDistance(targetEntity->getPosition(), m_position) <= Globals::UNIT_ATTACK_RANGE * Globals::UNIT_ATTACK_RANGE)
 			{
-				GameEventHandler::getInstance().gameEvents.push(GameEvent::createSpawnProjectile(m_owningFaction.getController(), getID(),
+				GameEventHandler::getInstance().gameEvents.push(GameEvent::createSpawnProjectile(m_owningFaction.get().getController(), getID(),
 					getEntityType(), targetFaction.getController(), targetEntity->getID(), DAMAGE, m_position, targetEntity->getPosition()));
 
 				m_attackTimer.resetElaspedTime();
@@ -298,7 +298,7 @@ void Unit::takeDamage(const TakeDamageEvent& gameEvent, const Map& map, FactionH
 	Entity::takeDamage(gameEvent, map, factionHandler);	
 	if (!isDead())
 	{
-		m_owningFaction.onUnitTakenDamage(gameEvent, *this, map, factionHandler);
+		m_owningFaction.get().onUnitTakenDamage(gameEvent, *this, map, factionHandler);
 	}
 }
 
@@ -311,7 +311,7 @@ void Unit::switchToState(eUnitState newState, const Map& map, const Entity* targ
 	{
 	case eUnitState::Idle:
 		GameEventHandler::getInstance().gameEvents.push(
-			GameEvent::createOnEnteredIdleState(m_owningFaction.getController(), getEntityType(), getID()));
+			GameEvent::createOnEnteredIdleState(m_owningFaction.get().getController(), getEntityType(), getID()));
 		m_targetEntity.reset();
 		m_pathToPosition.clear();
 		break;

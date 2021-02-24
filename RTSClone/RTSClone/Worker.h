@@ -68,7 +68,7 @@ public:
 #endif // RENDER_PATHING
 
 private:
-	Faction& m_owningFaction;
+	std::reference_wrapper<Faction> m_owningFaction;
 	eWorkerState m_currentState;
 	std::vector<glm::vec3> m_pathToPosition;
 	std::list<BuildingInWorkerQueue> m_buildQueue;

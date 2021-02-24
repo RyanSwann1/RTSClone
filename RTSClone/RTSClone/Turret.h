@@ -17,12 +17,14 @@ class Turret : public Entity
 {
 public:
 	Turret(const glm::vec3& startingPosition, const Faction& owningFaction);
+	Turret(Turret&&) = default;
+	Turret& operator=(Turret&&) = default;
 	~Turret();
 	
 	void update(float deltaTime, FactionHandler& factionHandler, const Map& map);
 
 private:
-	const Faction& m_owningFaction;
+	std::reference_wrapper<const Faction> m_owningFaction;
 	TargetEntity m_targetEntity;
 	eTurretState m_currentState;
 	Timer m_stateHandlerTimer;

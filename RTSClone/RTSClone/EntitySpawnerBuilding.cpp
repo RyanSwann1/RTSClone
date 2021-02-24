@@ -86,8 +86,8 @@ void EntitySpawnerBuilding::setWaypointPosition(const glm::vec3& position, const
 bool EntitySpawnerBuilding::isEntityAddableToSpawnQueue(int maxEntitiesInSpawnQueue, int resourceCost, int populationCost) const
 {
 	return m_spawnQueue.size() < maxEntitiesInSpawnQueue &&
-		m_owningFaction.isAffordable(static_cast<int>(m_spawnQueue.size()) * resourceCost + resourceCost) &&
-		!m_owningFaction.isExceedPopulationLimit(static_cast<int>(m_spawnQueue.size()) * populationCost + populationCost);
+		m_owningFaction.get().isAffordable(static_cast<int>(m_spawnQueue.size()) * resourceCost + resourceCost) &&
+		!m_owningFaction.get().isExceedPopulationLimit(static_cast<int>(m_spawnQueue.size()) * populationCost + populationCost);
 }
 
 void EntitySpawnerBuilding::addEntityToSpawnQueue(eEntityType entityType)
@@ -118,8 +118,8 @@ void EntitySpawnerBuilding::update(float deltaTime, int resourceCost, int popula
 			{
 				m_spawnTimer.setActive(false);
 			}
-			else if (!m_owningFaction.isAffordable(static_cast<int>(m_spawnQueue.size()) * resourceCost) ||
-				m_owningFaction.isExceedPopulationLimit(static_cast<int>(m_spawnQueue.size()) * populationCost))
+			else if (!m_owningFaction.get().isAffordable(static_cast<int>(m_spawnQueue.size()) * resourceCost) ||
+				m_owningFaction.get().isExceedPopulationLimit(static_cast<int>(m_spawnQueue.size()) * populationCost))
 			{
 				m_spawnQueue.clear();
 				m_spawnTimer.setActive(false);
