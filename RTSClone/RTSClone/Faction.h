@@ -10,7 +10,6 @@
 #include "Turret.h"
 #include "Laboratory.h"
 #include <vector>
-#include <list>
 
 struct Camera;
 struct GameEvent;
@@ -35,7 +34,7 @@ public:
 	const Headquarters& getClosestHeadquarters(const glm::vec3& position) const;
 	const glm::vec3& getMainHeadquartersPosition() const;
 	eFactionController getController() const;
-	const std::list<Unit>& getUnits() const;
+	const std::vector<Unit>& getUnits() const;
 	const Entity* getEntity(const glm::vec3& position, float maxDistance, bool prioritizeUnits = true) const;
 	const Entity* getEntity(const AABB& AABB, int entityID) const;
 	const Entity* getEntity(int entityID) const;
@@ -66,13 +65,13 @@ protected:
 		int startingResources, int startingPopulationCap);
 
 	std::vector<Entity*> m_allEntities;
-	std::list<Unit> m_units;
-	std::list<Worker> m_workers;
-	std::list<SupplyDepot> m_supplyDepots;
-	std::list<Barracks> m_barracks;
-	std::list<Turret> m_turrets;
-	std::list<Headquarters> m_headquarters;
-	std::list<Laboratory> m_laboratories;
+	std::vector<Unit> m_units;
+	std::vector<Worker> m_workers;
+	std::vector<SupplyDepot> m_supplyDepots;
+	std::vector<Barracks> m_barracks;
+	std::vector<Turret> m_turrets;
+	std::vector<Headquarters> m_headquarters;
+	std::vector<Laboratory> m_laboratories;
 
 	virtual void onEntityRemoval(const Entity& entity) {}
 
@@ -94,15 +93,18 @@ private:
 
 	//Presumes entity already found in all entities container
 	template <class T>
-	void removeEntity(std::list<T>& entityContainer, int entityID, std::vector<Entity*>::iterator entity)
+	void removeEntity(std::vector<T>& entityContainer, int entityID, std::vector<Entity*>::iterator entity)
 	{
 		assert(entity != m_allEntities.cend());
 		onEntityRemoval(*(*entity));
 
-		entityContainer.remove_if([entityID](const auto& entity)
+		auto iter = std::find_if(entityContainer.begin(), entityContainer.end(), [entityID](const auto& entity)
 		{
 			return entity.getID() == entityID;
 		});
+		
+		assert(iter != entityContainer.end());
+		entityContainer.erase(iter);
 
 		m_allEntities.erase(entity);
 	}

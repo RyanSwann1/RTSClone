@@ -5,6 +5,17 @@
 #include "TypeComparison.h"
 #include "FactionHandler.h"
 
+namespace
+{
+    const size_t MAX_UNITS = 100;
+    const size_t MAX_WORKERS = 100;
+    const size_t MAX_SUPPLY_DEPOTS = 20;
+    const size_t MAX_BARRACKS = 20;
+    const size_t MAX_TURRETS = 20;
+    const size_t MAX_HEADQUARTERS = 4;
+    const size_t MAX_LABORATORIES = 1;
+}
+
 Faction::Faction(eFactionController factionController, const glm::vec3& hqStartingPosition, 
     int startingResources, int startingPopulationCap)
     : m_allEntities(),
@@ -21,6 +32,14 @@ Faction::Faction(eFactionController factionController, const glm::vec3& hqStarti
     m_currentPopulationLimit(startingPopulationCap),
     m_currentShieldAmount(0)
 {
+    m_units.reserve(MAX_UNITS);
+    m_workers.reserve(MAX_WORKERS);
+    m_supplyDepots.reserve(MAX_SUPPLY_DEPOTS);
+    m_barracks.reserve(MAX_BARRACKS);
+    m_turrets.reserve(MAX_TURRETS);
+    m_headquarters.reserve(MAX_HEADQUARTERS);
+    m_laboratories.reserve(MAX_LABORATORIES);
+
     m_headquarters.emplace_back(hqStartingPosition, *this);
     m_allEntities.push_back(&m_headquarters.back());
 }
@@ -74,7 +93,7 @@ eFactionController Faction::getController() const
     return m_controller;
 }
 
-const std::list<Unit>& Faction::getUnits() const
+const std::vector<Unit>& Faction::getUnits() const
 {
     return m_units;
 }
