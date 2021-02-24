@@ -1,7 +1,5 @@
 #pragma once
 
-#include "NonCopyable.h"
-#include "NonMovable.h"
 #include "ProjectileHandler.h"
 #include "FactionPlayer.h"
 #include "FactionAI.h"
@@ -20,11 +18,16 @@ using FactionsContainer = std::array<std::unique_ptr<Faction>, static_cast<size_
 struct Camera;
 class UIManager;
 class ShaderHandler;
-class Level : private NonCopyable, private NonMovable
+class Level
 {
 public:
-	static std::unique_ptr<Level> create(const std::string& levelName, Camera& camera);
+	Level(const Level&) = delete;
+	Level& operator=(const Level&) = delete;
+	Level(Level&&) = delete;
+	Level& operator=(Level&&) = delete;
 	~Level();
+
+	static std::unique_ptr<Level> create(const std::string& levelName, Camera& camera);
 
 	const Faction* getWinningFaction() const;
 

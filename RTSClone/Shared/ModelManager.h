@@ -29,9 +29,13 @@ extern const std::array<std::string, static_cast<size_t>(eEntityType::Max) + 1> 
 enum class eEntityType;
 class AABB;
 #endif // GAME
-class ModelManager : private NonMovable, private NonCopyable
+class ModelManager
 {
 public:
+	ModelManager(const ModelManager&) = delete;
+	ModelManager& operator=(const ModelManager&) = delete;
+	ModelManager(ModelManager&&) = delete;
+	ModelManager& operator=(ModelManager&&) = delete;
 	static ModelManager& getInstance() 
 	{
 		static ModelManager instance;

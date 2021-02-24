@@ -221,8 +221,6 @@
     <ClInclude Include="..\Shared\Model.h" />
     <ClInclude Include="..\Shared\ModelLoader.h" />
     <ClInclude Include="..\Shared\ModelManager.h" />
-    <ClInclude Include="..\Shared\NonCopyable.h" />
-    <ClInclude Include="..\Shared\NonMovable.h" />
     <ClInclude Include="..\Shared\Quad.h" />
     <ClInclude Include="..\Shared\ShaderHandler.h" />
     <ClInclude Include="AdjacentPositions.h" />

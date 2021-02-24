@@ -1,17 +1,19 @@
 #pragma once
 
-#include "NonCopyable.h"
-#include "NonMovable.h"
 #include "Faction.h"
 #include <vector>
 #include <memory>
 #include <functional>
 
 class Unit;
-class FactionHandler : private NonCopyable, private NonMovable
+class FactionHandler
 {
 public:
 	FactionHandler(const std::array<std::unique_ptr<Faction>, static_cast<size_t>(eFactionController::Max) + 1>& factions);
+	FactionHandler(const FactionHandler&) = delete;
+	FactionHandler& operator=(const FactionHandler&) = delete;
+	FactionHandler(FactionHandler&&) = delete;
+	FactionHandler& operator=(FactionHandler&&) = delete;
 
 	bool isFactionActive(eFactionController factionController) const;
 	const std::array<std::unique_ptr<Faction>, static_cast<size_t>(eFactionController::Max) + 1>& getFactions() const;

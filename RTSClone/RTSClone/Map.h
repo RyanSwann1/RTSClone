@@ -1,7 +1,5 @@
 #pragma once
 
-#include "NonCopyable.h"
-#include "NonMovable.h"
 #include "Globals.h"
 
 namespace GameMessages
@@ -11,10 +9,14 @@ namespace GameMessages
 	struct NewMapSize;
 }
 class AABB;
-class Map : private NonCopyable, private NonMovable
+class Map 
 {
 public:
 	Map();
+	Map(const Map&) = delete;
+	Map& operator=(const Map&) = delete;
+	Map(Map&&) = delete;
+	Map& operator=(Map&&) = delete;
 	~Map();
 
 	bool isCollidable(const glm::vec3& position) const;

@@ -1,16 +1,18 @@
 #pragma once
 
-#include "NonCopyable.h"
-#include "NonMovable.h"
 #include "AABB.h"
 #include <SFML/Graphics.hpp>
 
 class ShaderHandler;
 struct Camera;
-class EntitySelector : private NonCopyable, private NonMovable
+class EntitySelector 
 {
 public:
 	EntitySelector();
+	EntitySelector(const EntitySelector&) = delete;
+	EntitySelector& operator=(const EntitySelector&) = delete;
+	EntitySelector(EntitySelector&&) = delete;
+	EntitySelector& operator=(EntitySelector&&) = delete;
 	~EntitySelector();
 
 	const AABB& getAABB() const;

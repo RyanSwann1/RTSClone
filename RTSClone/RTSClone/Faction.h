@@ -16,9 +16,13 @@ struct GameEvent;
 class FactionHandler;
 class ShaderHandler;
 class Map;
-class Faction : private NonCopyable, private NonMovable
+class Faction
 {
 public:
+	Faction(const Faction&) = delete;
+	Faction& operator=(const Faction&) = delete;
+	Faction(Faction&&) = delete;
+	Faction& operator=(Faction&&) = delete;
 	virtual ~Faction() {}
 
 	bool isMineralInUse(const Mineral& mineral) const;

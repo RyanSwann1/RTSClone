@@ -1,15 +1,16 @@
 #pragma once
 
-#include "NonCopyable.h"
 #include "AABB.h"
 #include "glm/glm.hpp"
 
 class ShaderHandler;
-struct Quad : private NonCopyable
+struct Quad
 {
 public:
 	Quad(const glm::vec3& size, const glm::vec3& color, float opacity = 1.0f);
 	Quad(const glm::vec3& position, const glm::vec3& size, const glm::vec3& color, float opacity = 1.0f);
+	Quad(const Quad&) = delete;
+	Quad& operator=(const Quad&) = delete;
 	Quad(Quad&&) noexcept;
 	Quad& operator=(Quad&&) noexcept;
 	~Quad();

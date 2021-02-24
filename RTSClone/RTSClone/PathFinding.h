@@ -1,7 +1,5 @@
 #pragma once
 
-#include "NonCopyable.h"
-#include "NonMovable.h"
 #include "glm/glm.hpp"
 #include "Globals.h"
 #include "Unit.h"
@@ -28,9 +26,13 @@ class Map;
 class FactionHandler;
 class FactionAI;
 class BaseHandler;
-class PathFinding : private NonCopyable, private NonMovable
+class PathFinding 
 {
 public:
+	PathFinding(const PathFinding&) = delete;
+	PathFinding& operator=(const PathFinding&) = delete;
+	PathFinding(PathFinding&&) = delete;
+	PathFinding& operator=(PathFinding&&) = delete;
 	~PathFinding();
 
 	static PathFinding& getInstance()

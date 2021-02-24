@@ -1,15 +1,16 @@
 #pragma once
 
-#include "NonCopyable.h"
 #include "glm/glm.hpp"
 #include "Model.h"
 #include <functional>
 
 class ShaderHandler;
-class SceneryGameObject : private NonCopyable
+class SceneryGameObject
 {
 public:
 	SceneryGameObject(const Model& model, const glm::vec3& position, const glm::vec3& rotation);
+	SceneryGameObject(const SceneryGameObject&) = delete;
+	SceneryGameObject& operator=(const SceneryGameObject&) = delete;
 	SceneryGameObject(SceneryGameObject&&) noexcept;
 	SceneryGameObject& operator=(SceneryGameObject&&) noexcept;
 	~SceneryGameObject();

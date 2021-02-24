@@ -1,7 +1,5 @@
 #pragma once
 
-#include "NonCopyable.h"
-#include "NonMovable.h"
 #include "Mesh.h"
 #include <string>
 #include <memory>
@@ -9,8 +7,13 @@
 
 enum class eFactionController;
 class ShaderHandler;
-struct Model : private NonMovable, private NonCopyable
+struct Model 
 {
+	Model(const Model&) = delete;
+	Model& operator=(const Model&) = delete;
+	Model(Model&&) = delete;
+	Model& operator=(Model&&) = delete;
+
 	static std::unique_ptr<Model> create(const std::string& fileName, bool renderFromCentrePosition, 
 		const glm::vec3& AABBSizeFromCenter, const glm::vec3& scale);
 

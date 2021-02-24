@@ -1,11 +1,13 @@
 #pragma once
 
-#include "NonCopyable.h"
-#include "NonMovable.h"
-
-class UniqueIDGenerator : private NonCopyable, private NonMovable
+class UniqueIDGenerator 
 {
 public:
+	UniqueIDGenerator(const UniqueIDGenerator&) = delete;
+	UniqueIDGenerator& operator=(const UniqueIDGenerator&) = delete;
+	UniqueIDGenerator(UniqueIDGenerator&&) = delete;
+	UniqueIDGenerator&& operator=(UniqueIDGenerator&&) = delete;
+
 	static UniqueIDGenerator& getInstance()
 	{
 		static UniqueIDGenerator instance;

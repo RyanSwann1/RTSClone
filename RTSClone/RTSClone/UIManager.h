@@ -1,7 +1,5 @@
 #pragma once
 
-#include "NonCopyable.h"
-#include "NonMovable.h"
 #include "EntityType.h"
 #include "FactionController.h"
 #include "GameMessages.h"
@@ -12,9 +10,14 @@
 //https://eliasdaler.github.io/using-imgui-with-sfml-pt2/#getting-back-to-the-context-of-the-window-tree-etc
 
 template <class MessageType>
-class Widget : private NonCopyable, private NonMovable
+class Widget 
 {
 public:
+	Widget(const Widget&) = delete;
+	Widget& operator=(const Widget&) = delete;
+	Widget(Widget&&) = delete;
+	Widget& operator=(Widget&&) = delete;
+
 	void deactivate()
 	{
 		m_active = false;
@@ -59,10 +62,14 @@ struct WinningFactionWidget : public Widget<GameMessages::UIDisplayWinner>
 struct GameEvent;
 struct Camera;
 class FactionHandler;
-class UIManager : private NonCopyable, private NonMovable
+class UIManager 
 {
 public:
 	UIManager();
+	UIManager(const UIManager&) = delete;
+	UIManager& operator=(const UIManager&) = delete;
+	UIManager(UIManager&&) = delete;
+	UIManager& operator=(UIManager&&) = delete;
 	~UIManager();
 
 	void handleInput(const sf::Window& window, const FactionHandler& factionHandler, const Camera& camera,

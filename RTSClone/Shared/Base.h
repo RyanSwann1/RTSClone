@@ -32,14 +32,17 @@ struct Base
 };
 
 #ifdef GAME
-#include "NonMovable.h"
 class ShaderHandler;
 class Faction;
 struct GameEvent;
-class BaseHandler : private NonCopyable, private NonMovable
+class BaseHandler 
 {
 public:
 	BaseHandler(std::vector<Base>&& m_bases);
+	BaseHandler(const BaseHandler&) = delete;
+	BaseHandler& operator=(const BaseHandler&) = delete;
+	BaseHandler(BaseHandler&&) = delete;
+	BaseHandler& operator=(BaseHandler&&) = delete;
 
 	bool isWithinRangeOfMinerals(const glm::vec3& position, float distance) const;
 	const std::vector<Base>& getBases() const;

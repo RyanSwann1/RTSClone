@@ -1,13 +1,11 @@
 #pragma once
 
-#include "NonCopyable.h"
-#include "NonMovable.h"
 #include <functional>
 #include <vector>
 #include <assert.h>
 
 template <typename Message>
-class GameMessenger : private NonCopyable, private NonMovable
+class GameMessenger 
 {
 	struct Listener
 	{
@@ -21,6 +19,11 @@ class GameMessenger : private NonCopyable, private NonMovable
 	};
 
 public:
+	GameMessenger(const GameMessenger&) = delete;
+	GameMessenger& operator=(const GameMessenger&) = delete;
+	GameMessenger(GameMessenger&&) = delete;
+	GameMessenger& operator=(GameMessenger&&) = delete;
+
 	static GameMessenger<Message>& getInstance()
 	{
 		static GameMessenger<Message> instance;

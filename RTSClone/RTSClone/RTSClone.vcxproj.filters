@@ -359,12 +359,6 @@
     <ClInclude Include="..\Shared\ModelManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\Shared\NonCopyable.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Shared\NonMovable.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\Shared\ShaderHandler.h">
       <Filter>Header Files</Filter>
     </ClInclude>

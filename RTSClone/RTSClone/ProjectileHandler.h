@@ -1,17 +1,19 @@
 #pragma once
 
-#include "NonCopyable.h"
-#include "NonMovable.h"
 #include "Projectile.h"
 #include <vector>
 #include <memory>
 
 class ShaderHandler;
 class FactionHandler;
-class ProjectileHandler : private NonCopyable, private NonMovable
+class ProjectileHandler
 {
 public:
 	ProjectileHandler();
+	ProjectileHandler(const ProjectileHandler&) = delete;
+	ProjectileHandler& operator=(const ProjectileHandler&) = delete;
+	ProjectileHandler(ProjectileHandler&&) = delete;
+	ProjectileHandler& operator=(ProjectileHandler&&) = delete;
 	
 	void addProjectile(const GameEvent& gameEvent);
 	void update(float deltaTime, const FactionHandler& factionHandler);

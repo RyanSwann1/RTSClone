@@ -1,14 +1,15 @@
 #pragma once
 
-#include "NonCopyable.h"
 #include "glm/glm.hpp"
 
 struct Camera;
 class ShaderHandler;
-class Sprite : private NonCopyable
+class Sprite 
 {
 public:
 	Sprite();
+	Sprite(const Sprite&) = delete;
+	Sprite& operator=(const Sprite&) = delete;
 	Sprite(Sprite&&) noexcept;
 	Sprite& operator=(Sprite&&) noexcept;
 	~Sprite();

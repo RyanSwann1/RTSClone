@@ -1,14 +1,17 @@
 #pragma once
 
-#include "NonCopyable.h"
-#include "NonMovable.h"
 #include <bitset>
 #include <vector>
 
 template <class Type>
-class TypeComparison : private NonCopyable, private NonMovable
+class TypeComparison 
 {
 public:
+	TypeComparison(const TypeComparison&) = delete;
+	TypeComparison& operator=(const TypeComparison&) = delete;
+	TypeComparison(TypeComparison&&) = delete;
+	TypeComparison& operator=(TypeComparison&&) = delete;
+
 	TypeComparison(const std::vector<Type>& cubeTypes)
 	{
 		for (auto cubeType : cubeTypes)

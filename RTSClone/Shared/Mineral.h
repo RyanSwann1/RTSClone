@@ -1,18 +1,19 @@
 #pragma once
 
-#include "NonCopyable.h"
 #include "AABB.h"
 #include <functional>
 
 struct Model;
 class ShaderHandler;
-class Mineral : private NonCopyable
+class Mineral
 {
 public:
 #ifdef LEVEL_EDITOR
 	Mineral();
 #endif // LEVEL_EDITOR
 	Mineral(const glm::vec3& startingPosition);
+	Mineral(const Mineral&) = delete;
+	Mineral& operator=(const Mineral&) = delete;
 	Mineral(Mineral&&) noexcept;
 	Mineral& operator=(Mineral&&) = delete;
 #ifdef GAME

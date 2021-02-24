@@ -1,7 +1,5 @@
 #pragma once
 
-#include "NonCopyable.h"
-#include "NonMovable.h"
 #include "glm/glm.hpp"
 #include <memory>
 #include <array>
@@ -17,12 +15,16 @@ enum class eShaderType
 	Max = Debug
 };
 
-class ShaderHandler final : private NonCopyable, private NonMovable
+class ShaderHandler final 
 {
-	class Shader : private NonCopyable
+	class Shader
 	{
 	public:
 		Shader(eShaderType shaderType);
+		Shader(const Shader&) = delete;
+		Shader& operator=(const Shader&) = delete;
+		Shader(Shader&&) = delete;
+		Shader& operator=(Shader&&) = delete;
 		~Shader();
 
 		unsigned int getID() const;
@@ -36,6 +38,10 @@ class ShaderHandler final : private NonCopyable, private NonMovable
 	};
 
 public:
+	ShaderHandler(const ShaderHandler&) = delete;
+	ShaderHandler& operator=(const ShaderHandler&) = delete;
+	ShaderHandler(ShaderHandler&&) = delete;
+	ShaderHandler& operator=(ShaderHandler&&) = delete;
 	static std::unique_ptr<ShaderHandler> create();
 
 	eShaderType getActiveShaderType() const;

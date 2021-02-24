@@ -1,7 +1,5 @@
 #pragma once
 
-#include "NonCopyable.h"
-#include "NonMovable.h"
 #include "glm/glm.hpp"
 #include "AABB.h"
 #include <functional>

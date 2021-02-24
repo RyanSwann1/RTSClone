@@ -7,10 +7,14 @@
 class BaseHandler;
 struct Camera;
 struct PlayerActivatePlannedBuildingEvent;
-class FactionPlayerPlannedBuilding : private NonCopyable, private NonMovable
+class FactionPlayerPlannedBuilding
 {	
 public:
 	FactionPlayerPlannedBuilding(const PlayerActivatePlannedBuildingEvent& gameEvent, const glm::vec3& position);
+	FactionPlayerPlannedBuilding(const FactionPlayerPlannedBuilding&) = delete;
+	FactionPlayerPlannedBuilding& operator=(const FactionPlayerPlannedBuilding&) = delete;
+	FactionPlayerPlannedBuilding(FactionPlayerPlannedBuilding&&) = delete;
+	FactionPlayerPlannedBuilding& operator=(FactionPlayerPlannedBuilding&&) = delete;
 
 	bool isOnValidPosition(const BaseHandler& baseHandler, const Map& map) const;
 	const glm::vec3& getPosition() const;

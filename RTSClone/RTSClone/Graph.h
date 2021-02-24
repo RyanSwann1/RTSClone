@@ -1,7 +1,5 @@
 #pragma once
 
-#include "NonCopyable.h"
-#include "NonMovable.h"
 #include "Globals.h"
 #include "glm/glm.hpp"
 #include <array>
@@ -27,10 +25,14 @@ namespace GameMessages
 	struct NewMapSize;
 }
 class Map;
-class Graph : private NonMovable, private NonCopyable
+class Graph 
 {
 public:
 	Graph();
+	Graph(const Graph&) = delete;
+	Graph& operator=(const Graph&) = delete;
+	Graph(Graph&&) = delete;
+	Graph& operator=(Graph&&) = delete;
 	~Graph();
 
 	bool isEmpty() const;

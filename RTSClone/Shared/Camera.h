@@ -1,13 +1,15 @@
 #pragma once
 
 #include "glm/glm.hpp"
-#include "NonCopyable.h"
-#include "NonMovable.h"
 #include <SFML/Graphics.hpp>
 
-struct Camera : private NonCopyable, private NonMovable
+struct Camera 
 {
 	Camera();
+	Camera(const Camera&) = delete;
+	Camera& operator=(const Camera&) = delete;
+	Camera(Camera&&) = delete;
+	Camera& operator=(Camera&&) = delete;
 
 	glm::mat4 getView() const;
 	glm::mat4 getProjection(glm::ivec2 windowSize) const;
