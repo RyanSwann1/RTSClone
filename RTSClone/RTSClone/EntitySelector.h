@@ -1,6 +1,7 @@
 #pragma once
 
 #include "AABB.h"
+#include "OpenGLResource.h"
 #include <SFML/Graphics.hpp>
 
 class ShaderHandler;
@@ -13,7 +14,9 @@ public:
 	EntitySelector& operator=(const EntitySelector&) = delete;
 	EntitySelector(EntitySelector&&) = delete;
 	EntitySelector& operator=(EntitySelector&&) = delete;
-	~EntitySelector();
+	//EntitySelector(EntitySelector&&) = delete;
+	//EntitySelector& operator=(EntitySelector&&) = delete;
+	//~EntitySelector();
 
 	const AABB& getAABB() const;
 	bool isActive() const;
@@ -28,8 +31,10 @@ private:
 	bool m_enabled;
 	glm::vec2 m_startingMousePosition;
 	glm::vec3 m_worldStartingPosition;
-	unsigned int m_vaoID;
-	unsigned int m_vboID;
+	OpenGLResourceVertexArray m_VAO;
+	OpenGLResourceBuffer m_VBO;
+	//unsigned int m_vaoID;
+	//unsigned int m_vboID;
 
 	bool isMinimumSize() const;
 };

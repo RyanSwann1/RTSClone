@@ -38,21 +38,21 @@ EntitySelector::EntitySelector()
     m_enabled(false),
     m_startingMousePosition(),
     m_worldStartingPosition(),
-    m_vaoID(Globals::INVALID_OPENGL_ID),
-    m_vboID(Globals::INVALID_OPENGL_ID)
+    m_VAO(),
+    m_VBO(GL_ARRAY_BUFFER)
 {
-    glGenVertexArrays(1, &m_vaoID);
-    glGenBuffers(1, &m_vboID);
+    //glGenVertexArrays(1, &m_vaoID);
+    //glGenBuffers(1, &m_vboID);
 }
-
-EntitySelector::~EntitySelector()
-{
-    assert(m_vaoID != Globals::INVALID_OPENGL_ID);
-    glDeleteVertexArrays(1, &m_vaoID);
-
-    assert(m_vboID != Globals::INVALID_OPENGL_ID);
-    glDeleteBuffers(1, &m_vboID);
-}
+//
+//EntitySelector::~EntitySelector()
+//{
+//    assert(m_vaoID != Globals::INVALID_OPENGL_ID);
+//    glDeleteVertexArrays(1, &m_vaoID);
+//
+//    assert(m_vboID != Globals::INVALID_OPENGL_ID);
+//    glDeleteBuffers(1, &m_vboID);
+//}
 
 const AABB& EntitySelector::getAABB() const
 {
@@ -114,10 +114,13 @@ void EntitySelector::render(const sf::Window& window, ShaderHandler& shaderHandl
         shaderHandler.setUniformVec3(eShaderType::Widjet, "uColor", COLOR);
         shaderHandler.setUniform1f(eShaderType::Widjet, "uOpacity", OPACITY);
 
-        glBindVertexArray(m_vaoID);
-        glBindBuffer(GL_ARRAY_BUFFER, m_vboID);
+
+        //glBindVertexArray(m_vaoID);
+        //glBindBuffer(GL_ARRAY_BUFFER, m_vboID);
+        m_VBO.bind();
         glBufferData(GL_ARRAY_BUFFER, quadCoords.size() * sizeof(glm::vec2), quadCoords.data(), GL_STATIC_DRAW);
 
+        m_VAO.bind();
         glEnableVertexAttribArray(0);
         glVertexAttribPointer(0, glm::vec2::length(), GL_FLOAT, GL_FALSE, sizeof(glm::vec2), (const void*)0);
 
