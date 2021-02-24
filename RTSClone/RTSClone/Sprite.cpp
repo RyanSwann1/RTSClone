@@ -26,41 +26,11 @@ namespace
 }
 
 Sprite::Sprite()
-	: m_vaoID(Globals::INVALID_OPENGL_ID),
-	m_vboID(Globals::INVALID_OPENGL_ID)
+	: m_VAO(),
+	m_VBO()
 {
-	glGenVertexArrays(1, &m_vaoID);
-	glGenBuffers(1, &m_vboID);
-}
-
-Sprite::Sprite(Sprite&& rhs) noexcept
-	: m_vaoID(rhs.m_vaoID),
-	m_vboID(rhs.m_vboID)
-{
-	rhs.m_vaoID = Globals::INVALID_OPENGL_ID;
-	rhs.m_vboID = Globals::INVALID_OPENGL_ID;
-}
-
-Sprite& Sprite::operator=(Sprite&& rhs) noexcept
-{
-	assert(this != &rhs);
-	if (this != &rhs)
-	{
-		onDestroy();
-
-		m_vaoID = rhs.m_vaoID;
-		m_vboID = rhs.m_vboID;
-
-		rhs.m_vaoID = Globals::INVALID_OPENGL_ID;
-		rhs.m_vboID = Globals::INVALID_OPENGL_ID;
-	}
-
-	return *this;
-}
-
-Sprite::~Sprite()
-{
-	onDestroy();
+	glGenVertexArrays(1, &m_VAO.ID);
+	glGenBuffers(1, &m_VBO.ID);
 }
 
 void Sprite::render(const glm::vec3& position, glm::uvec2 windowSize, float originalWidth, float spriteWidth, float height, float yOffset, 
@@ -79,25 +49,12 @@ void Sprite::render(const glm::vec3& position, glm::uvec2 windowSize, float orig
 	shaderHandler.setUniformVec3(eShaderType::Widjet, "uColor", materialColor);
 	shaderHandler.setUniform1f(eShaderType::Widjet, "uOpacity", OPACITY);
 
-	glBindBuffer(GL_ARRAY_BUFFER, m_vboID);
+	glBindBuffer(GL_ARRAY_BUFFER, m_VBO.ID);
 	glBufferData(GL_ARRAY_BUFFER, quad.size() * sizeof(glm::vec2), quad.data(), GL_STATIC_DRAW);
 
-	glBindVertexArray(m_vaoID);
+	glBindVertexArray(m_VAO.ID);
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(glm::vec2), (const void*)0);
 
 	glDrawArrays(GL_TRIANGLES, 0, QUAD_VERTEX_COUNT);
-}
-
-void Sprite::onDestroy()
-{
-	if (m_vaoID != Globals::INVALID_OPENGL_ID && m_vboID != Globals::INVALID_OPENGL_ID)
-	{
-		glDeleteVertexArrays(1, &m_vaoID);
-		glDeleteBuffers(1, &m_vboID);
-	}
-	else
-	{
-		assert(m_vaoID == Globals::INVALID_OPENGL_ID && m_vboID == Globals::INVALID_OPENGL_ID);
-	}
 }
