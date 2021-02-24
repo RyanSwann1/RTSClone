@@ -31,18 +31,18 @@ Material::Material(const glm::vec3& diffuse, const std::string& name)
 {}
 
 Mesh::Mesh()
-	: vaoID(),
-	vboID(GL_ARRAY_BUFFER),
-	indiciesID(GL_ELEMENT_ARRAY_BUFFER),
+	: m_VAO(),
+	m_VBO(GL_ARRAY_BUFFER),
+	m_indices(GL_ELEMENT_ARRAY_BUFFER),
 	vertices(),
 	indices(),
 	material()
 {}
 
 Mesh::Mesh(std::vector<Vertex>&& vertices, std::vector<unsigned int>&& indices, const Material& material)
-	: vaoID(),
-	vboID(GL_ARRAY_BUFFER),
-	indiciesID(GL_ELEMENT_ARRAY_BUFFER),
+	: m_VAO(),
+	m_VBO(GL_ARRAY_BUFFER),
+	m_indices(GL_ELEMENT_ARRAY_BUFFER),
 	vertices(std::move(vertices)),
 	indices(std::move(indices)),
 	material(material)
@@ -50,9 +50,9 @@ Mesh::Mesh(std::vector<Vertex>&& vertices, std::vector<unsigned int>&& indices, 
 
 void Mesh::attachToVAO() const
 {
-	vaoID.bind();
+	m_VAO.bind();
 	assert(!vertices.empty());
-	vboID.bind();
+	m_VBO.bind();
 	glBufferData(GL_ARRAY_BUFFER, 
 		static_cast<GLsizei>(vertices.size() * sizeof(Vertex)), 
 		vertices.data(), GL_STATIC_DRAW);
@@ -68,7 +68,7 @@ void Mesh::attachToVAO() const
 		reinterpret_cast<const void*>(offsetof(Vertex, normal)));
 
 	assert(!indices.empty());
-	indiciesID.bind();
+	m_indices.bind();
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, 
 		static_cast<GLsizei>(indices.size() * sizeof(unsigned int)), 
 		indices.data(), GL_STATIC_DRAW);
@@ -77,7 +77,7 @@ void Mesh::attachToVAO() const
 #if defined RENDER_AABB || defined RENDER_PATHING
 void Mesh::renderDebugMesh(ShaderHandler& shaderHandler) const
 {
-	vaoID.bind();
+	m_VAO.bind();
 	glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(indices.size()), GL_UNSIGNED_INT, nullptr);
 }
 #endif // RENDER_AABB || defined RENDER_PATHING
@@ -90,7 +90,7 @@ void Mesh::render(ShaderHandler& shaderHandler, const glm::vec3& additionalColor
 	shaderHandler.setUniformVec3(eShaderType::Default, "uAdditionalColour", additionalColor);
 	shaderHandler.setUniform1f(eShaderType::Default, "uOpacity", opacity);
 
-	vaoID.bind();
+	m_VAO.bind();
 	glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(indices.size()), GL_UNSIGNED_INT, nullptr);
 }
 
@@ -109,7 +109,7 @@ void Mesh::render(ShaderHandler& shaderHandler, bool highlight) const
 		shaderHandler.setUniform1f(eShaderType::Default, "uSelectedAmplifier", 1.0f);
 	}
 
-	vaoID.bind();
+	m_VAO.bind();
 	glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(indices.size()), GL_UNSIGNED_INT, nullptr);
 }
 
@@ -137,6 +137,6 @@ void Mesh::render(ShaderHandler& shaderHandler, eFactionController owningFaction
 		shaderHandler.setUniform1f(eShaderType::Default, "uSelectedAmplifier", 1.0f);
 	}
 
-	vaoID.bind();
+	m_VAO.bind();
 	glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(indices.size()), GL_UNSIGNED_INT, nullptr);
 }

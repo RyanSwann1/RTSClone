@@ -49,7 +49,7 @@ struct Mesh
 	Material material;
 
 private:
-	OpenGLResourceVertexArray vaoID;
-	OpenGLResourceBuffer vboID;
-	OpenGLResourceBuffer indiciesID;
+	OpenGLResourceVertexArray m_VAO;
+	OpenGLResourceBuffer m_VBO;
+	OpenGLResourceBuffer m_indices;
 };

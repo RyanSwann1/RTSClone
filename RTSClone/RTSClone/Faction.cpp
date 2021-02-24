@@ -7,6 +7,7 @@
 
 namespace
 {
+    const size_t MAX_ENTITIES = 250;
     const size_t MAX_UNITS = 100;
     const size_t MAX_WORKERS = 100;
     const size_t MAX_SUPPLY_DEPOTS = 20;
@@ -32,6 +33,7 @@ Faction::Faction(eFactionController factionController, const glm::vec3& hqStarti
     m_currentPopulationLimit(startingPopulationCap),
     m_currentShieldAmount(0)
 {
+    m_allEntities.reserve(MAX_ENTITIES);
     m_units.reserve(MAX_UNITS);
     m_workers.reserve(MAX_WORKERS);
     m_supplyDepots.reserve(MAX_SUPPLY_DEPOTS);
