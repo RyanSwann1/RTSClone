@@ -14,9 +14,6 @@ public:
 	EntitySelector& operator=(const EntitySelector&) = delete;
 	EntitySelector(EntitySelector&&) = delete;
 	EntitySelector& operator=(EntitySelector&&) = delete;
-	//EntitySelector(EntitySelector&&) = delete;
-	//EntitySelector& operator=(EntitySelector&&) = delete;
-	//~EntitySelector();
 
 	const AABB& getAABB() const;
 	bool isActive() const;
@@ -33,8 +30,6 @@ private:
 	glm::vec3 m_worldStartingPosition;
 	OpenGLResourceVertexArray m_VAO;
 	OpenGLResourceBuffer m_VBO;
-	//unsigned int m_vaoID;
-	//unsigned int m_vboID;
 
 	bool isMinimumSize() const;
 };
