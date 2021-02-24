@@ -1,7 +1,7 @@
 #pragma once
 
 #include "glm/glm.hpp"
-#include "OpenGLResourceID.h"
+#include "OpenGLResource.h"
 #include <vector>
 #include <string>
 
@@ -50,7 +50,7 @@ struct Mesh
 	Material material;
 
 private:
-	OpenGLResourceVertexArrayID vaoID;
-	OpenGLResourceBufferID vboID;
-	OpenGLResourceBufferID indiciesID;
+	OpenGLResourceVertexArray vaoID;
+	OpenGLResourceBuffer vboID;
+	OpenGLResourceBuffer indiciesID;
 };
