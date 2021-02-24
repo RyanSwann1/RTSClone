@@ -34,7 +34,6 @@ struct Mesh
 	Mesh(Mesh&&) = default;
 	Mesh& operator=(Mesh&&) = default;
 
-	void bind() const;
 	void attachToVAO() const;
 
 #if defined RENDER_AABB || defined RENDER_PATHING

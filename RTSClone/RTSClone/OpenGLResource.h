@@ -1,9 +1,11 @@
 #pragma once
 
+#include "glad.h"
+
 //glGenBuffers
 struct OpenGLResourceBuffer
 {
-	OpenGLResourceBuffer();
+	OpenGLResourceBuffer(GLenum target);
 	OpenGLResourceBuffer(const OpenGLResourceBuffer&) = delete;
 	OpenGLResourceBuffer& operator=(const OpenGLResourceBuffer&) = delete;
 	OpenGLResourceBuffer(OpenGLResourceBuffer&&) noexcept;
@@ -11,9 +13,11 @@ struct OpenGLResourceBuffer
 	~OpenGLResourceBuffer();
 
 	unsigned int getID() const;
+	void bind() const;
 
 private:
 	unsigned int ID;
+	GLenum target;
 
 	void onDestroy();
 };
@@ -29,6 +33,7 @@ struct OpenGLResourceVertexArray
 	~OpenGLResourceVertexArray();
 
 	unsigned int getID() const;
+	void bind() const;
 
 private:
 	unsigned int ID;

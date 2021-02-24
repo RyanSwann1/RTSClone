@@ -32,8 +32,8 @@ Material::Material(const glm::vec3& diffuse, const std::string& name)
 
 Mesh::Mesh()
 	: vaoID(),
-	vboID(),
-	indiciesID(),
+	vboID(GL_ARRAY_BUFFER),
+	indiciesID(GL_ELEMENT_ARRAY_BUFFER),
 	vertices(),
 	indices(),
 	material()
@@ -41,25 +41,19 @@ Mesh::Mesh()
 
 Mesh::Mesh(std::vector<Vertex>&& vertices, std::vector<unsigned int>&& indices, const Material& material)
 	: vaoID(),
-	vboID(),
-	indiciesID(),
+	vboID(GL_ARRAY_BUFFER),
+	indiciesID(GL_ELEMENT_ARRAY_BUFFER),
 	vertices(std::move(vertices)),
 	indices(std::move(indices)),
 	material(material)
 {}
 
-void Mesh::bind() const
-{
-    glBindVertexArray(vaoID.getID());
-}
-
 void Mesh::attachToVAO() const
 {
-    bind();
-
+	vaoID.bind();
 	assert(!vertices.empty());
-    glBindBuffer(GL_ARRAY_BUFFER, vboID.getID());
-    glBufferData(GL_ARRAY_BUFFER, 
+	vboID.bind();
+	glBufferData(GL_ARRAY_BUFFER, 
 		static_cast<GLsizei>(vertices.size() * sizeof(Vertex)), 
 		vertices.data(), GL_STATIC_DRAW);
 
@@ -74,8 +68,8 @@ void Mesh::attachToVAO() const
 		reinterpret_cast<const void*>(offsetof(Vertex, normal)));
 
 	assert(!indices.empty());
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indiciesID.getID());
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, 
+	indiciesID.bind();
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, 
 		static_cast<GLsizei>(indices.size() * sizeof(unsigned int)), 
 		indices.data(), GL_STATIC_DRAW);
 }
@@ -83,7 +77,7 @@ void Mesh::attachToVAO() const
 #if defined RENDER_AABB || defined RENDER_PATHING
 void Mesh::renderDebugMesh(ShaderHandler& shaderHandler) const
 {
-	bind();
+	vaoID.bind();
 	glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(indices.size()), GL_UNSIGNED_INT, nullptr);
 }
 #endif // RENDER_AABB || defined RENDER_PATHING
@@ -91,18 +85,19 @@ void Mesh::renderDebugMesh(ShaderHandler& shaderHandler) const
 void Mesh::render(ShaderHandler& shaderHandler, const glm::vec3& additionalColor, float opacity) const
 {
 	assert(!indices.empty());
-	bind();
+
 	shaderHandler.setUniformVec3(eShaderType::Default, "uMaterialColour", material.diffuse);
 	shaderHandler.setUniformVec3(eShaderType::Default, "uAdditionalColour", additionalColor);
 	shaderHandler.setUniform1f(eShaderType::Default, "uOpacity", opacity);
 
+	vaoID.bind();
 	glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(indices.size()), GL_UNSIGNED_INT, nullptr);
 }
 
 void Mesh::render(ShaderHandler& shaderHandler, bool highlight) const
 {
 	assert(!indices.empty());
-	bind();
+
 	shaderHandler.setUniformVec3(eShaderType::Default, "uMaterialColour", material.diffuse);
 	shaderHandler.setUniformVec3(eShaderType::Default, "uAdditionalColour", glm::vec3(1.0f));
 	if (highlight)
@@ -114,13 +109,13 @@ void Mesh::render(ShaderHandler& shaderHandler, bool highlight) const
 		shaderHandler.setUniform1f(eShaderType::Default, "uSelectedAmplifier", 1.0f);
 	}
 
+	vaoID.bind();
 	glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(indices.size()), GL_UNSIGNED_INT, nullptr);
 }
 
 void Mesh::render(ShaderHandler& shaderHandler, eFactionController owningFactionController, bool highlight) const
 {
 	assert(!indices.empty());
-	bind();
 
 	shaderHandler.setUniformVec3(eShaderType::Default, "uAdditionalColour", glm::vec3(1.0f));
 	if (material.name == Globals::FACTION_MATERIAL_NAME_ID)
@@ -142,5 +137,6 @@ void Mesh::render(ShaderHandler& shaderHandler, eFactionController owningFaction
 		shaderHandler.setUniform1f(eShaderType::Default, "uSelectedAmplifier", 1.0f);
 	}
 
+	vaoID.bind();
 	glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(indices.size()), GL_UNSIGNED_INT, nullptr);
 }

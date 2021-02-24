@@ -2,14 +2,16 @@
 #include "Globals.h"
 #include "glad.h"
 
-OpenGLResourceBuffer::OpenGLResourceBuffer()
-	: ID(Globals::INVALID_OPENGL_ID)
+OpenGLResourceBuffer::OpenGLResourceBuffer(GLenum target)
+	: ID(Globals::INVALID_OPENGL_ID),
+	target(target)
 {
 	glGenBuffers(1, &ID);
 }
 
 OpenGLResourceBuffer::OpenGLResourceBuffer(OpenGLResourceBuffer&& rhs) noexcept
-	: ID(rhs.ID)
+	: ID(rhs.ID),
+	target(rhs.target)
 {
 	rhs.ID = Globals::INVALID_ENTITY_ID;
 }
@@ -18,6 +20,7 @@ OpenGLResourceBuffer& OpenGLResourceBuffer::operator=(OpenGLResourceBuffer&& rhs
 {
 	onDestroy();
 	ID = rhs.ID;
+	target = rhs.target;
 	rhs.ID = Globals::INVALID_OPENGL_ID;
 
 	return *this;
@@ -26,6 +29,11 @@ OpenGLResourceBuffer& OpenGLResourceBuffer::operator=(OpenGLResourceBuffer&& rhs
 OpenGLResourceBuffer::~OpenGLResourceBuffer()
 {
 	onDestroy();
+}
+
+void OpenGLResourceBuffer::bind() const
+{
+	glBindBuffer(target, ID);
 }
 
 unsigned int OpenGLResourceBuffer::getID() const
@@ -70,6 +78,11 @@ OpenGLResourceVertexArray::~OpenGLResourceVertexArray()
 unsigned int OpenGLResourceVertexArray::getID() const
 {
 	return ID;
+}
+
+void OpenGLResourceVertexArray::bind() const
+{
+	glBindVertexArray(ID);
 }
 
 void OpenGLResourceVertexArray::onDestroy()
