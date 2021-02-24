@@ -40,7 +40,7 @@ AdjacentPositions createAdjacentPositions(const Map& map, const AABB& ignoreAABB
 AdjacentPositions createAdjacentPositions(const Map& map);
 
 std::array<AdjacentPosition, ALL_DIRECTIONS_ON_GRID.size()> getAdjacentPositions(const glm::ivec2& position, const Map& map,
-	const std::list<Unit>& units, const std::list<Worker>& workers);
+	const std::vector<Unit>& units, const std::vector<Worker>& workers);
 
 std::array<AdjacentPosition, ALL_DIRECTIONS_ON_GRID.size()> getAllAdjacentPositions(const glm::ivec2& position, const Map& map);
 

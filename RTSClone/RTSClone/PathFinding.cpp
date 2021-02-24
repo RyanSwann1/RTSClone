@@ -275,8 +275,8 @@ bool PathFinding::isTargetInLineOfSight(const glm::vec3& startingPosition, const
 	return targetEntityVisible;
 }
 
-glm::vec3 PathFinding::getClosestAvailablePosition(const glm::vec3& startingPosition, const std::list<Unit>& units, 
-	const std::list<Worker>& workers, const Map& map)
+glm::vec3 PathFinding::getClosestAvailablePosition(const glm::vec3& startingPosition, const std::vector<Unit>& units, 
+	const std::vector<Worker>& workers, const Map& map)
 {
 	m_graph.reset(m_frontier);
 	m_frontier.push(Globals::convertToGridPosition(startingPosition));

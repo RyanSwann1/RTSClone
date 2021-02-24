@@ -31,7 +31,7 @@ AdjacentPositions createAdjacentPositions(const Map& map)
 }
 
 std::array<AdjacentPosition, ALL_DIRECTIONS_ON_GRID.size()> getAdjacentPositions(const glm::ivec2 & position,
-	const Map & map, const std::list<Unit> & units, const std::list<Worker>& workers)
+	const Map & map, const std::vector<Unit> & units, const std::vector<Worker>& workers)
 {
 	std::array<AdjacentPosition, ALL_DIRECTIONS_ON_GRID.size()> adjacentPositions;
 	for (int i = 0; i < adjacentPositions.size(); ++i)

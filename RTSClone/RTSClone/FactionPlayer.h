@@ -63,7 +63,7 @@ private:
 		const BaseHandler& baseHandler);
 
 	template <class Entity>
-	void selectEntity(std::list<Entity>& entities, const glm::vec3& mouseToGroundPosition, bool selectAllEntities = false,
+	void selectEntity(std::vector<Entity>& entities, const glm::vec3& mouseToGroundPosition, bool selectAllEntities = false,
 		int selectEntityID = Globals::INVALID_ENTITY_ID)
 	{
 		auto selectedEntity = std::find_if(entities.begin(), entities.end(), [&mouseToGroundPosition](const auto& entity)
@@ -104,7 +104,7 @@ private:
 	}
 
 	template <class Entity>
-	void selectEntities(std::list<Entity>& units)
+	void selectEntities(std::vector<Entity>& units)
 	{
 		for (auto& unit : units)
 		{
@@ -113,7 +113,7 @@ private:
 	}
 
 	template <class Entity>
-	void deselectEntities(std::list<Entity>& entities)
+	void deselectEntities(std::vector<Entity>& entities)
 	{
 		for (auto& entity : entities)
 		{
