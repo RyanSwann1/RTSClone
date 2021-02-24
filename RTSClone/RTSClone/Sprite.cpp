@@ -28,10 +28,7 @@ namespace
 Sprite::Sprite()
 	: m_VAO(),
 	m_VBO()
-{
-	glGenVertexArrays(1, &m_VAO.ID);
-	glGenBuffers(1, &m_VBO.ID);
-}
+{}
 
 void Sprite::render(const glm::vec3& position, glm::uvec2 windowSize, float originalWidth, float spriteWidth, float height, float yOffset, 
 	ShaderHandler& shaderHandler, const Camera& camera, const glm::vec3& materialColor) const
@@ -49,10 +46,10 @@ void Sprite::render(const glm::vec3& position, glm::uvec2 windowSize, float orig
 	shaderHandler.setUniformVec3(eShaderType::Widjet, "uColor", materialColor);
 	shaderHandler.setUniform1f(eShaderType::Widjet, "uOpacity", OPACITY);
 
-	glBindBuffer(GL_ARRAY_BUFFER, m_VBO.ID);
+	glBindBuffer(GL_ARRAY_BUFFER, m_VBO.getID());
 	glBufferData(GL_ARRAY_BUFFER, quad.size() * sizeof(glm::vec2), quad.data(), GL_STATIC_DRAW);
 
-	glBindVertexArray(m_VAO.ID);
+	glBindVertexArray(m_VAO.getID());
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(glm::vec2), (const void*)0);
 

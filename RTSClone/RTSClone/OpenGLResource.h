@@ -10,9 +10,11 @@ struct OpenGLResourceBuffer
 	OpenGLResourceBuffer& operator=(OpenGLResourceBuffer&&) noexcept;
 	~OpenGLResourceBuffer();
 
-	unsigned int ID;
+	unsigned int getID() const;
 
 private:
+	unsigned int ID;
+
 	void onDestroy();
 };
 
@@ -26,8 +28,10 @@ struct OpenGLResourceVertexArray
 	OpenGLResourceVertexArray& operator=(OpenGLResourceVertexArray&&) noexcept;
 	~OpenGLResourceVertexArray();
 
-	unsigned int ID;
+	unsigned int getID() const;
 
 private:
+	unsigned int ID;
+
 	void onDestroy();
 };

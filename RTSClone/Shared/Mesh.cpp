@@ -37,11 +37,7 @@ Mesh::Mesh()
 	vertices(),
 	indices(),
 	material()
-{
-	glGenVertexArrays(1, &vaoID.ID);
-	glGenBuffers(1, &vboID.ID);
-	glGenBuffers(1, &indiciesID.ID);
-}
+{}
 
 Mesh::Mesh(std::vector<Vertex>&& vertices, std::vector<unsigned int>&& indices, const Material& material)
 	: vaoID(),
@@ -50,15 +46,11 @@ Mesh::Mesh(std::vector<Vertex>&& vertices, std::vector<unsigned int>&& indices, 
 	vertices(std::move(vertices)),
 	indices(std::move(indices)),
 	material(material)
-{
-	glGenVertexArrays(1, &vaoID.ID);
-	glGenBuffers(1, &vboID.ID);
-	glGenBuffers(1, &indiciesID.ID);
-}
+{}
 
 void Mesh::bind() const
 {
-    glBindVertexArray(vaoID.ID);
+    glBindVertexArray(vaoID.getID());
 }
 
 void Mesh::attachToVAO() const
@@ -66,7 +58,7 @@ void Mesh::attachToVAO() const
     bind();
 
 	assert(!vertices.empty());
-    glBindBuffer(GL_ARRAY_BUFFER, vboID.ID);
+    glBindBuffer(GL_ARRAY_BUFFER, vboID.getID());
     glBufferData(GL_ARRAY_BUFFER, 
 		static_cast<GLsizei>(vertices.size() * sizeof(Vertex)), 
 		vertices.data(), GL_STATIC_DRAW);
@@ -82,7 +74,7 @@ void Mesh::attachToVAO() const
 		reinterpret_cast<const void*>(offsetof(Vertex, normal)));
 
 	assert(!indices.empty());
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indiciesID.ID);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indiciesID.getID());
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, 
 		static_cast<GLsizei>(indices.size() * sizeof(unsigned int)), 
 		indices.data(), GL_STATIC_DRAW);

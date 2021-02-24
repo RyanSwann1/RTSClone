@@ -4,7 +4,9 @@
 
 OpenGLResourceBuffer::OpenGLResourceBuffer()
 	: ID(Globals::INVALID_OPENGL_ID)
-{}
+{
+	glGenBuffers(1, &ID);
+}
 
 OpenGLResourceBuffer::OpenGLResourceBuffer(OpenGLResourceBuffer&& rhs) noexcept
 	: ID(rhs.ID)
@@ -26,6 +28,11 @@ OpenGLResourceBuffer::~OpenGLResourceBuffer()
 	onDestroy();
 }
 
+unsigned int OpenGLResourceBuffer::getID() const
+{
+	return ID;
+}
+
 void OpenGLResourceBuffer::onDestroy()
 {
 	if (ID != Globals::INVALID_OPENGL_ID)
@@ -36,7 +43,9 @@ void OpenGLResourceBuffer::onDestroy()
 
 OpenGLResourceVertexArray::OpenGLResourceVertexArray()
 	: ID(Globals::INVALID_OPENGL_ID)
-{}
+{
+	glGenVertexArrays(1, &ID);
+}
 
 OpenGLResourceVertexArray::OpenGLResourceVertexArray(OpenGLResourceVertexArray&& rhs) noexcept
 	: ID(rhs.ID)
@@ -56,6 +65,11 @@ OpenGLResourceVertexArray& OpenGLResourceVertexArray::operator=(OpenGLResourceVe
 OpenGLResourceVertexArray::~OpenGLResourceVertexArray()
 {
 	onDestroy();
+}
+
+unsigned int OpenGLResourceVertexArray::getID() const
+{
+	return ID;
 }
 
 void OpenGLResourceVertexArray::onDestroy()
