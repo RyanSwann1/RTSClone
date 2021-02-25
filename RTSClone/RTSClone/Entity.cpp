@@ -55,30 +55,6 @@ namespace
 	const float SHIELD_REPLENISH_TIMER_EXPIRATION = 15.0f;
 }
 
-//EntityStatus
-EntityStatus::EntityStatus()
-	: active(true)
-{}
-
-EntityStatus::EntityStatus(EntityStatus&& rhs) noexcept
-	: active(rhs.active)
-{
-	rhs.active = false;
-}
-
-EntityStatus& EntityStatus::operator=(EntityStatus&& rhs) noexcept
-{
-	active = rhs.active;
-	rhs.active = false;
-
-	return *this;
-}
-
-bool EntityStatus::isActive() const
-{
-	return active;
-}
-
 //Entity
 Entity::Entity(const Model& model, const glm::vec3& startingPosition, eEntityType entityType, 
 	int health, int shield, glm::vec3 startingRotation)

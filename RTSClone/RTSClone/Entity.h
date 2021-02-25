@@ -6,21 +6,7 @@
 #include "EntityType.h"
 #include "Sprite.h"
 #include "Timer.h"
-
-class EntityStatus
-{
-public:
-	EntityStatus();
-	EntityStatus(const EntityStatus&) = delete;
-	EntityStatus& operator=(const EntityStatus&) = delete;
-	EntityStatus(EntityStatus&&) noexcept;
-	EntityStatus& operator=(EntityStatus&&) noexcept;
-
-	bool isActive() const;
-
-private:
-	bool active;
-};
+#include "ActiveStatus.h"
 
 struct TakeDamageEvent;
 class FactionHandler;
@@ -71,7 +57,7 @@ protected:
 	
 	void update(float deltaTime);
 	
-	EntityStatus m_status;
+	ActiveStatus m_status;
 	Sprite m_statbarSprite;
 	glm::vec3 m_position;
 	glm::vec3 m_rotation;
