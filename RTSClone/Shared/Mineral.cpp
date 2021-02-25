@@ -30,7 +30,7 @@ Mineral::Mineral(Mineral&& rhs) noexcept
 
 #ifdef GAME
 Mineral::Mineral(const glm::vec3& startingPosition)
-	: m_active(true),
+	: m_status(),// m_active(true),
 	m_position(Globals::convertToMiddleGridPosition(startingPosition)),
 	m_AABB(),
 	m_model(ModelManager::getInstance().getModel(MINERALS_MODEL_NAME))
@@ -39,18 +39,9 @@ Mineral::Mineral(const glm::vec3& startingPosition)
 	broadcastToMessenger<GameMessages::AddToMap>({ m_AABB });
 }
 
-Mineral::Mineral(Mineral&& rhs) noexcept
-	: m_active(rhs.m_active),
-	m_position(rhs.m_position),
-	m_AABB(std::move(rhs.m_AABB)),
-	m_model(rhs.m_model)
-{
-	rhs.m_active = false;
-}
-
 Mineral::~Mineral()
 {
-	if (m_active)
+	if (m_status.isActive())
 	{
 		broadcastToMessenger<GameMessages::RemoveFromMap>({ m_AABB });
 	}

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "AABB.h"
+#include "ActiveStatus.h"
 #include <functional>
 
 struct Model;
@@ -14,8 +15,8 @@ public:
 	Mineral(const glm::vec3& startingPosition);
 	Mineral(const Mineral&) = delete;
 	Mineral& operator=(const Mineral&) = delete;
-	Mineral(Mineral&&) noexcept;
-	Mineral& operator=(Mineral&&) = delete;
+	Mineral(Mineral&&) = default;
+	Mineral& operator=(Mineral&&) = default;
 #ifdef GAME
 	~Mineral();
 #endif // GAME
@@ -30,7 +31,7 @@ public:
 
 private:
 #ifdef GAME
-	bool m_active;
+	ActiveStatus m_status;
 #endif // GAME
 	glm::vec3 m_position;
 	AABB m_AABB;
