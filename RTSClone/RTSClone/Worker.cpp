@@ -71,7 +71,7 @@ const Mineral* Worker::getMineralToHarvest() const
 	return m_mineralToHarvest;
 }
 
-const std::list<BuildingInWorkerQueue>& Worker::getBuildingCommands() const
+const std::deque<BuildingInWorkerQueue>& Worker::getBuildingCommands() const
 {
 	return m_buildQueue;
 }

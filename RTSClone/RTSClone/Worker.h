@@ -32,9 +32,9 @@ struct BuildingInWorkerQueue
 {
 	BuildingInWorkerQueue(const glm::vec3& position, eEntityType entityType);
 
-	const glm::vec3 position;
-	const eEntityType entityType;
-	const std::reference_wrapper<const Model> model;
+	glm::vec3 position;
+	eEntityType entityType;
+	std::reference_wrapper<const Model> model;
 };
 
 class Faction;
@@ -46,7 +46,7 @@ public:
 	Worker(Faction& owningFaction, const glm::vec3& startingPosition, const glm::vec3& destination, const Map& map);
 	
 	const Mineral* getMineralToHarvest() const;
-	const std::list<BuildingInWorkerQueue>& getBuildingCommands() const;
+	const std::deque<BuildingInWorkerQueue>& getBuildingCommands() const;
 	const std::vector<glm::vec3>& getPathToPosition() const;
 	eWorkerState getCurrentState() const;
 	bool isHoldingResources() const;
@@ -71,7 +71,7 @@ private:
 	std::reference_wrapper<Faction> m_owningFaction;
 	eWorkerState m_currentState;
 	std::vector<glm::vec3> m_pathToPosition;
-	std::list<BuildingInWorkerQueue> m_buildQueue;
+	std::deque<BuildingInWorkerQueue> m_buildQueue;
 	int m_repairTargetEntityID;
 	int m_currentResourceAmount;
 	Timer m_taskTimer;
