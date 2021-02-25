@@ -10,6 +10,7 @@
 #include "Turret.h"
 #include "Laboratory.h"
 #include <vector>
+#include <functional>
 
 struct Camera;
 struct GameEvent;
@@ -68,7 +69,7 @@ protected:
 	Faction(eFactionController factionController, const glm::vec3& hqStartingPosition, 
 		int startingResources, int startingPopulationCap);
 
-	std::vector<Entity*> m_allEntities;
+	std::vector<std::reference_wrapper<Entity>> m_allEntities;
 	std::vector<Unit> m_units;
 	std::vector<Worker> m_workers;
 	std::vector<SupplyDepot> m_supplyDepots;
@@ -97,10 +98,10 @@ private:
 
 	//Presumes entity already found in all entities container
 	template <class T>
-	void removeEntity(std::vector<T>& entityContainer, int entityID, std::vector<Entity*>::iterator entity)
+	void removeEntity(std::vector<T>& entityContainer, int entityID, std::vector<std::reference_wrapper<Entity>>::iterator entity)
 	{
 		assert(entity != m_allEntities.cend());
-		onEntityRemoval(*(*entity));
+		onEntityRemoval((*entity).get());
 
 		auto iter = std::find_if(entityContainer.begin(), entityContainer.end(), [entityID](const auto& entity)
 		{

@@ -236,17 +236,17 @@ void FactionPlayer::handleEvent(const GameEvent& gameEvent, const Map& map, Fact
         int targetEntityID = gameEvent.data.playerSpawnEntity.targetID;
         auto entity = std::find_if(m_allEntities.begin(), m_allEntities.end(), [targetEntityID](const auto& entity)
         {
-            return entity->getID() == targetEntityID;
+            return entity.get().getID() == targetEntityID;
         });
         if (entity != m_allEntities.end())
         {
-            switch ((*entity)->getEntityType())
+            switch ((*entity).get().getEntityType())
             {
             case eEntityType::Barracks:
-                static_cast<Barracks&>(*(*entity)).addUnitToSpawnQueue();
+                static_cast<Barracks&>((*entity).get()).addUnitToSpawnQueue();
                 break;
             case eEntityType::Headquarters:
-                static_cast<Headquarters&>(*(*entity)).addWorkerToSpawnQueue();
+                static_cast<Headquarters&>((*entity).get()).addWorkerToSpawnQueue();
                 break;
             default:
                 assert(false);
@@ -397,12 +397,12 @@ void FactionPlayer::moveSingularSelectedEntity(const glm::vec3& planeIntersectio
             auto selectedEntity = std::find_if(m_allEntities.cbegin(), m_allEntities.cend(), 
                 [&planeIntersection, &selectedWorker](const auto& entity)
             {
-                return entity->getAABB().contains(planeIntersection) && entity->getID() != selectedWorker.getID();
+                return entity.get().getAABB().contains(planeIntersection) && entity.get().getID() != selectedWorker.getID();
             });
             if (selectedEntity != m_allEntities.cend() &&
-                (*selectedEntity)->getHealth() < (*selectedEntity)->getMaximumHealth())
+                (*selectedEntity).get().getHealth() < (*selectedEntity).get().getMaximumHealth())
             {
-                selectedWorker.repairEntity(*(*selectedEntity), map);
+                selectedWorker.repairEntity((*selectedEntity), map);
             }
             else
             {
@@ -439,7 +439,7 @@ void FactionPlayer::moveMultipleSelectedEntities(const glm::vec3& planeIntersect
     {
         auto selectedEntity = std::find_if(m_allEntities.cbegin(), m_allEntities.cend(), [&planeIntersection](const auto& entity)
         {
-            return entity->getAABB().contains(planeIntersection);
+            return entity.get().getAABB().contains(planeIntersection);
         });
 
         if (selectedEntity != m_allEntities.cend())
@@ -447,13 +447,13 @@ void FactionPlayer::moveMultipleSelectedEntities(const glm::vec3& planeIntersect
             for (auto& selectedUnit : m_selectedEntities)
             {
                 if (selectedUnit->getEntityType() == eEntityType::Worker &&
-                    (*selectedEntity)->getID() != selectedUnit->getID() &&
-                    (*selectedEntity)->getHealth() < (*selectedEntity)->getMaximumHealth())
+                    (*selectedEntity).get().getID() != selectedUnit->getID() &&
+                    (*selectedEntity).get().getHealth() < (*selectedEntity).get().getMaximumHealth())
                 {
                     glm::vec3 destination = PathFinding::getInstance().getClosestPositionToAABB(selectedUnit->getPosition(),
-                        (*selectedEntity)->getAABB(), map);
+                        (*selectedEntity).get().getAABB(), map);
 
-                    static_cast<Worker&>(*selectedUnit).repairEntity(*(*selectedEntity), map);
+                    static_cast<Worker&>(*selectedUnit).repairEntity((*selectedEntity), map);
                 }
             }
         }

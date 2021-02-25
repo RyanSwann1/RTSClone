@@ -110,13 +110,13 @@ void FactionAI::handleEvent(const GameEvent& gameEvent, const Map& map, FactionH
 		int targetID = gameEvent.data.takeDamage.targetID;
 		auto entity = std::find_if(m_allEntities.begin(), m_allEntities.end(), [targetID](const auto& entity)
 		{
-			return entity->getID() == targetID;
+			return entity.get().getID() == targetID;
 		});
 
 		if (entity != m_allEntities.end() &&
-			(*entity)->getEntityType() == eEntityType::Headquarters)
+			(*entity).get().getEntityType() == eEntityType::Headquarters)
 		{
-			instructWorkersToRepair(static_cast<Headquarters&>(*(*entity)), map);
+			instructWorkersToRepair(static_cast<Headquarters&>((*entity).get()), map);
 		}
 	}
 	break;
@@ -209,7 +209,7 @@ void FactionAI::selectEntity(const glm::vec3& position)
 {
 	for (auto& entity : m_allEntities)
 	{
-		entity->setSelected(entity->getAABB().contains(position));
+		entity.get().setSelected(entity.get().getAABB().contains(position));
 	}
 }
 
@@ -348,14 +348,14 @@ bool FactionAI::isWithinRangeOfBuildings(const glm::vec3& position, float distan
 {
 	for (const auto& entity : m_allEntities)
 	{
-		switch (entity->getEntityType())
+		switch (entity.get().getEntityType())
 		{
 		case eEntityType::Headquarters:
 		case eEntityType::SupplyDepot:
 		case eEntityType::Barracks:
 		case eEntityType::Turret:
 		case eEntityType::Laboratory:
-			if (Globals::getSqrDistance(entity->getPosition(), position) <= distance * distance)
+			if (Globals::getSqrDistance(entity.get().getPosition(), position) <= distance * distance)
 			{
 				return true;
 			}
@@ -363,7 +363,7 @@ bool FactionAI::isWithinRangeOfBuildings(const glm::vec3& position, float distan
 		case eEntityType::Unit:
 			break;
 		case eEntityType::Worker:
-			for (const auto& buildingCommand : static_cast<Worker&>((*entity)).getBuildingCommands())
+			for (const auto& buildingCommand : static_cast<Worker&>(entity.get()).getBuildingCommands())
 			{
 				if (Globals::getSqrDistance(buildingCommand.position, position) <= distance * distance)
 				{
