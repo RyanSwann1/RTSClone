@@ -20,7 +20,7 @@ namespace
 	const int DAMAGE = 1;
 }
 
-Unit::Unit(Faction& owningFaction, const glm::vec3& startingPosition, const glm::vec3& startingRotation, const Map& map)
+Unit::Unit(const Faction& owningFaction, const glm::vec3& startingPosition, const glm::vec3& startingRotation, const Map& map)
 	: Entity(ModelManager::getInstance().getModel(UNIT_MODEL_NAME), startingPosition, eEntityType::Unit, 
 		Globals::UNIT_STARTING_HEALTH, owningFaction.getCurrentShieldAmount(), startingRotation),
 	m_owningFaction(owningFaction),
@@ -32,7 +32,7 @@ Unit::Unit(Faction& owningFaction, const glm::vec3& startingPosition, const glm:
 	switchToState(m_currentState, map);
 }
 
-Unit::Unit(Faction & owningFaction, const glm::vec3 & startingPosition, const glm::vec3 & startingRotation, 
+Unit::Unit(const Faction & owningFaction, const glm::vec3 & startingPosition, const glm::vec3 & startingRotation, 
 	const glm::vec3 & destination, FactionHandler& factionHandler, const Map& map)
 	: Entity(ModelManager::getInstance().getModel(UNIT_MODEL_NAME), startingPosition, eEntityType::Unit,
 		Globals::UNIT_STARTING_HEALTH, owningFaction.getCurrentShieldAmount(), startingRotation),

@@ -116,6 +116,7 @@ bool PathFinding::isBuildingSpawnAvailable(const glm::vec3& startingPosition, eE
 	glm::vec3& buildPosition, const FactionAI& owningFaction, const BaseHandler& baseHandler)
 {
 	std::vector<glm::vec3> buildPositions;
+	buildPositions.reserve(5);
 	AABB buildingAABB(startingPosition, ModelManager::getInstance().getModel(buildingEntityType));
 	for (int i = 0; i < 5; ++i)
 	{

@@ -30,8 +30,8 @@ class FactionHandler;
 class Unit : public Entity
 {
 public:
-	Unit(Faction& owningFaction, const glm::vec3& startingPosition, const glm::vec3& startingRotation, const Map& map);
-	Unit(Faction& owningFaction, const glm::vec3& startingPosition, const glm::vec3& startingRotation,
+	Unit(const Faction& owningFaction, const glm::vec3& startingPosition, const glm::vec3& startingRotation, const Map& map);
+	Unit(const Faction& owningFaction, const glm::vec3& startingPosition, const glm::vec3& startingRotation,
 		const glm::vec3& destination, FactionHandler& FactionHandler, const Map& map);
 
 	TargetEntity getTargetEntity() const;
@@ -54,7 +54,7 @@ public:
 #endif // RENDER_PATHING
 
 private:
-	std::reference_wrapper<Faction> m_owningFaction;
+	std::reference_wrapper<const Faction> m_owningFaction;
 	std::vector<glm::vec3> m_pathToPosition;
 	eUnitState m_currentState;
 	Timer m_attackTimer;

@@ -379,7 +379,7 @@ bool FactionAI::isWithinRangeOfBuildings(const glm::vec3& position, float distan
 	return false;
 }
 
-void FactionAI::onUnitTakenDamage(const TakeDamageEvent& gameEvent, Unit& unit, const Map& map, FactionHandler& factionHandler)
+void FactionAI::onUnitTakenDamage(const TakeDamageEvent& gameEvent, Unit& unit, const Map& map, FactionHandler& factionHandler) const
 {
 	assert(!unit.isDead());
 	if (!factionHandler.isFactionActive(gameEvent.senderFaction))

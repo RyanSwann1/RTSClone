@@ -45,7 +45,7 @@ public:
 	const Entity* getEntity(const glm::vec3& position) const;
 
 	void addResources(Worker& worker);
-	virtual void onUnitTakenDamage(const TakeDamageEvent& gameEvent, Unit& unit, const Map& map, FactionHandler& factionHandler) {}
+	virtual void onUnitTakenDamage(const TakeDamageEvent& gameEvent, Unit& unit, const Map& map, FactionHandler& factionHandler) const {}
 	virtual const Entity* createUnit(const Map& map, const Barracks& barracks, FactionHandler& factionHandler);
 	virtual Entity* createWorker(const Map& map, const Headquarters& headquarters);
 	virtual const Entity* createBuilding(const Map& map, const Worker& worker);
