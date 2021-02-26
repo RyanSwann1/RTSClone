@@ -12,10 +12,11 @@ class FactionHandler;
 class EntitySpawnerBuilding : public Entity
 {
 public:
+	EntitySpawnerBuilding(const glm::vec3& startingPosition, eEntityType entityType, float spawnTimerExpirationTime, int health,
+		Faction& owningFaction, const Model& model, int maxEntityInSpawnQueue);
 	EntitySpawnerBuilding(EntitySpawnerBuilding&&) = default;
 	EntitySpawnerBuilding& operator=(EntitySpawnerBuilding&&) = default;
-	virtual ~EntitySpawnerBuilding();
-
+	
 	const Timer& getSpawnTimer() const;
 	int getCurrentSpawnCount() const;
 	bool isWaypointActive() const;
@@ -26,9 +27,8 @@ public:
 	void render(ShaderHandler& shaderHandler, eFactionController owningFactionController) const;
 
 protected:
-	EntitySpawnerBuilding(const glm::vec3& startingPosition, eEntityType entityType, float spawnTimerExpirationTime, int health, 
-		Faction& owningFaction, const Model& model, int maxEntityInSpawnQueue);
-	
+	~EntitySpawnerBuilding();
+
 	bool isEntityAddableToSpawnQueue(int maxEntitiesInSpawnQueue, int resourceCost, int populationCost) const;
 	void addEntityToSpawnQueue(eEntityType entityType);
 	virtual const Entity* spawnEntity(const Map& map, FactionHandler& factionHandler) const = 0;
