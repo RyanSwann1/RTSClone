@@ -2,6 +2,11 @@
 
 #include "Globals.h"
 
+//struct Tile
+//{
+//	int occupierID;
+//};
+
 namespace GameMessages
 {
 	struct AddToMap;
@@ -31,6 +36,7 @@ public:
 private:
 	glm::ivec2 m_size;
 	std::vector<bool> m_map;
+	//std::vector<int> m_occupied;
 	
 	void addEntityToMap(const GameMessages::AddToMap& message);
 	void removeEntityFromMap(const GameMessages::RemoveFromMap& message);

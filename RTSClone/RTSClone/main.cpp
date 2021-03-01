@@ -63,7 +63,7 @@ int main()
 	glEnable(GL_CULL_FACE);
 	glEnable(GL_BACK);
 	ImGui_SFML_OpenGL3::init(window);
-	
+
 	if (!ModelManager::getInstance().isAllModelsLoaded())
 	{
 		std::cout << "Failed to load all models\n";

@@ -118,8 +118,8 @@ public:
 	bool isTargetInLineOfSight(const glm::vec3& startingPosition, const Entity& targetEntity, const Map& map) const;
 	bool isTargetInLineOfSight(const glm::vec3& startingPosition, const Entity& targetEntity, const Map& map, const AABB& senderAABB) const;
 
-	glm::vec3 getClosestAvailablePosition(const glm::vec3& startingPosition, const std::vector<Unit>& units, 
-		const std::vector<Worker>& workers, const Map& map);
+	bool getClosestAvailableEntitySpawnPosition(const glm::vec3& startingPosition, const std::vector<Unit>& units, 
+		const std::vector<Worker>& workers, const Map& map, glm::vec3& position);
 
 	glm::vec3 getRandomAvailablePositionOutsideAABB(const Entity& senderEntity, const Map& map);
 

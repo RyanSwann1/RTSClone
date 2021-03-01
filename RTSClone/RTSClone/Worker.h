@@ -43,7 +43,8 @@ class Worker : public Entity
 {
 public:
 	Worker(Faction& owningFaction, const Map& map, const glm::vec3& startingPosition, const glm::vec3& startingRotation);
-	Worker(Faction& owningFaction, const glm::vec3& startingPosition, const glm::vec3& destination, const Map& map);
+	Worker(Faction& owningFaction, const glm::vec3& startingPosition, const glm::vec3& destination, const Map& map, 
+		const glm::vec3& startingRotation);
 	
 	const Mineral* getMineralToHarvest() const;
 	const std::deque<BuildingInWorkerQueue>& getBuildingCommands() const;

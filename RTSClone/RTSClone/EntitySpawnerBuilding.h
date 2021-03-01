@@ -9,6 +9,8 @@ struct Model;
 class Map;
 class Faction;
 class FactionHandler;
+class Unit;
+class Worker;
 class EntitySpawnerBuilding : public Entity
 {
 public:
@@ -23,6 +25,8 @@ public:
 	const glm::vec3& getWaypointPosition() const;
 	glm::vec3 getUnitSpawnPosition() const;
 
+	bool getEntitySpawnPosition(const Map& map, glm::vec3& position, const std::vector<Unit>& units,
+		const std::vector<Worker>& workers) const;
 	void setWaypointPosition(const glm::vec3& position, const Map& map);
 	void render(ShaderHandler& shaderHandler, eFactionController owningFactionController) const;
 

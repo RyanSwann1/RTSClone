@@ -52,9 +52,10 @@ Worker::Worker(Faction& owningFaction, const Map& map, const glm::vec3& starting
 	switchTo(eWorkerState::Idle, map);
 }
 
-Worker::Worker(Faction& owningFaction, const glm::vec3 & startingPosition, const glm::vec3 & destination, const Map & map)
+Worker::Worker(Faction& owningFaction, const glm::vec3 & startingPosition, const glm::vec3 & destination, const Map & map,
+	const glm::vec3& startingRotation)
 	: Entity(ModelManager::getInstance().getModel(WORKER_MODEL_NAME), startingPosition, eEntityType::Worker, Globals::WORKER_STARTING_HEALTH,
-		owningFaction.getCurrentShieldAmount()),
+		owningFaction.getCurrentShieldAmount(), startingRotation),
 	m_owningFaction(owningFaction),
 	m_currentState(eWorkerState::Idle),
 	m_buildQueue(),
@@ -108,8 +109,8 @@ void Worker::repairEntity(const Entity& entity, const Map& map)
 
 bool Worker::build(const glm::vec3& buildPosition, const Map& map, eEntityType entityType)
 {
-	assert(map.isWithinBounds(AABB(buildPosition, ModelManager::getInstance().getModel(entityType))) &&
-		!map.isAABBOccupied(AABB(buildPosition, ModelManager::getInstance().getModel(entityType))));
+	AABB buildingAABB(buildPosition, ModelManager::getInstance().getModel(entityType));
+	assert(map.isWithinBounds(buildingAABB) && !map.isAABBOccupied(buildingAABB));
 
 	if (!m_owningFaction.get().isCollidingWithWorkerBuildQueue(ModelManager::getInstance().getModelAABB(buildPosition, entityType)))
 	{
@@ -223,7 +224,6 @@ void Worker::update(float deltaTime, const Map& map, FactionHandler& factionHand
 					glm::vec3 destination = PathFinding::getInstance().getRandomAvailablePositionOutsideAABB(*this, map);
 					moveTo(destination, map, building->getAABB());
 				}
-				assert(m_currentState != eWorkerState::Idle);
 			}
 		}
 		break;

@@ -45,6 +45,7 @@ namespace Globals
 	const float GROUND_HEIGHT = 0.0f;
 	const int MAP_SIZE = 30;
 	const int NODE_SIZE = 6;
+
 #ifdef GAME
 	const int INVALID_ENTITY_ID = -1;
 #endif // GAME
@@ -135,6 +136,9 @@ namespace Globals
 		TURRET_POPULATION_COST,
 		LABORATORY_POPULATION_COST
 	};
+
+	const float UNIT_GRID_ATTACK_RANGE = 5.0f;
+	const float UNIT_ATTACK_RANGE = UNIT_GRID_ATTACK_RANGE * static_cast<float>(Globals::NODE_SIZE);
 #endif // GAME
 
 	const int MAX_FACTION_SHIELD_AMOUNT = 5;
@@ -194,25 +198,25 @@ namespace Globals
 
 	inline float getSqrDistance(const glm::vec2& positionB, const glm::vec2& positionA)
 	{
-		float x = glm::pow(positionB.x - positionA.x, 2);
-		float y = glm::pow(positionB.y - positionA.y, 2);
+		float x = glm::pow<float, float>(positionB.x - positionA.x, 2.0f);
+		float y = glm::pow<float, float>(positionB.y - positionA.y, 2.0f);
 
 		return x + y;
 	}
 
 	inline float getSqrDistance(const glm::vec3& positionB, const glm::vec3& positionA)
 	{
-		float x = glm::pow(positionB.x - positionA.x, 2);
-		float y = glm::pow(positionB.y - positionA.y, 2);
-		float z = glm::pow(positionB.z - positionA.z, 2);
+		float x = glm::pow<float, float>(positionB.x - positionA.x, 2.0f);
+		float y = glm::pow<float, float>(positionB.y - positionA.y, 2.0f);
+		float z = glm::pow<float, float>(positionB.z - positionA.z, 2.0f);
 
 		return x + y + z;
 	}
 
 	inline float getSqrDistance(glm::ivec2 positionB, glm::ivec2 positionA)
 	{
-		float x = glm::pow(static_cast<float>(positionB.x - positionA.x), 2);
-		float y = glm::pow(static_cast<float>(positionB.y - positionA.y), 2);
+		float x = glm::pow<float, float>(static_cast<float>(positionB.x - positionA.x), 2.0f);
+		float y = glm::pow<float, float>(static_cast<float>(positionB.y - positionA.y), 2.0f);
 
 		return x + y;
 	}
@@ -242,7 +246,7 @@ namespace Globals
 			position.y == Globals::GROUND_HEIGHT &&
 			static_cast<int>(position.z) % Globals::NODE_SIZE == 0);
 
-		return { position.x + static_cast<float>(Globals::NODE_SIZE) / 2.0f, position.y, 
+		return { position.x + static_cast<float>(Globals::NODE_SIZE) / 2.0f, Globals::GROUND_HEIGHT, 
 			position.z + static_cast<float>(Globals::NODE_SIZE) / 2.0f };
 	}
 

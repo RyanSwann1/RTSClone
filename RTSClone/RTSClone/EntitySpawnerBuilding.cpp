@@ -11,6 +11,34 @@
 
 namespace
 {	
+	const int MAX_SPAWN_DISTANCE = 20;
+
+	bool getWaypointSpawnPosition(const EntitySpawnerBuilding& building, const Map& map, glm::vec3& spawnPosition)
+	{
+		assert(building.isWaypointActive());
+		glm::ivec2 startingPosition = Globals::convertToGridPosition(building.getPosition());
+		glm::ivec2 waypointPosition = Globals::convertToGridPosition(building.getWaypointPosition());
+		bool positionFound = false;
+		int distance = glm::ceil<int>(glm::distance(glm::vec2(waypointPosition), glm::vec2(startingPosition)));
+		
+		for (int i = Globals::NODE_SIZE; i < distance; i += Globals::NODE_SIZE)
+		{
+			glm::vec3 position = Globals::convertToWorldPosition(startingPosition + (waypointPosition - startingPosition) * i);
+			if (!building.getAABB().contains(position) && map.isPositionOccupied(position))
+			{
+				positionFound = false;
+				break;
+			}
+			else if (!building.getAABB().contains(position))
+			{
+				positionFound = true;
+				spawnPosition = position;
+			}
+		}
+
+		return positionFound;
+	}
+
 	glm::vec3 getSpawnPosition(const AABB& AABB, const glm::vec3& direction, const glm::vec3& startingPosition)
 	{
 		glm::vec3 position = startingPosition;
@@ -22,6 +50,30 @@ namespace
 		}
 		
 		return position;
+	}
+
+	bool getRandomSpawnDirection(const EntitySpawnerBuilding& building, const Map& map, glm::vec3& spawnPosition)
+	{
+		std::array<glm::ivec2, ALL_DIRECTIONS_ON_GRID.size()> randomDirections = ALL_DIRECTIONS_ON_GRID;
+		static std::random_device rd;
+		static std::mt19937 g(rd());
+		std::shuffle(randomDirections.begin(), randomDirections.end(), g);
+
+		glm::ivec2 buildingPositionOnGrid = Globals::convertToGridPosition(building.getPosition());
+		for (auto direction : randomDirections)
+		{
+			for (int i = 1; i <= MAX_SPAWN_DISTANCE; ++i)
+			{
+				glm::vec3 position = Globals::convertToWorldPosition(buildingPositionOnGrid + direction * i);
+				if (!building.getAABB().contains(position) && !map.isPositionOccupied(position))
+				{
+					spawnPosition = position;
+					return true;
+				}
+			}
+		}
+
+		return false;
 	}
 }
 
@@ -66,6 +118,22 @@ glm::vec3 EntitySpawnerBuilding::getUnitSpawnPosition() const
 			glm::normalize(glm::vec3(Globals::getRandomNumber(-1.0f, 1.0f), Globals::GROUND_HEIGHT, Globals::getRandomNumber(-1.0f, 1.0f))),
 			m_position);
 	}
+}
+
+bool EntitySpawnerBuilding::getEntitySpawnPosition(const Map& map, glm::vec3& position, const std::vector<Unit>& units, 
+	const std::vector<Worker>& workers) const
+{
+	bool spawnPositionFound = false;
+	if (isWaypointActive() && getWaypointSpawnPosition(*this, map, position))
+	{
+		spawnPositionFound = true;
+	}
+	if (!spawnPositionFound && PathFinding::getInstance().getClosestAvailableEntitySpawnPosition(m_position, units, workers, map, position))
+	{
+		spawnPositionFound = true;
+	}
+
+	return spawnPositionFound;
 }
 
 void EntitySpawnerBuilding::setWaypointPosition(const glm::vec3& position, const Map& map)

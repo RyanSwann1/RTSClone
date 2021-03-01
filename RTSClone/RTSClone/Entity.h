@@ -19,6 +19,7 @@ class Map;
 class Entity
 {
 public:
+	//
 	Entity(const Entity&) = delete;
 	Entity& operator=(const Entity&) = delete;
 	Entity(Entity&&) = default;
@@ -53,7 +54,7 @@ public:
 protected:	
 	Entity(const Model& model, const glm::vec3& startingPosition, eEntityType entityType, 
 		int health, int shield, glm::vec3 startingRotation = glm::vec3(0.0f));
-	~Entity();
+	~Entity() {}
 	
 	void update(float deltaTime);
 	

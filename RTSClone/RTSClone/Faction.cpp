@@ -711,24 +711,34 @@ bool Faction::isMineralInUse(const Mineral& mineral) const
 const Entity* Faction::createUnit(const Map& map, const Barracks& barracks, FactionHandler& factionHandler)
 {
     assert(barracks.getCurrentSpawnCount() > 0);
-    if (isAffordable(eEntityType::Unit) && !isExceedPopulationLimit(eEntityType::Unit))
+    glm::vec3 startingPosition(0.0f);
+    if (isAffordable(eEntityType::Unit) && !isExceedPopulationLimit(eEntityType::Unit) &&
+        barracks.getEntitySpawnPosition(map, startingPosition, m_units, m_workers))
     {
+        glm::vec3 startingRotation = { 0.0f, Globals::getAngle(startingPosition, barracks.getPosition()), 0.0f };
         if (barracks.isWaypointActive())
         {
-            glm::vec3 startingPosition = barracks.getUnitSpawnPosition();
-            glm::vec3 startingRotation = { 0.0f, Globals::getAngle(startingPosition, barracks.getPosition()), 0.0f };
-            glm::vec3 destination = PathFinding::getInstance().getClosestAvailablePosition(barracks.getWaypointPosition(), m_units, m_workers, map);
-
-            m_units.emplace_back(*this, startingPosition, startingRotation, destination, factionHandler, map);
+            m_units.emplace_back(*this, startingPosition, startingRotation, barracks.getWaypointPosition(), factionHandler, map);
         }
         else
         {
-            glm::vec3 startingPosition = PathFinding::getInstance().getClosestAvailablePosition(barracks.getUnitSpawnPosition(),
-                m_units, m_workers, map);
-            glm::vec3 startingRotation = { 0.0f, Globals::getAngle(startingPosition, barracks.getPosition()), 0.0f };
-            
             m_units.emplace_back(*this, startingPosition, startingRotation, map);
         }
+        //if (barracks.isWaypointActive())
+        //{
+        //    glm::vec3 startingPosition = barracks.getUnitSpawnPosition();
+        //    glm::vec3 startingRotation = { 0.0f, Globals::getAngle(startingPosition, barracks.getPosition()), 0.0f };
+        //    glm::vec3 destination = PathFinding::getInstance().getClosestAvailablePosition(barracks.getWaypointPosition(), m_units, m_workers, map);
+        //    m_units.emplace_back(*this, startingPosition, startingRotation, destination, factionHandler, map);
+        //}
+        //else
+        //{
+        //    glm::vec3 startingPosition = PathFinding::getInstance().getClosestAvailablePosition(barracks.getUnitSpawnPosition(),
+        //        m_units, m_workers, map);
+        //    glm::vec3 startingRotation = { 0.0f, Globals::getAngle(startingPosition, barracks.getPosition()), 0.0f };
+        //    
+        //    m_units.emplace_back(*this, startingPosition, startingRotation, map);
+        //}
 
         reduceResources(eEntityType::Unit);
         increaseCurrentPopulationAmount(eEntityType::Unit);
@@ -743,24 +753,33 @@ const Entity* Faction::createUnit(const Map& map, const Barracks& barracks, Fact
 Entity* Faction::createWorker(const Map& map, const Headquarters& headquarters)
 {
     assert(headquarters.getCurrentSpawnCount() > 0);
-    if (isAffordable(eEntityType::Worker) && !isExceedPopulationLimit(eEntityType::Worker))
+    glm::vec3 startingPosition(0.0f);
+    if (isAffordable(eEntityType::Worker) && !isExceedPopulationLimit(eEntityType::Worker) &&
+        headquarters.getEntitySpawnPosition(map, startingPosition, m_units, m_workers))
     {
+        glm::vec3 startingRotation = { 0.0f, Globals::getAngle(startingPosition, headquarters.getPosition()), 0.0f };
         if (headquarters.isWaypointActive())
         {
-            glm::vec3 startingPosition = headquarters.getUnitSpawnPosition();
-            glm::vec3 destination = PathFinding::getInstance().getClosestAvailablePosition(
-                headquarters.getWaypointPosition(), m_units, m_workers, map);
-
-            m_workers.emplace_back(*this, startingPosition, destination, map);
+            m_workers.emplace_back(*this, startingPosition, headquarters.getWaypointPosition(), map, startingRotation);
         }
         else
         {
-            glm::vec3 startingPosition = PathFinding::getInstance().getClosestAvailablePosition(
-                headquarters.getUnitSpawnPosition(), m_units, m_workers, map);
-            glm::vec3 startingRotation = { 0.0f, Globals::getAngle(startingPosition, headquarters.getPosition()), 0.0f };
-
             m_workers.emplace_back(*this, map, startingPosition, startingRotation);
         }
+        //if (headquarters.isWaypointActive())
+        //{
+        //    glm::vec3 startingPosition = headquarters.getUnitSpawnPosition();
+        //    glm::vec3 destination = PathFinding::getInstance().getClosestAvailablePosition(
+        //        headquarters.getWaypointPosition(), m_units, m_workers, map);
+        //    m_workers.emplace_back(*this, startingPosition, destination, map);
+        //}
+        //else
+        //{
+        //    glm::vec3 startingPosition = PathFinding::getInstance().getClosestAvailablePosition(
+        //        headquarters.getUnitSpawnPosition(), m_units, m_workers, map);
+        //    
+        //    m_workers.emplace_back(*this, map, startingPosition, startingRotation);
+        //}
 
         reduceResources(eEntityType::Worker);
         increaseCurrentPopulationAmount(eEntityType::Worker);

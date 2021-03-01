@@ -276,12 +276,11 @@ bool PathFinding::isTargetInLineOfSight(const glm::vec3& startingPosition, const
 	return targetEntityVisible;
 }
 
-glm::vec3 PathFinding::getClosestAvailablePosition(const glm::vec3& startingPosition, const std::vector<Unit>& units, 
-	const std::vector<Worker>& workers, const Map& map)
+bool PathFinding::getClosestAvailableEntitySpawnPosition(const glm::vec3& startingPosition, const std::vector<Unit>& units, 
+	const std::vector<Worker>& workers, const Map& map, glm::vec3& spawnPosition)
 {
 	m_graph.reset(m_frontier);
 	m_frontier.push(Globals::convertToGridPosition(startingPosition));
-	glm::ivec2 availablePositionOnGrid = {0, 0};
 	bool availablePositionFound = false;
 
 	while (!m_frontier.empty() && !availablePositionFound)
@@ -293,7 +292,8 @@ glm::vec3 PathFinding::getClosestAvailablePosition(const glm::vec3& startingPosi
 		{
 			if (adjacentPosition.valid)
 			{
-				availablePositionOnGrid = adjacentPosition.position;
+				spawnPosition = Globals::convertToWorldPosition(adjacentPosition.position);
+				//availablePositionOnGrid = adjacentPosition.position;
 				availablePositionFound = true;
 				break;
 			}
@@ -307,7 +307,7 @@ glm::vec3 PathFinding::getClosestAvailablePosition(const glm::vec3& startingPosi
 		assert(isFrontierWithinSizeLimit(m_frontier, map.getSize()));
 	}
 
-	return Globals::convertToWorldPosition(availablePositionOnGrid);
+	return availablePositionFound;
 }
 
 glm::vec3 PathFinding::getRandomAvailablePositionOutsideAABB(const Entity& senderEntity, const Map& map)

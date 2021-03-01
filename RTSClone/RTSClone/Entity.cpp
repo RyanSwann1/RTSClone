@@ -115,9 +115,6 @@ void Entity::increaseShield()
 	}
 }
 
-Entity::~Entity()
-{}
-
 int Entity::getID() const
 {
 	return m_ID;
