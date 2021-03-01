@@ -23,7 +23,6 @@ public:
 	int getCurrentSpawnCount() const;
 	bool isWaypointActive() const;
 	const glm::vec3& getWaypointPosition() const;
-	glm::vec3 getUnitSpawnPosition() const;
 
 	bool getEntitySpawnPosition(const Map& map, glm::vec3& position, const std::vector<Unit>& units,
 		const std::vector<Worker>& workers) const;

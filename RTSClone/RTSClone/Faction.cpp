@@ -724,21 +724,6 @@ const Entity* Faction::createUnit(const Map& map, const Barracks& barracks, Fact
         {
             m_units.emplace_back(*this, startingPosition, startingRotation, map);
         }
-        //if (barracks.isWaypointActive())
-        //{
-        //    glm::vec3 startingPosition = barracks.getUnitSpawnPosition();
-        //    glm::vec3 startingRotation = { 0.0f, Globals::getAngle(startingPosition, barracks.getPosition()), 0.0f };
-        //    glm::vec3 destination = PathFinding::getInstance().getClosestAvailablePosition(barracks.getWaypointPosition(), m_units, m_workers, map);
-        //    m_units.emplace_back(*this, startingPosition, startingRotation, destination, factionHandler, map);
-        //}
-        //else
-        //{
-        //    glm::vec3 startingPosition = PathFinding::getInstance().getClosestAvailablePosition(barracks.getUnitSpawnPosition(),
-        //        m_units, m_workers, map);
-        //    glm::vec3 startingRotation = { 0.0f, Globals::getAngle(startingPosition, barracks.getPosition()), 0.0f };
-        //    
-        //    m_units.emplace_back(*this, startingPosition, startingRotation, map);
-        //}
 
         reduceResources(eEntityType::Unit);
         increaseCurrentPopulationAmount(eEntityType::Unit);
@@ -766,20 +751,6 @@ Entity* Faction::createWorker(const Map& map, const Headquarters& headquarters)
         {
             m_workers.emplace_back(*this, map, startingPosition, startingRotation);
         }
-        //if (headquarters.isWaypointActive())
-        //{
-        //    glm::vec3 startingPosition = headquarters.getUnitSpawnPosition();
-        //    glm::vec3 destination = PathFinding::getInstance().getClosestAvailablePosition(
-        //        headquarters.getWaypointPosition(), m_units, m_workers, map);
-        //    m_workers.emplace_back(*this, startingPosition, destination, map);
-        //}
-        //else
-        //{
-        //    glm::vec3 startingPosition = PathFinding::getInstance().getClosestAvailablePosition(
-        //        headquarters.getUnitSpawnPosition(), m_units, m_workers, map);
-        //    
-        //    m_workers.emplace_back(*this, map, startingPosition, startingRotation);
-        //}
 
         reduceResources(eEntityType::Worker);
         increaseCurrentPopulationAmount(eEntityType::Worker);

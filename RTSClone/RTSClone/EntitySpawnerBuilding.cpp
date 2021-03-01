@@ -38,43 +38,6 @@ namespace
 
 		return positionFound;
 	}
-
-	glm::vec3 getSpawnPosition(const AABB& AABB, const glm::vec3& direction, const glm::vec3& startingPosition)
-	{
-		glm::vec3 position = startingPosition;
-		float distance = 1.0f;
-		while (AABB.contains(position))
-		{
-			position = position + direction * distance;
-			++distance;
-		}
-		
-		return position;
-	}
-
-	bool getRandomSpawnDirection(const EntitySpawnerBuilding& building, const Map& map, glm::vec3& spawnPosition)
-	{
-		std::array<glm::ivec2, ALL_DIRECTIONS_ON_GRID.size()> randomDirections = ALL_DIRECTIONS_ON_GRID;
-		static std::random_device rd;
-		static std::mt19937 g(rd());
-		std::shuffle(randomDirections.begin(), randomDirections.end(), g);
-
-		glm::ivec2 buildingPositionOnGrid = Globals::convertToGridPosition(building.getPosition());
-		for (auto direction : randomDirections)
-		{
-			for (int i = 1; i <= MAX_SPAWN_DISTANCE; ++i)
-			{
-				glm::vec3 position = Globals::convertToWorldPosition(buildingPositionOnGrid + direction * i);
-				if (!building.getAABB().contains(position) && !map.isPositionOccupied(position))
-				{
-					spawnPosition = position;
-					return true;
-				}
-			}
-		}
-
-		return false;
-	}
 }
 
 EntitySpawnerBuilding::~EntitySpawnerBuilding()
@@ -104,20 +67,6 @@ const glm::vec3& EntitySpawnerBuilding::getWaypointPosition() const
 {
 	assert(isWaypointActive());
 	return m_waypointPosition;
-}
-
-glm::vec3 EntitySpawnerBuilding::getUnitSpawnPosition() const
-{
-	if (isWaypointActive())
-	{
-		return getSpawnPosition(m_AABB, glm::normalize(m_waypointPosition - m_position), m_position);
-	}
-	else
-	{
-		return getSpawnPosition(m_AABB,
-			glm::normalize(glm::vec3(Globals::getRandomNumber(-1.0f, 1.0f), Globals::GROUND_HEIGHT, Globals::getRandomNumber(-1.0f, 1.0f))),
-			m_position);
-	}
 }
 
 bool EntitySpawnerBuilding::getEntitySpawnPosition(const Map& map, glm::vec3& position, const std::vector<Unit>& units, 
