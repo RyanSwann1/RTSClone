@@ -276,11 +276,11 @@ bool PathFinding::isTargetInLineOfSight(const glm::vec3& startingPosition, const
 	return targetEntityVisible;
 }
 
-bool PathFinding::getClosestAvailableEntitySpawnPosition(const glm::vec3& startingPosition, const std::vector<Unit>& units, 
+bool PathFinding::getClosestAvailableEntitySpawnPosition(const EntitySpawnerBuilding& building, const std::vector<Unit>& units, 
 	const std::vector<Worker>& workers, const Map& map, glm::vec3& spawnPosition)
 {
 	m_graph.reset(m_frontier);
-	m_frontier.push(Globals::convertToGridPosition(startingPosition));
+	m_frontier.push(Globals::convertToGridPosition(building.getPosition()));
 	bool availablePositionFound = false;
 
 	while (!m_frontier.empty() && !availablePositionFound)
@@ -288,12 +288,11 @@ bool PathFinding::getClosestAvailableEntitySpawnPosition(const glm::vec3& starti
 		glm::ivec2 position = m_frontier.front();
 		m_frontier.pop();
 
-		for (const auto& adjacentPosition : getAdjacentPositions(position, map, units, workers))
+		for (const auto& adjacentPosition : getAdjacentPositions(position, map, units, workers, building.getAABB()))
 		{
 			if (adjacentPosition.valid)
 			{
 				spawnPosition = Globals::convertToWorldPosition(adjacentPosition.position);
-				//availablePositionOnGrid = adjacentPosition.position;
 				availablePositionFound = true;
 				break;
 			}

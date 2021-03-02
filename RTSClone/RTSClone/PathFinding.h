@@ -26,6 +26,7 @@ class Map;
 class FactionHandler;
 class FactionAI;
 class BaseHandler;
+class EntitySpawnerBuilding;
 class PathFinding 
 {
 public:
@@ -118,7 +119,7 @@ public:
 	bool isTargetInLineOfSight(const glm::vec3& startingPosition, const Entity& targetEntity, const Map& map) const;
 	bool isTargetInLineOfSight(const glm::vec3& startingPosition, const Entity& targetEntity, const Map& map, const AABB& senderAABB) const;
 
-	bool getClosestAvailableEntitySpawnPosition(const glm::vec3& startingPosition, const std::vector<Unit>& units, 
+	bool getClosestAvailableEntitySpawnPosition(const EntitySpawnerBuilding& building, const std::vector<Unit>& units, 
 		const std::vector<Worker>& workers, const Map& map, glm::vec3& position);
 
 	glm::vec3 getRandomAvailablePositionOutsideAABB(const Entity& senderEntity, const Map& map);
