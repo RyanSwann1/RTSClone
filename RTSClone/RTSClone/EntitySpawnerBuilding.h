@@ -24,8 +24,6 @@ public:
 	bool isWaypointActive() const;
 	const glm::vec3& getWaypointPosition() const;
 
-	bool getEntitySpawnPosition(const Map& map, glm::vec3& position, const std::vector<Unit>& units,
-		const std::vector<Worker>& workers) const;
 	void setWaypointPosition(const glm::vec3& position, const Map& map);
 	void render(ShaderHandler& shaderHandler, eFactionController owningFactionController) const;
 

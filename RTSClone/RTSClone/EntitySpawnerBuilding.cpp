@@ -9,35 +9,17 @@
 #include "Map.h"
 #include "ShaderHandler.h"
 
-namespace
-{	
-	const int MAX_SPAWN_DISTANCE = 20;
-
-	bool getWaypointSpawnPosition(const EntitySpawnerBuilding& building, const Map& map, glm::vec3& spawnPosition)
-	{
-		assert(building.isWaypointActive());
-		glm::ivec2 startingPosition = Globals::convertToGridPosition(building.getPosition());
-		glm::ivec2 waypointPosition = Globals::convertToGridPosition(building.getWaypointPosition());
-		bool positionFound = false;
-		int distance = glm::ceil<int>(glm::distance(glm::vec2(waypointPosition), glm::vec2(startingPosition)));
-		
-		for (int i = Globals::NODE_SIZE; i < distance; i += Globals::NODE_SIZE)
-		{
-			glm::vec3 position = Globals::convertToWorldPosition(startingPosition + (waypointPosition - startingPosition) * i);
-			if (!building.getAABB().contains(position) && map.isPositionOccupied(position))
-			{
-				positionFound = false;
-				break;
-			}
-			else if (!building.getAABB().contains(position))
-			{
-				positionFound = true;
-				spawnPosition = position;
-			}
-		}
-
-		return positionFound;
-	}
+EntitySpawnerBuilding::EntitySpawnerBuilding(const glm::vec3& startingPosition, eEntityType entityType,
+	float spawnTimerExpirationTime, int health, Faction& owningFaction, const Model& model,
+	int maxEntityInSpawnQueue)
+	: Entity(model, startingPosition, entityType, health, owningFaction.getCurrentShieldAmount()),
+	m_owningFaction(owningFaction),
+	m_spawnQueue(),
+	m_spawnTimer(spawnTimerExpirationTime, false),
+	m_waypointPosition(m_position)
+{
+	broadcastToMessenger<GameMessages::AddToMap>({ m_AABB });
+	m_spawnQueue.reserve(static_cast<size_t>(maxEntityInSpawnQueue));
 }
 
 EntitySpawnerBuilding::~EntitySpawnerBuilding()
@@ -67,22 +49,6 @@ const glm::vec3& EntitySpawnerBuilding::getWaypointPosition() const
 {
 	assert(isWaypointActive());
 	return m_waypointPosition;
-}
-
-bool EntitySpawnerBuilding::getEntitySpawnPosition(const Map& map, glm::vec3& position, const std::vector<Unit>& units, 
-	const std::vector<Worker>& workers) const
-{
-	bool spawnPositionFound = false;
-	if (isWaypointActive() && getWaypointSpawnPosition(*this, map, position))
-	{
-		spawnPositionFound = true;
-	}
-	if (!spawnPositionFound && PathFinding::getInstance().getClosestAvailableEntitySpawnPosition(m_position, units, workers, map, position))
-	{
-		spawnPositionFound = true;
-	}
-
-	return spawnPositionFound;
 }
 
 void EntitySpawnerBuilding::setWaypointPosition(const glm::vec3& position, const Map& map)
@@ -155,15 +121,3 @@ void EntitySpawnerBuilding::render(ShaderHandler& shaderHandler, eFactionControl
 	Entity::render(shaderHandler, owningFactionController);
 }
 
-EntitySpawnerBuilding::EntitySpawnerBuilding(const glm::vec3& startingPosition, eEntityType entityType, 
-	float spawnTimerExpirationTime, int health, Faction& owningFaction, const Model& model,
-	int maxEntityInSpawnQueue)
-	: Entity(model, startingPosition, entityType, health, owningFaction.getCurrentShieldAmount()),
-	m_owningFaction(owningFaction),
-	m_spawnQueue(),
-	m_spawnTimer(spawnTimerExpirationTime, false),
-	m_waypointPosition(m_position)
-{
-	broadcastToMessenger<GameMessages::AddToMap>({ m_AABB });
-	m_spawnQueue.reserve(static_cast<size_t>(maxEntityInSpawnQueue));
-}
