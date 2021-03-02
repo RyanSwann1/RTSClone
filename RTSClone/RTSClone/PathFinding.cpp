@@ -276,8 +276,8 @@ bool PathFinding::isTargetInLineOfSight(const glm::vec3& startingPosition, const
 	return targetEntityVisible;
 }
 
-bool PathFinding::getClosestAvailableEntitySpawnPosition(const EntitySpawnerBuilding& building, const std::vector<Unit>& units, 
-	const std::vector<Worker>& workers, const Map& map, glm::vec3& spawnPosition)
+bool PathFinding::getClosestAvailableEntitySpawnPosition(const EntitySpawnerBuilding& building, const std::list<Unit>& units, 
+	const std::list<Worker>& workers, const Map& map, glm::vec3& spawnPosition)
 {
 	m_graph.reset(m_frontier);
 	m_frontier.push(Globals::convertToGridPosition(building.getPosition()));

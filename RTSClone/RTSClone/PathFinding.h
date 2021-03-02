@@ -43,7 +43,7 @@ public:
 	}
 
 	template <class Entity>
-	glm::vec3 getClosestAvailablePosition(const Entity& currentEntity, const std::vector<Entity>& entities, const Map& map) const
+	glm::vec3 getClosestAvailablePosition(const Entity& currentEntity, const std::list<Entity>& entities, const Map& map) const
 	{
 		constexpr float MAX_RAY_DISTANCE = static_cast<float>(Globals::NODE_SIZE) * 10.0f;
 		const std::array<glm::ivec2, 4> DIRECTIONS_ON_GRID =
@@ -119,8 +119,8 @@ public:
 	bool isTargetInLineOfSight(const glm::vec3& startingPosition, const Entity& targetEntity, const Map& map) const;
 	bool isTargetInLineOfSight(const glm::vec3& startingPosition, const Entity& targetEntity, const Map& map, const AABB& senderAABB) const;
 
-	bool getClosestAvailableEntitySpawnPosition(const EntitySpawnerBuilding& building, const std::vector<Unit>& units, 
-		const std::vector<Worker>& workers, const Map& map, glm::vec3& position);
+	bool getClosestAvailableEntitySpawnPosition(const EntitySpawnerBuilding& building, const std::list<Unit>& units, 
+		const std::list<Worker>& workers, const Map& map, glm::vec3& position);
 
 	glm::vec3 getRandomAvailablePositionOutsideAABB(const Entity& senderEntity, const Map& map);
 

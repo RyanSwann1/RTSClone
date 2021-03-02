@@ -47,7 +47,7 @@ namespace
         }
     }
 
-    void setSelectedEntities(std::vector<Entity*>& selectedUnits, std::vector<Unit>& units, std::vector<Worker>& workers)
+    void setSelectedEntities(std::vector<Entity*>& selectedUnits, std::list<Unit>& units, std::list<Worker>& workers)
     {
         selectedUnits.clear();
 
