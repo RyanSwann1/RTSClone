@@ -6,18 +6,19 @@
 
 SceneryGameObject::SceneryGameObject(const Model& model, const glm::vec3& position, const glm::vec3& rotation)
 	: m_model(model),
+	m_AABB(position, model),
 	m_position(position),
 	m_rotation(rotation),
 	m_active(true)
 {
-	broadcastToMessenger<GameMessages::AddBuildingToMap>({ {m_position, m_model} });
+	broadcastToMessenger<GameMessages::AddSceneryGameObjectToMap>({ *this });
 }
 
 SceneryGameObject::~SceneryGameObject()
 {
 	if (m_active)
 	{
-		broadcastToMessenger<GameMessages::RemoveBuildingFromMap>({ {m_position, m_model} });
+		broadcastToMessenger<GameMessages::RemoveSceneryGameObjectFromMap>({ *this });
 	}
 }
 
@@ -40,6 +41,11 @@ SceneryGameObject& SceneryGameObject::operator=(SceneryGameObject&& orig) noexce
 	orig.m_active = false;
 
 	return *this;
+}
+
+const AABB & SceneryGameObject::getAABB() const
+{
+	return m_AABB;
 }
 
 void SceneryGameObject::render(ShaderHandler& shaderHandler) const

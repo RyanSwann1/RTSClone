@@ -2,6 +2,7 @@
 
 #include "glm/glm.hpp"
 #include "Model.h"
+#include "AABB.h"
 #include <functional>
 
 class ShaderHandler;
@@ -15,6 +16,7 @@ public:
 	SceneryGameObject& operator=(SceneryGameObject&&) noexcept;
 	~SceneryGameObject();
 
+	const AABB& getAABB() const;
 	void render(ShaderHandler& shaderHandler) const;
 
 #ifdef RENDER_AABB
@@ -23,6 +25,7 @@ public:
 
 private:
 	std::reference_wrapper<const Model> m_model;
+	AABB m_AABB;
 	glm::vec3 m_position;
 	glm::vec3 m_rotation;
 	bool m_active;

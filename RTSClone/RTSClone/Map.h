@@ -2,15 +2,14 @@
 
 #include "Globals.h"
 
-//struct Tile
-//{
-//	int occupierID;
-//};
-
 namespace GameMessages
 {
 	struct AddBuildingToMap;
 	struct RemoveBuildingFromMap;
+	struct AddMineralToMap;
+	struct RemoveMineralFromMap;
+	struct AddSceneryGameObjectToMap;
+	struct RemoveSceneryGameObjectFromMap;
 	struct NewMapSize;
 }
 class AABB;
@@ -36,10 +35,14 @@ public:
 private:
 	glm::ivec2 m_size;
 	std::vector<bool> m_map;
-	//std::vector<int> m_occupied;
 	
 	void addEntityToMap(const GameMessages::AddBuildingToMap& message);
 	void removeEntityFromMap(const GameMessages::RemoveBuildingFromMap& message);
+	void addMineralToMap(const GameMessages::AddMineralToMap& message);
+	void removeMineralFromMap(const GameMessages::RemoveMineralFromMap& message);
+	void addSceneryToMap(const GameMessages::AddSceneryGameObjectToMap& message);
+	void removeSceneryFromMap(const GameMessages::RemoveSceneryGameObjectFromMap& message);
+
 	void setSize(const GameMessages::NewMapSize& message);
 	void editMap(const AABB& AABB, bool occupyAABB);
 };

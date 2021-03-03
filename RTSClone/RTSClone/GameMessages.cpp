@@ -41,6 +41,14 @@ GameMessages::RemoveMineralFromMap::RemoveMineralFromMap(const Mineral& mineral)
 	: mineral(mineral)
 {}
 
+GameMessages::AddSceneryGameObjectToMap::AddSceneryGameObjectToMap(const SceneryGameObject& gameObject)
+	: gameObject(gameObject)
+{}
+
+GameMessages::RemoveSceneryGameObjectFromMap::RemoveSceneryGameObjectFromMap(const SceneryGameObject& gameObject)
+	: gameObject(gameObject)
+{}
+
 GameMessages::UIDisplayPlayerDetails::UIDisplayPlayerDetails()
 	: resourceAmount(0),
 	currentPopulationAmount(0),

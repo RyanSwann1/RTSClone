@@ -78,11 +78,17 @@ int main()
 		return -1;
 	}
 
+	GameMessenger<GameMessages::AddBuildingToMap>::getInstance();
+	GameMessenger<GameMessages::RemoveBuildingFromMap>::getInstance();
+	GameMessenger<GameMessages::AddMineralToMap>::getInstance();
+	GameMessenger<GameMessages::RemoveMineralFromMap>::getInstance();
+	GameMessenger<GameMessages::AddSceneryGameObjectToMap>::getInstance();
+	GameMessenger<GameMessages::RemoveSceneryGameObjectFromMap>::getInstance();
+
+	GameMessenger<GameMessages::NewMapSize>::getInstance();
+
 	GameMessenger<GameMessages::UIClearDisplaySelectedEntity>::getInstance();
 	GameMessenger<GameMessages::UIClearWinner>::getInstance();
-	GameMessenger<GameMessages::AddToMap>::getInstance();
-	GameMessenger<GameMessages::RemoveFromMap>::getInstance();
-	GameMessenger<GameMessages::NewMapSize>::getInstance();
 	GameMessenger<GameMessages::UIDisplayPlayerDetails>::getInstance();
 	GameMessenger<GameMessages::UIDisplaySelectedEntity>::getInstance();
 	GameMessenger<GameMessages::UIDisplayWinner>::getInstance();

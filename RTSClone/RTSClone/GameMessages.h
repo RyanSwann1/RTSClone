@@ -6,6 +6,7 @@
 
 class Entity;
 class Mineral;
+class SceneryGameObject;
 //Caller is not meant to go out of scope. 
 namespace GameMessages
 {
@@ -34,6 +35,18 @@ namespace GameMessages
 	{
 		RemoveMineralFromMap(const Mineral& mineral);
 		const Mineral& mineral;
+	};
+
+	struct AddSceneryGameObjectToMap
+	{
+		AddSceneryGameObjectToMap(const SceneryGameObject& gameObject);
+		const SceneryGameObject& gameObject;
+	};
+
+	struct RemoveSceneryGameObjectFromMap
+	{
+		RemoveSceneryGameObjectFromMap(const SceneryGameObject& gameObject);
+		const SceneryGameObject& gameObject;
 	};
 
 	struct NewMapSize 
