@@ -33,6 +33,7 @@ public:
 	Unit(const Faction& owningFaction, const glm::vec3& startingPosition, const glm::vec3& startingRotation, const Map& map);
 	Unit(const Faction& owningFaction, const glm::vec3& startingPosition, const glm::vec3& startingRotation,
 		const glm::vec3& destination, FactionHandler& FactionHandler, const Map& map);
+	~Unit();
 
 	TargetEntity getTargetEntity() const;
 	const Faction& getOwningFaction() const;

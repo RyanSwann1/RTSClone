@@ -1,4 +1,45 @@
 #include "GameMessages.h"
+#include "Entity.h"
+
+GameMessages::AddBuildingToMap::AddBuildingToMap(const Entity& entity)
+	: entity(entity)
+{
+	switch (entity.getEntityType())
+	{
+	case eEntityType::Barracks:
+	case eEntityType::Headquarters:
+	case eEntityType::Laboratory:
+	case eEntityType::SupplyDepot:
+	case eEntityType::Turret:
+		break;
+	default:
+		assert(false);
+	}
+}
+
+GameMessages::RemoveBuildingFromMap::RemoveBuildingFromMap(const Entity& entity)
+	: entity(entity)
+{
+	switch (entity.getEntityType())
+	{
+	case eEntityType::Barracks:
+	case eEntityType::Headquarters:
+	case eEntityType::Laboratory:
+	case eEntityType::SupplyDepot:
+	case eEntityType::Turret:
+		break;
+	default:
+		assert(false);
+	}
+}
+
+GameMessages::AddMineralToMap::AddMineralToMap(const Mineral& mineral)
+	: mineral(mineral)
+{}
+
+GameMessages::RemoveMineralFromMap::RemoveMineralFromMap(const Mineral& mineral)
+	: mineral(mineral)
+{}
 
 GameMessages::UIDisplayPlayerDetails::UIDisplayPlayerDetails()
 	: resourceAmount(0),

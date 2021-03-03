@@ -18,7 +18,7 @@ EntitySpawnerBuilding::EntitySpawnerBuilding(const glm::vec3& startingPosition, 
 	m_spawnTimer(spawnTimerExpirationTime, false),
 	m_waypointPosition(m_position)
 {
-	broadcastToMessenger<GameMessages::AddToMap>({ m_AABB });
+	broadcastToMessenger<GameMessages::AddBuildingToMap>({ m_AABB });
 	m_spawnQueue.reserve(static_cast<size_t>(maxEntityInSpawnQueue));
 }
 
@@ -26,7 +26,7 @@ EntitySpawnerBuilding::~EntitySpawnerBuilding()
 {
 	if (m_status.isActive())
 	{
-		broadcastToMessenger<GameMessages::RemoveFromMap>({ m_AABB });
+		broadcastToMessenger<GameMessages::RemoveBuildingFromMap>({ m_AABB });
 	}
 }
 

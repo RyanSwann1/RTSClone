@@ -1,23 +1,23 @@
 #include "Map.h"
-#include "AABB.h"
 #include "GameMessenger.h"
 #include "GameMessages.h"
+#include "Entity.h"
 
 Map::Map()
 	: m_size(),
 	m_map()
 {
-	subscribeToMessenger<GameMessages::AddToMap>([this](const GameMessages::AddToMap& gameMessage) { return addEntityToMap(gameMessage); }, this);
-	subscribeToMessenger<GameMessages::RemoveFromMap>(
-		[this](const GameMessages::RemoveFromMap& gameMessage) { return removeEntityFromMap(gameMessage); }, this);
+	subscribeToMessenger<GameMessages::AddBuildingToMap>([this](const GameMessages::AddBuildingToMap& gameMessage) { return addEntityToMap(gameMessage); }, this);
+	subscribeToMessenger<GameMessages::RemoveBuildingFromMap>(
+		[this](const GameMessages::RemoveBuildingFromMap& gameMessage) { return removeEntityFromMap(gameMessage); }, this);
 	subscribeToMessenger<GameMessages::NewMapSize>(
 		[this](const GameMessages::NewMapSize& gameMessage) { return setSize(gameMessage); }, this);
 }
 
 Map::~Map()
 {
-	unsubscribeToMessenger<GameMessages::AddToMap>(this);
-	unsubscribeToMessenger<GameMessages::RemoveFromMap>(this);
+	unsubscribeToMessenger<GameMessages::AddBuildingToMap>(this);
+	unsubscribeToMessenger<GameMessages::RemoveBuildingFromMap>(this);
 	unsubscribeToMessenger<GameMessages::NewMapSize>(this);
 }
 
@@ -94,14 +94,14 @@ bool Map::isPositionOccupied(const glm::ivec2& position) const
 	return true;
 }
 
-void Map::addEntityToMap(const GameMessages::AddToMap& message)
+void Map::addEntityToMap(const GameMessages::AddBuildingToMap& message)
 {
-	editMap(message.AABB, true);
+	editMap(message.entity.getAABB(), true);
 }
 
-void Map::removeEntityFromMap(const GameMessages::RemoveFromMap& message)
+void Map::removeEntityFromMap(const GameMessages::RemoveBuildingFromMap& message)
 {
-	editMap(message.AABB, false);
+	editMap(message.entity.getAABB(), false);
 }
 
 void Map::setSize(const GameMessages::NewMapSize& gameMessage)

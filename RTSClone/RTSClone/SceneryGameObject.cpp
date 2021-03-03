@@ -10,14 +10,14 @@ SceneryGameObject::SceneryGameObject(const Model& model, const glm::vec3& positi
 	m_rotation(rotation),
 	m_active(true)
 {
-	broadcastToMessenger<GameMessages::AddToMap>({ {m_position, m_model} });
+	broadcastToMessenger<GameMessages::AddBuildingToMap>({ {m_position, m_model} });
 }
 
 SceneryGameObject::~SceneryGameObject()
 {
 	if (m_active)
 	{
-		broadcastToMessenger<GameMessages::RemoveFromMap>({ {m_position, m_model} });
+		broadcastToMessenger<GameMessages::RemoveBuildingFromMap>({ {m_position, m_model} });
 	}
 }
 

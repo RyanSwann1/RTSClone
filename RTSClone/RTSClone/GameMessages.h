@@ -4,27 +4,36 @@
 #include "FactionController.h"
 #include "Globals.h"
 
-class AABB;
+class Entity;
+class Mineral;
 //Caller is not meant to go out of scope. 
 namespace GameMessages
 {
 	struct UIClearDisplaySelectedEntity {};
 	struct UIClearWinner {};
 
-	struct AddToMap 
+	struct AddBuildingToMap 
 	{
-		AddToMap(const AABB& AABB)
-			: AABB(AABB) {}
-
-		const AABB& AABB;
+		AddBuildingToMap(const Entity& entity);
+		const Entity& entity;
 	};
 
-	struct RemoveFromMap 
+	struct RemoveBuildingFromMap 
 	{
-		RemoveFromMap(const AABB& AABB)
-			: AABB(AABB) {}
+		RemoveBuildingFromMap(const Entity& entity);
+		const Entity& entity;
+	};
 
-		const AABB& AABB;
+	struct AddMineralToMap
+	{
+		AddMineralToMap(const Mineral& mineral);
+		const Mineral& mineral;
+	};
+
+	struct RemoveMineralFromMap
+	{
+		RemoveMineralFromMap(const Mineral& mineral);
+		const Mineral& mineral;
 	};
 
 	struct NewMapSize 

@@ -26,7 +26,7 @@
 
 namespace
 {
-	const float DELAY_TIMER_EXPIRATION = 10.0f;
+	const float DELAY_TIMER_EXPIRATION = 5.0f;
 	const float IDLE_TIMER_EXPIRATION = 1.0f;
 	const float MIN_SPAWN_TIMER_EXPIRATION = 7.5f;
 	const float MAX_SPAWN_TIMER_EXPIRATION = 15.0f;
@@ -221,7 +221,7 @@ void FactionAI::update(float deltaTime, const Map & map, FactionHandler& faction
 	if (m_spawnTimer.isExpired())
 	{
 		m_spawnTimer.resetElaspedTime();
-		m_spawnQueue.push(eEntityType::Unit);
+		//m_spawnQueue.push(eEntityType::Unit);
 	}
 
 	m_delayTimer.update(deltaTime);

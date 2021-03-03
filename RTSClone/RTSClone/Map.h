@@ -9,8 +9,8 @@
 
 namespace GameMessages
 {
-	struct AddToMap;
-	struct RemoveFromMap;
+	struct AddBuildingToMap;
+	struct RemoveBuildingFromMap;
 	struct NewMapSize;
 }
 class AABB;
@@ -38,8 +38,8 @@ private:
 	std::vector<bool> m_map;
 	//std::vector<int> m_occupied;
 	
-	void addEntityToMap(const GameMessages::AddToMap& message);
-	void removeEntityFromMap(const GameMessages::RemoveFromMap& message);
+	void addEntityToMap(const GameMessages::AddBuildingToMap& message);
+	void removeEntityFromMap(const GameMessages::RemoveBuildingFromMap& message);
 	void setSize(const GameMessages::NewMapSize& message);
 	void editMap(const AABB& AABB, bool occupyAABB);
 };

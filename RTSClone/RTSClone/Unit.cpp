@@ -18,6 +18,18 @@ namespace
 	const float MOVEMENT_SPEED = 7.5f;
 	const float TIME_BETWEEN_ATTACK = 1.0f;
 	const int DAMAGE = 1;
+
+	void printPositionEnter(const glm::vec3& position)
+	{
+		std::cout << "Enter\n";
+		std::cout << position.x << " " << position.y << " " << position.z << "\n";
+	}
+
+	void printPositionExit(const glm::vec3& position)
+	{
+		std::cout << "Exit\n";
+		std::cout << position.x << " " << position.y << " " << position.z << "\n";
+	}
 }
 
 Unit::Unit(const Faction& owningFaction, const glm::vec3& startingPosition, const glm::vec3& startingRotation, const Map& map)
@@ -30,6 +42,7 @@ Unit::Unit(const Faction& owningFaction, const glm::vec3& startingPosition, cons
 	m_targetEntity()
 {
 	switchToState(m_currentState, map);
+	printPositionEnter(m_position);
 }
 
 Unit::Unit(const Faction & owningFaction, const glm::vec3 & startingPosition, const glm::vec3 & startingRotation, 
@@ -43,6 +56,21 @@ Unit::Unit(const Faction & owningFaction, const glm::vec3 & startingPosition, co
 	m_targetEntity()
 {
 	moveTo(destination, map, factionHandler);
+}
+
+Unit::~Unit()
+{
+	if (!m_pathToPosition.empty())
+	{
+		printPositionExit(m_pathToPosition.front());
+		//printPosition(m_pathToPosition.front());
+	}
+	else
+	{
+		assert(Globals::isOnMiddlePosition(m_position));
+//		printPositionExit(m_pathToPosition.front());
+		printPositionExit(m_position);
+	}
 }
 
 TargetEntity Unit::getTargetEntity() const
@@ -306,6 +334,26 @@ void Unit::switchToState(eUnitState newState, const Map& map, const Entity* targ
 {
 	assert(targetEntity && targetFaction || !targetEntity && !targetFaction);
 
+	switch (m_currentState)
+	{
+	case eUnitState::Idle:
+	case eUnitState::AttackingTarget:
+		assert(Globals::isOnMiddlePosition(m_position));
+		printPositionExit(m_position);
+		//printPosition(m_position);
+		break;
+	case eUnitState::AttackMoving:
+	case eUnitState::Moving:
+		if (!m_pathToPosition.empty())
+		{
+			printPositionExit(m_pathToPosition.front());
+			//printPosition(m_pathToPosition.front());
+		}
+		break;
+	default:
+		assert(false);
+	}
+
 	//On enter new state
 	switch (newState)
 	{
@@ -316,6 +364,9 @@ void Unit::switchToState(eUnitState newState, const Map& map, const Entity* targ
 		m_pathToPosition.clear();
 		break;
 	case eUnitState::AttackMoving:
+		assert(!m_pathToPosition.empty());
+		printPositionEnter(m_pathToPosition.front());
+		//printPosition(m_pathToPosition.front());
 		m_targetEntity.reset();
 		break;
 	case eUnitState::AttackingTarget:
@@ -328,6 +379,7 @@ void Unit::switchToState(eUnitState newState, const Map& map, const Entity* targ
 		m_targetEntity.set(targetFaction->getController(), targetEntity->getID());
 		break;
 	case eUnitState::Moving:
+		assert(!m_pathToPosition.empty());
 		if (targetEntity && targetFaction)
 		{
 			m_targetEntity.set(targetFaction->getController(), targetEntity->getID());
@@ -336,6 +388,8 @@ void Unit::switchToState(eUnitState newState, const Map& map, const Entity* targ
 		{
 			m_targetEntity.reset();
 		}
+		printPositionEnter(m_pathToPosition.front());
+		//printPosition(m_pathToPosition.front());
 		break;
 	default:
 		assert(false);

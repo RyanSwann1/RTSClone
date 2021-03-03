@@ -103,6 +103,9 @@ private:
 		assert(entity != m_allEntities.cend());
 		onEntityRemoval((*entity).get());
 
+
+
+
 		auto iter = std::find_if(entityContainer.begin(), entityContainer.end(), [entityID](const auto& entity)
 		{
 			return entity.getID() == entityID;
