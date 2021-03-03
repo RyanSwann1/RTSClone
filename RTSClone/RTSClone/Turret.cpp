@@ -26,14 +26,14 @@ Turret::Turret(const glm::vec3& startingPosition, const Faction& owningFaction)
 	m_stateHandlerTimer(0.2f, true),
 	m_attackTimer(TIME_BETWEEN_ATTACK, true)
 {
-	broadcastToMessenger<GameMessages::AddBuildingToMap>({ *this });
+	broadcastToMessenger<GameMessages::AddAABBToMap>({ m_AABB });
 }
 
 Turret::~Turret()
 {
 	if (m_status.isActive())
 	{
-		broadcastToMessenger<GameMessages::RemoveBuildingFromMap>({ *this });
+		broadcastToMessenger<GameMessages::RemoveAABBFromMap>({ m_AABB });
 	}
 }
 

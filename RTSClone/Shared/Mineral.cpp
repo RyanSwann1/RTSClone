@@ -36,14 +36,14 @@ Mineral::Mineral(const glm::vec3& startingPosition)
 	m_model(ModelManager::getInstance().getModel(MINERALS_MODEL_NAME))
 {
 	m_AABB.reset(m_position, m_model);
-	broadcastToMessenger<GameMessages::AddMineralToMap>({*this});
+	broadcastToMessenger<GameMessages::AddAABBToMap>({ m_AABB });
 }
 
 Mineral::~Mineral()
 {
 	if (m_status.isActive())
 	{
-		broadcastToMessenger<GameMessages::RemoveMineralFromMap>({ *this });
+		broadcastToMessenger<GameMessages::RemoveAABBFromMap>({ m_AABB });
 	}
 }
 #endif // GAME

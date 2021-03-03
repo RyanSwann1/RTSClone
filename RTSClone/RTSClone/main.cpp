@@ -78,13 +78,8 @@ int main()
 		return -1;
 	}
 
-	GameMessenger<GameMessages::AddBuildingToMap>::getInstance();
-	GameMessenger<GameMessages::RemoveBuildingFromMap>::getInstance();
-	GameMessenger<GameMessages::AddMineralToMap>::getInstance();
-	GameMessenger<GameMessages::RemoveMineralFromMap>::getInstance();
-	GameMessenger<GameMessages::AddSceneryGameObjectToMap>::getInstance();
-	GameMessenger<GameMessages::RemoveSceneryGameObjectFromMap>::getInstance();
-
+	GameMessenger<GameMessages::AddAABBToMap>::getInstance();
+	GameMessenger<GameMessages::RemoveAABBFromMap>::getInstance();
 	GameMessenger<GameMessages::NewMapSize>::getInstance();
 
 	GameMessenger<GameMessages::UIClearDisplaySelectedEntity>::getInstance();

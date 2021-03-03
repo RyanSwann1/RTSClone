@@ -10,18 +10,8 @@ Map::Map()
 	: m_size(),
 	m_map()
 {
-	subscribeToMessenger<GameMessages::AddBuildingToMap>([this](const GameMessages::AddBuildingToMap& message) { return addEntityToMap(message); }, this);
-	subscribeToMessenger<GameMessages::RemoveBuildingFromMap>(
-		[this](const GameMessages::RemoveBuildingFromMap& message) { return removeEntityFromMap(message); }, this);
-
-	subscribeToMessenger<GameMessages::AddMineralToMap>([this](const GameMessages::AddMineralToMap& message) { return addMineralToMap(message); }, this);
-	subscribeToMessenger<GameMessages::RemoveMineralFromMap>(
-		[this](const GameMessages::RemoveMineralFromMap& message) { return removeMineralFromMap(message); }, this);
-
-	subscribeToMessenger<GameMessages::AddSceneryGameObjectToMap>([this](const GameMessages::AddSceneryGameObjectToMap& message)
-		{ return addSceneryToMap(message); }, this);
-	subscribeToMessenger<GameMessages::RemoveSceneryGameObjectFromMap>(
-		[this](const GameMessages::RemoveSceneryGameObjectFromMap & message) { return removeSceneryFromMap(message); }, this);
+	subscribeToMessenger<GameMessages::AddAABBToMap>([this](const GameMessages::AddAABBToMap& message) { return addAABB(message); }, this);
+	subscribeToMessenger<GameMessages::RemoveAABBFromMap>([this](const GameMessages::RemoveAABBFromMap& message) { return removeAABB(message); }, this);
 
 	subscribeToMessenger<GameMessages::NewMapSize>(
 		[this](const GameMessages::NewMapSize& gameMessage) { return setSize(gameMessage); }, this);
@@ -29,12 +19,8 @@ Map::Map()
 
 Map::~Map()
 {
-	unsubscribeToMessenger<GameMessages::AddBuildingToMap>(this);
-	unsubscribeToMessenger<GameMessages::RemoveBuildingFromMap>(this);
-	unsubscribeToMessenger<GameMessages::AddMineralToMap>(this);
-	unsubscribeToMessenger<GameMessages::RemoveMineralFromMap>(this);
-	unsubscribeToMessenger<GameMessages::AddSceneryGameObjectToMap>(this);
-	unsubscribeToMessenger<GameMessages::RemoveSceneryGameObjectFromMap>(this);
+	unsubscribeToMessenger<GameMessages::AddAABBToMap>(this);
+	unsubscribeToMessenger<GameMessages::RemoveAABBFromMap>(this);
 	unsubscribeToMessenger<GameMessages::NewMapSize>(this);
 }
 
@@ -111,34 +97,14 @@ bool Map::isPositionOccupied(const glm::ivec2& position) const
 	return true;
 }
 
-void Map::addEntityToMap(const GameMessages::AddBuildingToMap& message)
+void Map::addAABB(const GameMessages::AddAABBToMap& message)
 {
-	editMap(message.entity.getAABB(), true);
+	editMap(message.aabb, true);
 }
 
-void Map::removeEntityFromMap(const GameMessages::RemoveBuildingFromMap& message)
+void Map::removeAABB(const GameMessages::RemoveAABBFromMap& message)
 {
-	editMap(message.entity.getAABB(), false);
-}
-
-void Map::addMineralToMap(const GameMessages::AddMineralToMap& message)
-{
-	editMap(message.mineral.getAABB(), true);
-}
-
-void Map::removeMineralFromMap(const GameMessages::RemoveMineralFromMap& message)
-{
-	editMap(message.mineral.getAABB(), false);
-}
-
-void Map::addSceneryToMap(const GameMessages::AddSceneryGameObjectToMap & message)
-{
-	editMap(message.gameObject.getAABB(), true);
-}
-
-void Map::removeSceneryFromMap(const GameMessages::RemoveSceneryGameObjectFromMap & message)
-{
-	editMap(message.gameObject.getAABB(), false);
+	editMap(message.aabb, false);
 }
 
 void Map::setSize(const GameMessages::NewMapSize& gameMessage)

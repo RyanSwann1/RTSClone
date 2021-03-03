@@ -4,12 +4,8 @@
 
 namespace GameMessages
 {
-	struct AddBuildingToMap;
-	struct RemoveBuildingFromMap;
-	struct AddMineralToMap;
-	struct RemoveMineralFromMap;
-	struct AddSceneryGameObjectToMap;
-	struct RemoveSceneryGameObjectFromMap;
+	struct AddAABBToMap;
+	struct RemoveAABBFromMap;
 	struct NewMapSize;
 }
 class AABB;
@@ -36,13 +32,8 @@ private:
 	glm::ivec2 m_size;
 	std::vector<bool> m_map;
 	
-	void addEntityToMap(const GameMessages::AddBuildingToMap& message);
-	void removeEntityFromMap(const GameMessages::RemoveBuildingFromMap& message);
-	void addMineralToMap(const GameMessages::AddMineralToMap& message);
-	void removeMineralFromMap(const GameMessages::RemoveMineralFromMap& message);
-	void addSceneryToMap(const GameMessages::AddSceneryGameObjectToMap& message);
-	void removeSceneryFromMap(const GameMessages::RemoveSceneryGameObjectFromMap& message);
-
+	void addAABB(const GameMessages::AddAABBToMap& message);
+	void removeAABB(const GameMessages::RemoveAABBFromMap& message);
 	void setSize(const GameMessages::NewMapSize& message);
 	void editMap(const AABB& AABB, bool occupyAABB);
 };

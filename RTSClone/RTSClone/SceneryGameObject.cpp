@@ -11,14 +11,14 @@ SceneryGameObject::SceneryGameObject(const Model& model, const glm::vec3& positi
 	m_rotation(rotation),
 	m_active(true)
 {
-	broadcastToMessenger<GameMessages::AddSceneryGameObjectToMap>({ *this });
+	broadcastToMessenger<GameMessages::AddAABBToMap>({ m_AABB });
 }
 
 SceneryGameObject::~SceneryGameObject()
 {
 	if (m_active)
 	{
-		broadcastToMessenger<GameMessages::RemoveSceneryGameObjectFromMap>({ *this });
+		broadcastToMessenger<GameMessages::RemoveAABBFromMap>({ m_AABB });
 	}
 }
 

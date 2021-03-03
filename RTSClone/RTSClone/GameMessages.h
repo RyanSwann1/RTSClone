@@ -7,46 +7,25 @@
 class Entity;
 class Mineral;
 class SceneryGameObject;
+class AABB;
 //Caller is not meant to go out of scope. 
 namespace GameMessages
 {
 	struct UIClearDisplaySelectedEntity {};
 	struct UIClearWinner {};
 
-	struct AddBuildingToMap 
+	struct AddAABBToMap
 	{
-		AddBuildingToMap(const Entity& entity);
-		const Entity& entity;
+		AddAABBToMap(const AABB & aabb)
+			: aabb(aabb) {}
+		const AABB& aabb;
 	};
 
-	struct RemoveBuildingFromMap 
+	struct RemoveAABBFromMap
 	{
-		RemoveBuildingFromMap(const Entity& entity);
-		const Entity& entity;
-	};
-
-	struct AddMineralToMap
-	{
-		AddMineralToMap(const Mineral& mineral);
-		const Mineral& mineral;
-	};
-
-	struct RemoveMineralFromMap
-	{
-		RemoveMineralFromMap(const Mineral& mineral);
-		const Mineral& mineral;
-	};
-
-	struct AddSceneryGameObjectToMap
-	{
-		AddSceneryGameObjectToMap(const SceneryGameObject& gameObject);
-		const SceneryGameObject& gameObject;
-	};
-
-	struct RemoveSceneryGameObjectFromMap
-	{
-		RemoveSceneryGameObjectFromMap(const SceneryGameObject& gameObject);
-		const SceneryGameObject& gameObject;
+		RemoveAABBFromMap(const AABB& aabb)
+			: aabb(aabb) {}
+		const AABB& aabb;
 	};
 
 	struct NewMapSize 
