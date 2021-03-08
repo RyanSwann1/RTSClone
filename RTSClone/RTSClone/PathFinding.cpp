@@ -88,7 +88,7 @@ namespace
 }
 
 PathFinding::PathFinding()
-	: m_sharedPositionContainer(),
+	: m_sharedContainer(),
 	m_graph(),
 	m_frontier(),
 	m_openQueue(),
@@ -107,16 +107,15 @@ PathFinding::~PathFinding()
 
 void PathFinding::onNewMapSize(const GameMessages::NewMapSize& gameMessage)
 {
-	m_sharedPositionContainer.clear();
-	m_sharedPositionContainer.reserve(
+	m_sharedContainer.clear();
+	m_sharedContainer.reserve(
 		static_cast<size_t>(gameMessage.mapSize.x) * static_cast<size_t>(gameMessage.mapSize.y));
 }
 
 bool PathFinding::isBuildingSpawnAvailable(const glm::vec3& startingPosition, eEntityType buildingEntityType, const Map& map, 
 	glm::vec3& buildPosition, const FactionAI& owningFaction, const BaseHandler& baseHandler)
 {
-	std::vector<glm::vec3> buildPositions;
-	buildPositions.reserve(5);
+	m_sharedContainer.clear();
 	AABB buildingAABB(startingPosition, ModelManager::getInstance().getModel(buildingEntityType));
 	for (int i = 0; i < 5; ++i)
 	{
@@ -137,10 +136,10 @@ bool PathFinding::isBuildingSpawnAvailable(const glm::vec3& startingPosition, eE
 					if (!map.isAABBOccupied(buildingAABB) &&
 						!owningFaction.isWithinRangeOfBuildings(Globals::convertToWorldPosition(adjacentPosition.position), Globals::NODE_SIZE * 3.0f) && 
 						!baseHandler.isWithinRangeOfMinerals(Globals::convertToWorldPosition(adjacentPosition.position), Globals::NODE_SIZE * 6.0f) &&
-						!isWithinBuildingPositionsRange(buildPositions, Globals::convertToWorldPosition(adjacentPosition.position)))
+						!isWithinBuildingPositionsRange(m_sharedContainer, Globals::convertToWorldPosition(adjacentPosition.position)))
 					{
 						buildPositionFound = true;
-						buildPositions.emplace_back(Globals::convertToWorldPosition(adjacentPosition.position));
+						m_sharedContainer.emplace_back(Globals::convertToWorldPosition(adjacentPosition.position));
 						break;
 					}
 				}
@@ -153,9 +152,9 @@ bool PathFinding::isBuildingSpawnAvailable(const glm::vec3& startingPosition, eE
 		}
 	}
 
-	if (!buildPositions.empty())
+	if (!m_sharedContainer.empty())
 	{
-		buildPosition = buildPositions[Globals::getRandomNumber(0, static_cast<int>(buildPositions.size()) - 1)];
+		buildPosition = m_sharedContainer[Globals::getRandomNumber(0, static_cast<int>(m_sharedContainer.size()) - 1)];
 		return true;
 	}
 

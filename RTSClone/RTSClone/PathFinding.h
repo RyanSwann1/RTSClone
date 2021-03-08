@@ -140,7 +140,7 @@ public:
 
 private:
 	PathFinding();
-	std::vector<glm::vec3> m_sharedPositionContainer;
+	std::vector<glm::vec3> m_sharedContainer;
 	//BFS
 	Graph m_graph;
 	std::queue<glm::ivec2> m_frontier;
