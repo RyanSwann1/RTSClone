@@ -182,6 +182,28 @@ bool PathFinding::isPositionInLineOfSight(const glm::vec3& startingPosition, con
 	return targetEntityVisible;
 }
 
+bool PathFinding::isPositionInLineOfSight(const glm::vec3& startingPosition, const glm::vec3& targetPosition, const Map& map, const Unit& unit) const
+{
+	glm::vec3 startingCenteredPosition = Globals::convertToMiddleGridPosition(Globals::convertToNodePosition(startingPosition));
+	glm::vec3 endingCenteredPosition = Globals::convertToMiddleGridPosition(Globals::convertToNodePosition(targetPosition));
+	glm::vec3 direction = glm::normalize(endingCenteredPosition - startingCenteredPosition);
+	float distance = glm::distance(endingCenteredPosition, startingCenteredPosition);
+	bool targetEntityVisible = true;
+
+	for (int i = Globals::NODE_SIZE; i <= static_cast<int>(glm::ceil(distance)); i += Globals::NODE_SIZE)
+	{
+		glm::vec3 position = startingCenteredPosition + direction * static_cast<float>(i);
+		if (map.isPositionOccupied(position) || 
+			!map.isPositionOnUnitMapAvailable(Globals::convertToGridPosition(position), unit.getID()))
+		{
+			targetEntityVisible = false;
+			break;
+		}
+	}
+
+	return targetEntityVisible;
+}
+
 bool PathFinding::isTargetInLineOfSight(const glm::vec3& startingPosition, const Entity& targetEntity, const Map& map) const
 {
 	glm::vec3 startingCenteredPosition = Globals::convertToMiddleGridPosition(Globals::convertToNodePosition(startingPosition));
@@ -223,6 +245,31 @@ bool PathFinding::isTargetInLineOfSight(const glm::vec3& startingPosition, const
 			break;
 		}
 		else if (!senderAABB.contains(position) && map.isPositionOccupied(position))
+		{
+			targetEntityVisible = false;
+			break;
+		}
+	}
+
+	return targetEntityVisible;
+}
+
+bool PathFinding::isTargetInLineOfSight(const Unit& unit, const Entity& targetEntity, const Map& map) const
+{
+	glm::vec3 startingCenteredPosition = Globals::convertToMiddleGridPosition(Globals::convertToNodePosition(unit.getPosition()));
+	glm::vec3 endingCenteredPosition = Globals::convertToMiddleGridPosition(Globals::convertToNodePosition(targetEntity.getPosition()));
+	glm::vec3 direction = glm::normalize(endingCenteredPosition - startingCenteredPosition);
+	float distance = glm::distance(endingCenteredPosition, startingCenteredPosition);
+	bool targetEntityVisible = true;
+
+	for (int i = Globals::NODE_SIZE; i <= static_cast<int>(glm::ceil(distance)); i += Globals::NODE_SIZE)
+	{
+		glm::vec3 position = startingCenteredPosition + direction * static_cast<float>(i);
+		if (targetEntity.getAABB().contains(position))
+		{
+			break;
+		}
+		else if (!map.isPositionOnUnitMapAvailable(Globals::convertToGridPosition(position), unit.getID()) && map.isPositionOccupied(position))
 		{
 			targetEntityVisible = false;
 			break;
@@ -333,7 +380,7 @@ bool PathFinding::setUnitAttackPosition(const Unit& unit, const Entity& targetEn
 
 		if (Globals::getSqrDistance(targetEntity.getPosition(), Globals::convertToWorldPosition(currentNode.position)) <=
 			unit.getAttackRange() * unit.getAttackRange() && 
-			isTargetInLineOfSight(Globals::convertToWorldPosition(currentNode.position), targetEntity, map))
+			isTargetInLineOfSight(unit, targetEntity, map))
 		{
 			if (currentNode.position == startingPosition)
 			{
@@ -367,7 +414,7 @@ bool PathFinding::setUnitAttackPosition(const Unit& unit, const Entity& targetEn
 				{
 					float sqrDistance = Globals::getSqrDistance(targetPosition, adjacentPosition.position);
 					if (isPositionInLineOfSight(Globals::convertToWorldPosition(adjacentPosition.position),
-						Globals::convertToWorldPosition(parentNode.position), map))
+						Globals::convertToWorldPosition(parentNode.position), map, unit))
 					{
 						PriorityQueueNode adjacentNode(adjacentPosition.position, parentNode.position,
 							parentNode.g + Globals::getSqrDistance(adjacentPosition.position, parentNode.position),
@@ -462,7 +509,7 @@ void PathFinding::getPathToPosition(const Unit& unit, const glm::vec3& destinati
 						shortestDistance = sqrDistance;
 
 						if (isPositionInLineOfSight(Globals::convertToWorldPosition(adjacentPosition.position),
-							Globals::convertToWorldPosition(parentNode.position), map))
+							Globals::convertToWorldPosition(parentNode.position), map, unit))
 						{
 							PriorityQueueNode adjacentNode(adjacentPosition.position, parentNode.position,
 								parentNode.g + Globals::getSqrDistance(adjacentPosition.position, parentNode.position),

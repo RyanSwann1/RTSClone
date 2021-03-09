@@ -112,9 +112,11 @@ public:
 	bool isBuildingSpawnAvailable(const glm::vec3& startingPosition, eEntityType buildingEntityType, const Map& map,
 		glm::vec3& buildPosition, const FactionAI& owningFaction, const BaseHandler& baseHandler);
 
+	bool isPositionInLineOfSight(const glm::vec3& startingPosition, const glm::vec3& targetPosition, const Map& map, const Unit& unit) const;
 	bool isPositionInLineOfSight(const glm::vec3& startingPosition, const glm::vec3& targetPosition, const Map& map) const;
 	bool isTargetInLineOfSight(const glm::vec3& startingPosition, const Entity& targetEntity, const Map& map) const;
 	bool isTargetInLineOfSight(const glm::vec3& startingPosition, const Entity& targetEntity, const Map& map, const AABB& senderAABB) const;
+	bool isTargetInLineOfSight(const Unit& unit, const Entity& targetEntity, const Map& map) const;
 
 	bool getClosestAvailableEntitySpawnPosition(const EntitySpawnerBuilding& building, const std::list<Unit>& units, 
 		const std::list<Worker>& workers, const Map& map, glm::vec3& position);
