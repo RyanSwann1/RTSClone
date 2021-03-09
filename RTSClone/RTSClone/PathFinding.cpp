@@ -161,49 +161,6 @@ bool PathFinding::isBuildingSpawnAvailable(const glm::vec3& startingPosition, eE
 	return false;
 }
 
-bool PathFinding::isUnitPositionAvailable(const glm::vec3& position, const Entity& entity, FactionHandler& factionHandler, 
-	const Faction& owningFaction) const
-{
-	for (const auto& opposingFaction : factionHandler.getOpposingFactions(owningFaction.getController()))
-	{
-		auto unit = std::find_if(opposingFaction.get().getUnits().cbegin(), opposingFaction.get().getUnits().cend(), [&position](const auto& unit)
-		{
-			if (!unit.getPathToPosition().empty())
-			{
-				return unit.getPathToPosition().front() == position;
-			}
-			else
-			{
-				return unit.getAABB().contains(position);
-			}
-		});
-		if (unit != opposingFaction.get().getUnits().cend())
-		{
-			return false;
-		}
-	}
-
-	assert(factionHandler.isFactionActive(owningFaction.getController()));
-	int senderUnitID = entity.getID();
-	auto unit = std::find_if(owningFaction.getUnits().cbegin(), owningFaction.getUnits().cend(), [&position, senderUnitID](const auto& unit)
-	{
-		if (!unit.getPathToPosition().empty())
-		{
-			return unit.getID() != senderUnitID && unit.getPathToPosition().front() == position;
-		}
-		else
-		{
-			return unit.getID() != senderUnitID && unit.getAABB().contains(position);
-		}
-	});
-	if (unit != owningFaction.getUnits().cend())
-	{
-		return false;
-	}
-
-	return true;
-}
-
 bool PathFinding::isPositionInLineOfSight(const glm::vec3& startingPosition, const glm::vec3& targetPosition, const Map& map) const
 {
 	glm::vec3 startingCenteredPosition = Globals::convertToMiddleGridPosition(Globals::convertToNodePosition(startingPosition));
@@ -380,7 +337,7 @@ bool PathFinding::setUnitAttackPosition(const Unit& unit, const Entity& targetEn
 		{
 			if (currentNode.position == startingPosition)
 			{
-				if (isUnitPositionAvailable(Globals::convertToWorldPosition(startingPosition), unit, factionHandler, unit.getOwningFaction()))
+				if(map.isPositionOnUnitMapAvailable(startingPosition, unit.getID()))
 				{
 					positionFound = true;
 					if (Globals::convertToWorldPosition(currentNode.position) != unit.getPosition())
@@ -470,7 +427,7 @@ void PathFinding::getPathToPosition(const Unit& unit, const glm::vec3& destinati
 		{
 			if (currentNode.position == startingPositionOnGrid)
 			{
-				if (isUnitPositionAvailable(Globals::convertToWorldPosition(startingPositionOnGrid), unit, factionHandler, owningFaction))
+				if(map.isPositionOnUnitMapAvailable(startingPositionOnGrid, unit.getID()))
 				{
 					destinationReached = true;
 					if (Globals::convertToWorldPosition(currentNode.position) != unit.getPosition())

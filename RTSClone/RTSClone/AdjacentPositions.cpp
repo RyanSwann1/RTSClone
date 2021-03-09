@@ -130,8 +130,7 @@ std::array<AdjacentPosition, ALL_DIRECTIONS_ON_GRID.size()> getAdjacentPositions
 		glm::ivec2 adjacentPosition = position + ALL_DIRECTIONS_ON_GRID[i];
 		if (map.isWithinBounds(adjacentPosition) && 
 			!map.isPositionOccupied(adjacentPosition) &&
-			PathFinding::getInstance().isUnitPositionAvailable(Globals::convertToWorldPosition(adjacentPosition), unit, factionHandler,
-				unit.getOwningFaction()))
+			map.isPositionOnUnitMapAvailable(adjacentPosition, unit.getID()))
 		{
 			adjacentPositions[i] = AdjacentPosition(adjacentPosition);
 		}		
@@ -151,19 +150,12 @@ std::array<AdjacentPosition, ALL_DIRECTIONS_ON_GRID.size()> getAdjacentPositions
 		{
 			if (ignoreAABB.contains(Globals::convertToWorldPosition(adjacentPosition)) || !map.isPositionOccupied(adjacentPosition))
 			{
-				if (PathFinding::getInstance().isUnitPositionAvailable(Globals::convertToWorldPosition(adjacentPosition), unit, factionHandler,
-					unit.getOwningFaction()))
+				if (map.isPositionOnUnitMapAvailable(adjacentPosition, unit.getID()))
 				{
 					adjacentPositions[i] = AdjacentPosition(adjacentPosition);
 				}
 			}
 		}
-		//	!map.isPositionOccupied(adjacentPosition) &&
-		//	PathFinding::getInstance().isUnitPositionAvailable(Globals::convertToWorldPosition(adjacentPosition), unit, factionHandler,
-		//		unit.getOwningFaction()))
-		//{
-		//	
-		//}
 	}
 
 	return adjacentPositions;

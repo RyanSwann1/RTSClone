@@ -80,6 +80,8 @@ int main()
 
 	GameMessenger<GameMessages::AddAABBToMap>::getInstance();
 	GameMessenger<GameMessages::RemoveAABBFromMap>::getInstance();
+	GameMessenger<GameMessages::AddUnitPositionToMap>::getInstance();
+	GameMessenger<GameMessages::RemoveUnitPositionFromMap>::getInstance();
 	GameMessenger<GameMessages::NewMapSize>::getInstance();
 
 	GameMessenger<GameMessages::UIClearDisplaySelectedEntity>::getInstance();
