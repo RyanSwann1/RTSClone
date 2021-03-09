@@ -9,6 +9,8 @@
 #include "FactionHandler.h"
 #include "PathFinding.h"
 #include "glm/gtx/vector_angle.hpp"
+#include "GameMessages.h"
+#include "GameMessenger.h"
 #ifdef RENDER_PATHING
 #include "RenderPathMesh.h"
 #endif // RENDER_PATHING
@@ -18,18 +20,6 @@ namespace
 	const float MOVEMENT_SPEED = 7.5f;
 	const float TIME_BETWEEN_ATTACK = 1.0f;
 	const int DAMAGE = 1;
-
-	void printPositionEnter(const glm::vec3& position)
-	{
-		std::cout << "Enter\n";
-		std::cout << position.x << " " << position.y << " " << position.z << "\n";
-	}
-
-	void printPositionExit(const glm::vec3& position)
-	{
-		std::cout << "Exit\n";
-		std::cout << position.x << " " << position.y << " " << position.z << "\n";
-	}
 }
 
 Unit::Unit(const Faction& owningFaction, const glm::vec3& startingPosition, const glm::vec3& startingRotation, const Map& map)
@@ -42,7 +32,7 @@ Unit::Unit(const Faction& owningFaction, const glm::vec3& startingPosition, cons
 	m_targetEntity()
 {
 	switchToState(m_currentState, map);
-	printPositionEnter(m_position);
+	broadcastToMessenger<GameMessages::AddUnitPositionToMap>({ m_position, getID() });
 }
 
 Unit::Unit(const Faction & owningFaction, const glm::vec3 & startingPosition, const glm::vec3 & startingRotation, 
@@ -62,14 +52,12 @@ Unit::~Unit()
 {
 	if (!m_pathToPosition.empty())
 	{
-		printPositionExit(m_pathToPosition.front());
-		//printPosition(m_pathToPosition.front());
+		broadcastToMessenger<GameMessages::RemoveUnitPositionFromMap>({ m_pathToPosition.front(), getID() });
 	}
 	else
 	{
 		assert(Globals::isOnMiddlePosition(m_position));
-//		printPositionExit(m_pathToPosition.front());
-		printPositionExit(m_position);
+		broadcastToMessenger<GameMessages::RemoveUnitPositionFromMap>({ m_position, getID() });
 	}
 }
 
@@ -106,6 +94,10 @@ eUnitState Unit::getCurrentState() const
 void Unit::moveToAttackPosition(const Entity& targetEntity, const Faction& targetFaction, const Map& map, FactionHandler& factionHandler)
 {
 	glm::vec3 previousDestination = Globals::getNextPathDestination(m_pathToPosition, m_position);
+	if (!m_pathToPosition.empty())
+	{
+		broadcastToMessenger<GameMessages::RemoveUnitPositionFromMap>({ m_pathToPosition.front(), getID() });
+	}
 	bool attackPositionFound = PathFinding::getInstance().setUnitAttackPosition(*this, targetEntity, m_pathToPosition, map, factionHandler);
 	if (attackPositionFound)
 	{
@@ -143,8 +135,12 @@ void Unit::moveToAttackPosition(const Entity& targetEntity, const Faction& targe
 void Unit::moveTo(const glm::vec3& destination, const Map& map, FactionHandler& factionHandler, eUnitState state)
 {
 	glm::vec3 previousDestination = Globals::getNextPathDestination(m_pathToPosition, m_position);
-	PathFinding::getInstance().getPathToPosition(*this, destination, m_pathToPosition, map, factionHandler, m_owningFaction);
+	if (!m_pathToPosition.empty())
+	{
+		broadcastToMessenger<GameMessages::RemoveUnitPositionFromMap>({ m_pathToPosition.front(), getID() });
+	}
 
+	PathFinding::getInstance().getPathToPosition(*this, destination, m_pathToPosition, map, factionHandler, m_owningFaction);
 	if (!m_pathToPosition.empty())
 	{
 		switchToState(state, map);
@@ -339,16 +335,13 @@ void Unit::switchToState(eUnitState newState, const Map& map, const Entity* targ
 	case eUnitState::Idle:
 	case eUnitState::AttackingTarget:
 		assert(Globals::isOnMiddlePosition(m_position));
-		printPositionExit(m_position);
-		//printPosition(m_position);
+		if (newState == eUnitState::Moving || newState == eUnitState::AttackMoving)
+		{
+			broadcastToMessenger<GameMessages::RemoveUnitPositionFromMap>({ m_position, getID() });
+		}
 		break;
 	case eUnitState::AttackMoving:
 	case eUnitState::Moving:
-		if (!m_pathToPosition.empty())
-		{
-			printPositionExit(m_pathToPosition.front());
-			//printPosition(m_pathToPosition.front());
-		}
 		break;
 	default:
 		assert(false);
@@ -360,13 +353,13 @@ void Unit::switchToState(eUnitState newState, const Map& map, const Entity* targ
 	case eUnitState::Idle:
 		GameEventHandler::getInstance().gameEvents.push(
 			GameEvent::createOnEnteredIdleState(m_owningFaction.get().getController(), getEntityType(), getID()));
+		broadcastToMessenger<GameMessages::AddUnitPositionToMap>({ m_position, getID() });
 		m_targetEntity.reset();
 		m_pathToPosition.clear();
 		break;
 	case eUnitState::AttackMoving:
 		assert(!m_pathToPosition.empty());
-		printPositionEnter(m_pathToPosition.front());
-		//printPosition(m_pathToPosition.front());
+		broadcastToMessenger<GameMessages::AddUnitPositionToMap>({ m_pathToPosition.front(), getID()  });
 		m_targetEntity.reset();
 		break;
 	case eUnitState::AttackingTarget:
@@ -388,8 +381,7 @@ void Unit::switchToState(eUnitState newState, const Map& map, const Entity* targ
 		{
 			m_targetEntity.reset();
 		}
-		printPositionEnter(m_pathToPosition.front());
-		//printPosition(m_pathToPosition.front());
+		broadcastToMessenger<GameMessages::AddUnitPositionToMap>({ m_pathToPosition.front(), getID() });
 		break;
 	default:
 		assert(false);
