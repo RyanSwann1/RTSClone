@@ -28,6 +28,28 @@ namespace GameMessages
 		const AABB& aabb;
 	};
 
+	struct AddUnitPositionToMap
+	{
+		AddUnitPositionToMap(const glm::vec3& position, int ID)
+			: position(position),
+			ID(ID)
+		{}
+
+		const glm::vec3& position;
+		int ID;
+	};
+
+	struct RemoveUnitPositionFromMap
+	{
+		RemoveUnitPositionFromMap(const glm::vec3& position, int ID)
+			: position(position),
+			ID(ID)
+		{}
+
+		const glm::vec3& position;
+		int ID;
+	};
+
 	struct NewMapSize 
 	{
 		NewMapSize(glm::ivec2 mapSize)
