@@ -12,6 +12,9 @@ Map::Map()
 {
 	subscribeToMessenger<GameMessages::AddAABBToMap>([this](const GameMessages::AddAABBToMap& message) { return addAABB(message); }, this);
 	subscribeToMessenger<GameMessages::RemoveAABBFromMap>([this](const GameMessages::RemoveAABBFromMap& message) { return removeAABB(message); }, this);
+	subscribeToMessenger<GameMessages::AddUnitPositionToMap>([this](const GameMessages::AddUnitPositionToMap& message) { return addUnitPosition(message); }, this);
+	subscribeToMessenger<GameMessages::RemoveUnitPositionFromMap>(
+		[this](const GameMessages::RemoveUnitPositionFromMap& message) { return removeUnitPosition(message); }, this);
 
 	subscribeToMessenger<GameMessages::NewMapSize>(
 		[this](const GameMessages::NewMapSize& gameMessage) { return setSize(gameMessage); }, this);
@@ -21,6 +24,8 @@ Map::~Map()
 {
 	unsubscribeToMessenger<GameMessages::AddAABBToMap>(this);
 	unsubscribeToMessenger<GameMessages::RemoveAABBFromMap>(this);
+	unsubscribeToMessenger<GameMessages::AddUnitPositionToMap>(this);
+	unsubscribeToMessenger<GameMessages::RemoveUnitPositionFromMap>(this);
 	unsubscribeToMessenger<GameMessages::NewMapSize>(this);
 }
 
@@ -97,6 +102,17 @@ bool Map::isPositionOccupied(const glm::ivec2& position) const
 	return true;
 }
 
+bool Map::isPositionOnUnitMapAvailable(glm::ivec2 position, int senderID) const
+{
+	if (isWithinBounds(position))
+	{
+		int ID = m_unitMap[Globals::convertTo1D(position, m_size)];
+		return ID == senderID || ID == Globals::INVALID_ENTITY_ID;
+	}
+
+	return false;
+}
+
 void Map::addAABB(const GameMessages::AddAABBToMap& message)
 {
 	editMap(message.aabb, true);
@@ -107,10 +123,31 @@ void Map::removeAABB(const GameMessages::RemoveAABBFromMap& message)
 	editMap(message.aabb, false);
 }
 
+void Map::addUnitPosition(const GameMessages::AddUnitPositionToMap& message)
+{
+	editUnitMap(message.position, message.ID, true);
+}
+
+void Map::removeUnitPosition(const GameMessages::RemoveUnitPositionFromMap& message)
+{
+	editUnitMap(message.position, message.ID, false);
+}
+
 void Map::setSize(const GameMessages::NewMapSize& gameMessage)
 {
 	m_size = gameMessage.mapSize;
 	m_map.resize(static_cast<size_t>(m_size.x) * static_cast<size_t>(m_size.y), false);
+	m_unitMap.resize(static_cast<size_t>(m_size.x) * static_cast<size_t>(m_size.y), Globals::INVALID_ENTITY_ID);
+}
+
+int Map::getIDOnUnitMap(glm::ivec2 position) const
+{
+	if (isWithinBounds(position))
+	{
+		return m_unitMap[Globals::convertTo1D(position, m_size)];
+	}
+
+	return Globals::INVALID_ENTITY_ID;
 }
 
 void Map::editMap(const AABB& AABB, bool occupyAABB)
@@ -126,5 +163,22 @@ void Map::editMap(const AABB& AABB, bool occupyAABB)
 				m_map[Globals::convertTo1D(positionOnGrid, m_size)] = occupyAABB;
 			}
 		}
+	}
+}
+
+void Map::editUnitMap(const glm::vec3& position, int ID, bool occupy)
+{
+	assert(isWithinBounds(position));
+	glm::ivec2 positionOnGrid = Globals::convertToGridPosition(position);
+	int existingUnitID = getIDOnUnitMap(positionOnGrid);
+	assert(existingUnitID == Globals::INVALID_ENTITY_ID || existingUnitID == ID);
+
+	if (occupy)
+	{
+		m_unitMap[Globals::convertTo1D(positionOnGrid, m_size)] = ID;
+	}
+	else
+	{
+		m_unitMap[Globals::convertTo1D(positionOnGrid, m_size)] = Globals::INVALID_ENTITY_ID;
 	}
 }
