@@ -12,11 +12,13 @@ AdjacentPosition::AdjacentPosition()
 
 AdjacentPosition::AdjacentPosition(const glm::ivec2 & position)
 	: valid(true),
+	used(false),
 	position(position)
 {}
 
 AdjacentPosition::AdjacentPosition(const glm::ivec2 & position, bool valid)
 	: valid(valid),
+	used(false),
 	position(position)
 {}
 

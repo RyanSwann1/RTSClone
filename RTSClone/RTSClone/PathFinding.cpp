@@ -112,6 +112,7 @@ void PathFinding::onNewMapSize(const GameMessages::NewMapSize& gameMessage)
 		static_cast<size_t>(gameMessage.mapSize.x) * static_cast<size_t>(gameMessage.mapSize.y));
 }
 
+
 bool PathFinding::isBuildingSpawnAvailable(const glm::vec3& startingPosition, eEntityType buildingEntityType, const Map& map, 
 	glm::vec3& buildPosition, const FactionAI& owningFaction, const BaseHandler& baseHandler)
 {
@@ -361,7 +362,7 @@ bool PathFinding::setUnitAttackPosition(const Unit& unit, const Entity& targetEn
 	const Map& map, FactionHandler& factionHandler)
 {
 	assert(unit.getID() != targetEntity.getID());
-	
+
 	pathToPosition.clear();
 	m_openQueue.clear();
 	m_closedQueue.clear();
@@ -379,12 +380,12 @@ bool PathFinding::setUnitAttackPosition(const Unit& unit, const Entity& targetEn
 		m_openQueue.popTop();
 
 		if (Globals::getSqrDistance(targetEntity.getPosition(), Globals::convertToWorldPosition(currentNode.position)) <=
-			unit.getAttackRange() * unit.getAttackRange() && 
+			unit.getAttackRange() * unit.getAttackRange() &&
 			isTargetInLineOfSight(unit, targetEntity, map))
 		{
 			if (currentNode.position == startingPosition)
 			{
-				if(map.isPositionOnUnitMapAvailable(startingPosition, unit.getID()))
+				if (map.isPositionOnUnitMapAvailable(startingPosition, unit.getID()))
 				{
 					positionFound = true;
 					if (Globals::convertToWorldPosition(currentNode.position) != unit.getPosition())
@@ -440,17 +441,44 @@ bool PathFinding::setUnitAttackPosition(const Unit& unit, const Entity& targetEn
 		assert(isPriorityQueueWithinSizeLimit(m_openQueue, map.getSize()) &&
 			isPriorityQueueWithinSizeLimit(m_closedQueue, map.getSize()));
 	}
-	
+
 	return positionFound;
 }
 
 void PathFinding::getPathToPosition(const Unit& unit, const glm::vec3& destination, std::vector<glm::vec3>& pathToPosition, 
 	const Map& map, FactionHandler& factionHandler, const Faction& owningFaction)
 {
+	if (!getShortestPath(unit, destination, pathToPosition, map, factionHandler, owningFaction))
+	{
+		getGarunteedPath(unit, destination, pathToPosition, map, factionHandler, owningFaction);
+	}
+}
+
+void PathFinding::getPathToPosition(const Worker& worker, const glm::vec3& destination, std::vector<glm::vec3>& pathToPosition, 
+	AdjacentPositions adjacentPositions, const Map& map, const Faction& owningFaction)
+{
+	if (!getShortestPath(worker, destination, pathToPosition, adjacentPositions, map, owningFaction))
+	{
+		getGarunteedPath(worker, destination, pathToPosition, adjacentPositions, map, owningFaction);
+	}
+}
+
+void PathFinding::getPathToPosition(const Worker& worker, const Entity& target, std::vector<glm::vec3>& pathToPosition, 
+	const Map& map, const Faction& owningFaction)
+{
+	if (!getShortestPath(worker, target, pathToPosition, map, owningFaction))
+	{
+		getGarunteedPath(worker, target, pathToPosition, map, owningFaction);
+	}
+}
+
+bool PathFinding::getShortestPath(const Unit& unit, const glm::vec3& destination, std::vector<glm::vec3>& pathToPosition, 
+	const Map& map, FactionHandler& factionHandler, const Faction& owningFaction)
+{
 	pathToPosition.clear();
 	if (unit.getPosition() == destination || !map.isWithinBounds(destination))
 	{
-		return;
+		return false;
 	}
 
 	m_openQueue.clear();
@@ -459,9 +487,8 @@ void PathFinding::getPathToPosition(const Unit& unit, const glm::vec3& destinati
 	bool destinationReached = false;
 	glm::ivec2 startingPositionOnGrid = Globals::convertToGridPosition(unit.getPosition());
 	glm::ivec2 destinationOnGrid = Globals::convertToGridPosition(destination);
-	float shortestDistance = Globals::getSqrDistance(destination, unit.getPosition());
-	glm::ivec2 closestAvailablePosition = { 0, 0 };
-	m_openQueue.add({ startingPositionOnGrid, startingPositionOnGrid, 0.0f, 
+	float shortestSqrDistance = Globals::getSqrDistance(destination, unit.getPosition());
+	m_openQueue.add({ startingPositionOnGrid, startingPositionOnGrid, 0.0f,
 		Globals::getSqrDistance(destinationOnGrid, startingPositionOnGrid) });
 
 	PriorityQueueNode parentNode = m_openQueue.getTop();
@@ -474,7 +501,7 @@ void PathFinding::getPathToPosition(const Unit& unit, const glm::vec3& destinati
 		{
 			if (currentNode.position == startingPositionOnGrid)
 			{
-				if(map.isPositionOnUnitMapAvailable(startingPositionOnGrid, unit.getID()))
+				if (map.isPositionOnUnitMapAvailable(startingPositionOnGrid, unit.getID()))
 				{
 					destinationReached = true;
 					if (Globals::convertToWorldPosition(currentNode.position) != unit.getPosition())
@@ -494,7 +521,7 @@ void PathFinding::getPathToPosition(const Unit& unit, const glm::vec3& destinati
 		}
 		else
 		{
-			for (const auto& adjacentPosition : getAdjacentPositions(currentNode.position, map, factionHandler, unit))
+			for (auto& adjacentPosition : getAdjacentPositions(currentNode.position, map, factionHandler, unit))
 			{
 				if (!adjacentPosition.valid || m_closedQueue.contains(adjacentPosition.position))
 				{
@@ -503,10 +530,9 @@ void PathFinding::getPathToPosition(const Unit& unit, const glm::vec3& destinati
 				else
 				{
 					float sqrDistance = Globals::getSqrDistance(destinationOnGrid, adjacentPosition.position);
-					if (sqrDistance < shortestDistance)
+					if (sqrDistance < shortestSqrDistance)
 					{
-						closestAvailablePosition = adjacentPosition.position;
-						shortestDistance = sqrDistance;
+						shortestSqrDistance = sqrDistance;
 
 						if (isPositionInLineOfSight(Globals::convertToWorldPosition(adjacentPosition.position),
 							Globals::convertToWorldPosition(parentNode.position), map, unit))
@@ -533,23 +559,20 @@ void PathFinding::getPathToPosition(const Unit& unit, const glm::vec3& destinati
 
 		m_closedQueue.add(currentNode);
 
-		assert(isPriorityQueueWithinSizeLimit(m_openQueue, map.getSize()) && 
+		assert(isPriorityQueueWithinSizeLimit(m_openQueue, map.getSize()) &&
 			isPriorityQueueWithinSizeLimit(m_closedQueue, map.getSize()));
 	}
-
-	if (pathToPosition.empty() && shortestDistance != Globals::getSqrDistance(destination, unit.getPosition()))
-	{	
-		getPathFromClosedQueue(pathToPosition, startingPositionOnGrid, closestAvailablePosition, m_closedQueue, map);
-	}
+	
+	return destinationReached;
 }
 
-void PathFinding::getPathToPosition(const Worker& worker, const glm::vec3& destination, std::vector<glm::vec3>& pathToPosition, 
+bool PathFinding::getShortestPath(const Worker& worker, const glm::vec3& destination, std::vector<glm::vec3>& pathToPosition, 
 	AdjacentPositions adjacentPositions, const Map& map, const Faction& owningFaction)
 {
 	pathToPosition.clear();
 	if (worker.getPosition() == destination || !map.isWithinBounds(destination))
 	{
-		return;
+		return false;
 	}
 
 	m_openQueue.clear();
@@ -559,7 +582,6 @@ void PathFinding::getPathToPosition(const Worker& worker, const glm::vec3& desti
 	glm::ivec2 startingPositionOnGrid = Globals::convertToGridPosition(worker.getPosition());
 	glm::ivec2 destinationOnGrid = Globals::convertToGridPosition(destination);
 	float shortestDistance = Globals::getSqrDistance(destination, worker.getPosition());
-	glm::ivec2 closestAvailablePosition = { 0, 0 };
 	m_openQueue.add({ startingPositionOnGrid, startingPositionOnGrid, 0.0f,
 		Globals::getSqrDistance(destinationOnGrid, startingPositionOnGrid) });
 
@@ -592,9 +614,7 @@ void PathFinding::getPathToPosition(const Worker& worker, const glm::vec3& desti
 					float sqrDistance = Globals::getSqrDistance(destinationOnGrid, adjacentPosition.position);
 					if (sqrDistance < shortestDistance)
 					{
-						closestAvailablePosition = adjacentPosition.position;
 						shortestDistance = sqrDistance;
-
 						if (isPositionInLineOfSight(Globals::convertToWorldPosition(adjacentPosition.position),
 							Globals::convertToWorldPosition(parentNode.position), map))
 						{
@@ -622,13 +642,10 @@ void PathFinding::getPathToPosition(const Worker& worker, const glm::vec3& desti
 			isPriorityQueueWithinSizeLimit(m_closedQueue, map.getSize()));
 	}
 
-	if (pathToPosition.empty() && shortestDistance != Globals::getSqrDistance(destination, worker.getPosition()))
-	{
-		getPathFromClosedQueue(pathToPosition, startingPositionOnGrid, closestAvailablePosition, m_closedQueue, map);
-	}
+	return destinationReached;
 }
 
-void PathFinding::getPathToPosition(const Worker& worker, const Entity& target, std::vector<glm::vec3>& pathToPosition, 
+bool PathFinding::getShortestPath(const Worker& worker, const Entity& target, std::vector<glm::vec3>& pathToPosition, 
 	const Map& map, const Faction& owningFaction)
 {
 	glm::vec3 destination = PathFinding::getInstance().getClosestPositionToAABB(worker.getPosition(),
@@ -637,7 +654,7 @@ void PathFinding::getPathToPosition(const Worker& worker, const Entity& target, 
 	pathToPosition.clear();
 	if (worker.getPosition() == destination || !map.isWithinBounds(destination))
 	{
-		return;
+		return false;
 	}
 
 	m_openQueue.clear();
@@ -647,7 +664,6 @@ void PathFinding::getPathToPosition(const Worker& worker, const Entity& target, 
 	glm::ivec2 startingPositionOnGrid = Globals::convertToGridPosition(worker.getPosition());
 	glm::ivec2 destinationOnGrid = Globals::convertToGridPosition(destination);
 	float shortestDistance = Globals::getSqrDistance(destination, worker.getPosition());
-	glm::ivec2 closestAvailablePosition = { 0, 0 };
 	m_openQueue.add({ startingPositionOnGrid, startingPositionOnGrid, 0.0f,
 		Globals::getSqrDistance(destinationOnGrid, startingPositionOnGrid) });
 
@@ -680,7 +696,6 @@ void PathFinding::getPathToPosition(const Worker& worker, const Entity& target, 
 					float sqrDistance = Globals::getSqrDistance(destinationOnGrid, adjacentPosition.position);
 					if (sqrDistance < shortestDistance)
 					{
-						closestAvailablePosition = adjacentPosition.position;
 						shortestDistance = sqrDistance;
 
 						if (isPositionInLineOfSight(Globals::convertToWorldPosition(adjacentPosition.position),
@@ -712,8 +727,353 @@ void PathFinding::getPathToPosition(const Worker& worker, const Entity& target, 
 			isPriorityQueueWithinSizeLimit(m_closedQueue, map.getSize()));
 	}
 
-	if (pathToPosition.empty() && shortestDistance != Globals::getSqrDistance(destination, worker.getPosition()))
+	return destinationReached;
+}
+
+void PathFinding::getGarunteedPath(const Unit& unit, const glm::vec3& destination, std::vector<glm::vec3>& pathToPosition, const Map& map, FactionHandler& factionHandler, 
+	const Faction& owningFaction)
+{
+	pathToPosition.clear();
+	if (unit.getPosition() == destination || !map.isWithinBounds(destination))
 	{
-		getPathFromClosedQueue(pathToPosition, startingPositionOnGrid, closestAvailablePosition, m_closedQueue, map);
+		return;
+	}
+
+	m_openQueue.clear();
+	m_closedQueue.clear();
+
+	bool destinationReached = false;
+	glm::ivec2 startingPositionOnGrid = Globals::convertToGridPosition(unit.getPosition());
+	glm::ivec2 destinationOnGrid = Globals::convertToGridPosition(destination);
+	float shortestSqrDistance = Globals::getSqrDistance(destination, unit.getPosition());
+	m_openQueue.add({ startingPositionOnGrid, startingPositionOnGrid, 0.0f,
+		Globals::getSqrDistance(destinationOnGrid, startingPositionOnGrid) });
+
+	PriorityQueueNode parentNode = m_openQueue.getTop();
+	while (!m_openQueue.isEmpty() && !destinationReached)
+	{
+		PriorityQueueNode currentNode = m_openQueue.getTop();
+		m_openQueue.popTop();
+
+		if (currentNode.position == destinationOnGrid)
+		{
+			if (currentNode.position == startingPositionOnGrid)
+			{
+				if (map.isPositionOnUnitMapAvailable(startingPositionOnGrid, unit.getID()))
+				{
+					destinationReached = true;
+					if (Globals::convertToWorldPosition(currentNode.position) != unit.getPosition())
+					{
+						pathToPosition.push_back(Globals::convertToWorldPosition(startingPositionOnGrid));
+					}
+				}
+			}
+			else
+			{
+				destinationReached = true;
+				if (Globals::convertToWorldPosition(currentNode.position) != unit.getPosition())
+				{
+					getPathFromClosedQueue(pathToPosition, startingPositionOnGrid, currentNode, m_closedQueue, map);
+				}
+			}
+		}
+		else
+		{
+
+			AdjacentPositionsContainer adjacentPositions = getAdjacentPositions(currentNode.position, map, factionHandler, unit);
+			for (auto& adjacentPosition : adjacentPositions)
+			{
+				if (!adjacentPosition.valid || m_closedQueue.contains(adjacentPosition.position))
+				{
+					continue;
+				}
+				else
+				{
+					float sqrDistance = Globals::getSqrDistance(destinationOnGrid, adjacentPosition.position);
+					if (sqrDistance < shortestSqrDistance)
+					{
+						adjacentPosition.used = true;
+						shortestSqrDistance = sqrDistance;
+
+						if (isPositionInLineOfSight(Globals::convertToWorldPosition(adjacentPosition.position),
+							Globals::convertToWorldPosition(parentNode.position), map, unit))
+						{
+							PriorityQueueNode adjacentNode(adjacentPosition.position, parentNode.position,
+								parentNode.g + Globals::getSqrDistance(adjacentPosition.position, parentNode.position),
+								sqrDistance);
+
+							addToOpenQueue(m_openQueue, adjacentNode);
+						}
+						else
+						{
+							PriorityQueueNode adjacentNode(adjacentPosition.position, currentNode.position,
+								currentNode.g + Globals::getSqrDistance(adjacentPosition.position, currentNode.position),
+								sqrDistance);
+
+							parentNode = currentNode;
+							addToOpenQueue(m_openQueue, adjacentNode);
+						}
+					}
+				}
+			}
+			for (const auto& adjacentPosition : adjacentPositions)
+			{
+				if (!adjacentPosition.valid || adjacentPosition.used || m_closedQueue.contains(adjacentPosition.position))
+				{
+					continue;
+				}
+				else
+				{
+					float sqrDistance = Globals::getSqrDistance(destinationOnGrid, adjacentPosition.position);
+					if (isPositionInLineOfSight(Globals::convertToWorldPosition(adjacentPosition.position),
+						Globals::convertToWorldPosition(parentNode.position), map, unit))
+					{
+						PriorityQueueNode adjacentNode(adjacentPosition.position, parentNode.position,
+							parentNode.g + Globals::getSqrDistance(adjacentPosition.position, parentNode.position),
+							sqrDistance);
+
+						addToOpenQueue(m_openQueue, adjacentNode);
+					}
+					else
+					{
+						PriorityQueueNode adjacentNode(adjacentPosition.position, currentNode.position,
+							currentNode.g + Globals::getSqrDistance(adjacentPosition.position, currentNode.position),
+							sqrDistance);
+
+						parentNode = currentNode;
+						addToOpenQueue(m_openQueue, adjacentNode);
+					}
+				}
+			}
+		}
+
+		m_closedQueue.add(currentNode);
+
+		assert(isPriorityQueueWithinSizeLimit(m_openQueue, map.getSize()) &&
+			isPriorityQueueWithinSizeLimit(m_closedQueue, map.getSize()));
+	}
+}
+
+void PathFinding::getGarunteedPath(const Worker& worker, const glm::vec3& destination, std::vector<glm::vec3>& pathToPosition, 
+	AdjacentPositions adjacentPositions, const Map& map, const Faction& owningFaction)
+{
+	pathToPosition.clear();
+	if (worker.getPosition() == destination || !map.isWithinBounds(destination))
+	{
+		return;
+	}
+
+	m_openQueue.clear();
+	m_closedQueue.clear();
+
+	bool destinationReached = false;
+	glm::ivec2 startingPositionOnGrid = Globals::convertToGridPosition(worker.getPosition());
+	glm::ivec2 destinationOnGrid = Globals::convertToGridPosition(destination);
+	float shortestDistance = Globals::getSqrDistance(destination, worker.getPosition());
+	m_openQueue.add({ startingPositionOnGrid, startingPositionOnGrid, 0.0f,
+		Globals::getSqrDistance(destinationOnGrid, startingPositionOnGrid) });
+
+	PriorityQueueNode parentNode = m_openQueue.getTop();
+	while (!m_openQueue.isEmpty() && !destinationReached)
+	{
+		PriorityQueueNode currentNode = m_openQueue.getTop();
+		m_openQueue.popTop();
+
+		if (currentNode.position == destinationOnGrid)
+		{
+			destinationReached = true;
+			if (Globals::convertToWorldPosition(currentNode.position) != worker.getPosition())
+			{
+				getPathFromClosedQueue(pathToPosition, startingPositionOnGrid, currentNode, m_closedQueue, map);
+				assert(!pathToPosition.empty());
+				*pathToPosition.begin() = destination;
+			}
+		}
+		else
+		{
+			for (auto& adjacentPosition : adjacentPositions(currentNode.position))
+			{
+				if (!adjacentPosition.valid || m_closedQueue.contains(adjacentPosition.position))
+				{
+					continue;
+				}
+				else
+				{
+					float sqrDistance = Globals::getSqrDistance(destinationOnGrid, adjacentPosition.position);
+					if (sqrDistance < shortestDistance)
+					{
+						adjacentPosition.used = true;
+						shortestDistance = sqrDistance;
+
+						if (isPositionInLineOfSight(Globals::convertToWorldPosition(adjacentPosition.position),
+							Globals::convertToWorldPosition(parentNode.position), map))
+						{
+							PriorityQueueNode adjacentNode(adjacentPosition.position, parentNode.position,
+								parentNode.g + Globals::getSqrDistance(adjacentPosition.position, parentNode.position), sqrDistance);
+
+							addToOpenQueue(m_openQueue, adjacentNode);
+						}
+						else
+						{
+							PriorityQueueNode adjacentNode(adjacentPosition.position, currentNode.position,
+								currentNode.g + Globals::getSqrDistance(adjacentPosition.position, currentNode.position), sqrDistance);
+
+							parentNode = currentNode;
+							addToOpenQueue(m_openQueue, adjacentNode);
+						}
+					}
+				}
+			}
+			for (const auto& adjacentPosition : adjacentPositions(currentNode.position))
+			{
+				if (!adjacentPosition.valid || adjacentPosition.used || m_closedQueue.contains(adjacentPosition.position))
+				{
+					continue;
+				}
+				else
+				{
+					float sqrDistance = Globals::getSqrDistance(destinationOnGrid, adjacentPosition.position);
+					if (sqrDistance < shortestDistance)
+					{
+						shortestDistance = sqrDistance;
+						if (isPositionInLineOfSight(Globals::convertToWorldPosition(adjacentPosition.position),
+							Globals::convertToWorldPosition(parentNode.position), map))
+						{
+							PriorityQueueNode adjacentNode(adjacentPosition.position, parentNode.position,
+								parentNode.g + Globals::getSqrDistance(adjacentPosition.position, parentNode.position), sqrDistance);
+
+							addToOpenQueue(m_openQueue, adjacentNode);
+						}
+						else
+						{
+							PriorityQueueNode adjacentNode(adjacentPosition.position, currentNode.position,
+								currentNode.g + Globals::getSqrDistance(adjacentPosition.position, currentNode.position), sqrDistance);
+
+							parentNode = currentNode;
+							addToOpenQueue(m_openQueue, adjacentNode);
+						}
+					}
+				}
+			}
+		}
+
+		m_closedQueue.add(currentNode);
+
+		assert(isPriorityQueueWithinSizeLimit(m_openQueue, map.getSize()) &&
+			isPriorityQueueWithinSizeLimit(m_closedQueue, map.getSize()));
+	}
+}
+
+void PathFinding::getGarunteedPath(const Worker& worker, const Entity& target, std::vector<glm::vec3>& pathToPosition, 
+	const Map& map, const Faction& owningFaction)
+{
+	glm::vec3 destination = PathFinding::getInstance().getClosestPositionToAABB(worker.getPosition(),
+		target.getAABB(), map);
+
+	pathToPosition.clear();
+	if (worker.getPosition() == destination || !map.isWithinBounds(destination))
+	{
+		return;
+	}
+
+	m_openQueue.clear();
+	m_closedQueue.clear();
+
+	bool destinationReached = false;
+	glm::ivec2 startingPositionOnGrid = Globals::convertToGridPosition(worker.getPosition());
+	glm::ivec2 destinationOnGrid = Globals::convertToGridPosition(destination);
+	float shortestDistance = Globals::getSqrDistance(destination, worker.getPosition());
+	m_openQueue.add({ startingPositionOnGrid, startingPositionOnGrid, 0.0f,
+		Globals::getSqrDistance(destinationOnGrid, startingPositionOnGrid) });
+
+	PriorityQueueNode parentNode = m_openQueue.getTop();
+	while (!m_openQueue.isEmpty() && !destinationReached)
+	{
+		PriorityQueueNode currentNode = m_openQueue.getTop();
+		m_openQueue.popTop();
+
+		if (currentNode.position == destinationOnGrid)
+		{
+			destinationReached = true;
+			if (Globals::convertToWorldPosition(currentNode.position) != worker.getPosition())
+			{
+				getPathFromClosedQueue(pathToPosition, startingPositionOnGrid, currentNode, m_closedQueue, map);
+				assert(!pathToPosition.empty());
+				*pathToPosition.begin() = destination;
+			}
+		}
+		else
+		{
+			AdjacentPositionsContainer adjacentPositions = getAdjacentPositions(currentNode.position, map);
+			for (auto& adjacentPosition : adjacentPositions)
+			{
+				if (!adjacentPosition.valid || m_closedQueue.contains(adjacentPosition.position))
+				{
+					continue;
+				}
+				else
+				{
+					float sqrDistance = Globals::getSqrDistance(destinationOnGrid, adjacentPosition.position);
+					if (sqrDistance < shortestDistance)
+					{
+						adjacentPosition.used = true;
+						shortestDistance = sqrDistance;
+
+						if (isPositionInLineOfSight(Globals::convertToWorldPosition(adjacentPosition.position),
+							Globals::convertToWorldPosition(parentNode.position), map))
+						{
+							PriorityQueueNode adjacentNode(adjacentPosition.position, parentNode.position,
+								parentNode.g + Globals::getSqrDistance(adjacentPosition.position, parentNode.position),
+								sqrDistance);
+
+							addToOpenQueue(m_openQueue, adjacentNode);
+						}
+						else
+						{
+							PriorityQueueNode adjacentNode(adjacentPosition.position, currentNode.position,
+								currentNode.g + Globals::getSqrDistance(adjacentPosition.position, currentNode.position),
+								sqrDistance);
+
+							parentNode = currentNode;
+							addToOpenQueue(m_openQueue, adjacentNode);
+						}
+					}
+				}
+			}
+			for (const auto& adjacentPosition : adjacentPositions)
+			{
+				if (!adjacentPosition.valid || adjacentPosition.used || m_closedQueue.contains(adjacentPosition.position))
+				{
+					continue;
+				}
+				else
+				{
+					float sqrDistance = Globals::getSqrDistance(destinationOnGrid, adjacentPosition.position);
+					if (isPositionInLineOfSight(Globals::convertToWorldPosition(adjacentPosition.position),
+						Globals::convertToWorldPosition(parentNode.position), map))
+					{
+						PriorityQueueNode adjacentNode(adjacentPosition.position, parentNode.position,
+							parentNode.g + Globals::getSqrDistance(adjacentPosition.position, parentNode.position),
+							sqrDistance);
+
+						addToOpenQueue(m_openQueue, adjacentNode);
+					}
+					else
+					{
+						PriorityQueueNode adjacentNode(adjacentPosition.position, currentNode.position,
+							currentNode.g + Globals::getSqrDistance(adjacentPosition.position, currentNode.position),
+							sqrDistance);
+
+						parentNode = currentNode;
+						addToOpenQueue(m_openQueue, adjacentNode);
+					}
+				}
+			}
+		}
+
+		m_closedQueue.add(currentNode);
+
+		assert(isPriorityQueueWithinSizeLimit(m_openQueue, map.getSize()) &&
+			isPriorityQueueWithinSizeLimit(m_closedQueue, map.getSize()));
 	}
 }

@@ -25,9 +25,11 @@ struct AdjacentPosition
 	AdjacentPosition(const glm::ivec2& position, bool valid);
 
 	bool valid;
+	bool used;
 	glm::ivec2 position;
 };
 
+using AdjacentPositionsContainer = std::array<AdjacentPosition, ALL_DIRECTIONS_ON_GRID.size()>;
 using AdjacentPositions = std::function<std::array<AdjacentPosition, ALL_DIRECTIONS_ON_GRID.size()>(const glm::ivec2&)>;
 
 class AABB;

@@ -131,7 +131,7 @@ public:
 	void getPathToPosition(const Unit& unit, const glm::vec3& destination, std::vector<glm::vec3>& pathToPosition,
 		const Map& map, FactionHandler& factionHandler, const Faction& owningFaction);
 
-	void getPathToPosition(const Worker& entity, const glm::vec3& destination, std::vector<glm::vec3>& pathToPosition,
+	void getPathToPosition(const Worker& worker, const glm::vec3& destination, std::vector<glm::vec3>& pathToPosition,
 		AdjacentPositions adjacentPositions, const Map& map, const Faction& owningFaction);
 
 	void getPathToPosition(const Worker& entity, const Entity& target, std::vector<glm::vec3>& pathToPosition,
@@ -148,4 +148,18 @@ private:
 	PriorityQueue m_closedQueue;
 
 	void onNewMapSize(const GameMessages::NewMapSize& gameMessage);
+
+	bool getShortestPath(const Unit& unit, const glm::vec3& destination, std::vector<glm::vec3>& pathToPosition,
+		const Map& map, FactionHandler& factionHandler, const Faction& owningFaction);
+	bool getShortestPath(const Worker& worker, const glm::vec3& destination, std::vector<glm::vec3>& pathToPosition,
+		AdjacentPositions adjacentPositions, const Map& map, const Faction& owningFaction);
+	bool getShortestPath(const Worker& worker, const Entity& target, std::vector<glm::vec3>& pathToPosition,
+		const Map& map, const Faction& owningFaction);
+
+	void getGarunteedPath(const Unit& unit, const glm::vec3& destination, std::vector<glm::vec3>& pathToPosition,
+		const Map& map, FactionHandler& factionHandler, const Faction& owningFaction);
+	void getGarunteedPath(const Worker& worker, const glm::vec3& destination, std::vector<glm::vec3>& pathToPosition,
+		AdjacentPositions adjacentPositions, const Map& map, const Faction& owningFaction);
+	void getGarunteedPath(const Worker& worker, const Entity& target, std::vector<glm::vec3>& pathToPosition,
+		const Map& map, const Faction& owningFaction);
 };
