@@ -94,7 +94,7 @@
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="..\Shared\OpenGLResource.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>src</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -158,12 +158,6 @@
     <ClInclude Include="..\Shared\ModelManager.h">
       <Filter>src</Filter>
     </ClInclude>
-    <ClInclude Include="..\Shared\NonCopyable.h">
-      <Filter>src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Shared\NonMovable.h">
-      <Filter>src</Filter>
-    </ClInclude>
     <ClInclude Include="..\Shared\FactionController.h">
       <Filter>src</Filter>
     </ClInclude>
@@ -189,7 +183,7 @@
       <Filter>src</Filter>
     </ClInclude>
     <ClInclude Include="..\Shared\OpenGLResource.h">
-      <Filter>Header Files</Filter>
+      <Filter>src</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

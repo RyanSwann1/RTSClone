@@ -307,8 +307,8 @@ void Level::handleSelectedEntityGUI()
 void Level::handleLevelDetailsGUI(bool& showGUIWindow)
 {
 	ImGui::Begin("Level Details", &showGUIWindow, ImGuiWindowFlags_None);
-	if (ImGui::InputInt("x", &m_size.x, 1) ||
-		ImGui::InputInt("z", &m_size.y, 1))
+	if (ImGui::InputInt("x", &m_size.x, Globals::NODE_SIZE) ||
+		ImGui::InputInt("z", &m_size.y, Globals::NODE_SIZE))
 	{
 		m_size.x = glm::clamp(m_size.x, 0, MAX_MAP_SIZE);
 		m_size.y = glm::clamp(m_size.y, 0, MAX_MAP_SIZE);
@@ -405,6 +405,7 @@ const std::ifstream& operator>>(std::ifstream& file, Level& level)
 	assert(file.is_open());
 
 	level.m_size = LevelFileHandler::loadMapSizeFromFile(file);
+	level.m_playableArea.setSize({ level.m_size.x * Globals::NODE_SIZE, 0.0f, level.m_size.y * Globals::NODE_SIZE });
 	level.m_factionStartingResources = LevelFileHandler::loadFactionStartingResources(file);
 	level.m_factionStartingPopulationCap = LevelFileHandler::loadFactionStartingPopulation(file);
 	level.m_factionCount = LevelFileHandler::loadFactionCount(file);
