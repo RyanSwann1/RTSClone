@@ -147,8 +147,7 @@ void Worker::update(float deltaTime, const Map& map, FactionHandler& factionHand
 	switch (m_currentState)
 	{
 	case eWorkerState::Idle:
-		assert(m_pathToPosition.empty() &&
-			m_owningFaction.get().getController() == eFactionController::Player);
+		assert(m_pathToPosition.empty());
 		break;
 	case eWorkerState::Moving:
 		if (m_pathToPosition.empty())
