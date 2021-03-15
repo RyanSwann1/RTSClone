@@ -135,8 +135,16 @@ void FactionAI::handleEvent(const GameEvent& gameEvent, const Map& map, FactionH
 				unit->getCurrentState() == eUnitState::Idle &&
 				m_targetFaction != eFactionController::None)
 			{
-				glm::vec3 destination = factionHandler.getFaction(m_targetFaction).getClosestHeadquarters(unit->getPosition()).getPosition();
-				unit->moveTo(destination, map, factionHandler, eUnitState::AttackMoving);	
+				if (factionHandler.isFactionActive(m_targetFaction))
+				{
+					const Faction& targetFaction = factionHandler.getFaction(m_targetFaction);
+					const Headquarters& targetHeadquarters = targetFaction.getClosestHeadquarters(unit->getPosition());
+					unit->moveToAttackPosition(targetHeadquarters, targetFaction, map, factionHandler);
+				}
+				else
+				{
+					m_targetFaction = eFactionController::None;
+				}
 			}
 		}
 		break;
@@ -221,7 +229,7 @@ void FactionAI::update(float deltaTime, const Map & map, FactionHandler& faction
 	if (m_spawnTimer.isExpired())
 	{
 		m_spawnTimer.resetElaspedTime();
-		//m_spawnQueue.push(eEntityType::Unit);
+		m_spawnQueue.push(eEntityType::Unit);
 	}
 
 	m_delayTimer.update(deltaTime);
