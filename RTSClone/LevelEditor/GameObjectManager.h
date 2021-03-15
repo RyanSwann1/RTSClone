@@ -1,7 +1,6 @@
 #pragma once
 
 #include "glm/glm.hpp"
-#include "NonMovable.h"
 #include "GameObject.h"
 #include <list>
 #include <memory>
@@ -9,10 +8,14 @@
 
 struct Model;
 class ShaderHandler;
-class GameObjectManager : private NonCopyable, private NonMovable
+class GameObjectManager
 {
 public:
 	GameObjectManager();
+	GameObjectManager(const GameObjectManager&) = delete;
+	GameObjectManager& operator=(const GameObjectManager&) = delete;
+	GameObjectManager(GameObjectManager&&) = delete;
+	GameObjectManager& operator=(GameObjectManager&&) = delete;
 
 	GameObject* getGameObject(const glm::vec3& position);
 	const std::list<GameObject>& getGameObjects() const;

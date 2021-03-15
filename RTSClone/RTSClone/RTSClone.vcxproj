@@ -163,6 +163,7 @@
     <ClCompile Include="..\Shared\Model.cpp" />
     <ClCompile Include="..\Shared\ModelLoader.cpp" />
     <ClCompile Include="..\Shared\ModelManager.cpp" />
+    <ClCompile Include="..\Shared\OpenGLResource.cpp" />
     <ClCompile Include="..\Shared\Quad.cpp" />
     <ClCompile Include="..\Shared\ShaderHandler.cpp" />
     <ClCompile Include="AdjacentPositions.cpp" />
@@ -178,7 +179,6 @@
     <ClCompile Include="Headquarters.cpp" />
     <ClCompile Include="Laboratory.cpp" />
     <ClCompile Include="Level.cpp" />
-    <ClCompile Include="OpenGLResource.cpp" />
     <ClCompile Include="Projectile.cpp" />
     <ClCompile Include="ProjectileHandler.cpp" />
     <ClCompile Include="RenderPathMesh.cpp" />
@@ -221,6 +221,7 @@
     <ClInclude Include="..\Shared\Model.h" />
     <ClInclude Include="..\Shared\ModelLoader.h" />
     <ClInclude Include="..\Shared\ModelManager.h" />
+    <ClInclude Include="..\Shared\OpenGLResource.h" />
     <ClInclude Include="..\Shared\Quad.h" />
     <ClInclude Include="..\Shared\ShaderHandler.h" />
     <ClInclude Include="ActiveStatus.h" />
@@ -270,7 +271,6 @@
     <ClInclude Include="FactionHandler.h" />
     <ClInclude Include="Headquarters.h" />
     <ClInclude Include="Laboratory.h" />
-    <ClInclude Include="OpenGLResource.h" />
     <ClInclude Include="RenderPathMesh.h" />
     <ClInclude Include="SceneryGameObject.h" />
     <ClInclude Include="Level.h" />

@@ -13,7 +13,7 @@ OpenGLResourceBuffer::OpenGLResourceBuffer(OpenGLResourceBuffer&& rhs) noexcept
 	: ID(rhs.ID),
 	target(rhs.target)
 {
-	rhs.ID = Globals::INVALID_ENTITY_ID;
+	rhs.ID = Globals::INVALID_OPENGL_ID;
 }
 
 OpenGLResourceBuffer& OpenGLResourceBuffer::operator=(OpenGLResourceBuffer&& rhs) noexcept

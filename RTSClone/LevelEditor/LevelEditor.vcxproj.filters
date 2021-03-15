@@ -93,6 +93,9 @@
     <ClCompile Include="..\Shared\Base.cpp">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="..\Shared\OpenGLResource.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Shared\imgui\imstb_truetype.h">
@@ -184,6 +187,9 @@
     </ClInclude>
     <ClInclude Include="..\Shared\Base.h">
       <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Shared\OpenGLResource.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

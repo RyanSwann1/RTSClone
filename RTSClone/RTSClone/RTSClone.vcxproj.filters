@@ -165,7 +165,7 @@
     <ClCompile Include="Barracks.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="OpenGLResource.cpp">
+    <ClCompile Include="..\Shared\OpenGLResource.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -464,10 +464,10 @@
     <ClInclude Include="Barracks.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="OpenGLResource.h">
+    <ClInclude Include="ActiveStatus.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ActiveStatus.h">
+    <ClInclude Include="..\Shared\OpenGLResource.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

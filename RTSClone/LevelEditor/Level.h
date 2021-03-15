@@ -1,7 +1,5 @@
 #pragma once
 
-#include "NonCopyable.h"
-#include "NonMovable.h"
 #include "GameObjectManager.h"
 #include "Quad.h"
 #include "Globals.h"
@@ -20,9 +18,13 @@ struct PlannedEntity
 };
 
 struct Camera;
-class Level : private NonCopyable, private NonMovable
+class Level
 {
 public:
+	Level(const Level&) = delete;
+	Level& operator=(const Level&) = delete;
+	Level(Level&&) = delete;
+	Level& operator=(Level&&) = delete;
 	static std::unique_ptr<Level> create(const std::string& levelName);
 	static std::unique_ptr<Level> load(const std::string& levelName);
 

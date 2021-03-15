@@ -1,7 +1,9 @@
 #pragma once
 
 #include "AABB.h"
+#ifdef GAME
 #include "ActiveStatus.h"
+#endif // GAME
 #include <functional>
 
 struct Model;

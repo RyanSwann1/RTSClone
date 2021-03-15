@@ -1,16 +1,17 @@
 #pragma once
 
-#include "NonCopyable.h"
 #include "AABB.h"
 #include <functional>
 
 class ShaderHandler;
 struct Model;
-class GameObject : private NonCopyable
+class GameObject
 {
 public:
 	GameObject(const Model& model);
 	GameObject(const Model& model, const glm::vec3& startingPosition, glm::vec3 startingRotation = glm::vec3(0.0f));
+	GameObject(const GameObject&) = delete;
+	GameObject& operator=(const GameObject&) = delete;
 	GameObject(GameObject&&) noexcept;
 	GameObject& operator=(GameObject&&) noexcept;
 

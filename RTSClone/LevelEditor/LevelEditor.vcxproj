@@ -160,6 +160,7 @@
     <ClCompile Include="..\Shared\Model.cpp" />
     <ClCompile Include="..\Shared\ModelLoader.cpp" />
     <ClCompile Include="..\Shared\ModelManager.cpp" />
+    <ClCompile Include="..\Shared\OpenGLResource.cpp" />
     <ClCompile Include="..\Shared\Quad.cpp" />
     <ClCompile Include="..\Shared\ShaderHandler.cpp" />
     <ClCompile Include="GameObjectManager.cpp" />
@@ -192,6 +193,7 @@
     <ClInclude Include="..\Shared\ModelManager.h" />
     <ClInclude Include="..\Shared\NonCopyable.h" />
     <ClInclude Include="..\Shared\NonMovable.h" />
+    <ClInclude Include="..\Shared\OpenGLResource.h" />
     <ClInclude Include="..\Shared\Quad.h" />
     <ClInclude Include="..\Shared\ShaderHandler.h" />
     <ClInclude Include="GameObjectManager.h" />

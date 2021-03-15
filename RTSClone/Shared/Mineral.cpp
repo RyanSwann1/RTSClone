@@ -21,11 +21,6 @@ Mineral::Mineral(const glm::vec3& startingPosition)
 {
 	m_AABB.reset(m_position, m_model);
 }
-Mineral::Mineral(Mineral&& rhs) noexcept
-	: m_position(rhs.m_position),
-	m_AABB(std::move(rhs.m_AABB)),
-	m_model(rhs.m_model)
-{}
 #endif // LEVEL_EDITOR
 
 #ifdef GAME
