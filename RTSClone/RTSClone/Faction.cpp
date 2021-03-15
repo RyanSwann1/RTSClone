@@ -280,41 +280,6 @@ void Faction::addResources(Worker& worker)
     m_currentResourceAmount += worker.extractResources();
 }
 
-void Faction::handleUnitCollisions(const Map& map, FactionHandler& factionHandler)
-{
-    std::vector<const Entity*> handledUnits;
-    for (auto& unit : m_units)
-    {
-        if (unit.getCurrentState() == eUnitState::Idle)
-        {
-            if (map.isCollidable(unit.getPosition()))
-            {
-                glm::vec3 destination = PathFinding::getInstance().getClosestAvailablePosition<Unit>(unit, m_units, map);
-                unit.moveTo(destination, map, factionHandler);
-            }
-            else
-            {
-                for (const auto& otherUnit : m_units)
-                {
-                    if (&unit != &otherUnit &&
-                        std::find(handledUnits.cbegin(), handledUnits.cend(), &otherUnit) == handledUnits.cend() &&
-                        otherUnit.getCurrentState() == eUnitState::Idle &&
-                        unit.getAABB().contains(otherUnit.getAABB()))
-                    {
-                        glm::vec3 destination = PathFinding::getInstance().getClosestAvailablePosition<Unit>(unit, m_units, map);
-                        unit.moveTo(destination, map, factionHandler);
-                        break;
-                    }
-                }
-            }
-        }
-
-        handledUnits.push_back(&unit);
-    }
-
-    handledUnits.clear();
-}
-
 void Faction::handleWorkerCollisions(const Map& map)
 {
     std::vector<const Entity*> handledUnits;
@@ -389,7 +354,6 @@ void Faction::update(float deltaTime, const Map& map, FactionHandler& factionHan
 
     if (unitStateHandlerTimer.isExpired())
     {
-        handleUnitCollisions(map, factionHandler);
         handleWorkerCollisions(map);
     }
 }
@@ -698,7 +662,8 @@ const Entity* Faction::createUnit(const Map& map, const Barracks& barracks, Fact
 {
     assert(barracks.getCurrentSpawnCount() > 0);
     glm::vec3 startingPosition(0.0f);
-    if (isAffordable(eEntityType::Unit) && !isExceedPopulationLimit(eEntityType::Unit) &&
+    if (isAffordable(eEntityType::Unit) && 
+        !isExceedPopulationLimit(eEntityType::Unit) &&
         PathFinding::getInstance().getClosestAvailableEntitySpawnPosition(barracks, m_units, m_workers, map, startingPosition))
     {
         glm::vec3 startingRotation = { 0.0f, Globals::getAngle(startingPosition, barracks.getPosition()), 0.0f };

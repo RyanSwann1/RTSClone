@@ -92,8 +92,6 @@ private:
 	void decreaseCurrentPopulationAmount(const Entity& entity);
 	void increasePopulationLimit();
 	void revalidateExistingUnitPaths(const Map& map, FactionHandler& factionHandler);
-
-	void handleUnitCollisions(const Map& map, FactionHandler& factionHandler);
 	void handleWorkerCollisions(const Map& map);
 
 	//Presumes entity already found in all entities container
@@ -102,9 +100,6 @@ private:
 	{
 		assert(entity != m_allEntities.cend());
 		onEntityRemoval((*entity).get());
-
-
-
 
 		auto iter = std::find_if(entityContainer.begin(), entityContainer.end(), [entityID](const auto& entity)
 		{
