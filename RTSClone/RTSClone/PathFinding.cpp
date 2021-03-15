@@ -294,7 +294,7 @@ bool PathFinding::getClosestAvailableEntitySpawnPosition(const EntitySpawnerBuil
 
 		for (const auto& adjacentPosition : getAdjacentPositions(position, map, units, workers, building.getAABB()))
 		{
-			if (adjacentPosition.valid)
+			if (adjacentPosition.valid && !building.getAABB().contains(Globals::convertToWorldPosition(adjacentPosition.position)))
 			{
 				spawnPosition = Globals::convertToWorldPosition(adjacentPosition.position);
 				availablePositionFound = true;
@@ -304,7 +304,7 @@ bool PathFinding::getClosestAvailableEntitySpawnPosition(const EntitySpawnerBuil
 			{
 				m_graph.addToGraph(adjacentPosition.position, position, map);
 				m_frontier.push(adjacentPosition.position);
-			}
+			}	
 		}
 
 		assert(isFrontierWithinSizeLimit(m_frontier, map.getSize()));
