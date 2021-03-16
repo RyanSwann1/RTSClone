@@ -77,3 +77,19 @@ void Quad::render(ShaderHandler& shaderHandler) const
 
 	glDrawArrays(GL_TRIANGLES, 0, static_cast<GLsizei>(QUAD_VERTEX_COUNT));
 }
+
+void Quad::render(ShaderHandler& shaderHandler, const glm::vec3& color) const
+{
+	m_VBO.bind();
+	std::array<glm::vec3, QUAD_VERTEX_COUNT> quad = getQuad(m_position, m_size);
+	glBufferData(GL_ARRAY_BUFFER, quad.size() * sizeof(glm::vec3), quad.data(), GL_STATIC_DRAW);
+
+	m_VAO.bind();
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, glm::vec3::length(), GL_FLOAT, GL_FALSE, sizeof(glm::vec3), reinterpret_cast<const void*>(0));
+
+	shaderHandler.setUniformVec3(eShaderType::Debug, "uColor", color);
+	shaderHandler.setUniform1f(eShaderType::Debug, "uOpacity", m_opacity);
+
+	glDrawArrays(GL_TRIANGLES, 0, static_cast<GLsizei>(QUAD_VERTEX_COUNT));
+}

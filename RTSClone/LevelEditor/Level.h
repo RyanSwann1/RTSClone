@@ -36,6 +36,7 @@ public:
 	void handleSelectedEntityGUI();
 	void handleLevelDetailsGUI(bool& showGUIWindow);
 	void handleMainBasesGui();
+	void handleSecondaryBaseGUI();
 	void save() const;
 
 	void render(ShaderHandler& shaderHandler) const;
@@ -52,6 +53,7 @@ private:
 
 	const std::string m_levelName;
 	std::vector<Base> m_mainBases;
+	std::vector<Base> m_secondaryBases;
 	PlannedEntity m_plannedEntity;
 	glm::ivec2 m_size;
 	Quad m_playableArea;

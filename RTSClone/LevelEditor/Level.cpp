@@ -16,8 +16,8 @@ namespace
 		Globals::GROUND_HEIGHT,
 		3.0f * static_cast<float>(Globals::NODE_SIZE)),
 
-		glm::vec3(11.0f * static_cast<float>(Globals::NODE_SIZE), 
-		Globals::GROUND_HEIGHT, 
+		glm::vec3(11.0f * static_cast<float>(Globals::NODE_SIZE),
+		Globals::GROUND_HEIGHT,
 		3.0f * static_cast<float>(Globals::NODE_SIZE)),
 
 		glm::vec3(4.0f * static_cast<float>(Globals::NODE_SIZE),
@@ -29,35 +29,59 @@ namespace
 		13.0f * static_cast<float>(Globals::NODE_SIZE)),
 	};
 
+
 	const int MAX_MAP_SIZE = 60 * Globals::NODE_SIZE;
 	const int DEFAULT_STARTING_RESOURCES = 100;
 	const int DEFAULT_STARTING_POPULATION_CAP = 5;
 	const glm::ivec2 DEFAULT_MAP_SIZE = { 30, 30 };
 	const float ENTITY_TRANSLATE_SPEED = 5.0f;
 	const glm::vec3 PLAYABLE_AREA_GROUND_COLOR = { 1.0f, 1.0f, 0.5f };
+	const glm::vec3 MAIN_BASE_QUAD_COLOR = { 1.0f, 0.0f, 0.0f };
+	const glm::vec3 SECONDARY_BASE_QUAD_COLOR = { 0.0f, 1.0f, 0.0f };
 	const float PLAYABLE_AREA_OPACITY = 0.1f;
 
 	const int MIN_FACTIONS = 2;
 	const int DEFAULT_FACTIONS_COUNT = 2;
 
-	Base* getBase(std::vector<Base>& bases, const glm::vec3& position)
+	Base* getBase(std::vector<Base>& mainBases, std::vector<Base>& secondaryBases, const glm::vec3& position)
 	{
-		auto base = std::find_if(bases.begin(), bases.end(), [&position](const auto& base)
+		auto mainBase = std::find_if(mainBases.begin(), mainBases.end(), [&position](const auto& base)
 		{
 			return base.quad.getAABB().contains(position);
 		});
 
-		if (base != bases.end())
+		if (mainBase != mainBases.end())
 		{
-			return &(*base);
+			return &(*mainBase);
+		}
+
+		auto secondaryBase = std::find_if(secondaryBases.begin(), secondaryBases.end(), [&position](const auto& base)
+		{
+			return base.quad.getAABB().contains(position);
+		});
+
+		if (secondaryBase != secondaryBases.end())
+		{
+			return &(*secondaryBase);
 		}
 
 		return nullptr;
 	}
 
-	Mineral* getBaseMineral(std::vector<Base>& bases, const glm::vec3& position)
+	Mineral* getBaseMineral(std::vector<Base>& mainBases, std::vector<Base>& secondaryBases, const glm::vec3& position)
 	{
-		for (auto& base : bases)
+		for (auto& base : mainBases)
+		{
+			for (auto& mineral : base.minerals)
+			{
+				if (mineral.getAABB().contains(position))
+				{
+					return &mineral;
+				}
+			}
+		}
+
+		for (auto& base : secondaryBases)
 		{
 			for (auto& mineral : base.minerals)
 			{
@@ -82,6 +106,8 @@ PlannedEntity::PlannedEntity()
 //Level
 Level::Level(const std::string& levelName)
 	: m_levelName(levelName),
+	m_mainBases(),
+	m_secondaryBases(),
 	m_plannedEntity(),
 	m_size(DEFAULT_MAP_SIZE),
 	m_playableArea({ m_size.x * Globals::NODE_SIZE, 0.0f, m_size.y * Globals::NODE_SIZE }, 
@@ -95,7 +121,8 @@ Level::Level(const std::string& levelName)
 	m_factionCount(DEFAULT_FACTIONS_COUNT)
 {
 	m_mainBases.reserve(static_cast<size_t>(eFactionController::Max) + 1);
-	
+	m_secondaryBases.reserve(static_cast<size_t>(eFactionController::Max) + 1);
+
 	if (!LevelFileHandler::loadLevelFromFile(*this))
 	{
 		m_mainBases.emplace_back(FACTION_STARTING_POSITIONS[static_cast<int>(eFactionController::Player)]);
@@ -186,10 +213,10 @@ void Level::handleInput(const sf::Event& currentSFMLEvent, const Camera& camera,
 						m_selectedGameObject = m_gameObjectManager.getGameObject(planeIntersection);
 						if (!m_selectedGameObject)
 						{
-							m_selectedBase = getBase(m_mainBases, planeIntersection);
+							m_selectedBase = getBase(m_mainBases, m_secondaryBases, planeIntersection);
 							if (!m_selectedBase)
 							{
-								m_selectedMineral = getBaseMineral(m_mainBases, planeIntersection);
+								m_selectedMineral = getBaseMineral(m_mainBases, m_secondaryBases, planeIntersection);
 							}
 						}
 					}
@@ -355,6 +382,28 @@ void Level::handleMainBasesGui()
 	ImGui::EndChild();
 }
 
+void Level::handleSecondaryBaseGUI()
+{
+	ImGui::BeginChild("Secondary Base Quantity", ImVec2(175, 40), true);
+	int secondaryBaseQuantity = static_cast<int>(m_secondaryBases.size());
+	if (ImGui::InputInt("Secondary Bases", &secondaryBaseQuantity, 1, ImGuiInputTextFlags_ReadOnly))
+	{
+		if (secondaryBaseQuantity >= 0 && secondaryBaseQuantity <= static_cast<int>(eFactionController::Max) + 1)
+		{
+			if (secondaryBaseQuantity > static_cast<int>(m_secondaryBases.size()))
+			{
+				m_secondaryBases.emplace_back(FACTION_STARTING_POSITIONS[secondaryBaseQuantity - 1]);
+			}
+			else
+			{
+				m_secondaryBases.pop_back();
+			}
+		}
+	};
+
+	ImGui::EndChild();
+}
+
 void Level::save() const
 {
 	if (!LevelFileHandler::saveLevelToFile(*this))
@@ -367,9 +416,17 @@ void Level::render(ShaderHandler& shaderHandler) const
 {
 	m_gameObjectManager.render(shaderHandler, m_selectedGameObject);
 
-	for (const auto& baseLocation : m_mainBases)
+	for (const auto& base : m_mainBases)
 	{
-		for (const auto& mineral : baseLocation.minerals)
+		for (const auto& mineral : base.minerals)
+		{
+			mineral.render(shaderHandler);
+		}
+	}
+
+	for (const auto& base : m_secondaryBases)
+	{
+		for (const auto& mineral : base.minerals)
 		{
 			mineral.render(shaderHandler);
 		}
@@ -387,9 +444,14 @@ void Level::renderDebug(ShaderHandler& shaderHandler) const
 {
 	m_playableArea.render(shaderHandler);
 	
-	for (const auto& baseLocation : m_mainBases)
+	for (const auto& base : m_mainBases)
 	{
-		baseLocation.quad.render(shaderHandler);
+		base.quad.render(shaderHandler, MAIN_BASE_QUAD_COLOR);
+	}
+
+	for (const auto& base : m_secondaryBases)
+	{
+		base.quad.render(shaderHandler, SECONDARY_BASE_QUAD_COLOR);
 	}
 }
 

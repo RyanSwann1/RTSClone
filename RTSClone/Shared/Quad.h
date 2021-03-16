@@ -21,6 +21,7 @@ public:
 	void setSize(const glm::vec3& size);
 	void setPosition(const glm::vec3& position);
 	void render(ShaderHandler& shaderHandler) const;
+	void render(ShaderHandler& shaderHandler, const glm::vec3& color) const;
 
 private:
 	float m_opacity;
