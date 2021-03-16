@@ -260,7 +260,7 @@ glm::ivec2 LevelFileHandler::loadMapSizeFromFile(std::ifstream& file)
 
 #ifdef GAME
 bool LevelFileHandler::loadLevelFromFile(const std::string& fileName, std::vector<SceneryGameObject>& scenery,
-	std::vector<Base>& mainBases, int& factionStartingResources, int& factionStartingPopulation,
+	std::vector<Base>& bases, int& factionStartingResources, int& factionStartingPopulation,
 	int& factionCount, glm::vec3& size)
 {
 	std::ifstream file(Globals::SHARED_FILE_DIRECTORY + LEVELS_FILE_DIRECTORY + fileName);
@@ -276,7 +276,8 @@ bool LevelFileHandler::loadLevelFromFile(const std::string& fileName, std::vecto
 	factionStartingResources = loadFactionStartingResources(file);
 	factionStartingPopulation = loadFactionStartingPopulation(file);
 	factionCount = loadFactionCount(file);
-	loadAllMainBases(file, mainBases);
+	loadAllMainBases(file, bases);
+	loadAllSecondaryBases(file, bases);
 
 	return true;
 }
@@ -380,7 +381,7 @@ int loadBaseQuantity(std::ifstream& file, const std::string& conditionalName)
 
 	auto conditional = [&conditionalName](const std::string& line)
 	{
-		return line == conditionalName;// Globals::TEXT_HEADER_MAIN_BASE_QUANTITY;
+		return line == conditionalName;
 	};
 
 	LevelFileHandler::loadFromFile(file, data, conditional);
