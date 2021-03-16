@@ -19,6 +19,7 @@ class Level;
 namespace LevelFileHandler
 { 
 	void loadAllMainBases(std::ifstream& file, std::vector<Base>& mainBases);
+	void loadAllSecondaryBases(std::ifstream& file, std::vector<Base>& secondaryBases);
 	int loadFactionCount(std::ifstream& file);
 	int loadFactionStartingPopulation(std::ifstream& file);
 	int loadFactionStartingResources(std::ifstream& file);

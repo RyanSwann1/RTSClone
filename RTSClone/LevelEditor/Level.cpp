@@ -474,7 +474,9 @@ const std::ifstream& operator>>(std::ifstream& file, Level& level)
 
 	level.m_mainBases.clear();
 	LevelFileHandler::loadAllMainBases(file, level.m_mainBases);
-
+	level.m_secondaryBases.clear();
+	LevelFileHandler::loadAllSecondaryBases(file, level.m_secondaryBases);
+	
 	file >> level.m_gameObjectManager;
 
 	return file;
@@ -500,6 +502,25 @@ std::ostream& operator<<(std::ostream& file, const Level& level)
 	{
 		file << Globals::TEXT_HEADER_MAIN_BASE_MINERALS[i] << "\n";
 		for (const auto& mineral : level.m_mainBases[i].minerals)
+		{
+			file << mineral.getPosition().x << " " << mineral.getPosition().y << " " << mineral.getPosition().z << "\n";
+		}
+	}
+
+	file << Globals::TEXT_HEADER_SECONDARY_BASE_QUANTITY << "\n";
+	file << static_cast<int>(level.m_secondaryBases.size()) << "\n";
+	for (int i = 0; i < static_cast<int>(level.m_secondaryBases.size()); ++i)
+	{
+		file << Globals::TEXT_HEADER_SECONDARY_BASES[i] << "\n";
+		file << level.m_secondaryBases[i].quad.getPosition().x << " " <<
+			level.m_secondaryBases[i].quad.getPosition().y << " " <<
+			level.m_secondaryBases[i].quad.getPosition().z << "\n";
+	}
+
+	for (int i = 0; i < static_cast<int>(level.m_secondaryBases.size()); ++i)
+	{
+		file << Globals::TEXT_HEADER_SECONDARY_BASE_MINERALS[i] << "\n";
+		for (const auto& mineral : level.m_secondaryBases[i].minerals)
 		{
 			file << mineral.getPosition().x << " " << mineral.getPosition().y << " " << mineral.getPosition().z << "\n";
 		}

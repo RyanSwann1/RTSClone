@@ -202,6 +202,7 @@ int main()
 				level->handleModelNamesGUI();
 				level->handlePlayersGUI();
 				level->handleMainBasesGui();
+				level->handleSecondaryBaseGUI();
 				level->handleSelectedEntityGUI();
 			}
 		}

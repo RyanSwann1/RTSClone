@@ -22,9 +22,9 @@ namespace
 	const std::string LEVELS_FILE_NAME = "Levels.txt";
 }
 
-int loadMainBaseQuantity(std::ifstream& file);
-void loadMainBase(std::ifstream& file, const std::string& textHeader, glm::vec3& position);
-void loadMainBaseMinerals(std::ifstream& file, const std::string& textHeader, std::vector<Mineral>& minerals);
+int loadBaseQuantity(std::ifstream& file, const std::string& conditionalName);
+void loadBasePosition(std::ifstream& file, const std::string& textHeader, glm::vec3& position);
+void loadBaseMinerals(std::ifstream& file, const std::string& textHeader, std::vector<Mineral>& minerals);
 
 #ifdef GAME
 void loadScenery(std::ifstream& file, std::vector<SceneryGameObject>& scenery);
@@ -102,15 +102,31 @@ void LevelFileHandler::loadAllMainBases(std::ifstream& file, std::vector<Base>& 
 {
 	assert(file.is_open());
 
-	for (int i = 0; i < loadMainBaseQuantity(file); ++i)
+	for (int i = 0; i < loadBaseQuantity(file, Globals::TEXT_HEADER_MAIN_BASE_QUANTITY); ++i)
 	{
 		glm::vec3 mainBasePosition(0.0f);
-		loadMainBase(file, Globals::TEXT_HEADER_MAIN_BASES[i], mainBasePosition);
+		loadBasePosition(file, Globals::TEXT_HEADER_MAIN_BASES[i], mainBasePosition);
 
 		std::vector<Mineral> minerals;
-		loadMainBaseMinerals(file, Globals::TEXT_HEADER_MAIN_BASE_MINERALS[i], minerals);
+		loadBaseMinerals(file, Globals::TEXT_HEADER_MAIN_BASE_MINERALS[i], minerals);
 
 		mainBases.emplace_back(mainBasePosition, std::move(minerals));
+	}
+}
+
+void LevelFileHandler::loadAllSecondaryBases(std::ifstream& file, std::vector<Base>& secondaryBases)
+{
+	assert(file.is_open());
+
+	for (int i = 0; i < loadBaseQuantity(file, Globals::TEXT_HEADER_SECONDARY_BASE_QUANTITY); ++i)
+	{
+		glm::vec3 mainBasePosition(0.0f);
+		loadBasePosition(file, Globals::TEXT_HEADER_SECONDARY_BASES[i], mainBasePosition);
+
+		std::vector<Mineral> minerals;
+		loadBaseMinerals(file, Globals::TEXT_HEADER_SECONDARY_BASE_MINERALS[i], minerals);
+
+		secondaryBases.emplace_back(mainBasePosition, std::move(minerals));
 	}
 }
 
@@ -313,7 +329,7 @@ void loadScenery(std::ifstream& file, std::vector<SceneryGameObject>& scenery)
 }
 #endif // GAME
 
-void loadMainBase(std::ifstream& file, const std::string& textHeader, glm::vec3& position)
+void loadBasePosition(std::ifstream& file, const std::string& textHeader, glm::vec3& position)
 {
 	assert(file.is_open());
 
@@ -331,7 +347,7 @@ void loadMainBase(std::ifstream& file, const std::string& textHeader, glm::vec3&
 	LevelFileHandler::loadFromFile(file, data, conditional);
 }
 
-void loadMainBaseMinerals(std::ifstream& file, const std::string& textHeader, std::vector<Mineral>& minerals)
+void loadBaseMinerals(std::ifstream& file, const std::string& textHeader, std::vector<Mineral>& minerals)
 {
 	assert(file.is_open());
 
@@ -351,7 +367,7 @@ void loadMainBaseMinerals(std::ifstream& file, const std::string& textHeader, st
 	LevelFileHandler::loadFromFile(file, data, conditional);
 }
 
-int loadMainBaseQuantity(std::ifstream& file)
+int loadBaseQuantity(std::ifstream& file, const std::string& conditionalName)
 {
 	assert(file.is_open());
 
@@ -362,9 +378,9 @@ int loadMainBaseQuantity(std::ifstream& file)
 		stream >> mainBaseQuantity;
 	};
 
-	auto conditional = [](const std::string& line)
+	auto conditional = [&conditionalName](const std::string& line)
 	{
-		return line == Globals::TEXT_HEADER_MAIN_BASE_QUANTITY;
+		return line == conditionalName;// Globals::TEXT_HEADER_MAIN_BASE_QUANTITY;
 	};
 
 	LevelFileHandler::loadFromFile(file, data, conditional);
