@@ -179,6 +179,7 @@
     <ClCompile Include="Headquarters.cpp" />
     <ClCompile Include="Laboratory.cpp" />
     <ClCompile Include="Level.cpp" />
+    <ClCompile Include="MiniMap.cpp" />
     <ClCompile Include="Projectile.cpp" />
     <ClCompile Include="ProjectileHandler.cpp" />
     <ClCompile Include="RenderPathMesh.cpp" />
@@ -271,6 +272,7 @@
     <ClInclude Include="FactionHandler.h" />
     <ClInclude Include="Headquarters.h" />
     <ClInclude Include="Laboratory.h" />
+    <ClInclude Include="MiniMap.h" />
     <ClInclude Include="RenderPathMesh.h" />
     <ClInclude Include="SceneryGameObject.h" />
     <ClInclude Include="Level.h" />

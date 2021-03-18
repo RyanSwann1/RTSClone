@@ -21,6 +21,7 @@
 #include "GameMessenger.h"
 #include "PathFinding.h"
 #include "LevelFileHandler.h"
+#include "MiniMap.h"
 
 //AI
 //https://www.youtube.com/watch?v=V3qASwCM-PE&list=PLdgLYFdStKu03Dv9GUsXBDQMdyJbkDb8i
@@ -95,6 +96,7 @@ int main()
 	sf::Clock gameClock;
 	Camera camera;
 	UIManager uiManager;
+	MiniMap miniMap({ 50, 50 }, { 200, 200 });
 	Map map;
 	const std::array<std::string, Globals::MAX_LEVELS> levelNames = LevelFileHandler::loadLevelNames();
 	std::unique_ptr<Level> level; 
@@ -227,11 +229,12 @@ int main()
 			level->renderPlannedBuildings(*shaderHandler);
 			shaderHandler->switchToShader(eShaderType::Debug);
 			level->renderBasePositions(*shaderHandler);
-			glEnable(GL_CULL_FACE);
-
+			
 			shaderHandler->switchToShader(eShaderType::Widjet);
 			level->renderEntityStatusBars(*shaderHandler, camera, windowSize);
 			level->renderEntitySelector(window, *shaderHandler);
+			miniMap.render(*shaderHandler, windowSize);
+			glEnable(GL_CULL_FACE);
 		}
 
 		glDisable(GL_BLEND);

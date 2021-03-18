@@ -4,14 +4,23 @@
 #include "Entity.h"
 #include "Camera.h"
 #include "ShaderHandler.h"
-#include <array>
 
 namespace
 {
-	const int QUAD_VERTEX_COUNT = 6;
-	const float OPACITY = 1.0f;
+	std::array<glm::ivec2, QUAD_VERTEX_COUNT> getQuadCoords(glm::ivec2 position, glm::ivec2 size)
+	{
+		return
+		{
+			position, 
+			glm::ivec2(position.x + size.x, position.y),
+			glm::ivec2(position.x + size.x, position.y + size.y),
+			glm::ivec2(position.x + size.x, position.y + size.y),
+			glm::ivec2(position.x, position.y + size.y),
+			position
+		};
+	};
 
-	std::array<glm::vec2, QUAD_VERTEX_COUNT> getQuadCoords(glm::vec2 position, float width, float height, float yOffset)
+	std::array<glm::vec2, QUAD_VERTEX_COUNT> getQuadCoords(glm::vec2 position, float width, float height, float yOffset = 0.0f)
 	{
 		return
 		{
@@ -31,7 +40,7 @@ Sprite::Sprite()
 {}
 
 void Sprite::render(const glm::vec3& position, glm::uvec2 windowSize, float originalWidth, float spriteWidth, float height, float yOffset, 
-	ShaderHandler& shaderHandler, const Camera& camera, const glm::vec3& materialColor) const
+	ShaderHandler& shaderHandler, const Camera& camera, const glm::vec3& materialColor, float opacity) const
 {
 	glm::vec4 positionNDC = camera.getProjection(glm::ivec2(windowSize.x, windowSize.y)) * camera.getView() * glm::vec4(position, 1.0f);
 	positionNDC /= positionNDC.w;
@@ -44,8 +53,32 @@ void Sprite::render(const glm::vec3& position, glm::uvec2 windowSize, float orig
 		(2.0f * yOffset) / windowSize.y);
 
 	shaderHandler.setUniformVec3(eShaderType::Widjet, "uColor", materialColor);
-	shaderHandler.setUniform1f(eShaderType::Widjet, "uOpacity", OPACITY);
+	shaderHandler.setUniform1f(eShaderType::Widjet, "uOpacity", opacity);
 
+	fillBuffer(quad);
+}
+
+void Sprite::render(glm::ivec2 position, glm::ivec2 size, const glm::vec3& color, ShaderHandler& shaderHandler,
+	glm::uvec2 windowSize, float opacity) const
+{
+	shaderHandler.setUniformVec3(eShaderType::Widjet, "uColor", color);
+	shaderHandler.setUniform1f(eShaderType::Widjet, "uOpacity", opacity);
+
+	glm::vec2 positionNDC = {
+		((position.x * 2.0f) / windowSize.x) - 1.0f,
+		 ((position.y * 2.0f) / windowSize.y) - 1.0f
+	};
+
+	glm::vec2 sizeNDC = {
+		(size.x * 2.0f) / windowSize.x,
+		(size.y * 2.0f) / windowSize.y
+	};
+
+	fillBuffer(getQuadCoords(positionNDC, sizeNDC.x, sizeNDC.y));
+}
+
+void Sprite::fillBuffer(const std::array<glm::vec2, QUAD_VERTEX_COUNT>& quad) const
+{
 	m_VBO.bind();
 	glBufferData(GL_ARRAY_BUFFER, quad.size() * sizeof(glm::vec2), quad.data(), GL_STATIC_DRAW);
 

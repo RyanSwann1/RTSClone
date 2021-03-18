@@ -168,6 +168,9 @@
     <ClCompile Include="..\Shared\OpenGLResource.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="MiniMap.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="assimp\include\Compiler\poppack1.h">
@@ -468,6 +471,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\Shared\OpenGLResource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MiniMap.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
