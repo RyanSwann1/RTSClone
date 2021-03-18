@@ -29,6 +29,7 @@ public:
 
 	static std::unique_ptr<Level> create(const std::string& levelName, Camera& camera);
 
+	const glm::vec3& getSize() const;
 	const Faction* getWinningFaction() const;
 
 	void handleInput(const sf::Window& window, const Camera& camera, const sf::Event& currentSFMLEvent, const Map& map,

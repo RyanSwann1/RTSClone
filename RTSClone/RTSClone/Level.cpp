@@ -102,7 +102,7 @@ std::unique_ptr<Level> Level::create(const std::string& levelName, Camera& camer
 				factionStartingResources, factionStartingPopulation);
 
 			const glm::vec3& headquartersPosition = factions[i]->getMainHeadquartersPosition();
-			camera.position = glm::vec3(headquartersPosition.x - 25.f, camera.position.y, headquartersPosition.z);
+			camera.setPosition({ headquartersPosition.z, headquartersPosition.x });
 		}
 			break;
 		case eFactionController::AI_1:
@@ -117,6 +117,11 @@ std::unique_ptr<Level> Level::create(const std::string& levelName, Camera& camer
 	}
 
 	return std::unique_ptr<Level>(new Level(std::move(scenery), std::move(factions), std::move(baseHandler), size));
+}
+
+const glm::vec3& Level::getSize() const
+{
+	return m_playableArea.getSize();
 }
 
 Level::~Level()

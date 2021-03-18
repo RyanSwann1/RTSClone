@@ -96,7 +96,7 @@ int main()
 	sf::Clock gameClock;
 	Camera camera;
 	UIManager uiManager;
-	MiniMap miniMap({ 50, 50 }, { 200, 200 });
+	MiniMap miniMap({ 35, 35 }, { 200, 200 });
 	Map map;
 	const std::array<std::string, Globals::MAX_LEVELS> levelNames = LevelFileHandler::loadLevelNames();
 	std::unique_ptr<Level> level; 
@@ -127,7 +127,8 @@ int main()
 
 			if (level)
 			{
-				level->handleInput(window, camera, currentSFMLEvent, map, uiManager);
+				//level->handleInput(window, camera, currentSFMLEvent, map, uiManager);
+				miniMap.handleInput(windowSize, window, level->getSize(), camera);
 			}
 		}
 

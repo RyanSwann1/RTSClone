@@ -15,6 +15,7 @@ public:
 	Quad(Quad&&) = default;
 	Quad& operator=(Quad&&) = default;
 
+	const glm::vec3& getSize() const;
 	const glm::vec3& getPosition() const;
 	const AABB& getAABB() const;
 

@@ -41,6 +41,11 @@ Quad::Quad(const glm::vec3& position, const glm::vec3& size, const glm::vec3& co
 	m_VBO(GL_ARRAY_BUFFER)
 {}
 
+const glm::vec3& Quad::getSize() const
+{
+	return m_size;
+}
+
 const glm::vec3& Quad::getPosition() const
 {
 	return m_position;

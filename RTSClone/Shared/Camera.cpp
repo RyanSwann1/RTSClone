@@ -14,6 +14,7 @@ namespace
 #ifdef GAME
 	const float MOVEMENT_SPEED = 110.0f;
 	const float MOUSE_MOVEMENT_SPEED = 90.0f;
+	const float Z_OFFSET = 25.0f;
 #endif // GAME
 
 	const float SENSITIVITY = 4.0f;
@@ -138,6 +139,12 @@ glm::vec3 Camera::getRayToGroundPlaneIntersection(const sf::Window& window) cons
 
 	assert(k >= 0.0f);
 	return intersection;
+}
+
+void Camera::setPosition(glm::vec2 _position)
+{
+	position.x = _position.y - Z_OFFSET;
+	position.z = _position.x;
 }
 #endif // GAME
 
