@@ -5,6 +5,8 @@
 
 namespace
 {
+	const glm::ivec2 STARTING_POSITION = { 50, 50 };
+	const glm::ivec2 STARTING_SIZE = { 250, 250 };
 	const glm::vec3 BACKGROUND_COLOR = { 0.0f, 0.0f, 0.0f };
 	const glm::vec3 FRIENDLY_ENTITY_COLOR = { 0.0f, 1.0f, 0.0f };
 	const glm::vec3 UNFRIENDLY_ENTITY_COLOR = { 1.0f, 0.0f, 0.0f };
@@ -18,10 +20,10 @@ namespace
 	}
 }
 
-MiniMap::MiniMap(glm::ivec2 position, glm::ivec2 size)
+MiniMap::MiniMap()
 	: m_background(),
-	m_position(position),
-	m_size(size),
+	m_position(STARTING_POSITION),
+	m_size(STARTING_SIZE),
 	m_entitySprite(),
 	m_mouseButtonPressed(false)
 {}

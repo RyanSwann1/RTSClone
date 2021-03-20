@@ -58,6 +58,7 @@ Level::Level(std::vector<SceneryGameObject>&& scenery, FactionsContainer&& facti
 	: m_playableArea(size, TERRAIN_COLOR),
 	m_baseHandler(std::move(baseHandler)),
 	m_scenery(std::move(scenery)),
+	m_minimap(),
 	m_factions(std::move(factions)),
 	m_unitStateHandlerTimer(TIME_BETWEEN_UNIT_STATE, true),
 	m_factionHandler(m_factions),
@@ -119,6 +120,11 @@ std::unique_ptr<Level> Level::create(const std::string& levelName, Camera& camer
 	return std::unique_ptr<Level>(new Level(std::move(scenery), std::move(factions), std::move(baseHandler), size));
 }
 
+bool Level::isMinimapInteracted() const
+{
+	return m_minimap.isMouseButtonPressed();
+}
+
 const FactionsContainer& Level::getFactions() const
 {
 	return m_factions;
@@ -152,10 +158,16 @@ const Faction* Level::getWinningFaction() const
 	return winningFaction;
 }
 
-void Level::handleInput(const sf::Window& window, const Camera& camera, const sf::Event& currentSFMLEvent, const Map& map,
+void Level::handleInput(glm::uvec2 windowSize, const sf::Window& window, Camera& camera, const sf::Event& currentSFMLEvent, const Map& map,
 	UIManager& uiManager)
 {
 	if (ImGui::IsWindowHovered(ImGuiHoveredFlags_::ImGuiHoveredFlags_AnyWindow))
+	{
+		return;
+	}
+
+	m_minimap.handleInput(windowSize, window, getSize(), camera, currentSFMLEvent);
+	if (m_minimap.isMouseButtonPressed())
 	{
 		return;
 	}
@@ -269,6 +281,11 @@ void Level::renderPlayerPlannedBuilding(ShaderHandler& shaderHandler, const Map&
 void Level::renderBasePositions(ShaderHandler& shaderHandler) const
 {
 	m_baseHandler->renderBasePositions(shaderHandler);
+}
+
+void Level::renderMinimap(ShaderHandler& shaderHandler, glm::uvec2 windowSize, const Camera& camera) const
+{
+	m_minimap.render(shaderHandler, windowSize, *this, camera);
 }
 
 void Level::render(ShaderHandler& shaderHandler) const

@@ -8,6 +8,7 @@
 #include "Timer.h"
 #include "Base.h"
 #include "Quad.h"
+#include "MiniMap.h"
 #include <string>
 #include <vector>
 #include <memory>
@@ -29,11 +30,12 @@ public:
 
 	static std::unique_ptr<Level> create(const std::string& levelName, Camera& camera);
 
+	bool isMinimapInteracted() const;
 	const FactionsContainer& getFactions() const;
 	const glm::vec3& getSize() const;
 	const Faction* getWinningFaction() const;
 
-	void handleInput(const sf::Window& window, const Camera& camera, const sf::Event& currentSFMLEvent, const Map& map,
+	void handleInput(glm::uvec2 windowSize, const sf::Window& window, Camera& camera, const sf::Event& currentSFMLEvent, const Map& map,
 		UIManager& uiManager);
 	void update(float deltaTime, const Map& map, UIManager& uiManager);
 	void renderEntitySelector(const sf::Window& window, ShaderHandler& shaderHandler) const;
@@ -42,6 +44,7 @@ public:
 	void renderTerrain(ShaderHandler& shaderHandler) const;
 	void renderPlayerPlannedBuilding(ShaderHandler& shaderHandler, const Map& map) const;
 	void renderBasePositions(ShaderHandler& shaderHandler) const;
+	void renderMinimap(ShaderHandler& shaderHandler, glm::uvec2 windowSize, const Camera& camera) const;
 	void render(ShaderHandler& shaderHandler) const;
 
 #ifdef RENDER_AABB
@@ -59,6 +62,7 @@ private:
 	const Quad m_playableArea;
 	const std::unique_ptr<BaseHandler> m_baseHandler;
 	const std::vector<SceneryGameObject> m_scenery;
+	MiniMap m_minimap;
 	FactionsContainer m_factions;
 	Timer m_unitStateHandlerTimer;
 	FactionHandler m_factionHandler;

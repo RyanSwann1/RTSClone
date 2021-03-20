@@ -21,7 +21,6 @@
 #include "GameMessenger.h"
 #include "PathFinding.h"
 #include "LevelFileHandler.h"
-#include "MiniMap.h"
 
 //AI
 //https://www.youtube.com/watch?v=V3qASwCM-PE&list=PLdgLYFdStKu03Dv9GUsXBDQMdyJbkDb8i
@@ -96,7 +95,6 @@ int main()
 	sf::Clock gameClock;
 	Camera camera;
 	UIManager uiManager;
-	MiniMap miniMap({ 50, 50 }, { 250, 250 });
 	Map map;
 	const std::array<std::string, Globals::MAX_LEVELS> levelNames = LevelFileHandler::loadLevelNames();
 	std::unique_ptr<Level> level; 
@@ -127,14 +125,7 @@ int main()
 
 			if (level)
 			{
-				if (!miniMap.handleInput(windowSize, window, level->getSize(), camera, currentSFMLEvent))
-				{
-					level->handleInput(window, camera, currentSFMLEvent, map, uiManager);
-				}
-				if (!miniMap.isMouseButtonPressed())
-				{
-					camera.move(deltaTime, window, windowSize);
-				}
+				level->handleInput(windowSize, window, camera, currentSFMLEvent, map, uiManager);
 			}
 		}
 
@@ -175,6 +166,10 @@ int main()
 		uiManager.render(window);
 		if (level)
 		{	
+			if (!level->isMinimapInteracted())
+			{
+				camera.move(deltaTime, window, windowSize);
+			}
 			level->update(deltaTime, map, uiManager);
 		}
 
@@ -239,7 +234,7 @@ int main()
 			shaderHandler->switchToShader(eShaderType::Widjet);
 			level->renderEntityStatusBars(*shaderHandler, camera, windowSize);
 			level->renderEntitySelector(window, *shaderHandler); 
-			miniMap.render(*shaderHandler, windowSize, *level, camera);
+			level->renderMinimap(*shaderHandler, windowSize, camera);
 			glEnable(GL_CULL_FACE);
 		}
 

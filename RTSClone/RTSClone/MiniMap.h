@@ -10,7 +10,7 @@ class Level;
 class MiniMap
 {
 public:
-	MiniMap(glm::ivec2 position, glm::ivec2 size);
+	MiniMap();
 	MiniMap(const MiniMap&) = delete;
 	MiniMap& operator=(const MiniMap&) = delete;
 	MiniMap(MiniMap&&) = delete;
