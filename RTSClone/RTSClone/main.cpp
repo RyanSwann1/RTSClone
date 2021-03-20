@@ -4,7 +4,6 @@
 #include <SFML/Graphics.hpp>
 #include "ModelLoader.h"
 #include "ShaderHandler.h"
-#include "Camera.h"
 #include "Unit.h"
 #include "Map.h"
 #include "glm/gtc/matrix_transform.hpp"
@@ -93,7 +92,6 @@ int main()
 	PathFinding::getInstance();
 	
 	sf::Clock gameClock;
-	Camera camera;
 	UIManager uiManager;
 	Map map;
 	const std::array<std::string, Globals::MAX_LEVELS> levelNames = LevelFileHandler::loadLevelNames();
@@ -125,7 +123,7 @@ int main()
 
 			if (level)
 			{
-				level->handleInput(windowSize, window, camera, currentSFMLEvent, map, uiManager);
+				level->handleInput(windowSize, window, currentSFMLEvent, map, uiManager);
 			}
 		}
 
@@ -149,7 +147,7 @@ int main()
 				if (!levelName.empty() && ImGui::Button(levelName.c_str()))
 				{
 					broadcastToMessenger<GameMessages::UIClearWinner>({});
-					level = Level::create(levelName, camera);
+					level = Level::create(levelName);
 					assert(level);
 					if (!level)
 					{
@@ -166,63 +164,47 @@ int main()
 		uiManager.render(window);
 		if (level)
 		{	
-			if (!level->isMinimapInteracted())
-			{
-				camera.move(deltaTime, window, windowSize);
-			}
-			level->update(deltaTime, map, uiManager);
+			level->update(deltaTime, map, uiManager, windowSize, window);
 		}
 
 		//Render
-		glm::mat4 view = camera.getView(); 
-		glm::mat4 projection = camera.getProjection(glm::ivec2(window.getSize().x, window.getSize().y));
-
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-		shaderHandler->switchToShader(eShaderType::Default);
-		shaderHandler->setUniformMat4f(eShaderType::Default, "uView", view);
-		shaderHandler->setUniformMat4f(eShaderType::Default, "uProjection", projection);
-		shaderHandler->setUniform1f(eShaderType::Default, "uOpacity", 1.0f);
-	
 		if (level)
 		{
+			glm::mat4 view = level->getCamera().getView();
+			glm::mat4 projection = level->getCamera().getProjection(glm::ivec2(window.getSize().x, window.getSize().y));
+
+			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+			shaderHandler->switchToShader(eShaderType::Default);
+			shaderHandler->setUniformMat4f(eShaderType::Default, "uView", view);
+			shaderHandler->setUniformMat4f(eShaderType::Default, "uProjection", projection);
+			shaderHandler->setUniform1f(eShaderType::Default, "uOpacity", 1.0f);
+
 			level->render(*shaderHandler);
-		}
+		
+			glDisable(GL_CULL_FACE);
+			shaderHandler->switchToShader(eShaderType::Debug);
+			shaderHandler->setUniformMat4f(eShaderType::Debug, "uView", view);
+			shaderHandler->setUniformMat4f(eShaderType::Debug, "uProjection", projection);
 
-		glDisable(GL_CULL_FACE);
-		shaderHandler->switchToShader(eShaderType::Debug);
-		shaderHandler->setUniformMat4f(eShaderType::Debug, "uView", view);
-		shaderHandler->setUniformMat4f(eShaderType::Debug, "uProjection", projection);
-
-		if (level)
-		{
 			level->renderTerrain(*shaderHandler);
-		}
-		glEnable(GL_CULL_FACE);
-		glEnable(GL_BACK);
+			
+			glEnable(GL_CULL_FACE);
+			glEnable(GL_BACK);
 
-		glEnable(GL_BLEND);
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-		glDisable(GL_DEPTH_TEST);
+			glEnable(GL_BLEND);
+			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+			glDisable(GL_DEPTH_TEST);
 #ifdef RENDER_AABB
-		shaderHandler->switchToShader(eShaderType::Debug);
-		shaderHandler->setUniformMat4f(eShaderType::Debug, "uView", view);
-		shaderHandler->setUniformMat4f(eShaderType::Debug, "uProjection", projection);
-		if (level)
-		{
+			shaderHandler->switchToShader(eShaderType::Debug);
+			shaderHandler->setUniformMat4f(eShaderType::Debug, "uView", view);
+			shaderHandler->setUniformMat4f(eShaderType::Debug, "uProjection", projection);
+			
 			level->renderAABB(*shaderHandler);
-		}
 #endif // RENDER_AABB
-
 #ifdef RENDER_PATHING
-		if (level)
-		{
 			level->renderPathing(*shaderHandler);
-		}
 #endif // RENDER_PATHING
-
-		if (level)
-		{
 			glDisable(GL_CULL_FACE);
 			shaderHandler->switchToShader(eShaderType::Default);
 			shaderHandler->setUniform1f(eShaderType::Default, "uOpacity", 0.35f);
@@ -230,11 +212,11 @@ int main()
 			level->renderPlannedBuildings(*shaderHandler);
 			shaderHandler->switchToShader(eShaderType::Debug);
 			level->renderBasePositions(*shaderHandler);
-			
+
 			shaderHandler->switchToShader(eShaderType::Widjet);
-			level->renderEntityStatusBars(*shaderHandler, camera, windowSize);
-			level->renderEntitySelector(window, *shaderHandler); 
-			level->renderMinimap(*shaderHandler, windowSize, camera);
+			level->renderEntityStatusBars(*shaderHandler, windowSize);
+			level->renderEntitySelector(window, *shaderHandler);
+			level->renderMinimap(*shaderHandler, windowSize);
 			glEnable(GL_CULL_FACE);
 		}
 

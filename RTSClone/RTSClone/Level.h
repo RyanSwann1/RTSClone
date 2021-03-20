@@ -9,6 +9,7 @@
 #include "Base.h"
 #include "Quad.h"
 #include "MiniMap.h"
+#include "Camera.h"
 #include <string>
 #include <vector>
 #include <memory>
@@ -16,7 +17,6 @@
 
 using FactionsContainer = std::array<std::unique_ptr<Faction>, static_cast<size_t>(eFactionController::Max) + 1>;
 
-struct Camera;
 class UIManager;
 class ShaderHandler;
 class Level
@@ -28,23 +28,24 @@ public:
 	Level& operator=(Level&&) = delete;
 	~Level();
 
-	static std::unique_ptr<Level> create(const std::string& levelName, Camera& camera);
+	static std::unique_ptr<Level> create(const std::string& levelName);
 
+	const Camera& getCamera() const;
 	bool isMinimapInteracted() const;
 	const FactionsContainer& getFactions() const;
 	const glm::vec3& getSize() const;
 	const Faction* getWinningFaction() const;
 
-	void handleInput(glm::uvec2 windowSize, const sf::Window& window, Camera& camera, const sf::Event& currentSFMLEvent, const Map& map,
+	void handleInput(glm::uvec2 windowSize, const sf::Window& window, const sf::Event& currentSFMLEvent, const Map& map,
 		UIManager& uiManager);
-	void update(float deltaTime, const Map& map, UIManager& uiManager);
+	void update(float deltaTime, const Map& map, UIManager& uiManager, glm::uvec2 windowSize, const sf::Window& window);
 	void renderEntitySelector(const sf::Window& window, ShaderHandler& shaderHandler) const;
 	void renderPlannedBuildings(ShaderHandler& shaderHandler) const;
-	void renderEntityStatusBars(ShaderHandler& shaderHandler, const Camera& camera, glm::uvec2 windowSize) const;
+	void renderEntityStatusBars(ShaderHandler& shaderHandler, glm::uvec2 windowSize) const;
 	void renderTerrain(ShaderHandler& shaderHandler) const;
 	void renderPlayerPlannedBuilding(ShaderHandler& shaderHandler, const Map& map) const;
 	void renderBasePositions(ShaderHandler& shaderHandler) const;
-	void renderMinimap(ShaderHandler& shaderHandler, glm::uvec2 windowSize, const Camera& camera) const;
+	void renderMinimap(ShaderHandler& shaderHandler, glm::uvec2 windowSize) const;
 	void render(ShaderHandler& shaderHandler) const;
 
 #ifdef RENDER_AABB
@@ -57,11 +58,13 @@ public:
 
 private:
 	Level(std::vector<SceneryGameObject>&& scenery, FactionsContainer&& factions, 
-		std::unique_ptr<BaseHandler>&& baseHandler, const glm::vec3& size);
+		std::unique_ptr<BaseHandler>&& baseHandler, const glm::vec3& size, 
+		glm::vec2 cameraStartingPosition);
 
 	const Quad m_playableArea;
 	const std::unique_ptr<BaseHandler> m_baseHandler;
 	const std::vector<SceneryGameObject> m_scenery;
+	Camera m_camera;
 	MiniMap m_minimap;
 	FactionsContainer m_factions;
 	Timer m_unitStateHandlerTimer;

@@ -54,10 +54,11 @@ namespace
 
 //Level
 Level::Level(std::vector<SceneryGameObject>&& scenery, FactionsContainer&& factions, 
-	std::unique_ptr<BaseHandler>&& baseHandler, const glm::vec3& size)
+	std::unique_ptr<BaseHandler>&& baseHandler, const glm::vec3& size, glm::vec2 cameraStartingPosition)
 	: m_playableArea(size, TERRAIN_COLOR),
 	m_baseHandler(std::move(baseHandler)),
 	m_scenery(std::move(scenery)),
+	m_camera(),
 	m_minimap(),
 	m_factions(std::move(factions)),
 	m_unitStateHandlerTimer(TIME_BETWEEN_UNIT_STATE, true),
@@ -71,9 +72,11 @@ Level::Level(std::vector<SceneryGameObject>&& scenery, FactionsContainer&& facti
 			static_cast<FactionAI&>(*faction.get()).setTargetFaction(m_factionHandler);
 		}
 	}
+
+	m_camera.setPosition(cameraStartingPosition);
 }
 
-std::unique_ptr<Level> Level::create(const std::string& levelName, Camera& camera)
+std::unique_ptr<Level> Level::create(const std::string& levelName)
 {
 	std::vector<Base> mainBases;
 	std::vector<SceneryGameObject> scenery;
@@ -89,7 +92,8 @@ std::unique_ptr<Level> Level::create(const std::string& levelName, Camera& camer
 
 	std::unique_ptr<BaseHandler> baseHandler = std::make_unique<BaseHandler>(std::move(mainBases));
 	std::array<std::unique_ptr<Faction>, static_cast<size_t>(eFactionController::Max) + 1> factions;
-	
+	glm::vec2 cameraStartingPosition(0.0f);
+
 	assert(factionCount < static_cast<int>(eFactionController::Max) + 1 && 
 		factionCount < static_cast<int>(baseHandler->getBases().size()));
 	for (int i = 0; i < factionCount; ++i)
@@ -103,7 +107,7 @@ std::unique_ptr<Level> Level::create(const std::string& levelName, Camera& camer
 				factionStartingResources, factionStartingPopulation);
 
 			const glm::vec3& headquartersPosition = factions[i]->getMainHeadquartersPosition();
-			camera.setPosition({ headquartersPosition.z, headquartersPosition.x });
+			cameraStartingPosition = { headquartersPosition.z, headquartersPosition.x };
 		}
 			break;
 		case eFactionController::AI_1:
@@ -117,7 +121,13 @@ std::unique_ptr<Level> Level::create(const std::string& levelName, Camera& camer
 		}
 	}
 
-	return std::unique_ptr<Level>(new Level(std::move(scenery), std::move(factions), std::move(baseHandler), size));
+	return std::unique_ptr<Level>(new Level(std::move(scenery), std::move(factions), 
+		std::move(baseHandler), size, cameraStartingPosition));
+}
+
+const Camera& Level::getCamera() const
+{
+	return m_camera;
 }
 
 bool Level::isMinimapInteracted() const
@@ -158,7 +168,7 @@ const Faction* Level::getWinningFaction() const
 	return winningFaction;
 }
 
-void Level::handleInput(glm::uvec2 windowSize, const sf::Window& window, Camera& camera, const sf::Event& currentSFMLEvent, const Map& map,
+void Level::handleInput(glm::uvec2 windowSize, const sf::Window& window, const sf::Event& currentSFMLEvent, const Map& map,
 	UIManager& uiManager)
 {
 	if (ImGui::IsWindowHovered(ImGuiHoveredFlags_::ImGuiHoveredFlags_AnyWindow))
@@ -166,7 +176,7 @@ void Level::handleInput(glm::uvec2 windowSize, const sf::Window& window, Camera&
 		return;
 	}
 
-	m_minimap.handleInput(windowSize, window, getSize(), camera, currentSFMLEvent);
+	m_minimap.handleInput(windowSize, window, getSize(), m_camera, currentSFMLEvent);
 	if (m_minimap.isMouseButtonPressed())
 	{
 		return;
@@ -174,7 +184,7 @@ void Level::handleInput(glm::uvec2 windowSize, const sf::Window& window, Camera&
 
 	if (isFactionActive(m_factions, eFactionController::Player))
 	{
-		getFactionPlayer(m_factions).handleInput(currentSFMLEvent, window, camera, map, m_factionHandler, *m_baseHandler);
+		getFactionPlayer(m_factions).handleInput(currentSFMLEvent, window, m_camera, map, m_factionHandler, *m_baseHandler);
 	}
 
 	if (currentSFMLEvent.type == sf::Event::MouseButtonPressed)
@@ -188,7 +198,7 @@ void Level::handleInput(glm::uvec2 windowSize, const sf::Window& window, Camera&
 				case eFactionController::AI_1:
 				case eFactionController::AI_2:					
 				case eFactionController::AI_3:
-					static_cast<FactionAI&>(*faction).selectEntity(camera.getRayToGroundPlaneIntersection(window));
+					static_cast<FactionAI&>(*faction).selectEntity(m_camera.getRayToGroundPlaneIntersection(window));
 					break;
 				case eFactionController::Player:
 					break;
@@ -199,11 +209,15 @@ void Level::handleInput(glm::uvec2 windowSize, const sf::Window& window, Camera&
 		}
 	}
 
-	uiManager.handleInput(window, m_factionHandler, camera, currentSFMLEvent);
+	uiManager.handleInput(window, m_factionHandler, m_camera, currentSFMLEvent);
 }
 
-void Level::update(float deltaTime, const Map& map, UIManager& uiManager)
+void Level::update(float deltaTime, const Map& map, UIManager& uiManager, glm::uvec2 windowSize, const sf::Window& window)
 {
+	if (!m_minimap.isMouseButtonPressed())
+	{
+		m_camera.move(deltaTime, window, windowSize);
+	}
 	m_unitStateHandlerTimer.update(deltaTime);
 
 	for (auto& faction : m_factions)
@@ -254,13 +268,13 @@ void Level::renderPlannedBuildings(ShaderHandler& shaderHandler) const
 	}
 }
 
-void Level::renderEntityStatusBars(ShaderHandler& shaderHandler, const Camera& camera, glm::uvec2 windowSize) const
+void Level::renderEntityStatusBars(ShaderHandler& shaderHandler, glm::uvec2 windowSize) const
 {
 	for (const auto& faction : m_factions)
 	{
 		if (faction)
 		{
-			faction->renderEntityStatusBars(shaderHandler, camera, windowSize);
+			faction->renderEntityStatusBars(shaderHandler, m_camera, windowSize);
 		}
 	}
 }
@@ -283,9 +297,9 @@ void Level::renderBasePositions(ShaderHandler& shaderHandler) const
 	m_baseHandler->renderBasePositions(shaderHandler);
 }
 
-void Level::renderMinimap(ShaderHandler& shaderHandler, glm::uvec2 windowSize, const Camera& camera) const
+void Level::renderMinimap(ShaderHandler& shaderHandler, glm::uvec2 windowSize) const
 {
-	m_minimap.render(shaderHandler, windowSize, *this, camera);
+	m_minimap.render(shaderHandler, windowSize, *this, m_camera);
 }
 
 void Level::render(ShaderHandler& shaderHandler) const
