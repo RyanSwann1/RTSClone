@@ -29,7 +29,7 @@ struct Camera
 	glm::vec3 getInfiniteForwardRay(const sf::Window& window) const;
 	glm::vec3 getRayToGroundPlaneIntersection(const sf::Window& window) const;
 	void setPosition(glm::vec2 position);
-	void update(float deltaTime, const sf::Window& window, glm::uvec2 windowSize);
+	void move(float deltaTime, const sf::Window& window, glm::uvec2 windowSize);
 #endif // GAME
 
 	const float FOV;

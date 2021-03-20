@@ -29,6 +29,7 @@ public:
 
 	static std::unique_ptr<Level> create(const std::string& levelName, Camera& camera);
 
+	const FactionsContainer& getFactions() const;
 	const glm::vec3& getSize() const;
 	const Faction* getWinningFaction() const;
 

@@ -86,7 +86,7 @@ glm::mat4 Camera::getProjection(glm::ivec2 windowSize) const
 }
 
 #ifdef GAME
-void Camera::update(float deltaTime, const sf::Window& window, glm::uvec2 windowSize)
+void Camera::move(float deltaTime, const sf::Window& window, glm::uvec2 windowSize)
 {
 	setFront();
 	moveByArrowKeys(deltaTime);

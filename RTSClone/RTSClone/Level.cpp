@@ -119,6 +119,11 @@ std::unique_ptr<Level> Level::create(const std::string& levelName, Camera& camer
 	return std::unique_ptr<Level>(new Level(std::move(scenery), std::move(factions), std::move(baseHandler), size));
 }
 
+const FactionsContainer& Level::getFactions() const
+{
+	return m_factions;
+}
+
 const glm::vec3& Level::getSize() const
 {
 	return m_playableArea.getSize();

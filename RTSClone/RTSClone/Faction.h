@@ -40,6 +40,7 @@ public:
 	const glm::vec3& getMainHeadquartersPosition() const;
 	eFactionController getController() const;
 	const std::list<Unit>& getUnits() const;
+	const std::vector<std::reference_wrapper<Entity>>& getAllEntities() const;
 	const Entity* getEntity(const glm::vec3& position, float maxDistance, bool prioritizeUnits = true) const;
 	const Entity* getEntity(const AABB& AABB, int entityID) const;
 	const Entity* getEntity(int entityID) const;

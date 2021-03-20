@@ -96,7 +96,7 @@ int main()
 	sf::Clock gameClock;
 	Camera camera;
 	UIManager uiManager;
-	MiniMap miniMap({ 35, 35 }, { 200, 200 });
+	MiniMap miniMap({ 50, 50 }, { 250, 250 });
 	Map map;
 	const std::array<std::string, Globals::MAX_LEVELS> levelNames = LevelFileHandler::loadLevelNames();
 	std::unique_ptr<Level> level; 
@@ -127,8 +127,14 @@ int main()
 
 			if (level)
 			{
-				//level->handleInput(window, camera, currentSFMLEvent, map, uiManager);
-				miniMap.handleInput(windowSize, window, level->getSize(), camera);
+				if (!miniMap.handleInput(windowSize, window, level->getSize(), camera, currentSFMLEvent))
+				{
+					level->handleInput(window, camera, currentSFMLEvent, map, uiManager);
+				}
+				if (!miniMap.isMouseButtonPressed())
+				{
+					camera.move(deltaTime, window, windowSize);
+				}
 			}
 		}
 
@@ -168,8 +174,7 @@ int main()
 		//Update
 		uiManager.render(window);
 		if (level)
-		{
-			camera.update(deltaTime, window, windowSize);
+		{	
 			level->update(deltaTime, map, uiManager);
 		}
 
@@ -233,8 +238,8 @@ int main()
 			
 			shaderHandler->switchToShader(eShaderType::Widjet);
 			level->renderEntityStatusBars(*shaderHandler, camera, windowSize);
-			level->renderEntitySelector(window, *shaderHandler);
-			miniMap.render(*shaderHandler, windowSize);
+			level->renderEntitySelector(window, *shaderHandler); 
+			miniMap.render(*shaderHandler, windowSize, *level, camera);
 			glEnable(GL_CULL_FACE);
 		}
 
