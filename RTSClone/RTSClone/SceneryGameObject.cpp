@@ -22,6 +22,11 @@ SceneryGameObject::~SceneryGameObject()
 	}
 }
 
+const glm::vec3& SceneryGameObject::getPosition() const
+{
+	return m_position;
+}
+
 SceneryGameObject::SceneryGameObject(SceneryGameObject&& orig) noexcept
 	: m_model(orig.m_model),
 	m_position(orig.m_position),

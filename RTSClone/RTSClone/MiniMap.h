@@ -27,5 +27,6 @@ private:
 	const glm::ivec2 m_position;
 	const glm::ivec2 m_size;
 	Sprite m_entitySprite;
+	Sprite m_cameraViewSprite;
 	bool m_mouseButtonPressed;
 };

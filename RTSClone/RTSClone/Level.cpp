@@ -125,6 +125,11 @@ std::unique_ptr<Level> Level::create(const std::string& levelName)
 		std::move(baseHandler), size, cameraStartingPosition));
 }
 
+const std::vector<SceneryGameObject>& Level::getSceneryGameObjects() const
+{
+	return m_scenery;
+}
+
 const BaseHandler& Level::getBaseHandler() const
 {
 	return *m_baseHandler.get();

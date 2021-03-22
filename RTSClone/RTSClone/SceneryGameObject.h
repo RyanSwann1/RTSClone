@@ -16,6 +16,7 @@ public:
 	SceneryGameObject& operator=(SceneryGameObject&&) noexcept;
 	~SceneryGameObject();
 
+	const glm::vec3& getPosition() const;
 	const AABB& getAABB() const;
 	void render(ShaderHandler& shaderHandler) const;
 

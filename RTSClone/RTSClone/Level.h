@@ -30,6 +30,7 @@ public:
 
 	static std::unique_ptr<Level> create(const std::string& levelName);
 
+	const std::vector<SceneryGameObject>& getSceneryGameObjects() const;
 	const BaseHandler& getBaseHandler() const;
 	const Camera& getCamera() const;
 	bool isMinimapInteracted() const;

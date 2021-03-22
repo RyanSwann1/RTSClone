@@ -11,11 +11,14 @@ namespace
 	const glm::vec3 FRIENDLY_ENTITY_COLOR = { 0.0f, 1.0f, 0.0f };
 	const glm::vec3 UNFRIENDLY_ENTITY_COLOR = { 1.0f, 0.0f, 0.0f };
 	const glm::vec3 MINERAL_COLOR = { 1.0f, 1.0f, 0.0f };
+	const glm::vec3 SCENERY_COLOR = { 1.0f, 1.0f, 1.0f };
 
 	const glm::ivec2 BIG_SIZE = { 7, 7 };
 	const glm::ivec2 MEDIUM_SIZE = { 5, 5 };
 	const glm::ivec2 SMALL_SIZE = { 3, 3 };
 	const glm::ivec2 SMALLEST_SIZE = { 2, 2 };
+
+	const float OPACITY = 0.95f;
 
 	bool isWithinBounds(glm::ivec2 mousePosition, glm::ivec2 position, glm::ivec2 size)
 	{
@@ -31,6 +34,7 @@ MiniMap::MiniMap()
 	m_position(STARTING_POSITION),
 	m_size(STARTING_SIZE),
 	m_entitySprite(),
+	m_cameraViewSprite(),
 	m_mouseButtonPressed(false)
 {}
 
@@ -74,8 +78,15 @@ void MiniMap::render(ShaderHandler& shaderHandler, glm::uvec2 windowSize, const 
 		{
 			glm::vec2 convertedMineralPosition((mineral.getPosition().z / level.getSize().x) * m_size.x, (mineral.getPosition().x / level.getSize().z) * m_size.y);
 			convertedMineralPosition += m_position;
-			m_entitySprite.render(convertedMineralPosition, { 2, 2 }, MINERAL_COLOR, shaderHandler, windowSize, 0.75f);
+			m_entitySprite.render(convertedMineralPosition, SMALLEST_SIZE, MINERAL_COLOR, shaderHandler, windowSize, OPACITY);
 		}
+	}
+
+	for (const auto& gameObject : level.getSceneryGameObjects())
+	{
+		glm::vec2 convertedMineralPosition((gameObject.getPosition().z / level.getSize().x) * m_size.x, (gameObject.getPosition().x / level.getSize().z) * m_size.y);
+		convertedMineralPosition += m_position;
+		m_entitySprite.render(convertedMineralPosition, SMALL_SIZE, SCENERY_COLOR, shaderHandler, windowSize, OPACITY);
 	}
 
 	for (const auto& faction : level.getFactions())
@@ -127,7 +138,7 @@ void MiniMap::render(ShaderHandler& shaderHandler, glm::uvec2 windowSize, const 
 				assert(false);
 			}
 
-			m_entitySprite.render(convertedEntityPosition, size, color, shaderHandler, windowSize, 0.75f);
+			m_entitySprite.render(convertedEntityPosition, size, color, shaderHandler, windowSize, OPACITY);
 		}
 	}
 }
