@@ -12,6 +12,11 @@ namespace
 	const glm::vec3 UNFRIENDLY_ENTITY_COLOR = { 1.0f, 0.0f, 0.0f };
 	const glm::vec3 MINERAL_COLOR = { 1.0f, 1.0f, 0.0f };
 
+	const glm::ivec2 BIG_SIZE = { 7, 7 };
+	const glm::ivec2 MEDIUM_SIZE = { 5, 5 };
+	const glm::ivec2 SMALL_SIZE = { 3, 3 };
+	const glm::ivec2 SMALLEST_SIZE = { 2, 2 };
+
 	bool isWithinBounds(glm::ivec2 mousePosition, glm::ivec2 position, glm::ivec2 size)
 	{
 		return mousePosition.x >= position.x &&
@@ -100,7 +105,29 @@ void MiniMap::render(ShaderHandler& shaderHandler, glm::uvec2 windowSize, const 
 			glm::vec2 convertedEntityPosition((entityPosition.z / level.getSize().x) * m_size.x, (entityPosition.x / level.getSize().z) * m_size.y);
 			convertedEntityPosition += m_position;
 
-			m_entitySprite.render(convertedEntityPosition, { 3, 3 }, color, shaderHandler, windowSize, 0.75f);
+			glm::ivec2 size(1);
+			switch (entity.get().getEntityType())
+			{
+			case eEntityType::Unit:
+				size = SMALL_SIZE;
+				break;
+			case eEntityType::Worker:
+				size = SMALLEST_SIZE;
+				break;
+			case eEntityType::Headquarters:
+				size = BIG_SIZE;
+				break;
+			case eEntityType::SupplyDepot:
+			case eEntityType::Barracks:
+			case eEntityType::Turret:
+			case eEntityType::Laboratory:
+				size = MEDIUM_SIZE;
+				break;
+			default:
+				assert(false);
+			}
+
+			m_entitySprite.render(convertedEntityPosition, size, color, shaderHandler, windowSize, 0.75f);
 		}
 	}
 }
