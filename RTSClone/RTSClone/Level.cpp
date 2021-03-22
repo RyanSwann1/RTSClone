@@ -125,6 +125,11 @@ std::unique_ptr<Level> Level::create(const std::string& levelName)
 		std::move(baseHandler), size, cameraStartingPosition));
 }
 
+const BaseHandler& Level::getBaseHandler() const
+{
+	return *m_baseHandler.get();
+}
+
 const Camera& Level::getCamera() const
 {
 	return m_camera;

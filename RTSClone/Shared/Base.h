@@ -16,6 +16,7 @@ struct Base
 
 #ifdef GAME
 	glm::vec3 getConvertedPosition() const;
+	const std::vector<Mineral>& getMinerals() const;
 #endif // GAME
 
 #ifdef LEVEL_EDITOR

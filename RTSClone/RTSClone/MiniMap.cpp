@@ -10,6 +10,7 @@ namespace
 	const glm::vec3 BACKGROUND_COLOR = { 0.0f, 0.0f, 0.0f };
 	const glm::vec3 FRIENDLY_ENTITY_COLOR = { 0.0f, 1.0f, 0.0f };
 	const glm::vec3 UNFRIENDLY_ENTITY_COLOR = { 1.0f, 0.0f, 0.0f };
+	const glm::vec3 MINERAL_COLOR = { 1.0f, 1.0f, 0.0f };
 
 	bool isWithinBounds(glm::ivec2 mousePosition, glm::ivec2 position, glm::ivec2 size)
 	{
@@ -61,6 +62,16 @@ bool MiniMap::handleInput(glm::uvec2 windowSize, const sf::Window& window, const
 void MiniMap::render(ShaderHandler& shaderHandler, glm::uvec2 windowSize, const Level& level, const Camera& camera) const
 {
 	m_background.render(m_position, m_size, BACKGROUND_COLOR, shaderHandler, windowSize, 0.8f);
+
+	for (const auto& base : level.getBaseHandler().getBases())
+	{
+		for (const auto& mineral : base.getMinerals())
+		{
+			glm::vec2 convertedMineralPosition((mineral.getPosition().z / level.getSize().x) * m_size.x, (mineral.getPosition().x / level.getSize().z) * m_size.y);
+			convertedMineralPosition += m_position;
+			m_entitySprite.render(convertedMineralPosition, { 2, 2 }, MINERAL_COLOR, shaderHandler, windowSize, 0.75f);
+		}
+	}
 
 	for (const auto& faction : level.getFactions())
 	{

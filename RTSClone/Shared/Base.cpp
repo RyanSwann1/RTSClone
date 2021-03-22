@@ -27,6 +27,12 @@ glm::vec3 Base::getConvertedPosition() const
 {
 	return Globals::convertToMiddleGridPosition(Globals::convertToNodePosition(position));
 }
+
+const std::vector<Mineral>& Base::getMinerals() const
+{
+	return minerals;
+}
+
 #endif // GAME
 
 #ifdef LEVEL_EDITOR
