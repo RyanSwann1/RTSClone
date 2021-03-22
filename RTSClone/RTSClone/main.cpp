@@ -216,7 +216,7 @@ int main()
 			shaderHandler->switchToShader(eShaderType::Widjet);
 			level->renderEntityStatusBars(*shaderHandler, windowSize);
 			level->renderEntitySelector(window, *shaderHandler);
-			level->renderMinimap(*shaderHandler, windowSize);
+			level->renderMinimap(*shaderHandler, windowSize, window);
 			glEnable(GL_CULL_FACE);
 		}
 

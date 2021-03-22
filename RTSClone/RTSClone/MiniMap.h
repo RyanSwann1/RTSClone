@@ -16,11 +16,12 @@ public:
 	MiniMap(MiniMap&&) = delete;
 	MiniMap& operator=(MiniMap&&) = delete;
 
-	bool isMouseButtonPressed() const;
+	bool isUserInteracted() const;
 
 	bool handleInput(glm::uvec2 windowSize, const sf::Window& window, const glm::vec3& levelSize, Camera& camera,
 		sf::Event sfmlEvent);
-	void render(ShaderHandler& shaderHandler, glm::uvec2 windowSize, const Level& level, const Camera& camera) const;
+	void render(ShaderHandler& shaderHandler, glm::uvec2 windowSize, const Level& level, const Camera& camera,
+		const sf::Window& window) const;
 
 private:
 	const Sprite m_background;

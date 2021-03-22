@@ -47,7 +47,7 @@ public:
 	void renderTerrain(ShaderHandler& shaderHandler) const;
 	void renderPlayerPlannedBuilding(ShaderHandler& shaderHandler, const Map& map) const;
 	void renderBasePositions(ShaderHandler& shaderHandler) const;
-	void renderMinimap(ShaderHandler& shaderHandler, glm::uvec2 windowSize) const;
+	void renderMinimap(ShaderHandler& shaderHandler, glm::uvec2 windowSize, const sf::Window& window) const;
 	void render(ShaderHandler& shaderHandler) const;
 
 #ifdef RENDER_AABB

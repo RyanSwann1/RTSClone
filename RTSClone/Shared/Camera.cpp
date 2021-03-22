@@ -141,6 +141,20 @@ glm::vec3 Camera::getRayToGroundPlaneIntersection(const sf::Window& window) cons
 	return intersection;
 }
 
+glm::vec3 Camera::getRayToGroundPlaneIntersection(const sf::Window& window, glm::ivec2 mousePosition) const
+{
+	glm::vec3 planeNormal = { 0.0f, 1.0f, 0.0f };
+	glm::vec3 rayStartingPosition = position;
+	glm::vec3 rayDirection = getRayDirectionFromCamera(getProjection(glm::ivec2(window.getSize().x, window.getSize().y)), 
+		getView(), window, mousePosition);
+
+	float k = glm::dot(glm::proj(-rayStartingPosition, planeNormal), planeNormal) / glm::dot(glm::proj(rayDirection, planeNormal), planeNormal);
+	glm::vec3 intersection = (rayStartingPosition + rayDirection * k);
+
+	assert(k >= 0.0f);
+	return intersection;
+}
+
 void Camera::setPosition(glm::vec2 _position)
 {
 	position.x = _position.y - Z_OFFSET;

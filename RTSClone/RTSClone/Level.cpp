@@ -142,7 +142,7 @@ const Camera& Level::getCamera() const
 
 bool Level::isMinimapInteracted() const
 {
-	return m_minimap.isMouseButtonPressed();
+	return m_minimap.isUserInteracted();
 }
 
 const FactionsContainer& Level::getFactions() const
@@ -187,7 +187,7 @@ void Level::handleInput(glm::uvec2 windowSize, const sf::Window& window, const s
 	}
 
 	m_minimap.handleInput(windowSize, window, getSize(), m_camera, currentSFMLEvent);
-	if (m_minimap.isMouseButtonPressed())
+	if (m_minimap.isUserInteracted())
 	{
 		return;
 	}
@@ -224,7 +224,7 @@ void Level::handleInput(glm::uvec2 windowSize, const sf::Window& window, const s
 
 void Level::update(float deltaTime, const Map& map, UIManager& uiManager, glm::uvec2 windowSize, const sf::Window& window)
 {
-	if (!m_minimap.isMouseButtonPressed())
+	if (!m_minimap.isUserInteracted())
 	{
 		m_camera.move(deltaTime, window, windowSize);
 	}
@@ -307,9 +307,9 @@ void Level::renderBasePositions(ShaderHandler& shaderHandler) const
 	m_baseHandler->renderBasePositions(shaderHandler);
 }
 
-void Level::renderMinimap(ShaderHandler& shaderHandler, glm::uvec2 windowSize) const
+void Level::renderMinimap(ShaderHandler& shaderHandler, glm::uvec2 windowSize, const sf::Window& window) const
 {
-	m_minimap.render(shaderHandler, windowSize, *this, m_camera);
+	m_minimap.render(shaderHandler, windowSize, *this, m_camera, window);
 }
 
 void Level::render(ShaderHandler& shaderHandler) const
