@@ -28,7 +28,7 @@ public:
 	Level& operator=(Level&&) = delete;
 	~Level();
 
-	static std::unique_ptr<Level> create(const std::string& levelName);
+	static std::unique_ptr<Level> create(const std::string& levelName, glm::ivec2 windowSize);
 
 	const std::vector<SceneryGameObject>& getSceneryGameObjects() const;
 	const BaseHandler& getBaseHandler() const;
@@ -61,7 +61,7 @@ public:
 private:
 	Level(std::vector<SceneryGameObject>&& scenery, FactionsContainer&& factions, 
 		std::unique_ptr<BaseHandler>&& baseHandler, const glm::vec3& size, 
-		glm::vec2 cameraStartingPosition);
+		glm::vec2 cameraStartingPosition, glm::ivec2 windowSize);
 
 	const Quad m_playableArea;
 	const std::unique_ptr<BaseHandler> m_baseHandler;

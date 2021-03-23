@@ -54,7 +54,8 @@ namespace
 
 //Level
 Level::Level(std::vector<SceneryGameObject>&& scenery, FactionsContainer&& factions, 
-	std::unique_ptr<BaseHandler>&& baseHandler, const glm::vec3& size, glm::vec2 cameraStartingPosition)
+	std::unique_ptr<BaseHandler>&& baseHandler, const glm::vec3& size, glm::vec2 cameraStartingPosition, 
+	glm::ivec2 windowSize)
 	: m_playableArea(size, TERRAIN_COLOR),
 	m_baseHandler(std::move(baseHandler)),
 	m_scenery(std::move(scenery)),
@@ -73,10 +74,11 @@ Level::Level(std::vector<SceneryGameObject>&& scenery, FactionsContainer&& facti
 		}
 	}
 
-	m_camera.setPosition(cameraStartingPosition);
+	m_camera.setPosition({ cameraStartingPosition.x, m_camera.position.y, cameraStartingPosition.y }, 
+		m_playableArea.getSize(), windowSize, true);
 }
 
-std::unique_ptr<Level> Level::create(const std::string& levelName)
+std::unique_ptr<Level> Level::create(const std::string& levelName, glm::ivec2 windowSize)
 {
 	std::vector<Base> mainBases;
 	std::vector<SceneryGameObject> scenery;
@@ -122,7 +124,7 @@ std::unique_ptr<Level> Level::create(const std::string& levelName)
 	}
 
 	return std::unique_ptr<Level>(new Level(std::move(scenery), std::move(factions), 
-		std::move(baseHandler), size, cameraStartingPosition));
+		std::move(baseHandler), size, cameraStartingPosition, windowSize));
 }
 
 const std::vector<SceneryGameObject>& Level::getSceneryGameObjects() const
@@ -226,7 +228,7 @@ void Level::update(float deltaTime, const Map& map, UIManager& uiManager, glm::u
 {
 	if (!m_minimap.isUserInteracted())
 	{
-		m_camera.move(deltaTime, window, windowSize);
+		m_camera.update(deltaTime, window, windowSize, m_playableArea.getSize());
 	}
 	m_unitStateHandlerTimer.update(deltaTime);
 

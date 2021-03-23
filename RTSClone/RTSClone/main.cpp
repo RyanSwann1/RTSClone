@@ -147,7 +147,7 @@ int main()
 				if (!levelName.empty() && ImGui::Button(levelName.c_str()))
 				{
 					broadcastToMessenger<GameMessages::UIClearWinner>({});
-					level = Level::create(levelName);
+					level = Level::create(levelName, windowSize);
 					assert(level);
 					if (!level)
 					{

@@ -29,9 +29,21 @@ namespace
 	const float MAXIMUM_ZOOM_HEIGHT = 25.0f;
 	const float MINIMUM_ZOOM_HEIGHT = 150.0f;
 
-	//RAY TO AABB http://www.3dkingdoms.com/weekly/weekly.php?a=3
-	glm::vec3 getRayDirectionFromCamera(const glm::mat4& projection, const glm::mat4& view, const sf::Window& window, glm::ivec2 mousePosition)
+	glm::vec3 getRayDirectionFromCamera(const glm::mat4& projection, const glm::mat4& view, glm::ivec2 windowSize, glm::ivec2 mousePosition)
 	{
+		glm::vec4 clipSpace = { (mousePosition.x * 2.0f) / windowSize.x - 1.0f,
+			(mousePosition.y * 2.0f) / windowSize.y - 1.0f,
+			-1.0f,
+			1.0f };
+		glm::vec4 viewSpace = glm::inverse(projection) * clipSpace;
+		glm::vec3 rayDirection = glm::inverse(view) * glm::vec4(viewSpace.x, viewSpace.y, -1.0f, 0.0f);
+
+		return glm::normalize(rayDirection);
+	}
+
+	glm::vec3 getRayDirectionFromCamera(const glm::mat4& projection, const glm::mat4& view, const sf::Window& window)
+	{
+		glm::ivec2 mousePosition = { sf::Mouse::getPosition(window).x, sf::Mouse::getPosition(window).y };
 		glm::vec4 clipSpace = { (mousePosition.x * 2.0f) / window.getSize().x - 1.0f,
 			1.0f - (mousePosition.y * 2.0f) / window.getSize().y,
 			-1.0f,
@@ -42,6 +54,7 @@ namespace
 		return glm::normalize(rayDirection);
 	}
 
+	//RAY TO AABB http://www.3dkingdoms.com/weekly/weekly.php?a=3
 	int GetIntersection(float fDst1, float fDst2, const glm::vec3& P1, const glm::vec3& P2, glm::vec3& Hit) {
 		if ((fDst1 * fDst2) >= 0.0f) return 0;
 		if (fDst1 == fDst2) return 0;
@@ -86,44 +99,37 @@ glm::mat4 Camera::getProjection(glm::ivec2 windowSize) const
 }
 
 #ifdef GAME
-void Camera::move(float deltaTime, const sf::Window& window, glm::uvec2 windowSize)
+void Camera::update(float deltaTime, const sf::Window& window, glm::ivec2 windowSize, const glm::vec3& levelSize)
 {
 	setFront();
-	moveByArrowKeys(deltaTime);
-	moveByMouse(deltaTime, window, windowSize);
+	glm::vec3 newPosition = position;
+	moveByArrowKeys(deltaTime, newPosition);
+	moveByMouse(deltaTime, window, windowSize, newPosition);
+	setPosition(newPosition, levelSize, windowSize);
 }
 
-glm::vec3 Camera::getInfiniteForwardRay(const sf::Window& window) const
-{
-	glm::vec3 rayStartingPosition = position;
-	glm::vec3 rayDirection = getRayDirectionFromCamera(getProjection(glm::ivec2(window.getSize().x, window.getSize().y)), getView(), window,
-		{ sf::Mouse::getPosition(window).x, sf::Mouse::getPosition(window).y });
-
-	return rayStartingPosition + rayDirection * std::numeric_limits<float>::max();
-}
-
-void Camera::moveByMouse(float deltaTime, const sf::Window& window, glm::uvec2 windowSize)
+void Camera::moveByMouse(float deltaTime, const sf::Window& window, glm::uvec2 windowSize, glm::vec3& newPosition)
 {
 	glm::vec2 mousePosition = { static_cast<float>(sf::Mouse::getPosition(window).x), static_cast<float>(sf::Mouse::getPosition(window).y) };
 	glm::vec2 mousePositionNDC = { (mousePosition.x / windowSize.x * 2.0f) - 1.0f, (mousePosition.y / windowSize.y * 2.0f) - 1.0f };
 
 	if (mousePositionNDC.x <= -MOUSE_MOVE_BOUNDARY)
 	{
-		position -= glm::normalize(glm::cross(front, up)) * MOUSE_MOVEMENT_SPEED * deltaTime;
+		newPosition -= glm::normalize(glm::cross(front, up)) * MOUSE_MOVEMENT_SPEED * deltaTime;
 	}
 	if (mousePositionNDC.x >= MOUSE_MOVE_BOUNDARY)
 	{
-		position += glm::normalize(glm::cross(front, up)) * MOUSE_MOVEMENT_SPEED * deltaTime;
+		newPosition += glm::normalize(glm::cross(front, up)) * MOUSE_MOVEMENT_SPEED * deltaTime;
 	}
 	if (mousePositionNDC.y <= -MOUSE_MOVE_BOUNDARY)
 	{
-		position.x += glm::cos(glm::radians(rotation.y)) * MOUSE_MOVEMENT_SPEED * deltaTime;
-		position.z += glm::sin(glm::radians(rotation.y)) * MOUSE_MOVEMENT_SPEED * deltaTime;
+		newPosition.x += glm::cos(glm::radians(rotation.y)) * MOUSE_MOVEMENT_SPEED * deltaTime;
+		newPosition.z += glm::sin(glm::radians(rotation.y)) * MOUSE_MOVEMENT_SPEED * deltaTime;
 	}
 	if (mousePositionNDC.y >= MOUSE_MOVE_BOUNDARY)
 	{
-		position.x -= glm::cos(glm::radians(rotation.y)) * MOUSE_MOVEMENT_SPEED * deltaTime;
-		position.z -= glm::sin(glm::radians(rotation.y)) * MOUSE_MOVEMENT_SPEED * deltaTime;
+		newPosition.x -= glm::cos(glm::radians(rotation.y)) * MOUSE_MOVEMENT_SPEED * deltaTime;
+		newPosition.z -= glm::sin(glm::radians(rotation.y)) * MOUSE_MOVEMENT_SPEED * deltaTime;
 	}
 }
 
@@ -131,8 +137,8 @@ glm::vec3 Camera::getRayToGroundPlaneIntersection(const sf::Window& window) cons
 {
 	glm::vec3 planeNormal = { 0.0f, 1.0f, 0.0f };
 	glm::vec3 rayStartingPosition = position;
-	glm::vec3 rayDirection = getRayDirectionFromCamera(getProjection(glm::ivec2(window.getSize().x, window.getSize().y)), getView(), window,
-		{ sf::Mouse::getPosition(window).x, sf::Mouse::getPosition(window).y });
+	glm::vec3 rayDirection = getRayDirectionFromCamera(getProjection(glm::ivec2(window.getSize().x, window.getSize().y)), 
+		getView(), window);
 
 	float k = glm::dot(glm::proj(-rayStartingPosition, planeNormal), planeNormal) / glm::dot(glm::proj(rayDirection, planeNormal), planeNormal);
 	glm::vec3 intersection = (rayStartingPosition + rayDirection * k);
@@ -141,12 +147,11 @@ glm::vec3 Camera::getRayToGroundPlaneIntersection(const sf::Window& window) cons
 	return intersection;
 }
 
-glm::vec3 Camera::getRayToGroundPlaneIntersection(const sf::Window& window, glm::ivec2 mousePosition) const
+glm::vec3 Camera::getRayToGroundPlaneIntersection(glm::ivec2 windowSize, glm::ivec2 mousePosition) const
 {
 	glm::vec3 planeNormal = { 0.0f, 1.0f, 0.0f };
 	glm::vec3 rayStartingPosition = position;
-	glm::vec3 rayDirection = getRayDirectionFromCamera(getProjection(glm::ivec2(window.getSize().x, window.getSize().y)), 
-		getView(), window, mousePosition);
+	glm::vec3 rayDirection = getRayDirectionFromCamera(getProjection(windowSize), getView(), windowSize, mousePosition);
 
 	float k = glm::dot(glm::proj(-rayStartingPosition, planeNormal), planeNormal) / glm::dot(glm::proj(rayDirection, planeNormal), planeNormal);
 	glm::vec3 intersection = (rayStartingPosition + rayDirection * k);
@@ -155,10 +160,33 @@ glm::vec3 Camera::getRayToGroundPlaneIntersection(const sf::Window& window, glm:
 	return intersection;
 }
 
-void Camera::setPosition(glm::vec2 _position)
+glm::vec3 Camera::getRayToGroundPlaneIntersection(glm::ivec2 windowSize, glm::ivec2 mousePosition, const glm::vec3& startingPosition) const
 {
-	position.x = _position.y - Z_OFFSET;
-	position.z = _position.x;
+	glm::vec3 planeNormal = { 0.0f, 1.0f, 0.0f };
+	glm::vec3 rayDirection = getRayDirectionFromCamera(getProjection(windowSize),
+		getView(), windowSize, mousePosition);
+
+	float k = glm::dot(glm::proj(-startingPosition, planeNormal), planeNormal) / glm::dot(glm::proj(rayDirection, planeNormal), planeNormal);
+	glm::vec3 intersection = (startingPosition + rayDirection * k);
+
+	assert(k >= 0.0f);
+	return intersection;
+}
+
+void Camera::setPosition(const glm::vec3& newPosition, const glm::vec3& levelSize, glm::ivec2 windowSize, bool applyZOffset)
+{
+	glm::vec3 startingPosition = getRayToGroundPlaneIntersection(windowSize, { 0, 0 }, newPosition);
+	glm::vec3 endingPosition = getRayToGroundPlaneIntersection(windowSize, windowSize, newPosition);
+	if (startingPosition.x > -30.0f && endingPosition.x < levelSize.x + 30.0f)
+	{
+		position.x = newPosition.x;
+	}
+
+	if (startingPosition.z > -25.0f && endingPosition.z < levelSize.z + 25.0f)
+	{
+		position.z = applyZOffset ? newPosition.z - Z_OFFSET : newPosition.z;
+	}
+
 }
 #endif // GAME
 
@@ -321,25 +349,25 @@ void Camera::zoom(const sf::Window& window, glm::ivec2 lastMousePosition)
 }
 #endif // LEVEL_EDITOR
 
-void Camera::moveByArrowKeys(float deltaTime)
+void Camera::moveByArrowKeys(float deltaTime, glm::vec3& newPosition)
 {
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left) || sf::Keyboard::isKeyPressed(sf::Keyboard::A))
 	{
-		position -= glm::normalize(glm::cross(front, up)) * MOVEMENT_SPEED * deltaTime;
+		newPosition -= glm::normalize(glm::cross(front, up)) * MOVEMENT_SPEED * deltaTime;
 	}
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right) || sf::Keyboard::isKeyPressed(sf::Keyboard::D))
 	{
-		position += glm::normalize(glm::cross(front, up)) * MOVEMENT_SPEED * deltaTime;
+		newPosition += glm::normalize(glm::cross(front, up)) * MOVEMENT_SPEED * deltaTime;
 	}
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up) || sf::Keyboard::isKeyPressed(sf::Keyboard::W))
 	{
-		position.x += glm::cos(glm::radians(rotation.y)) * MOVEMENT_SPEED * deltaTime;
-		position.z += glm::sin(glm::radians(rotation.y)) * MOVEMENT_SPEED * deltaTime;
+		newPosition.x += glm::cos(glm::radians(rotation.y)) * MOVEMENT_SPEED * deltaTime;
+		newPosition.z += glm::sin(glm::radians(rotation.y)) * MOVEMENT_SPEED * deltaTime;
 	}
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down) || sf::Keyboard::isKeyPressed(sf::Keyboard::S))
 	{
-		position.x -= glm::cos(glm::radians(rotation.y)) * MOVEMENT_SPEED * deltaTime;
-		position.z -= glm::sin(glm::radians(rotation.y)) * MOVEMENT_SPEED * deltaTime;
+		newPosition.x -= glm::cos(glm::radians(rotation.y)) * MOVEMENT_SPEED * deltaTime;
+		newPosition.z -= glm::sin(glm::radians(rotation.y)) * MOVEMENT_SPEED * deltaTime;
 	}
 }
 

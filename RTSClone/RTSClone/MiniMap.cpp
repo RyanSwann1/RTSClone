@@ -61,7 +61,8 @@ bool MiniMap::handleInput(glm::uvec2 windowSize, const sf::Window& window, const
 			m_mouseButtonPressed = true;
 			glm::vec2 convertedMousePosition(static_cast<float>(mousePosition.x - m_position.x) / m_size.x, 
 				static_cast<float>(mousePosition.y - m_position.y) / m_size.y);
-			camera.setPosition({ convertedMousePosition.x * levelSize.x, convertedMousePosition.y * levelSize.z });
+			camera.setPosition({ convertedMousePosition.y * levelSize.x, camera.position.y, convertedMousePosition.x * levelSize.z }, 
+				levelSize, windowSize);
 		
 			return true;
 		}
@@ -73,8 +74,8 @@ bool MiniMap::handleInput(glm::uvec2 windowSize, const sf::Window& window, const
 void MiniMap::render(ShaderHandler& shaderHandler, glm::uvec2 windowSize, const Level& level, const Camera& camera,
 	const sf::Window& window) const
 {
-	glm::vec3 startingPosition = camera.getRayToGroundPlaneIntersection(window, { 0, 0 });
-	glm::vec3 endingPosition = camera.getRayToGroundPlaneIntersection(window, windowSize);
+	glm::vec3 startingPosition = camera.getRayToGroundPlaneIntersection(windowSize, { 0, 0 });
+	glm::vec3 endingPosition = camera.getRayToGroundPlaneIntersection(windowSize, windowSize);
 
 	glm::ivec2 convertedStartingPosition(glm::clamp<int>(startingPosition.z / level.getSize().x * m_size.x, 0, m_size.x), 
 		glm::clamp<int>(startingPosition.x / level.getSize().z * m_size.y, 0, m_size.y));
