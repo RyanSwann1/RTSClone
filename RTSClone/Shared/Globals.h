@@ -25,14 +25,14 @@ namespace Globals
 	inline const std::string TEXT_HEADER_FACTION_COUNT = TEXT_HEADER_BEGINNING + "Faction Count";
 
 	inline const std::string TEXT_HEADER_MAIN_BASE_QUANTITY = TEXT_HEADER_BEGINNING + "Main Base Quantity";
-	const std::array<std::string, static_cast<size_t>(eFactionController::Max) + 1> TEXT_HEADER_MAIN_BASES
+	inline const std::array<std::string, static_cast<size_t>(eFactionController::Max) + 1> TEXT_HEADER_MAIN_BASES
 	{
 		TEXT_HEADER_BEGINNING + "Main Base Location_1",
 		TEXT_HEADER_BEGINNING + "Main Base Location_2",
 		TEXT_HEADER_BEGINNING + "Main Base Location_3",
 		TEXT_HEADER_BEGINNING + "Main Base Location_4"
 	};
-	const std::array<std::string, static_cast<size_t>(eFactionController::Max) + 1> TEXT_HEADER_MAIN_BASE_MINERALS
+	inline const std::array<std::string, static_cast<size_t>(eFactionController::Max) + 1> TEXT_HEADER_MAIN_BASE_MINERALS
 	{
 		TEXT_HEADER_BEGINNING + "Main Base Minerals_1",
 		TEXT_HEADER_BEGINNING + "Main Base Minerals_2",
@@ -41,14 +41,14 @@ namespace Globals
 	};
 
 	inline const std::string TEXT_HEADER_SECONDARY_BASE_QUANTITY = TEXT_HEADER_BEGINNING + "Secondary Base Quantity";
-	const std::array<std::string, static_cast<size_t>(eFactionController::Max) + 1> TEXT_HEADER_SECONDARY_BASES
+	inline const std::array<std::string, static_cast<size_t>(eFactionController::Max) + 1> TEXT_HEADER_SECONDARY_BASES
 	{
 		TEXT_HEADER_BEGINNING + "Secondary Base Location_1",
 		TEXT_HEADER_BEGINNING + "Secondary Base Location_2",
 		TEXT_HEADER_BEGINNING + "Secondary Base Location_3",
 		TEXT_HEADER_BEGINNING + "Secondary Base Location_4"
 	};
-	const std::array<std::string, static_cast<size_t>(eFactionController::Max) + 1> TEXT_HEADER_SECONDARY_BASE_MINERALS
+	inline const std::array<std::string, static_cast<size_t>(eFactionController::Max) + 1> TEXT_HEADER_SECONDARY_BASE_MINERALS
 	{
 		TEXT_HEADER_BEGINNING + "Secondary Base Minerals_1",
 		TEXT_HEADER_BEGINNING + "Secondary Base Minerals_2",
@@ -56,25 +56,25 @@ namespace Globals
 		TEXT_HEADER_BEGINNING + "Secondary Base Minerals_4"
 	};
 
-	const glm::vec3 TERRAIN_POSITION = { 0.0f, -0.01f, 0.0f };
-	const size_t MAX_LEVELS = 5;
-	const unsigned int INVALID_OPENGL_ID = 0;
-	const float GROUND_HEIGHT = 0.0f;
-	const int MAP_SIZE = 30;
-	const int NODE_SIZE = 6;
+	inline const glm::vec3 TERRAIN_POSITION = { 0.0f, -0.01f, 0.0f };
+	constexpr size_t MAX_LEVELS = 5;
+	constexpr unsigned int INVALID_OPENGL_ID = 0;
+	constexpr float GROUND_HEIGHT = 0.0f;
+	constexpr int MAP_SIZE = 30;
+	constexpr int NODE_SIZE = 6;
 
 #ifdef GAME
-	const int INVALID_ENTITY_ID = -1;
+	constexpr int INVALID_ENTITY_ID = -1;
 #endif // GAME
 #ifdef LEVEL_EDITOR
-	const int INVALID_GAMEOBJECT_ID = -1;
+	constexpr int INVALID_GAMEOBJECT_ID = -1;
 #endif // LEVEL_EDITOR
 
-	const size_t MAX_MINERALS = 5;
-	const glm::vec3 PLAYER_MATERIAL_DIFFUSE = { 1.0f, 0.2f, 0.2f };
-	const glm::vec3 AI_1_MATERIAL_DIFFUSE = { 0.2f, 0.2f, 1.0f };
-	const glm::vec3 AI_2_MATERIAL_DIFFUSE = { 1.0f, 1.0f, 0.2f };
-	const glm::vec3 AI_3_MATERIAL_DIFFUSE = { 0.2f, 1.0f, 0.2f };
+	constexpr size_t MAX_MINERALS = 5;
+	inline const glm::vec3 PLAYER_MATERIAL_DIFFUSE = { 1.0f, 0.2f, 0.2f };
+	inline const glm::vec3 AI_1_MATERIAL_DIFFUSE = { 0.2f, 0.2f, 1.0f };
+	inline const glm::vec3 AI_2_MATERIAL_DIFFUSE = { 1.0f, 1.0f, 0.2f };
+	inline glm::vec3 AI_3_MATERIAL_DIFFUSE = { 0.2f, 1.0f, 0.2f };
 	inline std::array<glm::vec3, static_cast<size_t>(eFactionController::Max) + 1> FACTION_COLORS
 	{
 		PLAYER_MATERIAL_DIFFUSE,
@@ -84,41 +84,41 @@ namespace Globals
 	};
 
 	inline const std::string FACTION_MATERIAL_NAME_ID = "metal";
-	const glm::uvec2 WINDOW_SIZE(1600, 900);
+	inline const glm::uvec2 WINDOW_SIZE(1600, 900);
 
-	const int HQ_STARTING_HEALTH = 25;
-	const int BARRACKS_STARTING_HEALTH = 10;
-	const int SUPPLY_DEPOT_STARTING_HEALTH = 10;
-	const int UNIT_STARTING_HEALTH = 5;
-	const int WORKER_STARTING_HEALTH = 2;
-	const int LABORATORY_STARTING_HEALTH = 10;
+	constexpr int HQ_STARTING_HEALTH = 25;
+	constexpr int BARRACKS_STARTING_HEALTH = 10;
+	constexpr int SUPPLY_DEPOT_STARTING_HEALTH = 10;
+	constexpr int UNIT_STARTING_HEALTH = 5;
+	constexpr int WORKER_STARTING_HEALTH = 2;
+	constexpr int LABORATORY_STARTING_HEALTH = 10;
 
-	const int STARTING_RESOURCES = 1500;
-	const int STARTING_POPULATION = 50;
-	const int WORKER_RESOURCE_COST = 50;
-	const int SUPPLY_DEPOT_RESOURCE_COST = 50;
-	const int BARRACKS_RESOURCE_COST = 50;
-	const int UNIT_RESOURCE_COST = 100;
-	const int WORKER_POPULATION_COST = 1;
-	const int UNIT_POPULATION_COST = 2;
-	const int TURRET_RESOURCE_COST = 50;
-	const int POPULATION_INCREMENT = 5;
-	const int LABORATORY_RESOURCE_COST = 100;
+	constexpr int STARTING_RESOURCES = 1500;
+	constexpr int STARTING_POPULATION = 50;
+	constexpr int WORKER_RESOURCE_COST = 50;
+	constexpr int SUPPLY_DEPOT_RESOURCE_COST = 50;
+	constexpr int BARRACKS_RESOURCE_COST = 50;
+	constexpr int UNIT_RESOURCE_COST = 100;
+	constexpr int WORKER_POPULATION_COST = 1;
+	constexpr int UNIT_POPULATION_COST = 2;
+	constexpr int TURRET_RESOURCE_COST = 50;
+	constexpr int POPULATION_INCREMENT = 5;
+	constexpr int LABORATORY_RESOURCE_COST = 100;
 
-	const float UNIT_STAT_BAR_WIDTH = 75.0f;
-	const float WORKER_STAT_BAR_WIDTH = 60.0f;
-	const float HQ_STAT_BAR_WIDTH = 150.0f;
-	const float SUPPLY_DEPOT_STAT_BAR_WIDTH = 100.0f;
-	const float BARRACKS_STAT_BAR_WIDTH = 100.0f;
-	const float TURRET_STAT_BAR_WIDTH = 100.0f;
-	const float LABORATORY_STAT_BAR_WIDTH = 150.0f;
+	constexpr float UNIT_STAT_BAR_WIDTH = 75.0f;
+	constexpr float WORKER_STAT_BAR_WIDTH = 60.0f;
+	constexpr float HQ_STAT_BAR_WIDTH = 150.0f;
+	constexpr float SUPPLY_DEPOT_STAT_BAR_WIDTH = 100.0f;
+	constexpr float BARRACKS_STAT_BAR_WIDTH = 100.0f;
+	constexpr float TURRET_STAT_BAR_WIDTH = 100.0f;
+	constexpr float LABORATORY_STAT_BAR_WIDTH = 150.0f;
 
-	const int HQ_RESOURCES_COST = 100;
-	const int HQ_POPULATION_COST = 0;
-	const int SUPPLY_DEPOT_POPULATION_COST = 0;
-	const int BARRACKS_POPULATION_COST = 0;
-	const int TURRET_POPULATION_COST = 0;
-	const int LABORATORY_POPULATION_COST = 0;
+	constexpr int HQ_RESOURCES_COST = 100;
+	constexpr int HQ_POPULATION_COST = 0;
+	constexpr int SUPPLY_DEPOT_POPULATION_COST = 0;
+	constexpr int BARRACKS_POPULATION_COST = 0;
+	constexpr int TURRET_POPULATION_COST = 0;
+	constexpr int LABORATORY_POPULATION_COST = 0;
 
 #ifdef GAME
 	inline const std::array<float, static_cast<size_t>(eEntityType::Max) + 1> ENTITIES_STAT_BAR_WIDTH
@@ -154,18 +154,18 @@ namespace Globals
 		LABORATORY_POPULATION_COST
 	};
 
-	const float UNIT_GRID_ATTACK_RANGE = 5.0f;
-	const float UNIT_ATTACK_RANGE = UNIT_GRID_ATTACK_RANGE * static_cast<float>(Globals::NODE_SIZE);
+	constexpr float UNIT_GRID_ATTACK_RANGE = 5.0f;
+	constexpr float UNIT_ATTACK_RANGE = UNIT_GRID_ATTACK_RANGE * static_cast<float>(Globals::NODE_SIZE);
 #endif // GAME
 
-	const int MAX_FACTION_SHIELD_AMOUNT = 5;
-	const int FACTION_SHIELD_INCREASE_COST = 100;
+	constexpr int MAX_FACTION_SHIELD_AMOUNT = 5;
+	constexpr int FACTION_SHIELD_INCREASE_COST = 100;
 
-	const glm::vec3 PROGRESS_BAR_COLOR = { 1.0f, 1.0f, 0.4f };
-	const glm::vec3 HEALTH_BAR_COLOR = { 0.0f, 0.8f, 0.0f };
-	const glm::vec3 SHIELD_BAR_COLOR = { 0.0f, 1.0f, 1.0f };
-	const glm::vec3 BACKGROUND_BAR_COLOR = { 0.0f, 0.0f, 0.0f };
-	const float DEFAULT_PROGRESS_BAR_HEIGHT = 5.0f;
+	inline const glm::vec3 PROGRESS_BAR_COLOR = { 1.0f, 1.0f, 0.4f };
+	inline const glm::vec3 HEALTH_BAR_COLOR = { 0.0f, 0.8f, 0.0f };
+	inline const glm::vec3 SHIELD_BAR_COLOR = { 0.0f, 1.0f, 1.0f };
+	inline const glm::vec3 BACKGROUND_BAR_COLOR = { 0.0f, 0.0f, 0.0f };
+	constexpr float DEFAULT_PROGRESS_BAR_HEIGHT = 5.0f;
 
 #ifdef GAME
 	inline const TypeComparison<eEntityType> BUILDING_TYPES({ eEntityType::Headquarters, eEntityType::Barracks, 
