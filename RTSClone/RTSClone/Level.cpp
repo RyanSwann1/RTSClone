@@ -196,7 +196,8 @@ void Level::handleInput(glm::uvec2 windowSize, const sf::Window& window, const s
 
 	if (isFactionActive(m_factions, eFactionController::Player))
 	{
-		getFactionPlayer(m_factions).handleInput(currentSFMLEvent, window, m_camera, map, m_factionHandler, *m_baseHandler);
+		getFactionPlayer(m_factions).handleInput(currentSFMLEvent, window, m_camera, map, m_factionHandler, 
+			*m_baseHandler, m_minimap, getSize());
 	}
 
 	if (currentSFMLEvent.type == sf::Event::MouseButtonPressed)

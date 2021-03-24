@@ -16,6 +16,9 @@ public:
 	MiniMap(MiniMap&&) = delete;
 	MiniMap& operator=(MiniMap&&) = delete;
 
+	glm::ivec2 getPosition() const;
+	glm::ivec2 getSize() const;
+	bool isIntersecting(const sf::Window& window) const;
 	bool isUserInteracted() const;
 
 	bool handleInput(glm::uvec2 windowSize, const sf::Window& window, const glm::vec3& levelSize, Camera& camera,

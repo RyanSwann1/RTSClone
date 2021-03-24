@@ -171,7 +171,8 @@ const std::vector<Entity*>& FactionPlayer::getSelectedEntities() const
 }
 
 void FactionPlayer::handleInput(const sf::Event& currentSFMLEvent, const sf::Window& window, const Camera& camera, 
-    const Map& map, FactionHandler& factionHandler, const BaseHandler& baseHandler)
+    const Map& map, FactionHandler& factionHandler, const BaseHandler& baseHandler, const MiniMap& miniMap, 
+    const glm::vec3& levelSize)
 {
     switch (currentSFMLEvent.type)
     {
@@ -182,7 +183,7 @@ void FactionPlayer::handleInput(const sf::Event& currentSFMLEvent, const sf::Win
         }
         else if (currentSFMLEvent.mouseButton.button == sf::Mouse::Right)
         {
-            onRightClick(window, camera, factionHandler, map, baseHandler);
+            onRightClick(window, camera, factionHandler, map, baseHandler, miniMap, levelSize);
         }
         break;
     case sf::Event::MouseButtonReleased:
@@ -515,16 +516,28 @@ void FactionPlayer::onLeftClick(const sf::Window& window, const Camera& camera, 
 }
 
 void FactionPlayer::onRightClick(const sf::Window& window, const Camera& camera, FactionHandler& factionHandler, const Map& map,
-    const BaseHandler& baseHandler)
+    const BaseHandler& baseHandler, const MiniMap& minimap, const glm::vec3& levelSize)
 {
     m_plannedBuilding.reset();
-    glm::vec3 planeIntersection = camera.getRayToGroundPlaneIntersection(window);
+    glm::vec3 position(0.0f);
+    if (minimap.isIntersecting(window))
+    {
+        glm::vec2 mousePosition = { sf::Mouse::getPosition(window).x, window.getSize().y - sf::Mouse::getPosition(window).y };
+        position = { mousePosition.y / (minimap.getPosition().y + minimap.getSize().y) * levelSize.z, 
+            Globals::GROUND_HEIGHT, mousePosition.x / (minimap.getPosition().x + minimap.getSize().x) * levelSize.x };
+        position.x -= minimap.getPosition().x;
+        position.z -= minimap.getPosition().y;
+    }
+    else
+    {
+        position = camera.getRayToGroundPlaneIntersection(window);
+    }
     const Faction* targetFaction = nullptr;
     const Entity* targetEntity = nullptr;
 
     for (const auto& opposingFactions : factionHandler.getOpposingFactions(getController()))
     {
-        targetEntity = opposingFactions.get().getEntity(planeIntersection);
+        targetEntity = opposingFactions.get().getEntity(position);
         if (targetEntity)
         {
             targetFaction = &opposingFactions.get();
@@ -561,9 +574,9 @@ void FactionPlayer::onRightClick(const sf::Window& window, const Camera& camera,
         {
             if (headquarters.isSelected())
             {
-                headquarters.setWaypointPosition(planeIntersection, map);
+                headquarters.setWaypointPosition(position, map);
             }
-            else if (headquarters.getAABB().contains(planeIntersection))
+            else if (headquarters.getAABB().contains(position))
             {
                 instructWorkerReturnMinerals(map, headquarters);
             }
@@ -573,17 +586,17 @@ void FactionPlayer::onRightClick(const sf::Window& window, const Camera& camera,
         {
             if (barracks.isSelected())
             {
-                barracks.setWaypointPosition(planeIntersection, map);
+                barracks.setWaypointPosition(position, map);
             }
         }
 
         if (m_selectedEntities.size() == 1)
         {
-            moveSingularSelectedEntity(planeIntersection, map, *m_selectedEntities.front(), factionHandler, baseHandler);
+            moveSingularSelectedEntity(position, map, *m_selectedEntities.front(), factionHandler, baseHandler);
         }
         else if (!m_selectedEntities.empty())
         {
-            moveMultipleSelectedEntities(planeIntersection, map, factionHandler, baseHandler);
+            moveMultipleSelectedEntities(position, map, factionHandler, baseHandler);
         }
     }
 }

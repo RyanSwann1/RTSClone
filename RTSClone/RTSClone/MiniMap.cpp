@@ -40,6 +40,22 @@ MiniMap::MiniMap()
 	m_mouseButtonPressed(false)
 {}
 
+glm::ivec2 MiniMap::getPosition() const
+{
+	return m_position;
+}
+
+glm::ivec2 MiniMap::getSize() const
+{
+	return m_size;
+}
+
+bool MiniMap::isIntersecting(const sf::Window& window) const
+{
+	glm::ivec2 mousePosition = { sf::Mouse::getPosition(window).x, window.getSize().y - sf::Mouse::getPosition(window).y };
+	return isWithinBounds(mousePosition, m_position, m_size);
+}
+
 bool MiniMap::isUserInteracted() const
 {
 	return m_mouseButtonPressed;

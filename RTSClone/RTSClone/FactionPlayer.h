@@ -31,6 +31,7 @@ private:
 	glm::vec3 m_position;
 };
 
+class MiniMap;
 class FactionPlayer : public Faction
 {
 public:
@@ -39,7 +40,7 @@ public:
 	const std::vector<Entity*>& getSelectedEntities() const;
 
 	void handleInput(const sf::Event& currentSFMLEvent, const sf::Window& window, const Camera& camera, const Map& map, 
-		FactionHandler& factionHandler, const BaseHandler& baseHandler);
+		FactionHandler& factionHandler, const BaseHandler& baseHandler, const MiniMap& miniMap, const glm::vec3& levelSize);
 	void handleEvent(const GameEvent& gameEvent, const Map& map, FactionHandler& factionHandler) override;
 	void update(float deltaTime, const Map& map, FactionHandler& factionHandler, const Timer& unitStateHandlerTimer) override;
 	void render(ShaderHandler& shaderHandler) const override;
@@ -64,7 +65,7 @@ private:
 
 	void onLeftClick(const sf::Window& window, const Camera& camera, const Map& map, const BaseHandler& baseHandler);
 	void onRightClick(const sf::Window& window, const Camera& camera, FactionHandler& factionHandler, const Map& map, 
-		const BaseHandler& baseHandler);
+		const BaseHandler& baseHandler, const MiniMap& minimap, const glm::vec3& levelSize);
 
 	template <class Entity>
 	void selectEntity(std::list<Entity>& entities, const glm::vec3& mouseToGroundPosition, bool selectAllEntities = false,
