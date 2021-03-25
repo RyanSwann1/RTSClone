@@ -219,16 +219,15 @@ bool Camera::isRayIntersectingAABB(const glm::vec3& B1, const glm::vec3& B2, con
 
 glm::vec3 Camera::getRayDirectionFromMouse(const sf::Window& window) const
 {
-	return getRayDirectionFromCamera(getProjection(glm::ivec2(window.getSize().x, window.getSize().y)), getView(), window,
-		{ sf::Mouse::getPosition(window).x, sf::Mouse::getPosition(window).y });
+	glm::ivec2 windowSize(window.getSize().x, window.getSize().y);
+	return getRayDirectionFromCamera(getProjection(windowSize), getView(), window);
 }
 
-bool Camera::getRayToGroundIntersection(const sf::Window& window, glm::uvec2 windowSize, glm::vec3& intersection) const
+bool Camera::getRayToGroundIntersection(const sf::Window& window, glm::ivec2 windowSize, glm::vec3& intersection) const
 {
 	glm::vec3 planeNormal = { 0.0f, 1.0f, 0.0f };
 	glm::vec3 rayStartingPosition = position;
-	glm::vec3 rayDirection = getRayDirectionFromCamera(getProjection(glm::ivec2(window.getSize().x, window.getSize().y)), getView(), window,
-		{ sf::Mouse::getPosition(window).x, sf::Mouse::getPosition(window).y });
+	glm::vec3 rayDirection = getRayDirectionFromCamera(getProjection(windowSize), getView(), window);
 
 	if (glm::dot(rayDirection, planeNormal) > -std::numeric_limits<float>::epsilon())
 	{
