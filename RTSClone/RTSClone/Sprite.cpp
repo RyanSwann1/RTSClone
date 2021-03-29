@@ -58,7 +58,7 @@ void Sprite::render(const glm::vec3& position, glm::uvec2 windowSize, float orig
 	fillBuffer(quad);
 }
 
-void Sprite::render(glm::ivec2 position, glm::ivec2 size, const glm::vec3& color, ShaderHandler& shaderHandler,
+void Sprite::render(glm::vec2 position, glm::vec2 size, const glm::vec3& color, ShaderHandler& shaderHandler,
 	glm::uvec2 windowSize, float opacity) const
 {
 	shaderHandler.setUniformVec3(eShaderType::Widjet, "uColor", color);

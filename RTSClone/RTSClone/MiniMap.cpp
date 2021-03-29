@@ -21,8 +21,9 @@ namespace
 
 	const float OPACITY = 0.7f;
 	const float CAMERA_VIEWPORT_OPACITY = 0.95f;
+	const float OUTER_BOUNDARY = 25.0f;
 
-	bool isWithinBounds(glm::ivec2 mousePosition, glm::ivec2 position, glm::ivec2 size)
+	bool isWithinBounds(glm::ivec2 mousePosition, glm::vec2 position, glm::vec2 size)
 	{
 		return mousePosition.x >= position.x &&
 			mousePosition.x <= position.x + size.x &&
@@ -40,12 +41,12 @@ MiniMap::MiniMap()
 	m_mouseButtonPressed(false)
 {}
 
-glm::ivec2 MiniMap::getPosition() const
+glm::vec2 MiniMap::getPosition() const
 {
 	return m_position;
 }
 
-glm::ivec2 MiniMap::getSize() const
+glm::vec2 MiniMap::getSize() const
 {
 	return m_size;
 }
@@ -90,17 +91,20 @@ bool MiniMap::handleInput(glm::uvec2 windowSize, const sf::Window& window, const
 void MiniMap::render(ShaderHandler& shaderHandler, glm::uvec2 windowSize, const Level& level, const Camera& camera,
 	const sf::Window& window) const
 {
-	glm::vec3 startingPosition = camera.getRayToGroundPlaneIntersection(windowSize, { 0, 0 });
-	glm::vec3 endingPosition = camera.getRayToGroundPlaneIntersection(windowSize, windowSize);
+	//Render camera view
+	{
+		glm::vec3 startingPosition = camera.getRayToGroundPlaneIntersection(windowSize, { 0, 0 });
+		glm::vec3 endingPosition = camera.getRayToGroundPlaneIntersection(windowSize, windowSize);
 
-	glm::ivec2 convertedStartingPosition(glm::clamp<int>(startingPosition.z / level.getSize().x * m_size.x, 0, m_size.x), 
-		glm::clamp<int>(startingPosition.x / level.getSize().z * m_size.y, 0, m_size.y));
-	
-	glm::ivec2 convertedEndingPosition(glm::clamp<int>(endingPosition.z / level.getSize().x * m_size.x, 0, m_size.x),
-		glm::clamp<int>(endingPosition.x / level.getSize().z * m_size.y, 0, m_size.y));
+		glm::vec2 convertedStartingPosition(glm::clamp<float>(startingPosition.z / level.getSize().x * m_size.x, 0, m_size.x),
+			glm::clamp<float>(startingPosition.x / level.getSize().z * m_size.y, 0, m_size.y));
 
-	glm::ivec2 convertedSize(convertedEndingPosition.x - convertedStartingPosition.x, convertedEndingPosition.y - convertedStartingPosition.y);
-	m_cameraViewSprite.render(convertedStartingPosition + m_position, convertedSize, CAMERA_VIEWPORT_COLOR, shaderHandler, windowSize, CAMERA_VIEWPORT_OPACITY);
+		glm::vec2 convertedEndingPosition(glm::clamp<float>(endingPosition.z / level.getSize().x * m_size.x, 0, m_size.x),
+			glm::clamp<float>(endingPosition.x / level.getSize().z * m_size.y, 0, m_size.y));
+
+		glm::vec2 convertedSize(convertedEndingPosition.x - convertedStartingPosition.x, convertedEndingPosition.y - convertedStartingPosition.y);
+		m_cameraViewSprite.render(convertedStartingPosition + glm::vec2(m_position), convertedSize, CAMERA_VIEWPORT_COLOR, shaderHandler, windowSize, CAMERA_VIEWPORT_OPACITY);
+	}
 
 	m_background.render(m_position, m_size, BACKGROUND_COLOR, shaderHandler, windowSize, OPACITY);
 
@@ -148,7 +152,7 @@ void MiniMap::render(ShaderHandler& shaderHandler, glm::uvec2 windowSize, const 
 			glm::vec2 convertedEntityPosition((entityPosition.z / level.getSize().x) * m_size.x, (entityPosition.x / level.getSize().z) * m_size.y);
 			convertedEntityPosition += m_position;
 
-			glm::ivec2 size(1);
+			glm::vec2 size(1.0f);
 			switch (entity.get().getEntityType())
 			{
 			case eEntityType::Unit:

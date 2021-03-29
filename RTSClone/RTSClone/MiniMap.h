@@ -4,7 +4,7 @@
 #include "OpenGLResource.h"
 #include <SFML/Graphics.hpp>
 
-class Camera;
+struct Camera;
 class ShaderHandler;
 class Level;
 class MiniMap
@@ -16,8 +16,8 @@ public:
 	MiniMap(MiniMap&&) = delete;
 	MiniMap& operator=(MiniMap&&) = delete;
 
-	glm::ivec2 getPosition() const;
-	glm::ivec2 getSize() const;
+	glm::vec2 getPosition() const;
+	glm::vec2 getSize() const;
 	bool isIntersecting(const sf::Window& window) const;
 	bool isUserInteracted() const;
 
@@ -28,8 +28,8 @@ public:
 
 private:
 	const Sprite m_background;
-	const glm::ivec2 m_position;
-	const glm::ivec2 m_size;
+	const glm::vec2 m_position;
+	const glm::vec2 m_size;
 	Sprite m_entitySprite;
 	Sprite m_cameraViewSprite;
 	bool m_mouseButtonPressed;
