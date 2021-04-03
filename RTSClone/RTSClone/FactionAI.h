@@ -5,6 +5,14 @@
 #include <queue>
 #include <functional>
 
+enum class eAIBehaviour
+{
+	Defensive,
+	Expansive,
+	Aggressive,
+	Max = Aggressive
+};
+
 enum class eActionType
 {
 	BuildSupplyDepot,
@@ -46,6 +54,7 @@ public:
 
 private:
 	const BaseHandler& m_baseHandler;
+	eAIBehaviour m_currentBehaviour;
 	std::queue<eEntityType> m_spawnQueue;
 	std::queue<AIAction> m_actionQueue;
 	Timer m_delayTimer;

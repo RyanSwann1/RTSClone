@@ -58,6 +58,30 @@ namespace
 		eActionType::BuildSupplyDepot,
 		eActionType::BuildTurret }
 	};
+
+	eEntityType convertActionTypeToEntityType(eActionType actionType)
+	{
+		eEntityType entityType;
+		switch (actionType)
+		{
+		case eActionType::BuildSupplyDepot:
+			entityType = eEntityType::SupplyDepot;
+			break;
+		case eActionType::BuildBarracks:
+			entityType = eEntityType::Barracks;
+			break;
+		case eActionType::BuildTurret:
+			entityType = eEntityType::Turret;
+			break;
+		case eActionType::BuildLaboratory:
+			entityType = eEntityType::Laboratory;
+			break;
+		default:
+			assert(false);
+		}
+
+		return entityType;
+	}
 }
 
 //AIAction
@@ -76,6 +100,7 @@ FactionAI::FactionAI(eFactionController factionController, const glm::vec3& hqSt
 	int startingResources, int startingPopulationCap, const BaseHandler& baseHandler)
 	: Faction(factionController, hqStartingPosition, startingResources, startingPopulationCap),
 	m_baseHandler(baseHandler),
+	m_currentBehaviour(static_cast<eAIBehaviour>(Globals::getRandomNumber(0, static_cast<int>(eAIBehaviour::Max)))),
 	m_spawnQueue(),
 	m_actionQueue(),
 	m_delayTimer(DELAY_TIMER_EXPIRATION, true),
@@ -180,39 +205,11 @@ void FactionAI::handleEvent(const GameEvent& gameEvent, const Map& map, FactionH
 				break;
 			}
 			bool actionCompleted = false;
-			if (!m_actionQueue.empty())
+			if (!m_actionQueue.empty() &&
+				build(map, convertActionTypeToEntityType(m_actionQueue.front().actionType), *(*worker)))
 			{
-				switch (m_actionQueue.front().actionType)
-				{
-				case eActionType::BuildBarracks:
-					if (build(map, eEntityType::Barracks, *(*worker)))
-					{
-						m_actionQueue.pop();
-						actionCompleted = true;
-					}
-					break;
-				case eActionType::BuildSupplyDepot:
-					if (build(map, eEntityType::SupplyDepot, *(*worker)))
-					{
-						m_actionQueue.pop();
-						actionCompleted = true;
-					}
-					break;
-				case eActionType::BuildTurret:
-					if (build(map, eEntityType::Turret, *(*worker)))
-					{
-						m_actionQueue.pop();
-						actionCompleted = true;
-					}
-					break;
-				case eActionType::BuildLaboratory:
-					if (build(map, eEntityType::Laboratory, *(*worker)))
-					{
-						m_actionQueue.pop();
-						actionCompleted = true;
-					}
-					break;
-				}
+				m_actionQueue.pop();
+				actionCompleted = true;
 			}
 			if (!actionCompleted)
 			{
@@ -265,25 +262,10 @@ void FactionAI::update(float deltaTime, const Map & map, FactionHandler& faction
 				switch (m_actionQueue.front().actionType)
 				{
 				case eActionType::BuildBarracks:
-					if (build(map, eEntityType::Barracks))
-					{
-						m_actionQueue.pop();
-					}
-					break;
 				case eActionType::BuildSupplyDepot:
-					if (build(map, eEntityType::SupplyDepot))
-					{
-						m_actionQueue.pop();
-					}
-					break;
 				case eActionType::BuildTurret:
-					if (build(map, eEntityType::Turret))
-					{
-						m_actionQueue.pop();
-					}
-					break;
 				case eActionType::BuildLaboratory:
-					if (build(map, eEntityType::Laboratory))
+					if (build(map, convertActionTypeToEntityType(m_actionQueue.front().actionType)))
 					{
 						m_actionQueue.pop();
 					}
