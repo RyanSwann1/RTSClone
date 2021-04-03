@@ -37,6 +37,27 @@ namespace
 	const float DISTANCE_FROM_MINERALS = static_cast<float>(Globals::NODE_SIZE) * 7.0f;
 
 	const int MAX_WORKERS_REPAIR_BUILDING = 2;
+
+	const std::array< std::array<eActionType, 4>, 3> BUILD_ORDERS
+	{
+		std::array<eActionType, 4> {
+		eActionType::BuildBarracks,
+		eActionType::BuildBarracks,
+		eActionType::BuildTurret,
+		eActionType::BuildSupplyDepot },
+
+		std::array<eActionType, 4> {
+		eActionType::BuildTurret,
+		eActionType::BuildTurret,
+		eActionType::BuildLaboratory,
+		eActionType::BuildTurret },
+		
+		std::array<eActionType, 4> {
+		eActionType::BuildSupplyDepot,
+		eActionType::BuildSupplyDepot,
+		eActionType::BuildSupplyDepot,
+		eActionType::BuildTurret }
+	};
 }
 
 //AIAction
@@ -66,10 +87,10 @@ FactionAI::FactionAI(eFactionController factionController, const glm::vec3& hqSt
 		m_spawnQueue.push(eEntityType::Worker);
 	}
 
-	m_actionQueue.emplace(eActionType::BuildBarracks);
-	m_actionQueue.emplace(eActionType::BuildSupplyDepot);
-	m_actionQueue.emplace(eActionType::BuildLaboratory);
-	m_actionQueue.emplace(eActionType::BuildTurret);
+	for (const auto& i : BUILD_ORDERS[Globals::getRandomNumber(0, static_cast<int>(BUILD_ORDERS.size() - 1))])
+	{
+		m_actionQueue.emplace(i);
+	}
 }
 
 void FactionAI::setTargetFaction(FactionHandler& factionHandler)

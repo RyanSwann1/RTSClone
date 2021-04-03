@@ -14,6 +14,7 @@ namespace
     const size_t MAX_BARRACKS = 20;
     const size_t MAX_TURRETS = 20;
     const size_t MAX_LABORATORIES = 1;
+
     const size_t MAX_ENTITIES = 
         MAX_UNITS + 
         MAX_WORKERS +
