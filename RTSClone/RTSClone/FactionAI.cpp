@@ -80,8 +80,8 @@ void FactionAI::setTargetFaction(FactionHandler& factionHandler)
 	float targetFactionDistance = std::numeric_limits<float>::max();
 	for (const auto& opposingFaction : factionHandler.getOpposingFactions(getController()))
 	{
-		const Headquarters& opposingHeadquarters = opposingFaction.get().getClosestHeadquarters(m_headquarters.front().getPosition());
-		float distance = Globals::getSqrDistance(opposingHeadquarters.getPosition(), m_headquarters.front().getPosition());
+		const Headquarters& opposingHeadquarters = opposingFaction.get().getClosestHeadquarters(m_headquarters.front()->getPosition());
+		float distance = Globals::getSqrDistance(opposingHeadquarters.getPosition(), m_headquarters.front()->getPosition());
 		if (distance < targetFactionDistance)
 		{
 			m_targetFaction = opposingFaction.get().getController();
@@ -129,17 +129,17 @@ void FactionAI::handleEvent(const GameEvent& gameEvent, const Map& map, FactionH
 		{
 			auto unit = std::find_if(m_units.begin(), m_units.end(), [entityID](const auto& unit)
 			{
-				return unit.getID() == entityID;
+				return unit->getID() == entityID;
 			});
 			if (unit != m_units.end() && 
-				unit->getCurrentState() == eUnitState::Idle &&
+				(*unit)->getCurrentState() == eUnitState::Idle &&
 				m_targetFaction != eFactionController::None)
 			{
 				if (factionHandler.isFactionActive(m_targetFaction))
 				{
 					const Faction& targetFaction = factionHandler.getFaction(m_targetFaction);
-					const Headquarters& targetHeadquarters = targetFaction.getClosestHeadquarters(unit->getPosition());
-					unit->moveToAttackPosition(targetHeadquarters, targetFaction, map, factionHandler);
+					const Headquarters& targetHeadquarters = targetFaction.getClosestHeadquarters((*unit)->getPosition());
+					(*unit)->moveToAttackPosition(targetHeadquarters, targetFaction, map, factionHandler);
 				}
 				else
 				{
@@ -152,9 +152,9 @@ void FactionAI::handleEvent(const GameEvent& gameEvent, const Map& map, FactionH
 		{
 			auto worker = std::find_if(m_workers.begin(), m_workers.end(), [entityID](const auto& worker)
 			{
-				return worker.getID() == entityID;
+				return worker->getID() == entityID;
 			});
-			if (worker == m_workers.end() || worker->getCurrentState() != eWorkerState::Idle)
+			if (worker == m_workers.end() || (*worker)->getCurrentState() != eWorkerState::Idle)
 			{
 				break;
 			}
@@ -164,28 +164,28 @@ void FactionAI::handleEvent(const GameEvent& gameEvent, const Map& map, FactionH
 				switch (m_actionQueue.front().actionType)
 				{
 				case eActionType::BuildBarracks:
-					if (build(map, eEntityType::Barracks, *worker))
+					if (build(map, eEntityType::Barracks, *(*worker)))
 					{
 						m_actionQueue.pop();
 						actionCompleted = true;
 					}
 					break;
 				case eActionType::BuildSupplyDepot:
-					if (build(map, eEntityType::SupplyDepot, *worker))
+					if (build(map, eEntityType::SupplyDepot, *(*worker)))
 					{
 						m_actionQueue.pop();
 						actionCompleted = true;
 					}
 					break;
 				case eActionType::BuildTurret:
-					if (build(map, eEntityType::Turret, *worker))
+					if (build(map, eEntityType::Turret, *(*worker)))
 					{
 						m_actionQueue.pop();
 						actionCompleted = true;
 					}
 					break;
 				case eActionType::BuildLaboratory:
-					if (build(map, eEntityType::Laboratory, *worker))
+					if (build(map, eEntityType::Laboratory, *(*worker)))
 					{
 						m_actionQueue.pop();
 						actionCompleted = true;
@@ -195,12 +195,12 @@ void FactionAI::handleEvent(const GameEvent& gameEvent, const Map& map, FactionH
 			}
 			if (!actionCompleted)
 			{
-				const Base& nearestBase = m_baseHandler.getNearestBase(getClosestHeadquarters(worker->getPosition()).getPosition());
-				const Mineral* nearestMineral = m_baseHandler.getNearestAvailableMineralAtBase(*this, nearestBase, worker->getPosition());
+				const Base& nearestBase = m_baseHandler.getNearestBase(getClosestHeadquarters((*worker)->getPosition()).getPosition());
+				const Mineral* nearestMineral = m_baseHandler.getNearestAvailableMineralAtBase(*this, nearestBase, (*worker)->getPosition());
 				assert(nearestMineral);
 				if (nearestMineral)
 				{
-					worker->moveTo(*nearestMineral, map);
+					(*worker)->moveTo(*nearestMineral, map);
 				}
 			}
 		}
@@ -229,7 +229,7 @@ void FactionAI::update(float deltaTime, const Map & map, FactionHandler& faction
 	if (m_spawnTimer.isExpired())
 	{
 		m_spawnTimer.resetElaspedTime();
-		m_spawnQueue.push(eEntityType::Unit);
+		//m_spawnQueue.push(eEntityType::Unit);
 	}
 
 	m_delayTimer.update(deltaTime);
@@ -297,7 +297,7 @@ void FactionAI::instructWorkersToRepair(const Headquarters& HQ, const Map& map)
 	int repairCount = 0;
 	for (auto& worker : m_workers)
 	{
-		if (worker.getCurrentState() == eWorkerState::Repairing || worker.getCurrentState() == eWorkerState::MovingToRepairPosition)
+		if (worker->getCurrentState() == eWorkerState::Repairing || worker->getCurrentState() == eWorkerState::MovingToRepairPosition)
 		{
 			++repairCount;
 
@@ -308,7 +308,7 @@ void FactionAI::instructWorkersToRepair(const Headquarters& HQ, const Map& map)
 		}
 		else
 		{
-			worker.repairEntity(HQ, map);
+			worker->repairEntity(HQ, map);
 		}
 	}
 }
@@ -319,19 +319,19 @@ Worker* FactionAI::getAvailableWorker(const glm::vec3& position)
 	float closestDistance = std::numeric_limits<float>::max();
 	for (auto& availableWorker : m_workers)
 	{
-		float distance = Globals::getSqrDistance(position, availableWorker.getPosition());
+		float distance = Globals::getSqrDistance(position, availableWorker->getPosition());
 		bool selectWorker = false;
 		if (!selectedWorker)
 		{
 			selectWorker = true;
-			selectedWorker = &availableWorker;
+			selectedWorker = &(*availableWorker);
 		}
-		else if (availableWorker.getCurrentState() == eWorkerState::Idle &&
+		else if (availableWorker->getCurrentState() == eWorkerState::Idle &&
 			selectedWorker->getCurrentState() != eWorkerState::Idle)
 		{
 			selectWorker = true;
 		}
-		else if (availableWorker.getCurrentState() == eWorkerState::Idle &&
+		else if (availableWorker->getCurrentState() == eWorkerState::Idle &&
 			selectedWorker->getCurrentState() == eWorkerState::Idle &&
 			distance < closestDistance)
 		{
@@ -344,7 +344,7 @@ Worker* FactionAI::getAvailableWorker(const glm::vec3& position)
 
 		if (selectWorker)
 		{
-			selectedWorker = &availableWorker;
+			selectedWorker = &(*availableWorker);
 			closestDistance = distance;
 		}
 	}
@@ -514,7 +514,7 @@ bool FactionAI::build(const Map& map, eEntityType entityType)
 	case eEntityType::Laboratory:
 	{
 		glm::vec3 buildPosition(0.0f);
-		if (PathFinding::getInstance().isBuildingSpawnAvailable(m_headquarters.front().getPosition(),
+		if (PathFinding::getInstance().isBuildingSpawnAvailable(m_headquarters.front()->getPosition(),
 			entityType, map, buildPosition, *this, m_baseHandler))
 		{
 			Worker* availableWorker = getAvailableWorker(buildPosition);
@@ -526,9 +526,9 @@ bool FactionAI::build(const Map& map, eEntityType entityType)
 	}
 		break;
 	case eEntityType::Unit:
-		return !m_barracks.empty() && m_barracks.front().addUnitToSpawnQueue();
+		return !m_barracks.empty() && m_barracks.front()->addUnitToSpawnQueue();
 	case eEntityType::Worker:
-		return m_headquarters.front().addWorkerToSpawnQueue();
+		return m_headquarters.front()->addWorkerToSpawnQueue();
 	default:
 		assert(false);
 	}
@@ -552,7 +552,7 @@ bool FactionAI::build(const Map& map, eEntityType entityType, Worker& worker)
 	{
 		glm::vec3 buildPosition(0.0f);
 		assert(!m_headquarters.empty());
-		if (PathFinding::getInstance().isBuildingSpawnAvailable(m_headquarters.front().getPosition(),
+		if (PathFinding::getInstance().isBuildingSpawnAvailable(m_headquarters.front()->getPosition(),
 			entityType, map, buildPosition, *this, m_baseHandler))
 		{
 			return worker.build(buildPosition, map, entityType);

@@ -7,6 +7,7 @@
 
 AdjacentPosition::AdjacentPosition()
 	: valid(false),
+	used(false),
 	position()
 {}
 
@@ -33,7 +34,7 @@ AdjacentPositions createAdjacentPositions(const Map& map)
 }
 
 std::array<AdjacentPosition, ALL_DIRECTIONS_ON_GRID.size()> getAdjacentPositions(const glm::ivec2 & position,
-	const Map & map, const std::list<Unit> & units, const std::list<Worker>& workers, const AABB& ignoreAABB)
+	const Map & map, const std::vector<std::unique_ptr<Unit>> & units, const std::vector<std::unique_ptr<Worker>>& workers, const AABB& ignoreAABB)
 {
 	std::array<AdjacentPosition, ALL_DIRECTIONS_ON_GRID.size()> adjacentPositions;
 	for (int i = 0; i < adjacentPositions.size(); ++i)
@@ -45,7 +46,7 @@ std::array<AdjacentPosition, ALL_DIRECTIONS_ON_GRID.size()> getAdjacentPositions
 			bool unitCollision = false;
 			for (const auto& unit : units)
 			{
-				if (unit.getAABB().contains(Globals::convertToWorldPosition(adjacentPosition)))
+				if (unit->getAABB().contains(Globals::convertToWorldPosition(adjacentPosition)))
 				{
 					unitCollision = true;
 					break;
@@ -56,7 +57,7 @@ std::array<AdjacentPosition, ALL_DIRECTIONS_ON_GRID.size()> getAdjacentPositions
 			{
 				for (const auto& harvester : workers)
 				{
-					if (harvester.getAABB().contains(Globals::convertToWorldPosition(adjacentPosition)))
+					if (harvester->getAABB().contains(Globals::convertToWorldPosition(adjacentPosition)))
 					{
 						unitCollision = true;
 						break;

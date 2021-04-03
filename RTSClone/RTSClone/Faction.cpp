@@ -28,8 +28,8 @@ Faction::Faction(eFactionController factionController, const glm::vec3& hqStarti
 {
     m_allEntities.reserve(MAX_ENTITIES);
 
-    m_headquarters.emplace_back(hqStartingPosition, *this);
-    m_allEntities.push_back(m_headquarters.back());
+    m_headquarters.emplace_back(std::make_unique<Headquarters>(hqStartingPosition, *this));
+    m_allEntities.push_back(*m_headquarters.back());
 }
 
 int Faction::getCurrentShieldAmount() const
@@ -58,11 +58,11 @@ const Headquarters& Faction::getClosestHeadquarters(const glm::vec3& position) c
     float distance = std::numeric_limits<float>::max();
     for (const auto& headquarters : m_headquarters)
     {
-        float result = Globals::getSqrDistance(headquarters.getPosition(), position);
+        float result = Globals::getSqrDistance(headquarters->getPosition(), position);
         if (result < distance)
         {
             distance = result;
-            closestHeadquarters = &headquarters;
+            closestHeadquarters = headquarters.get();
         }
     }
 
@@ -73,7 +73,7 @@ const Headquarters& Faction::getClosestHeadquarters(const glm::vec3& position) c
 const glm::vec3& Faction::getMainHeadquartersPosition() const
 {
     assert(!m_headquarters.empty());
-    return m_headquarters.begin()->getPosition();
+    return (*m_headquarters.begin())->getPosition();
 }
 
 eFactionController Faction::getController() const
@@ -81,7 +81,7 @@ eFactionController Faction::getController() const
     return m_controller;
 }
 
-const std::list<Unit>& Faction::getUnits() const
+const std::vector<std::unique_ptr<Unit>>& Faction::getUnits() const
 {
     return m_units;
 }
@@ -274,7 +274,7 @@ void Faction::handleEvent(const GameEvent& gameEvent, const Map& map, FactionHan
             isAffordable(Globals::FACTION_SHIELD_INCREASE_COST) &&
             m_laboratories.size() == 1)
         {
-            m_laboratories.front().handleEvent(gameEvent.data.increaseFactionShield);
+            m_laboratories.front()->handleEvent(gameEvent.data.increaseFactionShield);
         }
         break;
     }
@@ -290,31 +290,31 @@ void Faction::handleWorkerCollisions(const Map& map)
     std::vector<const Entity*> handledUnits;
     for (auto& worker : m_workers)
     {
-        if (worker.getCurrentState() == eWorkerState::Idle)
+        if (worker->getCurrentState() == eWorkerState::Idle)
         {
-            if (map.isCollidable(worker.getPosition()))
+            if (map.isCollidable(worker->getPosition()))
             {
-                glm::vec3 destination = PathFinding::getInstance().getClosestAvailablePosition<Worker>(worker, m_workers, map);
-                worker.moveTo(destination, map);
+                glm::vec3 destination = PathFinding::getInstance().getClosestAvailablePosition<Worker>(*worker, m_workers, map);
+                worker->moveTo(destination, map);
             }
             else
             {
                 for (const auto& otherWorker : m_workers)
                 {
-                    if (&worker != &otherWorker &&
-                        std::find(handledUnits.cbegin(), handledUnits.cend(), &otherWorker) == handledUnits.cend() &&
-                        otherWorker.getCurrentState() == eWorkerState::Idle &&
-                        worker.getAABB().contains(otherWorker.getAABB()))
+                    if (worker->getID() != otherWorker->getID() &&
+                        std::find(handledUnits.cbegin(), handledUnits.cend(), &*otherWorker) == handledUnits.cend() &&
+                        otherWorker->getCurrentState() == eWorkerState::Idle &&
+                        worker->getAABB().contains(otherWorker->getAABB()))
                     {
-                        glm::vec3 destination = PathFinding::getInstance().getClosestAvailablePosition<Worker>(worker, m_workers, map);
-                        worker.moveTo(destination, map);
+                        glm::vec3 destination = PathFinding::getInstance().getClosestAvailablePosition<Worker>(*worker, m_workers, map);
+                        worker->moveTo(destination, map);
                         break;
                     }
                 }
             }
         }
 
-        handledUnits.push_back(&worker);
+        handledUnits.push_back(worker.get());
     }
 
     handledUnits.clear();
@@ -324,37 +324,37 @@ void Faction::update(float deltaTime, const Map& map, FactionHandler& factionHan
 {
     for (auto& unit : m_units)
     {
-        unit.update(deltaTime, factionHandler, map, unitStateHandlerTimer);
+        unit->update(deltaTime, factionHandler, map, unitStateHandlerTimer);
     }
 
     for (auto& worker : m_workers)
     {
-        worker.update(deltaTime, map, factionHandler, unitStateHandlerTimer);
+        worker->update(deltaTime, map, factionHandler, unitStateHandlerTimer);
     }
 
     for (auto& barracks : m_barracks)
     {
-        barracks.update(deltaTime, map, factionHandler);
+        barracks->update(deltaTime, map, factionHandler);
     }
 
     for (auto& turret : m_turrets)
     {
-        turret.update(deltaTime, factionHandler, map);
+        turret->update(deltaTime, factionHandler, map);
     }
 
     for (auto& supplyDepot : m_supplyDepots)
     {
-        supplyDepot.update(deltaTime);
+        supplyDepot->update(deltaTime);
     }
 
     for (auto& headquarters : m_headquarters)
     {
-        headquarters.update(deltaTime, map, factionHandler);
+        headquarters->update(deltaTime, map, factionHandler);
     }
 
     for (auto& laboratory : m_laboratories)
     {
-        laboratory.update(deltaTime);
+        laboratory->update(deltaTime);
     }
 
     if (unitStateHandlerTimer.isExpired())
@@ -367,37 +367,37 @@ void Faction::render(ShaderHandler& shaderHandler) const
 {
     for (const auto& unit : m_units)
     {
-        unit.render(shaderHandler, m_controller);
+        unit->render(shaderHandler, m_controller);
     }
 
     for (const auto& worker : m_workers)
     {
-        worker.render(shaderHandler, m_controller);
+        worker->render(shaderHandler, m_controller);
     }
 
     for (const auto& supplyDepot : m_supplyDepots)
     {
-        supplyDepot.render(shaderHandler, m_controller);
+        supplyDepot->render(shaderHandler, m_controller);
     }
 
     for (const auto& barracks : m_barracks)
     {
-        barracks.render(shaderHandler, m_controller);
+        barracks->render(shaderHandler, m_controller);
     }
 
     for (const auto& turret : m_turrets)
     {
-        turret.render(shaderHandler, m_controller);
+        turret->render(shaderHandler, m_controller);
     }
 
     for (const auto& headquarters : m_headquarters)
     {
-        headquarters.render(shaderHandler, m_controller);
+        headquarters->render(shaderHandler, m_controller);
     }
  
     for (const auto& laboratory : m_laboratories)
     {
-        laboratory.render(shaderHandler, m_controller);
+        laboratory->render(shaderHandler, m_controller);
     }
 }
 
@@ -405,7 +405,7 @@ void Faction::renderPlannedBuildings(ShaderHandler& shaderHandler) const
 {
     for (const auto& worker : m_workers)
     {
-        worker.renderBuildingCommands(shaderHandler);
+        worker->renderBuildingCommands(shaderHandler);
     }
 }
 
@@ -445,12 +445,12 @@ void Faction::renderPathing(ShaderHandler& shaderHandler)
 {
     for (auto& unit : m_units)
     {
-        unit.renderPathMesh(shaderHandler);
+        unit->renderPathMesh(shaderHandler);
     }
 
     for (auto& worker : m_workers)
     {
-        worker.renderPathMesh(shaderHandler);
+        worker->renderPathMesh(shaderHandler);
     }
 }
 #endif // RENDER_PATHING
@@ -506,12 +506,12 @@ bool Faction::isCollidingWithWorkerBuildQueue(const AABB& AABB) const
 {
     for (const auto& worker : m_workers)
     {
-        auto buildingCommand = std::find_if(worker.getBuildingCommands().cbegin(), worker.getBuildingCommands().cend(),
+        auto buildingCommand = std::find_if(worker->getBuildingCommands().cbegin(), worker->getBuildingCommands().cend(),
             [&AABB](const auto& buildingCommand)
         {
             return AABB.contains(buildingCommand.position);
         });
-        if (buildingCommand != worker.getBuildingCommands().cend())
+        if (buildingCommand != worker->getBuildingCommands().cend())
         {
             return true;
         }
@@ -533,25 +533,25 @@ const Entity* Faction::createBuilding(const Map& map, const Worker& worker)
         switch (entityType)
         {
         case eEntityType::SupplyDepot:
-            m_supplyDepots.emplace_back(position, *this);
-            addedBuilding = &m_supplyDepots.back();
+            m_supplyDepots.emplace_back(std::make_unique<SupplyDepot>(position, *this));
+            addedBuilding = &*m_supplyDepots.back().get();
             increasePopulationLimit();
             break;
         case eEntityType::Barracks:
-            m_barracks.emplace_back(position, *this);
-            addedBuilding = &m_barracks.back();
+            m_barracks.emplace_back(std::make_unique<Barracks>(position, *this));
+            addedBuilding = &*m_barracks.back().get();
             break;
         case eEntityType::Turret:
-            m_turrets.emplace_back(position, *this);
-            addedBuilding = &m_turrets.back();
+            m_turrets.emplace_back(std::make_unique<Turret>(position, *this));
+            addedBuilding = &*m_turrets.back().get();
             break;
         case eEntityType::Headquarters:
-            m_headquarters.emplace_back(position, *this);
-            addedBuilding = &m_headquarters.back();
+            m_headquarters.emplace_back(std::make_unique<Headquarters>(position, *this));
+            addedBuilding = &*m_headquarters.back().get();
             break;
         case eEntityType::Laboratory:
-            m_laboratories.emplace_back(position, *this);
-            addedBuilding = &m_laboratories.back();
+            m_laboratories.emplace_back(std::make_unique<Laboratory>(position, *this));
+            addedBuilding = &*m_laboratories.back().get();
             break;
         default:
             assert(false);
@@ -614,28 +614,28 @@ void Faction::revalidateExistingUnitPaths(const Map& map, FactionHandler& factio
 {
     for (auto& unit : m_units)
     {
-        if (!unit.getPathToPosition().empty())
+        if (!unit->getPathToPosition().empty())
         {
-            unit.moveTo(unit.getPathToPosition().front(), map, factionHandler, unit.getCurrentState());
+            unit->moveTo(unit->getPathToPosition().front(), map, factionHandler, unit->getCurrentState());
         }
     }
 
     for (auto& worker : m_workers)
     {
-        if (!worker.getPathToPosition().empty())
+        if (!worker->getPathToPosition().empty())
         {
-            switch (worker.getCurrentState())
+            switch (worker->getCurrentState())
             {
             case eWorkerState::Moving:
             case eWorkerState::ReturningMineralsToHeadquarters:
             case eWorkerState::MovingToBuildingPosition:
             case eWorkerState::MovingToRepairPosition:
-                assert(!worker.getPathToPosition().empty());
-                worker.moveTo(worker.getPathToPosition().front(), map, worker.getCurrentState());
+                assert(!worker->getPathToPosition().empty());
+                worker->moveTo(worker->getPathToPosition().front(), map, worker->getCurrentState());
                 break;
             case eWorkerState::MovingToMinerals:
-                assert(worker.getMineralToHarvest());
-                worker.moveTo(*worker.getMineralToHarvest(), map);
+                assert(worker->getMineralToHarvest());
+                worker->moveTo(*worker->getMineralToHarvest(), map);
                 break;
             case eWorkerState::Idle:
             case eWorkerState::Harvesting:
@@ -653,8 +653,8 @@ bool Faction::isMineralInUse(const Mineral& mineral) const
 {
     for (const auto& worker : m_workers)
     {
-        if (worker.getMineralToHarvest() && 
-            &(*worker.getMineralToHarvest()) == &mineral)
+        if (worker->getMineralToHarvest() && 
+            &(*worker->getMineralToHarvest()) == &mineral)
         {
             return true;
         }
@@ -674,18 +674,18 @@ const Entity* Faction::createUnit(const Map& map, const Barracks& barracks, Fact
         glm::vec3 startingRotation = { 0.0f, Globals::getAngle(startingPosition, barracks.getPosition()), 0.0f };
         if (barracks.isWaypointActive())
         {
-            m_units.emplace_back(*this, startingPosition, startingRotation, barracks.getWaypointPosition(), factionHandler, map);
+            m_units.emplace_back(std::make_unique<Unit>(*this, startingPosition, startingRotation, barracks.getWaypointPosition(), factionHandler, map));
         }
         else
         {
-            m_units.emplace_back(*this, startingPosition, startingRotation, map);
+            m_units.emplace_back(std::make_unique<Unit>(*this, startingPosition, startingRotation, map));
         }
 
         reduceResources(eEntityType::Unit);
         increaseCurrentPopulationAmount(eEntityType::Unit);
-        m_allEntities.push_back(m_units.back());
+        m_allEntities.push_back(*m_units.back());
 
-        return &m_units.back();
+        return &*m_units.back();
     }
 
     return nullptr;
@@ -701,18 +701,18 @@ Entity* Faction::createWorker(const Map& map, const Headquarters& headquarters)
         glm::vec3 startingRotation = { 0.0f, Globals::getAngle(startingPosition, headquarters.getPosition()), 0.0f };
         if (headquarters.isWaypointActive())
         {
-            m_workers.emplace_back(*this, startingPosition, headquarters.getWaypointPosition(), map, startingRotation);
+            m_workers.emplace_back(std::make_unique<Worker>(*this, startingPosition, headquarters.getWaypointPosition(), map, startingRotation));
         }
         else
         {
-            m_workers.emplace_back(*this, map, startingPosition, startingRotation);
+            m_workers.emplace_back(std::make_unique<Worker>(*this, map, startingPosition, startingRotation));
         }
 
         reduceResources(eEntityType::Worker);
         increaseCurrentPopulationAmount(eEntityType::Worker);
-        m_allEntities.push_back(m_workers.back());
+        m_allEntities.push_back(*m_workers.back());
 
-        return &m_workers.back();
+        return &*m_workers.back();
     }
 
     return nullptr;

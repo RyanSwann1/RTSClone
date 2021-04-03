@@ -68,12 +68,12 @@ private:
 		const BaseHandler& baseHandler, const MiniMap& minimap, const glm::vec3& levelSize);
 
 	template <class Entity>
-	void selectEntity(std::list<Entity>& entities, const glm::vec3& mouseToGroundPosition, bool selectAllEntities = false,
+	void selectEntity(std::vector<std::unique_ptr<Entity>>& entities, const glm::vec3& mouseToGroundPosition, bool selectAllEntities = false,
 		int selectEntityID = Globals::INVALID_ENTITY_ID)
 	{
 		auto selectedEntity = std::find_if(entities.begin(), entities.end(), [&mouseToGroundPosition](const auto& entity)
 		{
-			return entity.getAABB().contains(mouseToGroundPosition);
+			return entity->getAABB().contains(mouseToGroundPosition);
 		});
 		if (selectedEntity != entities.end())
 		{
@@ -81,14 +81,14 @@ private:
 			{
 				for (auto& entity : entities)
 				{
-					entity.setSelected(true);
+					entity->setSelected(true);
 				}
 			}
 			else
 			{
 				for (auto& entity : entities)
 				{
-					entity.setSelected(entity.getAABB().contains(mouseToGroundPosition));
+					entity->setSelected(entity->getAABB().contains(mouseToGroundPosition));
 				}
 			}
 		}
@@ -96,33 +96,33 @@ private:
 		{
 			for (auto& entity : entities)
 			{
-				if (selectEntityID == entity.getID())
+				if (selectEntityID == entity->getID())
 				{
-					entity.setSelected(true);
+					entity->setSelected(true);
 				}
 				else
 				{
-					entity.setSelected(false);
+					entity->setSelected(false);
 				}
 			}
 		}
 	}
 
 	template <class Entity>
-	void selectEntities(std::list<Entity>& units)
+	void selectEntities(std::vector<std::unique_ptr<Entity>>& units)
 	{
 		for (auto& unit : units)
 		{
-			unit.setSelected(m_entitySelector.getAABB().contains(unit.getAABB()));
+			unit->setSelected(m_entitySelector.getAABB().contains(unit->getAABB()));
 		}
 	}
 
 	template <class Entity>
-	void deselectEntities(std::list<Entity>& entities)
+	void deselectEntities(std::vector<std::unique_ptr<Entity>>& entities)
 	{
 		for (auto& entity : entities)
 		{
-			entity.setSelected(false);
+			entity->setSelected(false);
 		}
 	}
 };

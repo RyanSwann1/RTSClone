@@ -47,23 +47,24 @@ namespace
         }
     }
 
-    void setSelectedEntities(std::vector<Entity*>& selectedUnits, std::list<Unit>& units, std::list<Worker>& workers)
+    void setSelectedEntities(std::vector<Entity*>& selectedUnits, std::vector<std::unique_ptr<Unit>>& units, 
+        std::vector<std::unique_ptr<Worker>>& workers)
     {
         selectedUnits.clear();
 
         for (auto& unit : units)
         {
-            if (unit.isSelected())
+            if (unit->isSelected())
             {
-                selectedUnits.push_back(&unit);
+                selectedUnits.push_back(&*unit);
             }
         }
 
         for (auto& worker : workers)
         {
-            if (worker.isSelected())
+            if (worker->isSelected())
             {
-                selectedUnits.push_back(&worker);
+                selectedUnits.push_back(&*worker);
             }
         }
     }
@@ -324,9 +325,9 @@ void FactionPlayer::instructWorkerReturnMinerals(const Map& map, const Headquart
 {
     for (auto& worker : m_workers)
     {
-        if (worker.isSelected() && worker.isHoldingResources())
+        if (worker->isSelected() && worker->isHoldingResources())
         {
-            worker.moveTo(headquarters, map, eWorkerState::ReturningMineralsToHeadquarters);
+            worker->moveTo(headquarters, map, eWorkerState::ReturningMineralsToHeadquarters);
         }
     }
 }
@@ -342,11 +343,11 @@ int FactionPlayer::instructWorkerToBuild(const Map& map, const BaseHandler& base
         {
             auto selectedWorker = std::find_if(m_workers.begin(), m_workers.end(), [workerID](const auto& worker)
             {
-                return worker.getID() == workerID;
+                return worker->getID() == workerID;
             });
             assert(selectedWorker != m_workers.cend());
             if (selectedWorker != m_workers.end() &&
-                selectedWorker->build(m_plannedBuilding->getPosition(), map, m_plannedBuilding->getEntityType()))
+                (*selectedWorker)->build(m_plannedBuilding->getPosition(), map, m_plannedBuilding->getEntityType()))
             {
                 m_plannedBuilding.reset();
             }
@@ -510,7 +511,7 @@ void FactionPlayer::onLeftClick(const sf::Window& window, const Camera& camera, 
         if (!m_laboratories.empty())
         {
             assert(m_laboratories.size() == 1);
-            m_laboratories.front().setSelected(m_laboratories.front().getAABB().contains(planeIntersection));
+            m_laboratories.front()->setSelected(m_laboratories.front()->getAABB().contains(planeIntersection));
         }
     }
 }
@@ -572,21 +573,21 @@ void FactionPlayer::onRightClick(const sf::Window& window, const Camera& camera,
     {
         for (auto& headquarters : m_headquarters)
         {
-            if (headquarters.isSelected())
+            if (headquarters->isSelected())
             {
-                headquarters.setWaypointPosition(position, map);
+                headquarters->setWaypointPosition(position, map);
             }
-            else if (headquarters.getAABB().contains(position))
+            else if (headquarters->getAABB().contains(position))
             {
-                instructWorkerReturnMinerals(map, headquarters);
+                instructWorkerReturnMinerals(map, *headquarters);
             }
         }
 
         for (auto& barracks : m_barracks)
         {
-            if (barracks.isSelected())
+            if (barracks->isSelected())
             {
-                barracks.setWaypointPosition(position, map);
+                barracks->setWaypointPosition(position, map);
             }
         }
 

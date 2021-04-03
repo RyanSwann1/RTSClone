@@ -11,6 +11,7 @@
 #include "Laboratory.h"
 #include <vector>
 #include <functional>
+#include <memory>
 
 struct Camera;
 struct GameEvent;
@@ -39,7 +40,7 @@ public:
 	const Headquarters& getClosestHeadquarters(const glm::vec3& position) const;
 	const glm::vec3& getMainHeadquartersPosition() const;
 	eFactionController getController() const;
-	const std::list<Unit>& getUnits() const;
+	const std::vector<std::unique_ptr<Unit>>& getUnits() const;
 	const std::vector<std::reference_wrapper<Entity>>& getAllEntities() const;
 	const Entity* getEntity(const glm::vec3& position, float maxDistance, bool prioritizeUnits = true) const;
 	const Entity* getEntity(const AABB& AABB, int entityID) const;
@@ -71,13 +72,13 @@ protected:
 		int startingResources, int startingPopulationCap);
 
 	std::vector<std::reference_wrapper<Entity>> m_allEntities;
-	std::list<Unit> m_units;
-	std::list<Worker> m_workers;
-	std::list<SupplyDepot> m_supplyDepots;
-	std::list<Barracks> m_barracks;
-	std::list<Turret> m_turrets;
-	std::list<Headquarters> m_headquarters;
-	std::list<Laboratory> m_laboratories;
+	std::vector<std::unique_ptr<Unit>> m_units;
+	std::vector<std::unique_ptr<Worker>> m_workers;
+	std::vector<std::unique_ptr<SupplyDepot>> m_supplyDepots;
+	std::vector<std::unique_ptr<Barracks>> m_barracks;
+	std::vector<std::unique_ptr<Turret>> m_turrets;
+	std::vector<std::unique_ptr<Headquarters>> m_headquarters;
+	std::vector<std::unique_ptr<Laboratory>> m_laboratories;
 
 	virtual void onEntityRemoval(const Entity& entity) {}
 
@@ -97,14 +98,14 @@ private:
 
 	//Presumes entity already found in all entities container
 	template <class T>
-	void removeEntity(std::list<T>& entityContainer, int entityID, std::vector<std::reference_wrapper<Entity>>::iterator entity)
+	void removeEntity(std::vector<std::unique_ptr<T>>& entityContainer, int entityID, std::vector<std::reference_wrapper<Entity>>::iterator entity)
 	{
 		assert(entity != m_allEntities.cend());
 		onEntityRemoval((*entity).get());
 
 		auto iter = std::find_if(entityContainer.begin(), entityContainer.end(), [entityID](const auto& entity)
 		{
-			return entity.getID() == entityID;
+			return entity->getID() == entityID;
 		});
 		
 		assert(iter != entityContainer.end());
