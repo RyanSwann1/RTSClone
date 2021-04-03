@@ -7,7 +7,21 @@
 
 namespace
 {
-    const size_t MAX_ENTITIES = 250;
+    const size_t MAX_UNITS = 50;
+    const size_t MAX_WORKERS = 50;
+    const size_t MAX_HEADQUARTERS = 4;
+    const size_t MAX_SUPPLY_DEPOTS = 20;
+    const size_t MAX_BARRACKS = 20;
+    const size_t MAX_TURRETS = 20;
+    const size_t MAX_LABORATORIES = 1;
+    const size_t MAX_ENTITIES = 
+        MAX_UNITS + 
+        MAX_WORKERS +
+        MAX_HEADQUARTERS +
+        MAX_SUPPLY_DEPOTS + 
+        MAX_BARRACKS + 
+        MAX_TURRETS + 
+        MAX_LABORATORIES;
 }
 
 Faction::Faction(eFactionController factionController, const glm::vec3& hqStartingPosition, 
@@ -27,6 +41,13 @@ Faction::Faction(eFactionController factionController, const glm::vec3& hqStarti
     m_currentShieldAmount(0)
 {
     m_allEntities.reserve(MAX_ENTITIES);
+    m_units.reserve(MAX_UNITS);
+    m_workers.reserve(MAX_WORKERS);
+    m_headquarters.reserve(MAX_HEADQUARTERS);
+    m_supplyDepots.reserve(MAX_SUPPLY_DEPOTS);
+    m_barracks.reserve(MAX_BARRACKS);
+    m_turrets.reserve(MAX_TURRETS);
+    m_laboratories.reserve(MAX_LABORATORIES);
 
     m_headquarters.emplace_back(std::make_unique<Headquarters>(hqStartingPosition, *this));
     m_allEntities.push_back(*m_headquarters.back());
@@ -533,25 +554,40 @@ const Entity* Faction::createBuilding(const Map& map, const Worker& worker)
         switch (entityType)
         {
         case eEntityType::SupplyDepot:
-            m_supplyDepots.emplace_back(std::make_unique<SupplyDepot>(position, *this));
-            addedBuilding = &*m_supplyDepots.back().get();
-            increasePopulationLimit();
+			if (m_supplyDepots.size() < MAX_SUPPLY_DEPOTS)
+			{
+				m_supplyDepots.emplace_back(std::make_unique<SupplyDepot>(position, *this));
+				addedBuilding = &*m_supplyDepots.back();
+				increasePopulationLimit();
+			}
             break;
         case eEntityType::Barracks:
-            m_barracks.emplace_back(std::make_unique<Barracks>(position, *this));
-            addedBuilding = &*m_barracks.back().get();
+            if (m_barracks.size() < MAX_BARRACKS)
+            {
+				m_barracks.emplace_back(std::make_unique<Barracks>(position, *this));
+				addedBuilding = &*m_barracks.back();
+            }
             break;
         case eEntityType::Turret:
-            m_turrets.emplace_back(std::make_unique<Turret>(position, *this));
-            addedBuilding = &*m_turrets.back().get();
+            if (m_turrets.size() < MAX_TURRETS)
+            {
+				m_turrets.emplace_back(std::make_unique<Turret>(position, *this));
+				addedBuilding = &*m_turrets.back();
+            }
             break;
         case eEntityType::Headquarters:
-            m_headquarters.emplace_back(std::make_unique<Headquarters>(position, *this));
-            addedBuilding = &*m_headquarters.back().get();
+            if (m_headquarters.size() < MAX_HEADQUARTERS)
+            {
+				m_headquarters.emplace_back(std::make_unique<Headquarters>(position, *this));
+				addedBuilding = &*m_headquarters.back();
+            }
             break;
         case eEntityType::Laboratory:
-            m_laboratories.emplace_back(std::make_unique<Laboratory>(position, *this));
-            addedBuilding = &*m_laboratories.back().get();
+            if (m_laboratories.size() < MAX_LABORATORIES)
+            {
+				m_laboratories.emplace_back(std::make_unique<Laboratory>(position, *this));
+				addedBuilding = &*m_laboratories.back();
+            }
             break;
         default:
             assert(false);
@@ -667,7 +703,8 @@ const Entity* Faction::createUnit(const Map& map, const Barracks& barracks, Fact
 {
     assert(barracks.getCurrentSpawnCount() > 0);
     glm::vec3 startingPosition(0.0f);
-    if (isAffordable(eEntityType::Unit) && 
+    if (m_units.size() < MAX_UNITS &&
+        isAffordable(eEntityType::Unit) && 
         !isExceedPopulationLimit(eEntityType::Unit) &&
         PathFinding::getInstance().getClosestAvailableEntitySpawnPosition(barracks, m_units, m_workers, map, startingPosition))
     {
@@ -695,7 +732,9 @@ Entity* Faction::createWorker(const Map& map, const Headquarters& headquarters)
 {
     assert(headquarters.getCurrentSpawnCount() > 0);
     glm::vec3 startingPosition(0.0f);
-    if (isAffordable(eEntityType::Worker) && !isExceedPopulationLimit(eEntityType::Worker) &&
+    if (m_workers.size() < MAX_WORKERS &&
+        isAffordable(eEntityType::Worker) && 
+        !isExceedPopulationLimit(eEntityType::Worker) &&
         PathFinding::getInstance().getClosestAvailableEntitySpawnPosition(headquarters, m_units, m_workers, map, startingPosition))
     {
         glm::vec3 startingRotation = { 0.0f, Globals::getAngle(startingPosition, headquarters.getPosition()), 0.0f };
