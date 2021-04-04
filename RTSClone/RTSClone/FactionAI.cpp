@@ -206,7 +206,7 @@ void FactionAI::handleEvent(const GameEvent& gameEvent, const Map& map, FactionH
 			}
 			bool actionCompleted = false;
 			if (!m_actionQueue.empty() &&
-				build(map, convertActionTypeToEntityType(m_actionQueue.front().actionType), *(*worker)))
+				build(map, convertActionTypeToEntityType(m_actionQueue.front().actionType), &*(*worker)))
 			{
 				m_actionQueue.pop();
 				actionCompleted = true;
@@ -501,7 +501,7 @@ Entity* FactionAI::createWorker(const Map& map, const Headquarters& headquarters
 	return spawnedWorker;
 }
 
-bool FactionAI::build(const Map& map, eEntityType entityType)
+bool FactionAI::build(const Map& map, eEntityType entityType, Worker* worker)
 {
 	assert(!m_headquarters.empty());
 	if (!isAffordable(entityType))
@@ -520,48 +520,28 @@ bool FactionAI::build(const Map& map, eEntityType entityType)
 		if (PathFinding::getInstance().isBuildingSpawnAvailable(m_headquarters.front()->getPosition(),
 			entityType, map, buildPosition, *this, m_baseHandler))
 		{
-			Worker* availableWorker = getAvailableWorker(buildPosition);
-			if (availableWorker)
+			if (worker)
 			{
-				return availableWorker->build(buildPosition, map, entityType);
+				return worker->build(buildPosition, map, entityType);
 			}
+			else
+			{
+				Worker* availableWorker = getAvailableWorker(buildPosition);
+				if (availableWorker)
+				{
+					return availableWorker->build(buildPosition, map, entityType);
+				}
+			}
+
 		}
 	}
 		break;
 	case eEntityType::Unit:
+		assert(!worker);
 		return !m_barracks.empty() && m_barracks.front()->addUnitToSpawnQueue();
 	case eEntityType::Worker:
+		assert(!worker);
 		return m_headquarters.front()->addWorkerToSpawnQueue();
-	default:
-		assert(false);
-	}
-
-	return false;
-}
-
-bool FactionAI::build(const Map& map, eEntityType entityType, Worker& worker)
-{
-	if (!isAffordable(entityType))
-	{
-		return false;
-	}
-
-	switch (entityType)
-	{
-	case eEntityType::Barracks:
-	case eEntityType::SupplyDepot:
-	case eEntityType::Turret:
-	case eEntityType::Laboratory:
-	{
-		glm::vec3 buildPosition(0.0f);
-		assert(!m_headquarters.empty());
-		if (PathFinding::getInstance().isBuildingSpawnAvailable(m_headquarters.front()->getPosition(),
-			entityType, map, buildPosition, *this, m_baseHandler))
-		{
-			return worker.build(buildPosition, map, entityType);
-		}
-	}
-	break;
 	default:
 		assert(false);
 	}
