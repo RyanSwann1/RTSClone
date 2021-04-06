@@ -23,7 +23,7 @@ Base::Base(const glm::vec3& position, std::vector<Mineral>&& minerals)
 	owningFactionController(eFactionController::None)
 {}
 
-glm::vec3 Base::getConvertedPosition() const
+glm::vec3 Base::getCenteredPosition() const
 {
 	return Globals::convertToMiddleGridPosition(Globals::convertToNodePosition(position));
 }
@@ -102,7 +102,7 @@ namespace
 	{
 		auto base = std::find_if(m_bases.begin(), m_bases.end(), [&position](const auto& base)
 		{
-			return base.getConvertedPosition() == position;
+			return base.getCenteredPosition() == position;
 		});
 		assert(base != m_bases.end());
 
@@ -217,6 +217,24 @@ const Base& BaseHandler::getNearestBase(const glm::vec3& position) const
 
 	assert(closestBase);
 	return *closestBase;
+}
+
+const Base* BaseHandler::getNearestUnusedBase(const glm::vec3& position) const
+{
+	float closestDistance = std::numeric_limits<float>::max();
+	const Base* closestBase = nullptr;
+	for (const auto& base : m_bases)
+	{
+		float distance = Globals::getSqrDistance(base.position, position);
+		if (distance < closestDistance && 
+			base.owningFactionController == eFactionController::None)
+		{
+			closestBase = &base;
+			closestDistance = distance;
+		}
+	}
+
+	return closestBase;
 }
 
 void BaseHandler::handleEvent(const GameEvent& gameEvent)

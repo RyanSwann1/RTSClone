@@ -15,7 +15,7 @@ struct Base
 	Base(const glm::vec3& position, std::vector<Mineral>&& minerals);
 
 #ifdef GAME
-	glm::vec3 getConvertedPosition() const;
+	glm::vec3 getCenteredPosition() const;
 	const std::vector<Mineral>& getMinerals() const;
 #endif // GAME
 
@@ -52,6 +52,7 @@ public:
 	const Mineral* getMineral(const glm::vec3& position) const;
 	const Base* getBaseAtMineral(const glm::vec3& position) const;
 	const Base& getNearestBase(const glm::vec3& position) const;
+	const Base* getNearestUnusedBase(const glm::vec3& position) const;
 
 	void handleEvent(const GameEvent& gameEvent);
 	void renderMinerals(ShaderHandler& shaderHandler) const;
