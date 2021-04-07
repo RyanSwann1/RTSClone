@@ -2,6 +2,7 @@
 
 #include "Faction.h"
 #include "Graph.h"
+#include "Timer.h"
 #include <queue>
 #include <functional>
 
@@ -54,8 +55,7 @@ public:
 
 private:
 	const BaseHandler& m_baseHandler;
-	float m_elaspedTime;
-	bool m_grownBase;
+	Timer m_baseExpansionTimer;
 	eAIBehaviour m_currentBehaviour;
 	std::queue<eEntityType> m_spawnQueue;
 	std::queue<AIAction> m_actionQueue;

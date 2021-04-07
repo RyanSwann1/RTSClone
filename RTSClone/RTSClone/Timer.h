@@ -10,6 +10,7 @@ public:
 	bool isExpired() const;
 	bool isActive() const;
 
+	void setExpirationTime(float expirationTime); 
 	void setActive(bool active);
 	void update(float deltaTime);
 	void resetElaspedTime();

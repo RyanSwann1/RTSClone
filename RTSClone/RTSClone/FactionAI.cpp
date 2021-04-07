@@ -35,6 +35,8 @@ namespace
 	const float MAX_DISTANCE_FROM_HQ = static_cast<float>(Globals::NODE_SIZE) * 18.0f;
 	const float MIN_DISTANCE_FROM_HQ = static_cast<float>(Globals::NODE_SIZE) * 5.0f;
 	const float DISTANCE_FROM_MINERALS = static_cast<float>(Globals::NODE_SIZE) * 7.0f;
+	const float MIN_BASE_EXPANSION_TIME = 2.0f;
+	const float MAX_BASE_EXPANSION_TIME = MIN_BASE_EXPANSION_TIME * 2.0f;
 
 	const int MAX_WORKERS_REPAIR_BUILDING = 2;
 
@@ -103,8 +105,7 @@ FactionAI::FactionAI(eFactionController factionController, const glm::vec3& hqSt
 	int startingResources, int startingPopulationCap, const BaseHandler& baseHandler)
 	: Faction(factionController, hqStartingPosition, startingResources, startingPopulationCap),
 	m_baseHandler(baseHandler),
-	m_elaspedTime(0.0f),
-	m_grownBase(false),
+	m_baseExpansionTimer(Globals::getRandomNumber(MIN_BASE_EXPANSION_TIME, MAX_BASE_EXPANSION_TIME), true),
 	m_currentBehaviour(static_cast<eAIBehaviour>(Globals::getRandomNumber(0, static_cast<int>(eAIBehaviour::Max)))),
 	m_spawnQueue(),
 	m_actionQueue(),
@@ -119,7 +120,7 @@ FactionAI::FactionAI(eFactionController factionController, const glm::vec3& hqSt
 
 	for (const auto& i : BUILD_ORDERS[Globals::getRandomNumber(0, static_cast<int>(BUILD_ORDERS.size() - 1))])
 	{
-		//m_actionQueue.emplace(i);
+		m_actionQueue.emplace(i);
 	}
 }
 
@@ -311,8 +312,8 @@ void FactionAI::update(float deltaTime, const Map & map, FactionHandler& faction
 			assert(false);
 	}
 
-	m_elaspedTime += deltaTime;
-	if (m_elaspedTime > 5.0f && !m_grownBase)
+	m_baseExpansionTimer.update(deltaTime);
+	if (m_baseExpansionTimer.isExpired() && isAffordable(eEntityType::Headquarters))
 	{
 		const Base* availableBase = m_baseHandler.getNearestUnusedBase(getMainHeadquartersPosition());
 		if (availableBase)
@@ -321,7 +322,7 @@ void FactionAI::update(float deltaTime, const Map & map, FactionHandler& faction
 			if (availableWorker)
 			{
 				availableWorker->build(availableBase->getCenteredPosition(), map, eEntityType::Headquarters, availableBase);
-				m_grownBase = true;
+				m_baseExpansionTimer.setExpirationTime(200.0f);
 			}
 		}
 	}

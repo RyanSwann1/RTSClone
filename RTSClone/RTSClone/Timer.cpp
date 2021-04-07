@@ -1,4 +1,5 @@
 #include "Timer.h"
+#include <assert.h>
 
 Timer::Timer(float expirationTime, bool active)
 	: m_expirationTime(expirationTime),
@@ -24,6 +25,12 @@ bool Timer::isExpired() const
 bool Timer::isActive() const
 {
 	return m_active;
+}
+
+void Timer::setExpirationTime(float expirationTime)
+{
+	assert(m_elaspedTime == 0.0f || isExpired());
+	m_expirationTime = expirationTime;
 }
 
 void Timer::setActive(bool active)
