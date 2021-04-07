@@ -54,6 +54,8 @@ public:
 
 private:
 	const BaseHandler& m_baseHandler;
+	float m_elaspedTime;
+	bool m_grownBase;
 	eAIBehaviour m_currentBehaviour;
 	std::queue<eEntityType> m_spawnQueue;
 	std::queue<AIAction> m_actionQueue;

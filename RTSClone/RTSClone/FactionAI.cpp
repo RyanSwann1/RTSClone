@@ -82,6 +82,9 @@ namespace
 
 		return entityType;
 	}
+
+	//Defensive
+	const size_t DEFENSIVE_MAX_TURRETS = 5;
 }
 
 //AIAction
@@ -100,6 +103,8 @@ FactionAI::FactionAI(eFactionController factionController, const glm::vec3& hqSt
 	int startingResources, int startingPopulationCap, const BaseHandler& baseHandler)
 	: Faction(factionController, hqStartingPosition, startingResources, startingPopulationCap),
 	m_baseHandler(baseHandler),
+	m_elaspedTime(0.0f),
+	m_grownBase(false),
 	m_currentBehaviour(static_cast<eAIBehaviour>(Globals::getRandomNumber(0, static_cast<int>(eAIBehaviour::Max)))),
 	m_spawnQueue(),
 	m_actionQueue(),
@@ -114,7 +119,7 @@ FactionAI::FactionAI(eFactionController factionController, const glm::vec3& hqSt
 
 	for (const auto& i : BUILD_ORDERS[Globals::getRandomNumber(0, static_cast<int>(BUILD_ORDERS.size() - 1))])
 	{
-		m_actionQueue.emplace(i);
+		//m_actionQueue.emplace(i);
 	}
 }
 
@@ -293,6 +298,33 @@ void FactionAI::update(float deltaTime, const Map & map, FactionHandler& faction
 			}
 		}
 	}
+
+	switch (m_currentBehaviour)
+	{
+		case eAIBehaviour::Defensive:
+			break;
+		case eAIBehaviour::Expansive:
+			break;
+		case eAIBehaviour::Aggressive:
+			break;
+		default:
+			assert(false);
+	}
+
+	m_elaspedTime += deltaTime;
+	if (m_elaspedTime > 5.0f && !m_grownBase)
+	{
+		const Base* availableBase = m_baseHandler.getNearestUnusedBase(getMainHeadquartersPosition());
+		if (availableBase)
+		{
+			Worker* availableWorker = getAvailableWorker(availableBase->position);
+			if (availableWorker)
+			{
+				availableWorker->build(availableBase->getCenteredPosition(), map, eEntityType::Headquarters, availableBase);
+				m_grownBase = true;
+			}
+		}
+	}
 }
 
 void FactionAI::instructWorkersToRepair(const Headquarters& HQ, const Map& map)
@@ -303,7 +335,6 @@ void FactionAI::instructWorkersToRepair(const Headquarters& HQ, const Map& map)
 		if (worker->getCurrentState() == eWorkerState::Repairing || worker->getCurrentState() == eWorkerState::MovingToRepairPosition)
 		{
 			++repairCount;
-
 			if (repairCount == MAX_WORKERS_REPAIR_BUILDING)
 			{
 				break;
@@ -532,7 +563,6 @@ bool FactionAI::build(const Map& map, eEntityType entityType, Worker* worker)
 					return availableWorker->build(buildPosition, map, entityType);
 				}
 			}
-
 		}
 	}
 		break;
