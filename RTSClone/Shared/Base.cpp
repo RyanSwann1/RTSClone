@@ -63,22 +63,6 @@ void Base::setPosition(const glm::vec3 & _position)
 #ifdef GAME
 namespace
 {
-	const Base& getBase(const std::vector<Base>& m_bases, const Mineral& _mineral)
-	{
-		for (const auto& base : m_bases)
-		{
-			for (const auto& mineral : base.minerals)
-			{
-				if (&mineral == &_mineral)
-				{
-					return base;
-				}
-			}
-		}
-
-		assert(false);
-	}
-
 	std::array<const Mineral*, Globals::MAX_MINERALS> getClosestMinerals(const std::vector<Mineral>& minerals, const glm::vec3& position)
 	{
 		assert(static_cast<int>(minerals.size()) == Globals::MAX_MINERALS);
@@ -96,17 +80,6 @@ namespace
 		});
 
 		return sortedMinerals;
-	}
-
-	Base& getBase(std::vector<Base>& m_bases, const glm::vec3& position)
-	{
-		auto base = std::find_if(m_bases.begin(), m_bases.end(), [&position](const auto& base)
-		{
-			return base.getCenteredPosition() == position;
-		});
-		assert(base != m_bases.end());
-
-		return (*base);
 	}
 }
 
@@ -155,7 +128,7 @@ const Mineral* BaseHandler::getNearestAvailableMineralAtBase(const Faction& fact
 	const glm::vec3& position) const
 {
 	assert(faction.isMineralInUse(_mineral));
-	std::array<const Mineral*, Globals::MAX_MINERALS> minerals = getClosestMinerals(getBase(m_bases, _mineral).minerals, position);
+	std::array<const Mineral*, Globals::MAX_MINERALS> minerals = getClosestMinerals(getBase(_mineral).minerals, position);
 	for (const auto& mineral : minerals)
 	{
 		assert(mineral);
@@ -237,20 +210,56 @@ const Base* BaseHandler::getNearestUnusedBase(const glm::vec3& position) const
 	return closestBase;
 }
 
+const Base& BaseHandler::getBase(const glm::vec3& position) const
+{
+	auto base = std::find_if(m_bases.cbegin(), m_bases.cend(), [&position](const auto& base)
+	{
+		return base.getCenteredPosition() == position;	
+	});
+	assert(base != m_bases.cend());
+	return (*base);
+}
+
+const Base& BaseHandler::getBase(const Mineral& _mineral) const
+{
+	for (const auto& base : m_bases)
+	{
+		for (const auto& mineral : base.minerals)
+		{
+			if (&mineral == &_mineral)
+			{
+				return base;
+			}
+		}
+	}
+
+	assert(false);
+}
+
+Base& BaseHandler::getBase(const glm::vec3& position)
+{
+	auto base = std::find_if(m_bases.begin(), m_bases.end(), [&position](const auto& base)
+	{
+		return base.getCenteredPosition() == position;
+	});
+	assert(base != m_bases.end());
+	return (*base);
+}
+
 void BaseHandler::handleEvent(const GameEvent& gameEvent)
 {
 	switch (gameEvent.type)
 	{
 	case eGameEventType::AttachFactionToBase:
 	{
-		Base& base = getBase(m_bases, gameEvent.data.attachFactionToBase.position);
+		Base& base = getBase(gameEvent.data.attachFactionToBase.position);
 		assert(base.owningFactionController == eFactionController::None);
 		base.owningFactionController = gameEvent.data.attachFactionToBase.factionController;
 	}
 		break;
 	case eGameEventType::DetachFactionFromBase:
 	{
-		Base& base = getBase(m_bases, gameEvent.data.attachFactionToBase.position);
+		Base& base = getBase(gameEvent.data.attachFactionToBase.position);
 		assert(base.owningFactionController == gameEvent.data.detachFactionFromBase.factionController);
 		base.owningFactionController = eFactionController::None;
 	}
