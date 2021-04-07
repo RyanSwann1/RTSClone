@@ -142,7 +142,7 @@ bool FactionPlayerPlannedBuilding::isOnValidPosition(const BaseHandler& baseHand
         {
             for (const auto& base : baseHandler.getBases())
             {
-                if (base.getConvertedPosition() == m_position)
+                if (base.getCenteredPosition() == m_position)
                 {
                     return true;
                 }
@@ -346,10 +346,23 @@ int FactionPlayer::instructWorkerToBuild(const Map& map, const BaseHandler& base
                 return worker->getID() == workerID;
             });
             assert(selectedWorker != m_workers.cend());
-            if (selectedWorker != m_workers.end() &&
-                (*selectedWorker)->build(m_plannedBuilding->getPosition(), map, m_plannedBuilding->getEntityType()))
+            if (selectedWorker != m_workers.end())
             {
-                m_plannedBuilding.reset();
+				if (m_plannedBuilding->getEntityType() == eEntityType::Headquarters)
+				{
+                    const Base& base = baseHandler.getBase(m_plannedBuilding->getPosition());
+                    if ((*selectedWorker)->build(base.getCenteredPosition(), map, m_plannedBuilding->getEntityType(), &base))
+                    {
+                        m_plannedBuilding.reset();
+                    }
+				}
+                else
+                {
+					if ((*selectedWorker)->build(m_plannedBuilding->getPosition(), map, m_plannedBuilding->getEntityType()))
+					{
+						m_plannedBuilding.reset();
+					}
+                }
             }
         }
         else if (!isAffordable(m_plannedBuilding->getEntityType()))

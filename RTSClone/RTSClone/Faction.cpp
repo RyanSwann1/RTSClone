@@ -95,7 +95,7 @@ const Headquarters& Faction::getClosestHeadquarters(const glm::vec3& position) c
 const glm::vec3& Faction::getMainHeadquartersPosition() const
 {
     assert(!m_headquarters.empty());
-    return (*m_headquarters.begin())->getPosition();
+    return m_headquarters.front()->getPosition();
 }
 
 eFactionController Faction::getController() const
