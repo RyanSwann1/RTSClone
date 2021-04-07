@@ -12,6 +12,7 @@
 #include "Camera.h"
 #include "GameMessenger.h"
 #include "GameMessages.h"
+#include "Base.h"
 #ifdef RENDER_PATHING
 #include "RenderPathMesh.h"
 #endif // RENDER_PATHING
@@ -28,6 +29,7 @@ namespace
 	const float REPAIR_DISTANCE = static_cast<float>(Globals::NODE_SIZE) * 3.0f;
 	const float WORKER_PROGRESS_BAR_WIDTH = 60.0f;
 	const float WORKER_PROGRESS_BAR_YOFFSET = 30.0f;
+	const float MAX_DISTANCE_BUILD_HEADQUARTERS = static_cast<float>(Globals::NODE_SIZE) * 12.0f;
 }
 
 //BuildingInWorkerQueue
@@ -44,6 +46,7 @@ Worker::Worker(Faction& owningFaction, const Map& map, const glm::vec3& starting
 	m_owningFaction(owningFaction),
 	m_currentState(eWorkerState::Idle),
 	m_buildQueue(),
+	m_baseToExpandTo(nullptr),
 	m_repairTargetEntityID(Globals::INVALID_ENTITY_ID),
 	m_currentResourceAmount(0),
 	m_taskTimer(0.0f, false),
@@ -59,6 +62,7 @@ Worker::Worker(Faction& owningFaction, const glm::vec3 & startingPosition, const
 	m_owningFaction(owningFaction),
 	m_currentState(eWorkerState::Idle),
 	m_buildQueue(),
+	m_baseToExpandTo(nullptr),
 	m_repairTargetEntityID(Globals::INVALID_ENTITY_ID),
 	m_currentResourceAmount(0),
 	m_taskTimer(0.0f, false),
@@ -107,13 +111,16 @@ void Worker::repairEntity(const Entity& entity, const Map& map)
 	m_repairTargetEntityID = entity.getID();
 }
 
-bool Worker::build(const glm::vec3& buildPosition, const Map& map, eEntityType entityType)
+bool Worker::build(const glm::vec3& buildPosition, const Map& map, eEntityType entityType, const Base* baseToExpandTo)
 {
+	assert((baseToExpandTo && entityType == eEntityType::Headquarters) || (!baseToExpandTo && entityType != eEntityType::Headquarters));
+	assert((baseToExpandTo && baseToExpandTo->owningFactionController == eFactionController::None) || !baseToExpandTo);
 	AABB buildingAABB(buildPosition, ModelManager::getInstance().getModel(entityType));
 	assert(map.isWithinBounds(buildingAABB) && !map.isAABBOccupied(buildingAABB));
 
 	if (!m_owningFaction.get().isCollidingWithWorkerBuildQueue(ModelManager::getInstance().getModelAABB(buildPosition, entityType)))
 	{
+		m_baseToExpandTo = baseToExpandTo;
 		if (m_buildQueue.empty())
 		{
 			moveTo(buildPosition, map, eWorkerState::MovingToBuildingPosition);
@@ -196,7 +203,11 @@ void Worker::update(float deltaTime, const Map& map, FactionHandler& factionHand
 		break;
 	case eWorkerState::MovingToBuildingPosition:
 		assert(!m_buildQueue.empty());
-		if (m_pathToPosition.empty())
+		if (m_baseToExpandTo && m_baseToExpandTo->owningFactionController != eFactionController::None)
+		{
+			switchTo(eWorkerState::Idle, map);
+		}
+		else if (m_pathToPosition.empty())
 		{
 			switchTo(eWorkerState::Building, map);
 		}
@@ -358,6 +369,33 @@ void Worker::moveTo(const glm::vec3& destination, const Map& map, eWorkerState s
 	}
 }
 
+void Worker::moveTo(const Base& base, const Map& map)
+{
+	assert(base.owningFactionController == eFactionController::None);
+	
+	glm::vec3 previousDestination = Globals::getNextPathDestination(m_pathToPosition, m_position);
+
+	m_baseToExpandTo = &base;
+	PathFinding::getInstance().getPathToPosition(*this, m_baseToExpandTo->getCenteredPosition(), m_pathToPosition, 
+		createAdjacentPositions(map), map, m_owningFaction);
+	if (!m_pathToPosition.empty())
+	{
+		switchTo(eWorkerState::MovingToBuildingPosition, map);
+	}
+	else
+	{
+		if (previousDestination != m_position)
+		{
+			m_pathToPosition.push_back(previousDestination);
+			switchTo(eWorkerState::Moving, map);
+		}
+		else
+		{
+			switchTo(eWorkerState::Idle, map);
+		}
+	}
+}
+
 void Worker::render(ShaderHandler& shaderHandler, eFactionController owningFactionController) const
 {
 	if (m_currentResourceAmount > 0 && m_currentState != eWorkerState::Harvesting)
@@ -401,7 +439,7 @@ void Worker::switchTo(eWorkerState newState, const Map& map, const Mineral* mine
 	{
 	case eWorkerState::Idle:
 	case eWorkerState::Moving:
-		break;
+	break;
 	case eWorkerState::MovingToMinerals:
 	case eWorkerState::ReturningMineralsToHeadquarters:
 		if (newState != eWorkerState::MovingToMinerals &&
@@ -427,6 +465,7 @@ void Worker::switchTo(eWorkerState newState, const Map& map, const Mineral* mine
 			newState != eWorkerState::Building)
 		{
 			m_buildQueue.clear();
+			m_baseToExpandTo = nullptr;
 		}
 		break;
 	case eWorkerState::MovingToRepairPosition:
@@ -461,8 +500,8 @@ void Worker::switchTo(eWorkerState newState, const Map& map, const Mineral* mine
 		m_pathToPosition.clear();
 		break;
 	case eWorkerState::Moving:
-	case eWorkerState::MovingToBuildingPosition:
 	case eWorkerState::ReturningMineralsToHeadquarters:
+	case eWorkerState::MovingToBuildingPosition:
 		m_taskTimer.setActive(false);
 		break;
 	case eWorkerState::MovingToRepairPosition:

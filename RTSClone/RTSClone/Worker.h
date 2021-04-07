@@ -37,6 +37,7 @@ struct BuildingInWorkerQueue
 	std::reference_wrapper<const Model> model;
 };
 
+struct Base;
 class Faction;
 class Mineral;
 class Worker : public Entity
@@ -54,8 +55,9 @@ public:
 	int extractResources();	
 
 	void repairEntity(const Entity& entity, const Map& map);
-	bool build(const glm::vec3& buildPosition, const Map& map, eEntityType entityType);
+	bool build(const glm::vec3& buildPosition, const Map& map, eEntityType entityType, const Base* baseToExpandTo = nullptr);
 	void update(float deltaTime, const Map& map, FactionHandler& factionHandler, const Timer& unitStateHandlerTimer);
+	void moveTo(const Base& base, const Map& map);
 	void moveTo(const Mineral& mineral, const Map& map);
 	void moveTo(const Entity& target, const Map& map, eWorkerState state);
 	void moveTo(const glm::vec3& destination, const Map& map, eWorkerState state = eWorkerState::Moving);
@@ -73,6 +75,7 @@ private:
 	eWorkerState m_currentState;
 	std::vector<glm::vec3> m_pathToPosition;
 	std::deque<BuildingInWorkerQueue> m_buildQueue;
+	const Base* m_baseToExpandTo;
 	int m_repairTargetEntityID;
 	int m_currentResourceAmount;
 	Timer m_taskTimer;
