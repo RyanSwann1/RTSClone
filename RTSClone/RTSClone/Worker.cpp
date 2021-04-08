@@ -242,6 +242,10 @@ void Worker::update(float deltaTime, const Map& map, FactionHandler& factionHand
 		{
 			switchTo(eWorkerState::Repairing, map);
 		}
+		else if (!m_owningFaction.get().getEntity(m_repairTargetEntityID))
+		{
+			switchTo(eWorkerState::Idle, map);
+		}
 		break;
 	case eWorkerState::Repairing:
 		assert(m_pathToPosition.empty() && m_repairTargetEntityID != Globals::INVALID_ENTITY_ID &&
