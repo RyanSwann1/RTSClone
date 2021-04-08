@@ -62,18 +62,19 @@ struct IncreaseFactionShieldEvent : public GameEvent_2
 
 struct GameEvent_3
 {
-	GameEvent_3(eFactionController senderFaction, int senderID);
+	GameEvent_3(eFactionController senderFaction, int senderID, eEntityType entityType);
 
 	eFactionController factionController;
 	int entityID;
+	eEntityType entityType;
 };
 struct RepairEntityEvent : public GameEvent_3 {
-	RepairEntityEvent(eFactionController factionController, int senderID) :
-		GameEvent_3(factionController, senderID) {}
+	RepairEntityEvent(eFactionController factionController, int senderID, eEntityType entityType) :
+		GameEvent_3(factionController, senderID, entityType) {}
 };
 struct SetTargetEntityGUIEvent : public GameEvent_3 {
-	SetTargetEntityGUIEvent(eFactionController factionController, int senderID) :
-		GameEvent_3(factionController, senderID) {}
+	SetTargetEntityGUIEvent(eFactionController factionController, int senderID, eEntityType entityType) :
+		GameEvent_3(factionController, senderID, entityType) {}
 };
 
 struct GameEvent_4
@@ -195,8 +196,8 @@ struct GameEvent
 	static GameEvent createIncreaseFactionShield(eFactionController factionController);
 	
 	//GameEvent_3
-	static GameEvent createRepairEntity(eFactionController senderFaction, int senderID);
-	static GameEvent createSetTargetEntityGUI(eFactionController senderFaction, int senderID);
+	static GameEvent createRepairEntity(eFactionController senderFaction, int senderID, eEntityType entityType);
+	static GameEvent createSetTargetEntityGUI(eFactionController senderFaction, int senderID, eEntityType entityType);
 
 	//GameEvent_4
 	static GameEvent createTakeDamage(eFactionController senderFaction, int senderID, eEntityType senderEntityType, 

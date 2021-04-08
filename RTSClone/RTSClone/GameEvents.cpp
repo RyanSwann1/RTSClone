@@ -10,9 +10,10 @@ GameEvent_2::GameEvent_2(eFactionController senderFaction)
 	: factionController(senderFaction)
 {}
 
-GameEvent_3::GameEvent_3(eFactionController senderFaction, int senderID)
+GameEvent_3::GameEvent_3(eFactionController senderFaction, int senderID, eEntityType entityType)
 	: factionController(senderFaction),
-	entityID(senderID)
+	entityID(senderID),
+	entityType(entityType)
 {}
 
 GameEvent_4::GameEvent_4(eFactionController senderFaction, int senderID, eEntityType senderEntityType, 
@@ -95,14 +96,14 @@ GameEvent GameEvent::createIncreaseFactionShield(eFactionController factionContr
 	return { eGameEventType::IncreaseFactionShield, IncreaseFactionShieldEvent{factionController} };	
 }
 
-GameEvent GameEvent::createRepairEntity(eFactionController senderFaction, int senderID)
+GameEvent GameEvent::createRepairEntity(eFactionController senderFaction, int senderID, eEntityType entityType)
 {
-	return { eGameEventType::RepairEntity, RepairEntityEvent{senderFaction, senderID} };
+	return { eGameEventType::RepairEntity, RepairEntityEvent{senderFaction, senderID, entityType} };
 }
 
-GameEvent GameEvent::createSetTargetEntityGUI(eFactionController senderFaction, int senderID)
+GameEvent GameEvent::createSetTargetEntityGUI(eFactionController senderFaction, int senderID, eEntityType entityType)
 {
-	return { eGameEventType::SetTargetEntityGUI,SetTargetEntityGUIEvent{senderFaction, senderID} };
+	return { eGameEventType::SetTargetEntityGUI,SetTargetEntityGUIEvent{senderFaction, senderID, entityType} };
 }
 
 GameEvent GameEvent::createTakeDamage(eFactionController senderFaction, int senderID, eEntityType senderEntityType, 
