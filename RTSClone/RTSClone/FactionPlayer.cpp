@@ -272,7 +272,8 @@ void FactionPlayer::update(float deltaTime, const Map& map, FactionHandler& fact
 
         if (m_selectedEntities.size() == 1)
         {
-            GameEventHandler::getInstance().gameEvents.push(GameEvent::createSetTargetEntityGUI(getController(), m_selectedEntities.back()->getID()));
+            GameEventHandler::getInstance().gameEvents.push(
+                GameEvent::createSetTargetEntityGUI(getController(), m_selectedEntities.back()->getID(), m_selectedEntities.back()->getEntityType()));
         }
         else if (!m_selectedEntities.empty())
         {

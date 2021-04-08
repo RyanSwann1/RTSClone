@@ -98,10 +98,11 @@ void PlayerDetailsWidget::render(const sf::Window& window)
 }
 
 //SelectedEntityWidget
-SelectedEntityWidget::SelectedEntityWidget(eFactionController factionController, int ID)
+SelectedEntityWidget::SelectedEntityWidget(eFactionController factionController, int ID, eEntityType entityType)
 	: Widget(),
 	factionController(factionController),
-	ID(ID)
+	ID(ID),
+	entityType(entityType)
 {}
 
 void SelectedEntityWidget::render(const sf::Window& window)
@@ -255,7 +256,8 @@ void UIManager::handleInput(const sf::Window& window, const FactionHandler& fact
 				selectedEntity = faction->getEntity(mouseToGroundPosition);
 				if (selectedEntity)
 				{
-					m_selectedEntityWidget = std::make_unique<SelectedEntityWidget>(faction->getController(), selectedEntity->getID());
+					m_selectedEntityWidget = 
+						std::make_unique<SelectedEntityWidget>(faction->getController(), selectedEntity->getID(), selectedEntity->getEntityType());
 					break;
 				}
 			}
@@ -277,7 +279,8 @@ void UIManager::handleEvent(const GameEvent& gameEvent)
 	case eGameEventType::SetTargetEntityGUI:
 		m_selectedEntityWidget = std::make_unique<SelectedEntityWidget>(
 			gameEvent.data.setTargetEntityGUI.factionController,
-			gameEvent.data.setTargetEntityGUI.entityID);
+			gameEvent.data.setTargetEntityGUI.entityID, 
+			gameEvent.data.setTargetEntityGUI.entityType);
 		break;
 	case eGameEventType::ResetTargetEntityGUI:
 		m_selectedEntityWidget.reset();
@@ -292,7 +295,7 @@ void UIManager::update(const FactionHandler& factionHandler)
 		if (factionHandler.isFactionActive(m_selectedEntityWidget->factionController))
 		{
 			const Entity* targetEntity =
-				factionHandler.getFaction(m_selectedEntityWidget->factionController).getEntity(m_selectedEntityWidget->ID);
+				factionHandler.getFaction(m_selectedEntityWidget->factionController).getEntity(m_selectedEntityWidget->ID, m_selectedEntityWidget->entityType);
 			if (!targetEntity)
 			{
 				m_selectedEntityWidget.reset();
@@ -346,7 +349,7 @@ void UIManager::onDisplayPlayerDetails(const GameMessages::UIDisplayPlayerDetail
 
 void UIManager::onDisplayEntity(const GameMessages::UIDisplaySelectedEntity& gameMessage)
 {
-	m_selectedEntityWidget = std::make_unique<SelectedEntityWidget>(gameMessage.owningFaction, gameMessage.entityID);
+	m_selectedEntityWidget = std::make_unique<SelectedEntityWidget>(gameMessage.owningFaction, gameMessage.entityID, gameMessage.entityType);
 }
 
 void UIManager::onClearDisplayEntity(GameMessages::UIClearDisplaySelectedEntity)

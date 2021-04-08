@@ -302,14 +302,14 @@ void FactionAI::update(float deltaTime, const Map & map, FactionHandler& faction
 
 	switch (m_currentBehaviour)
 	{
-		case eAIBehaviour::Defensive:
-			break;
-		case eAIBehaviour::Expansive:
-			break;
-		case eAIBehaviour::Aggressive:
-			break;
-		default:
-			assert(false);
+	case eAIBehaviour::Defensive:
+		break;
+	case eAIBehaviour::Expansive:
+		break;
+	case eAIBehaviour::Aggressive:
+		break;
+	default:
+		assert(false);
 	}
 
 	m_baseExpansionTimer.update(deltaTime);
@@ -436,7 +436,7 @@ void FactionAI::onUnitTakenDamage(const TakeDamageEvent& gameEvent, Unit& unit, 
 		if (factionHandler.isFactionActive(unit.getTargetEntity().getFactionController()))
 		{
 			const Faction& opposingFaction = factionHandler.getFaction(unit.getTargetEntity().getFactionController());
-			const Entity* targetEntity = opposingFaction.getEntity(unit.getTargetEntity().getID());
+			const Entity* targetEntity = opposingFaction.getEntity(unit.getTargetEntity().getID(), unit.getTargetEntity().getType());
 			if (!targetEntity)
 			{
 				changeTargetEntity = true;
@@ -456,7 +456,7 @@ void FactionAI::onUnitTakenDamage(const TakeDamageEvent& gameEvent, Unit& unit, 
 	if (changeTargetEntity)
 	{
 		const Faction& opposingFaction = factionHandler.getFaction(gameEvent.senderFaction);
-		const Entity* targetEntity = opposingFaction.getEntity(gameEvent.senderID);
+		const Entity* targetEntity = opposingFaction.getEntity(gameEvent.senderID, gameEvent.senderEntityType);
 		if (targetEntity)
 		{
 			unit.moveToAttackPosition(*targetEntity, opposingFaction, map, factionHandler);

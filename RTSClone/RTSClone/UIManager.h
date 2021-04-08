@@ -45,12 +45,13 @@ struct PlayerDetailsWidget : public Widget<GameMessages::UIDisplayPlayerDetails>
 
 struct SelectedEntityWidget : public Widget<GameMessages::UIDisplaySelectedEntity>
 {
-	SelectedEntityWidget(eFactionController factionController, int ID);
+	SelectedEntityWidget(eFactionController factionController, int ID, eEntityType entityType);
 
 	void render(const sf::Window& window);
 
 	const eFactionController factionController; 
 	const int ID;
+	const eEntityType entityType;
 };
 
 struct WinningFactionWidget : public Widget<GameMessages::UIDisplayWinner>

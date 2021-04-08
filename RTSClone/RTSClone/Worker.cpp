@@ -266,7 +266,7 @@ void Worker::update(float deltaTime, const Map& map, FactionHandler& factionHand
 					m_rotation.y = Globals::getAngle(targetEntity->getPosition(), m_position);
 
 					GameEventHandler::getInstance().gameEvents.push(GameEvent::createRepairEntity(
-						m_owningFaction.get().getController(), m_repairTargetEntity.getID()));
+						m_owningFaction.get().getController(), m_repairTargetEntity.getID(), m_repairTargetEntity.getType()));
 				}
 			}
 			else
@@ -276,7 +276,7 @@ void Worker::update(float deltaTime, const Map& map, FactionHandler& factionHand
 		}
 		else if (unitStateHandlerTimer.isExpired())
 		{
-			const Entity* targetEntity = m_owningFaction.get().getEntity(m_repairTargetEntity.getID());
+			const Entity* targetEntity = m_owningFaction.get().getEntity(m_repairTargetEntity.getID(), m_repairTargetEntity.getType());
 			if (targetEntity && targetEntity->getHealth() != targetEntity->getMaximumHealth())
 			{
 				if (Globals::getSqrDistance(targetEntity->getPosition(), m_position) > REPAIR_DISTANCE * REPAIR_DISTANCE)
