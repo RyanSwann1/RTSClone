@@ -191,21 +191,6 @@ const Entity* Faction::getEntity(const AABB& AABB, int entityID, eEntityType ent
 	return entity;
 }
 
-const Entity* Faction::getEntity(int entityID) const
-{
-    auto entity = std::find_if(m_allEntities.cbegin(), m_allEntities.cend(), [entityID](const auto& entity)
-    {
-        return entity.get().getID() == entityID;
-    });
-    
-    if (entity != m_allEntities.cend())
-    {
-        return &(*entity).get();
-    }
-
-    return nullptr;
-}
-
 const Entity* Faction::getEntity(const glm::vec3& position) const
 {
     auto entity = std::find_if(m_allEntities.cbegin(), m_allEntities.cend(), [&position](const auto& entity)
