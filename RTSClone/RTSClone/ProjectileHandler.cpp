@@ -22,7 +22,7 @@ void ProjectileHandler::update(float deltaTime, const FactionHandler& factionHan
 		if (factionHandler.isFactionActive(projectile->getSenderEvent().targetFaction))
 		{
 			const Faction& targetFaction = factionHandler.getFaction(projectile->getSenderEvent().targetFaction);
-			entity = targetFaction.getEntity(projectile->getAABB(), projectile->getSenderEvent().targetID);
+			entity = targetFaction.getEntity(projectile->getAABB(), projectile->getSenderEvent().targetID, projectile->getSenderEvent().targetEntityType);
 		}
 
 		if (entity || projectile->isReachedDestination())

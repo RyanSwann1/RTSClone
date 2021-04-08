@@ -26,12 +26,14 @@ GameEvent_4::GameEvent_4(eFactionController senderFaction, int senderID, eEntity
 {}
 
 GameEvent_5::GameEvent_5(eFactionController senderFaction, int senderID, eEntityType senderEntityType, 
-	eFactionController targetFaction, int targetID, int damage, const glm::vec3& startingPosition, const glm::vec3& endingPosition)
+	eFactionController targetFaction, int targetID, eEntityType targetEntityType, 
+	int damage, const glm::vec3& startingPosition, const glm::vec3& endingPosition)
 	: senderFaction(senderFaction),
 	senderID(senderID),
 	senderEntityType(senderEntityType),
 	targetFaction(targetFaction),
 	targetID(targetID),
+	targetEntityType(targetEntityType),
 	damage(damage),
 	spawnPosition(startingPosition),
 	destination(endingPosition)
@@ -110,8 +112,8 @@ GameEvent GameEvent::createTakeDamage(eFactionController senderFaction, int send
 }
 
 GameEvent GameEvent::createSpawnProjectile(eFactionController senderFaction, int senderID, eEntityType senderEntityType,
-	eFactionController targetFaction, int targetID, int damage, const glm::vec3& startingPosition, const glm::vec3& endingPosition)
+	eFactionController targetFaction, int targetID, eEntityType targetEntityType, int damage, const glm::vec3& startingPosition, const glm::vec3& endingPosition)
 {
 	return { eGameEventType::SpawnProjectile,
-		SpawnProjectileEvent{senderFaction, senderID, senderEntityType, targetFaction, targetID, damage, startingPosition, endingPosition} };
+		SpawnProjectileEvent{senderFaction, senderID, senderEntityType, targetFaction, targetID, targetEntityType, damage, startingPosition, endingPosition} };
 }
