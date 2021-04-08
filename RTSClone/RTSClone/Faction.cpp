@@ -158,19 +158,37 @@ const Entity* Faction::getEntity(const glm::vec3& position, float maxDistance, b
     return closestEntity;
 }
 
-const Entity* Faction::getEntity(const AABB& AABB, int entityID) const
+const Entity* Faction::getEntity(const AABB& AABB, int entityID, eEntityType entityType) const
 {
-    auto entity = std::find_if(m_allEntities.cbegin(), m_allEntities.cend(), [&AABB, entityID](const auto& entity)
-    {
-        return entity.get().getAABB().contains(AABB) && entity.get().getID() == entityID;
-    });
-    
-    if (entity != m_allEntities.cend())
-    {
-        return &(*entity).get();
-    }
+	const Entity* entity = nullptr;
+	switch (entityType)
+	{
+	case eEntityType::Unit:
+		entity = getEntity<std::vector<std::unique_ptr<Unit>>>(m_units, entityID, AABB);
+		break;
+	case eEntityType::Worker:
+		entity = getEntity<std::vector<std::unique_ptr<Worker>>>(m_workers, entityID, AABB);
+		break;
+	case eEntityType::Headquarters:
+		entity = getEntity<std::vector<std::unique_ptr<Headquarters>>>(m_headquarters, entityID, AABB);
+		break;
+	case eEntityType::SupplyDepot:
+		entity = getEntity<std::vector<std::unique_ptr<SupplyDepot>>>(m_supplyDepots, entityID, AABB);
+		break;
+	case eEntityType::Barracks:
+		entity = getEntity<std::vector<std::unique_ptr<Barracks>>>(m_barracks, entityID, AABB);
+		break;
+	case eEntityType::Turret:
+		entity = getEntity<std::vector<std::unique_ptr<Turret>>>(m_turrets, entityID, AABB);
+		break;
+	case eEntityType::Laboratory:
+		entity = getEntity<std::vector<std::unique_ptr<Laboratory>>>(m_laboratories, entityID, AABB);
+		break;
+	default:
+		assert(false);
+	}
 
-    return nullptr;
+	return entity;
 }
 
 const Entity* Faction::getEntity(int entityID) const

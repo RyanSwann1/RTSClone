@@ -43,7 +43,7 @@ public:
 	const std::vector<std::unique_ptr<Unit>>& getUnits() const;
 	const std::vector<std::reference_wrapper<Entity>>& getAllEntities() const;
 	const Entity* getEntity(const glm::vec3& position, float maxDistance, bool prioritizeUnits = true) const;
-	const Entity* getEntity(const AABB& AABB, int entityID) const;
+	const Entity* getEntity(const AABB& AABB, int entityID, eEntityType entityType) const;
 	const Entity* getEntity(int entityID) const;
 	const Entity* getEntity(int entityID, eEntityType entityType) const;
 	const Entity* getEntity(const glm::vec3& position) const;
@@ -119,11 +119,23 @@ private:
 	const Entity* getEntity(const T& entityContainer, int entityID) const
 	{
 		assert(entityID != Globals::INVALID_ENTITY_ID);
-		auto cIter = std::find_if(entityContainer.cbegin(), entityContainer.cend(), [entityID](const auto& entity)
+		auto entity = std::find_if(entityContainer.cbegin(), entityContainer.cend(), [entityID](const auto& entity)
 		{
 			return entity->getID() == entityID;
 		});
 
-		return (cIter != entityContainer.cend() ? &*(*cIter) : nullptr);
+		return (entity != entityContainer.cend() ? &*(*entity) : nullptr);
+	}
+
+	template <typename T> 
+	const Entity* getEntity(const T& entityContainer, int entityID, const AABB& entityAABB) const
+	{
+		assert(entity != Globals::INVALID_ENTITY_ID);
+		auto entity = std::find_if(entityContainer.cbegin(), entityContainer.cend(), [&entityAABB, entityID](const auto& entity)
+		{
+			return entity.get()->getAABB().contains(entityAABB) && entity.get()->getID() == entityID;
+		});
+
+		return (entity != entityContainer.cend() ? &*(*entity) : nullptr);
 	}
 };
