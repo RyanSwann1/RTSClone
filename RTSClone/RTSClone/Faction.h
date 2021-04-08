@@ -45,6 +45,7 @@ public:
 	const Entity* getEntity(const glm::vec3& position, float maxDistance, bool prioritizeUnits = true) const;
 	const Entity* getEntity(const AABB& AABB, int entityID) const;
 	const Entity* getEntity(int entityID) const;
+	const Entity* getEntity(int entityID, eEntityType entityType) const;
 	const Entity* getEntity(const glm::vec3& position) const;
 
 	void addResources(Worker& worker);
@@ -112,5 +113,17 @@ private:
 		entityContainer.erase(iter);
 
 		m_allEntities.erase(entity);
+	}
+
+	template <typename T>
+	const Entity* getEntity(const T& entityContainer, int entityID) const
+	{
+		assert(entityID != Globals::INVALID_ENTITY_ID);
+		auto cIter = std::find_if(entityContainer.cbegin(), entityContainer.cend(), [entityID](const auto& entity)
+		{
+			return entity->getID() == entityID;
+		});
+
+		return (cIter != entityContainer.cend() ? &*(*cIter) : nullptr);
 	}
 };

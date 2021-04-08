@@ -205,6 +205,39 @@ const Entity* Faction::getEntity(const glm::vec3& position) const
     }
 }
 
+const Entity* Faction::getEntity(int entityID, eEntityType entityType) const
+{
+    const Entity* entity = nullptr; 
+    switch(entityType)
+    {
+        case eEntityType::Unit:
+			entity = getEntity<std::vector<std::unique_ptr<Unit>>>(m_units, entityID);
+			break;
+        case eEntityType::Worker:
+			entity = getEntity<std::vector<std::unique_ptr<Worker>>>(m_workers, entityID);
+			break;
+        case eEntityType::Headquarters:
+			entity = getEntity<std::vector<std::unique_ptr<Headquarters>>>(m_headquarters, entityID);
+			break;
+        case eEntityType::SupplyDepot:
+			entity = getEntity<std::vector<std::unique_ptr<SupplyDepot>>>(m_supplyDepots, entityID);
+			break;
+        case eEntityType::Barracks:
+			entity = getEntity<std::vector<std::unique_ptr<Barracks>>>(m_barracks, entityID);
+			break;
+        case eEntityType::Turret:
+			entity = getEntity<std::vector<std::unique_ptr<Turret>>>(m_turrets, entityID);
+			break;
+        case eEntityType::Laboratory:
+			entity = getEntity<std::vector<std::unique_ptr<Laboratory>>>(m_laboratories, entityID);
+			break;
+        default:
+            assert(false);
+    }
+
+    return entity;
+}
+
 void Faction::handleEvent(const GameEvent& gameEvent, const Map& map, FactionHandler& factionHandler)
 {
     switch (gameEvent.type)
