@@ -1,8 +1,25 @@
 #pragma once
 
 #include "FactionController.h"
+#include "EntityType.h"
 
-class FactionHandler;
+class RepairTargetEntity
+{
+public:
+	RepairTargetEntity();
+	RepairTargetEntity(eEntityType entityType, int targetID);
+
+	eEntityType getType() const;
+	int getID() const;
+
+	void set(eEntityType type, int ID);
+	void reset();
+
+private:
+	eEntityType m_type;
+	int m_ID;
+};
+
 class TargetEntity
 {
 public:

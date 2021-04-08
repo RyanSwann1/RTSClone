@@ -47,7 +47,7 @@ Worker::Worker(Faction& owningFaction, const Map& map, const glm::vec3& starting
 	m_currentState(eWorkerState::Idle),
 	m_buildQueue(),
 	m_baseToExpandTo(nullptr),
-	m_repairTargetEntityID(Globals::INVALID_ENTITY_ID),
+	m_repairTargetEntity(),
 	m_currentResourceAmount(0),
 	m_taskTimer(0.0f, false),
 	m_mineralToHarvest(nullptr)
@@ -63,7 +63,7 @@ Worker::Worker(Faction& owningFaction, const glm::vec3 & startingPosition, const
 	m_currentState(eWorkerState::Idle),
 	m_buildQueue(),
 	m_baseToExpandTo(nullptr),
-	m_repairTargetEntityID(Globals::INVALID_ENTITY_ID),
+	m_repairTargetEntity(),
 	m_currentResourceAmount(0),
 	m_taskTimer(0.0f, false),
 	m_mineralToHarvest(nullptr)
@@ -108,7 +108,7 @@ int Worker::extractResources()
 void Worker::repairEntity(const Entity& entity, const Map& map)
 {
 	moveTo(entity, map, eWorkerState::MovingToRepairPosition);
-	m_repairTargetEntityID = entity.getID();
+	m_repairTargetEntity.set(entity.getEntityType(), entity.getID());
 }
 
 bool Worker::build(const glm::vec3& buildPosition, const Map& map, eEntityType entityType, const Base* baseToExpandTo)
@@ -242,19 +242,19 @@ void Worker::update(float deltaTime, const Map& map, FactionHandler& factionHand
 		{
 			switchTo(eWorkerState::Repairing, map);
 		}
-		else if (!m_owningFaction.get().getEntity(m_repairTargetEntityID))
+		else if (!m_owningFaction.get().getEntity(m_repairTargetEntity.getID(), m_repairTargetEntity.getType()))
 		{
 			switchTo(eWorkerState::Idle, map);
 		}
 		break;
 	case eWorkerState::Repairing:
-		assert(m_pathToPosition.empty() && m_repairTargetEntityID != Globals::INVALID_ENTITY_ID &&
+		assert(m_pathToPosition.empty() && m_repairTargetEntity.getID() != Globals::INVALID_ENTITY_ID &&
 			m_taskTimer.isActive());
 
 		if (m_taskTimer.isExpired())
 		{
 			m_taskTimer.resetElaspedTime();
-			const Entity* targetEntity = m_owningFaction.get().getEntity(m_repairTargetEntityID);
+			const Entity* targetEntity = m_owningFaction.get().getEntity(m_repairTargetEntity.getID(), m_repairTargetEntity.getType());
 			if (targetEntity && targetEntity->getHealth() != targetEntity->getMaximumHealth())
 			{
 				if (Globals::getSqrDistance(targetEntity->getPosition(), m_position) > REPAIR_DISTANCE * REPAIR_DISTANCE)
@@ -266,7 +266,7 @@ void Worker::update(float deltaTime, const Map& map, FactionHandler& factionHand
 					m_rotation.y = Globals::getAngle(targetEntity->getPosition(), m_position);
 
 					GameEventHandler::getInstance().gameEvents.push(GameEvent::createRepairEntity(
-						m_owningFaction.get().getController(), m_repairTargetEntityID));
+						m_owningFaction.get().getController(), m_repairTargetEntity.getID()));
 				}
 			}
 			else
@@ -276,7 +276,7 @@ void Worker::update(float deltaTime, const Map& map, FactionHandler& factionHand
 		}
 		else if (unitStateHandlerTimer.isExpired())
 		{
-			const Entity* targetEntity = m_owningFaction.get().getEntity(m_repairTargetEntityID);
+			const Entity* targetEntity = m_owningFaction.get().getEntity(m_repairTargetEntity.getID());
 			if (targetEntity && targetEntity->getHealth() != targetEntity->getMaximumHealth())
 			{
 				if (Globals::getSqrDistance(targetEntity->getPosition(), m_position) > REPAIR_DISTANCE * REPAIR_DISTANCE)
@@ -476,14 +476,14 @@ void Worker::switchTo(eWorkerState newState, const Map& map, const Mineral* mine
 		if (newState != eWorkerState::MovingToRepairPosition &&
 			newState != eWorkerState::Repairing)
 		{
-			m_repairTargetEntityID = Globals::INVALID_ENTITY_ID;
+			m_repairTargetEntity.reset();
 		}
 		break;
 	case eWorkerState::Repairing:
 		if (newState != eWorkerState::MovingToRepairPosition &&
 			newState != eWorkerState::Repairing)
 		{
-			m_repairTargetEntityID = Globals::INVALID_ENTITY_ID;
+			m_repairTargetEntity.reset();
 			m_taskTimer.setActive(false);
 			m_taskTimer.resetElaspedTime();
 		}
@@ -533,7 +533,7 @@ void Worker::switchTo(eWorkerState newState, const Map& map, const Mineral* mine
 		m_pathToPosition.clear();
 		break;
 	case eWorkerState::Repairing:
-		assert(m_repairTargetEntityID != Globals::INVALID_ENTITY_ID);
+		assert(m_repairTargetEntity.getID() != Globals::INVALID_ENTITY_ID);
 		m_taskTimer.resetExpirationTime(REPAIR_EXPIRATION_TIME);
 		m_taskTimer.setActive(true);
 		m_pathToPosition.clear();

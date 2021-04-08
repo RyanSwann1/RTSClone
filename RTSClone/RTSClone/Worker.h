@@ -3,6 +3,7 @@
 #include "Entity.h"
 #include "Timer.h"
 #include "AdjacentPositions.h"
+#include "TargetEntity.h"
 #include <queue>
 #include <vector>
 #include <deque>
@@ -76,7 +77,7 @@ private:
 	std::vector<glm::vec3> m_pathToPosition;
 	std::deque<BuildingInWorkerQueue> m_buildQueue;
 	const Base* m_baseToExpandTo;
-	int m_repairTargetEntityID;
+	RepairTargetEntity m_repairTargetEntity;
 	int m_currentResourceAmount;
 	Timer m_taskTimer;
 	const Mineral* m_mineralToHarvest;
