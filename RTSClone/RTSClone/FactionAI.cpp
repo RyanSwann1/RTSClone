@@ -40,6 +40,9 @@ namespace
 
 	const int MAX_WORKERS_REPAIR_BUILDING = 2;
 
+	//Defensive
+	const size_t DEFENSIVE_MAX_TURRETS = 5;
+
 	const std::array< std::array<eActionType, 4>, 3> BUILD_ORDERS
 	{
 		std::array<eActionType, 4> {
@@ -85,8 +88,22 @@ namespace
 		return entityType;
 	}
 
-	//Defensive
-	const size_t DEFENSIVE_MAX_TURRETS = 5;
+	bool isBaseClosest(const BaseHandler& baseHandler, const glm::vec3& position, const Headquarters& headquarters)
+	{
+		const Base& baseOnHeadquarters = baseHandler.getBase(headquarters.getPosition());
+		for (const auto& base : baseHandler.getBases())
+		{
+			if (&baseOnHeadquarters != &base &&
+				Globals::getSqrDistance(base.getCenteredPosition(), position) < 
+				Globals::getSqrDistance(baseOnHeadquarters.getCenteredPosition(), position))
+			{
+				return false;
+			}
+		}
+
+		return true;
+	}
+
 }
 
 //AIAction
@@ -330,20 +347,11 @@ void FactionAI::update(float deltaTime, const Map & map, FactionHandler& faction
 
 void FactionAI::instructWorkersToRepair(const Headquarters& HQ, const Map& map)
 {
-	int repairCount = 0;
-	for (auto& worker : m_workers)
+	for (int i = 0; i < m_workers.size(); i += 2)
 	{
-		if (worker->getCurrentState() == eWorkerState::Repairing || worker->getCurrentState() == eWorkerState::MovingToRepairPosition)
+		if (isBaseClosest(m_baseHandler, m_workers[i]->getPosition(), HQ))
 		{
-			++repairCount;
-			if (repairCount == MAX_WORKERS_REPAIR_BUILDING)
-			{
-				break;
-			}
-		}
-		else
-		{
-			worker->repairEntity(HQ, map);
+			m_workers[i]->repairEntity(HQ, map);
 		}
 	}
 }
