@@ -37,13 +37,20 @@ void RepairTargetEntity::reset()
 //TargetEntity
 TargetEntity::TargetEntity()
 	: m_targetFactionController(),
-	m_targetID(Globals::INVALID_ENTITY_ID)
+	m_targetID(Globals::INVALID_ENTITY_ID),
+	m_targetType()
 {}
 
-TargetEntity::TargetEntity(eFactionController targetFactionController, int targetID)
+TargetEntity::TargetEntity(eFactionController targetFactionController, int targetID, eEntityType targetType)
 	: m_targetFactionController(targetFactionController),
-	m_targetID(targetID)
+	m_targetID(targetID),
+	m_targetType(targetType)
 {}
+
+eEntityType TargetEntity::getType() const
+{
+	return m_targetType;
+}
 
 eFactionController TargetEntity::getFactionController() const
 {
@@ -55,10 +62,11 @@ int TargetEntity::getID() const
 	return m_targetID;
 }
 
-void TargetEntity::set(eFactionController targetFactionController, int ID)
+void TargetEntity::set(eFactionController targetFactionController, int ID, eEntityType type)
 {
 	m_targetFactionController = targetFactionController;
 	m_targetID = ID;
+	m_targetType = type;
 }
 
 void TargetEntity::reset()

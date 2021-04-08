@@ -202,7 +202,7 @@ void Unit::update(float deltaTime, FactionHandler& factionHandler, const Map& ma
 				const Entity* targetEntity = nullptr;
 				if (factionHandler.isFactionActive(m_targetEntity.getFactionController()))
 				{
-					targetEntity = factionHandler.getFaction(m_targetEntity.getFactionController()).getEntity(m_targetEntity.getID());
+					targetEntity = factionHandler.getFaction(m_targetEntity.getFactionController()).getEntity(m_targetEntity.getID(), m_targetEntity.getType());
 				}
 
 				if (targetEntity)
@@ -259,7 +259,7 @@ void Unit::update(float deltaTime, FactionHandler& factionHandler, const Map& ma
 			if (factionHandler.isFactionActive(m_targetEntity.getFactionController()))
 			{
 				const Faction& targetFaction = factionHandler.getFaction(m_targetEntity.getFactionController());
-				const Entity* targetEntity = targetFaction.getEntity(m_targetEntity.getID());
+				const Entity* targetEntity = targetFaction.getEntity(m_targetEntity.getID(), m_targetEntity.getType());
 				if (!targetEntity)
 				{
 					targetEntity = targetFaction.getEntity(m_position, Globals::UNIT_ATTACK_RANGE);
@@ -270,7 +270,7 @@ void Unit::update(float deltaTime, FactionHandler& factionHandler, const Map& ma
 					}
 					else
 					{
-						m_targetEntity.set(targetFaction.getController(), targetEntity->getID());
+						m_targetEntity.set(targetFaction.getController(), targetEntity->getID(), targetEntity->getEntityType());
 					}
 				}
 				else
@@ -296,7 +296,7 @@ void Unit::update(float deltaTime, FactionHandler& factionHandler, const Map& ma
 		if (m_attackTimer.isExpired() && factionHandler.isFactionActive(m_targetEntity.getFactionController()))
 		{
 			const Faction& targetFaction = factionHandler.getFaction(m_targetEntity.getFactionController());
-			const Entity* targetEntity = targetFaction.getEntity(m_targetEntity.getID());
+			const Entity* targetEntity = targetFaction.getEntity(m_targetEntity.getID(), m_targetEntity.getType());
 			if (targetEntity && Globals::getSqrDistance(targetEntity->getPosition(), m_position) <= Globals::UNIT_ATTACK_RANGE * Globals::UNIT_ATTACK_RANGE)
 			{
 				GameEventHandler::getInstance().gameEvents.push(GameEvent::createSpawnProjectile(m_owningFaction.get().getController(), getID(),
@@ -369,13 +369,13 @@ void Unit::switchToState(eUnitState newState, const Map& map, const Entity* targ
 			m_attackTimer.resetElaspedTime();
 		}
 		assert(targetEntity && targetFaction);
-		m_targetEntity.set(targetFaction->getController(), targetEntity->getID());
+		m_targetEntity.set(targetFaction->getController(), targetEntity->getID(), targetEntity->getEntityType());
 		break;
 	case eUnitState::Moving:
 		assert(!m_pathToPosition.empty());
 		if (targetEntity && targetFaction)
 		{
-			m_targetEntity.set(targetFaction->getController(), targetEntity->getID());
+			m_targetEntity.set(targetFaction->getController(), targetEntity->getID(), targetEntity->getEntityType());
 		}
 		else
 		{

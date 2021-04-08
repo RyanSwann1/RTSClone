@@ -24,15 +24,17 @@ class TargetEntity
 {
 public:
 	TargetEntity();
-	TargetEntity(eFactionController targetFactionController, int targetID);
+	TargetEntity(eFactionController targetFactionController, int targetID, eEntityType targetType);
 
+	eEntityType getType() const;
 	eFactionController getFactionController() const;
 	int getID() const;
 
-	void set(eFactionController targetFactionController, int ID);
+	void set(eFactionController targetFactionController, int ID, eEntityType type);
 	void reset();
 
 private:
 	eFactionController m_targetFactionController;
 	int m_targetID;
+	eEntityType m_targetType;
 };
