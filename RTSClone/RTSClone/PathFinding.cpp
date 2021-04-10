@@ -313,27 +313,36 @@ bool PathFinding::getClosestAvailableEntitySpawnPosition(const EntitySpawnerBuil
 	return availablePositionFound;
 }
 
-glm::vec3 PathFinding::getRandomAvailablePositionOutsideAABB(const Entity& senderEntity, const Map& map)
+bool PathFinding::getRandomPositionOutsideAABB(const Entity& building, const Map& map, glm::vec3& positionOutsideAABB)
 {
-	static std::random_device rd;
-	static std::mt19937 g(rd());
-	std::array<glm::ivec2, 8> shuffledAllDirectionsOnGrid = ALL_DIRECTIONS_ON_GRID;
-	std::shuffle(shuffledAllDirectionsOnGrid.begin(), shuffledAllDirectionsOnGrid.end(), g);
+	m_graph.reset(m_frontier);
+	m_frontier.push(Globals::convertToGridPosition(building.getPosition()));
+	bool availablePositionFound = false;
 
-	for (glm::vec2 direction : shuffledAllDirectionsOnGrid)
+	while (!m_frontier.empty() && !availablePositionFound)
 	{
-		glm::vec2 position = Globals::convertToGridPosition(senderEntity.getPosition());
-		for (int i = 1; i <= Globals::NODE_SIZE * 10; ++i)
+		glm::ivec2 position = m_frontier.front();
+		m_frontier.pop();
+
+		for (const auto& adjacentPosition : getRandomAdjacentPositions(position, map, building.getAABB()))
 		{
-			position = position + direction * static_cast<float>(i);
-			if (!map.isPositionOccupied(position) && map.isWithinBounds(position))
+			if (adjacentPosition.valid && !building.getAABB().contains(Globals::convertToWorldPosition(adjacentPosition.position)))
 			{
-				return Globals::convertToWorldPosition(position);
+				positionOutsideAABB = Globals::convertToWorldPosition(adjacentPosition.position);
+				availablePositionFound = true;
+				break;
+			}
+			else if (!m_graph.isPositionVisited(adjacentPosition.position, map))
+			{
+				m_graph.addToGraph(adjacentPosition.position, position, map);
+				m_frontier.push(adjacentPosition.position);
 			}
 		}
+
+		assert(isFrontierWithinSizeLimit(m_frontier, map.getSize()));
 	}
 
-	return senderEntity.getPosition();
+	return availablePositionFound;
 }
 
 glm::vec3 PathFinding::getClosestPositionToAABB(const glm::vec3& entityPosition, const AABB& AABB, const Map& map)

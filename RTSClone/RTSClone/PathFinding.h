@@ -121,7 +121,7 @@ public:
 	bool getClosestAvailableEntitySpawnPosition(const EntitySpawnerBuilding& building, const std::vector<std::unique_ptr<Unit>>& units, 
 		const std::vector<std::unique_ptr<Worker>>& workers, const Map& map, glm::vec3& position);
 
-	glm::vec3 getRandomAvailablePositionOutsideAABB(const Entity& senderEntity, const Map& map);
+	bool getRandomPositionOutsideAABB(const Entity& building, const Map& map, glm::vec3& positionOutsideAABB);
 
 	glm::vec3 getClosestPositionToAABB(const glm::vec3& entityPosition, const AABB& AABB, const Map& map);
 
