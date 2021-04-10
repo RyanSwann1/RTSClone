@@ -253,7 +253,6 @@ void Level::update(float deltaTime, const Map& map, UIManager& uiManager, glm::u
 	{
 		const GameEvent& gameEvent = gameEvents.front();
 		handleEvent(gameEvent, map);
-		m_baseHandler->handleEvent(gameEvent);
 		uiManager.handleEvent(gameEvent);
 
 		gameEvents.pop();
@@ -428,6 +427,14 @@ void Level::handleEvent(const GameEvent& gameEvent, const Map& map)
 			m_factions[static_cast<int>(gameEvent.data.onEnteredIdleState.factionController)]->
 				handleEvent(gameEvent, map, m_factionHandler);
 		}
+		break;
+	case eGameEventType::AttachFactionToBase:
+		m_baseHandler->handleEvent(gameEvent);
+		getFaction(m_factions, gameEvent.data.attachFactionToBase.factionController).handleEvent(gameEvent, map, m_factionHandler);
+		break;
+	case eGameEventType::DetachFactionFromBase:
+		getFaction(m_factions, gameEvent.data.detachFactionFromBase.factionController).handleEvent(gameEvent, map, m_factionHandler);
+		m_baseHandler->handleEvent(gameEvent);
 		break;
 	}
 }

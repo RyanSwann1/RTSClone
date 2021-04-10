@@ -55,6 +55,7 @@ public:
 
 private:
 	const BaseHandler& m_baseHandler;
+	std::vector<std::reference_wrapper<const Base>> m_occupiedBases;
 	Timer m_baseExpansionTimer;
 	eAIBehaviour m_currentBehaviour;
 	std::queue<eEntityType> m_spawnQueue;

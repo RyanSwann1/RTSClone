@@ -30,7 +30,7 @@ namespace
 	const float IDLE_TIMER_EXPIRATION = 1.0f;
 	const float MIN_SPAWN_TIMER_EXPIRATION = 7.5f;
 	const float MAX_SPAWN_TIMER_EXPIRATION = 15.0f;
-	const int STARTING_WORKER_COUNT = 3;
+	const int STARTING_WORKER_COUNT = 7;
 	const int STARTING_UNIT_COUNT = 1;
 	const float MAX_DISTANCE_FROM_HQ = static_cast<float>(Globals::NODE_SIZE) * 18.0f;
 	const float MIN_DISTANCE_FROM_HQ = static_cast<float>(Globals::NODE_SIZE) * 5.0f;
@@ -104,6 +104,10 @@ namespace
 		return true;
 	}
 
+	bool getOtherOccupiedBase(eFactionController factionController, const BaseHandler& baseHandler, const glm::vec3& position)
+	{
+		return false;
+	}
 }
 
 //AIAction
@@ -122,6 +126,7 @@ FactionAI::FactionAI(eFactionController factionController, const glm::vec3& hqSt
 	int startingResources, int startingPopulationCap, const BaseHandler& baseHandler)
 	: Faction(factionController, hqStartingPosition, startingResources, startingPopulationCap),
 	m_baseHandler(baseHandler),
+	m_occupiedBases(),
 	m_baseExpansionTimer(Globals::getRandomNumber(MIN_BASE_EXPANSION_TIME, MAX_BASE_EXPANSION_TIME), true),
 	m_currentBehaviour(static_cast<eAIBehaviour>(Globals::getRandomNumber(0, static_cast<int>(eAIBehaviour::Max)))),
 	m_spawnQueue(),
@@ -130,6 +135,8 @@ FactionAI::FactionAI(eFactionController factionController, const glm::vec3& hqSt
 	m_spawnTimer(Globals::getRandomNumber(MIN_SPAWN_TIMER_EXPIRATION, MAX_SPAWN_TIMER_EXPIRATION), true),
 	m_targetFaction(eFactionController::None)
 {
+	m_occupiedBases.reserve(m_baseHandler.getBases().size());
+
 	for (int i = 0; i < STARTING_WORKER_COUNT; ++i)
 	{
 		m_spawnQueue.push(eEntityType::Worker);
@@ -238,7 +245,6 @@ void FactionAI::handleEvent(const GameEvent& gameEvent, const Map& map, FactionH
 			{
 				const Base& nearestBase = m_baseHandler.getNearestBase(getClosestHeadquarters((*worker)->getPosition()).getPosition());
 				const Mineral* nearestMineral = m_baseHandler.getNearestAvailableMineralAtBase(*this, nearestBase, (*worker)->getPosition());
-				assert(nearestMineral);
 				if (nearestMineral)
 				{
 					(*worker)->moveTo(*nearestMineral, map);
@@ -250,7 +256,21 @@ void FactionAI::handleEvent(const GameEvent& gameEvent, const Map& map, FactionH
 			assert(false);
 		}
 	}
-		break;
+	break;
+	case eGameEventType::AttachFactionToBase:
+	{
+		const Base& base = m_baseHandler.getBase(gameEvent.data.attachFactionToBase.position);
+		assert(base.owningFactionController == getController());
+		m_occupiedBases.emplace_back(base);
+	}
+	break;
+	case eGameEventType::DetachFactionFromBase:
+	{
+		const Base& base = m_baseHandler.getBase(gameEvent.data.detachFactionFromBase.position);
+		assert(base.owningFactionController == getController());
+		m_occupiedBases.emplace_back(base);
+	}
+	break;
 	}
 }
 
