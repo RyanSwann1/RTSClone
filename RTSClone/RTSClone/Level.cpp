@@ -249,7 +249,8 @@ void Level::update(float deltaTime, const Map& map, UIManager& uiManager, glm::u
 	m_projectileHandler.update(deltaTime, m_factionHandler);
 
 	std::queue<GameEvent>& gameEvents = GameEventHandler::getInstance().gameEvents;
-	for (int i = 0; i < gameEvents.size(); ++i)
+	int gameEventsSize = static_cast<int>(gameEvents.size());
+	for (int i = 0; i < gameEventsSize; ++i)
 	{
 		const GameEvent& gameEvent = gameEvents.front();
 		handleEvent(gameEvent, map);

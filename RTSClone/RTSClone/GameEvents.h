@@ -170,20 +170,20 @@ union GameEvents
 	AttachFactionToBaseEvent				attachFactionToBase;
 	DetachFactionFromBaseEvent				detachFactionFromBase;
 
-	GameEvents(RevalidateMovementPathsEvent gameEvent) :			revalidateMovementPaths(gameEvent) {}
-	GameEvents(ResetTargetEntityGUIEvent gameEvent) :				resetTargetEntityGUI(gameEvent) {}
-	GameEvents(IncreaseFactionShieldEvent gameEvent) :				increaseFactionShield(gameEvent) {}
-	GameEvents(PlayerSpawnEntity gameEvent) :						playerSpawnEntity(gameEvent) {}
-	GameEvents(PlayerActivatePlannedBuildingEvent gameEvent) :		playerActivatePlannedBuilding(gameEvent) {}
-	GameEvents(EliminateFactionEvent gameEvent) :					eliminateFaction(gameEvent) {}
-	GameEvents(RepairEntityEvent gameEvent) :						repairEntity(gameEvent) {}
-	GameEvents(SetTargetEntityGUIEvent gameEvent) :					setTargetEntityGUI(gameEvent) {}
-	GameEvents(ForceSelfDestructEntityEvent gameEvent) :			forceSelfDestructEntity(gameEvent) {}
-	GameEvents(const TakeDamageEvent& gameEvent) :					takeDamage(gameEvent) {}
-	GameEvents(const SpawnProjectileEvent& gameEvent) :				spawnProjectile(gameEvent) {}
-	GameEvents(const OnEnteredIdleStateEvent& gameEvent) :			onEnteredIdleState(gameEvent) {}
-	GameEvents(const AttachFactionToBaseEvent& gameEvent) :			attachFactionToBase(gameEvent) {}
-	GameEvents(const DetachFactionFromBaseEvent& gameEvent) :		detachFactionFromBase(gameEvent) {}
+	GameEvents(RevalidateMovementPathsEvent gameEvent)			:	revalidateMovementPaths(gameEvent) {}
+	GameEvents(ResetTargetEntityGUIEvent gameEvent)				:	resetTargetEntityGUI(gameEvent) {}
+	GameEvents(IncreaseFactionShieldEvent gameEvent)			:	increaseFactionShield(gameEvent) {}
+	GameEvents(PlayerSpawnEntity gameEvent)						:	playerSpawnEntity(gameEvent) {}
+	GameEvents(PlayerActivatePlannedBuildingEvent gameEvent)	:	playerActivatePlannedBuilding(gameEvent) {}
+	GameEvents(EliminateFactionEvent gameEvent)					:	eliminateFaction(gameEvent) {}
+	GameEvents(const RepairEntityEvent& gameEvent)				:	repairEntity(gameEvent) {}
+	GameEvents(const SetTargetEntityGUIEvent& gameEvent)		:	setTargetEntityGUI(gameEvent) {}
+	GameEvents(const ForceSelfDestructEntityEvent& gameEvent)	:	forceSelfDestructEntity(gameEvent) {}
+	GameEvents(const TakeDamageEvent& gameEvent)				:   takeDamage(gameEvent) {}
+	GameEvents(const SpawnProjectileEvent& gameEvent)			:	spawnProjectile(gameEvent) {}
+	GameEvents(const OnEnteredIdleStateEvent& gameEvent)		:   onEnteredIdleState(gameEvent) {}
+	GameEvents(const AttachFactionToBaseEvent& gameEvent)		:   attachFactionToBase(gameEvent) {}
+	GameEvents(const DetachFactionFromBaseEvent& gameEvent)		:	detachFactionFromBase(gameEvent) {}
 };
 
 struct GameEvent

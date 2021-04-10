@@ -130,8 +130,8 @@ private:
 			assert(entity != entityContainer.end());
 
 			onEntityRemoval(*(*entity));
-			entityContainer.erase(entity);
 			m_allEntities.erase(iter);
+			entityContainer.erase(entity);
 		}
 	}
 
