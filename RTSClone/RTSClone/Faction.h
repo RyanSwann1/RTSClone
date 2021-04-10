@@ -115,6 +115,27 @@ private:
 	}
 
 	template <typename T>
+	void removeEntity(std::vector<std::unique_ptr<T>>& entityContainer, int entityID)
+	{
+		auto iter = std::find_if(m_allEntities.begin(), m_allEntities.end(), [entityID](const auto& entity)
+		{
+			return entity.get().getID() == entityID;
+		});
+		if (iter != m_allEntities.end())
+		{
+			auto entity = std::find_if(entityContainer.begin(), entityContainer.end(), [entityID](const auto& entity)
+			{
+				return entity->getID() == entityID;
+			});
+			assert(entity != entityContainer.end());
+
+			onEntityRemoval(*(*entity));
+			entityContainer.erase(entity);
+			m_allEntities.erase(iter);
+		}
+	}
+
+	template <typename T>
 	const Entity* getEntity(const T& entityContainer, int entityID) const
 	{
 		auto entity = std::find_if(entityContainer.cbegin(), entityContainer.cend(), [entityID](const auto& entity)

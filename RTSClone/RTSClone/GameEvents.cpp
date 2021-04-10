@@ -106,6 +106,11 @@ GameEvent GameEvent::createSetTargetEntityGUI(eFactionController senderFaction, 
 	return { eGameEventType::SetTargetEntityGUI,SetTargetEntityGUIEvent{senderFaction, senderID, entityType} };
 }
 
+GameEvent GameEvent::createForceSelfDestructEntity(eFactionController senderFaction, int senderID, eEntityType entityType)
+{
+	return { eGameEventType::ForceSelfDestructEntity, ForceSelfDestructEntityEvent(senderFaction, senderID, entityType) };
+}
+
 GameEvent GameEvent::createTakeDamage(eFactionController senderFaction, int senderID, eEntityType senderEntityType, 
 	eFactionController targetFaction, int targetID, int damage)
 {

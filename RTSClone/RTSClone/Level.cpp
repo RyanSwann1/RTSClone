@@ -436,5 +436,8 @@ void Level::handleEvent(const GameEvent& gameEvent, const Map& map)
 		getFaction(m_factions, gameEvent.data.detachFactionFromBase.factionController).handleEvent(gameEvent, map, m_factionHandler);
 		m_baseHandler->handleEvent(gameEvent);
 		break;
+	case eGameEventType::ForceSelfDestructEntity:
+		getFaction(m_factions, gameEvent.data.forceSelfDestructEntity.factionController).handleEvent(gameEvent, map, m_factionHandler);
+		break;
 	}
 }

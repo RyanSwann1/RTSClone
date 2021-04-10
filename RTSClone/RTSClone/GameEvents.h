@@ -14,6 +14,7 @@ enum class eGameEventType
 	PlayerActivatePlannedBuilding,
 	RepairEntity,
 	SetTargetEntityGUI,
+	ForceSelfDestructEntity,
 	ResetTargetEntityGUI,
 	IncreaseFactionShield,
 	OnEnteredIdleState,
@@ -74,6 +75,10 @@ struct RepairEntityEvent : public GameEvent_3 {
 };
 struct SetTargetEntityGUIEvent : public GameEvent_3 {
 	SetTargetEntityGUIEvent(eFactionController factionController, int senderID, eEntityType entityType) :
+		GameEvent_3(factionController, senderID, entityType) {}
+};
+struct ForceSelfDestructEntityEvent : public GameEvent_3 {
+	ForceSelfDestructEntityEvent(eFactionController factionController, int senderID, eEntityType entityType) :
 		GameEvent_3(factionController, senderID, entityType) {}
 };
 
@@ -158,6 +163,7 @@ union GameEvents
 	IncreaseFactionShieldEvent				increaseFactionShield;
 	RepairEntityEvent						repairEntity;
 	SetTargetEntityGUIEvent					setTargetEntityGUI;
+	ForceSelfDestructEntityEvent			forceSelfDestructEntity;
 	TakeDamageEvent							takeDamage;
 	SpawnProjectileEvent					spawnProjectile;
 	OnEnteredIdleStateEvent					onEnteredIdleState;
@@ -172,6 +178,7 @@ union GameEvents
 	GameEvents(EliminateFactionEvent gameEvent) :					eliminateFaction(gameEvent) {}
 	GameEvents(RepairEntityEvent gameEvent) :						repairEntity(gameEvent) {}
 	GameEvents(SetTargetEntityGUIEvent gameEvent) :					setTargetEntityGUI(gameEvent) {}
+	GameEvents(ForceSelfDestructEntityEvent gameEvent) :			forceSelfDestructEntity(gameEvent) {}
 	GameEvents(const TakeDamageEvent& gameEvent) :					takeDamage(gameEvent) {}
 	GameEvents(const SpawnProjectileEvent& gameEvent) :				spawnProjectile(gameEvent) {}
 	GameEvents(const OnEnteredIdleStateEvent& gameEvent) :			onEnteredIdleState(gameEvent) {}
@@ -198,6 +205,7 @@ struct GameEvent
 	//GameEvent_3
 	static GameEvent createRepairEntity(eFactionController senderFaction, int senderID, eEntityType entityType);
 	static GameEvent createSetTargetEntityGUI(eFactionController senderFaction, int senderID, eEntityType entityType);
+	static GameEvent createForceSelfDestructEntity(eFactionController senderFaction, int senderID, eEntityType entityType);
 
 	//GameEvent_4
 	static GameEvent createTakeDamage(eFactionController senderFaction, int senderID, eEntityType senderEntityType, 
