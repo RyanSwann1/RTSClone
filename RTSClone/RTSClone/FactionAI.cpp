@@ -103,11 +103,6 @@ namespace
 
 		return true;
 	}
-
-	bool getOtherOccupiedBase(eFactionController factionController, const BaseHandler& baseHandler, const glm::vec3& position)
-	{
-		return false;
-	}
 }
 
 //AIAction
@@ -248,6 +243,20 @@ void FactionAI::handleEvent(const GameEvent& gameEvent, const Map& map, FactionH
 				if (nearestMineral)
 				{
 					(*worker)->moveTo(*nearestMineral, map);
+				}
+				else
+				{
+					const glm::vec3& position = (*worker)->getPosition();
+					std::sort(m_occupiedBases.begin(), m_occupiedBases.end(), [&position](const auto& a, const auto& b)
+						{ return Globals::getSqrDistance(a.get().position, position) < Globals::getSqrDistance(b.get().position, position); });
+					for (const auto& base : m_occupiedBases)
+					{
+						nearestMineral = m_baseHandler.getNearestAvailableMineralAtBase(*this, base, position);
+						if (nearestMineral)
+						{
+							(*worker)->moveTo(*nearestMineral, map);
+						}
+					}
 				}
 			}
 		}
