@@ -130,6 +130,11 @@ bool Worker::build(const glm::vec3& buildPosition, const Map& map, eEntityType e
 				return true;
 			}
 		}
+		else
+		{
+			m_buildQueue.emplace_back(buildPosition, entityType);
+			return true;
+		}
 	}
 
 	return false;
