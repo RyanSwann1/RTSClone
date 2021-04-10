@@ -243,7 +243,8 @@ void Worker::update(float deltaTime, const Map& map, FactionHandler& factionHand
 					}
 					else
 					{
-						assert(false);
+						GameEventHandler::getInstance().gameEvents.emplace(
+							GameEvent::createForceSelfDestructEntity(m_owningFaction.get().getController(), getID(), getEntityType()));
 					}
 				}
 			}
