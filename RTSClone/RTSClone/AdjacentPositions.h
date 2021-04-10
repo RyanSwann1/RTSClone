@@ -47,6 +47,9 @@ std::array<AdjacentPosition, ALL_DIRECTIONS_ON_GRID.size()> getAllAdjacentPositi
 
 std::array<AdjacentPosition, ALL_DIRECTIONS_ON_GRID.size()> getAdjacentPositions(const glm::ivec2& position, const Map& map);
 
+std::array<AdjacentPosition, ALL_DIRECTIONS_ON_GRID.size()> getRandomAdjacentPositions(const glm::ivec2& position, const Map& map, 
+	const AABB& ignoreAABB);
+
 std::array<AdjacentPosition, ALL_DIRECTIONS_ON_GRID.size()> getAdjacentPositions(const glm::ivec2& position, const Map& map,
 	const AABB& ignoreAABB);
 
