@@ -236,8 +236,15 @@ void Worker::update(float deltaTime, const Map& map, FactionHandler& factionHand
 				}
 				else
 				{
-					glm::vec3 destination = PathFinding::getInstance().getRandomAvailablePositionOutsideAABB(*this, map);
-					moveTo(destination, map, building->getAABB());
+					glm::vec3 destination(0.0f);
+					if (PathFinding::getInstance().getRandomPositionOutsideAABB(*building, map, destination))
+					{
+						moveTo(destination, map, building->getAABB());
+					}
+					else
+					{
+						assert(false);
+					}
 				}
 			}
 		}
