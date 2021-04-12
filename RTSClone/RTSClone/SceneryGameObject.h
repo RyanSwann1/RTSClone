@@ -1,10 +1,11 @@
 #pragma once
 
 #include "glm/glm.hpp"
-#include "Model.h"
 #include "AABB.h"
+#include "ActiveStatus.h"
 #include <functional>
 
+class Model;
 class ShaderHandler;
 class SceneryGameObject
 {
@@ -12,8 +13,8 @@ public:
 	SceneryGameObject(const Model& model, const glm::vec3& position, const glm::vec3& rotation);
 	SceneryGameObject(const SceneryGameObject&) = delete;
 	SceneryGameObject& operator=(const SceneryGameObject&) = delete;
-	SceneryGameObject(SceneryGameObject&&) noexcept;
-	SceneryGameObject& operator=(SceneryGameObject&&) noexcept;
+	SceneryGameObject(SceneryGameObject&&) = default;
+	SceneryGameObject& operator=(SceneryGameObject&&) = default;
 	~SceneryGameObject();
 
 	const glm::vec3& getPosition() const;
@@ -29,5 +30,5 @@ private:
 	AABB m_AABB;
 	glm::vec3 m_position;
 	glm::vec3 m_rotation;
-	bool m_active;
+	ActiveStatus m_active;
 };
