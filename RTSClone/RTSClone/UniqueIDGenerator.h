@@ -16,9 +16,7 @@ public:
 
 	int getUniqueID()
 	{
-		int ID = m_uniqueEntityIDCounter;
-		++m_uniqueEntityIDCounter;
-		return ID;
+		return m_uniqueEntityIDCounter++;
 	}
 
 private:
