@@ -255,7 +255,8 @@ void Worker::update(float deltaTime, const Map& map, FactionHandler& factionHand
 		{
 			switchTo(eWorkerState::Repairing, map);
 		}
-		else if (!m_owningFaction.get().getEntity(m_repairTargetEntity.getID(), m_repairTargetEntity.getType()))
+		else if (unitStateHandlerTimer.isExpired() &&
+			!m_owningFaction.get().getEntity(m_repairTargetEntity.getID(), m_repairTargetEntity.getType()))
 		{
 			switchTo(eWorkerState::Idle, map);
 		}
@@ -268,7 +269,7 @@ void Worker::update(float deltaTime, const Map& map, FactionHandler& factionHand
 		{
 			m_taskTimer.resetElaspedTime();
 			const Entity* targetEntity = m_owningFaction.get().getEntity(m_repairTargetEntity.getID(), m_repairTargetEntity.getType());
-			if (targetEntity && targetEntity->getHealth() != targetEntity->getMaximumHealth())
+			if (targetEntity && targetEntity->getHealth() < targetEntity->getMaximumHealth())
 			{
 				if (Globals::getSqrDistance(targetEntity->getPosition(), m_position) > REPAIR_DISTANCE * REPAIR_DISTANCE)
 				{
@@ -290,12 +291,11 @@ void Worker::update(float deltaTime, const Map& map, FactionHandler& factionHand
 		else if (unitStateHandlerTimer.isExpired())
 		{
 			const Entity* targetEntity = m_owningFaction.get().getEntity(m_repairTargetEntity.getID(), m_repairTargetEntity.getType());
-			if (targetEntity && targetEntity->getHealth() != targetEntity->getMaximumHealth())
+			if (targetEntity && targetEntity->getHealth() < targetEntity->getMaximumHealth())
 			{
 				if (Globals::getSqrDistance(targetEntity->getPosition(), m_position) > REPAIR_DISTANCE * REPAIR_DISTANCE)
 				{
 					repairEntity(*targetEntity, map);
-					break;
 				}
 				else
 				{
