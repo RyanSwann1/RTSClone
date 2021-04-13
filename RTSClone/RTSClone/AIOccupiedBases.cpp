@@ -11,7 +11,7 @@ AIOccupiedBase::AIOccupiedBase(const Base& base)
 	workers()
 {}
 
-void AIOccupiedBase::addWorker(const Worker& worker)
+void AIOccupiedBase::addWorker(Worker& worker)
 {
 	assert(std::find_if(workers.cbegin(), workers.cend(), [&worker](const auto& i)
 	{
@@ -35,6 +35,17 @@ AIOccupiedBases::AIOccupiedBases(const BaseHandler& baseHandler)
 	: m_bases()
 {
 	m_bases.reserve(baseHandler.getBases().size());
+}
+
+const AIOccupiedBase& AIOccupiedBases::getBase(const Headquarters& headquarters) const
+{
+	auto base = std::find_if(m_bases.cbegin(), m_bases.cend(), [&headquarters](const auto& base)
+	{
+		return base.base.get().getCenteredPosition() == headquarters.getPosition();
+	});
+	
+	assert(base != m_bases.cend());
+	return (*base);
 }
 
 const std::vector<AIOccupiedBase>& AIOccupiedBases::getSortedBases(const glm::vec3& position)
@@ -65,7 +76,7 @@ void AIOccupiedBases::removeBase(const Base& base)
 	m_bases.erase(iter);
 }
 
-void AIOccupiedBases::addWorker(const Worker& worker, const Headquarters& headquarters)
+void AIOccupiedBases::addWorker(Worker& worker, const Headquarters& headquarters)
 {
 	auto base = std::find_if(m_bases.begin(), m_bases.end(), [&headquarters](const auto& base)
 	{
@@ -76,7 +87,7 @@ void AIOccupiedBases::addWorker(const Worker& worker, const Headquarters& headqu
 	base->addWorker(worker);
 }
 
-void AIOccupiedBases::addWorker(const Worker& worker, const Base& base)
+void AIOccupiedBases::addWorker(Worker& worker, const Base& base)
 {
 	auto iter = std::find_if(m_bases.begin(), m_bases.end(), [&base](const auto& existingBase)
 	{
