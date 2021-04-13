@@ -380,11 +380,11 @@ void FactionAI::onEntityRemoval(const Entity& entity)
 
 void FactionAI::instructWorkersToRepair(const Headquarters& HQ, const Map& map)
 {
-	for (int i = 0; i < m_workers.size(); i += 2)
+	for (auto& worker : m_occupiedBases.getBase(HQ).workers)
 	{
-		if (isBaseClosest(m_baseHandler, m_workers[i]->getPosition(), HQ))
+		if (!worker.get().isRepairing())
 		{
-			m_workers[i]->repairEntity(HQ, map);
+			worker.get().repairEntity(HQ, map);
 		}
 	}
 }
@@ -573,7 +573,7 @@ Entity* FactionAI::createWorker(const Map& map, const Headquarters& headquarters
 	else
 	{
 		assert(spawnedWorker->getEntityType() == eEntityType::Worker);
-		m_occupiedBases.addWorker(static_cast<const Worker&>(*spawnedWorker), headquarters);
+		m_occupiedBases.addWorker(static_cast<Worker&>(*spawnedWorker), headquarters);
 	}
 
 	return spawnedWorker;

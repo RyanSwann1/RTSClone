@@ -53,6 +53,7 @@ public:
 	const std::vector<glm::vec3>& getPathToPosition() const;
 	eWorkerState getCurrentState() const;
 	bool isHoldingResources() const;
+	bool isRepairing() const;
 	int extractResources();	
 
 	void repairEntity(const Entity& entity, const Map& map);

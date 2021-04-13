@@ -96,6 +96,11 @@ bool Worker::isHoldingResources() const
 	return m_currentResourceAmount > 0;
 }
 
+bool Worker::isRepairing() const
+{
+	return m_repairTargetEntity.getID() != Globals::INVALID_ENTITY_ID;
+}
+
 int Worker::extractResources()
 {
 	assert(isHoldingResources());
