@@ -3,6 +3,7 @@
 #include "Faction.h"
 #include "Graph.h"
 #include "Timer.h"
+#include "AIOccupiedBases.h"
 #include <queue>
 #include <functional>
 
@@ -53,9 +54,12 @@ public:
 	Entity* createWorker(const Map& map, const Headquarters& headquarters) override;
 	void update(float deltaTime, const Map& map, FactionHandler& factionHandler, const Timer& unitStateHandlerTimer) override;
 
+protected:
+	void onEntityRemoval(const Entity& entity) override;
+
 private:
 	const BaseHandler& m_baseHandler;
-	std::vector<std::reference_wrapper<const Base>> m_occupiedBases;
+	AIOccupiedBases m_occupiedBases;
 	Timer m_baseExpansionTimer;
 	eAIBehaviour m_currentBehaviour;
 	std::queue<eEntityType> m_spawnQueue;

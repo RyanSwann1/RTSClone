@@ -33,6 +33,7 @@ public:
 	void removeBase(const Base& base);
 
 	void addWorker(const Worker& worker, const Headquarters& headquarters);
+	void addWorker(const Worker& worker, const Base& base);
 	void removeWorker(const Worker& worker);
 
 private:

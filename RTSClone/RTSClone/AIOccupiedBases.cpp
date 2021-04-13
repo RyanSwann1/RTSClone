@@ -76,6 +76,17 @@ void AIOccupiedBases::addWorker(const Worker& worker, const Headquarters& headqu
 	base->addWorker(worker);
 }
 
+void AIOccupiedBases::addWorker(const Worker& worker, const Base& base)
+{
+	auto iter = std::find_if(m_bases.begin(), m_bases.end(), [&base](const auto& existingBase)
+	{
+		return existingBase.base.get().getCenteredPosition() == base.getCenteredPosition();
+	});
+
+	assert(iter != m_bases.end());
+	iter->addWorker(worker);
+}
+
 void AIOccupiedBases::removeWorker(const Worker& worker)
 {
 	for (auto& base : m_bases)
@@ -89,6 +100,4 @@ void AIOccupiedBases::removeWorker(const Worker& worker)
 			}
 		}
 	}
-
-	assert(false);
 }
