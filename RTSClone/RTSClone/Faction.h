@@ -151,7 +151,7 @@ private:
 	{
 		auto entity = std::find_if(entityContainer.cbegin(), entityContainer.cend(), [&entityAABB, entityID](const auto& entity)
 		{
-			return entity.get()->getAABB().contains(entityAABB) && entity.get()->getID() == entityID;
+			return entity.get()->getID() == entityID && entity.get()->getAABB().contains(entityAABB);
 		});
 
 		return (entity != entityContainer.cend() ? &*(*entity) : nullptr);
