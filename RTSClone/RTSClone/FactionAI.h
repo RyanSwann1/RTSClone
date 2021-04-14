@@ -33,6 +33,25 @@ struct AIAction
 	glm::vec3 position;
 };
 
+class AIUnattachedToBaseWorkers
+{
+public:
+	AIUnattachedToBaseWorkers();
+	AIUnattachedToBaseWorkers(const AIUnattachedToBaseWorkers&) = delete;
+	AIUnattachedToBaseWorkers& operator=(const AIUnattachedToBaseWorkers&) = delete;
+	AIUnattachedToBaseWorkers(AIUnattachedToBaseWorkers&&) = delete;
+	AIUnattachedToBaseWorkers& operator=(AIUnattachedToBaseWorkers&&) = delete;
+	
+	bool isEmpty() const;
+	Worker& getClosestWorker(const glm::vec3& position);
+
+	void addWorker(Worker& worker);
+	void remove(const Worker& worker);
+
+private:
+	std::vector<std::reference_wrapper<Worker>> m_unattachedToBaseWorkers;
+};
+
 class BaseHandler;
 class FactionHandler;
 class FactionAI : public Faction
@@ -59,6 +78,7 @@ protected:
 
 private:
 	const BaseHandler& m_baseHandler;
+	AIUnattachedToBaseWorkers m_unattachedToBaseWorkers;
 	AIOccupiedBases m_occupiedBases;
 	Timer m_baseExpansionTimer;
 	eAIBehaviour m_currentBehaviour;

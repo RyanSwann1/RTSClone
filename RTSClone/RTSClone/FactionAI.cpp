@@ -243,6 +243,7 @@ void FactionAI::handleEvent(const GameEvent& gameEvent, const Map& map, FactionH
 				else
 				{
 					const glm::vec3& position = (*worker)->getPosition();
+					bool mineralFound = false;
 					for (const auto& base : m_occupiedBases.getSortedBases(position))
 					{
 						nearestMineral = m_baseHandler.getNearestAvailableMineralAtBase(*this, base.base, position);
@@ -251,7 +252,12 @@ void FactionAI::handleEvent(const GameEvent& gameEvent, const Map& map, FactionH
 							m_occupiedBases.removeWorker(*(*worker));
 							m_occupiedBases.addWorker(*(*worker), base.base);
 							(*worker)->moveTo(*nearestMineral, map);
+							mineralFound = true;
 						}
+					}
+					if (!mineralFound)
+					{	
+						m_unattachedToBaseWorkers.addWorker(*(*worker));
 					}
 				}
 			}
@@ -267,12 +273,26 @@ void FactionAI::handleEvent(const GameEvent& gameEvent, const Map& map, FactionH
 		const Base& base = m_baseHandler.getBase(gameEvent.data.attachFactionToBase.position);
 		assert(base.owningFactionController == getController());
 		m_occupiedBases.addBase(base);
+		for (const auto& mineral : base.minerals)
+		{
+			if (m_unattachedToBaseWorkers.isEmpty())
+			{
+				break;
+			}
+
+			Worker& worker = m_unattachedToBaseWorkers.getClosestWorker(base.getCenteredPosition());
+			worker.moveTo(mineral, map);
+		}
 	}
 	break;
 	case eGameEventType::DetachFactionFromBase:
 	{
 		const Base& base = m_baseHandler.getBase(gameEvent.data.detachFactionFromBase.position);
 		assert(base.owningFactionController == getController());
+		for (auto& worker : m_occupiedBases.getBase(base).workers)
+		{
+			m_unattachedToBaseWorkers.addWorker(worker);
+		}
 		m_occupiedBases.removeBase(base);
 	}
 	break;
@@ -391,41 +411,48 @@ void FactionAI::instructWorkersToRepair(const Headquarters& HQ, const Map& map)
 
 Worker* FactionAI::getAvailableWorker(const glm::vec3& position)
 {
-	Worker* selectedWorker = nullptr;
-	float closestDistance = std::numeric_limits<float>::max();
-	for (auto& availableWorker : m_workers)
+	if (!m_unattachedToBaseWorkers.isEmpty())
 	{
-		float distance = Globals::getSqrDistance(position, availableWorker->getPosition());
-		bool selectWorker = false;
-		if (!selectedWorker)
-		{
-			selectWorker = true;
-			selectedWorker = &(*availableWorker);
-		}
-		else if (availableWorker->getCurrentState() == eWorkerState::Idle &&
-			selectedWorker->getCurrentState() != eWorkerState::Idle)
-		{
-			selectWorker = true;
-		}
-		else if (availableWorker->getCurrentState() == eWorkerState::Idle &&
-			selectedWorker->getCurrentState() == eWorkerState::Idle &&
-			distance < closestDistance)
-		{
-			selectWorker = true;
-		}
-		else if (distance < closestDistance)
-		{
-			selectWorker = true;
-		}
-
-		if (selectWorker)
-		{
-			selectedWorker = &(*availableWorker);
-			closestDistance = distance;
-		}
+		return &m_unattachedToBaseWorkers.getClosestWorker(position);
 	}
+	else
+	{
+		Worker* selectedWorker = nullptr;
+		float closestDistance = std::numeric_limits<float>::max();
+		for (auto& availableWorker : m_workers)
+		{
+			float distance = Globals::getSqrDistance(position, availableWorker->getPosition());
+			bool selectWorker = false;
+			if (!selectedWorker)
+			{
+				selectWorker = true;
+				selectedWorker = &(*availableWorker);
+			}
+			else if (availableWorker->getCurrentState() == eWorkerState::Idle &&
+				selectedWorker->getCurrentState() != eWorkerState::Idle)
+			{
+				selectWorker = true;
+			}
+			else if (availableWorker->getCurrentState() == eWorkerState::Idle &&
+				selectedWorker->getCurrentState() == eWorkerState::Idle &&
+				distance < closestDistance)
+			{
+				selectWorker = true;
+			}
+			else if (distance < closestDistance)
+			{
+				selectWorker = true;
+			}
 
-	return selectedWorker;
+			if (selectWorker)
+			{
+				selectedWorker = &(*availableWorker);
+				closestDistance = distance;
+			}
+		}
+
+		return selectedWorker;
+	}
 }
 
 bool FactionAI::isWithinRangeOfBuildings(const glm::vec3& position, float distance) const
@@ -626,3 +653,44 @@ bool FactionAI::build(const Map& map, eEntityType entityType, Worker* worker)
 	return false;
 }
 
+AIUnattachedToBaseWorkers::AIUnattachedToBaseWorkers()
+	: m_unattachedToBaseWorkers()
+{}
+
+bool AIUnattachedToBaseWorkers::isEmpty() const
+{
+	return m_unattachedToBaseWorkers.empty();
+}
+
+Worker& AIUnattachedToBaseWorkers::getClosestWorker(const glm::vec3& position)
+{
+	assert(!m_unattachedToBaseWorkers.empty());
+	std::sort(m_unattachedToBaseWorkers.begin(), m_unattachedToBaseWorkers.end(), [&position](const auto& a, const auto& b)
+	{
+		return Globals::getSqrDistance(position, a.get().getPosition()) > Globals::getSqrDistance(position, b.get().getPosition());
+	});
+	Worker& worker = m_unattachedToBaseWorkers.back();
+	m_unattachedToBaseWorkers.pop_back();
+	return worker;
+}
+
+void AIUnattachedToBaseWorkers::addWorker(Worker& _worker)
+{
+	if (std::find_if(m_unattachedToBaseWorkers.cbegin(), m_unattachedToBaseWorkers.cend(), [&_worker](const auto& worker)
+	{
+		return _worker.getID() == worker.get().getID();
+	}) == m_unattachedToBaseWorkers.cend())
+	{
+		m_unattachedToBaseWorkers.emplace_back(_worker);
+	}
+}
+
+void AIUnattachedToBaseWorkers::remove(const Worker& _worker)
+{
+	auto iter = std::find_if(m_unattachedToBaseWorkers.begin(), m_unattachedToBaseWorkers.end(), [&_worker](const auto& worker)
+	{
+		return _worker.getID() == worker.get().getID();
+	});
+	assert(iter != m_unattachedToBaseWorkers.end());
+	m_unattachedToBaseWorkers.erase(iter);
+}

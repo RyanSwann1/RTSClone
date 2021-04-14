@@ -28,6 +28,7 @@ public:
 	AIOccupiedBases(AIOccupiedBases&&) = delete;
 	AIOccupiedBases& operator=(AIOccupiedBases&&) = delete;
 
+	const AIOccupiedBase& getBase(const Base& base) const;
 	const AIOccupiedBase& getBase(const Headquarters& headquarters) const;
 	const std::vector<AIOccupiedBase>& getSortedBases(const glm::vec3& position);
 	void addBase(const Base& base);

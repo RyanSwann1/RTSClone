@@ -48,6 +48,17 @@ const AIOccupiedBase& AIOccupiedBases::getBase(const Headquarters& headquarters)
 	return (*base);
 }
 
+const AIOccupiedBase& AIOccupiedBases::getBase(const Base& _base) const
+{
+	auto iter = std::find_if(m_bases.cbegin(), m_bases.cend(), [&_base](const auto& base)
+	{
+		return _base.getCenteredPosition() == base.base.get().getCenteredPosition();// headquarters.getPosition();
+	});
+
+	assert(iter != m_bases.cend());
+	return (*iter);
+}
+
 const std::vector<AIOccupiedBase>& AIOccupiedBases::getSortedBases(const glm::vec3& position)
 {
 	std::sort(m_bases.begin(), m_bases.end(), [&position](const auto& a, const auto& b)
