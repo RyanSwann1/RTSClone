@@ -339,29 +339,29 @@ void Faction::handleEvent(const GameEvent& gameEvent, const Map& map, FactionHan
         switch(gameEvent.data.forceSelfDestructEntity.entityType)
         {
 		case eEntityType::Worker:
-            removeEntity<Worker>(m_workers, gameEvent.data.forceSelfDestructEntity.entityID);
+            removeEntity<Worker>(m_workers, gameEvent.data.forceSelfDestructEntity.entityID, true);
 			break;
 		case eEntityType::Unit:
-            removeEntity<Unit>(m_units, gameEvent.data.forceSelfDestructEntity.entityID);
+            removeEntity<Unit>(m_units, gameEvent.data.forceSelfDestructEntity.entityID, true);
 			break;
 		case eEntityType::SupplyDepot:
-            removeEntity<SupplyDepot>(m_supplyDepots, gameEvent.data.forceSelfDestructEntity.entityID);
+            removeEntity<SupplyDepot>(m_supplyDepots, gameEvent.data.forceSelfDestructEntity.entityID, true);
 			break;
 		case eEntityType::Barracks:
-            removeEntity<Barracks>(m_barracks, gameEvent.data.forceSelfDestructEntity.entityID);
+            removeEntity<Barracks>(m_barracks, gameEvent.data.forceSelfDestructEntity.entityID, true);
 			break;
 		case eEntityType::Headquarters:
-            removeEntity<Headquarters>(m_headquarters, gameEvent.data.forceSelfDestructEntity.entityID);
+            removeEntity<Headquarters>(m_headquarters, gameEvent.data.forceSelfDestructEntity.entityID, true);
 			if (m_headquarters.empty())
 			{
 				GameEventHandler::getInstance().gameEvents.push(GameEvent::createEliminateFaction(m_controller));
 			}
 			break;
 		case eEntityType::Turret:
-            removeEntity<Turret>(m_turrets, gameEvent.data.forceSelfDestructEntity.entityID);
+            removeEntity<Turret>(m_turrets, gameEvent.data.forceSelfDestructEntity.entityID, true);
 			break;
 		case eEntityType::Laboratory:
-            removeEntity<Laboratory>(m_laboratories, gameEvent.data.forceSelfDestructEntity.entityID);
+            removeEntity<Laboratory>(m_laboratories, gameEvent.data.forceSelfDestructEntity.entityID, true);
 			break;
 		default:
 			assert(false);

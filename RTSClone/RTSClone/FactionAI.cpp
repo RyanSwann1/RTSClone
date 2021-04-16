@@ -390,13 +390,13 @@ void FactionAI::update(float deltaTime, const Map & map, FactionHandler& faction
 	}
 }
 
-void FactionAI::onEntityRemoval(const Entity& entity)
+void FactionAI::onEntityRemoval(const Entity& entity, bool forceDestroyed)
 {
 	if (entity.getEntityType() == eEntityType::Worker)
 	{
 		m_occupiedBases.removeWorker(static_cast<const Worker&>(entity));
 	}
-	else if(Globals::BUILDING_TYPES.isMatch(entity.getEntityType()))
+	else if(!forceDestroyed && Globals::BUILDING_TYPES.isMatch(entity.getEntityType()))
 	{
 		m_occupiedBases.removeBuilding(entity);
 	}

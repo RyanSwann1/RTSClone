@@ -74,7 +74,7 @@ public:
 	void update(float deltaTime, const Map& map, FactionHandler& factionHandler, const Timer& unitStateHandlerTimer) override;
 
 protected:
-	void onEntityRemoval(const Entity& entity) override;
+	void onEntityRemoval(const Entity& entity, bool forceDestroyed = false) override;
 
 private:
 	const BaseHandler& m_baseHandler;
