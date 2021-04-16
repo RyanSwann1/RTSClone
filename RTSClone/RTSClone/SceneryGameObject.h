@@ -5,7 +5,7 @@
 #include "ActiveStatus.h"
 #include <functional>
 
-class Model;
+struct Model;
 class ShaderHandler;
 class SceneryGameObject
 {
