@@ -10,6 +10,7 @@ class Worker;
 struct AIOccupiedBase
 {
 	AIOccupiedBase(const Base& base);
+	~AIOccupiedBase();
 
 	bool isWorkerAdded(const Worker& worker) const;
 	void addWorker(Worker& worker);

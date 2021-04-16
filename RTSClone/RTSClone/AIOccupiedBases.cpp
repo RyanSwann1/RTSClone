@@ -4,6 +4,8 @@
 #include "Headquarters.h"
 #include "Globals.h"
 #include "Turret.h"
+#include "GameEventHandler.h"
+#include "GameEvents.h"
 #include <assert.h>
 
 //AIOccupiedBase
@@ -16,6 +18,16 @@ AIOccupiedBase::AIOccupiedBase(const Base& base)
 	supplyDepotCount(0),
 	laboratoryCount(0)
 {}
+
+AIOccupiedBase::~AIOccupiedBase()
+{
+	assert(base.get().owningFactionController != eFactionController::None);
+	for (const auto& building : buildings)
+	{
+		GameEventHandler::getInstance().gameEvents.emplace(
+			GameEvent::createForceSelfDestructEntity(base.get().owningFactionController, building.get().getID(), building.get().getEntityType()));
+	}
+}
 
 bool AIOccupiedBase::isWorkerAdded(const Worker& worker) const
 {
@@ -68,7 +80,7 @@ const AIOccupiedBase& AIOccupiedBases::getBase(const Base& _base) const
 {
 	auto iter = std::find_if(m_bases.cbegin(), m_bases.cend(), [&_base](const auto& base)
 	{
-		return _base.getCenteredPosition() == base.base.get().getCenteredPosition();// headquarters.getPosition();
+		return _base.getCenteredPosition() == base.base.get().getCenteredPosition();
 	});
 
 	assert(iter != m_bases.cend());
@@ -214,6 +226,8 @@ void AIOccupiedBases::removeBuilding(const Entity& building)
 		break;
 	case eEntityType::Turret:
 		--occupiedBase->turretCount;
+		break;
+		case eEntityType::Headquarters:
 		break;
 	default:
 		assert(false);
