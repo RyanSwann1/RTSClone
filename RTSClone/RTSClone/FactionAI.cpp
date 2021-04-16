@@ -396,6 +396,10 @@ void FactionAI::onEntityRemoval(const Entity& entity)
 	{
 		m_occupiedBases.removeWorker(static_cast<const Worker&>(entity));
 	}
+	else if(Globals::BUILDING_TYPES.isMatch(entity.getEntityType()))
+	{
+		m_occupiedBases.removeBuilding(entity);
+	}
 }
 
 void FactionAI::instructWorkersToRepair(const Headquarters& HQ, const Map& map)
@@ -548,11 +552,10 @@ const Entity* FactionAI::createBuilding(const Map& map, const Worker& worker)
 	const Entity* spawnedBuilding = Faction::createBuilding(map, worker);
 	if (spawnedBuilding)
 	{
-		switch (spawnedBuilding->getEntityType())
+		m_occupiedBases.addBuilding(worker, *spawnedBuilding);
+		if (spawnedBuilding->getEntityType() == eEntityType::Laboratory)
 		{
-		case eEntityType::Laboratory:
 			GameEventHandler::getInstance().gameEvents.push(GameEvent::createIncreaseFactionShield(getController()));
-			break;
 		}
 	}
 	else

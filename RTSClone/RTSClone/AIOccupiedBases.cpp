@@ -3,13 +3,29 @@
 #include "Base.h"
 #include "Headquarters.h"
 #include "Globals.h"
+#include "Turret.h"
 #include <assert.h>
 
 //AIOccupiedBase
 AIOccupiedBase::AIOccupiedBase(const Base& base)
 	: base(base),
-	workers()
+	workers(),
+	buildings(),
+	turretCount(0),
+	barracksCount(0),
+	supplyDepotCount(0),
+	laboratoryCount(0)
 {}
+
+bool AIOccupiedBase::isWorkerAdded(const Worker& worker) const
+{
+	auto iter = std::find_if(workers.cbegin(), workers.cend(), [&worker](const auto& i)
+	{
+		return worker.getID() == i.get().getID();
+	});
+
+	return iter != workers.cend();
+}
 
 void AIOccupiedBase::addWorker(Worker& worker)
 {
@@ -37,14 +53,14 @@ AIOccupiedBases::AIOccupiedBases(const BaseHandler& baseHandler)
 	m_bases.reserve(baseHandler.getBases().size());
 }
 
-const AIOccupiedBase& AIOccupiedBases::getBase(const Headquarters& headquarters) const
+AIOccupiedBase& AIOccupiedBases::getBase(const Headquarters& headquarters)
 {
-	auto base = std::find_if(m_bases.cbegin(), m_bases.cend(), [&headquarters](const auto& base)
+	auto base = std::find_if(m_bases.begin(), m_bases.end(), [&headquarters](const auto& base)
 	{
 		return base.base.get().getCenteredPosition() == headquarters.getPosition();
 	});
 	
-	assert(base != m_bases.cend());
+	assert(base != m_bases.end());
 	return (*base);
 }
 
@@ -57,6 +73,16 @@ const AIOccupiedBase& AIOccupiedBases::getBase(const Base& _base) const
 
 	assert(iter != m_bases.cend());
 	return (*iter);
+}
+
+AIOccupiedBase* AIOccupiedBases::getBase(const Worker& worker)
+{
+	auto base = std::find_if(m_bases.begin(), m_bases.end(), [&worker](const auto& base)
+	{
+		return base.isWorkerAdded(worker);
+	});
+
+	return base != m_bases.end() ? &(*base) : nullptr;
 }
 
 const std::vector<AIOccupiedBase>& AIOccupiedBases::getSortedBases(const glm::vec3& position)
@@ -121,5 +147,75 @@ void AIOccupiedBases::removeWorker(const Worker& worker)
 				return;
 			}
 		}
+	}
+}
+
+void AIOccupiedBases::addBuilding(const Worker& worker, const Entity& building)
+{
+	AIOccupiedBase* occupiedBase = getBase(worker);
+	assert(occupiedBase);
+	if (occupiedBase)
+	{
+		assert(std::find_if(occupiedBase->buildings.cbegin(), occupiedBase->buildings.cend(), [&building](const auto& i)
+		{
+			return i.get().getID() == building.getID();
+		}) == occupiedBase->buildings.cend());
+		occupiedBase->buildings.emplace_back(building);
+
+		switch (building.getEntityType())
+		{
+			case eEntityType::Barracks:
+			++occupiedBase->barracksCount;
+			break;
+			case eEntityType::SupplyDepot:
+			++occupiedBase->supplyDepotCount;
+			break;
+			case eEntityType::Laboratory:
+			++occupiedBase->laboratoryCount;
+			break;
+			case eEntityType::Turret:
+			++occupiedBase->turretCount;
+			break;
+			case eEntityType::Headquarters:
+			break;
+			default:
+			assert(false);
+		}
+	}
+}
+
+void AIOccupiedBases::removeBuilding(const Entity& building)
+{
+	AIOccupiedBase* occupiedBase = nullptr;
+	for (auto& base : m_bases)
+	{
+		auto iter = std::find_if(base.buildings.begin(), base.buildings.end(), [&building](const auto& i)
+		{
+			return building.getID() == i.get().getID();
+		});
+		if (iter != base.buildings.end())
+		{
+			base.buildings.erase(iter);
+			occupiedBase = &base;
+		}
+	}
+
+	assert(occupiedBase);
+	switch (building.getEntityType())
+	{
+	case eEntityType::Barracks:
+		--occupiedBase->barracksCount;
+		break;
+	case eEntityType::SupplyDepot:
+		--occupiedBase->supplyDepotCount;
+		break;
+	case eEntityType::Laboratory:
+		--occupiedBase->laboratoryCount;
+		break;
+	case eEntityType::Turret:
+		--occupiedBase->turretCount;
+		break;
+	default:
+		assert(false);
 	}
 }
