@@ -106,14 +106,9 @@ namespace
 }
 
 //AIAction
-AIAction::AIAction(eActionType actionType)
+AIAction::AIAction(eActionType actionType, const glm::vec3& basePosition)
 	: actionType(actionType),
-	position()
-{}
-
-AIAction::AIAction(eActionType actionType, const glm::vec3& position)
-	: actionType(actionType),
-	position(position)
+	basePosition(basePosition)
 {}
 
 //FactionAI
@@ -137,7 +132,7 @@ FactionAI::FactionAI(eFactionController factionController, const glm::vec3& hqSt
 
 	for (const auto& i : BUILD_ORDERS[Globals::getRandomNumber(0, static_cast<int>(BUILD_ORDERS.size() - 1))])
 	{
-		m_actionQueue.emplace(i);
+		m_actionQueue.emplace(i, getMainHeadquartersPosition());
 	}
 }
 
@@ -400,7 +395,7 @@ void FactionAI::onEntityRemoval(const Entity& entity, bool forceDestroyed)
 
 void FactionAI::instructWorkersToRepair(const Headquarters& HQ, const Map& map)
 {
-	for (auto& worker : m_occupiedBases.getBase(HQ).workers)
+	for (auto& worker : m_occupiedBases.getBase(HQ.getPosition()).workers)
 	{
 		if (!worker.get().isRepairing())
 		{
@@ -536,7 +531,13 @@ bool FactionAI::increaseShield(const Laboratory& laboratory)
 {
 	if (!Faction::increaseShield(laboratory))
 	{
-		m_actionQueue.push(eActionType::IncreaseShield);
+		const AIOccupiedBase* occupiedBase = m_occupiedBases.getBase(laboratory);
+		assert(occupiedBase);
+		if (occupiedBase)
+		{
+			m_actionQueue.emplace(eActionType::IncreaseShield, occupiedBase->base.get().getCenteredPosition());
+		}
+		
 		return false;
 	}
 
@@ -556,22 +557,27 @@ const Entity* FactionAI::createBuilding(const Map& map, const Worker& worker)
 	}
 	else
 	{
-		switch (worker.getBuildingCommands().front().entityType)
+		const AIOccupiedBase* occupiedBase = m_occupiedBases.getBase(worker);
+		if (occupiedBase)
 		{
-		case eEntityType::SupplyDepot:
-			m_actionQueue.push(eActionType::BuildSupplyDepot);
-			break;
-		case eEntityType::Barracks:
-			m_actionQueue.push(eActionType::BuildBarracks);
-			break;
-		case eEntityType::Turret:
-			m_actionQueue.push(eActionType::BuildTurret);
-			break;
-		case eEntityType::Laboratory:
-			m_actionQueue.push(eActionType::BuildLaboratory);
-			break;
-		default:
-			assert(false);
+			const glm::vec3& basePosition = occupiedBase->base.get().getCenteredPosition();
+			switch (worker.getBuildingCommands().front().entityType)
+			{
+			case eEntityType::SupplyDepot:
+				m_actionQueue.emplace(eActionType::BuildSupplyDepot, basePosition);
+				break;
+			case eEntityType::Barracks:
+				m_actionQueue.emplace(eActionType::BuildBarracks, basePosition);
+				break;
+			case eEntityType::Turret:
+				m_actionQueue.emplace(eActionType::BuildTurret, basePosition);
+				break;
+			case eEntityType::Laboratory:
+				m_actionQueue.emplace(eActionType::BuildLaboratory, basePosition);
+				break;
+			default:
+				assert(false);
+			}
 		}
 	}
 

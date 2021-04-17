@@ -26,11 +26,10 @@ enum class eActionType
 
 struct AIAction
 {
-	AIAction(eActionType actionType);
-	AIAction(eActionType actionType, const glm::vec3& position);
+	AIAction(eActionType actionType, const glm::vec3& basePosition);
 
 	eActionType actionType;
-	glm::vec3 position;
+	glm::vec3 basePosition;
 };
 
 class AIUnattachedToBaseWorkers
