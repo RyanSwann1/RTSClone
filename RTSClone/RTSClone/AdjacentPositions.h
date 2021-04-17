@@ -5,17 +5,7 @@
 #include <vector>
 #include <functional>
 
-const std::array<glm::ivec2, 8> ALL_DIRECTIONS_ON_GRID =
-{
-	glm::ivec2(0, 1),
-	glm::ivec2(1, 1),
-	glm::ivec2(1, 0),
-	glm::ivec2(1, -1),
-	glm::ivec2(0, -1),
-	glm::ivec2(-1, -1),
-	glm::ivec2(-1, 0),
-	glm::ivec2(-1, 1)
-};
+extern const std::array<glm::ivec2, 8> ALL_DIRECTIONS_ON_GRID;
 
 struct AdjacentPosition
 {
