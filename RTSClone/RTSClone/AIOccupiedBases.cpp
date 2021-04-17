@@ -207,21 +207,24 @@ void AIOccupiedBases::addBuilding(const Worker& worker, const Entity& building)
 		{
 			return i.get().getID() == building.getID();
 		}) == occupiedBase->buildings.cend());
-		occupiedBase->buildings.emplace_back(building);
 
 		switch (building.getEntityType())
 		{
 			case eEntityType::Barracks:
 			++occupiedBase->barracksCount;
+			occupiedBase->buildings.emplace_back(building);
 			break;
 			case eEntityType::SupplyDepot:
 			++occupiedBase->supplyDepotCount;
+			occupiedBase->buildings.emplace_back(building);
 			break;
 			case eEntityType::Laboratory:
 			++occupiedBase->laboratoryCount;
+			occupiedBase->buildings.emplace_back(building);
 			break;
 			case eEntityType::Turret:
 			++occupiedBase->turretCount;
+			occupiedBase->buildings.emplace_back(building);
 			break;
 			case eEntityType::Headquarters:
 			break;
@@ -262,7 +265,7 @@ void AIOccupiedBases::removeBuilding(const Entity& building)
 	case eEntityType::Turret:
 		--occupiedBase->turretCount;
 		break;
-		case eEntityType::Headquarters:
+	case eEntityType::Headquarters:
 		break;
 	default:
 		assert(false);
