@@ -39,6 +39,17 @@ bool AIOccupiedBase::isWorkerAdded(const Worker& worker) const
 	return iter != workers.cend();
 }
 
+const Entity* AIOccupiedBase::getBuilding(const Entity& building) const
+{
+	int buildingID = building.getID();
+	auto iter = std::find_if(buildings.cbegin(), buildings.cend(), [buildingID](const auto& building)
+	{
+		return building.get().getID() == buildingID;
+	});
+
+	return iter != buildings.cend() ? &(*iter).get() : nullptr;
+}
+
 void AIOccupiedBase::addWorker(Worker& worker)
 {
 	assert(std::find_if(workers.cbegin(), workers.cend(), [&worker](const auto& i)
@@ -65,11 +76,11 @@ AIOccupiedBases::AIOccupiedBases(const BaseHandler& baseHandler)
 	m_bases.reserve(baseHandler.getBases().size());
 }
 
-AIOccupiedBase& AIOccupiedBases::getBase(const Headquarters& headquarters)
+AIOccupiedBase& AIOccupiedBases::getBase(const glm::vec3& position)
 {
-	auto base = std::find_if(m_bases.begin(), m_bases.end(), [&headquarters](const auto& base)
+	auto base = std::find_if(m_bases.begin(), m_bases.end(), [&position](const auto& base)
 	{
-		return base.base.get().getCenteredPosition() == headquarters.getPosition();
+		return base.base.get().getCenteredPosition() == position;
 	});
 	
 	assert(base != m_bases.end());
@@ -87,14 +98,38 @@ const AIOccupiedBase& AIOccupiedBases::getBase(const Base& _base) const
 	return (*iter);
 }
 
-AIOccupiedBase* AIOccupiedBases::getBase(const Worker& worker)
+AIOccupiedBase* AIOccupiedBases::getBase(const Entity& entity)
 {
-	auto base = std::find_if(m_bases.begin(), m_bases.end(), [&worker](const auto& base)
+	AIOccupiedBase* occupiedBase = nullptr;
+	switch (entity.getEntityType())
 	{
-		return base.isWorkerAdded(worker);
-	});
+		case eEntityType::Headquarters:
+		occupiedBase = &getBase(entity.getPosition());
+		break;
+		case eEntityType::Worker:
+		occupiedBase = getBaseWithWorker(static_cast<const Worker&>(entity));
+		break;
+		case eEntityType::SupplyDepot:
+		case eEntityType::Barracks:
+		case eEntityType::Turret:
+		case eEntityType::Laboratory:
+			for (auto& base : m_bases)
+			{
+				const Entity* building = base.getBuilding(entity);
+				if (building && building->getID() == entity.getID())
+				{
+					occupiedBase = &base;
+					break;
+				}
+			}
+		break;
+		case eEntityType::Unit:
+		break;
+		default:
+			assert(false);
+	}
 
-	return base != m_bases.end() ? &(*base) : nullptr;
+	return occupiedBase;
 }
 
 const std::vector<AIOccupiedBase>& AIOccupiedBases::getSortedBases(const glm::vec3& position)
@@ -164,7 +199,7 @@ void AIOccupiedBases::removeWorker(const Worker& worker)
 
 void AIOccupiedBases::addBuilding(const Worker& worker, const Entity& building)
 {
-	AIOccupiedBase* occupiedBase = getBase(worker);
+	AIOccupiedBase* occupiedBase = getBaseWithWorker(worker);
 	assert(occupiedBase);
 	if (occupiedBase)
 	{
@@ -232,4 +267,22 @@ void AIOccupiedBases::removeBuilding(const Entity& building)
 	default:
 		assert(false);
 	}
+}
+
+AIOccupiedBase* AIOccupiedBases::getBaseWithWorker(const Worker& worker)
+{
+	int workerID = worker.getID();
+	for (auto& base : m_bases)
+	{
+		auto iter = std::find_if(base.workers.cbegin(), base.workers.cend(), [workerID](const auto& worker)
+		{
+			return worker.get().getID() == workerID;
+		});
+		if (iter != base.workers.cend())
+		{
+			return &base;
+		}
+	}
+
+	return nullptr;
 }

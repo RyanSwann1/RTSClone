@@ -13,6 +13,7 @@ struct AIOccupiedBase
 	~AIOccupiedBase();
 
 	bool isWorkerAdded(const Worker& worker) const;
+	const Entity* getBuilding(const Entity& building) const;
 	void addWorker(Worker& worker);
 	void removeWorker(const Worker& worker);
 	
@@ -37,7 +38,9 @@ public:
 	AIOccupiedBases& operator=(AIOccupiedBases&&) = delete;
 
 	const AIOccupiedBase& getBase(const Base& base) const;
-	AIOccupiedBase& getBase(const Headquarters& headquarters);
+	AIOccupiedBase& getBase(const glm::vec3& position);
+	AIOccupiedBase* getBase(const Entity& entity);
+
 	const std::vector<AIOccupiedBase>& getSortedBases(const glm::vec3& position);
 	void addBase(const Base& base);
 	void removeBase(const Base& base);
@@ -51,6 +54,6 @@ public:
 
 private:
 	std::vector<AIOccupiedBase> m_bases;
-	
-	AIOccupiedBase* getBase(const Worker& worker);
+
+	AIOccupiedBase* getBaseWithWorker(const Worker& worker);
 };			
