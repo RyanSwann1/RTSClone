@@ -244,12 +244,15 @@ void FactionAI::handleEvent(const GameEvent& gameEvent, const Map& map, FactionH
 				{
 					for (const auto& base : m_occupiedBases.getSortedBases((*worker)->getPosition()))
 					{
-						nearestMineral = m_baseHandler.getNearestAvailableMineralAtBase(*this, base.base, (*worker)->getPosition());
-						if (nearestMineral)
+						if (&base.base.get() != &nearestBase)
 						{
-							m_occupiedBases.removeWorker(*(*worker));
-							m_occupiedBases.addWorker(*(*worker), base.base);
-							(*worker)->moveTo(*nearestMineral, map);
+							nearestMineral = m_baseHandler.getNearestAvailableMineralAtBase(*this, base.base, (*worker)->getPosition());
+							if (nearestMineral)
+							{
+								m_occupiedBases.removeWorker(*(*worker));
+								m_occupiedBases.addWorker(*(*worker), base.base);
+								(*worker)->moveTo(*nearestMineral, map);
+							}
 						}
 					}
 				}
