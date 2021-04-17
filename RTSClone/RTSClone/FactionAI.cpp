@@ -242,22 +242,15 @@ void FactionAI::handleEvent(const GameEvent& gameEvent, const Map& map, FactionH
 				}
 				else
 				{
-					const glm::vec3& position = (*worker)->getPosition();
-					bool mineralFound = false;
-					for (const auto& base : m_occupiedBases.getSortedBases(position))
+					for (const auto& base : m_occupiedBases.getSortedBases((*worker)->getPosition()))
 					{
-						nearestMineral = m_baseHandler.getNearestAvailableMineralAtBase(*this, base.base, position);
+						nearestMineral = m_baseHandler.getNearestAvailableMineralAtBase(*this, base.base, (*worker)->getPosition());
 						if (nearestMineral)
 						{
 							m_occupiedBases.removeWorker(*(*worker));
 							m_occupiedBases.addWorker(*(*worker), base.base);
 							(*worker)->moveTo(*nearestMineral, map);
-							mineralFound = true;
 						}
-					}
-					if (!mineralFound)
-					{	
-						m_unattachedToBaseWorkers.addWorker(*(*worker));
 					}
 				}
 			}
