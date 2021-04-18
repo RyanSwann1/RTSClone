@@ -104,6 +104,7 @@ private:
 
 	void instructWorkersToRepair(const Headquarters& HQ, const Map& map);
 	Worker* getAvailableWorker(const glm::vec3& position);
+	Worker* getAvailableWorker(const glm::vec3& position, AIOccupiedBase& occupiedBase);
 
-	bool build(const Map& map, eEntityType entityType, Worker* worker = nullptr);
+	bool build(const Map& map, eEntityType entityType, Worker* worker = nullptr, AIOccupiedBase* occupiedBase = nullptr);
 };

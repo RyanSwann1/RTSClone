@@ -67,7 +67,7 @@ namespace
 	const int MAX_BARRACKS_DEFENSIVE = 2;
 	const int MAX_TURRETS_DEFENSIVE = 4;
 
-	const std::array<std::vector<eAIActionType>, 3> BUILD_ORDERS
+	const std::array<std::vector<eAIActionType>, 3> STARTING_BUILD_ORDERS
 	{
 		std::vector<eAIActionType> {
 			eAIActionType::SpawnWorker,
@@ -134,6 +134,30 @@ namespace
 		}
 
 		return entityType;
+	}
+
+	eAIActionType convertEntityToActionType(eEntityType entityType)
+	{
+		eAIActionType actionType;
+		switch (entityType)
+		{	
+			case eEntityType::SupplyDepot:
+			actionType = eAIActionType::BuildSupplyDepot;
+			break;
+			case eEntityType::Barracks:
+			actionType = eAIActionType::BuildBarracks;
+			break;
+			case eEntityType::Turret:
+			actionType = eAIActionType::BuildTurret;
+			break;
+			case eEntityType::Laboratory:
+			actionType = eAIActionType::BuildLaboratory;
+			break;
+			default:
+			assert(false);
+		}
+
+		return actionType;
 	}
 
 	bool isBaseClosest(const BaseHandler& baseHandler, const glm::vec3& position, const Headquarters& headquarters)
@@ -222,9 +246,9 @@ FactionAI::FactionAI(eFactionController factionController, const glm::vec3& hqSt
 	m_spawnTimer(Globals::getRandomNumber(MIN_SPAWN_TIMER_EXPIRATION, MAX_SPAWN_TIMER_EXPIRATION), true),
 	m_targetFaction(eFactionController::None)
 {
-	for (const auto& i : BUILD_ORDERS[Globals::getRandomNumber(0, static_cast<int>(BUILD_ORDERS.size() - 1))])
+	for (const auto& actionType : STARTING_BUILD_ORDERS[Globals::getRandomNumber(0, static_cast<int>(STARTING_BUILD_ORDERS.size() - 1))])
 	{
-		m_actionQueue.emplace(i, getMainHeadquartersPosition());
+		m_actionQueue.emplace(actionType, getMainHeadquartersPosition());
 	}
 }
 
@@ -357,15 +381,19 @@ void FactionAI::handleEvent(const GameEvent& gameEvent, const Map& map, FactionH
 		const Base& base = m_baseHandler.getBase(gameEvent.data.attachFactionToBase.position);
 		assert(base.owningFactionController == getController());
 		m_occupiedBases.addBase(base);
-		for (const auto& mineral : base.minerals)
+		if (!m_unattachedToBaseWorkers.isEmpty())
 		{
-			if (m_unattachedToBaseWorkers.isEmpty())
+			for (const auto& mineral : base.minerals)
 			{
-				break;
-			}
+				if (m_unattachedToBaseWorkers.isEmpty())
+				{
+					break;
+				}
 
-			Worker& worker = m_unattachedToBaseWorkers.getClosestWorker(base.getCenteredPosition());
-			worker.moveTo(mineral, map);
+				Worker& worker = m_unattachedToBaseWorkers.getClosestWorker(base.getCenteredPosition());
+				worker.moveTo(mineral, map);
+				m_occupiedBases.addWorker(worker, base);
+			}
 		}
 	}
 	break;
@@ -415,7 +443,8 @@ void FactionAI::update(float deltaTime, const Map & map, FactionHandler& faction
 			case eAIActionType::BuildSupplyDepot:
 			case eAIActionType::BuildTurret:
 			case eAIActionType::BuildLaboratory:
-				if (build(map, convertActionTypeToEntityType(m_actionQueue.front().actionType)))
+				if (build(map, convertActionTypeToEntityType(m_actionQueue.front().actionType), nullptr, 
+					&m_occupiedBases.getBase(m_actionQueue.front().basePosition)))
 				{
 					m_actionQueue.pop();
 				}
@@ -426,7 +455,7 @@ void FactionAI::update(float deltaTime, const Map & map, FactionHandler& faction
 				break;
 			case eAIActionType::SpawnUnit:
 			case eAIActionType::SpawnWorker:
-				if (build(map, convertActionTypeToEntityType(m_actionQueue.front().actionType)))
+				if (build(map, convertActionTypeToEntityType(m_actionQueue.front().actionType), nullptr))
 				{
 					m_actionQueue.pop();
 				}
@@ -475,8 +504,18 @@ void FactionAI::update(float deltaTime, const Map & map, FactionHandler& faction
 			Worker* availableWorker = getAvailableWorker(availableBase->position);
 			if (availableWorker)
 			{
-				availableWorker->build(availableBase->getCenteredPosition(), map, eEntityType::Headquarters, availableBase);
 				m_baseExpansionTimer.setExpirationTime(200.0f);
+				
+				const AIOccupiedBase* currentBase = m_occupiedBases.getBase(*availableWorker);
+				assert(currentBase);
+				m_occupiedBases.removeWorker(*availableWorker);
+				
+				for (const auto& building : availableWorker->getBuildingCommands())
+				{
+					m_actionQueue.emplace(convertEntityToActionType(building.entityType), currentBase->base.get().getCenteredPosition());
+				}
+				availableWorker->build(availableBase->getCenteredPosition(), map, eEntityType::Headquarters, availableBase, true);
+				m_unattachedToBaseWorkers.addWorker(*availableWorker);
 			}
 		}
 	}
@@ -549,6 +588,45 @@ Worker* FactionAI::getAvailableWorker(const glm::vec3& position)
 
 		return selectedWorker;
 	}
+}
+
+Worker* FactionAI::getAvailableWorker(const glm::vec3& position, AIOccupiedBase& occupiedBase)
+{
+	Worker* selectedWorker = nullptr;
+	float closestDistance = std::numeric_limits<float>::max();
+	for (auto& availableWorker : occupiedBase.workers)
+	{
+		float distance = Globals::getSqrDistance(position, availableWorker.get().getPosition());
+		bool selectWorker = false;
+		if (!selectedWorker)
+		{
+			selectWorker = true;
+			selectedWorker = &availableWorker.get();
+		}
+		else if (availableWorker.get().getCurrentState() == eWorkerState::Idle &&
+			selectedWorker->getCurrentState() != eWorkerState::Idle)
+		{
+			selectWorker = true;
+		}
+		else if (availableWorker.get().getCurrentState() == eWorkerState::Idle &&
+			selectedWorker->getCurrentState() == eWorkerState::Idle &&
+			distance < closestDistance)
+		{
+			selectWorker = true;
+		}
+		else if (distance < closestDistance)
+		{
+			selectWorker = true;
+		}
+
+		if (selectWorker)
+		{
+			selectedWorker = &availableWorker.get();
+			closestDistance = distance;
+		}
+	}
+
+	return selectedWorker;
 }
 
 bool FactionAI::isWithinRangeOfBuildings(const glm::vec3& position, float distance) const
@@ -650,10 +728,21 @@ const Entity* FactionAI::createBuilding(const Map& map, const Worker& worker)
 	const Entity* spawnedBuilding = Faction::createBuilding(map, worker);
 	if (spawnedBuilding)
 	{
-		m_occupiedBases.addBuilding(worker, *spawnedBuilding);
-		if (spawnedBuilding->getEntityType() == eEntityType::Laboratory)
+		switch (spawnedBuilding->getEntityType())
 		{
-			GameEventHandler::getInstance().gameEvents.push(GameEvent::createIncreaseFactionShield(getController()));
+			case eEntityType::Barracks:
+			case eEntityType::SupplyDepot:
+			case eEntityType::Turret:
+				m_occupiedBases.addBuilding(worker, *spawnedBuilding);
+			break;
+			case eEntityType::Laboratory:
+				GameEventHandler::getInstance().gameEvents.push(GameEvent::createIncreaseFactionShield(getController()));
+				m_occupiedBases.addBuilding(worker, *spawnedBuilding);
+			break;
+			case eEntityType::Headquarters:
+			break;
+			default:
+				assert(false);
 		}
 	}
 	else
@@ -720,9 +809,8 @@ Entity* FactionAI::createWorker(const Map& map, const Headquarters& headquarters
 	return spawnedWorker;
 }
 
-bool FactionAI::build(const Map& map, eEntityType entityType, Worker* worker)
+bool FactionAI::build(const Map& map, eEntityType entityType, Worker* worker, AIOccupiedBase* occupiedBase)
 {
-	assert(!m_headquarters.empty());
 	if (!isAffordable(entityType))
 	{
 		return false;
@@ -745,7 +833,7 @@ bool FactionAI::build(const Map& map, eEntityType entityType, Worker* worker)
 			}
 			else
 			{
-				Worker* availableWorker = getAvailableWorker(buildPosition);
+				Worker* availableWorker = occupiedBase ? getAvailableWorker(buildPosition, *occupiedBase) : getAvailableWorker(buildPosition);
 				if (availableWorker)
 				{
 					return availableWorker->build(buildPosition, map, entityType);
