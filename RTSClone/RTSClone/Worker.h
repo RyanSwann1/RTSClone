@@ -57,7 +57,8 @@ public:
 	int extractResources();	
 
 	void repairEntity(const Entity& entity, const Map& map);
-	bool build(const glm::vec3& buildPosition, const Map& map, eEntityType entityType, const Base* baseToExpandTo = nullptr);
+	bool build(const glm::vec3& buildPosition, const Map& map, eEntityType entityType, const Base* baseToExpandTo = nullptr,
+		bool clearBuildQueue = false);
 	void update(float deltaTime, const Map& map, FactionHandler& factionHandler, const Timer& unitStateHandlerTimer);
 	void moveTo(const Base& base, const Map& map);
 	void moveTo(const Mineral& mineral, const Map& map);

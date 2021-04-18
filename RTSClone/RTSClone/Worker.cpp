@@ -116,7 +116,8 @@ void Worker::repairEntity(const Entity& entity, const Map& map)
 	m_repairTargetEntity.set(entity.getEntityType(), entity.getID());
 }
 
-bool Worker::build(const glm::vec3& buildPosition, const Map& map, eEntityType entityType, const Base* baseToExpandTo)
+bool Worker::build(const glm::vec3& buildPosition, const Map& map, eEntityType entityType, const Base* baseToExpandTo,
+	bool clearBuildQueue)
 {
 	assert((baseToExpandTo && entityType == eEntityType::Headquarters) || (!baseToExpandTo && entityType != eEntityType::Headquarters));
 	assert((baseToExpandTo && baseToExpandTo->owningFactionController == eFactionController::None) || !baseToExpandTo);
@@ -125,6 +126,10 @@ bool Worker::build(const glm::vec3& buildPosition, const Map& map, eEntityType e
 
 	if (!m_owningFaction.get().isCollidingWithWorkerBuildQueue(ModelManager::getInstance().getModelAABB(buildPosition, entityType)))
 	{
+		if (clearBuildQueue)
+		{
+			m_buildQueue.clear();
+		}
 		m_baseToExpandTo = baseToExpandTo;
 		if (m_buildQueue.empty())
 		{
