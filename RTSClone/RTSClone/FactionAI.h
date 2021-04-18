@@ -4,7 +4,9 @@
 #include "Graph.h"
 #include "Timer.h"
 #include "AIOccupiedBases.h"
+#include "PriorityQueue.h"
 #include <queue>
+#include <vector>
 #include <functional>
 
 enum class eAIBehaviour
@@ -51,8 +53,6 @@ private:
 	std::vector<std::reference_wrapper<Worker>> m_unattachedToBaseWorkers;
 };
 
-const auto AIPriorityActionCompare = [](const auto& a, const auto& b) -> bool { return b.weight > a.weight; };
-using AIPriorityActionQueue = std::priority_queue<AIPriorityAction, std::vector<AIPriorityAction>, decltype(AIPriorityActionCompare)>;
 struct AIPriorityAction
 {
 	AIPriorityAction(int weight, AIAction action);
@@ -60,6 +60,9 @@ struct AIPriorityAction
 	int weight;
 	AIAction action;
 };
+
+const auto AIPriorityActionCompare = [](AIPriorityAction a, AIPriorityAction b) -> bool { return b.weight > a.weight; };
+using AIPriorityActionQueue = std::priority_queue<AIPriorityAction, std::vector<AIPriorityAction>, decltype(AIPriorityActionCompare)>;
 
 class BaseHandler;
 class FactionHandler;
@@ -87,7 +90,7 @@ protected:
 
 private:
 	const BaseHandler& m_baseHandler;
-	AIPriorityActionQueue m_actionPriorityQueue;
+	AIPriorityActionQueue m_ActionPriorityQueue;
 	AIUnattachedToBaseWorkers m_unattachedToBaseWorkers;
 	AIOccupiedBases m_occupiedBases;
 	Timer m_baseExpansionTimer;

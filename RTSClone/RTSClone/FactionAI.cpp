@@ -147,8 +147,8 @@ AIPriorityAction::AIPriorityAction(int weight, AIAction action)
 FactionAI::FactionAI(eFactionController factionController, const glm::vec3& hqStartingPosition,
 	int startingResources, int startingPopulationCap, const BaseHandler& baseHandler)
 	: Faction(factionController, hqStartingPosition, startingResources, startingPopulationCap),
-	m_actionPriorityQueue(),
 	m_baseHandler(baseHandler),
+	m_ActionPriorityQueue(AIPriorityActionCompare),
 	m_occupiedBases(baseHandler),
 	m_baseExpansionTimer(Globals::getRandomNumber(MIN_BASE_EXPANSION_TIME, MAX_BASE_EXPANSION_TIME), true),
 	m_currentBehaviour(static_cast<eAIBehaviour>(Globals::getRandomNumber(0, static_cast<int>(eAIBehaviour::Max)))),
