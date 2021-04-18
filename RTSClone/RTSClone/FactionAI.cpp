@@ -38,10 +38,36 @@ namespace
 	const float MIN_BASE_EXPANSION_TIME = 2.0f;
 	const float MAX_BASE_EXPANSION_TIME = MIN_BASE_EXPANSION_TIME * 2.0f;
 
-	const int MAX_WORKERS_REPAIR_BUILDING = 2;
-
 	//Defensive
 	const size_t DEFENSIVE_MAX_TURRETS = 5;
+
+	const std::array<int, static_cast<size_t>(eEntityType::Max) + 1> MAX_BASE_BUILDINGS_DEFENSIVE
+	{
+		1, 
+		1,
+		1,
+		2,
+		1,
+		4,
+		1
+	};
+
+	const std::array<int, static_cast<size_t>(eEntityType::Max) + 1> ENTITY_MODIFIERS_DEFENSIVE
+	{
+		1,
+		2,
+		1,
+		1,
+		2,
+		4,
+		1
+	};
+
+	const int MAX_LABORATORY_ALL = 1;
+
+	const int MAX_SUPPLY_DEPOT_DEFENSIVE = 2;
+	const int MAX_BARRACKS_DEFENSIVE = 2;
+	const int MAX_TURRETS_DEFENSIVE = 4;
 
 	const std::array< std::array<eActionType, 4>, 3> BUILD_ORDERS
 	{
@@ -111,10 +137,17 @@ AIAction::AIAction(eActionType actionType, const glm::vec3& basePosition)
 	basePosition(basePosition)
 {}
 
+//AIPriorityAction
+AIPriorityAction::AIPriorityAction(int weight, AIAction action)
+	: weight(weight),
+	action(action)
+{}
+
 //FactionAI
 FactionAI::FactionAI(eFactionController factionController, const glm::vec3& hqStartingPosition,
 	int startingResources, int startingPopulationCap, const BaseHandler& baseHandler)
 	: Faction(factionController, hqStartingPosition, startingResources, startingPopulationCap),
+	m_actionPriorityQueue(),
 	m_baseHandler(baseHandler),
 	m_occupiedBases(baseHandler),
 	m_baseExpansionTimer(Globals::getRandomNumber(MIN_BASE_EXPANSION_TIME, MAX_BASE_EXPANSION_TIME), true),
@@ -363,6 +396,23 @@ void FactionAI::update(float deltaTime, const Map & map, FactionHandler& faction
 		break;
 	default:
 		assert(false);
+	}
+
+	for (const auto& occupiedBase : m_occupiedBases.getBases())
+	{
+
+		if (occupiedBase.turretCount < MAX_TURRETS_DEFENSIVE)
+		{
+			
+		}
+		if (occupiedBase.supplyDepotCount < MAX_SUPPLY_DEPOT_DEFENSIVE)
+		{
+
+		}
+		if (occupiedBase.barracksCount < MAX_BARRACKS_DEFENSIVE)
+		{
+
+		}
 	}
 
 	m_baseExpansionTimer.update(deltaTime);

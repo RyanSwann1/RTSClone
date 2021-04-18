@@ -51,6 +51,16 @@ private:
 	std::vector<std::reference_wrapper<Worker>> m_unattachedToBaseWorkers;
 };
 
+const auto AIPriorityActionCompare = [](const auto& a, const auto& b) -> bool { return b.weight > a.weight; };
+using AIPriorityActionQueue = std::priority_queue<AIPriorityAction, std::vector<AIPriorityAction>, decltype(AIPriorityActionCompare)>;
+struct AIPriorityAction
+{
+	AIPriorityAction(int weight, AIAction action);
+
+	int weight;
+	AIAction action;
+};
+
 class BaseHandler;
 class FactionHandler;
 class FactionAI : public Faction
@@ -77,6 +87,7 @@ protected:
 
 private:
 	const BaseHandler& m_baseHandler;
+	AIPriorityActionQueue m_actionPriorityQueue;
 	AIUnattachedToBaseWorkers m_unattachedToBaseWorkers;
 	AIOccupiedBases m_occupiedBases;
 	Timer m_baseExpansionTimer;

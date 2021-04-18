@@ -76,6 +76,11 @@ AIOccupiedBases::AIOccupiedBases(const BaseHandler& baseHandler)
 	m_bases.reserve(baseHandler.getBases().size());
 }
 
+const std::vector<AIOccupiedBase>& AIOccupiedBases::getBases() const
+{
+	return m_bases;
+}
+
 AIOccupiedBase& AIOccupiedBases::getBase(const glm::vec3& position)
 {
 	auto base = std::find_if(m_bases.begin(), m_bases.end(), [&position](const auto& base)
