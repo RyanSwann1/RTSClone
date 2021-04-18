@@ -23,6 +23,8 @@ enum class eActionType
 	BuildBarracks,
 	BuildTurret,
 	BuildLaboratory,
+	SpawnUnit,
+	SpawnWorker,
 	IncreaseShield
 };
 
@@ -95,7 +97,6 @@ private:
 	AIOccupiedBases m_occupiedBases;
 	Timer m_baseExpansionTimer;
 	eAIBehaviour m_currentBehaviour;
-	std::queue<eEntityType> m_spawnQueue;
 	std::queue<AIAction> m_actionQueue;
 	Timer m_delayTimer;
 	Timer m_spawnTimer;

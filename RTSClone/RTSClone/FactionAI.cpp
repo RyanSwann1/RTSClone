@@ -30,7 +30,7 @@ namespace
 	const float IDLE_TIMER_EXPIRATION = 1.0f;
 	const float MIN_SPAWN_TIMER_EXPIRATION = 7.5f;
 	const float MAX_SPAWN_TIMER_EXPIRATION = 15.0f;
-	const int STARTING_WORKER_COUNT = 9;
+	const int STARTING_WORKER_COUNT = 2;
 	const int STARTING_UNIT_COUNT = 1;
 	const float MAX_DISTANCE_FROM_HQ = static_cast<float>(Globals::NODE_SIZE) * 18.0f;
 	const float MIN_DISTANCE_FROM_HQ = static_cast<float>(Globals::NODE_SIZE) * 5.0f;
@@ -107,6 +107,12 @@ namespace
 		case eActionType::BuildLaboratory:
 			entityType = eEntityType::Laboratory;
 			break;
+		case eActionType::SpawnUnit:
+			entityType = eEntityType::Unit;
+			break;
+		case eActionType::SpawnWorker:
+			entityType = eEntityType::Worker;
+			break;
 		default:
 			assert(false);
 		}
@@ -131,6 +137,49 @@ namespace
 	}
 }
 
+//AIUnattachedToBaseWorkers
+AIUnattachedToBaseWorkers::AIUnattachedToBaseWorkers()
+	: m_unattachedToBaseWorkers() {}
+
+bool AIUnattachedToBaseWorkers::isEmpty() const
+{
+	return m_unattachedToBaseWorkers.empty();
+}
+
+Worker& AIUnattachedToBaseWorkers::getClosestWorker(const glm::vec3& position)
+{
+	assert(!m_unattachedToBaseWorkers.empty());
+	std::sort(m_unattachedToBaseWorkers.begin(), m_unattachedToBaseWorkers.end(), [&position](const auto& a, const auto& b)
+	{
+		return Globals::getSqrDistance(position, a.get().getPosition()) > Globals::getSqrDistance(position, b.get().getPosition());
+	});
+	Worker& worker = m_unattachedToBaseWorkers.back();
+	m_unattachedToBaseWorkers.pop_back();
+	return worker;
+}
+
+void AIUnattachedToBaseWorkers::addWorker(Worker& _worker)
+{
+	if (std::find_if(m_unattachedToBaseWorkers.cbegin(), m_unattachedToBaseWorkers.cend(), [&_worker](const auto& worker)
+	{
+		return _worker.getID() == worker.get().getID();
+	}) == m_unattachedToBaseWorkers.cend())
+	{
+		m_unattachedToBaseWorkers.emplace_back(_worker);
+	}
+}
+
+void AIUnattachedToBaseWorkers::remove(const Worker& _worker)
+{
+	auto iter = std::find_if(m_unattachedToBaseWorkers.begin(), m_unattachedToBaseWorkers.end(), [&_worker](const auto& worker)
+	{
+		return _worker.getID() == worker.get().getID();
+	});
+	assert(iter != m_unattachedToBaseWorkers.end());
+	m_unattachedToBaseWorkers.erase(iter);
+}
+
+
 //AIAction
 AIAction::AIAction(eActionType actionType, const glm::vec3& basePosition)
 	: actionType(actionType),
@@ -152,7 +201,6 @@ FactionAI::FactionAI(eFactionController factionController, const glm::vec3& hqSt
 	m_occupiedBases(baseHandler),
 	m_baseExpansionTimer(Globals::getRandomNumber(MIN_BASE_EXPANSION_TIME, MAX_BASE_EXPANSION_TIME), true),
 	m_currentBehaviour(static_cast<eAIBehaviour>(Globals::getRandomNumber(0, static_cast<int>(eAIBehaviour::Max)))),
-	m_spawnQueue(),
 	m_actionQueue(),
 	m_delayTimer(DELAY_TIMER_EXPIRATION, true),
 	m_spawnTimer(Globals::getRandomNumber(MIN_SPAWN_TIMER_EXPIRATION, MAX_SPAWN_TIMER_EXPIRATION), true),
@@ -160,7 +208,7 @@ FactionAI::FactionAI(eFactionController factionController, const glm::vec3& hqSt
 {
 	for (int i = 0; i < STARTING_WORKER_COUNT; ++i)
 	{
-		m_spawnQueue.push(eEntityType::Worker);
+		m_actionQueue.emplace(eActionType::SpawnWorker, getMainHeadquartersPosition());
 	}
 
 	for (const auto& i : BUILD_ORDERS[Globals::getRandomNumber(0, static_cast<int>(BUILD_ORDERS.size() - 1))])
@@ -256,7 +304,8 @@ void FactionAI::handleEvent(const GameEvent& gameEvent, const Map& map, FactionH
 				break;
 			}
 			if (!m_actionQueue.empty() &&
-				build(map, convertActionTypeToEntityType(m_actionQueue.front().actionType), &*(*worker)))
+				Globals::BUILDING_TYPES.isMatch(convertActionTypeToEntityType(m_actionQueue.front().actionType)) &&
+					build(map, convertActionTypeToEntityType(m_actionQueue.front().actionType), &*(*worker)))
 			{
 				m_actionQueue.pop();
 			}
@@ -339,7 +388,7 @@ void FactionAI::update(float deltaTime, const Map & map, FactionHandler& faction
 	if (m_spawnTimer.isExpired())
 	{
 		m_spawnTimer.resetElaspedTime();
-		//m_spawnQueue.push(eEntityType::Unit);
+		//Spawn Unit
 	}
 
 	m_delayTimer.update(deltaTime);
@@ -347,37 +396,28 @@ void FactionAI::update(float deltaTime, const Map & map, FactionHandler& faction
 	{
 		m_delayTimer.resetElaspedTime();
 
-		if (!m_spawnQueue.empty())
+		if (!m_actionQueue.empty())
 		{
-			if (!m_actionQueue.empty())
+			switch (m_actionQueue.front().actionType)
 			{
-				switch (m_actionQueue.front().actionType)
+			case eActionType::BuildBarracks:
+			case eActionType::BuildSupplyDepot:
+			case eActionType::BuildTurret:
+			case eActionType::BuildLaboratory:
+				if (build(map, convertActionTypeToEntityType(m_actionQueue.front().actionType)))
 				{
-				case eActionType::BuildBarracks:
-				case eActionType::BuildSupplyDepot:
-				case eActionType::BuildTurret:
-				case eActionType::BuildLaboratory:
-					if (build(map, convertActionTypeToEntityType(m_actionQueue.front().actionType)))
-					{
-						m_actionQueue.pop();
-					}
-					break;
-				case eActionType::IncreaseShield:
-					GameEventHandler::getInstance().gameEvents.push(GameEvent::createIncreaseFactionShield(getController()));
 					m_actionQueue.pop();
-					break;
-				default:
-					assert(false);
 				}
-			}
-
-			switch (m_spawnQueue.front())
-			{
-			case eEntityType::Unit:
-			case eEntityType::Worker:
-				if (build(map, m_spawnQueue.front()))
+				break;
+			case eActionType::IncreaseShield:
+				GameEventHandler::getInstance().gameEvents.push(GameEvent::createIncreaseFactionShield(getController()));
+				m_actionQueue.pop();
+				break;
+			case eActionType::SpawnUnit:
+			case eActionType::SpawnWorker:
+				if (build(map, convertActionTypeToEntityType(m_actionQueue.front().actionType)))
 				{
-					m_spawnQueue.pop();
+					m_actionQueue.pop();
 				}
 				break;
 			default:
@@ -639,7 +679,11 @@ const Entity* FactionAI::createUnit(const Map& map, const Barracks& barracks, Fa
 	const Entity* spawnedUnit = Faction::createUnit(map, barracks, factionHandler);
 	if (!spawnedUnit)
 	{
-		m_spawnQueue.push(eEntityType::Unit);
+		AIOccupiedBase* occupiedBase = m_occupiedBases.getBase(barracks);
+		if (occupiedBase)
+		{
+			m_actionQueue.emplace(eActionType::SpawnUnit, occupiedBase->base.get().getCenteredPosition());
+		}
 	}
 
 	return spawnedUnit;
@@ -650,7 +694,11 @@ Entity* FactionAI::createWorker(const Map& map, const Headquarters& headquarters
 	Entity* spawnedWorker = Faction::createWorker(map, headquarters);
 	if (!spawnedWorker)
 	{
-		m_spawnQueue.push(eEntityType::Worker);
+		AIOccupiedBase* occupiedBase = m_occupiedBases.getBase(headquarters);
+		if (occupiedBase)
+		{
+			m_actionQueue.emplace(eActionType::SpawnWorker, occupiedBase->base.get().getCenteredPosition());
+		}
 	}
 	else
 	{
@@ -706,46 +754,4 @@ bool FactionAI::build(const Map& map, eEntityType entityType, Worker* worker)
 	}
 
 	return false;
-}
-
-AIUnattachedToBaseWorkers::AIUnattachedToBaseWorkers()
-	: m_unattachedToBaseWorkers()
-{}
-
-bool AIUnattachedToBaseWorkers::isEmpty() const
-{
-	return m_unattachedToBaseWorkers.empty();
-}
-
-Worker& AIUnattachedToBaseWorkers::getClosestWorker(const glm::vec3& position)
-{
-	assert(!m_unattachedToBaseWorkers.empty());
-	std::sort(m_unattachedToBaseWorkers.begin(), m_unattachedToBaseWorkers.end(), [&position](const auto& a, const auto& b)
-	{
-		return Globals::getSqrDistance(position, a.get().getPosition()) > Globals::getSqrDistance(position, b.get().getPosition());
-	});
-	Worker& worker = m_unattachedToBaseWorkers.back();
-	m_unattachedToBaseWorkers.pop_back();
-	return worker;
-}
-
-void AIUnattachedToBaseWorkers::addWorker(Worker& _worker)
-{
-	if (std::find_if(m_unattachedToBaseWorkers.cbegin(), m_unattachedToBaseWorkers.cend(), [&_worker](const auto& worker)
-	{
-		return _worker.getID() == worker.get().getID();
-	}) == m_unattachedToBaseWorkers.cend())
-	{
-		m_unattachedToBaseWorkers.emplace_back(_worker);
-	}
-}
-
-void AIUnattachedToBaseWorkers::remove(const Worker& _worker)
-{
-	auto iter = std::find_if(m_unattachedToBaseWorkers.begin(), m_unattachedToBaseWorkers.end(), [&_worker](const auto& worker)
-	{
-		return _worker.getID() == worker.get().getID();
-	});
-	assert(iter != m_unattachedToBaseWorkers.end());
-	m_unattachedToBaseWorkers.erase(iter);
 }
