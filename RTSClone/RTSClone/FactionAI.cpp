@@ -30,8 +30,6 @@ namespace
 	const float IDLE_TIMER_EXPIRATION = 1.0f;
 	const float MIN_SPAWN_TIMER_EXPIRATION = 7.5f;
 	const float MAX_SPAWN_TIMER_EXPIRATION = 15.0f;
-	const int STARTING_WORKER_COUNT = 2;
-	const int STARTING_UNIT_COUNT = 1;
 	const float MAX_DISTANCE_FROM_HQ = static_cast<float>(Globals::NODE_SIZE) * 18.0f;
 	const float MIN_DISTANCE_FROM_HQ = static_cast<float>(Globals::NODE_SIZE) * 5.0f;
 	const float DISTANCE_FROM_MINERALS = static_cast<float>(Globals::NODE_SIZE) * 7.0f;
@@ -69,25 +67,43 @@ namespace
 	const int MAX_BARRACKS_DEFENSIVE = 2;
 	const int MAX_TURRETS_DEFENSIVE = 4;
 
-	const std::array< std::array<eAIActionType, 4>, 3> BUILD_ORDERS
+	const std::array<std::vector<eAIActionType>, 3> BUILD_ORDERS
 	{
-		std::array<eAIActionType, 4> {
-		eAIActionType::BuildBarracks,
-		eAIActionType::BuildBarracks,
-		eAIActionType::BuildTurret,
-		eAIActionType::BuildSupplyDepot },
+		std::vector<eAIActionType> {
+			eAIActionType::SpawnWorker,
+			eAIActionType::SpawnWorker,
+			eAIActionType::BuildBarracks,
+			eAIActionType::BuildBarracks,
+			eAIActionType::BuildTurret,
+			eAIActionType::BuildSupplyDepot,
+			eAIActionType::SpawnWorker,
+			eAIActionType::SpawnWorker,
+			eAIActionType::SpawnWorker
+		},
 
-		std::array<eAIActionType, 4> {
-		eAIActionType::BuildTurret,
-		eAIActionType::BuildTurret,
-		eAIActionType::BuildLaboratory,
-		eAIActionType::BuildTurret },
-		
-		std::array<eAIActionType, 4> {
-		eAIActionType::BuildSupplyDepot,
-		eAIActionType::BuildSupplyDepot,
-		eAIActionType::BuildSupplyDepot,
-		eAIActionType::BuildTurret }
+		std::vector<eAIActionType> {	
+			eAIActionType::SpawnWorker,
+			eAIActionType::SpawnWorker,
+			eAIActionType::BuildTurret,
+			eAIActionType::BuildTurret,
+			eAIActionType::BuildLaboratory,
+			eAIActionType::BuildTurret,
+			eAIActionType::SpawnWorker,
+			eAIActionType::SpawnWorker,
+			eAIActionType::SpawnWorker
+		},
+
+		std::vector<eAIActionType> {
+			eAIActionType::SpawnWorker,
+			eAIActionType::SpawnWorker,
+			eAIActionType::BuildSupplyDepot,
+			eAIActionType::BuildSupplyDepot,
+			eAIActionType::BuildSupplyDepot,
+			eAIActionType::BuildTurret,
+			eAIActionType::SpawnWorker,
+			eAIActionType::SpawnWorker,
+			eAIActionType::SpawnWorker
+		}
 	};
 
 	eEntityType convertActionTypeToEntityType(eAIActionType actionType)
@@ -206,11 +222,6 @@ FactionAI::FactionAI(eFactionController factionController, const glm::vec3& hqSt
 	m_spawnTimer(Globals::getRandomNumber(MIN_SPAWN_TIMER_EXPIRATION, MAX_SPAWN_TIMER_EXPIRATION), true),
 	m_targetFaction(eFactionController::None)
 {
-	for (int i = 0; i < STARTING_WORKER_COUNT; ++i)
-	{
-		m_actionQueue.emplace(eAIActionType::SpawnWorker, getMainHeadquartersPosition());
-	}
-
 	for (const auto& i : BUILD_ORDERS[Globals::getRandomNumber(0, static_cast<int>(BUILD_ORDERS.size() - 1))])
 	{
 		m_actionQueue.emplace(i, getMainHeadquartersPosition());
