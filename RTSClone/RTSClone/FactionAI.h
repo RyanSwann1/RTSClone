@@ -63,7 +63,7 @@ struct AIPriorityAction
 	AIAction action;
 };
 
-const auto AIPriorityActionCompare = [](AIPriorityAction a, AIPriorityAction b) -> bool { return b.weight > a.weight; };
+const auto AIPriorityActionCompare = [](const auto& a, const auto& b) -> bool { return b.weight > a.weight; };
 using AIPriorityActionQueue = std::priority_queue<AIPriorityAction, std::vector<AIPriorityAction>, decltype(AIPriorityActionCompare)>;
 
 class BaseHandler;
