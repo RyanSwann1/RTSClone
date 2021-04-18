@@ -81,26 +81,24 @@ const std::vector<AIOccupiedBase>& AIOccupiedBases::getBases() const
 	return m_bases;
 }
 
-AIOccupiedBase& AIOccupiedBases::getBase(const glm::vec3& position)
+AIOccupiedBase* AIOccupiedBases::getBase(const glm::vec3& position)
 {
 	auto base = std::find_if(m_bases.begin(), m_bases.end(), [&position](const auto& base)
 	{
 		return base.base.get().getCenteredPosition() == position;
 	});
 	
-	assert(base != m_bases.end());
-	return (*base);
+	return base != m_bases.end() ? &(*base) : nullptr;
 }
 
-const AIOccupiedBase& AIOccupiedBases::getBase(const Base& _base) const
+const AIOccupiedBase* AIOccupiedBases::getBase(const Base& _base) const
 {
 	auto iter = std::find_if(m_bases.cbegin(), m_bases.cend(), [&_base](const auto& base)
 	{
 		return _base.getCenteredPosition() == base.base.get().getCenteredPosition();
 	});
 
-	assert(iter != m_bases.cend());
-	return (*iter);
+	return iter != m_bases.cend() ? &(*iter) : nullptr;
 }
 
 AIOccupiedBase* AIOccupiedBases::getBase(const Entity& entity)
@@ -109,7 +107,14 @@ AIOccupiedBase* AIOccupiedBases::getBase(const Entity& entity)
 	switch (entity.getEntityType())
 	{
 		case eEntityType::Headquarters:
-		occupiedBase = &getBase(entity.getPosition());
+		{
+			AIOccupiedBase* base = getBase(entity.getPosition());
+			assert(base);
+			if (base)
+			{
+				occupiedBase = base;
+			}
+		}
 		break;
 		case eEntityType::Worker:
 		occupiedBase = getBaseWithWorker(static_cast<const Worker&>(entity));

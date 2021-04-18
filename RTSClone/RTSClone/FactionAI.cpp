@@ -401,11 +401,16 @@ void FactionAI::handleEvent(const GameEvent& gameEvent, const Map& map, FactionH
 	{
 		const Base& base = m_baseHandler.getBase(gameEvent.data.detachFactionFromBase.position);
 		assert(base.owningFactionController == getController());
-		for (auto& worker : m_occupiedBases.getBase(base).workers)
+		const AIOccupiedBase* occupiedBase = m_occupiedBases.getBase(base);
+		assert(occupiedBase);
+		if (occupiedBase)
 		{
-			m_unattachedToBaseWorkers.addWorker(worker);
+			for (auto& worker : occupiedBase->workers)
+			{
+				m_unattachedToBaseWorkers.addWorker(worker);
+			}
+			m_occupiedBases.removeBase(base);
 		}
-		m_occupiedBases.removeBase(base);
 	}
 	break;
 	}
@@ -443,11 +448,21 @@ void FactionAI::update(float deltaTime, const Map & map, FactionHandler& faction
 			case eAIActionType::BuildSupplyDepot:
 			case eAIActionType::BuildTurret:
 			case eAIActionType::BuildLaboratory:
-				if (build(map, convertActionTypeToEntityType(m_actionQueue.front().actionType), nullptr, 
-					&m_occupiedBases.getBase(m_actionQueue.front().basePosition)))
+			{
+				AIOccupiedBase* occupiedBase = m_occupiedBases.getBase(m_actionQueue.front().basePosition);
+				if (occupiedBase)
+				{
+					if (build(map, convertActionTypeToEntityType(m_actionQueue.front().actionType), nullptr, occupiedBase))
+					{
+						m_actionQueue.pop();
+					}
+				}
+				else
 				{
 					m_actionQueue.pop();
 				}
+			}
+
 				break;
 			case eAIActionType::IncreaseShield:
 				GameEventHandler::getInstance().gameEvents.push(GameEvent::createIncreaseFactionShield(getController()));
@@ -535,11 +550,16 @@ void FactionAI::onEntityRemoval(const Entity& entity, bool forceDestroyed)
 
 void FactionAI::instructWorkersToRepair(const Headquarters& HQ, const Map& map)
 {
-	for (auto& worker : m_occupiedBases.getBase(HQ.getPosition()).workers)
+	AIOccupiedBase* occupiedBase = m_occupiedBases.getBase(HQ);
+	assert(occupiedBase);
+	if (occupiedBase)
 	{
-		if (!worker.get().isRepairing())
+		for (auto& worker : occupiedBase->workers)
 		{
-			worker.get().repairEntity(HQ, map);
+			if (!worker.get().isRepairing())
+			{
+				worker.get().repairEntity(HQ, map);
+			}
 		}
 	}
 }
