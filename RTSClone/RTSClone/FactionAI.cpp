@@ -69,48 +69,48 @@ namespace
 	const int MAX_BARRACKS_DEFENSIVE = 2;
 	const int MAX_TURRETS_DEFENSIVE = 4;
 
-	const std::array< std::array<eActionType, 4>, 3> BUILD_ORDERS
+	const std::array< std::array<eAIActionType, 4>, 3> BUILD_ORDERS
 	{
-		std::array<eActionType, 4> {
-		eActionType::BuildBarracks,
-		eActionType::BuildBarracks,
-		eActionType::BuildTurret,
-		eActionType::BuildSupplyDepot },
+		std::array<eAIActionType, 4> {
+		eAIActionType::BuildBarracks,
+		eAIActionType::BuildBarracks,
+		eAIActionType::BuildTurret,
+		eAIActionType::BuildSupplyDepot },
 
-		std::array<eActionType, 4> {
-		eActionType::BuildTurret,
-		eActionType::BuildTurret,
-		eActionType::BuildLaboratory,
-		eActionType::BuildTurret },
+		std::array<eAIActionType, 4> {
+		eAIActionType::BuildTurret,
+		eAIActionType::BuildTurret,
+		eAIActionType::BuildLaboratory,
+		eAIActionType::BuildTurret },
 		
-		std::array<eActionType, 4> {
-		eActionType::BuildSupplyDepot,
-		eActionType::BuildSupplyDepot,
-		eActionType::BuildSupplyDepot,
-		eActionType::BuildTurret }
+		std::array<eAIActionType, 4> {
+		eAIActionType::BuildSupplyDepot,
+		eAIActionType::BuildSupplyDepot,
+		eAIActionType::BuildSupplyDepot,
+		eAIActionType::BuildTurret }
 	};
 
-	eEntityType convertActionTypeToEntityType(eActionType actionType)
+	eEntityType convertActionTypeToEntityType(eAIActionType actionType)
 	{
 		eEntityType entityType;
 		switch (actionType)
 		{
-		case eActionType::BuildSupplyDepot:
+		case eAIActionType::BuildSupplyDepot:
 			entityType = eEntityType::SupplyDepot;
 			break;
-		case eActionType::BuildBarracks:
+		case eAIActionType::BuildBarracks:
 			entityType = eEntityType::Barracks;
 			break;
-		case eActionType::BuildTurret:
+		case eAIActionType::BuildTurret:
 			entityType = eEntityType::Turret;
 			break;
-		case eActionType::BuildLaboratory:
+		case eAIActionType::BuildLaboratory:
 			entityType = eEntityType::Laboratory;
 			break;
-		case eActionType::SpawnUnit:
+		case eAIActionType::SpawnUnit:
 			entityType = eEntityType::Unit;
 			break;
-		case eActionType::SpawnWorker:
+		case eAIActionType::SpawnWorker:
 			entityType = eEntityType::Worker;
 			break;
 		default:
@@ -181,7 +181,7 @@ void AIUnattachedToBaseWorkers::remove(const Worker& _worker)
 
 
 //AIAction
-AIAction::AIAction(eActionType actionType, const glm::vec3& basePosition)
+AIAction::AIAction(eAIActionType actionType, const glm::vec3& basePosition)
 	: actionType(actionType),
 	basePosition(basePosition)
 {}
@@ -208,7 +208,7 @@ FactionAI::FactionAI(eFactionController factionController, const glm::vec3& hqSt
 {
 	for (int i = 0; i < STARTING_WORKER_COUNT; ++i)
 	{
-		m_actionQueue.emplace(eActionType::SpawnWorker, getMainHeadquartersPosition());
+		m_actionQueue.emplace(eAIActionType::SpawnWorker, getMainHeadquartersPosition());
 	}
 
 	for (const auto& i : BUILD_ORDERS[Globals::getRandomNumber(0, static_cast<int>(BUILD_ORDERS.size() - 1))])
@@ -400,21 +400,21 @@ void FactionAI::update(float deltaTime, const Map & map, FactionHandler& faction
 		{
 			switch (m_actionQueue.front().actionType)
 			{
-			case eActionType::BuildBarracks:
-			case eActionType::BuildSupplyDepot:
-			case eActionType::BuildTurret:
-			case eActionType::BuildLaboratory:
+			case eAIActionType::BuildBarracks:
+			case eAIActionType::BuildSupplyDepot:
+			case eAIActionType::BuildTurret:
+			case eAIActionType::BuildLaboratory:
 				if (build(map, convertActionTypeToEntityType(m_actionQueue.front().actionType)))
 				{
 					m_actionQueue.pop();
 				}
 				break;
-			case eActionType::IncreaseShield:
+			case eAIActionType::IncreaseShield:
 				GameEventHandler::getInstance().gameEvents.push(GameEvent::createIncreaseFactionShield(getController()));
 				m_actionQueue.pop();
 				break;
-			case eActionType::SpawnUnit:
-			case eActionType::SpawnWorker:
+			case eAIActionType::SpawnUnit:
+			case eAIActionType::SpawnWorker:
 				if (build(map, convertActionTypeToEntityType(m_actionQueue.front().actionType)))
 				{
 					m_actionQueue.pop();
@@ -625,7 +625,7 @@ bool FactionAI::increaseShield(const Laboratory& laboratory)
 		assert(occupiedBase);
 		if (occupiedBase)
 		{
-			m_actionQueue.emplace(eActionType::IncreaseShield, occupiedBase->base.get().getCenteredPosition());
+			m_actionQueue.emplace(eAIActionType::IncreaseShield, occupiedBase->base.get().getCenteredPosition());
 		}
 		
 		return false;
@@ -654,16 +654,16 @@ const Entity* FactionAI::createBuilding(const Map& map, const Worker& worker)
 			switch (worker.getBuildingCommands().front().entityType)
 			{
 			case eEntityType::SupplyDepot:
-				m_actionQueue.emplace(eActionType::BuildSupplyDepot, basePosition);
+				m_actionQueue.emplace(eAIActionType::BuildSupplyDepot, basePosition);
 				break;
 			case eEntityType::Barracks:
-				m_actionQueue.emplace(eActionType::BuildBarracks, basePosition);
+				m_actionQueue.emplace(eAIActionType::BuildBarracks, basePosition);
 				break;
 			case eEntityType::Turret:
-				m_actionQueue.emplace(eActionType::BuildTurret, basePosition);
+				m_actionQueue.emplace(eAIActionType::BuildTurret, basePosition);
 				break;
 			case eEntityType::Laboratory:
-				m_actionQueue.emplace(eActionType::BuildLaboratory, basePosition);
+				m_actionQueue.emplace(eAIActionType::BuildLaboratory, basePosition);
 				break;
 			default:
 				assert(false);
@@ -682,7 +682,7 @@ const Entity* FactionAI::createUnit(const Map& map, const Barracks& barracks, Fa
 		AIOccupiedBase* occupiedBase = m_occupiedBases.getBase(barracks);
 		if (occupiedBase)
 		{
-			m_actionQueue.emplace(eActionType::SpawnUnit, occupiedBase->base.get().getCenteredPosition());
+			m_actionQueue.emplace(eAIActionType::SpawnUnit, occupiedBase->base.get().getCenteredPosition());
 		}
 	}
 
@@ -697,7 +697,7 @@ Entity* FactionAI::createWorker(const Map& map, const Headquarters& headquarters
 		AIOccupiedBase* occupiedBase = m_occupiedBases.getBase(headquarters);
 		if (occupiedBase)
 		{
-			m_actionQueue.emplace(eActionType::SpawnWorker, occupiedBase->base.get().getCenteredPosition());
+			m_actionQueue.emplace(eAIActionType::SpawnWorker, occupiedBase->base.get().getCenteredPosition());
 		}
 	}
 	else

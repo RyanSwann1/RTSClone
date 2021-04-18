@@ -17,7 +17,7 @@ enum class eAIBehaviour
 	Max = Aggressive
 };
 
-enum class eActionType
+enum class eAIActionType
 {
 	BuildSupplyDepot,
 	BuildBarracks,
@@ -30,9 +30,9 @@ enum class eActionType
 
 struct AIAction
 {
-	AIAction(eActionType actionType, const glm::vec3& basePosition);
+	AIAction(eAIActionType actionType, const glm::vec3& basePosition);
 
-	eActionType actionType;
+	eAIActionType actionType;
 	glm::vec3 basePosition;
 };
 
