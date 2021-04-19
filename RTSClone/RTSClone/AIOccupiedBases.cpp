@@ -19,16 +19,6 @@ AIOccupiedBase::AIOccupiedBase(const Base& base)
 	laboratoryCount(0)
 {}
 
-AIOccupiedBase::~AIOccupiedBase()
-{
-	assert(base.get().owningFactionController != eFactionController::None);
-	for (const auto& building : buildings)
-	{
-		GameEventHandler::getInstance().gameEvents.emplace(
-			GameEvent::createForceSelfDestructEntity(base.get().owningFactionController, building.get().getID(), building.get().getEntityType()));
-	}
-}
-
 bool AIOccupiedBase::isWorkerAdded(const Worker& worker) const
 {
 	auto iter = std::find_if(workers.cbegin(), workers.cend(), [&worker](const auto& i)
@@ -74,6 +64,10 @@ AIOccupiedBases::AIOccupiedBases(const BaseHandler& baseHandler)
 	: m_bases()
 {
 	m_bases.reserve(baseHandler.getBases().size());
+	for (const auto& base : baseHandler.getBases())
+	{
+		m_bases.emplace_back(base);
+	}
 }
 
 const std::vector<AIOccupiedBase>& AIOccupiedBases::getBases() const
@@ -149,25 +143,6 @@ const std::vector<AIOccupiedBase>& AIOccupiedBases::getSortedBases(const glm::ve
 			Globals::getSqrDistance(b.base.get().getCenteredPosition(), position); });
 
 	return m_bases;
-}
-
-void AIOccupiedBases::addBase(const Base& base)
-{
-	assert(std::find_if(m_bases.cbegin(), m_bases.cend(), [&base](const auto& existingBase)
-	{
-		return existingBase.base.get().getCenteredPosition() == base.getCenteredPosition();
-	}) == m_bases.cend());
-	m_bases.emplace_back(base);
-}
-
-void AIOccupiedBases::removeBase(const Base& base)
-{
-	auto iter = std::find_if(m_bases.begin(), m_bases.end(), [&base](const auto& existingBase)
-	{
-		return existingBase.base.get().getCenteredPosition() == base.getCenteredPosition();
-	});
-	assert(iter != m_bases.end());
-	m_bases.erase(iter);
 }
 
 void AIOccupiedBases::addWorker(Worker& worker, const Headquarters& headquarters)

@@ -219,7 +219,6 @@ void AIUnattachedToBaseWorkers::remove(const Worker& _worker)
 	m_unattachedToBaseWorkers.erase(iter);
 }
 
-
 //AIAction
 AIAction::AIAction(eAIActionType actionType, const glm::vec3& basePosition)
 	: actionType(actionType),
@@ -356,7 +355,8 @@ void FactionAI::handleEvent(const GameEvent& gameEvent, const Map& map, FactionH
 				{
 					for (const auto& base : m_occupiedBases.getSortedBases((*worker)->getPosition()))
 					{
-						if (&base.base.get() != &nearestBase)
+						if (&base.base.get() != &nearestBase &&
+							base.base.get().owningFactionController == getController())
 						{
 							nearestMineral = m_baseHandler.getNearestAvailableMineralAtBase(*this, base.base, (*worker)->getPosition());
 							if (nearestMineral)
@@ -380,7 +380,6 @@ void FactionAI::handleEvent(const GameEvent& gameEvent, const Map& map, FactionH
 	{
 		const Base& base = m_baseHandler.getBase(gameEvent.data.attachFactionToBase.position);
 		assert(base.owningFactionController == getController());
-		m_occupiedBases.addBase(base);
 		if (!m_unattachedToBaseWorkers.isEmpty())
 		{
 			for (const auto& mineral : base.minerals)
@@ -409,7 +408,6 @@ void FactionAI::handleEvent(const GameEvent& gameEvent, const Map& map, FactionH
 			{
 				m_unattachedToBaseWorkers.addWorker(worker);
 			}
-			m_occupiedBases.removeBase(base);
 		}
 	}
 	break;
@@ -462,7 +460,6 @@ void FactionAI::update(float deltaTime, const Map & map, FactionHandler& faction
 					m_actionQueue.pop();
 				}
 			}
-
 				break;
 			case eAIActionType::IncreaseShield:
 				GameEventHandler::getInstance().gameEvents.push(GameEvent::createIncreaseFactionShield(getController()));

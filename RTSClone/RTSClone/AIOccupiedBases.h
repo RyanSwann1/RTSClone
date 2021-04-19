@@ -10,7 +10,6 @@ class Worker;
 struct AIOccupiedBase
 {
 	AIOccupiedBase(const Base& base);
-	~AIOccupiedBase();
 
 	bool isWorkerAdded(const Worker& worker) const;
 	const Entity* getBuilding(const Entity& building) const;
@@ -26,6 +25,7 @@ struct AIOccupiedBase
 	int laboratoryCount;
 };
 
+class FactionAI;
 class Headquarters;
 class BaseHandler;
 class AIOccupiedBases
@@ -43,8 +43,6 @@ public:
 	AIOccupiedBase* getBase(const Entity& entity);
 
 	const std::vector<AIOccupiedBase>& getSortedBases(const glm::vec3& position);
-	void addBase(const Base& base);
-	void removeBase(const Base& base);
 
 	void addWorker(Worker& worker, const Headquarters& headquarters);
 	void addWorker(Worker& worker, const Base& base);
