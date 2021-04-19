@@ -400,14 +400,10 @@ void FactionAI::handleEvent(const GameEvent& gameEvent, const Map& map, FactionH
 	{
 		const Base& base = m_baseHandler.getBase(gameEvent.data.detachFactionFromBase.position);
 		assert(base.owningFactionController == getController());
-		const AIOccupiedBase* occupiedBase = m_occupiedBases.getBase(base);
-		assert(occupiedBase);
-		if (occupiedBase)
+		const AIOccupiedBase& occupiedBase = m_occupiedBases.getBase(base);
+		for (auto& worker : occupiedBase.workers)
 		{
-			for (auto& worker : occupiedBase->workers)
-			{
-				m_unattachedToBaseWorkers.addWorker(worker);
-			}
+			m_unattachedToBaseWorkers.addWorker(worker);
 		}
 	}
 	break;
