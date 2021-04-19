@@ -31,7 +31,7 @@ class BaseHandler;
 class AIOccupiedBases
 {
 public:
-	AIOccupiedBases(const BaseHandler& baseHandler);
+	AIOccupiedBases(const BaseHandler& baseHandler, const FactionAI& owningFaction);
 	AIOccupiedBases(const AIOccupiedBases&) = delete;
 	AIOccupiedBases& operator=(const AIOccupiedBases&) = delete;
 	AIOccupiedBases(AIOccupiedBases&&) = delete;
@@ -52,6 +52,7 @@ public:
 	void removeBuilding(const Entity& building);
 
 private:
+	const FactionAI& m_owningFaction;
 	std::vector<AIOccupiedBase> m_bases;
 
 	AIOccupiedBase* getBaseWithWorker(const Worker& worker);

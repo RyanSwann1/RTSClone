@@ -237,7 +237,7 @@ FactionAI::FactionAI(eFactionController factionController, const glm::vec3& hqSt
 	: Faction(factionController, hqStartingPosition, startingResources, startingPopulationCap),
 	m_baseHandler(baseHandler),
 	m_ActionPriorityQueue(AIPriorityActionCompare),
-	m_occupiedBases(baseHandler),
+	m_occupiedBases(baseHandler, *this),
 	m_baseExpansionTimer(Globals::getRandomNumber(MIN_BASE_EXPANSION_TIME, MAX_BASE_EXPANSION_TIME), true),
 	m_currentBehaviour(static_cast<eAIBehaviour>(Globals::getRandomNumber(0, static_cast<int>(eAIBehaviour::Max)))),
 	m_actionQueue(),
