@@ -54,7 +54,7 @@ private:
 	bool m_attackMoveSelected;
 	std::vector<Entity*> m_selectedEntities;
 
-	void onEntityRemoval(const Entity& entity, bool forceDestroyed = false) override;
+	void onEntityRemoval(const Entity& entity) override;
 
 	void instructWorkerReturnMinerals(const Map& map, const Headquarters& headquarters);
 	int instructWorkerToBuild(const Map& map, const BaseHandler& baseHandler);

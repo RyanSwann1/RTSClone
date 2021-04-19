@@ -80,7 +80,7 @@ protected:
 	std::vector<std::unique_ptr<Headquarters>> m_headquarters;
 	std::vector<std::unique_ptr<Laboratory>> m_laboratories;
 
-	virtual void onEntityRemoval(const Entity& entity, bool forcedDestroy = false) {}
+	virtual void onEntityRemoval(const Entity& entity) {}
 
 private:
 	const eFactionController m_controller;
@@ -99,7 +99,7 @@ private:
 	//Presumes entity already found in all entities container
 	template <class T>
 	void removeEntity(std::vector<std::unique_ptr<T>>& entityContainer, int entityID, 
-		std::vector<std::reference_wrapper<Entity>>::iterator entity, bool forceDestroyed = false)
+		std::vector<std::reference_wrapper<Entity>>::iterator entity)
 	{
 		assert(entity != m_allEntities.cend());
 		
@@ -110,13 +110,13 @@ private:
 	
 		assert(iter != entityContainer.end());
 
-		onEntityRemoval((*entity).get(), forceDestroyed);
+		onEntityRemoval((*entity).get());
 		entityContainer.erase(iter);
 		m_allEntities.erase(entity);
 	}
 
 	template <typename T>
-	void removeEntity(std::vector<std::unique_ptr<T>>& entityContainer, int entityID, bool forceDestroyed = false)
+	void removeEntity(std::vector<std::unique_ptr<T>>& entityContainer, int entityID)
 	{
 		auto iter = std::find_if(m_allEntities.begin(), m_allEntities.end(), [entityID](const auto& entity)
 		{
@@ -130,7 +130,7 @@ private:
 			});
 			assert(entity != entityContainer.end());
 
-			onEntityRemoval(*(*entity), forceDestroyed);
+			onEntityRemoval(*(*entity));
 			m_allEntities.erase(iter);
 			entityContainer.erase(entity);
 		}
