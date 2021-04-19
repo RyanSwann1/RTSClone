@@ -15,6 +15,7 @@ struct AIOccupiedBase
 	const Entity* getBuilding(const Entity& building) const;
 	void addWorker(Worker& worker);
 	void removeWorker(const Worker& worker);
+	const Entity* removeBuilding(const Entity& building);
 	
 	std::reference_wrapper<const Base> base;
 	std::vector<std::reference_wrapper<Worker>> workers;

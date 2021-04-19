@@ -60,6 +60,22 @@ void AIOccupiedBase::removeWorker(const Worker& worker)
 	workers.erase(iter);
 }
 
+const Entity* AIOccupiedBase::removeBuilding(const Entity& building)
+{
+	const Entity* buildingRemoved = nullptr;
+	auto iter = std::find_if(buildings.begin(), buildings.end(), [&building](const auto& i)
+	{
+		return building.getID() == i.get().getID();
+	});
+	if (iter != buildings.end())
+	{
+		buildingRemoved = &(*iter).get();
+		buildings.erase(iter);
+	}
+
+	return buildingRemoved;
+}
+
 //AIOccupiedBases
 AIOccupiedBases::AIOccupiedBases(const BaseHandler& baseHandler, const FactionAI& owningFaction)
 	: m_owningFaction(owningFaction),
@@ -225,40 +241,41 @@ void AIOccupiedBases::addBuilding(const Worker& worker, const Entity& building)
 
 void AIOccupiedBases::removeBuilding(const Entity& building)
 {
-	AIOccupiedBase* occupiedBase = nullptr;
+	if (building.getEntityType() == eEntityType::Headquarters)
+	{
+		return;
+	}
+
+	const Entity* buildingRemoved = nullptr;
 	for (auto& base : m_bases)
 	{
-		auto iter = std::find_if(base.buildings.begin(), base.buildings.end(), [&building](const auto& i)
+		buildingRemoved = base.removeBuilding(building);
+		if (buildingRemoved)
 		{
-			return building.getID() == i.get().getID();
-		});
-		if (iter != base.buildings.end())
-		{
-			base.buildings.erase(iter);
-			occupiedBase = &base;
+			assert(base.base.get().owningFactionController == m_owningFaction.getController());
+			switch (building.getEntityType())
+			{
+			case eEntityType::Barracks:
+				--base.barracksCount;
+				break;
+			case eEntityType::SupplyDepot:
+				--base.supplyDepotCount;
+				break;
+			case eEntityType::Laboratory:
+				--base.laboratoryCount;
+				break;
+			case eEntityType::Turret:
+				--base.turretCount;
+				break;
+			default:
+				assert(false);
+			}
+
+			break;
 		}
 	}
 
-	assert(occupiedBase && occupiedBase->base.get().owningFactionController == m_owningFaction.getController());
-	switch (building.getEntityType())
-	{
-	case eEntityType::Barracks:
-		--occupiedBase->barracksCount;
-		break;
-	case eEntityType::SupplyDepot:
-		--occupiedBase->supplyDepotCount;
-		break;
-	case eEntityType::Laboratory:
-		--occupiedBase->laboratoryCount;
-		break;
-	case eEntityType::Turret:
-		--occupiedBase->turretCount;
-		break;
-	case eEntityType::Headquarters:
-		break;
-	default:
-		assert(false);
-	}
+	assert(buildingRemoved);
 }
 
 AIOccupiedBase* AIOccupiedBases::getBaseWithWorker(const Worker& worker)
