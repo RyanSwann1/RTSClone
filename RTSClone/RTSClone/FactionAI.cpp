@@ -384,14 +384,14 @@ void FactionAI::handleEvent(const GameEvent& gameEvent, const Map& map, FactionH
 		{
 			for (const auto& mineral : base.minerals)
 			{
+				Worker& worker = m_unattachedToBaseWorkers.getClosestWorker(base.getCenteredPosition());
+				worker.moveTo(mineral, map);
+				m_occupiedBases.addWorker(worker, base);
+				
 				if (m_unattachedToBaseWorkers.isEmpty())
 				{
 					break;
 				}
-
-				Worker& worker = m_unattachedToBaseWorkers.getClosestWorker(base.getCenteredPosition());
-				worker.moveTo(mineral, map);
-				m_occupiedBases.addWorker(worker, base);
 			}
 		}
 	}
@@ -749,8 +749,13 @@ const Entity* FactionAI::createBuilding(const Map& map, const Worker& worker)
 				m_occupiedBases.addBuilding(worker, *spawnedBuilding);
 			break;
 			case eEntityType::Laboratory:
-				GameEventHandler::getInstance().gameEvents.push(GameEvent::createIncreaseFactionShield(getController()));
 				m_occupiedBases.addBuilding(worker, *spawnedBuilding);
+				if (getCurrentShieldAmount() == 0)
+				{
+					const AIOccupiedBase* occupiedBase = m_occupiedBases.getBase(*spawnedBuilding);
+					assert(occupiedBase);
+					m_actionQueue.emplace(eAIActionType::IncreaseShield, occupiedBase->base.get().getCenteredPosition());
+				}
 			break;
 			case eEntityType::Headquarters:
 			break;
