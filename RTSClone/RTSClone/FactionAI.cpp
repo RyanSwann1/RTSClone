@@ -400,8 +400,7 @@ void FactionAI::handleEvent(const GameEvent& gameEvent, const Map& map, FactionH
 	{
 		const Base& base = m_baseHandler.getBase(gameEvent.data.detachFactionFromBase.position);
 		assert(base.owningFactionController == getController());
-		const AIOccupiedBase& occupiedBase = m_occupiedBases.getBase(base);
-		for (auto& worker : occupiedBase.workers)
+		for (auto& worker : m_occupiedBases.getBase(base).workers)
 		{
 			m_unattachedToBaseWorkers.addWorker(worker);
 		}
@@ -444,7 +443,8 @@ void FactionAI::update(float deltaTime, const Map & map, FactionHandler& faction
 			case eAIActionType::BuildLaboratory:
 			{
 				AIOccupiedBase* occupiedBase = m_occupiedBases.getBase(m_actionQueue.front().basePosition);
-				if (occupiedBase)
+				assert(occupiedBase);
+				if (occupiedBase->base.get().owningFactionController == getController())
 				{
 					if (build(map, convertActionTypeToEntityType(m_actionQueue.front().actionType), nullptr, occupiedBase))
 					{
@@ -488,18 +488,20 @@ void FactionAI::update(float deltaTime, const Map & map, FactionHandler& faction
 
 	for (const auto& occupiedBase : m_occupiedBases.getBases())
 	{
-
-		if (occupiedBase.turretCount < MAX_TURRETS_DEFENSIVE)
+		if (occupiedBase.base.get().owningFactionController == getController())
 		{
-			
-		}
-		if (occupiedBase.supplyDepotCount < MAX_SUPPLY_DEPOT_DEFENSIVE)
-		{
+			if (occupiedBase.turretCount < MAX_TURRETS_DEFENSIVE)
+			{
 
-		}
-		if (occupiedBase.barracksCount < MAX_BARRACKS_DEFENSIVE)
-		{
+			}
+			if (occupiedBase.supplyDepotCount < MAX_SUPPLY_DEPOT_DEFENSIVE)
+			{
 
+			}
+			if (occupiedBase.barracksCount < MAX_BARRACKS_DEFENSIVE)
+			{
+
+			}
 		}
 	}
 
@@ -515,7 +517,7 @@ void FactionAI::update(float deltaTime, const Map & map, FactionHandler& faction
 				m_baseExpansionTimer.setExpirationTime(200.0f);
 				
 				const AIOccupiedBase* currentBase = m_occupiedBases.getBase(*availableWorker);
-				assert(currentBase);
+				assert(currentBase && currentBase->base.get().owningFactionController == getController());
 				m_occupiedBases.removeWorker(*availableWorker);
 				
 				for (const auto& building : availableWorker->getBuildingCommands())
@@ -544,15 +546,12 @@ void FactionAI::onEntityRemoval(const Entity& entity)
 void FactionAI::instructWorkersToRepair(const Headquarters& HQ, const Map& map)
 {
 	AIOccupiedBase* occupiedBase = m_occupiedBases.getBase(HQ);
-	assert(occupiedBase);
-	if (occupiedBase)
+	assert(occupiedBase && occupiedBase->base.get().owningFactionController == getController());
+	for (auto& worker : occupiedBase->workers)
 	{
-		for (auto& worker : occupiedBase->workers)
+		if (!worker.get().isRepairing())
 		{
-			if (!worker.get().isRepairing())
-			{
-				worker.get().repairEntity(HQ, map);
-			}
+			worker.get().repairEntity(HQ, map);
 		}
 	}
 }
@@ -725,7 +724,7 @@ bool FactionAI::increaseShield(const Laboratory& laboratory)
 	{
 		const AIOccupiedBase* occupiedBase = m_occupiedBases.getBase(laboratory);
 		assert(occupiedBase);
-		if (occupiedBase)
+		if (occupiedBase->base.get().owningFactionController == getController())
 		{
 			m_actionQueue.emplace(eAIActionType::IncreaseShield, occupiedBase->base.get().getCenteredPosition());
 		}
@@ -754,7 +753,10 @@ const Entity* FactionAI::createBuilding(const Map& map, const Worker& worker)
 				{
 					const AIOccupiedBase* occupiedBase = m_occupiedBases.getBase(*spawnedBuilding);
 					assert(occupiedBase);
-					m_actionQueue.emplace(eAIActionType::IncreaseShield, occupiedBase->base.get().getCenteredPosition());
+					if (occupiedBase->base.get().owningFactionController == getController())
+					{
+						m_actionQueue.emplace(eAIActionType::IncreaseShield, occupiedBase->base.get().getCenteredPosition());
+					}
 				}
 			break;
 			case eEntityType::Headquarters:
@@ -766,7 +768,7 @@ const Entity* FactionAI::createBuilding(const Map& map, const Worker& worker)
 	else
 	{
 		const AIOccupiedBase* occupiedBase = m_occupiedBases.getBase(worker);
-		if (occupiedBase)
+		if (occupiedBase && occupiedBase->base.get().owningFactionController == getController())
 		{
 			const glm::vec3& basePosition = occupiedBase->base.get().getCenteredPosition();
 			switch (worker.getBuildingCommands().front().entityType)
@@ -798,7 +800,8 @@ const Entity* FactionAI::createUnit(const Map& map, const Barracks& barracks, Fa
 	if (!spawnedUnit)
 	{
 		AIOccupiedBase* occupiedBase = m_occupiedBases.getBase(barracks);
-		if (occupiedBase)
+		assert(occupiedBase);
+		if (occupiedBase->base.get().owningFactionController == getController())
 		{
 			m_actionQueue.emplace(eAIActionType::SpawnUnit, occupiedBase->base.get().getCenteredPosition());
 		}
@@ -813,10 +816,8 @@ Entity* FactionAI::createWorker(const Map& map, const Headquarters& headquarters
 	if (!spawnedWorker)
 	{
 		AIOccupiedBase* occupiedBase = m_occupiedBases.getBase(headquarters);
-		if (occupiedBase)
-		{
-			m_actionQueue.emplace(eAIActionType::SpawnWorker, occupiedBase->base.get().getCenteredPosition());
-		}
+		assert(occupiedBase && occupiedBase->base.get().owningFactionController == getController());
+		m_actionQueue.emplace(eAIActionType::SpawnWorker, occupiedBase->base.get().getCenteredPosition());
 	}
 	else
 	{
