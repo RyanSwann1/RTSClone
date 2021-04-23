@@ -220,9 +220,9 @@ void AIUnattachedToBaseWorkers::remove(const Worker& _worker)
 }
 
 //AIAction
-AIAction::AIAction(eAIActionType actionType, const glm::vec3& basePosition)
+AIAction::AIAction(eAIActionType actionType, AIOccupiedBase& base)
 	: actionType(actionType),
-	basePosition(basePosition)
+	base(base)
 {}
 
 //AIPriorityAction
@@ -247,7 +247,7 @@ FactionAI::FactionAI(eFactionController factionController, const glm::vec3& hqSt
 {
 	for (const auto& actionType : STARTING_BUILD_ORDERS[Globals::getRandomNumber(0, static_cast<int>(STARTING_BUILD_ORDERS.size() - 1))])
 	{
-		m_actionQueue.emplace(actionType, getMainHeadquartersPosition());
+		m_actionQueue.emplace(actionType, *m_occupiedBases.getBase(getMainHeadquartersPosition()));
 	}
 }
 
@@ -442,11 +442,9 @@ void FactionAI::update(float deltaTime, const Map & map, FactionHandler& faction
 			case eAIActionType::BuildTurret:
 			case eAIActionType::BuildLaboratory:
 			{
-				AIOccupiedBase* occupiedBase = m_occupiedBases.getBase(m_actionQueue.front().basePosition);
-				assert(occupiedBase);
-				if (occupiedBase->base.get().owningFactionController == getController())
+				if (m_actionQueue.front().base.get().getFactionController() == getController())
 				{
-					if (build(map, convertActionTypeToEntityType(m_actionQueue.front().actionType), nullptr, occupiedBase))
+					if (build(map, convertActionTypeToEntityType(m_actionQueue.front().actionType), nullptr, &m_actionQueue.front().base.get()))
 					{
 						m_actionQueue.pop();
 					}
@@ -516,13 +514,13 @@ void FactionAI::update(float deltaTime, const Map & map, FactionHandler& faction
 			{
 				m_baseExpansionTimer.setExpirationTime(200.0f);
 				
-				const AIOccupiedBase* currentBase = m_occupiedBases.getBase(*availableWorker);
+				AIOccupiedBase* currentBase = m_occupiedBases.getBase(*availableWorker);
 				assert(currentBase && currentBase->base.get().owningFactionController == getController());
 				m_occupiedBases.removeWorker(*availableWorker);
 				
 				for (const auto& building : availableWorker->getBuildingCommands())
 				{
-					m_actionQueue.emplace(convertEntityToActionType(building.entityType), currentBase->base.get().getCenteredPosition());
+					m_actionQueue.emplace(convertEntityToActionType(building.entityType), *currentBase);
 				}
 				availableWorker->build(availableBase->getCenteredPosition(), map, eEntityType::Headquarters, availableBase, true);
 				m_unattachedToBaseWorkers.addWorker(*availableWorker);
@@ -722,11 +720,10 @@ bool FactionAI::increaseShield(const Laboratory& laboratory)
 {
 	if (!Faction::increaseShield(laboratory))
 	{
-		const AIOccupiedBase* occupiedBase = m_occupiedBases.getBase(laboratory);
-		assert(occupiedBase);
-		if (occupiedBase->base.get().owningFactionController == getController())
+		AIOccupiedBase* occupiedBase = m_occupiedBases.getBase(laboratory);
+		if (occupiedBase && occupiedBase->base.get().owningFactionController == getController())
 		{
-			m_actionQueue.emplace(eAIActionType::IncreaseShield, occupiedBase->base.get().getCenteredPosition());
+			m_actionQueue.emplace(eAIActionType::IncreaseShield, *occupiedBase);
 		}
 		
 		return false;
@@ -751,11 +748,10 @@ const Entity* FactionAI::createBuilding(const Map& map, const Worker& worker)
 				m_occupiedBases.addBuilding(worker, *spawnedBuilding);
 				if (getCurrentShieldAmount() == 0)
 				{
-					const AIOccupiedBase* occupiedBase = m_occupiedBases.getBase(*spawnedBuilding);
-					assert(occupiedBase);
-					if (occupiedBase->base.get().owningFactionController == getController())
+					AIOccupiedBase* occupiedBase = m_occupiedBases.getBase(*spawnedBuilding);
+					if (occupiedBase && occupiedBase->base.get().owningFactionController == getController())
 					{
-						m_actionQueue.emplace(eAIActionType::IncreaseShield, occupiedBase->base.get().getCenteredPosition());
+						m_actionQueue.emplace(eAIActionType::IncreaseShield, *occupiedBase);
 					}
 				}
 			break;
@@ -767,23 +763,23 @@ const Entity* FactionAI::createBuilding(const Map& map, const Worker& worker)
 	}
 	else
 	{
-		const AIOccupiedBase* occupiedBase = m_occupiedBases.getBase(worker);
+		AIOccupiedBase* occupiedBase = m_occupiedBases.getBase(worker);
 		if (occupiedBase && occupiedBase->base.get().owningFactionController == getController())
 		{
 			const glm::vec3& basePosition = occupiedBase->base.get().getCenteredPosition();
 			switch (worker.getBuildingCommands().front().entityType)
 			{
 			case eEntityType::SupplyDepot:
-				m_actionQueue.emplace(eAIActionType::BuildSupplyDepot, basePosition);
+				m_actionQueue.emplace(eAIActionType::BuildSupplyDepot, *occupiedBase);
 				break;
 			case eEntityType::Barracks:
-				m_actionQueue.emplace(eAIActionType::BuildBarracks, basePosition);
+				m_actionQueue.emplace(eAIActionType::BuildBarracks, *occupiedBase); 
 				break;
 			case eEntityType::Turret:
-				m_actionQueue.emplace(eAIActionType::BuildTurret, basePosition);
+				m_actionQueue.emplace(eAIActionType::BuildTurret, *occupiedBase);
 				break;
 			case eEntityType::Laboratory:
-				m_actionQueue.emplace(eAIActionType::BuildLaboratory, basePosition);
+				m_actionQueue.emplace(eAIActionType::BuildLaboratory, *occupiedBase);
 				break;
 			default:
 				assert(false);
@@ -800,10 +796,10 @@ const Entity* FactionAI::createUnit(const Map& map, const Barracks& barracks, Fa
 	if (!spawnedUnit)
 	{
 		AIOccupiedBase* occupiedBase = m_occupiedBases.getBase(barracks);
-		assert(occupiedBase);
-		if (occupiedBase->base.get().owningFactionController == getController())
+		if (occupiedBase)
 		{
-			m_actionQueue.emplace(eAIActionType::SpawnUnit, occupiedBase->base.get().getCenteredPosition());
+			assert(occupiedBase->base.get().owningFactionController == getController());
+			m_actionQueue.emplace(eAIActionType::SpawnUnit, *occupiedBase);
 		}
 	}
 
@@ -817,7 +813,7 @@ Entity* FactionAI::createWorker(const Map& map, const Headquarters& headquarters
 	{
 		AIOccupiedBase* occupiedBase = m_occupiedBases.getBase(headquarters);
 		assert(occupiedBase && occupiedBase->base.get().owningFactionController == getController());
-		m_actionQueue.emplace(eAIActionType::SpawnWorker, occupiedBase->base.get().getCenteredPosition());
+		m_actionQueue.emplace(eAIActionType::SpawnWorker, *occupiedBase);
 	}
 	else
 	{

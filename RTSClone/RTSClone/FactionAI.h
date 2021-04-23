@@ -30,10 +30,10 @@ enum class eAIActionType
 
 struct AIAction
 {
-	AIAction(eAIActionType actionType, const glm::vec3& basePosition);
+	AIAction(eAIActionType actionType, AIOccupiedBase& base);
 
 	eAIActionType actionType;
-	glm::vec3 basePosition;
+	std::reference_wrapper<AIOccupiedBase> base;
 };
 
 class AIUnattachedToBaseWorkers

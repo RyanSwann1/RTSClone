@@ -4,6 +4,7 @@
 #include <functional>
 #include <vector>
 
+enum class eFactionController;
 class Entity;
 struct Base;
 class Worker;
@@ -11,6 +12,7 @@ struct AIOccupiedBase
 {
 	AIOccupiedBase(const Base& base);
 
+	eFactionController getFactionController() const;
 	bool isWorkerAdded(const Worker& worker) const;
 	const Entity* getBuilding(const Entity& building) const;
 	void addWorker(Worker& worker);
@@ -39,7 +41,7 @@ public:
 	AIOccupiedBases& operator=(AIOccupiedBases&&) = delete;
 
 	const std::vector<AIOccupiedBase>& getBases() const;
-	const AIOccupiedBase& getBase(const Base& base) const;
+	AIOccupiedBase& getBase(const Base& base);
 	AIOccupiedBase* getBase(const glm::vec3& position);
 	AIOccupiedBase* getBase(const Entity& entity);
 
