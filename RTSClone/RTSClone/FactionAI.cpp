@@ -7,6 +7,7 @@
 #include "GameMessages.h"
 #include "GameMessenger.h"
 #include "GameEventHandler.h"
+#include "AIConstants.h"
 #include <limits>
 
 //Levels
@@ -26,86 +27,6 @@
 
 namespace
 {
-	const float DELAY_TIMER_EXPIRATION = 5.0f;
-	const float IDLE_TIMER_EXPIRATION = 1.0f;
-	const float MIN_SPAWN_TIMER_EXPIRATION = 7.5f;
-	const float MAX_SPAWN_TIMER_EXPIRATION = 15.0f;
-	const float MAX_DISTANCE_FROM_HQ = static_cast<float>(Globals::NODE_SIZE) * 18.0f;
-	const float MIN_DISTANCE_FROM_HQ = static_cast<float>(Globals::NODE_SIZE) * 5.0f;
-	const float DISTANCE_FROM_MINERALS = static_cast<float>(Globals::NODE_SIZE) * 7.0f;
-	const float MIN_BASE_EXPANSION_TIME = 2.0f;
-	const float MAX_BASE_EXPANSION_TIME = MIN_BASE_EXPANSION_TIME * 2.0f;
-
-	//Defensive
-	const size_t DEFENSIVE_MAX_TURRETS = 5;
-
-	const std::array<int, static_cast<size_t>(eEntityType::Max) + 1> MAX_BASE_BUILDINGS_DEFENSIVE
-	{
-		1, 
-		1,
-		1,
-		2,
-		1,
-		4,
-		1
-	};
-
-	const std::array<int, static_cast<size_t>(eEntityType::Max) + 1> ENTITY_MODIFIERS_DEFENSIVE
-	{
-		1,
-		2,
-		1,
-		1,
-		2,
-		4,
-		1
-	};
-
-	const int MAX_LABORATORY_ALL = 1;
-
-	const int MAX_SUPPLY_DEPOT_DEFENSIVE = 2;
-	const int MAX_BARRACKS_DEFENSIVE = 2;
-	const int MAX_TURRETS_DEFENSIVE = 4;
-
-	const std::array<std::vector<eAIActionType>, 3> STARTING_BUILD_ORDERS
-	{
-		std::vector<eAIActionType> {
-			eAIActionType::SpawnWorker,
-			eAIActionType::SpawnWorker,
-			eAIActionType::BuildBarracks,
-			eAIActionType::BuildBarracks,
-			eAIActionType::BuildTurret,
-			eAIActionType::BuildSupplyDepot,
-			eAIActionType::SpawnWorker,
-			eAIActionType::SpawnWorker,
-			eAIActionType::SpawnWorker
-		},
-
-		std::vector<eAIActionType> {	
-			eAIActionType::SpawnWorker,
-			eAIActionType::SpawnWorker,
-			eAIActionType::BuildTurret,
-			eAIActionType::BuildTurret,
-			eAIActionType::BuildLaboratory,
-			eAIActionType::BuildTurret,
-			eAIActionType::SpawnWorker,
-			eAIActionType::SpawnWorker,
-			eAIActionType::SpawnWorker
-		},
-
-		std::vector<eAIActionType> {
-			eAIActionType::SpawnWorker,
-			eAIActionType::SpawnWorker,
-			eAIActionType::BuildSupplyDepot,
-			eAIActionType::BuildSupplyDepot,
-			eAIActionType::BuildSupplyDepot,
-			eAIActionType::BuildTurret,
-			eAIActionType::SpawnWorker,
-			eAIActionType::SpawnWorker,
-			eAIActionType::SpawnWorker
-		}
-	};
-
 	bool isBaseClosest(const BaseHandler& baseHandler, const glm::vec3& position, const Headquarters& headquarters)
 	{
 		const Base& baseOnHeadquarters = baseHandler.getBase(headquarters.getPosition());
@@ -172,14 +93,14 @@ FactionAI::FactionAI(eFactionController factionController, const glm::vec3& hqSt
 	m_baseHandler(baseHandler),
 	m_ActionPriorityQueue(AIPriorityActionCompare),
 	m_occupiedBases(baseHandler, *this),
-	m_baseExpansionTimer(Globals::getRandomNumber(MIN_BASE_EXPANSION_TIME, MAX_BASE_EXPANSION_TIME), true),
+	m_baseExpansionTimer(Globals::getRandomNumber(AIConstants::MIN_BASE_EXPANSION_TIME, AIConstants::MAX_BASE_EXPANSION_TIME), true),
 	m_currentBehaviour(static_cast<eAIBehaviour>(Globals::getRandomNumber(0, static_cast<int>(eAIBehaviour::Max)))),
 	m_actionQueue(),
-	m_delayTimer(DELAY_TIMER_EXPIRATION, true),
-	m_spawnTimer(Globals::getRandomNumber(MIN_SPAWN_TIMER_EXPIRATION, MAX_SPAWN_TIMER_EXPIRATION), true),
+	m_delayTimer(AIConstants::DELAY_TIMER_EXPIRATION, true),
+	m_spawnTimer(Globals::getRandomNumber(AIConstants::MIN_SPAWN_TIMER_EXPIRATION, AIConstants::MAX_SPAWN_TIMER_EXPIRATION), true),
 	m_targetFaction(eFactionController::None)
 {
-	for (const auto& actionType : STARTING_BUILD_ORDERS[Globals::getRandomNumber(0, static_cast<int>(STARTING_BUILD_ORDERS.size() - 1))])
+	for (const auto& actionType : AIConstants::STARTING_BUILD_ORDERS[Globals::getRandomNumber(0, static_cast<int>(AIConstants::STARTING_BUILD_ORDERS.size() - 1))])
 	{
 		m_actionQueue.emplace(actionType, *m_occupiedBases.getBase(getMainHeadquartersPosition()));
 	}
@@ -422,15 +343,15 @@ void FactionAI::update(float deltaTime, const Map & map, FactionHandler& faction
 	{
 		if (occupiedBase.base.get().owningFactionController == getController())
 		{
-			if (occupiedBase.turretCount < MAX_TURRETS_DEFENSIVE)
+			if (occupiedBase.turretCount < AIConstants::MAX_TURRETS_DEFENSIVE)
 			{
 
 			}
-			if (occupiedBase.supplyDepotCount < MAX_SUPPLY_DEPOT_DEFENSIVE)
+			if (occupiedBase.supplyDepotCount < AIConstants::MAX_SUPPLY_DEPOT_DEFENSIVE)
 			{
 
 			}
-			if (occupiedBase.barracksCount < MAX_BARRACKS_DEFENSIVE)
+			if (occupiedBase.barracksCount < AIConstants::MAX_BARRACKS_DEFENSIVE)
 			{
 
 			}

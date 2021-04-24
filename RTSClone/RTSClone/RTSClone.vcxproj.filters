@@ -488,6 +488,9 @@
     <ClInclude Include="AIAction.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="AIConstants.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="assimp\include\color4.inl">
