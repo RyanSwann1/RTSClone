@@ -167,6 +167,7 @@
     <ClCompile Include="..\Shared\Quad.cpp" />
     <ClCompile Include="..\Shared\ShaderHandler.cpp" />
     <ClCompile Include="AdjacentPositions.cpp" />
+    <ClCompile Include="AIAction.cpp" />
     <ClCompile Include="AIOccupiedBases.cpp" />
     <ClCompile Include="Barracks.cpp" />
     <ClCompile Include="Entity.cpp" />
@@ -228,6 +229,7 @@
     <ClInclude Include="..\Shared\ShaderHandler.h" />
     <ClInclude Include="ActiveStatus.h" />
     <ClInclude Include="AdjacentPositions.h" />
+    <ClInclude Include="AIAction.h" />
     <ClInclude Include="AIOccupiedBases.h" />
     <ClInclude Include="assimp\include\ai_assert.h" />
     <ClInclude Include="assimp\include\anim.h" />

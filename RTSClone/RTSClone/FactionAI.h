@@ -5,6 +5,7 @@
 #include "Timer.h"
 #include "AIOccupiedBases.h"
 #include "PriorityQueue.h"
+#include "AIAction.h"
 #include <queue>
 #include <vector>
 #include <functional>
@@ -15,25 +16,6 @@ enum class eAIBehaviour
 	Expansive,
 	Aggressive,
 	Max = Aggressive
-};
-
-enum class eAIActionType
-{
-	BuildSupplyDepot,
-	BuildBarracks,
-	BuildTurret,
-	BuildLaboratory,
-	SpawnUnit,
-	SpawnWorker,
-	IncreaseShield
-};
-
-struct AIAction
-{
-	AIAction(eAIActionType actionType, AIOccupiedBase& base);
-
-	eAIActionType actionType;
-	std::reference_wrapper<AIOccupiedBase> base;
 };
 
 class AIUnattachedToBaseWorkers
@@ -54,17 +36,6 @@ public:
 private:
 	std::vector<std::reference_wrapper<Worker>> m_unattachedToBaseWorkers;
 };
-
-struct AIPriorityAction
-{
-	AIPriorityAction(int weight, AIAction action);
-
-	int weight;
-	AIAction action;
-};
-
-const auto AIPriorityActionCompare = [](const auto& a, const auto& b) -> bool { return b.weight > a.weight; };
-using AIPriorityActionQueue = std::priority_queue<AIPriorityAction, std::vector<AIPriorityAction>, decltype(AIPriorityActionCompare)>;
 
 class BaseHandler;
 class FactionHandler;
