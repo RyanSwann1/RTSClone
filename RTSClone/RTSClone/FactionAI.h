@@ -63,7 +63,7 @@ protected:
 
 private:
 	const BaseHandler& m_baseHandler;
-	AIPriorityActionQueue m_ActionPriorityQueue;
+	AIPriorityActionQueue m_actionPriorityQueue;
 	AIUnattachedToBaseWorkers m_unattachedToBaseWorkers;
 	AIOccupiedBases m_occupiedBases;
 	Timer m_baseExpansionTimer;
@@ -78,4 +78,5 @@ private:
 	Worker* getAvailableWorker(const glm::vec3& position, AIOccupiedBase& occupiedBase);
 
 	bool build(const Map& map, eEntityType entityType, Worker* worker = nullptr, AIOccupiedBase* occupiedBase = nullptr);
+	bool handleAction(const AIAction& action, const Map& map);
 };

@@ -91,7 +91,7 @@ FactionAI::FactionAI(eFactionController factionController, const glm::vec3& hqSt
 	int startingResources, int startingPopulationCap, const BaseHandler& baseHandler)
 	: Faction(factionController, hqStartingPosition, startingResources, startingPopulationCap),
 	m_baseHandler(baseHandler),
-	m_ActionPriorityQueue(AIPriorityActionCompare),
+	m_actionPriorityQueue(AIPriorityActionCompare),
 	m_occupiedBases(baseHandler, *this),
 	m_baseExpansionTimer(Globals::getRandomNumber(AIConstants::MIN_BASE_EXPANSION_TIME, AIConstants::MAX_BASE_EXPANSION_TIME), true),
 	m_currentBehaviour(static_cast<eAIBehaviour>(Globals::getRandomNumber(0, static_cast<int>(eAIBehaviour::Max)))),
@@ -290,39 +290,16 @@ void FactionAI::update(float deltaTime, const Map & map, FactionHandler& faction
 
 		if (!m_actionQueue.empty())
 		{
-			switch (m_actionQueue.front().actionType)
+			if (handleAction(m_actionQueue.front(), map))
 			{
-			case eAIActionType::BuildBarracks:
-			case eAIActionType::BuildSupplyDepot:
-			case eAIActionType::BuildTurret:
-			case eAIActionType::BuildLaboratory:
-			{
-				if (m_actionQueue.front().base.get().getFactionController() == getController())
-				{
-					if (build(map, convertActionTypeToEntityType(m_actionQueue.front().actionType), nullptr, &m_actionQueue.front().base.get()))
-					{
-						m_actionQueue.pop();
-					}
-				}
-				else
-				{
-					m_actionQueue.pop();
-				}
-			}
-				break;
-			case eAIActionType::IncreaseShield:
-				GameEventHandler::getInstance().gameEvents.push(GameEvent::createIncreaseFactionShield(getController()));
 				m_actionQueue.pop();
-				break;
-			case eAIActionType::SpawnUnit:
-			case eAIActionType::SpawnWorker:
-				if (build(map, convertActionTypeToEntityType(m_actionQueue.front().actionType), nullptr))
-				{
-					m_actionQueue.pop();
-				}
-				break;
-			default:
-				assert(false);
+			}
+		}
+		else if (!m_actionPriorityQueue.empty())
+		{
+			if (handleAction(m_actionPriorityQueue.top().action, map))
+			{
+				m_actionPriorityQueue.pop();
 			}
 		}
 	}
@@ -718,6 +695,44 @@ bool FactionAI::build(const Map& map, eEntityType entityType, Worker* worker, AI
 	case eEntityType::Worker:
 		assert(!worker);
 		return m_headquarters.front()->addWorkerToSpawnQueue();
+	default:
+		assert(false);
+	}
+
+	return false;
+}
+
+bool FactionAI::handleAction(const AIAction& action, const Map& map)
+{
+	switch (action.actionType)
+	{
+	case eAIActionType::BuildBarracks:
+	case eAIActionType::BuildSupplyDepot:
+	case eAIActionType::BuildTurret:
+	case eAIActionType::BuildLaboratory:
+		if (m_actionQueue.front().base.get().getFactionController() == getController())
+		{
+			if (build(map, convertActionTypeToEntityType(action.actionType), nullptr, &action.base.get()))
+			{
+				return true;
+			}
+		}
+		else
+		{
+			return true;
+		}
+		break;
+	case eAIActionType::IncreaseShield:
+		GameEventHandler::getInstance().gameEvents.push(GameEvent::createIncreaseFactionShield(getController()));
+		return true;
+		break;
+	case eAIActionType::SpawnUnit:
+	case eAIActionType::SpawnWorker:
+		if (build(map, convertActionTypeToEntityType(action.actionType), nullptr))
+		{
+			return true;
+		}
+		break;
 	default:
 		assert(false);
 	}
