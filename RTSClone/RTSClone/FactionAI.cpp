@@ -194,7 +194,7 @@ void FactionAI::handleEvent(const GameEvent& gameEvent, const Map& map, FactionH
 			}
 			if (!m_actionQueue.empty() &&
 				Globals::BUILDING_TYPES.isMatch(convertActionTypeToEntityType(m_actionQueue.front().actionType)) &&
-					build(map, convertActionTypeToEntityType(m_actionQueue.front().actionType), &*(*worker), &m_actionQueue.front().base.get()))
+					build(map, convertActionTypeToEntityType(m_actionQueue.front().actionType), m_actionQueue.front().base.get(), &*(*worker)))
 			{
 				m_actionQueue.pop();
 			}
@@ -662,7 +662,7 @@ Entity* FactionAI::createWorker(const Map& map, const Headquarters& headquarters
 	return spawnedWorker;
 }
 
-bool FactionAI::build(const Map& map, eEntityType entityType, Worker* worker, AIOccupiedBase* occupiedBase)
+bool FactionAI::build(const Map& map, eEntityType entityType, AIOccupiedBase& occupiedBase, Worker* worker)
 {
 	if (!isAffordable(entityType))
 	{
@@ -676,10 +676,8 @@ bool FactionAI::build(const Map& map, eEntityType entityType, Worker* worker, AI
 	case eEntityType::Turret:
 	case eEntityType::Laboratory:
 	{
-		const glm::vec3& headquartersPosition = 
-			occupiedBase ? occupiedBase->base.get().getCenteredPosition() : getMainHeadquartersPosition();
 		glm::vec3 buildPosition(0.0f);
-		if (PathFinding::getInstance().isBuildingSpawnAvailable(headquartersPosition, 
+		if (PathFinding::getInstance().isBuildingSpawnAvailable(occupiedBase.base.get().getCenteredPosition(),
 			entityType, map, buildPosition, *this, m_baseHandler))
 		{
 			if (worker)
@@ -688,7 +686,7 @@ bool FactionAI::build(const Map& map, eEntityType entityType, Worker* worker, AI
 			}
 			else
 			{
-				Worker* availableWorker = occupiedBase ? getAvailableWorker(buildPosition, *occupiedBase) : getAvailableWorker(buildPosition);
+				Worker* availableWorker = getAvailableWorker(buildPosition, occupiedBase);
 				if (availableWorker)
 				{
 					const glm::vec3& mainHQPosition = getMainHeadquartersPosition();
@@ -722,7 +720,7 @@ bool FactionAI::handleAction(const AIAction& action, const Map& map)
 	case eAIActionType::BuildLaboratory:
 		if (m_actionQueue.front().base.get().getFactionController() == getController())
 		{
-			if (build(map, convertActionTypeToEntityType(action.actionType), nullptr, &action.base.get()))
+			if (build(map, convertActionTypeToEntityType(action.actionType), action.base.get(), nullptr))
 			{
 				return true;
 			}
@@ -738,7 +736,7 @@ bool FactionAI::handleAction(const AIAction& action, const Map& map)
 		break;
 	case eAIActionType::SpawnUnit:
 	case eAIActionType::SpawnWorker:
-		if (build(map, convertActionTypeToEntityType(action.actionType), nullptr))
+		if (build(map, convertActionTypeToEntityType(action.actionType), action.base.get(), nullptr))
 		{
 			return true;
 		}
