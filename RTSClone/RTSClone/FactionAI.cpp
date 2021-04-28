@@ -194,7 +194,7 @@ void FactionAI::handleEvent(const GameEvent& gameEvent, const Map& map, FactionH
 			}
 			if (!m_actionQueue.empty() &&
 				Globals::BUILDING_TYPES.isMatch(convertActionTypeToEntityType(m_actionQueue.front().actionType)) &&
-					build(map, convertActionTypeToEntityType(m_actionQueue.front().actionType), &*(*worker)))
+					build(map, convertActionTypeToEntityType(m_actionQueue.front().actionType), &*(*worker), &m_actionQueue.front().base.get()))
 			{
 				m_actionQueue.pop();
 			}
@@ -233,15 +233,15 @@ void FactionAI::handleEvent(const GameEvent& gameEvent, const Map& map, FactionH
 	break;
 	case eGameEventType::AttachFactionToBase:
 	{
-		const Base& base = m_baseHandler.getBase(gameEvent.data.attachFactionToBase.position);
-		assert(base.owningFactionController == getController());
+		AIOccupiedBase* occupiedBase = m_occupiedBases.getBase(gameEvent.data.attachFactionToBase.position);
+		assert(occupiedBase && occupiedBase->getFactionController() == getController());
 		if (!m_unattachedToBaseWorkers.isEmpty())
 		{
-			for (const auto& mineral : base.minerals)
+			for (const auto& mineral : occupiedBase->base.get().minerals)
 			{
-				Worker& worker = m_unattachedToBaseWorkers.getClosestWorker(base.getCenteredPosition());
+				Worker& worker = m_unattachedToBaseWorkers.getClosestWorker(occupiedBase->base.get().getCenteredPosition());
 				worker.moveTo(mineral, map);
-				m_occupiedBases.addWorker(worker, base);
+				m_occupiedBases.addWorker(worker, occupiedBase->base.get());
 				
 				if (m_unattachedToBaseWorkers.isEmpty())
 				{
@@ -249,11 +249,17 @@ void FactionAI::handleEvent(const GameEvent& gameEvent, const Map& map, FactionH
 				}
 			}
 		}
+
+		for (int i = occupiedBase->turretCount; i < 2; ++i)
+		{
+			m_actionQueue.emplace(eAIActionType::BuildTurret, *occupiedBase);
+		}
+		
 	}
 	break;
 	case eGameEventType::DetachFactionFromBase:
 	{
-		const Base& base = m_baseHandler.getBase(gameEvent.data.detachFactionFromBase.position);
+		const Base& base =  m_baseHandler.getBase(gameEvent.data.detachFactionFromBase.position);
 		assert(base.owningFactionController == getController());
 		for (auto& worker : m_occupiedBases.getBase(base).workers)
 		{
@@ -670,8 +676,10 @@ bool FactionAI::build(const Map& map, eEntityType entityType, Worker* worker, AI
 	case eEntityType::Turret:
 	case eEntityType::Laboratory:
 	{
+		const glm::vec3& headquartersPosition = 
+			occupiedBase ? occupiedBase->base.get().getCenteredPosition() : getMainHeadquartersPosition();
 		glm::vec3 buildPosition(0.0f);
-		if (PathFinding::getInstance().isBuildingSpawnAvailable(m_headquarters.front()->getPosition(),
+		if (PathFinding::getInstance().isBuildingSpawnAvailable(headquartersPosition, 
 			entityType, map, buildPosition, *this, m_baseHandler))
 		{
 			if (worker)
@@ -683,6 +691,8 @@ bool FactionAI::build(const Map& map, eEntityType entityType, Worker* worker, AI
 				Worker* availableWorker = occupiedBase ? getAvailableWorker(buildPosition, *occupiedBase) : getAvailableWorker(buildPosition);
 				if (availableWorker)
 				{
+					const glm::vec3& mainHQPosition = getMainHeadquartersPosition();
+					auto* base = m_occupiedBases.getBase(*availableWorker);
 					return availableWorker->build(buildPosition, map, entityType);
 				}
 			}
