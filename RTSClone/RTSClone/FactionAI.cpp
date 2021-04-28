@@ -254,7 +254,11 @@ void FactionAI::handleEvent(const GameEvent& gameEvent, const Map& map, FactionH
 		{
 			m_actionQueue.emplace(eAIActionType::BuildTurret, *occupiedBase);
 		}
-		
+
+		for (int i = occupiedBase->workers.size(); i < 2; ++i)
+		{
+			m_actionQueue.emplace(eAIActionType::SpawnWorker, *occupiedBase);
+		}
 	}
 	break;
 	case eGameEventType::DetachFactionFromBase:
@@ -570,9 +574,9 @@ bool FactionAI::increaseShield(const Laboratory& laboratory)
 	return true;
 }
 
-const Entity* FactionAI::createBuilding(const Map& map, const Worker& worker)
+Entity* FactionAI::createBuilding(const Map& map, const Worker& worker)
 {
-	const Entity* spawnedBuilding = Faction::createBuilding(map, worker);
+	Entity* spawnedBuilding = Faction::createBuilding(map, worker);
 	if (spawnedBuilding)
 	{
 		switch (spawnedBuilding->getEntityType())
@@ -689,8 +693,6 @@ bool FactionAI::build(const Map& map, eEntityType entityType, AIOccupiedBase& oc
 				Worker* availableWorker = getAvailableWorker(buildPosition, occupiedBase);
 				if (availableWorker)
 				{
-					const glm::vec3& mainHQPosition = getMainHeadquartersPosition();
-					auto* base = m_occupiedBases.getBase(*availableWorker);
 					return availableWorker->build(buildPosition, map, entityType);
 				}
 			}
@@ -698,11 +700,26 @@ bool FactionAI::build(const Map& map, eEntityType entityType, AIOccupiedBase& oc
 	}
 		break;
 	case eEntityType::Unit:
+	{
 		assert(!worker);
-		return !m_barracks.empty() && m_barracks.front()->addUnitToSpawnQueue();
+		Entity* barracks = occupiedBase.getBuilding(eEntityType::Barracks);
+		if (barracks)
+		{
+			return static_cast<Barracks&>(*barracks).addUnitToSpawnQueue();
+		}
+	}
+		break;
 	case eEntityType::Worker:
+	{
 		assert(!worker);
-		return m_headquarters.front()->addWorkerToSpawnQueue();
+		const glm::vec3& basePosition = occupiedBase.base.get().getCenteredPosition();
+		auto headquarters = std::find_if(m_headquarters.begin(), m_headquarters.end(), [&basePosition](const auto& headquarters)
+		{
+			return headquarters->getPosition() == basePosition;
+		});
+		return headquarters != m_headquarters.end() ? (*headquarters)->addWorkerToSpawnQueue() : false;
+	}
+		break;
 	default:
 		assert(false);
 	}

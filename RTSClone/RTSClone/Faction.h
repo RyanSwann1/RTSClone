@@ -51,7 +51,7 @@ public:
 	virtual void onUnitTakenDamage(const TakeDamageEvent& gameEvent, Unit& unit, const Map& map, FactionHandler& factionHandler) const {}
 	virtual const Entity* createUnit(const Map& map, const Barracks& barracks, FactionHandler& factionHandler);
 	virtual Entity* createWorker(const Map& map, const Headquarters& headquarters);
-	virtual const Entity* createBuilding(const Map& map, const Worker& worker);
+	virtual Entity* createBuilding(const Map& map, const Worker& worker);
 	virtual bool increaseShield(const Laboratory& laboratory);
 	virtual void handleEvent(const GameEvent& gameEvent, const Map& map, FactionHandler& factionHandler);
 	virtual void update(float deltaTime, const Map& map, FactionHandler& factionHandler, const Timer& unitStateHandlerTimer);

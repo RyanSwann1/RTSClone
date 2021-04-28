@@ -4,6 +4,7 @@
 #include <functional>
 #include <vector>
 
+enum class eEntityType;
 enum class eFactionController;
 class Entity;
 struct Base;
@@ -15,13 +16,14 @@ struct AIOccupiedBase
 	eFactionController getFactionController() const;
 	bool isWorkerAdded(const Worker& worker) const;
 	const Entity* getBuilding(const Entity& building) const;
+	Entity* getBuilding(eEntityType entityType) const;
 	void addWorker(Worker& worker);
 	void removeWorker(const Worker& worker);
 	const Entity* removeBuilding(const Entity& building);
 	
 	std::reference_wrapper<const Base> base;
 	std::vector<std::reference_wrapper<Worker>> workers;
-	std::vector<std::reference_wrapper<const Entity>> buildings;
+	std::vector<std::reference_wrapper<Entity>> buildings;
 	int turretCount;
 	int barracksCount;
 	int supplyDepotCount;
@@ -51,7 +53,7 @@ public:
 	void addWorker(Worker& worker, const Base& base);
 	void removeWorker(const Worker& worker);
 
-	void addBuilding(const Worker& worker, const Entity& building);
+	void addBuilding(const Worker& worker, Entity& building);
 	void removeBuilding(const Entity& building);
 
 private:

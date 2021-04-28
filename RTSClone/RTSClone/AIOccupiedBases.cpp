@@ -46,6 +46,15 @@ const Entity* AIOccupiedBase::getBuilding(const Entity& building) const
 	return iter != buildings.cend() ? &(*iter).get() : nullptr;
 }
 
+Entity* AIOccupiedBase::getBuilding(eEntityType entityType) const
+{
+	auto building = std::find_if(buildings.begin(), buildings.end(), [entityType](const auto& building)
+	{
+		return building.get().getEntityType() == entityType;
+	});
+	return building != buildings.end() ? &(*building).get() : nullptr;
+}
+
 void AIOccupiedBase::addWorker(Worker& worker)
 {
 	assert(std::find_if(workers.cbegin(), workers.cend(), [&worker](const auto& i)
@@ -207,7 +216,7 @@ void AIOccupiedBases::removeWorker(const Worker& worker)
 	}
 }
 
-void AIOccupiedBases::addBuilding(const Worker& worker, const Entity& building)
+void AIOccupiedBases::addBuilding(const Worker& worker, Entity& building)
 {
 	AIOccupiedBase* occupiedBase = getBaseWithWorker(worker);
 	assert(occupiedBase && occupiedBase->base.get().owningFactionController == m_owningFaction.getController());

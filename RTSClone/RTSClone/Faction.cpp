@@ -610,7 +610,7 @@ bool Faction::isCollidingWithWorkerBuildQueue(const AABB& AABB) const
     return false;
 }
 
-const Entity* Faction::createBuilding(const Map& map, const Worker& worker)
+Entity* Faction::createBuilding(const Map& map, const Worker& worker)
 {
     assert(worker.getCurrentState() == eWorkerState::Building && !worker.getBuildingCommands().empty());
 

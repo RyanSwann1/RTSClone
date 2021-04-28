@@ -59,8 +59,6 @@ namespace AIConstants
 			eAIActionType::BuildTurret,
 			eAIActionType::BuildSupplyDepot,
 			eAIActionType::SpawnWorker,
-			eAIActionType::SpawnWorker,
-			eAIActionType::SpawnWorker
 		},
 
 		std::vector<eAIActionType> {
@@ -71,8 +69,6 @@ namespace AIConstants
 			eAIActionType::BuildLaboratory,
 			eAIActionType::BuildTurret,
 			eAIActionType::SpawnWorker,
-			eAIActionType::SpawnWorker,
-			eAIActionType::SpawnWorker
 		},
 
 		std::vector<eAIActionType> {
@@ -83,8 +79,6 @@ namespace AIConstants
 			eAIActionType::BuildSupplyDepot,
 			eAIActionType::BuildTurret,
 			eAIActionType::SpawnWorker,
-			eAIActionType::SpawnWorker,
-			eAIActionType::SpawnWorker
 		}
 	};
 }

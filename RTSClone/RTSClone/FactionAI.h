@@ -49,7 +49,7 @@ public:
 
 	void onUnitTakenDamage(const TakeDamageEvent& gameEvent, Unit& unit, const Map& map, FactionHandler& factionHandler) const override;
 	bool increaseShield(const Laboratory& laboratory) override;
-	const Entity* createBuilding(const Map& map, const Worker& worker) override;
+	Entity* createBuilding(const Map& map, const Worker& worker) override;
 	void setTargetFaction(FactionHandler& factionHandler);
 	void onFactionElimination(FactionHandler& factionHandler, eFactionController eliminatedFaction);
 	void handleEvent(const GameEvent& gameEvent, const Map& map, FactionHandler& factionHandler) override;
