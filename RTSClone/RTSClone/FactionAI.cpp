@@ -250,25 +250,29 @@ void FactionAI::handleEvent(const GameEvent& gameEvent, const Map& map, FactionH
 			}
 		}
 
-		for (int i = occupiedBase->turretCount; i < 2; ++i)
+		if (occupiedBase->base.get().getCenteredPosition() != getMainHeadquartersPosition())
 		{
-			m_actionQueue.emplace(eAIActionType::BuildTurret, *occupiedBase);
-		}
+			for (int i = occupiedBase->turretCount; i < 2; ++i)
+			{
+				m_actionQueue.emplace(eAIActionType::BuildTurret, *occupiedBase);
+			}
 
-		for (int i = occupiedBase->workers.size(); i < 2; ++i)
-		{
-			m_actionQueue.emplace(eAIActionType::SpawnWorker, *occupiedBase);
+			for (int i = occupiedBase->workers.size(); i < 2; ++i)
+			{
+				m_actionQueue.emplace(eAIActionType::SpawnWorker, *occupiedBase);
+			}
 		}
 	}
 	break;
 	case eGameEventType::DetachFactionFromBase:
 	{
-		const Base& base =  m_baseHandler.getBase(gameEvent.data.detachFactionFromBase.position);
-		assert(base.owningFactionController == getController());
-		for (auto& worker : m_occupiedBases.getBase(base).workers)
+		AIOccupiedBase* base = m_occupiedBases.getBase(gameEvent.data.detachFactionFromBase.position);
+		assert(base && base->base.get().owningFactionController == getController());
+		for (auto& worker : base->workers)
 		{
 			m_unattachedToBaseWorkers.addWorker(worker);
 		}
+		base->workers.clear();
 	}
 	break;
 	}
