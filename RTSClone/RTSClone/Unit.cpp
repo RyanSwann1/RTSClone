@@ -22,7 +22,8 @@ namespace
 	const int DAMAGE = 1;
 }
 
-Unit::Unit(const Faction& owningFaction, const glm::vec3& startingPosition, const glm::vec3& startingRotation, const Map& map)
+Unit::Unit(Faction& owningFaction, const glm::vec3& startingPosition, const glm::vec3& startingRotation, const Map& map,
+	FactionHandler& factionHandler)
 	: Entity(ModelManager::getInstance().getModel(UNIT_MODEL_NAME), startingPosition, eEntityType::Unit, 
 		Globals::UNIT_STARTING_HEALTH, owningFaction.getCurrentShieldAmount(), startingRotation),
 	m_owningFaction(owningFaction),
@@ -31,11 +32,11 @@ Unit::Unit(const Faction& owningFaction, const glm::vec3& startingPosition, cons
 	m_attackTimer(TIME_BETWEEN_ATTACK, true),
 	m_targetEntity()
 {
-	switchToState(m_currentState, map);
+	switchToState(m_currentState, map, factionHandler);
 	broadcastToMessenger<GameMessages::AddUnitPositionToMap>({ m_position, getID() });
 }
 
-Unit::Unit(const Faction & owningFaction, const glm::vec3 & startingPosition, const glm::vec3 & startingRotation, 
+Unit::Unit(Faction & owningFaction, const glm::vec3 & startingPosition, const glm::vec3 & startingRotation, 
 	const glm::vec3 & destination, FactionHandler& factionHandler, const Map& map)
 	: Entity(ModelManager::getInstance().getModel(UNIT_MODEL_NAME), startingPosition, eEntityType::Unit,
 		Globals::UNIT_STARTING_HEALTH, owningFaction.getCurrentShieldAmount(), startingRotation),
@@ -103,16 +104,16 @@ void Unit::moveToAttackPosition(const Entity& targetEntity, const Faction& targe
 	{
 		if (!m_pathToPosition.empty())
 		{
-			switchToState(eUnitState::Moving, map, &targetEntity, &targetFaction);
+			switchToState(eUnitState::Moving, map, factionHandler, &targetEntity, &targetFaction);
 		}
 		else if(previousDestination != m_position)
 		{
 			PathFinding::getInstance().getPathToPosition(*this, previousDestination, m_pathToPosition, map, factionHandler, m_owningFaction);
-			switchToState(eUnitState::Moving, map, &targetEntity, &targetFaction);
+			switchToState(eUnitState::Moving, map, factionHandler, &targetEntity, &targetFaction);
 		}
 		else
 		{
-			switchToState(eUnitState::AttackingTarget, map, &targetEntity, &targetFaction);
+			switchToState(eUnitState::AttackingTarget, map, factionHandler, &targetEntity, &targetFaction);
 		}
 	}
 	else
@@ -122,12 +123,12 @@ void Unit::moveToAttackPosition(const Entity& targetEntity, const Faction& targe
 			if (previousDestination != m_position)
 			{
 				PathFinding::getInstance().getPathToPosition(*this, previousDestination, m_pathToPosition, map, factionHandler, m_owningFaction);
-				switchToState(eUnitState::Moving, map);
+				switchToState(eUnitState::Moving, map, factionHandler);
 			}
 		}
 		else
 		{
-			switchToState(eUnitState::Idle, map);
+			switchToState(eUnitState::Idle, map, factionHandler);
 		}	
 	}
 }
@@ -143,7 +144,7 @@ void Unit::moveTo(const glm::vec3& destination, const Map& map, FactionHandler& 
 	PathFinding::getInstance().getPathToPosition(*this, destination, m_pathToPosition, map, factionHandler, m_owningFaction);
 	if (!m_pathToPosition.empty())
 	{
-		switchToState(state, map);
+		switchToState(state, map, factionHandler);
 	}
 	else
 	{
@@ -151,11 +152,11 @@ void Unit::moveTo(const glm::vec3& destination, const Map& map, FactionHandler& 
 		{
 			PathFinding::getInstance().getPathToPosition(*this, previousDestination, m_pathToPosition, map, factionHandler, m_owningFaction);
 
-			switchToState(state, map);
+			switchToState(state, map, factionHandler);
 		}
 		else
 		{
-			switchToState(eUnitState::Idle, map);
+			switchToState(eUnitState::Idle, map, factionHandler);
 		}
 	}
 }
@@ -221,14 +222,14 @@ void Unit::update(float deltaTime, FactionHandler& factionHandler, const Map& ma
 					}
 					else
 					{
-						switchToState(eUnitState::Idle, map);
+						switchToState(eUnitState::Idle, map, factionHandler);
 					}
 				}
 			}
 		}
 		else if (m_pathToPosition.empty())
 		{
-			switchToState(eUnitState::Idle, map);
+			switchToState(eUnitState::Idle, map, factionHandler);
 		}
 		break;
 	case eUnitState::AttackMoving:
@@ -246,7 +247,7 @@ void Unit::update(float deltaTime, FactionHandler& factionHandler, const Map& ma
 		}
 		if (m_pathToPosition.empty())
 		{
-			switchToState(eUnitState::Idle, map);
+			switchToState(eUnitState::Idle, map, factionHandler);
 		}
 		break;
 	case eUnitState::AttackingTarget:
@@ -265,7 +266,7 @@ void Unit::update(float deltaTime, FactionHandler& factionHandler, const Map& ma
 					targetEntity = targetFaction.getEntity(m_position, Globals::UNIT_ATTACK_RANGE);
 					if (!targetEntity)
 					{
-						switchToState(eUnitState::Idle, map);
+						switchToState(eUnitState::Idle, map, factionHandler);
 						break;
 					}
 					else
@@ -288,7 +289,7 @@ void Unit::update(float deltaTime, FactionHandler& factionHandler, const Map& ma
 			}
 			else
 			{
-				switchToState(eUnitState::Idle, map);
+				switchToState(eUnitState::Idle, map, factionHandler);
 				break;
 			}
 		}
@@ -308,7 +309,7 @@ void Unit::update(float deltaTime, FactionHandler& factionHandler, const Map& ma
 		}
 		else if (!factionHandler.isFactionActive(m_targetEntity.getFactionController()))
 		{
-			switchToState(eUnitState::Idle, map);
+			switchToState(eUnitState::Idle, map, factionHandler);
 			break;
 		}
 	
@@ -327,7 +328,8 @@ void Unit::takeDamage(const TakeDamageEvent& gameEvent, const Map& map, FactionH
 	}
 }
 
-void Unit::switchToState(eUnitState newState, const Map& map, const Entity* targetEntity, const Faction* targetFaction)
+void Unit::switchToState(eUnitState newState, const Map& map, FactionHandler& factionHandler, 
+	const Entity* targetEntity, const Faction* targetFaction)
 {
 	assert(targetEntity && targetFaction || !targetEntity && !targetFaction);
 
@@ -348,15 +350,15 @@ void Unit::switchToState(eUnitState newState, const Map& map, const Entity* targ
 		assert(false);
 	}
 
+	eUnitState currentState = m_currentState;
+	m_currentState = newState;
 	//On enter new state
 	switch (newState)
 	{
 	case eUnitState::Idle:
-		GameEventHandler::getInstance().gameEvents.push(
-			GameEvent::createOnEnteredIdleState(m_owningFaction.get().getController(), getEntityType(), getID()));
-		broadcastToMessenger<GameMessages::AddUnitPositionToMap>({ m_position, getID() });
 		m_targetEntity.reset();
 		m_pathToPosition.clear();
+		m_owningFaction.get().onUnitEnteredIdleState(*this, map, factionHandler);
 		break;
 	case eUnitState::AttackMoving:
 		assert(!m_pathToPosition.empty());
@@ -365,7 +367,7 @@ void Unit::switchToState(eUnitState newState, const Map& map, const Entity* targ
 		break;
 	case eUnitState::AttackingTarget:
 		assert(m_pathToPosition.empty());
-		if (m_currentState != newState)
+		if (currentState != newState)
 		{
 			m_attackTimer.resetElaspedTime();
 		}
@@ -387,8 +389,6 @@ void Unit::switchToState(eUnitState newState, const Map& map, const Entity* targ
 	default:
 		assert(false);
 	}
-
-	m_currentState = newState;
 }
 
 #ifdef RENDER_PATHING

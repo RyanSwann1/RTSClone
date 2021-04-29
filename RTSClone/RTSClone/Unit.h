@@ -30,9 +30,10 @@ class FactionHandler;
 class Unit : public Entity
 {
 public:
-	Unit(const Faction& owningFaction, const glm::vec3& startingPosition, const glm::vec3& startingRotation, const Map& map);
-	Unit(const Faction& owningFaction, const glm::vec3& startingPosition, const glm::vec3& startingRotation,
-		const glm::vec3& destination, FactionHandler& FactionHandler, const Map& map);
+	Unit(Faction& owningFaction, const glm::vec3& startingPosition, const glm::vec3& startingRotation, const Map& map,
+		FactionHandler& factionHandler);
+	Unit(Faction& owningFaction, const glm::vec3& startingPosition, const glm::vec3& startingRotation,
+		const glm::vec3& destination, FactionHandler& factionHandler, const Map& map);
 	~Unit();
 
 	TargetEntity getTargetEntity() const;
@@ -55,7 +56,7 @@ public:
 #endif // RENDER_PATHING
 
 private:
-	std::reference_wrapper<const Faction> m_owningFaction;
+	std::reference_wrapper<Faction> m_owningFaction;
 	std::vector<glm::vec3> m_pathToPosition;
 	eUnitState m_currentState;
 	Timer m_attackTimer;
@@ -64,6 +65,6 @@ private:
 	Mesh m_renderPathMesh;
 #endif // RENDER_PATHING
 
-	void switchToState(eUnitState newState, const Map& map, 
+	void switchToState(eUnitState newState, const Map& map, FactionHandler& factionHandler,
 		const Entity* targetEntity = nullptr, const Faction* targetFaction = nullptr);
 };
