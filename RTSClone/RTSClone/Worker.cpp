@@ -517,14 +517,14 @@ void Worker::switchTo(eWorkerState newState, const Map& map, const Mineral* mine
 
 	
 	//On Enter New State
+	m_currentState = newState;
 	switch (newState)
 	{
 	case eWorkerState::Idle:
 		assert(m_buildQueue.empty());
-		GameEventHandler::getInstance().gameEvents.push(
-			GameEvent::createOnEnteredIdleState(m_owningFaction.get().getController(), getEntityType(), getID()));
 		m_taskTimer.setActive(false);
 		m_pathToPosition.clear();
+		m_owningFaction.get().onWorkerEnteredIdleState(*this, map);
 		break;
 	case eWorkerState::Moving:
 	case eWorkerState::ReturningMineralsToHeadquarters:
@@ -566,7 +566,7 @@ void Worker::switchTo(eWorkerState newState, const Map& map, const Mineral* mine
 	}
 
 	m_taskTimer.resetElaspedTime();
-	m_currentState = newState;
+	
 }
 
 void Worker::moveTo(const glm::vec3& destination, const Map& map, const AABB& ignoreAABB, eWorkerState state)

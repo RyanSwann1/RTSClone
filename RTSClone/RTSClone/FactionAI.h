@@ -47,6 +47,7 @@ public:
 
 	bool isWithinRangeOfBuildings(const glm::vec3& position, float distance) const;
 
+	void onWorkerEnteredIdleState(Worker& worker, const Map& map) override;
 	void onUnitTakenDamage(const TakeDamageEvent& gameEvent, Unit& unit, const Map& map, FactionHandler& factionHandler) const override;
 	bool increaseShield(const Laboratory& laboratory) override;
 	Entity* createBuilding(const Map& map, const Worker& worker) override;
