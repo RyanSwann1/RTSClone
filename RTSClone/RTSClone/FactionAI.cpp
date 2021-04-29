@@ -464,36 +464,37 @@ void FactionAI::onUnitEnteredIdleState(Unit& unit, const Map& map, FactionHandle
 void FactionAI::onWorkerEnteredIdleState(Worker& worker, const Map& map)
 {
 	assert(worker.getCurrentState() == eWorkerState::Idle);
-	if (!m_actionQueue.empty() &&
-		Globals::BUILDING_TYPES.isMatch(convertActionTypeToEntityType(m_actionQueue.front().actionType)) &&
-		build(map, convertActionTypeToEntityType(m_actionQueue.front().actionType), m_actionQueue.front().base.get(), &worker))// &*(*worker)))
+	const Base& nearestBase = m_baseHandler.getNearestBase(getClosestHeadquarters(worker.getPosition()).getPosition());
+	const Mineral* nearestMineral = m_baseHandler.getNearestAvailableMineralAtBase(*this, nearestBase, worker.getPosition());
+	if (nearestMineral)
 	{
-		m_actionQueue.pop();
+		worker.moveTo(*nearestMineral, map);
 	}
 	else
 	{
-		const Base& nearestBase = m_baseHandler.getNearestBase(getClosestHeadquarters(worker.getPosition()).getPosition());
-		const Mineral* nearestMineral = m_baseHandler.getNearestAvailableMineralAtBase(*this, nearestBase, worker.getPosition());
-		if (nearestMineral)
+		for (const auto& base : m_occupiedBases.getSortedBases(worker.getPosition()))
 		{
-			worker.moveTo(*nearestMineral, map);
-		}
-		else
-		{
-			for (const auto& base : m_occupiedBases.getSortedBases(worker.getPosition()))
+			if (&base.base.get() != &nearestBase &&
+				base.base.get().owningFactionController == getController())
 			{
-				if (&base.base.get() != &nearestBase &&
-					base.base.get().owningFactionController == getController())
+				nearestMineral = m_baseHandler.getNearestAvailableMineralAtBase(*this, base.base, worker.getPosition());
+				if (nearestMineral)
 				{
-					nearestMineral = m_baseHandler.getNearestAvailableMineralAtBase(*this, base.base, worker.getPosition());
-					if (nearestMineral)
-					{
-						m_occupiedBases.removeWorker(worker);
-						m_occupiedBases.addWorker(worker, base.base);
-						worker.moveTo(*nearestMineral, map);
-					}
+					m_occupiedBases.removeWorker(worker);
+					m_occupiedBases.addWorker(worker, base.base);
+					worker.moveTo(*nearestMineral, map);
 				}
 			}
+		}
+	}
+
+	if (worker.getCurrentState() == eWorkerState::Idle)
+	{
+		if (!m_actionQueue.empty() &&
+			Globals::BUILDING_TYPES.isMatch(convertActionTypeToEntityType(m_actionQueue.front().actionType)) &&
+			build(map, convertActionTypeToEntityType(m_actionQueue.front().actionType), m_actionQueue.front().base.get(), &worker))// &*(*worker)))
+		{
+			m_actionQueue.pop();
 		}
 	}
 }
