@@ -40,12 +40,6 @@ GameEvent_5::GameEvent_5(eFactionController senderFaction, int senderID, eEntity
 	destination(endingPosition)
 {}
 
-GameEvent_6::GameEvent_6(eFactionController factionController, eEntityType entityType, int entityID)
-	: factionController(factionController),
-	entityType(entityType),
-	entityID(entityID)
-{}
-
 GameEvent_7::GameEvent_7(eFactionController factionController, const glm::vec3& position)
 	: factionController(factionController),
 	position(position)
@@ -69,11 +63,6 @@ GameEvent GameEvent::createPlayerSpawnUnit(eEntityType entityType, int targetID)
 GameEvent GameEvent::createPlayerActivatePlannedBuilding(eEntityType entityType, int targetID)
 {
 	return { eGameEventType::PlayerActivatePlannedBuilding, PlayerActivatePlannedBuildingEvent{entityType, targetID} };
-}
-
-GameEvent GameEvent::createOnEnteredIdleState(eFactionController factionController, eEntityType entityType, int targetID)
-{
-	return { eGameEventType::OnEnteredIdleState, OnEnteredIdleStateEvent{factionController, entityType, targetID} };
 }
 
 GameEvent GameEvent::createAttachFactionToBase(eFactionController factionController, const glm::vec3& position)

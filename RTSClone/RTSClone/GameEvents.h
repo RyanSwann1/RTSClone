@@ -17,7 +17,6 @@ enum class eGameEventType
 	ForceSelfDestructEntity,
 	ResetTargetEntityGUI,
 	IncreaseFactionShield,
-	OnEnteredIdleState,
 	AttachFactionToBase,
 	DetachFactionFromBase
 };
@@ -121,20 +120,6 @@ struct SpawnProjectileEvent : public GameEvent_5 {
 		: GameEvent_5(senderFaction, senderID, senderEntityType, targetFaction, targetID, targetEntityType, damage, startingPosition, endingPosition) {}
 };
 
-struct GameEvent_6
-{
-	GameEvent_6(eFactionController factionController, eEntityType entityType, int entityID);
-
-	eFactionController factionController;
-	eEntityType entityType;
-	int entityID;
-};
-struct OnEnteredIdleStateEvent : public GameEvent_6
-{
-	OnEnteredIdleStateEvent(eFactionController factionController, eEntityType entityType, int entityID) :
-		GameEvent_6(factionController, entityType, entityID) {}
-};
-
 struct GameEvent_7
 {
 	GameEvent_7(eFactionController factionController, const glm::vec3& position);
@@ -166,7 +151,6 @@ union GameEvents
 	ForceSelfDestructEntityEvent			forceSelfDestructEntity;
 	TakeDamageEvent							takeDamage;
 	SpawnProjectileEvent					spawnProjectile;
-	OnEnteredIdleStateEvent					onEnteredIdleState;
 	AttachFactionToBaseEvent				attachFactionToBase;
 	DetachFactionFromBaseEvent				detachFactionFromBase;
 
@@ -181,7 +165,6 @@ union GameEvents
 	GameEvents(const ForceSelfDestructEntityEvent& gameEvent)	:	forceSelfDestructEntity(gameEvent) {}
 	GameEvents(const TakeDamageEvent& gameEvent)				:   takeDamage(gameEvent) {}
 	GameEvents(const SpawnProjectileEvent& gameEvent)			:	spawnProjectile(gameEvent) {}
-	GameEvents(const OnEnteredIdleStateEvent& gameEvent)		:   onEnteredIdleState(gameEvent) {}
 	GameEvents(const AttachFactionToBaseEvent& gameEvent)		:   attachFactionToBase(gameEvent) {}
 	GameEvents(const DetachFactionFromBaseEvent& gameEvent)		:	detachFactionFromBase(gameEvent) {}
 };
@@ -213,10 +196,8 @@ struct GameEvent
 
 	//GameEvent_5
 	static GameEvent createSpawnProjectile(eFactionController senderFaction, int senderID, eEntityType senderEntityType,
-		eFactionController targetFaction, int targetID, eEntityType targetEntityType, int damage, const glm::vec3& startingPosition, const glm::vec3& endingPosition);
-
-	//GameEvent_6
-	static GameEvent createOnEnteredIdleState(eFactionController factionController, eEntityType entityType, int targetID);
+		eFactionController targetFaction, int targetID, eEntityType targetEntityType, int damage, const glm::vec3& startingPosition, 
+		const glm::vec3& endingPosition);
 
 	//GameEvent_7
 	static GameEvent createAttachFactionToBase(eFactionController factionController, const glm::vec3& position);

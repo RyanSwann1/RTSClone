@@ -422,13 +422,6 @@ void Level::handleEvent(const GameEvent& gameEvent, const Map& map)
 			getFaction(m_factions, eFactionController::Player).handleEvent(gameEvent, map, m_factionHandler);
 		}
 		break;
-	case eGameEventType::OnEnteredIdleState:
-		if (isFactionActive(m_factions, gameEvent.data.onEnteredIdleState.factionController))
-		{
-			m_factions[static_cast<int>(gameEvent.data.onEnteredIdleState.factionController)]->
-				handleEvent(gameEvent, map, m_factionHandler);
-		}
-		break;
 	case eGameEventType::AttachFactionToBase:
 		m_baseHandler->handleEvent(gameEvent);
 		getFaction(m_factions, gameEvent.data.attachFactionToBase.factionController).handleEvent(gameEvent, map, m_factionHandler);
