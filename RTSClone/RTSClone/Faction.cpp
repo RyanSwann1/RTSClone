@@ -784,7 +784,7 @@ const Entity* Faction::createUnit(const Map& map, const Barracks& barracks, Fact
         }
         else
         {
-            m_units.emplace_back(std::make_unique<Unit>(*this, startingPosition, startingRotation, map));
+            m_units.emplace_back(std::make_unique<Unit>(*this, startingPosition, startingRotation, map, factionHandler));
         }
 
         reduceResources(eEntityType::Unit);

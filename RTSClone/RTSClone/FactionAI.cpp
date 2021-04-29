@@ -154,39 +154,6 @@ void FactionAI::handleEvent(const GameEvent& gameEvent, const Map& map, FactionH
 		}
 	}
 	break;
-	case eGameEventType::OnEnteredIdleState:
-	{
-		int entityID = gameEvent.data.onEnteredIdleState.entityID;
-		switch (gameEvent.data.onEnteredIdleState.entityType)
-		{
-		case eEntityType::Unit:
-		{
-			auto unit = std::find_if(m_units.begin(), m_units.end(), [entityID](const auto& unit)
-			{
-				return unit->getID() == entityID;
-			});
-			if (unit != m_units.end() && 
-				(*unit)->getCurrentState() == eUnitState::Idle &&
-				m_targetFaction != eFactionController::None)
-			{
-				if (factionHandler.isFactionActive(m_targetFaction))
-				{
-					const Faction& targetFaction = factionHandler.getFaction(m_targetFaction);
-					const Headquarters& targetHeadquarters = targetFaction.getClosestHeadquarters((*unit)->getPosition());
-					(*unit)->moveToAttackPosition(targetHeadquarters, targetFaction, map, factionHandler);
-				}
-				else
-				{
-					m_targetFaction = eFactionController::None;
-				}
-			}
-		}
-		break;
-		default:
-			assert(false);
-		}
-	}
-	break;
 	case eGameEventType::AttachFactionToBase:
 	{
 		AIOccupiedBase* occupiedBase = m_occupiedBases.getBase(gameEvent.data.attachFactionToBase.position);
@@ -476,8 +443,27 @@ bool FactionAI::isWithinRangeOfBuildings(const glm::vec3& position, float distan
 	return false;
 }
 
+void FactionAI::onUnitEnteredIdleState(Unit& unit, const Map& map, FactionHandler& factionHandler)
+{
+	assert(unit.getCurrentState() == eUnitState::Idle);
+	if (m_targetFaction != eFactionController::None)
+	{
+		if (factionHandler.isFactionActive(m_targetFaction))
+		{
+			const Faction& targetFaction = factionHandler.getFaction(m_targetFaction);
+			const Headquarters& targetHeadquarters = targetFaction.getClosestHeadquarters(unit.getPosition());
+			unit.moveToAttackPosition(targetHeadquarters, targetFaction, map, factionHandler);
+		}
+		else
+		{
+			m_targetFaction = eFactionController::None;
+		}
+	}
+}
+
 void FactionAI::onWorkerEnteredIdleState(Worker& worker, const Map& map)
 {
+	assert(worker.getCurrentState() == eWorkerState::Idle);
 	if (!m_actionQueue.empty() &&
 		Globals::BUILDING_TYPES.isMatch(convertActionTypeToEntityType(m_actionQueue.front().actionType)) &&
 		build(map, convertActionTypeToEntityType(m_actionQueue.front().actionType), m_actionQueue.front().base.get(), &worker))// &*(*worker)))
