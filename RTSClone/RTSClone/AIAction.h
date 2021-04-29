@@ -36,5 +36,5 @@ const auto AIPriorityActionCompare = [](const auto& a, const auto& b) -> bool { 
 using AIPriorityActionQueue = std::priority_queue<AIPriorityAction, std::vector<AIPriorityAction>, decltype(AIPriorityActionCompare)>;
 
 enum class eEntityType;
-eEntityType convertActionTypeToEntityType(eAIActionType actionType);
+bool convertActionTypeToEntityType(eAIActionType actionType, eEntityType& entityType);
 eAIActionType convertEntityToActionType(eEntityType entityType);

@@ -14,34 +14,31 @@ AIPriorityAction::AIPriorityAction(int weight, AIAction action)
 	action(action)
 {}
 
-eEntityType convertActionTypeToEntityType(eAIActionType actionType)
+bool convertActionTypeToEntityType(eAIActionType actionType, eEntityType& entityType)
 {
-	eEntityType entityType;
 	switch (actionType)
 	{
 	case eAIActionType::BuildSupplyDepot:
 		entityType = eEntityType::SupplyDepot;
-		break;
+		return true;
 	case eAIActionType::BuildBarracks:
 		entityType = eEntityType::Barracks;
-		break;
+		return true;
 	case eAIActionType::BuildTurret:
 		entityType = eEntityType::Turret;
-		break;
+		return true;
 	case eAIActionType::BuildLaboratory:
 		entityType = eEntityType::Laboratory;
-		break;
+		return true;
 	case eAIActionType::SpawnUnit:
 		entityType = eEntityType::Unit;
-		break;
+		return true;
 	case eAIActionType::SpawnWorker:
 		entityType = eEntityType::Worker;
-		break;
-	default:
-		assert(false);
+		return true;
 	}
 
-	return entityType;
+	return false;
 }
 
 eAIActionType convertEntityToActionType(eEntityType entityType)

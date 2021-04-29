@@ -488,11 +488,12 @@ void FactionAI::onWorkerEnteredIdleState(Worker& worker, const Map& map)
 		}
 	}
 
-	if (worker.getCurrentState() == eWorkerState::Idle)
+	if (worker.getCurrentState() == eWorkerState::Idle && !m_actionQueue.empty())
 	{
-		if (!m_actionQueue.empty() &&
-			Globals::BUILDING_TYPES.isMatch(convertActionTypeToEntityType(m_actionQueue.front().actionType)) &&
-			build(map, convertActionTypeToEntityType(m_actionQueue.front().actionType), m_actionQueue.front().base.get(), &worker))// &*(*worker)))
+		eEntityType entityType;
+		if (convertActionTypeToEntityType(m_actionQueue.front().actionType, entityType) &&
+			Globals::BUILDING_TYPES.isMatch(entityType) &&
+			build(map, entityType, m_actionQueue.front().base.get(), &worker))
 		{
 			m_actionQueue.pop();
 		}
@@ -712,15 +713,19 @@ bool FactionAI::build(const Map& map, eEntityType entityType, AIOccupiedBase& oc
 
 bool FactionAI::handleAction(const AIAction& action, const Map& map)
 {
+	assert(!m_actionQueue.empty());
 	switch (action.actionType)
 	{
 	case eAIActionType::BuildBarracks:
 	case eAIActionType::BuildSupplyDepot:
 	case eAIActionType::BuildTurret:
 	case eAIActionType::BuildLaboratory:
-		if (m_actionQueue.front().base.get().getFactionController() == getController())
+	{
+		eEntityType entityType;
+		if (m_actionQueue.front().base.get().getFactionController() == getController() &&
+			convertActionTypeToEntityType(action.actionType, entityType))
 		{
-			if (build(map, convertActionTypeToEntityType(action.actionType), action.base.get(), nullptr))
+			if (build(map, entityType, action.base.get(), nullptr))
 			{
 				return true;
 			}
@@ -729,6 +734,8 @@ bool FactionAI::handleAction(const AIAction& action, const Map& map)
 		{
 			return true;
 		}
+	}
+
 		break;
 	case eAIActionType::IncreaseShield:
 		GameEventHandler::getInstance().gameEvents.push(GameEvent::createIncreaseFactionShield(getController()));
@@ -736,10 +743,14 @@ bool FactionAI::handleAction(const AIAction& action, const Map& map)
 		break;
 	case eAIActionType::SpawnUnit:
 	case eAIActionType::SpawnWorker:
-		if (build(map, convertActionTypeToEntityType(action.actionType), action.base.get(), nullptr))
+	{
+		eEntityType entityType;
+		if (convertActionTypeToEntityType(action.actionType, entityType) &&
+		build(map, entityType, action.base.get(), nullptr))
 		{
 			return true;
 		}
+	}
 		break;
 	default:
 		assert(false);
