@@ -14,16 +14,6 @@ GraphNode::GraphNode(const glm::ivec2& cameFrom)
 	visited(true)
 {}
 
-const glm::ivec2& GraphNode::getCameFrom() const
-{
-	return cameFrom;
-}
-
-bool GraphNode::isVisited() const
-{
-	return visited;
-}
-
 //Graph
 Graph::Graph()
 	: m_size(),
@@ -49,8 +39,8 @@ void Graph::reset(std::queue<glm::ivec2>& frontier)
 
 void Graph::addToGraph(const glm::ivec2& position, const glm::ivec2& cameFromPosition, const Map& map)
 {
-	assert(map.isWithinBounds(position) && !m_graph[Globals::convertTo1D(position, map.getSize())].isVisited());
-	if (map.isWithinBounds(position) && !m_graph[Globals::convertTo1D(position, map.getSize())].isVisited())
+	assert(map.isWithinBounds(position) && !m_graph[Globals::convertTo1D(position, map.getSize())].visited);
+	if (map.isWithinBounds(position) && !m_graph[Globals::convertTo1D(position, map.getSize())].visited)
 	{
 		m_graph[Globals::convertTo1D(position, map.getSize())] = GraphNode(cameFromPosition);
 	}
@@ -75,10 +65,10 @@ bool Graph::isEmpty() const
 
 const glm::ivec2& Graph::getPreviousPosition(const glm::ivec2& position, const Map& map) const
 {
-	assert(map.isWithinBounds(position) && m_graph[Globals::convertTo1D(position, map.getSize())].isVisited());
-	if (map.isWithinBounds(position) && m_graph[Globals::convertTo1D(position, map.getSize())].isVisited())
+	assert(map.isWithinBounds(position) && m_graph[Globals::convertTo1D(position, map.getSize())].visited);
+	if (map.isWithinBounds(position) && m_graph[Globals::convertTo1D(position, map.getSize())].visited)
 	{
-		return m_graph[Globals::convertTo1D(position, map.getSize())].getCameFrom();
+		return m_graph[Globals::convertTo1D(position, map.getSize())].cameFrom;
 	}
 }
 
@@ -87,6 +77,6 @@ bool Graph::isPositionVisited(const glm::ivec2& position, const Map& map) const
 	assert(map.isWithinBounds(position));
 	if (map.isWithinBounds(position))
 	{
-		return m_graph[Globals::convertTo1D(position, map.getSize())].isVisited();
+		return m_graph[Globals::convertTo1D(position, map.getSize())].visited;
 	}
 }

@@ -6,16 +6,11 @@
 #include <vector>
 #include <queue>
 
-class GraphNode
+struct GraphNode
 {
-public:
 	GraphNode();
 	GraphNode(const glm::ivec2& cameFrom);
 
-	const glm::ivec2& getCameFrom() const;
-	bool isVisited() const;
-
-private:
 	glm::ivec2 cameFrom;
 	bool visited;
 };
