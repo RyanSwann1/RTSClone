@@ -213,6 +213,11 @@ namespace Globals
 			AABB.getForward() < mapSize.y * Globals::NODE_SIZE;
 	}
 
+	inline float getDistance(glm::ivec2 positionB, glm::ivec2 positionA)
+	{
+		return glm::distance(glm::vec2(positionB), glm::vec2(positionA));
+	}
+
 	inline float getSqrDistance(const glm::vec2& positionB, const glm::vec2& positionA)
 	{
 		float x = glm::pow<float, float>(positionB.x - positionA.x, 2.0f);

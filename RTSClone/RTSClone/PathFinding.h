@@ -158,25 +158,9 @@ private:
 	//BFS
 	Graph m_graph;
 	std::queue<glm::ivec2> m_frontier;
-	//A*
-	PriorityQueue m_openQueue;
-	PriorityQueue m_closedQueue;
+	//ThetaStar
 	std::vector<ThetaStarGraphNode> m_thetaGraph;
 	MinHeap m_newFrontier;
 
 	void onNewMapSize(const GameMessages::NewMapSize& gameMessage);
-
-	bool getShortestPath(const Unit& unit, const glm::vec3& destination, std::vector<glm::vec3>& pathToPosition,
-		const Map& map, FactionHandler& factionHandler, const Faction& owningFaction);
-	bool getShortestPath(const Worker& worker, const glm::vec3& destination, std::vector<glm::vec3>& pathToPosition,
-		AdjacentPositions adjacentPositions, const Map& map, const Faction& owningFaction);
-	bool getShortestPath(const Worker& worker, const Entity& target, std::vector<glm::vec3>& pathToPosition,
-		const Map& map, const Faction& owningFaction);
-
-	void getGarunteedPath(const Unit& unit, const glm::vec3& destination, std::vector<glm::vec3>& pathToPosition,
-		const Map& map, FactionHandler& factionHandler, const Faction& owningFaction);
-	void getGarunteedPath(const Worker& worker, const glm::vec3& destination, std::vector<glm::vec3>& pathToPosition,
-		AdjacentPositions adjacentPositions, const Map& map, const Faction& owningFaction);
-	void getGarunteedPath(const Worker& worker, const Entity& target, std::vector<glm::vec3>& pathToPosition,
-		const Map& map, const Faction& owningFaction);
 };
