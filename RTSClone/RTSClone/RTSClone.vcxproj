@@ -181,6 +181,7 @@
     <ClCompile Include="Headquarters.cpp" />
     <ClCompile Include="Laboratory.cpp" />
     <ClCompile Include="Level.cpp" />
+    <ClCompile Include="MinHeap.cpp" />
     <ClCompile Include="MiniMap.cpp" />
     <ClCompile Include="Projectile.cpp" />
     <ClCompile Include="ProjectileHandler.cpp" />
@@ -277,6 +278,7 @@
     <ClInclude Include="FactionHandler.h" />
     <ClInclude Include="Headquarters.h" />
     <ClInclude Include="Laboratory.h" />
+    <ClInclude Include="MinHeap.h" />
     <ClInclude Include="MiniMap.h" />
     <ClInclude Include="RenderPathMesh.h" />
     <ClInclude Include="SceneryGameObject.h" />

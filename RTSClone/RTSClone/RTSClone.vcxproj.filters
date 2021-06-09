@@ -177,6 +177,9 @@
     <ClCompile Include="AIAction.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="MinHeap.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="assimp\include\Compiler\poppack1.h">
@@ -489,6 +492,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="AIConstants.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MinHeap.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

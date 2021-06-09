@@ -7,11 +7,25 @@
 #include "PriorityQueue.h"
 #include "Graph.h"
 #include "Worker.h"
+#include "MinHeap.h"
 #include <vector>
 #include <queue>
 #include <array>
 #include <functional>
 #include <list>
+
+struct ThetaStarGraphNode
+{
+	ThetaStarGraphNode();
+	ThetaStarGraphNode(glm::ivec2 position, glm::ivec2 cameFrom, float g, float h);
+
+	float getF() const;                                                                                                                                                                                                                                                                                             
+
+	glm::ivec2 position;
+	glm::ivec2 cameFrom;
+	float g;
+	float h;
+};
 
 namespace GameMessages
 {
@@ -112,6 +126,7 @@ public:
 	bool isBuildingSpawnAvailable(const glm::vec3& startingPosition, eEntityType buildingEntityType, const Map& map,
 		glm::vec3& buildPosition, const FactionAI& owningFaction, const BaseHandler& baseHandler);
 
+	bool isPositionInLineOfSight(glm::ivec2 startingPositionOnGrid, glm::ivec2 targetPositionOnGrid, const Map& map, const Unit& unit) const;
 	bool isPositionInLineOfSight(const glm::vec3& startingPosition, const glm::vec3& targetPosition, const Map& map, const Unit& unit) const;
 	bool isPositionInLineOfSight(const glm::vec3& startingPosition, const glm::vec3& targetPosition, const Map& map) const;
 	bool isTargetInLineOfSight(const glm::vec3& startingPosition, const Entity& targetEntity, const Map& map) const;
@@ -146,6 +161,8 @@ private:
 	//A*
 	PriorityQueue m_openQueue;
 	PriorityQueue m_closedQueue;
+	std::vector<ThetaStarGraphNode> m_thetaGraph;
+	MinHeap m_newFrontier;
 
 	void onNewMapSize(const GameMessages::NewMapSize& gameMessage);
 
