@@ -17,11 +17,6 @@
 
 namespace
 {
-	bool isPriorityQueueWithinSizeLimit(const PriorityQueue& priorityQueue, const glm::ivec2& mapSize)
-	{
-		return static_cast<int>(priorityQueue.getSize()) <= mapSize.x * mapSize.y;
-	}
-
 	bool isFrontierWithinSizeLimit(const std::queue<glm::ivec2>& frontier, const glm::ivec2& mapSize)
 	{
 		return static_cast<int>(frontier.size()) <= mapSize.x * mapSize.y;
@@ -30,50 +25,6 @@ namespace
 	bool isPathWithinSizeLimit(const std::vector<glm::vec3>& pathToPosition, const glm::ivec2& mapSize)
 	{
 		return static_cast<int>(pathToPosition.size()) <= mapSize.x * mapSize.y;
-	}
-
-	void getPathFromClosedQueue(std::vector<glm::vec3>& pathToPosition, const glm::ivec2& startingPositionOnGrid,
-		const PriorityQueueNode& startingNode, const PriorityQueue& closedQueue, const Map& map)
-	{
-		pathToPosition.push_back(Globals::convertToWorldPosition(startingNode.position));
-		glm::ivec2 parentPosition = startingNode.parentPosition;
-
-		while (parentPosition != startingPositionOnGrid)
-		{
-			const PriorityQueueNode& parentNode = closedQueue.getNode(parentPosition);
-			parentPosition = parentNode.parentPosition;
-
-			pathToPosition.push_back(Globals::convertToWorldPosition(parentNode.position));
-			assert(isPathWithinSizeLimit(pathToPosition, map.getSize()));
-		}
-	}
-
-	void getPathFromClosedQueue(std::vector<glm::vec3>& pathToPosition, const glm::ivec2& startingPositionOnGrid,
-		const glm::ivec2 startingPosition, const PriorityQueue& closedQueue, const Map& map)
-	{
-		pathToPosition.push_back(Globals::convertToWorldPosition(startingPosition));
-		glm::ivec2 parentPosition = closedQueue.getNode(startingPosition).parentPosition;
-
-		while (parentPosition != startingPositionOnGrid)
-		{
-			const PriorityQueueNode& parentNode = closedQueue.getNode(parentPosition);
-			parentPosition = parentNode.parentPosition;
-
-			pathToPosition.push_back(Globals::convertToWorldPosition(parentNode.position));
-			assert(isPathWithinSizeLimit(pathToPosition, map.getSize()));
-		}
-	}
-
-	void addToOpenQueue(PriorityQueue& openQueue, const PriorityQueueNode& node)
-	{
-		if (openQueue.isSuccessorNodeValid(node))
-		{
-			openQueue.changeNode(node);
-		}
-		else if (!openQueue.contains(node.position))
-		{
-			openQueue.add(node);
-		}
 	}
 
 	bool isWithinBuildingPositionsRange(const std::vector<glm::vec3>& buildPositions, const glm::vec3& position)
@@ -808,7 +759,6 @@ void PathFinding::getPathToPosition(const Worker& worker, const Entity& target, 
 				if (m_thetaGraph[Globals::convertTo1D(adjacentPosition.position, map.getSize())].getF() == 0.f)
 				{
 					float costFromStart = 0.f;
-					float costFromEnd = Globals::getDistance(destinationOnGrid, adjacentPosition.position);
 					glm::ivec2 cameFrom(0, 0);
 					if (isPositionInLineOfSight(Globals::convertToWorldPosition(currentNode.cameFrom),
 						Globals::convertToWorldPosition(adjacentPosition.position), map))
@@ -823,6 +773,7 @@ void PathFinding::getPathToPosition(const Worker& worker, const Entity& target, 
 						cameFrom = currentNode.position;
 					}
 
+					float costFromEnd = Globals::getDistance(destinationOnGrid, adjacentPosition.position);
 					m_newFrontier.add({ adjacentPosition.position, cameFrom, costFromStart, costFromEnd });
 					m_thetaGraph[Globals::convertTo1D(adjacentPosition.position, map.getSize())] =
 					{ adjacentPosition.position, cameFrom, costFromStart, costFromEnd };
