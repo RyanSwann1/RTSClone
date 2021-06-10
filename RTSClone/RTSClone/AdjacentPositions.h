@@ -27,6 +27,7 @@ class Worker;
 class Map;
 class Unit;
 
+AdjacentPositions createAdjacentPositions(const Map& map, FactionHandler& factionHandler, const Unit& unit);
 AdjacentPositions createAdjacentPositions(const Map& map, const AABB& ignoreAABB);
 AdjacentPositions createAdjacentPositions(const Map& map);
 

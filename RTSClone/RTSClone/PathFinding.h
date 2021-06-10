@@ -123,7 +123,7 @@ public:
 	bool isBuildingSpawnAvailable(const glm::vec3& startingPosition, eEntityType buildingEntityType, const Map& map,
 		glm::vec3& buildPosition, const FactionAI& owningFaction, const BaseHandler& baseHandler);
 
-	bool isPositionInLineOfSight(glm::ivec2 startingPositionOnGrid, glm::ivec2 targetPositionOnGrid, const Map& map, const Unit& unit) const;
+	bool isPositionInLineOfSight(glm::ivec2 startingPositionOnGrid, glm::ivec2 targetPositionOnGrid, const Map& map, const Entity& entity) const;
 	bool isPositionInLineOfSight(const glm::vec3& startingPosition, const glm::vec3& targetPosition, const Map& map, const Unit& unit) const;
 	bool isPositionInLineOfSight(const glm::vec3& startingPosition, const glm::vec3& targetPosition, const Map& map) const;
 	bool isTargetInLineOfSight(const glm::vec3& startingPosition, const Entity& targetEntity, const Map& map) const;
@@ -140,14 +140,8 @@ public:
 	bool setUnitAttackPosition(const Unit& unit, const Entity& targetEntity, std::vector<glm::vec3>& pathToPosition,
 		const Map& map, FactionHandler& factionHandler);
 
-	void getPathToPosition(const Unit& unit, const glm::vec3& destination, std::vector<glm::vec3>& pathToPosition,
-		const Map& map, FactionHandler& factionHandler, const Faction& owningFaction);
-
-	void getPathToPosition(const Worker& worker, const glm::vec3& destination, std::vector<glm::vec3>& pathToPosition,
-		AdjacentPositions adjacentPositions, const Map& map, const Faction& owningFaction);
-
-	void getPathToPosition(const Worker& entity, const Entity& target, std::vector<glm::vec3>& pathToPosition,
-		const Map& map, const Faction& owningFaction);
+	void getPathToPosition(const Entity& entity, const glm::vec3& destination, std::vector<glm::vec3>& pathToPosition,
+		const Map& map, AdjacentPositions adjacentPositions);
 
 private:
 	PathFinding();

@@ -108,7 +108,8 @@ void Unit::moveToAttackPosition(const Entity& targetEntity, const Faction& targe
 		}
 		else if(previousDestination != m_position)
 		{
-			PathFinding::getInstance().getPathToPosition(*this, previousDestination, m_pathToPosition, map, factionHandler, m_owningFaction);
+			PathFinding::getInstance().getPathToPosition(*this, previousDestination, m_pathToPosition, map, 
+				createAdjacentPositions(map, factionHandler, *this));
 			switchToState(eUnitState::Moving, map, factionHandler, &targetEntity, &targetFaction);
 		}
 		else
@@ -122,7 +123,8 @@ void Unit::moveToAttackPosition(const Entity& targetEntity, const Faction& targe
 		{
 			if (previousDestination != m_position)
 			{
-				PathFinding::getInstance().getPathToPosition(*this, previousDestination, m_pathToPosition, map, factionHandler, m_owningFaction);
+				PathFinding::getInstance().getPathToPosition(*this, previousDestination, m_pathToPosition, map, 
+					createAdjacentPositions(map, factionHandler, *this));
 				switchToState(eUnitState::Moving, map, factionHandler);
 			}
 		}
@@ -141,7 +143,7 @@ void Unit::moveTo(const glm::vec3& destination, const Map& map, FactionHandler& 
 		broadcastToMessenger<GameMessages::RemoveUnitPositionFromMap>({ m_pathToPosition.front(), getID() });
 	}
 
-	PathFinding::getInstance().getPathToPosition(*this, destination, m_pathToPosition, map, factionHandler, m_owningFaction);
+	PathFinding::getInstance().getPathToPosition(*this, destination, m_pathToPosition, map, createAdjacentPositions(map, factionHandler, *this));
 	if (!m_pathToPosition.empty())
 	{
 		switchToState(state, map, factionHandler);
@@ -150,7 +152,7 @@ void Unit::moveTo(const glm::vec3& destination, const Map& map, FactionHandler& 
 	{
 		if (previousDestination != m_position)
 		{
-			PathFinding::getInstance().getPathToPosition(*this, previousDestination, m_pathToPosition, map, factionHandler, m_owningFaction);
+			PathFinding::getInstance().getPathToPosition(*this, previousDestination, m_pathToPosition, map, createAdjacentPositions(map, factionHandler, *this));
 
 			switchToState(state, map, factionHandler);
 		}

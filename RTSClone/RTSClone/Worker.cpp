@@ -331,7 +331,7 @@ void Worker::moveTo(const Mineral& mineral, const Map& map)
 	glm::vec3 previousDestination = Globals::getNextPathDestination(m_pathToPosition, m_position);
 	glm::vec3 destination = PathFinding::getInstance().getClosestPositionToAABB(m_position, mineral.getAABB(), map);
 
-	PathFinding::getInstance().getPathToPosition(*this, destination, m_pathToPosition, createAdjacentPositions(map), map, m_owningFaction);
+	PathFinding::getInstance().getPathToPosition(*this, destination, m_pathToPosition, map, createAdjacentPositions(map));
 	if (!m_pathToPosition.empty())
 	{
 		switchTo(eWorkerState::MovingToMinerals, map, &mineral);
@@ -353,8 +353,8 @@ void Worker::moveTo(const Mineral& mineral, const Map& map)
 void Worker::moveTo(const Entity& target, const Map& map, eWorkerState state)
 {
 	glm::vec3 previousDestination = Globals::getNextPathDestination(m_pathToPosition, m_position);
-
-	PathFinding::getInstance().getPathToPosition(*this, target, m_pathToPosition, map, m_owningFaction);
+	glm::vec3 destination = PathFinding::getInstance().getClosestPositionToAABB(getPosition(), target.getAABB(), map);
+	PathFinding::getInstance().getPathToPosition(*this, destination, m_pathToPosition, map, createAdjacentPositions(map));
 	if (!m_pathToPosition.empty())
 	{
 		switchTo(state, map);
@@ -377,7 +377,7 @@ void Worker::moveTo(const glm::vec3& destination, const Map& map, eWorkerState s
 {
 	glm::vec3 previousDestination = Globals::getNextPathDestination(m_pathToPosition, m_position);
 
-	PathFinding::getInstance().getPathToPosition(*this, destination, m_pathToPosition, createAdjacentPositions(map), map, m_owningFaction); 
+	PathFinding::getInstance().getPathToPosition(*this, destination, m_pathToPosition, map, createAdjacentPositions(map));
 	if (!m_pathToPosition.empty())
 	{
 		switchTo(state, map);
@@ -404,7 +404,7 @@ void Worker::moveTo(const Base& base, const Map& map)
 
 	m_baseToExpandTo = &base;
 	PathFinding::getInstance().getPathToPosition(*this, m_baseToExpandTo->getCenteredPosition(), m_pathToPosition, 
-		createAdjacentPositions(map), map, m_owningFaction);
+		map, createAdjacentPositions(map));
 	if (!m_pathToPosition.empty())
 	{
 		switchTo(eWorkerState::MovingToBuildingPosition, map);
@@ -574,7 +574,7 @@ void Worker::moveTo(const glm::vec3& destination, const Map& map, const AABB& ig
 	assert(m_currentState == eWorkerState::Building);
 	glm::vec3 previousDestination = Globals::getNextPathDestination(m_pathToPosition, m_position);
 
-	PathFinding::getInstance().getPathToPosition(*this, destination, m_pathToPosition, createAdjacentPositions(map, ignoreAABB), map, m_owningFaction);
+	PathFinding::getInstance().getPathToPosition(*this, destination, m_pathToPosition, map, createAdjacentPositions(map, ignoreAABB));
 	if (!m_pathToPosition.empty())
 	{
 		switchTo(state, map);

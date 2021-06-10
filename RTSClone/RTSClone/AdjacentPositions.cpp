@@ -45,6 +45,11 @@ AdjacentPositions createAdjacentPositions(const Map& map)
 	return [&](const glm::ivec2& position) { return getAdjacentPositions(position, map); };
 }
 
+AdjacentPositions createAdjacentPositions(const Map& map, FactionHandler& factionHandler, const Unit& unit)
+{
+	return [&](const glm::ivec2& position) { return getAdjacentPositions(position, map, factionHandler, unit); };
+}
+
 std::array<AdjacentPosition, ALL_DIRECTIONS_ON_GRID.size()> getAdjacentPositions(const glm::ivec2 & position,
 	const Map & map, const std::vector<std::unique_ptr<Unit>> & units, const std::vector<std::unique_ptr<Worker>>& workers, const AABB& ignoreAABB)
 {
