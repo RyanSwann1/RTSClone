@@ -36,6 +36,28 @@ namespace
 
 		return buildPosition != buildPositions.cend();
 	}
+
+	struct IsInLineOfSightObject
+	{
+		IsInLineOfSightObject(const glm::vec3& _startingPosition, const glm::vec3& _endingPosition)
+			: startingPosition(Globals::convertToMiddleGridPosition(Globals::convertToNodePosition(_startingPosition))),
+			endingPosition(Globals::convertToMiddleGridPosition(Globals::convertToNodePosition(_endingPosition))),
+			direction(glm::normalize(endingPosition - startingPosition)),
+			distance(glm::distance(endingPosition, startingPosition))
+		{}
+
+		IsInLineOfSightObject(glm::ivec2 startingPositionOnGrid, glm::ivec2 targetPositionOnGrid)
+			: startingPosition(Globals::convertToWorldPosition(startingPositionOnGrid)),
+			endingPosition(Globals::convertToWorldPosition(targetPositionOnGrid)),
+			direction(glm::normalize(endingPosition - startingPosition)),
+			distance(glm::distance(endingPosition, startingPosition))
+		{}
+
+		glm::vec3 startingPosition;
+		glm::vec3 endingPosition;
+		glm::vec3 direction;
+		float distance;
+	};
 }
 
 //ThetaStarGraphNode
@@ -76,9 +98,6 @@ PathFinding::~PathFinding()
 	//Don't unsub
 	//GameMessenger::getInstance().unsubscribe<GameMessages::NewMapSize>(this);
 }
-
-
-
 
 bool PathFinding::isBuildingSpawnAvailable(const glm::vec3& startingPosition, eEntityType buildingEntityType, const Map& map, 
 	glm::vec3& buildPosition, const FactionAI& owningFaction, const BaseHandler& baseHandler)
@@ -131,15 +150,10 @@ bool PathFinding::isBuildingSpawnAvailable(const glm::vec3& startingPosition, eE
 
 bool PathFinding::isPositionInLineOfSight(glm::ivec2 startingPositionOnGrid, glm::ivec2 targetPositionOnGrid, const Map& map, const Entity& entity) const
 {
-	 glm::vec3 startingPosition = Globals::convertToWorldPosition(startingPositionOnGrid);
-	 glm::vec3 targetPosition = Globals::convertToWorldPosition(targetPositionOnGrid);
-	 glm::vec3 direction = glm::normalize(targetPosition - startingPosition);
-	 float distance = glm::distance(targetPosition, startingPosition);
-
-	 for (int i = Globals::NODE_SIZE; i <= static_cast<int>(
-		 glm::ceil(glm::distance(targetPosition, startingPosition))); i += Globals::NODE_SIZE)
+	 IsInLineOfSightObject lineOfSightObject(startingPositionOnGrid, targetPositionOnGrid);
+	 for (int i = Globals::NODE_SIZE; i <= static_cast<int>(glm::ceil(lineOfSightObject.distance)); i += Globals::NODE_SIZE)
 	 {
-		 glm::vec3 position = startingPosition + direction * static_cast<float>(i);
+		 glm::vec3 position = lineOfSightObject.startingPosition+ lineOfSightObject.direction * static_cast<float>(i);
 		 if (map.isPositionOccupied(position) ||
 			 (entity.getEntityType() == eEntityType::Unit && !map.isPositionOnUnitMapAvailable(Globals::convertToGridPosition(position), entity.getID())))
 		 {
@@ -152,15 +166,11 @@ bool PathFinding::isPositionInLineOfSight(glm::ivec2 startingPositionOnGrid, glm
 
 bool PathFinding::isTargetInLineOfSight(const glm::vec3& startingPosition, const Entity& targetEntity, const Map& map) const
 {
-	glm::vec3 startingCenteredPosition = Globals::convertToMiddleGridPosition(Globals::convertToNodePosition(startingPosition));
-	glm::vec3 endingCenteredPosition = Globals::convertToMiddleGridPosition(Globals::convertToNodePosition(targetEntity.getPosition()));
-	glm::vec3 direction = glm::normalize(endingCenteredPosition - startingCenteredPosition);
-	float distance = glm::distance(endingCenteredPosition, startingCenteredPosition); 
+	IsInLineOfSightObject lineOfSightObject(startingPosition, targetEntity.getPosition());
 	bool targetEntityVisible = true;
-
-	for (int i = Globals::NODE_SIZE; i <= static_cast<int>(glm::ceil(distance)); i += Globals::NODE_SIZE)
+	for (int i = Globals::NODE_SIZE; i <= static_cast<int>(glm::ceil(lineOfSightObject.distance)); i += Globals::NODE_SIZE)
 	{
-		glm::vec3 position = startingCenteredPosition + direction * static_cast<float>(i);
+		glm::vec3 position = lineOfSightObject.startingPosition+ lineOfSightObject.direction * static_cast<float>(i);
 		if (targetEntity.getAABB().contains(position))
 		{
 			break;
@@ -177,15 +187,11 @@ bool PathFinding::isTargetInLineOfSight(const glm::vec3& startingPosition, const
 
 bool PathFinding::isTargetInLineOfSight(const glm::vec3& startingPosition, const Entity& targetEntity, const Map& map, const AABB& senderAABB) const
 {
-	glm::vec3 startingCenteredPosition = Globals::convertToMiddleGridPosition(Globals::convertToNodePosition(startingPosition));
-	glm::vec3 endingCenteredPosition = Globals::convertToMiddleGridPosition(Globals::convertToNodePosition(targetEntity.getPosition()));
-	glm::vec3 direction = glm::normalize(endingCenteredPosition - startingCenteredPosition);
-	float distance = glm::distance(endingCenteredPosition, startingCenteredPosition);
+	IsInLineOfSightObject lineOfSightObject(startingPosition, targetEntity.getPosition());
 	bool targetEntityVisible = true;
-
-	for (int i = Globals::NODE_SIZE; i <= static_cast<int>(glm::ceil(distance)); i += Globals::NODE_SIZE)
+	for (int i = Globals::NODE_SIZE; i <= static_cast<int>(glm::ceil(lineOfSightObject.distance)); i += Globals::NODE_SIZE)
 	{
-		glm::vec3 position = startingCenteredPosition + direction * static_cast<float>(i);
+		glm::vec3 position = lineOfSightObject.startingPosition + lineOfSightObject.direction * static_cast<float>(i);
 		if (targetEntity.getAABB().contains(position))
 		{
 			break;
@@ -202,15 +208,11 @@ bool PathFinding::isTargetInLineOfSight(const glm::vec3& startingPosition, const
 
 bool PathFinding::isTargetInLineOfSight(const Unit& unit, const Entity& targetEntity, const Map& map) const
 {
-	glm::vec3 startingCenteredPosition = Globals::convertToMiddleGridPosition(Globals::convertToNodePosition(unit.getPosition()));
-	glm::vec3 endingCenteredPosition = Globals::convertToMiddleGridPosition(Globals::convertToNodePosition(targetEntity.getPosition()));
-	glm::vec3 direction = glm::normalize(endingCenteredPosition - startingCenteredPosition);
-	float distance = glm::distance(endingCenteredPosition, startingCenteredPosition);
+	IsInLineOfSightObject lineOfSightObject(unit.getPosition(), targetEntity.getPosition());
 	bool targetEntityVisible = true;
-
-	for (int i = Globals::NODE_SIZE; i <= static_cast<int>(glm::ceil(distance)); i += Globals::NODE_SIZE)
+	for (int i = Globals::NODE_SIZE; i <= static_cast<int>(glm::ceil(lineOfSightObject.distance)); i += Globals::NODE_SIZE)
 	{
-		glm::vec3 position = startingCenteredPosition + direction * static_cast<float>(i);
+		glm::vec3 position = lineOfSightObject.startingPosition + lineOfSightObject.direction * static_cast<float>(i);
 		if (targetEntity.getAABB().contains(position))
 		{
 			break;
