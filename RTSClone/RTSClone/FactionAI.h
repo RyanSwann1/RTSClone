@@ -4,7 +4,6 @@
 #include "Graph.h"
 #include "Timer.h"
 #include "AIOccupiedBases.h"
-#include "PriorityQueue.h"
 #include "AIAction.h"
 #include <queue>
 #include <vector>

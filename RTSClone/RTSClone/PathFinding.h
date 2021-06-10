@@ -4,7 +4,6 @@
 #include "Globals.h"
 #include "Unit.h"
 #include "Map.h"
-#include "PriorityQueue.h"
 #include "Graph.h"
 #include "Worker.h"
 #include "MinHeap.h"
@@ -12,7 +11,6 @@
 #include <queue>
 #include <array>
 #include <functional>
-#include <list>
 
 struct ThetaStarGraphNode
 {
@@ -31,7 +29,6 @@ namespace GameMessages
 {
 	struct NewMapSize;
 }
-struct Model;
 class Faction;
 class Entity;
 class Worker;

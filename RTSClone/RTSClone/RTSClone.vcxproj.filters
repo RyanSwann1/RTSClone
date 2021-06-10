@@ -30,9 +30,6 @@
     <ClCompile Include="Timer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="PriorityQueue.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="AdjacentPositions.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -309,9 +306,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Timer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="PriorityQueue.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="AdjacentPositions.h">

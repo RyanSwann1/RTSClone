@@ -197,7 +197,6 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Map.cpp" />
     <ClCompile Include="PathFinding.cpp" />
-    <ClCompile Include="PriorityQueue.cpp" />
     <ClCompile Include="SupplyDepot.cpp" />
     <ClCompile Include="Timer.cpp" />
     <ClCompile Include="Unit.cpp" />
@@ -304,7 +303,6 @@
     <ClInclude Include="EntitySpawnerBuilding.h" />
     <ClInclude Include="Map.h" />
     <ClInclude Include="PathFinding.h" />
-    <ClInclude Include="PriorityQueue.h" />
     <ClInclude Include="SupplyDepot.h" />
     <ClInclude Include="Timer.h" />
     <ClInclude Include="Unit.h" />
