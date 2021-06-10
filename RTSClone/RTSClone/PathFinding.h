@@ -124,8 +124,6 @@ public:
 		glm::vec3& buildPosition, const FactionAI& owningFaction, const BaseHandler& baseHandler);
 
 	bool isPositionInLineOfSight(glm::ivec2 startingPositionOnGrid, glm::ivec2 targetPositionOnGrid, const Map& map, const Entity& entity) const;
-	bool isPositionInLineOfSight(const glm::vec3& startingPosition, const glm::vec3& targetPosition, const Map& map, const Unit& unit) const;
-	bool isPositionInLineOfSight(const glm::vec3& startingPosition, const glm::vec3& targetPosition, const Map& map) const;
 	bool isTargetInLineOfSight(const glm::vec3& startingPosition, const Entity& targetEntity, const Map& map) const;
 	bool isTargetInLineOfSight(const glm::vec3& startingPosition, const Entity& targetEntity, const Map& map, const AABB& senderAABB) const;
 	bool isTargetInLineOfSight(const Unit& unit, const Entity& targetEntity, const Map& map) const;
@@ -153,5 +151,7 @@ private:
 	std::vector<ThetaStarGraphNode> m_thetaGraph;
 	MinHeap m_thetaFrontier;
 
+	void expandFrontier(const MinHeapNode& currentNode, const Map& map, glm::ivec2 destinationOnGrid, AdjacentPositions adjacentPositions,
+		const Entity& entity);
 	void onNewMapSize(const GameMessages::NewMapSize& gameMessage);
 };

@@ -77,16 +77,7 @@ PathFinding::~PathFinding()
 	//GameMessenger::getInstance().unsubscribe<GameMessages::NewMapSize>(this);
 }
 
-void PathFinding::onNewMapSize(const GameMessages::NewMapSize& gameMessage)
-{
-	m_sharedContainer.clear();
-	m_sharedContainer.reserve(
-		static_cast<size_t>(gameMessage.mapSize.x) * static_cast<size_t>(gameMessage.mapSize.y));
 
-	m_thetaGraph.clear();
-	m_thetaGraph.resize(
-		static_cast<size_t>(gameMessage.mapSize.x) * static_cast<size_t>(gameMessage.mapSize.y));
-}
 
 
 bool PathFinding::isBuildingSpawnAvailable(const glm::vec3& startingPosition, eEntityType buildingEntityType, const Map& map, 
@@ -136,49 +127,6 @@ bool PathFinding::isBuildingSpawnAvailable(const glm::vec3& startingPosition, eE
 	}
 
 	return false;
-}
-
-bool PathFinding::isPositionInLineOfSight(const glm::vec3& startingPosition, const glm::vec3& targetPosition, const Map& map) const
-{
-	glm::vec3 startingCenteredPosition = Globals::convertToMiddleGridPosition(Globals::convertToNodePosition(startingPosition));
-	glm::vec3 endingCenteredPosition = Globals::convertToMiddleGridPosition(Globals::convertToNodePosition(targetPosition));
-	glm::vec3 direction = glm::normalize(endingCenteredPosition - startingCenteredPosition);
-	bool targetEntityVisible = true;
-
-	for (int i = Globals::NODE_SIZE; i <= static_cast<int>(
-		glm::ceil(glm::distance(endingCenteredPosition, startingCenteredPosition))); i += Globals::NODE_SIZE)
-	{
-		glm::vec3 position = startingCenteredPosition + direction * static_cast<float>(i);
-		if (map.isPositionOccupied(position))
-		{
-			targetEntityVisible = false;
-			break;
-		}
-	}
-
-	return targetEntityVisible;
-}
-
-bool PathFinding::isPositionInLineOfSight(const glm::vec3& startingPosition, const glm::vec3& targetPosition, const Map& map, const Unit& unit) const
-{
-	glm::vec3 startingCenteredPosition = Globals::convertToMiddleGridPosition(Globals::convertToNodePosition(startingPosition));
-	glm::vec3 endingCenteredPosition = Globals::convertToMiddleGridPosition(Globals::convertToNodePosition(targetPosition));
-	glm::vec3 direction = glm::normalize(endingCenteredPosition - startingCenteredPosition);
-	float distance = glm::distance(endingCenteredPosition, startingCenteredPosition);
-	bool targetEntityVisible = true;
-
-	for (int i = Globals::NODE_SIZE; i <= static_cast<int>(glm::ceil(distance)); i += Globals::NODE_SIZE)
-	{
-		glm::vec3 position = startingCenteredPosition + direction * static_cast<float>(i);
-		if (map.isPositionOccupied(position) || 
-			!map.isPositionOnUnitMapAvailable(Globals::convertToGridPosition(position), unit.getID()))
-		{
-			targetEntityVisible = false;
-			break;
-		}
-	}
-
-	return targetEntityVisible;
 }
 
 bool PathFinding::isPositionInLineOfSight(glm::ivec2 startingPositionOnGrid, glm::ivec2 targetPositionOnGrid, const Map& map, const Entity& entity) const
@@ -409,66 +357,9 @@ bool PathFinding::setUnitAttackPosition(const Unit& unit, const Entity& targetEn
 				}
 			}
 		}
-
-		for (const auto& adjacentPosition : getAdjacentPositions(currentNode.position, map, factionHandler, unit))
+		else
 		{
-			if (adjacentPosition.valid)
-			{
-				if (m_thetaGraph[Globals::convertTo1D(adjacentPosition.position, map.getSize())].getF() == 0.f)
-				{
-					float costFromStart = 0.f;
-					float costFromEnd = Globals::getDistance(destinationOnGrid, adjacentPosition.position);
-					glm::ivec2 cameFrom(0, 0);
-					if (isPositionInLineOfSight(currentNode.cameFrom, adjacentPosition.position, map, unit))
-					{
-						const ThetaStarGraphNode& currentPositionGraphNode = m_thetaGraph[Globals::convertTo1D(currentNode.cameFrom, map.getSize())];
-						costFromStart = currentPositionGraphNode.g + Globals::getDistance(adjacentPosition.position, currentNode.cameFrom);
-						cameFrom = currentNode.cameFrom;
-					}
-					else
-					{
-						costFromStart = currentNode.g + Globals::getDistance(adjacentPosition.position, currentNode.position);
-						cameFrom = currentNode.position;
-					}
-
-					m_thetaFrontier.add({ adjacentPosition.position, cameFrom, costFromStart, costFromEnd });
-					m_thetaGraph[Globals::convertTo1D(adjacentPosition.position, map.getSize())] =
-					{ adjacentPosition.position, cameFrom, costFromStart, costFromEnd };
-				}
-				else
-				{
-					ThetaStarGraphNode& adjacentGraphNode = m_thetaGraph[Globals::convertTo1D(adjacentPosition.position, map.getSize())];
-					float costFromStart = 0.f;
-					glm::ivec2 cameFrom(0, 0);
-					float cameFromG = 0.f;
-					if (isPositionInLineOfSight(currentNode.cameFrom, adjacentPosition.position, map, unit))
-					{
-						const ThetaStarGraphNode& camefromGraphNode = m_thetaGraph[Globals::convertTo1D(currentNode.cameFrom, map.getSize())];
-						costFromStart = camefromGraphNode.g + Globals::getDistance(adjacentPosition.position, camefromGraphNode.position);
-						cameFrom = camefromGraphNode.position;
-						cameFromG = camefromGraphNode.g;
-					}
-					else
-					{
-						costFromStart = currentNode.g + Globals::getDistance(adjacentPosition.position, currentNode.position);
-						cameFrom = currentNode.position;
-						cameFromG = currentNode.g;
-					}
-
-					if (costFromStart < adjacentGraphNode.g)
-					{
-						adjacentGraphNode.g = costFromStart;
-						adjacentGraphNode.cameFrom = cameFrom;
-						if (m_thetaFrontier.findAndErase(adjacentPosition.position))
-						{
-							m_thetaFrontier.add({ adjacentPosition.position,
-							cameFrom,
-							cameFromG + Globals::getDistance(adjacentPosition.position, cameFrom),
-							adjacentGraphNode.h });
-						}
-					}
-				}
-			}
+			expandFrontier(currentNode, map, destinationOnGrid, createAdjacentPositions(map, factionHandler, unit), unit);
 		}
 	}
 
@@ -519,69 +410,88 @@ void PathFinding::getPathToPosition(const Entity& entity, const glm::vec3& desti
 					assert(isPathWithinSizeLimit(pathToPosition, map.getSize()));
 				}
 			}
+		}
+		else
+		{
+			expandFrontier(currentNode, map, destinationOnGrid, adjacentPositions, entity);
+		}
+	}
+}
 
-			return;
+void PathFinding::expandFrontier(const MinHeapNode& currentNode, const Map& map, glm::ivec2 destinationOnGrid, AdjacentPositions adjacentPositions,
+	const Entity& entity)
+{
+	for (const auto& adjacentPosition : adjacentPositions(currentNode.position))
+	{
+		if (!adjacentPosition.valid)
+		{
+			continue;
 		}
 
-		for (const auto& adjacentPosition : adjacentPositions(currentNode.position))// getAdjacentPositions(currentNode.position, map, factionHandler, unit))
+		if (m_thetaGraph[Globals::convertTo1D(adjacentPosition.position, map.getSize())].getF() == 0.f)
 		{
-			if (adjacentPosition.valid)
+			float costFromStart = 0.f;
+			float costFromEnd = Globals::getDistance(destinationOnGrid, adjacentPosition.position);
+			glm::ivec2 cameFrom(0, 0);
+			if (isPositionInLineOfSight(currentNode.cameFrom, adjacentPosition.position, map, entity))
 			{
-				if (m_thetaGraph[Globals::convertTo1D(adjacentPosition.position, map.getSize())].getF() == 0.f)
-				{
-					float costFromStart = 0.f;
-					float costFromEnd = Globals::getDistance(destinationOnGrid, adjacentPosition.position);
-					glm::ivec2 cameFrom(0, 0);
-					if (isPositionInLineOfSight(currentNode.cameFrom, adjacentPosition.position, map, entity))
-					{
-						const ThetaStarGraphNode& currentPositionGraphNode = m_thetaGraph[Globals::convertTo1D(currentNode.cameFrom, map.getSize())];
-						costFromStart = currentPositionGraphNode.g + Globals::getDistance(adjacentPosition.position, currentNode.cameFrom);
-						cameFrom = currentNode.cameFrom;
-					}
-					else
-					{
-						costFromStart = currentNode.g + Globals::getDistance(adjacentPosition.position, currentNode.position);
-						cameFrom = currentNode.position;
-					}
+				const ThetaStarGraphNode& currentPositionGraphNode = m_thetaGraph[Globals::convertTo1D(currentNode.cameFrom, map.getSize())];
+				costFromStart = currentPositionGraphNode.g + Globals::getDistance(adjacentPosition.position, currentNode.cameFrom);
+				cameFrom = currentNode.cameFrom;
+			}
+			else
+			{
+				costFromStart = currentNode.g + Globals::getDistance(adjacentPosition.position, currentNode.position);
+				cameFrom = currentNode.position;
+			}
 
-					m_thetaFrontier.add({ adjacentPosition.position, cameFrom, costFromStart, costFromEnd });
-					m_thetaGraph[Globals::convertTo1D(adjacentPosition.position, map.getSize())] =
-					{ adjacentPosition.position, cameFrom, costFromStart, costFromEnd };
-				}
-				else
-				{
-					ThetaStarGraphNode& adjacentGraphNode = m_thetaGraph[Globals::convertTo1D(adjacentPosition.position, map.getSize())];
-					float costFromStart = 0.f;
-					glm::ivec2 cameFrom(0, 0);
-					float cameFromG = 0.f;
-					if (isPositionInLineOfSight(currentNode.cameFrom, adjacentPosition.position, map, entity))
-					{
-						const ThetaStarGraphNode& camefromGraphNode = m_thetaGraph[Globals::convertTo1D(currentNode.cameFrom, map.getSize())];
-						costFromStart = camefromGraphNode.g + Globals::getDistance(adjacentPosition.position, camefromGraphNode.position);
-						cameFrom = camefromGraphNode.position;
-						cameFromG = camefromGraphNode.g;
-					}
-					else
-					{
-						costFromStart = currentNode.g + Globals::getDistance(adjacentPosition.position, currentNode.position);
-						cameFrom = currentNode.position;
-						cameFromG = currentNode.g;
-					}
+			m_thetaFrontier.add({ adjacentPosition.position, cameFrom, costFromStart, costFromEnd });
+			m_thetaGraph[Globals::convertTo1D(adjacentPosition.position, map.getSize())] =
+			{ adjacentPosition.position, cameFrom, costFromStart, costFromEnd };
+		}
+		else
+		{
+			ThetaStarGraphNode& adjacentGraphNode = m_thetaGraph[Globals::convertTo1D(adjacentPosition.position, map.getSize())];
+			float costFromStart = 0.f;
+			glm::ivec2 cameFrom(0, 0);
+			float cameFromG = 0.f;
+			if (isPositionInLineOfSight(currentNode.cameFrom, adjacentPosition.position, map, entity))
+			{
+				const ThetaStarGraphNode& camefromGraphNode = m_thetaGraph[Globals::convertTo1D(currentNode.cameFrom, map.getSize())];
+				costFromStart = camefromGraphNode.g + Globals::getDistance(adjacentPosition.position, camefromGraphNode.position);
+				cameFrom = camefromGraphNode.position;
+				cameFromG = camefromGraphNode.g;
+			}
+			else
+			{
+				costFromStart = currentNode.g + Globals::getDistance(adjacentPosition.position, currentNode.position);
+				cameFrom = currentNode.position;
+				cameFromG = currentNode.g;
+			}
 
-					if (costFromStart < adjacentGraphNode.g)
-					{
-						adjacentGraphNode.g = costFromStart;
-						adjacentGraphNode.cameFrom = cameFrom;
-						if (m_thetaFrontier.findAndErase(adjacentPosition.position))
-						{
-							m_thetaFrontier.add({ adjacentPosition.position,
-							cameFrom,
-							cameFromG + Globals::getDistance(adjacentPosition.position, cameFrom),
-							adjacentGraphNode.h });
-						}
-					}
+			if (costFromStart < adjacentGraphNode.g)
+			{
+				adjacentGraphNode.g = costFromStart;
+				adjacentGraphNode.cameFrom = cameFrom;
+				if (m_thetaFrontier.findAndErase(adjacentPosition.position))
+				{
+					m_thetaFrontier.add({ adjacentPosition.position,
+					cameFrom,
+					cameFromG + Globals::getDistance(adjacentPosition.position, cameFrom),
+					adjacentGraphNode.h });
 				}
 			}
 		}
 	}
+}
+
+void PathFinding::onNewMapSize(const GameMessages::NewMapSize& gameMessage)
+{
+	m_sharedContainer.clear();
+	m_sharedContainer.reserve(
+		static_cast<size_t>(gameMessage.mapSize.x) * static_cast<size_t>(gameMessage.mapSize.y));
+
+	m_thetaGraph.clear();
+	m_thetaGraph.resize(
+		static_cast<size_t>(gameMessage.mapSize.x) * static_cast<size_t>(gameMessage.mapSize.y));
 }
