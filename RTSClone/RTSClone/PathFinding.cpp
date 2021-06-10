@@ -61,10 +61,10 @@ float ThetaStarGraphNode::getF() const
 //PathFinding
 PathFinding::PathFinding()
 	: m_sharedContainer(),
-	m_graph(),
-	m_frontier(),
+	m_BFSGraph(),
+	m_BFSFrontier(),
 	m_thetaGraph(),
-	m_newFrontier()
+	m_thetaFrontier()
 {
 	subscribeToMessenger<GameMessages::NewMapSize>(
 		[this](const GameMessages::NewMapSize& gameMessage) { return onNewMapSize(gameMessage); }, this);
@@ -96,14 +96,14 @@ bool PathFinding::isBuildingSpawnAvailable(const glm::vec3& startingPosition, eE
 	AABB buildingAABB(startingPosition, ModelManager::getInstance().getModel(buildingEntityType));
 	for (int i = 0; i < 5; ++i)
 	{
-		m_graph.reset(m_frontier);
-		m_frontier = std::queue<glm::ivec2>();
-		m_frontier.emplace(Globals::convertToGridPosition(startingPosition));
+		m_BFSGraph.reset(m_BFSFrontier);
+		m_BFSFrontier = std::queue<glm::ivec2>();
+		m_BFSFrontier.emplace(Globals::convertToGridPosition(startingPosition));
 		bool buildPositionFound = false;
-		while (!m_frontier.empty() && !buildPositionFound)
+		while (!m_BFSFrontier.empty() && !buildPositionFound)
 		{
-			glm::ivec2 position = m_frontier.front();
-			m_frontier.pop();
+			glm::ivec2 position = m_BFSFrontier.front();
+			m_BFSFrontier.pop();
 
 			for (const auto& adjacentPosition : getAllAdjacentPositions(position, map))
 			{
@@ -120,10 +120,10 @@ bool PathFinding::isBuildingSpawnAvailable(const glm::vec3& startingPosition, eE
 						break;
 					}
 				}
-				if (!m_graph.isPositionVisited(adjacentPosition.position, map))
+				if (!m_BFSGraph.isPositionVisited(adjacentPosition.position, map))
 				{
-					m_graph.addToGraph(adjacentPosition.position, position, map);
-					m_frontier.push(adjacentPosition.position);
+					m_BFSGraph.addToGraph(adjacentPosition.position, position, map);
+					m_BFSFrontier.push(adjacentPosition.position);
 				}
 			}
 		}
@@ -280,14 +280,14 @@ bool PathFinding::isTargetInLineOfSight(const Unit& unit, const Entity& targetEn
 bool PathFinding::getClosestAvailableEntitySpawnPosition(const EntitySpawnerBuilding& building, const std::vector<std::unique_ptr<Unit>>& units, 
 	const std::vector<std::unique_ptr<Worker>>& workers, const Map& map, glm::vec3& spawnPosition)
 {
-	m_graph.reset(m_frontier);
-	m_frontier.push(Globals::convertToGridPosition(building.getPosition()));
+	m_BFSGraph.reset(m_BFSFrontier);
+	m_BFSFrontier.push(Globals::convertToGridPosition(building.getPosition()));
 	bool availablePositionFound = false;
 
-	while (!m_frontier.empty() && !availablePositionFound)
+	while (!m_BFSFrontier.empty() && !availablePositionFound)
 	{
-		glm::ivec2 position = m_frontier.front();
-		m_frontier.pop();
+		glm::ivec2 position = m_BFSFrontier.front();
+		m_BFSFrontier.pop();
 
 		for (const auto& adjacentPosition : getAdjacentPositions(position, map, units, workers, building.getAABB()))
 		{
@@ -297,14 +297,14 @@ bool PathFinding::getClosestAvailableEntitySpawnPosition(const EntitySpawnerBuil
 				availablePositionFound = true;
 				break;
 			}
-			else if (!m_graph.isPositionVisited(adjacentPosition.position, map))
+			else if (!m_BFSGraph.isPositionVisited(adjacentPosition.position, map))
 			{
-				m_graph.addToGraph(adjacentPosition.position, position, map);
-				m_frontier.push(adjacentPosition.position);
+				m_BFSGraph.addToGraph(adjacentPosition.position, position, map);
+				m_BFSFrontier.push(adjacentPosition.position);
 			}	
 		}
 
-		assert(isFrontierWithinSizeLimit(m_frontier, map.getSize()));
+		assert(isFrontierWithinSizeLimit(m_BFSFrontier, map.getSize()));
 	}
 
 	return availablePositionFound;
@@ -312,14 +312,14 @@ bool PathFinding::getClosestAvailableEntitySpawnPosition(const EntitySpawnerBuil
 
 bool PathFinding::getRandomPositionOutsideAABB(const Entity& building, const Map& map, glm::vec3& positionOutsideAABB)
 {
-	m_graph.reset(m_frontier);
-	m_frontier.push(Globals::convertToGridPosition(building.getPosition()));
+	m_BFSGraph.reset(m_BFSFrontier);
+	m_BFSFrontier.push(Globals::convertToGridPosition(building.getPosition()));
 	bool availablePositionFound = false;
 
-	while (!m_frontier.empty() && !availablePositionFound)
+	while (!m_BFSFrontier.empty() && !availablePositionFound)
 	{
-		glm::ivec2 position = m_frontier.front();
-		m_frontier.pop();
+		glm::ivec2 position = m_BFSFrontier.front();
+		m_BFSFrontier.pop();
 
 		for (const auto& adjacentPosition : getRandomAdjacentPositions(position, map, building.getAABB()))
 		{
@@ -329,14 +329,14 @@ bool PathFinding::getRandomPositionOutsideAABB(const Entity& building, const Map
 				availablePositionFound = true;
 				break;
 			}
-			else if (!m_graph.isPositionVisited(adjacentPosition.position, map))
+			else if (!m_BFSGraph.isPositionVisited(adjacentPosition.position, map))
 			{
-				m_graph.addToGraph(adjacentPosition.position, position, map);
-				m_frontier.push(adjacentPosition.position);
+				m_BFSGraph.addToGraph(adjacentPosition.position, position, map);
+				m_BFSFrontier.push(adjacentPosition.position);
 			}
 		}
 
-		assert(isFrontierWithinSizeLimit(m_frontier, map.getSize()));
+		assert(isFrontierWithinSizeLimit(m_BFSFrontier, map.getSize()));
 	}
 
 	return availablePositionFound;
@@ -374,13 +374,13 @@ bool PathFinding::setUnitAttackPosition(const Unit& unit, const Entity& targetEn
 	glm::ivec2 startingPositionOnGrid = Globals::convertToGridPosition(unit.getPosition());
 	glm::ivec2 destinationOnGrid = Globals::convertToGridPosition(targetEntity.getPosition());
 	std::fill(m_thetaGraph.begin(), m_thetaGraph.end(), ThetaStarGraphNode());
-	m_newFrontier.clear();
-	m_newFrontier.add({ startingPositionOnGrid, startingPositionOnGrid, 0.f, Globals::getDistance(destinationOnGrid, startingPositionOnGrid) });
+	m_thetaFrontier.clear();
+	m_thetaFrontier.add({ startingPositionOnGrid, startingPositionOnGrid, 0.f, Globals::getDistance(destinationOnGrid, startingPositionOnGrid) });
 	bool positionFound = false;
 
-	while (!positionFound && !m_newFrontier.isEmpty())
+	while (!positionFound && !m_thetaFrontier.isEmpty())
 	{
-		MinHeapNode currentNode = m_newFrontier.pop();
+		MinHeapNode currentNode = m_thetaFrontier.pop();
 		if (Globals::getSqrDistance(targetEntity.getPosition(), Globals::convertToWorldPosition(currentNode.position)) <=
 			unit.getAttackRange() * unit.getAttackRange() &&
 			isTargetInLineOfSight(unit, targetEntity, map))
@@ -431,7 +431,7 @@ bool PathFinding::setUnitAttackPosition(const Unit& unit, const Entity& targetEn
 						cameFrom = currentNode.position;
 					}
 
-					m_newFrontier.add({ adjacentPosition.position, cameFrom, costFromStart, costFromEnd });
+					m_thetaFrontier.add({ adjacentPosition.position, cameFrom, costFromStart, costFromEnd });
 					m_thetaGraph[Globals::convertTo1D(adjacentPosition.position, map.getSize())] =
 					{ adjacentPosition.position, cameFrom, costFromStart, costFromEnd };
 				}
@@ -459,9 +459,9 @@ bool PathFinding::setUnitAttackPosition(const Unit& unit, const Entity& targetEn
 					{
 						adjacentGraphNode.g = costFromStart;
 						adjacentGraphNode.cameFrom = cameFrom;
-						if (m_newFrontier.findAndErase(adjacentPosition.position))
+						if (m_thetaFrontier.findAndErase(adjacentPosition.position))
 						{
-							m_newFrontier.add({ adjacentPosition.position,
+							m_thetaFrontier.add({ adjacentPosition.position,
 							cameFrom,
 							cameFromG + Globals::getDistance(adjacentPosition.position, cameFrom),
 							adjacentGraphNode.h });
@@ -487,13 +487,13 @@ void PathFinding::getPathToPosition(const Unit& unit, const glm::vec3& destinati
 	glm::ivec2 startingPositionOnGrid = Globals::convertToGridPosition(unit.getPosition());
 	glm::ivec2 destinationOnGrid = Globals::convertToGridPosition(destination);
 	std::fill(m_thetaGraph.begin(), m_thetaGraph.end(), ThetaStarGraphNode());
-	m_newFrontier.clear();
-	m_newFrontier.add({startingPositionOnGrid, startingPositionOnGrid, 0.f, Globals::getDistance(destinationOnGrid, startingPositionOnGrid)});
+	m_thetaFrontier.clear();
+	m_thetaFrontier.add({startingPositionOnGrid, startingPositionOnGrid, 0.f, Globals::getDistance(destinationOnGrid, startingPositionOnGrid)});
 	bool destinationReached = false;
 
-	while (!destinationReached && !m_newFrontier.isEmpty())
+	while (!destinationReached && !m_thetaFrontier.isEmpty())
 	{
-		MinHeapNode currentNode = m_newFrontier.pop();
+		MinHeapNode currentNode = m_thetaFrontier.pop();
 		if (currentNode.position == destinationOnGrid)
 		{
 			if (currentNode.position == startingPositionOnGrid)
@@ -544,7 +544,7 @@ void PathFinding::getPathToPosition(const Unit& unit, const glm::vec3& destinati
 						cameFrom = currentNode.position;
 					}
 
-					m_newFrontier.add({ adjacentPosition.position, cameFrom, costFromStart, costFromEnd });
+					m_thetaFrontier.add({ adjacentPosition.position, cameFrom, costFromStart, costFromEnd });
 					m_thetaGraph[Globals::convertTo1D(adjacentPosition.position, map.getSize())] =
 						{ adjacentPosition.position, cameFrom, costFromStart, costFromEnd };
 				}
@@ -572,9 +572,9 @@ void PathFinding::getPathToPosition(const Unit& unit, const glm::vec3& destinati
 					{
 						adjacentGraphNode.g = costFromStart;
 						adjacentGraphNode.cameFrom = cameFrom;
-						if (m_newFrontier.findAndErase(adjacentPosition.position))
+						if (m_thetaFrontier.findAndErase(adjacentPosition.position))
 						{
-							m_newFrontier.add({ adjacentPosition.position,
+							m_thetaFrontier.add({ adjacentPosition.position,
 							cameFrom,
 							cameFromG + Globals::getDistance(adjacentPosition.position, cameFrom),
 							adjacentGraphNode.h});
@@ -598,13 +598,13 @@ void PathFinding::getPathToPosition(const Worker& worker, const glm::vec3& desti
 	glm::ivec2 startingPositionOnGrid = Globals::convertToGridPosition(worker.getPosition());
 	glm::ivec2 destinationOnGrid = Globals::convertToGridPosition(destination);
 	std::fill(m_thetaGraph.begin(), m_thetaGraph.end(), ThetaStarGraphNode());
-	m_newFrontier.clear();
-	m_newFrontier.add({ startingPositionOnGrid, startingPositionOnGrid, 0.f, Globals::getDistance(destinationOnGrid, startingPositionOnGrid) });
+	m_thetaFrontier.clear();
+	m_thetaFrontier.add({ startingPositionOnGrid, startingPositionOnGrid, 0.f, Globals::getDistance(destinationOnGrid, startingPositionOnGrid) });
 	bool destinationReached = false;
 
-	while (!destinationReached && !m_newFrontier.isEmpty())
+	while (!destinationReached && !m_thetaFrontier.isEmpty())
 	{
-		MinHeapNode currentNode = m_newFrontier.pop();
+		MinHeapNode currentNode = m_thetaFrontier.pop();
 		if (currentNode.position == destinationOnGrid)
 		{
 
@@ -657,7 +657,7 @@ void PathFinding::getPathToPosition(const Worker& worker, const glm::vec3& desti
 						cameFrom = currentNode.position;
 					}
 
-					m_newFrontier.add({ adjacentPosition.position, cameFrom, costFromStart, costFromEnd });
+					m_thetaFrontier.add({ adjacentPosition.position, cameFrom, costFromStart, costFromEnd });
 					m_thetaGraph[Globals::convertTo1D(adjacentPosition.position, map.getSize())] =
 					{ adjacentPosition.position, cameFrom, costFromStart, costFromEnd };
 				}
@@ -686,9 +686,9 @@ void PathFinding::getPathToPosition(const Worker& worker, const glm::vec3& desti
 					{
 						adjacentGraphNode.g = costFromStart;
 						adjacentGraphNode.cameFrom = cameFrom;
-						if (m_newFrontier.findAndErase(adjacentPosition.position))
+						if (m_thetaFrontier.findAndErase(adjacentPosition.position))
 						{
-							m_newFrontier.add({ adjacentPosition.position,
+							m_thetaFrontier.add({ adjacentPosition.position,
 							cameFrom,
 							cameFromG + Globals::getDistance(adjacentPosition.position, cameFrom),
 							adjacentGraphNode.h });
@@ -715,13 +715,13 @@ void PathFinding::getPathToPosition(const Worker& worker, const Entity& target, 
 	glm::ivec2 startingPositionOnGrid = Globals::convertToGridPosition(worker.getPosition());
 	glm::ivec2 destinationOnGrid = Globals::convertToGridPosition(destination);
 	std::fill(m_thetaGraph.begin(), m_thetaGraph.end(), ThetaStarGraphNode());
-	m_newFrontier.clear();
-	m_newFrontier.add({ startingPositionOnGrid, startingPositionOnGrid, 0.f, Globals::getDistance(destinationOnGrid, startingPositionOnGrid) });
+	m_thetaFrontier.clear();
+	m_thetaFrontier.add({ startingPositionOnGrid, startingPositionOnGrid, 0.f, Globals::getDistance(destinationOnGrid, startingPositionOnGrid) });
 	bool destinationReached = false;
 
-	while (!destinationReached && !m_newFrontier.isEmpty())
+	while (!destinationReached && !m_thetaFrontier.isEmpty())
 	{
-		MinHeapNode currentNode = m_newFrontier.pop();
+		MinHeapNode currentNode = m_thetaFrontier.pop();
 		if (currentNode.position == destinationOnGrid)
 		{
 
@@ -774,7 +774,7 @@ void PathFinding::getPathToPosition(const Worker& worker, const Entity& target, 
 					}
 
 					float costFromEnd = Globals::getDistance(destinationOnGrid, adjacentPosition.position);
-					m_newFrontier.add({ adjacentPosition.position, cameFrom, costFromStart, costFromEnd });
+					m_thetaFrontier.add({ adjacentPosition.position, cameFrom, costFromStart, costFromEnd });
 					m_thetaGraph[Globals::convertTo1D(adjacentPosition.position, map.getSize())] =
 					{ adjacentPosition.position, cameFrom, costFromStart, costFromEnd };
 				}
@@ -803,9 +803,9 @@ void PathFinding::getPathToPosition(const Worker& worker, const Entity& target, 
 					{
 						adjacentGraphNode.g = costFromStart;
 						adjacentGraphNode.cameFrom = cameFrom;
-						if (m_newFrontier.findAndErase(adjacentPosition.position))
+						if (m_thetaFrontier.findAndErase(adjacentPosition.position))
 						{
-							m_newFrontier.add({ adjacentPosition.position,
+							m_thetaFrontier.add({ adjacentPosition.position,
 							cameFrom,
 							cameFromG + Globals::getDistance(adjacentPosition.position, cameFrom),
 							adjacentGraphNode.h });

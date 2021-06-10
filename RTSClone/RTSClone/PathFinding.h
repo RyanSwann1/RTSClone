@@ -156,11 +156,11 @@ private:
 	PathFinding();
 	std::vector<glm::vec3> m_sharedContainer;
 	//BFS
-	Graph m_graph;
-	std::queue<glm::ivec2> m_frontier;
+	Graph m_BFSGraph;
+	std::queue<glm::ivec2> m_BFSFrontier;
 	//ThetaStar
 	std::vector<ThetaStarGraphNode> m_thetaGraph;
-	MinHeap m_newFrontier;
+	MinHeap m_thetaFrontier;
 
 	void onNewMapSize(const GameMessages::NewMapSize& gameMessage);
 };
