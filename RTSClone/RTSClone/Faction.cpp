@@ -377,7 +377,7 @@ void Faction::addResources(Worker& worker)
 
 void Faction::handleWorkerCollisions(const Map& map)
 {
-    std::vector<const Entity*> handledUnits;
+    static std::vector<const Entity*> handledUnits;
     for (auto& worker : m_workers)
     {
         if (worker->getCurrentState() == eWorkerState::Idle)
