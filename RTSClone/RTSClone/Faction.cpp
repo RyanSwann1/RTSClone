@@ -377,7 +377,17 @@ void Faction::addResources(Worker& worker)
 
 void Faction::handleWorkerCollisions(const Map& map)
 {
-    static std::vector<const Entity*> handledUnits;
+    static std::vector<std::reference_wrapper<const Worker>> handledWorkers;
+
+    auto foundWorker = [](int ID) -> bool
+    {
+        auto worker = std::find_if(handledWorkers.cbegin(), handledWorkers.cend(), [ID](const auto& worker)
+        {
+            return worker.get().getID() == ID;
+        });
+        return worker != handledWorkers.cend();
+    };
+
     for (auto& worker : m_workers)
     {
         if (worker->getCurrentState() == eWorkerState::Idle)
@@ -395,7 +405,7 @@ void Faction::handleWorkerCollisions(const Map& map)
                 for (const auto& otherWorker : m_workers)
                 {
                     if (worker->getID() != otherWorker->getID() &&
-                        std::find(handledUnits.cbegin(), handledUnits.cend(), &*otherWorker) == handledUnits.cend() &&
+                        foundWorker(otherWorker->getID()) &&
                         otherWorker->getCurrentState() == eWorkerState::Idle &&
                         worker->getAABB().contains(otherWorker->getAABB()))
                     {
@@ -410,10 +420,10 @@ void Faction::handleWorkerCollisions(const Map& map)
             }
         }
 
-        handledUnits.push_back(worker.get());
+        handledWorkers.push_back(*worker.get());
     }
 
-    handledUnits.clear();
+    handledWorkers.clear();
 }
 
 void Faction::update(float deltaTime, const Map& map, FactionHandler& factionHandler, const Timer& unitStateHandlerTimer)
