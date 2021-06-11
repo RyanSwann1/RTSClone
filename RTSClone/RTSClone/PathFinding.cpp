@@ -99,6 +99,49 @@ PathFinding::~PathFinding()
 	//GameMessenger::getInstance().unsubscribe<GameMessages::NewMapSize>(this);
 }
 
+bool PathFinding::getClosestAvailablePosition(const Worker& worker, const std::vector<std::unique_ptr<Worker>>& workers, 
+	const Map& map, glm::vec3& outPosition)
+{
+	m_BFSGraph.reset(m_BFSFrontier);
+	m_BFSFrontier.emplace(Globals::convertToGridPosition(worker.getPosition()));
+	bool availablePositionFound = false;
+
+	int workerID = worker.getID();
+	auto workerCollision = [workerID, &workers](glm::ivec2 position) -> bool
+	{
+		auto worker = std::find_if(workers.cbegin(), workers.cend(), [workerID, position](const auto& worker)
+		{
+			return worker->getID() != workerID && !worker->getAABB().contains(Globals::convertToWorldPosition(position));
+		});
+		return worker != workers.cend();
+	};
+
+	while (!availablePositionFound && !m_BFSFrontier.empty())
+	{
+		glm::ivec2 position = m_BFSFrontier.front();
+		m_BFSFrontier.pop();
+
+		for (const auto& adjacentPosition : getAdjacentPositions(position, map))// getRandomAdjacentPositions(position, map, unit))
+		{
+			if (adjacentPosition.valid && workerCollision(adjacentPosition.position))
+			{
+				outPosition = Globals::convertToWorldPosition(adjacentPosition.position);
+				availablePositionFound = true;
+				break;
+			}
+			else if (!m_BFSGraph.isPositionVisited(adjacentPosition.position, map))
+			{
+				m_BFSGraph.addToGraph(adjacentPosition.position, position, map);
+				m_BFSFrontier.push(adjacentPosition.position);
+			}
+		}
+
+		assert(isFrontierWithinSizeLimit(m_BFSFrontier, map.getSize()));
+	}
+
+	return availablePositionFound;
+}
+
 bool PathFinding::isBuildingSpawnAvailable(const glm::vec3& startingPosition, eEntityType buildingEntityType, const Map& map, 
 	glm::vec3& buildPosition, const FactionAI& owningFaction, const BaseHandler& baseHandler)
 {

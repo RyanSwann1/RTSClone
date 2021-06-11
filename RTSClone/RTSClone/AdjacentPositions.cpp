@@ -117,6 +117,27 @@ std::array<AdjacentPosition, ALL_DIRECTIONS_ON_GRID.size()> getRandomAdjacentPos
 	return adjacentPositions;
 }
 
+std::array<AdjacentPosition, ALL_DIRECTIONS_ON_GRID.size()> getRandomAdjacentPositions(const glm::ivec2& position, const Map& map, const Unit& unit)
+{
+	static std::random_device rd;
+	static std::mt19937 g(rd());
+	std::array<glm::ivec2, 8> shuffledAllDirectionsOnGrid = ALL_DIRECTIONS_ON_GRID;
+	std::shuffle(shuffledAllDirectionsOnGrid.begin(), shuffledAllDirectionsOnGrid.end(), g);
+
+	std::array<AdjacentPosition, ALL_DIRECTIONS_ON_GRID.size()> adjacentPositions;
+	for (int i = 0; i < adjacentPositions.size(); ++i)
+	{
+		glm::ivec2 adjacentPosition = position + shuffledAllDirectionsOnGrid[i];
+		if (map.isWithinBounds(adjacentPosition) && !map.isPositionOccupied(adjacentPosition) &&
+			map.isPositionOnUnitMapAvailable(adjacentPosition, unit.getID()))
+		{
+  			adjacentPositions[i] = AdjacentPosition(adjacentPosition);
+		}
+	}
+
+	return adjacentPositions;
+}
+
 std::array<AdjacentPosition, ALL_DIRECTIONS_ON_GRID.size()> getAllAdjacentPositions(const glm::ivec2& position, const Map& map)
 {
 	std::array<AdjacentPosition, ALL_DIRECTIONS_ON_GRID.size()> adjacentPositions;

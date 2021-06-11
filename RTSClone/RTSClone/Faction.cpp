@@ -384,8 +384,11 @@ void Faction::handleWorkerCollisions(const Map& map)
         {
             if (map.isCollidable(worker->getPosition()))
             {
-                glm::vec3 destination = PathFinding::getInstance().getClosestAvailablePosition<Worker>(*worker, m_workers, map);
-                worker->moveTo(destination, map);
+                glm::vec3 destination(0.f);
+                if(PathFinding::getInstance().getClosestAvailablePosition(*worker, m_workers, map, destination))
+                {
+                    worker->moveTo(destination, map);
+                }
             }
             else
             {
@@ -396,9 +399,12 @@ void Faction::handleWorkerCollisions(const Map& map)
                         otherWorker->getCurrentState() == eWorkerState::Idle &&
                         worker->getAABB().contains(otherWorker->getAABB()))
                     {
-                        glm::vec3 destination = PathFinding::getInstance().getClosestAvailablePosition<Worker>(*worker, m_workers, map);
-                        worker->moveTo(destination, map);
-                        break;
+                        glm::vec3 destination(0.f);
+                        if(PathFinding::getInstance().getClosestAvailablePosition(*worker, m_workers, map, destination))
+                        {
+							worker->moveTo(destination, map);
+							break;
+                        }
                     }
                 }
             }
