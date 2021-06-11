@@ -455,6 +455,14 @@ void PathFinding::getPathToPosition(const Entity& entity, const glm::vec3& desti
 					assert(isPathWithinSizeLimit(pathToPosition, map.getSize()));
 				}
 			}
+
+			if (entity.getEntityType() == eEntityType::Worker)
+			{
+				if (isPositionInLineOfSight(startingPositionOnGrid, destinationOnGrid, map, entity) && !pathToPosition.empty())
+				{
+					*pathToPosition.begin() = destination;
+				}
+			}
 		}
 		else
 		{
