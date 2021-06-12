@@ -284,13 +284,16 @@ void FactionAI::update(float deltaTime, const Map & map, FactionHandler& faction
 				m_baseExpansionTimer.setExpirationTime(200.0f);
 				
 				AIOccupiedBase* currentBase = m_occupiedBases.getBase(*availableWorker);
-				assert(currentBase && currentBase->base.get().owningFactionController == getController());
-				m_occupiedBases.removeWorker(*availableWorker);
-				
-				for (const auto& building : availableWorker->getBuildingCommands())
+				if (currentBase)
 				{
-					m_actionQueue.emplace(convertEntityToActionType(building.entityType), *currentBase);
-				}
+					m_occupiedBases.removeWorker(*availableWorker);
+
+					for (const auto& building : availableWorker->getBuildingCommands())
+					{
+						m_actionQueue.emplace(convertEntityToActionType(building.entityType), *currentBase);
+					}
+				}	
+
 				availableWorker->build(availableBase->getCenteredPosition(), map, eEntityType::Headquarters, availableBase, true);
 				m_unattachedToBaseWorkers.addWorker(*availableWorker);
 			}
