@@ -13,8 +13,9 @@ enum class eAIBehaviour
 {
 	Defensive,
 	Expansive,
-	Aggressive,
-	Max = Aggressive
+	Max = Expansive
+	//Aggressive,
+	//Max = Aggressive
 };
 
 class AIUnattachedToBaseWorkers
@@ -64,11 +65,11 @@ protected:
 
 private:
 	const BaseHandler& m_baseHandler;
+	const eAIBehaviour m_currentBehaviour;
 	AIPriorityActionQueue m_actionPriorityQueue;
 	AIUnattachedToBaseWorkers m_unattachedToBaseWorkers;
 	AIOccupiedBases m_occupiedBases;
 	Timer m_baseExpansionTimer;
-	eAIBehaviour m_currentBehaviour;
 	std::queue<AIAction> m_actionQueue;
 	Timer m_delayTimer;
 	Timer m_spawnTimer;

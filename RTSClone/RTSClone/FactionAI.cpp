@@ -42,6 +42,11 @@ namespace
 
 		return true;
 	}
+
+	eAIBehaviour getRandomStartingBehaviour()
+	{
+		return static_cast<eAIBehaviour>(Globals::getRandomNumber(0, static_cast<int>(eAIBehaviour::Max)));
+	}
 }
 
 //AIUnattachedToBaseWorkers
@@ -91,10 +96,10 @@ FactionAI::FactionAI(eFactionController factionController, const glm::vec3& hqSt
 	int startingResources, int startingPopulationCap, const BaseHandler& baseHandler)
 	: Faction(factionController, hqStartingPosition, startingResources, startingPopulationCap),
 	m_baseHandler(baseHandler),
+	m_currentBehaviour(getRandomStartingBehaviour()),
 	m_actionPriorityQueue(AIPriorityActionCompare),
 	m_occupiedBases(baseHandler, *this),
 	m_baseExpansionTimer(Globals::getRandomNumber(AIConstants::MIN_BASE_EXPANSION_TIME, AIConstants::MAX_BASE_EXPANSION_TIME), true),
-	m_currentBehaviour(static_cast<eAIBehaviour>(Globals::getRandomNumber(0, static_cast<int>(eAIBehaviour::Max)))),
 	m_actionQueue(),
 	m_delayTimer(AIConstants::DELAY_TIMER_EXPIRATION, true),
 	m_spawnTimer(Globals::getRandomNumber(AIConstants::MIN_SPAWN_TIMER_EXPIRATION, AIConstants::MAX_SPAWN_TIMER_EXPIRATION), true),
@@ -247,8 +252,8 @@ void FactionAI::update(float deltaTime, const Map & map, FactionHandler& faction
 		break;
 	case eAIBehaviour::Expansive:
 		break;
-	case eAIBehaviour::Aggressive:
-		break;
+	//case eAIBehaviour::Aggressive:
+	//	break;
 	default:
 		assert(false);
 	}
