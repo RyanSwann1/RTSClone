@@ -51,16 +51,9 @@ namespace AI
 	enum class eBehaviour
 	{
 		Defensive,
-		Expansive,
-		Max = Expansive
-		//Aggressive,
-		//Max = Aggressive
+		Aggressive,
+		Max = Aggressive
 	};
-
-	inline eBehaviour getRandomStartingBehaviour()
-	{
-		return static_cast<eBehaviour>(Globals::getRandomNumber(0, static_cast<int>(eBehaviour::Max)));
-	}
 
 	inline const std::array<std::vector<eAIActionType>, static_cast<size_t>(eBehaviour::Max) + 1> STARTING_BUILD_ORDERS
 	{
@@ -75,26 +68,15 @@ namespace AI
 			eAIActionType::SpawnWorker,
 		},
 
-		//Expansive
+		//Aggressive
 		std::vector<eAIActionType> {
 			eAIActionType::SpawnWorker,
 			eAIActionType::SpawnWorker,
-			eAIActionType::BuildTurret,
-			eAIActionType::BuildTurret,
 			eAIActionType::BuildLaboratory,
+			eAIActionType::BuildSupplyDepot,
+			eAIActionType::BuildSupplyDepot,
 			eAIActionType::BuildTurret,
 			eAIActionType::SpawnWorker,
-		},
-
-		//Aggressive
-		//std::vector<eAIActionType> {
-		//	eAIActionType::SpawnWorker,
-		//	eAIActionType::SpawnWorker,
-		//	eAIActionType::BuildLaboratory,
-		//	eAIActionType::BuildSupplyDepot,
-		//	eAIActionType::BuildSupplyDepot,
-		//	eAIActionType::BuildTurret,
-		//	eAIActionType::SpawnWorker,
-		//}
+		}
 	};
 }
