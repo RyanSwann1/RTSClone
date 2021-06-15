@@ -7,7 +7,6 @@
 #include "GameMessages.h"
 #include "GameMessenger.h"
 #include "GameEventHandler.h"
-#include "AIConstants.h"
 #include <limits>
 
 //Levels
@@ -41,11 +40,6 @@ namespace
 		}
 
 		return true;
-	}
-
-	eAIBehaviour getRandomStartingBehaviour()
-	{
-		return static_cast<eAIBehaviour>(Globals::getRandomNumber(0, static_cast<int>(eAIBehaviour::Max)));
 	}
 }
 
@@ -96,16 +90,16 @@ FactionAI::FactionAI(eFactionController factionController, const glm::vec3& hqSt
 	int startingResources, int startingPopulationCap, const BaseHandler& baseHandler)
 	: Faction(factionController, hqStartingPosition, startingResources, startingPopulationCap),
 	m_baseHandler(baseHandler),
-	m_currentBehaviour(getRandomStartingBehaviour()),
+	m_behaviour(AI::getRandomStartingBehaviour()),
 	m_actionPriorityQueue(AIPriorityActionCompare),
 	m_occupiedBases(baseHandler, *this),
-	m_baseExpansionTimer(Globals::getRandomNumber(AIConstants::MIN_BASE_EXPANSION_TIME, AIConstants::MAX_BASE_EXPANSION_TIME), true),
+	m_baseExpansionTimer(Globals::getRandomNumber(AI::MIN_BASE_EXPANSION_TIME, AI::MAX_BASE_EXPANSION_TIME), true),
 	m_actionQueue(),
-	m_delayTimer(AIConstants::DELAY_TIMER_EXPIRATION, true),
-	m_spawnTimer(Globals::getRandomNumber(AIConstants::MIN_SPAWN_TIMER_EXPIRATION, AIConstants::MAX_SPAWN_TIMER_EXPIRATION), true),
+	m_delayTimer(AI::DELAY_TIMER_EXPIRATION, true),
+	m_spawnTimer(Globals::getRandomNumber(AI::MIN_SPAWN_TIMER_EXPIRATION, AI::MAX_SPAWN_TIMER_EXPIRATION), true),
 	m_targetFaction(eFactionController::None)
 {
-	for (const auto& actionType : AIConstants::STARTING_BUILD_ORDERS[Globals::getRandomNumber(0, static_cast<int>(AIConstants::STARTING_BUILD_ORDERS.size() - 1))])
+	for (const auto& actionType : AI::STARTING_BUILD_ORDERS[Globals::getRandomNumber(0, static_cast<int>(AI::STARTING_BUILD_ORDERS.size() - 1))])
 	{
 		m_actionQueue.emplace(actionType, *m_occupiedBases.getBase(getMainHeadquartersPosition()));
 	}
@@ -246,11 +240,11 @@ void FactionAI::update(float deltaTime, const Map & map, FactionHandler& faction
 		}
 	}
 
-	switch (m_currentBehaviour)
+	switch (m_behaviour)
 	{
-	case eAIBehaviour::Defensive:
+	case AI::eBehaviour::Defensive:
 		break;
-	case eAIBehaviour::Expansive:
+	case AI::eBehaviour::Expansive:
 		break;
 	//case eAIBehaviour::Aggressive:
 	//	break;
@@ -262,15 +256,15 @@ void FactionAI::update(float deltaTime, const Map & map, FactionHandler& faction
 	{
 		if (occupiedBase.base.get().owningFactionController == getController())
 		{
-			if (occupiedBase.turretCount < AIConstants::MAX_TURRETS_DEFENSIVE)
+			if (occupiedBase.turretCount < AI::MAX_TURRETS_DEFENSIVE)
 			{
 
 			}
-			if (occupiedBase.supplyDepotCount < AIConstants::MAX_SUPPLY_DEPOT_DEFENSIVE)
+			if (occupiedBase.supplyDepotCount < AI::MAX_SUPPLY_DEPOT_DEFENSIVE)
 			{
 
 			}
-			if (occupiedBase.barracksCount < AIConstants::MAX_BARRACKS_DEFENSIVE)
+			if (occupiedBase.barracksCount < AI::MAX_BARRACKS_DEFENSIVE)
 			{
 
 			}

@@ -6,7 +6,7 @@
 #include <array>
 #include <vector>
 
-namespace AIConstants
+namespace AI
 {
 	constexpr float DELAY_TIMER_EXPIRATION = 5.0f;
 	constexpr float IDLE_TIMER_EXPIRATION = 1.0f;
@@ -44,23 +44,38 @@ namespace AIConstants
 	};
 
 	constexpr int MAX_LABORATORY_ALL = 1;
-
 	constexpr int MAX_SUPPLY_DEPOT_DEFENSIVE = 2;
 	constexpr int MAX_BARRACKS_DEFENSIVE = 2;
 	constexpr int MAX_TURRETS_DEFENSIVE = 4;
 
-	inline const std::array<std::vector<eAIActionType>, 3> STARTING_BUILD_ORDERS
+	enum class eBehaviour
 	{
+		Defensive,
+		Expansive,
+		Max = Expansive
+		//Aggressive,
+		//Max = Aggressive
+	};
+
+	inline eBehaviour getRandomStartingBehaviour()
+	{
+		return static_cast<eBehaviour>(Globals::getRandomNumber(0, static_cast<int>(eBehaviour::Max)));
+	}
+
+	inline const std::array<std::vector<eAIActionType>, static_cast<size_t>(eBehaviour::Max) + 1> STARTING_BUILD_ORDERS
+	{
+		//Defensive
 		std::vector<eAIActionType> {
 			eAIActionType::SpawnWorker,
 			eAIActionType::SpawnWorker,
-			eAIActionType::BuildBarracks,
+			eAIActionType::BuildLaboratory,
 			eAIActionType::BuildBarracks,
 			eAIActionType::BuildTurret,
 			eAIActionType::BuildSupplyDepot,
 			eAIActionType::SpawnWorker,
 		},
 
+		//Expansive
 		std::vector<eAIActionType> {
 			eAIActionType::SpawnWorker,
 			eAIActionType::SpawnWorker,
@@ -71,14 +86,15 @@ namespace AIConstants
 			eAIActionType::SpawnWorker,
 		},
 
-		std::vector<eAIActionType> {
-			eAIActionType::SpawnWorker,
-			eAIActionType::SpawnWorker,
-			eAIActionType::BuildSupplyDepot,
-			eAIActionType::BuildSupplyDepot,
-			eAIActionType::BuildSupplyDepot,
-			eAIActionType::BuildTurret,
-			eAIActionType::SpawnWorker,
-		}
+		//Aggressive
+		//std::vector<eAIActionType> {
+		//	eAIActionType::SpawnWorker,
+		//	eAIActionType::SpawnWorker,
+		//	eAIActionType::BuildLaboratory,
+		//	eAIActionType::BuildSupplyDepot,
+		//	eAIActionType::BuildSupplyDepot,
+		//	eAIActionType::BuildTurret,
+		//	eAIActionType::SpawnWorker,
+		//}
 	};
 }

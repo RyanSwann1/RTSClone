@@ -5,18 +5,10 @@
 #include "Timer.h"
 #include "AIOccupiedBases.h"
 #include "AIAction.h"
+#include "AI.h"
 #include <queue>
 #include <vector>
 #include <functional>
-
-enum class eAIBehaviour
-{
-	Defensive,
-	Expansive,
-	Max = Expansive
-	//Aggressive,
-	//Max = Aggressive
-};
 
 class AIUnattachedToBaseWorkers
 {
@@ -65,7 +57,7 @@ protected:
 
 private:
 	const BaseHandler& m_baseHandler;
-	const eAIBehaviour m_currentBehaviour;
+	const AI::eBehaviour m_behaviour;
 	AIPriorityActionQueue m_actionPriorityQueue;
 	AIUnattachedToBaseWorkers m_unattachedToBaseWorkers;
 	AIOccupiedBases m_occupiedBases;

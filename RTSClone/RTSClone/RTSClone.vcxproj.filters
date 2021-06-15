@@ -485,7 +485,7 @@
     <ClInclude Include="AIAction.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="AIConstants.h">
+    <ClInclude Include="AI.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="MinHeap.h">
