@@ -35,7 +35,7 @@ class FactionAI : public Faction
 {
 public:
 	FactionAI(eFactionController factionController, const glm::vec3& hqStartingPosition, 
-		int startingResources, int startingPopulationCap, const BaseHandler& baseHandler);
+		int startingResources, int startingPopulationCap, AI::eBehaviour behaviour, const BaseHandler& baseHandler);
 
 	bool isWithinRangeOfBuildings(const glm::vec3& position, float distance) const;
 

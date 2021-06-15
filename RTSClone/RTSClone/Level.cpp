@@ -6,6 +6,7 @@
 #include "ModelManager.h"
 #include "UIManager.h"
 #include "Camera.h"
+#include "AI.h"
 #include <imgui/imgui.h>
 
 namespace
@@ -95,7 +96,9 @@ std::unique_ptr<Level> Level::create(const std::string& levelName, glm::ivec2 wi
 	std::unique_ptr<BaseHandler> baseHandler = std::make_unique<BaseHandler>(std::move(mainBases));
 	std::array<std::unique_ptr<Faction>, static_cast<size_t>(eFactionController::Max) + 1> factions;
 	glm::vec2 cameraStartingPosition(0.0f);
-
+	static_assert(static_cast<int>(AI::eBehaviour::Max) == 1, "Current assigning of AI behaviour relies on only two behaviours");
+	int AIBehaviourIndex = 0;
+	
 	assert(factionCount < static_cast<int>(eFactionController::Max) + 1 && 
 		factionCount < static_cast<int>(baseHandler->getBases().size()));
 	for (int i = 0; i < factionCount; ++i)
@@ -116,7 +119,8 @@ std::unique_ptr<Level> Level::create(const std::string& levelName, glm::ivec2 wi
 		case eFactionController::AI_2:
 		case eFactionController::AI_3:
 			factions[i] = std::make_unique<FactionAI>(eFactionController(i), baseHandler->getBases()[i].position,
-				factionStartingResources, factionStartingPopulation, *baseHandler);
+				factionStartingResources, factionStartingPopulation, static_cast<AI::eBehaviour>(AIBehaviourIndex), *baseHandler);
+			AIBehaviourIndex ^= 1;
 			break;
 		default:
 			assert(false);

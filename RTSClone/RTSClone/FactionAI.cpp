@@ -87,10 +87,10 @@ void AIUnattachedToBaseWorkers::remove(const Worker& _worker)
 
 //FactionAI
 FactionAI::FactionAI(eFactionController factionController, const glm::vec3& hqStartingPosition,
-	int startingResources, int startingPopulationCap, const BaseHandler& baseHandler)
+	int startingResources, int startingPopulationCap, AI::eBehaviour behaviour, const BaseHandler& baseHandler)
 	: Faction(factionController, hqStartingPosition, startingResources, startingPopulationCap),
 	m_baseHandler(baseHandler),
-	m_behaviour(AI::getRandomStartingBehaviour()),
+	m_behaviour(behaviour),
 	m_actionPriorityQueue(AIPriorityActionCompare),
 	m_occupiedBases(baseHandler, *this),
 	m_baseExpansionTimer(Globals::getRandomNumber(AI::MIN_BASE_EXPANSION_TIME, AI::MAX_BASE_EXPANSION_TIME), true),
@@ -99,7 +99,7 @@ FactionAI::FactionAI(eFactionController factionController, const glm::vec3& hqSt
 	m_spawnTimer(Globals::getRandomNumber(AI::MIN_SPAWN_TIMER_EXPIRATION, AI::MAX_SPAWN_TIMER_EXPIRATION), true),
 	m_targetFaction(eFactionController::None)
 {
-	for (const auto& actionType : AI::STARTING_BUILD_ORDERS[Globals::getRandomNumber(0, static_cast<int>(AI::STARTING_BUILD_ORDERS.size() - 1))])
+	for (const auto& actionType : AI::STARTING_BUILD_ORDERS[static_cast<size_t>(m_behaviour)])
 	{
 		m_actionQueue.emplace(actionType, *m_occupiedBases.getBase(getMainHeadquartersPosition()));
 	}
@@ -244,10 +244,8 @@ void FactionAI::update(float deltaTime, const Map & map, FactionHandler& faction
 	{
 	case AI::eBehaviour::Defensive:
 		break;
-	case AI::eBehaviour::Expansive:
+	case AI::eBehaviour::Aggressive:
 		break;
-	//case eAIBehaviour::Aggressive:
-	//	break;
 	default:
 		assert(false);
 	}
