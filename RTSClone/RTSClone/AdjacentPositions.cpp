@@ -22,10 +22,11 @@ AdjacentPosition::AdjacentPosition()
 	position()
 {}
 
-AdjacentPosition::AdjacentPosition(const glm::ivec2 & position)
+AdjacentPosition::AdjacentPosition(glm::ivec2 position)
 	: valid(true),
 	position(position)
 {}
+
 
 AdjacentPositions createAdjacentPositions(const Map& map, const AABB& ignoreAABB)
 {
@@ -42,10 +43,10 @@ AdjacentPositions createAdjacentPositions(const Map& map, FactionHandler& factio
 	return [&](const glm::ivec2& position) { return getAdjacentPositions(position, map, factionHandler, unit); };
 }
 
-std::array<AdjacentPosition, ALL_DIRECTIONS_ON_GRID.size()> getAdjacentPositions(const glm::ivec2 & position,
+AdjacentPositionsContainer getAdjacentPositions(const glm::ivec2 & position,
 	const Map & map, const EntitySpawnerBuilding& building)
 {
-	std::array<AdjacentPosition, ALL_DIRECTIONS_ON_GRID.size()> adjacentPositions;
+	AdjacentPositionsContainer adjacentPositions;
 	for (int i = 0; i < adjacentPositions.size(); ++i)
 	{
 		glm::ivec2 adjacentPosition = position + ALL_DIRECTIONS_ON_GRID[i];
@@ -59,7 +60,7 @@ std::array<AdjacentPosition, ALL_DIRECTIONS_ON_GRID.size()> getAdjacentPositions
 	return adjacentPositions;
 }
 
-std::array<AdjacentPosition, ALL_DIRECTIONS_ON_GRID.size()> getRandomAdjacentPositions(const glm::ivec2& position, 
+AdjacentPositionsContainer getRandomAdjacentPositions(const glm::ivec2& position, 
 	const Map& map, const AABB& ignoreAABB)
 {
 	static std::random_device rd;
@@ -67,7 +68,7 @@ std::array<AdjacentPosition, ALL_DIRECTIONS_ON_GRID.size()> getRandomAdjacentPos
 	std::array<glm::ivec2, 8> shuffledAllDirectionsOnGrid = ALL_DIRECTIONS_ON_GRID;
 	std::shuffle(shuffledAllDirectionsOnGrid.begin(), shuffledAllDirectionsOnGrid.end(), g);
 
-	std::array<AdjacentPosition, ALL_DIRECTIONS_ON_GRID.size()> adjacentPositions;
+	AdjacentPositionsContainer adjacentPositions;
 	for (int i = 0; i < adjacentPositions.size(); ++i)
 	{
 		glm::ivec2 adjacentPosition = position + shuffledAllDirectionsOnGrid[i];
@@ -84,14 +85,14 @@ std::array<AdjacentPosition, ALL_DIRECTIONS_ON_GRID.size()> getRandomAdjacentPos
 	return adjacentPositions;
 }
 
-std::array<AdjacentPosition, ALL_DIRECTIONS_ON_GRID.size()> getRandomAdjacentPositions(const glm::ivec2& position, const Map& map, const Unit& unit)
+AdjacentPositionsContainer getRandomAdjacentPositions(const glm::ivec2& position, const Map& map, const Unit& unit)
 {
 	static std::random_device rd;
 	static std::mt19937 g(rd());
 	std::array<glm::ivec2, 8> shuffledAllDirectionsOnGrid = ALL_DIRECTIONS_ON_GRID;
 	std::shuffle(shuffledAllDirectionsOnGrid.begin(), shuffledAllDirectionsOnGrid.end(), g);
 
-	std::array<AdjacentPosition, ALL_DIRECTIONS_ON_GRID.size()> adjacentPositions;
+	AdjacentPositionsContainer adjacentPositions;
 	for (int i = 0; i < adjacentPositions.size(); ++i)
 	{
 		glm::ivec2 adjacentPosition = position + shuffledAllDirectionsOnGrid[i];
@@ -105,9 +106,9 @@ std::array<AdjacentPosition, ALL_DIRECTIONS_ON_GRID.size()> getRandomAdjacentPos
 	return adjacentPositions;
 }
 
-std::array<AdjacentPosition, ALL_DIRECTIONS_ON_GRID.size()> getAllAdjacentPositions(const glm::ivec2& position, const Map& map)
+AdjacentPositionsContainer getAllAdjacentPositions(const glm::ivec2& position, const Map& map)
 {
-	std::array<AdjacentPosition, ALL_DIRECTIONS_ON_GRID.size()> adjacentPositions;
+	AdjacentPositionsContainer adjacentPositions;
 	for (int i = 0; i < adjacentPositions.size(); ++i)
 	{
 		glm::ivec2 adjacentPosition = position + ALL_DIRECTIONS_ON_GRID[i];
@@ -120,9 +121,9 @@ std::array<AdjacentPosition, ALL_DIRECTIONS_ON_GRID.size()> getAllAdjacentPositi
 	return adjacentPositions;
 }
 
-std::array<AdjacentPosition, ALL_DIRECTIONS_ON_GRID.size()> getAdjacentPositions(const glm::ivec2& position, const Map& map)
+AdjacentPositionsContainer getAdjacentPositions(const glm::ivec2& position, const Map& map)
 {
-	std::array<AdjacentPosition, ALL_DIRECTIONS_ON_GRID.size()> adjacentPositions;
+	AdjacentPositionsContainer adjacentPositions;
 	for (int i = 0; i < adjacentPositions.size(); ++i)
 	{
 		glm::ivec2 adjacentPosition = position + ALL_DIRECTIONS_ON_GRID[i];
@@ -135,9 +136,9 @@ std::array<AdjacentPosition, ALL_DIRECTIONS_ON_GRID.size()> getAdjacentPositions
 	return adjacentPositions;
 }
 
-std::array<AdjacentPosition, ALL_DIRECTIONS_ON_GRID.size()> getAdjacentPositions(const glm::ivec2& position, const Map& map, const AABB& ignoreAABB)
+AdjacentPositionsContainer getAdjacentPositions(const glm::ivec2& position, const Map& map, const AABB& ignoreAABB)
 {
-	std::array<AdjacentPosition, ALL_DIRECTIONS_ON_GRID.size()> adjacentPositions;
+	AdjacentPositionsContainer adjacentPositions;
 	for (int i = 0; i < adjacentPositions.size(); ++i)
 	{
 		glm::ivec2 adjacentPosition = position + ALL_DIRECTIONS_ON_GRID[i];
@@ -154,10 +155,10 @@ std::array<AdjacentPosition, ALL_DIRECTIONS_ON_GRID.size()> getAdjacentPositions
 	return adjacentPositions;
 }
 
-std::array<AdjacentPosition, ALL_DIRECTIONS_ON_GRID.size()> getAdjacentPositions(const glm::ivec2& position, 
+AdjacentPositionsContainer getAdjacentPositions(const glm::ivec2& position, 
 	const Map& map, FactionHandler& factionHandler, const Unit& unit)
 {
-	std::array<AdjacentPosition, ALL_DIRECTIONS_ON_GRID.size()> adjacentPositions;
+	AdjacentPositionsContainer adjacentPositions;
 	for (int i = 0; i < static_cast<int>(ALL_DIRECTIONS_ON_GRID.size()); ++i)
 	{
 		glm::ivec2 adjacentPosition = position + ALL_DIRECTIONS_ON_GRID[i];
@@ -172,10 +173,10 @@ std::array<AdjacentPosition, ALL_DIRECTIONS_ON_GRID.size()> getAdjacentPositions
 	return adjacentPositions;
 }
 
-std::array<AdjacentPosition, ALL_DIRECTIONS_ON_GRID.size()> getAdjacentPositions(const glm::ivec2& position, const Map& map, 
+AdjacentPositionsContainer getAdjacentPositions(const glm::ivec2& position, const Map& map, 
 	FactionHandler& factionHandler, const Unit& unit, const AABB& ignoreAABB)
 {
-	std::array<AdjacentPosition, ALL_DIRECTIONS_ON_GRID.size()> adjacentPositions;
+	AdjacentPositionsContainer adjacentPositions;
 	for (int i = 0; i < static_cast<int>(ALL_DIRECTIONS_ON_GRID.size()); ++i)
 	{
 		glm::ivec2 adjacentPosition = position + ALL_DIRECTIONS_ON_GRID[i];

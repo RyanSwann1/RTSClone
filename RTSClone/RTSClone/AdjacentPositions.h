@@ -10,7 +10,7 @@ extern const std::array<glm::ivec2, 8> ALL_DIRECTIONS_ON_GRID;
 struct AdjacentPosition
 {
 	AdjacentPosition();
-	AdjacentPosition(const glm::ivec2& position);
+	AdjacentPosition(glm::ivec2 position);
 
 	bool valid;
 	glm::ivec2 position;
@@ -30,24 +30,24 @@ AdjacentPositions createAdjacentPositions(const Map& map, FactionHandler& factio
 AdjacentPositions createAdjacentPositions(const Map& map, const AABB& ignoreAABB);
 AdjacentPositions createAdjacentPositions(const Map& map);
 
-std::array<AdjacentPosition, ALL_DIRECTIONS_ON_GRID.size()> getAdjacentPositions(const glm::ivec2& position, const Map& map,
+AdjacentPositionsContainer getAdjacentPositions(const glm::ivec2& position, const Map& map,
 	const EntitySpawnerBuilding& building);
 
-std::array<AdjacentPosition, ALL_DIRECTIONS_ON_GRID.size()> getAllAdjacentPositions(const glm::ivec2& position, const Map& map);
+AdjacentPositionsContainer getAllAdjacentPositions(const glm::ivec2& position, const Map& map);
 
-std::array<AdjacentPosition, ALL_DIRECTIONS_ON_GRID.size()> getAdjacentPositions(const glm::ivec2& position, const Map& map);
+AdjacentPositionsContainer getAdjacentPositions(const glm::ivec2& position, const Map& map);
 
-std::array<AdjacentPosition, ALL_DIRECTIONS_ON_GRID.size()> getRandomAdjacentPositions(const glm::ivec2& position, 
+AdjacentPositionsContainer getRandomAdjacentPositions(const glm::ivec2& position,
 	const Map& map, const Unit& unit);
 
-std::array<AdjacentPosition, ALL_DIRECTIONS_ON_GRID.size()> getRandomAdjacentPositions(const glm::ivec2& position, const Map& map, 
+AdjacentPositionsContainer getRandomAdjacentPositions(const glm::ivec2& position, const Map& map,
 	const AABB& ignoreAABB);
 
-std::array<AdjacentPosition, ALL_DIRECTIONS_ON_GRID.size()> getAdjacentPositions(const glm::ivec2& position, const Map& map,
+AdjacentPositionsContainer getAdjacentPositions(const glm::ivec2& position, const Map& map,
 	const AABB& ignoreAABB);
 
-std::array<AdjacentPosition, ALL_DIRECTIONS_ON_GRID.size()> getAdjacentPositions(const glm::ivec2& position, const Map& map,
+AdjacentPositionsContainer getAdjacentPositions(const glm::ivec2& position, const Map& map,
 	FactionHandler& factionHandler, const Unit& unit);
 
-std::array<AdjacentPosition, ALL_DIRECTIONS_ON_GRID.size()> getAdjacentPositions(const glm::ivec2& position, const Map& map,
+AdjacentPositionsContainer getAdjacentPositions(const glm::ivec2& position, const Map& map,
 	FactionHandler& factionHandler, const Unit& unit, const AABB& ignoreAABB);
