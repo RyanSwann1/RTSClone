@@ -10,6 +10,11 @@
 #include <vector>
 #include <functional>
 
+struct AISquad
+{
+	std::vector<std::reference_wrapper<Unit>> units;
+};
+
 class AIUnattachedToBaseWorkers
 {
 public:
@@ -67,6 +72,7 @@ private:
 	Timer m_spawnTimer;
 	eFactionController m_targetFaction;
 	std::vector<std::reference_wrapper<Unit>> m_unitsOnHold;
+	std::vector<AISquad> m_squads;
 
 	void instructWorkersToRepair(const Headquarters& HQ, const Map& map);
 	Worker* getAvailableWorker(const glm::vec3& position);

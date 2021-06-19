@@ -42,6 +42,26 @@ namespace
 		return true;
 	}
 
+	void removeFromSquad(std::vector<AISquad>& squads, const Unit& unit)
+	{
+		for (auto squad = squads.begin(); squad != squads.end(); ++squad)
+		{
+			auto iter = std::find_if(squad->units.begin(), squad->units.end(), [&unit](const auto& squadUnit)
+			{
+				return squadUnit.get().getID() == unit.getID();
+			});
+			if (iter != squad->units.end())
+			{
+				squad->units.erase(iter);
+				if (squad->units.empty())
+				{
+					squads.erase(squad);
+				}
+				break;
+			}
+		}
+	}
+
 	const int MAX_UNITS_ON_HOLD = 3;
 }
 
@@ -308,6 +328,10 @@ void FactionAI::onEntityRemoval(const Entity& entity)
 	if (entity.getEntityType() == eEntityType::Worker)
 	{
 		m_occupiedBases.removeWorker(static_cast<const Worker&>(entity));
+	}
+	else if (entity.getEntityType() == eEntityType::Unit)
+	{
+		removeFromSquad(m_squads, static_cast<const Unit&>(entity));
 	}
 	else if(Globals::BUILDING_TYPES.isMatch(entity.getEntityType()))
 	{
@@ -642,16 +666,18 @@ Entity* FactionAI::createUnit(const Map& map, const Barracks& barracks, FactionH
 	{
 		assert(std::find_if(m_unitsOnHold.cbegin(), m_unitsOnHold.cend(), [spawnedUnit](const auto& unit)
 		{
-			return unit.get().getID() == spawnedUnit->getID();// ID;
+			return unit.get().getID() == spawnedUnit->getID();
 		}) == m_unitsOnHold.cend());
 
 		assert(spawnedUnit->getEntityType() == eEntityType::Unit);
 		m_unitsOnHold.push_back(static_cast<Unit&>(*spawnedUnit));
 		if (m_unitsOnHold.size() == MAX_UNITS_ON_HOLD)
 		{
+			m_squads.emplace_back();
 			for (auto iter = m_unitsOnHold.begin(); iter != m_unitsOnHold.end();)
 			{
 				Unit& unitOnHold = *iter;
+				m_squads.back().units.push_back(unitOnHold);
 				iter = m_unitsOnHold.erase(iter);
 				onUnitEnteredIdleState(unitOnHold, map, factionHandler);
 			}
