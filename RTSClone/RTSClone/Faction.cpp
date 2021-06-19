@@ -74,6 +74,12 @@ int Faction::getCurrentResourceAmount() const
     return m_currentResourceAmount;
 }
 
+const Headquarters& Faction::getMainHeadquarters() const
+{
+    assert(!m_headquarters.empty());
+    return *m_headquarters.front();
+}
+
 const Headquarters& Faction::getClosestHeadquarters(const glm::vec3& position) const
 {
     const Headquarters* closestHeadquarters = nullptr;

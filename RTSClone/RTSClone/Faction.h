@@ -37,6 +37,7 @@ public:
 	int getCurrentPopulationAmount() const;
 	int getMaximumPopulationAmount() const;
 	int getCurrentResourceAmount() const;
+	const Headquarters& getMainHeadquarters() const;
 	const Headquarters& getClosestHeadquarters(const glm::vec3& position) const;
 	const glm::vec3& getMainHeadquartersPosition() const;
 	eFactionController getController() const;

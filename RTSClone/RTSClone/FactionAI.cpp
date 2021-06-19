@@ -212,13 +212,6 @@ void FactionAI::update(float deltaTime, const Map & map, FactionHandler& faction
 {
 	Faction::update(deltaTime, map, factionHandler, unitStateHandlerTimer);
 
-	m_spawnTimer.update(deltaTime);
-	if (m_spawnTimer.isExpired())
-	{
-		m_spawnTimer.resetElaspedTime();
-		//Spawn Unit
-	}
-
 	m_delayTimer.update(deltaTime);
 	if (m_delayTimer.isExpired())
 	{
@@ -245,6 +238,14 @@ void FactionAI::update(float deltaTime, const Map & map, FactionHandler& faction
 	case AI::eBehaviour::Defensive:
 		break;
 	case AI::eBehaviour::Aggressive:
+		m_spawnTimer.update(deltaTime);
+		if (m_spawnTimer.isExpired())
+		{
+			m_spawnTimer.resetElaspedTime();
+			AIOccupiedBase* occupiedBase = m_occupiedBases.getBase(getMainHeadquarters());
+			assert(occupiedBase);
+			build(map, eEntityType::Unit, *occupiedBase);
+		}
 		break;
 	default:
 		assert(false);
@@ -256,7 +257,7 @@ void FactionAI::update(float deltaTime, const Map & map, FactionHandler& faction
 		{
 			if (occupiedBase.turretCount < AI::MAX_TURRETS_DEFENSIVE)
 			{
-
+			
 			}
 			if (occupiedBase.supplyDepotCount < AI::MAX_SUPPLY_DEPOT_DEFENSIVE)
 			{
@@ -565,9 +566,9 @@ Entity* FactionAI::createBuilding(const Map& map, const Worker& worker)
 	{
 		switch (spawnedBuilding->getEntityType())
 		{
-			case eEntityType::Barracks:
 			case eEntityType::SupplyDepot:
 			case eEntityType::Turret:
+			case eEntityType::Barracks:
 				m_occupiedBases.addBuilding(worker, *spawnedBuilding);
 			break;
 			case eEntityType::Laboratory:

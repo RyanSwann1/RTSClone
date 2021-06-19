@@ -62,9 +62,9 @@ namespace AI
 			eAIActionType::SpawnWorker,
 			eAIActionType::SpawnWorker,
 			eAIActionType::BuildLaboratory,
-			eAIActionType::BuildBarracks,
-			eAIActionType::BuildTurret,
 			eAIActionType::BuildSupplyDepot,
+			eAIActionType::BuildSupplyDepot,
+			eAIActionType::BuildTurret,
 			eAIActionType::SpawnWorker,
 		},
 
@@ -73,10 +73,10 @@ namespace AI
 			eAIActionType::SpawnWorker,
 			eAIActionType::SpawnWorker,
 			eAIActionType::BuildLaboratory,
-			eAIActionType::BuildSupplyDepot,
-			eAIActionType::BuildSupplyDepot,
+			eAIActionType::BuildBarracks,
 			eAIActionType::BuildTurret,
+			eAIActionType::BuildSupplyDepot,
 			eAIActionType::SpawnWorker,
-		}
+		},
 	};
 }
