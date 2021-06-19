@@ -19,19 +19,11 @@ const std::array<glm::ivec2, 8> ALL_DIRECTIONS_ON_GRID =
 
 AdjacentPosition::AdjacentPosition()
 	: valid(false),
-	used(false),
 	position()
 {}
 
 AdjacentPosition::AdjacentPosition(const glm::ivec2 & position)
 	: valid(true),
-	used(false),
-	position(position)
-{}
-
-AdjacentPosition::AdjacentPosition(const glm::ivec2 & position, bool valid)
-	: valid(valid),
-	used(false),
 	position(position)
 {}
 
@@ -60,8 +52,7 @@ std::array<AdjacentPosition, ALL_DIRECTIONS_ON_GRID.size()> getAdjacentPositions
 		if (map.isWithinBounds(adjacentPosition) && map.isPositionOnUnitMapAvailable(adjacentPosition, Globals::INVALID_ENTITY_ID) &&
 			(building.getAABB().contains(Globals::convertToWorldPosition(adjacentPosition)) || !map.isPositionOccupied(adjacentPosition)))
 		{
-			adjacentPositions[i] = AdjacentPosition(adjacentPosition, true);
-			bool unitCollision = false;
+			adjacentPositions[i] = AdjacentPosition(adjacentPosition);
 		}
 	}
 

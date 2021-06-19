@@ -11,10 +11,8 @@ struct AdjacentPosition
 {
 	AdjacentPosition();
 	AdjacentPosition(const glm::ivec2& position);
-	AdjacentPosition(const glm::ivec2& position, bool valid);
 
 	bool valid;
-	bool used;
 	glm::ivec2 position;
 };
 
