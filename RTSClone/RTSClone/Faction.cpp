@@ -797,7 +797,7 @@ const Entity* Faction::createUnit(const Map& map, const Barracks& barracks, Fact
     if (m_units.size() < MAX_UNITS &&
         isAffordable(eEntityType::Unit) && 
         !isExceedPopulationLimit(eEntityType::Unit) &&
-        PathFinding::getInstance().getClosestAvailableEntitySpawnPosition(barracks, m_units, m_workers, map, startingPosition))
+        PathFinding::getInstance().getClosestAvailableEntitySpawnPosition(barracks, map, startingPosition))
     {
         glm::vec3 startingRotation = { 0.0f, Globals::getAngle(startingPosition, barracks.getPosition()), 0.0f };
         if (barracks.isWaypointActive())
@@ -826,7 +826,7 @@ Entity* Faction::createWorker(const Map& map, const Headquarters& headquarters)
     if (m_workers.size() < MAX_WORKERS &&
         isAffordable(eEntityType::Worker) && 
         !isExceedPopulationLimit(eEntityType::Worker) &&
-        PathFinding::getInstance().getClosestAvailableEntitySpawnPosition(headquarters, m_units, m_workers, map, startingPosition))
+        PathFinding::getInstance().getClosestAvailableEntitySpawnPosition(headquarters, map, startingPosition))
     {
         glm::vec3 startingRotation = { 0.0f, Globals::getAngle(startingPosition, headquarters.getPosition()), 0.0f };
         if (headquarters.isWaypointActive())

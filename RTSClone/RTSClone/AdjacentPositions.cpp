@@ -51,41 +51,17 @@ AdjacentPositions createAdjacentPositions(const Map& map, FactionHandler& factio
 }
 
 std::array<AdjacentPosition, ALL_DIRECTIONS_ON_GRID.size()> getAdjacentPositions(const glm::ivec2 & position,
-	const Map & map, const std::vector<std::unique_ptr<Unit>> & units, const std::vector<std::unique_ptr<Worker>>& workers, const AABB& ignoreAABB)
+	const Map & map, const EntitySpawnerBuilding& building)
 {
 	std::array<AdjacentPosition, ALL_DIRECTIONS_ON_GRID.size()> adjacentPositions;
 	for (int i = 0; i < adjacentPositions.size(); ++i)
 	{
 		glm::ivec2 adjacentPosition = position + ALL_DIRECTIONS_ON_GRID[i];
-		if (map.isWithinBounds(adjacentPosition) && 
-			ignoreAABB.contains(Globals::convertToWorldPosition(adjacentPosition)) || !map.isPositionOccupied(adjacentPosition))
+		if (map.isWithinBounds(adjacentPosition) && map.isPositionOnUnitMapAvailable(adjacentPosition, Globals::INVALID_ENTITY_ID) &&
+			(building.getAABB().contains(Globals::convertToWorldPosition(adjacentPosition)) || !map.isPositionOccupied(adjacentPosition)))
 		{
+			adjacentPositions[i] = AdjacentPosition(adjacentPosition, true);
 			bool unitCollision = false;
-			for (const auto& unit : units)
-			{
-				if (unit->getAABB().contains(Globals::convertToWorldPosition(adjacentPosition)))
-				{
-					unitCollision = true;
-					break;
-				}
-			}
-
-			if (!unitCollision)
-			{
-				for (const auto& harvester : workers)
-				{
-					if (harvester->getAABB().contains(Globals::convertToWorldPosition(adjacentPosition)))
-					{
-						unitCollision = true;
-						break;
-					}
-				}
-			}
-
-			if (!unitCollision)
-			{
-				adjacentPositions[i] = AdjacentPosition(adjacentPosition, true);
-			}
 		}
 	}
 

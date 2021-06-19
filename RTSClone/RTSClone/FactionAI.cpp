@@ -241,7 +241,7 @@ void FactionAI::update(float deltaTime, const Map & map, FactionHandler& faction
 		m_spawnTimer.update(deltaTime);
 		if (m_spawnTimer.isExpired())
 		{
-			m_spawnTimer.resetElaspedTime();
+			//m_spawnTimer.resetElaspedTime();
 			AIOccupiedBase* occupiedBase = m_occupiedBases.getBase(getMainHeadquarters());
 			assert(occupiedBase);
 			build(map, eEntityType::Unit, *occupiedBase);
