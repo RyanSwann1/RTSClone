@@ -69,9 +69,20 @@ Level::Level(std::vector<SceneryGameObject>&& scenery, FactionsContainer&& facti
 {
 	for (auto& faction : m_factions)
 	{
-		if (faction && faction->getController() != eFactionController::Player)
+		if (faction)
 		{
-			static_cast<FactionAI&>(*faction.get()).setTargetFaction(m_factionHandler);
+			switch (faction->getController())
+			{
+				case eFactionController::Player:
+				break;
+				case eFactionController::AI_1:
+				case eFactionController::AI_2:
+				case eFactionController::AI_3:
+					static_cast<FactionAI&>(*faction.get()).setTargetFaction(m_factionHandler);
+				break;
+				default:
+				assert(false);
+			}	
 		}
 	}
 
