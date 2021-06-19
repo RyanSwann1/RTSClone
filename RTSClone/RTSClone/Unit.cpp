@@ -32,7 +32,6 @@ Unit::Unit(Faction& owningFaction, const glm::vec3& startingPosition, const glm:
 	m_attackTimer(TIME_BETWEEN_ATTACK, true),
 	m_targetEntity()
 {
-	switchToState(m_currentState, map, factionHandler);
 	broadcastToMessenger<GameMessages::AddUnitPositionToMap>({ m_position, getID() });
 }
 

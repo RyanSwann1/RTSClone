@@ -48,7 +48,7 @@ public:
 	void onFactionElimination(FactionHandler& factionHandler, eFactionController eliminatedFaction);
 	void handleEvent(const GameEvent& gameEvent, const Map& map, FactionHandler& factionHandler) override;
 	void selectEntity(const glm::vec3& position);
-	const Entity* createUnit(const Map& map, const Barracks& barracks, FactionHandler& factionHandler) override;
+	Entity* createUnit(const Map& map, const Barracks& barracks, FactionHandler& factionHandler) override;
 	Entity* createWorker(const Map& map, const Headquarters& headquarters) override;
 	void update(float deltaTime, const Map& map, FactionHandler& factionHandler, const Timer& unitStateHandlerTimer) override;
 
@@ -66,6 +66,7 @@ private:
 	Timer m_delayTimer;
 	Timer m_spawnTimer;
 	eFactionController m_targetFaction;
+	std::vector<std::reference_wrapper<Unit>> m_unitsOnHold;
 
 	void instructWorkersToRepair(const Headquarters& HQ, const Map& map);
 	Worker* getAvailableWorker(const glm::vec3& position);

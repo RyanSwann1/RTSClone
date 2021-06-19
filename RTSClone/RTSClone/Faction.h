@@ -52,7 +52,7 @@ public:
 	virtual void onUnitEnteredIdleState(Unit& unit, const Map& map, FactionHandler& factionHandler) {}
 	virtual void onWorkerEnteredIdleState(Worker& worker, const Map& map) {}
 	virtual void onUnitTakenDamage(const TakeDamageEvent& gameEvent, Unit& unit, const Map& map, FactionHandler& factionHandler) const {}
-	virtual const Entity* createUnit(const Map& map, const Barracks& barracks, FactionHandler& factionHandler);
+	virtual Entity* createUnit(const Map& map, const Barracks& barracks, FactionHandler& factionHandler);
 	virtual Entity* createWorker(const Map& map, const Headquarters& headquarters);
 	virtual Entity* createBuilding(const Map& map, const Worker& worker);
 	virtual bool increaseShield(const Laboratory& laboratory);

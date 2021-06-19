@@ -41,6 +41,8 @@ namespace
 
 		return true;
 	}
+
+	const int MAX_UNITS_ON_HOLD = 3;
 }
 
 //AIUnattachedToBaseWorkers
@@ -103,6 +105,8 @@ FactionAI::FactionAI(eFactionController factionController, const glm::vec3& hqSt
 	{
 		m_actionQueue.emplace(actionType, *m_occupiedBases.getBase(getMainHeadquartersPosition()));
 	}
+
+	m_unitsOnHold.reserve(m_units.capacity());
 }
 
 void FactionAI::setTargetFaction(FactionHandler& factionHandler)
@@ -241,7 +245,7 @@ void FactionAI::update(float deltaTime, const Map & map, FactionHandler& faction
 		m_spawnTimer.update(deltaTime);
 		if (m_spawnTimer.isExpired())
 		{
-			//m_spawnTimer.resetElaspedTime();
+			m_spawnTimer.resetElaspedTime();
 			AIOccupiedBase* occupiedBase = m_occupiedBases.getBase(getMainHeadquarters());
 			assert(occupiedBase);
 			build(map, eEntityType::Unit, *occupiedBase);
@@ -447,7 +451,12 @@ bool FactionAI::isWithinRangeOfBuildings(const glm::vec3& position, float distan
 void FactionAI::onUnitEnteredIdleState(Unit& unit, const Map& map, FactionHandler& factionHandler)
 {
 	assert(unit.getCurrentState() == eUnitState::Idle);
-	if (m_targetFaction != eFactionController::None)
+	int unitID = unit.getID();
+	auto unitOnHold = std::find_if(m_unitsOnHold.cbegin(), m_unitsOnHold.cend(), [unitID](const auto& unit)
+	{
+		return unit.get().getID() == unitID;
+	});
+	if (unitOnHold == m_unitsOnHold.cend() && m_targetFaction != eFactionController::None)
 	{
 		if (factionHandler.isFactionActive(m_targetFaction))
 		{
@@ -617,9 +626,9 @@ Entity* FactionAI::createBuilding(const Map& map, const Worker& worker)
 	return spawnedBuilding;
 }
 
-const Entity* FactionAI::createUnit(const Map& map, const Barracks& barracks, FactionHandler& factionHandler)
+Entity* FactionAI::createUnit(const Map& map, const Barracks& barracks, FactionHandler& factionHandler)
 {
-	const Entity* spawnedUnit = Faction::createUnit(map, barracks, factionHandler);
+	Entity* spawnedUnit = Faction::createUnit(map, barracks, factionHandler);
 	if (!spawnedUnit)
 	{
 		AIOccupiedBase* occupiedBase = m_occupiedBases.getBase(barracks);
@@ -627,6 +636,25 @@ const Entity* FactionAI::createUnit(const Map& map, const Barracks& barracks, Fa
 		{
 			assert(occupiedBase->base.get().owningFactionController == getController());
 			m_actionQueue.emplace(eAIActionType::SpawnUnit, *occupiedBase);
+		}
+	}
+	else
+	{
+		assert(std::find_if(m_unitsOnHold.cbegin(), m_unitsOnHold.cend(), [spawnedUnit](const auto& unit)
+		{
+			return unit.get().getID() == spawnedUnit->getID();// ID;
+		}) == m_unitsOnHold.cend());
+
+		assert(spawnedUnit->getEntityType() == eEntityType::Unit);
+		m_unitsOnHold.push_back(static_cast<Unit&>(*spawnedUnit));
+		if (m_unitsOnHold.size() == MAX_UNITS_ON_HOLD)
+		{
+			for (auto iter = m_unitsOnHold.begin(); iter != m_unitsOnHold.end();)
+			{
+				Unit& unitOnHold = *iter;
+				iter = m_unitsOnHold.erase(iter);
+				onUnitEnteredIdleState(unitOnHold, map, factionHandler);
+			}
 		}
 	}
 

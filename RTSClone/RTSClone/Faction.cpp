@@ -790,7 +790,7 @@ bool Faction::isMineralInUse(const Mineral& mineral) const
     return false;
 }
 
-const Entity* Faction::createUnit(const Map& map, const Barracks& barracks, FactionHandler& factionHandler)
+Entity* Faction::createUnit(const Map& map, const Barracks& barracks, FactionHandler& factionHandler)
 {
     assert(barracks.getCurrentSpawnCount() > 0);
     glm::vec3 startingPosition(0.0f);
