@@ -56,7 +56,8 @@ MinHeap::MinHeap()
 
 MinHeap::~MinHeap()
 {
-
+	//Don't unsub, currently existing in static memory
+	//unsubscribeToMessenger<GameMessages::NewMapSize>(this);
 }
 
 bool MinHeap::isEmpty() const
