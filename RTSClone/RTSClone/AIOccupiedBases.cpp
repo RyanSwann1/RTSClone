@@ -102,7 +102,7 @@ AIOccupiedBases::AIOccupiedBases(const BaseHandler& baseHandler, const FactionAI
 	}
 }
 
-const std::vector<AIOccupiedBase>& AIOccupiedBases::getBases() const
+std::vector<AIOccupiedBase>& AIOccupiedBases::getBases()
 {
 	return m_bases;
 }

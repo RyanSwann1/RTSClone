@@ -212,19 +212,6 @@ void FactionAI::handleEvent(const GameEvent& gameEvent, const Map& map, FactionH
 				}
 			}
 		}
-
-		if (occupiedBase->base.get().getCenteredPosition() != getMainHeadquartersPosition())
-		{
-			for (int i = occupiedBase->turretCount; i < 2; ++i)
-			{
-				m_actionQueue.emplace(eAIActionType::BuildTurret, *occupiedBase);
-			}
-
-			for (int i = occupiedBase->workers.size(); i < 2; ++i)
-			{
-				m_actionQueue.emplace(eAIActionType::SpawnWorker, *occupiedBase);
-			}
-		}
 	}
 	break;
 	case eGameEventType::DetachFactionFromBase:
@@ -265,11 +252,26 @@ void FactionAI::update(float deltaTime, const Map & map, FactionHandler& faction
 				m_actionQueue.pop();
 			}
 		}
-		else if (!m_actionPriorityQueue.empty())
+		if (!m_actionPriorityQueue.empty())
 		{
-			if (handleAction(m_actionPriorityQueue.top().action, map))
+			if (handleAction(m_actionPriorityQueue.top(), map))
 			{
 				m_actionPriorityQueue.pop();
+			}
+		}
+
+		for (auto& occupiedBase : m_occupiedBases.getBases())
+		{
+			if (occupiedBase.base.get().owningFactionController == getController())
+			{
+				if (occupiedBase.workers.size() < AI::MIN_WORKERS_AT_BASE)
+				{
+					m_actionQueue.emplace(eAIActionType::SpawnWorker, occupiedBase);
+				}
+				else if (occupiedBase.workers.size() < occupiedBase.base.get().minerals.size())
+				{
+					m_actionPriorityQueue.emplace(getEntityModifier(eEntityType::Worker, m_behaviour), eAIActionType::SpawnWorker, occupiedBase);
+				}	
 			}
 		}
 	}
@@ -290,25 +292,6 @@ void FactionAI::update(float deltaTime, const Map & map, FactionHandler& faction
 		break;
 	default:
 		assert(false);
-	}
-
-	for (const auto& occupiedBase : m_occupiedBases.getBases())
-	{
-		if (occupiedBase.base.get().owningFactionController == getController())
-		{
-			if (occupiedBase.turretCount < AI::MAX_TURRETS_DEFENSIVE)
-			{
-			
-			}
-			if (occupiedBase.supplyDepotCount < AI::MAX_SUPPLY_DEPOT_DEFENSIVE)
-			{
-
-			}
-			if (occupiedBase.barracksCount < AI::MAX_BARRACKS_DEFENSIVE)
-			{
-
-			}
-		}
 	}
 
 	m_baseExpansionTimer.update(deltaTime);

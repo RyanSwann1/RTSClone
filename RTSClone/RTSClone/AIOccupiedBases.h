@@ -42,7 +42,7 @@ public:
 	AIOccupiedBases(AIOccupiedBases&&) = delete;
 	AIOccupiedBases& operator=(AIOccupiedBases&&) = delete;
 
-	const std::vector<AIOccupiedBase>& getBases() const;
+	std::vector<AIOccupiedBase>& getBases();
 	AIOccupiedBase& getBase(const Base& base);
 	AIOccupiedBase* getBase(const glm::vec3& position);
 	AIOccupiedBase* getBase(const Entity& entity);

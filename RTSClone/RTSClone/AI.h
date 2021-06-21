@@ -17,36 +17,11 @@ namespace AI
 	constexpr float DISTANCE_FROM_MINERALS = static_cast<float>(Globals::NODE_SIZE) * 7.0f;
 	constexpr float MIN_BASE_EXPANSION_TIME = 2.0f;
 	constexpr float MAX_BASE_EXPANSION_TIME = MIN_BASE_EXPANSION_TIME * 2.0f;
+	
+	constexpr int MIN_WORKERS_AT_BASE = 2;
 
 	//Defensive
 	constexpr size_t DEFENSIVE_MAX_TURRETS = 5;
-
-	inline const std::array<int, static_cast<size_t>(eEntityType::Max) + 1> MAX_BASE_BUILDINGS_DEFENSIVE
-	{
-		1,
-		1,
-		1,
-		2,
-		1,
-		4,
-		1
-	};
-
-	inline const std::array<int, static_cast<size_t>(eEntityType::Max) + 1> ENTITY_MODIFIERS_DEFENSIVE
-	{
-		1,
-		2,
-		1,
-		1,
-		2,
-		4,
-		1
-	};
-
-	constexpr int MAX_LABORATORY_ALL = 1;
-	constexpr int MAX_SUPPLY_DEPOT_DEFENSIVE = 2;
-	constexpr int MAX_BARRACKS_DEFENSIVE = 2;
-	constexpr int MAX_TURRETS_DEFENSIVE = 4;
 
 	enum class eBehaviour
 	{
@@ -54,6 +29,39 @@ namespace AI
 		Aggressive,
 		Max = Aggressive
 	};
+
+	inline const std::array<int, static_cast<size_t>(eEntityType::Max) + 1> ENTITY_MODIFIERS_DEFENSIVE
+	{
+		1, //Unit
+		4, //Worker
+		1, //Headquarters
+		1, //SupplyDepot
+		2, //Barracks
+		3, //Turret
+		1  //Laboratory
+	};
+
+	inline const std::array<int, static_cast<size_t>(eEntityType::Max) + 1> ENTITY_MODIFIERS_AGGRESSIVE
+	{
+		1, //Unit
+		4, //Worker
+		1, //Headquarters
+		1, //SupplyDepot
+		2, //Barracks
+		3, //Turret
+		1  //Laboratory
+	};
+
+	inline int getEntityModifier(eEntityType entityType, eBehaviour behaviour)
+	{
+		if (behaviour == eBehaviour::Defensive) { return ENTITY_MODIFIERS_DEFENSIVE[static_cast<int>(behaviour)]; }
+		else { return ENTITY_MODIFIERS_AGGRESSIVE[static_cast<int>(behaviour)]; }
+	}
+
+	constexpr int MAX_LABORATORY_ALL = 1;
+	constexpr int MAX_SUPPLY_DEPOT_DEFENSIVE = 2;
+	constexpr int MAX_BARRACKS_DEFENSIVE = 2;
+	constexpr int MAX_TURRETS_DEFENSIVE = 4;
 
 	inline const std::array<std::vector<eAIActionType>, static_cast<size_t>(eBehaviour::Max) + 1> STARTING_BUILD_ORDERS
 	{
