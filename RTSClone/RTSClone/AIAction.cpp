@@ -9,9 +9,9 @@ AIAction::AIAction(eAIActionType actionType, AIOccupiedBase& base)
 {}
 
 //AIPriorityAction
-AIPriorityAction::AIPriorityAction(int weight, AIAction action)
-	: weight(weight),
-	action(action)
+AIPriorityAction::AIPriorityAction(int weight, eAIActionType actionType, AIOccupiedBase& base)
+	: AIAction(actionType, base),
+	weight(weight)
 {}
 
 bool convertActionTypeToEntityType(eAIActionType actionType, eEntityType& entityType)

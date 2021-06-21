@@ -24,12 +24,11 @@ struct AIAction
 	std::reference_wrapper<AIOccupiedBase> base;
 };
 
-struct AIPriorityAction
+struct AIPriorityAction : public AIAction
 {
-	AIPriorityAction(int weight, AIAction action);
+	AIPriorityAction(int weight, eAIActionType actionType, AIOccupiedBase& base);
 
 	int weight;
-	AIAction action;
 };
 
 const auto AIPriorityActionCompare = [](const auto& a, const auto& b) -> bool { return b.weight > a.weight; };
