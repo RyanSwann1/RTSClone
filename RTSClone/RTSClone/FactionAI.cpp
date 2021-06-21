@@ -62,6 +62,23 @@ namespace
 		}
 	}
 
+	AISquad* getSquad(std::vector<AISquad>& squads, const Unit& unit)
+	{
+		for (auto& squad : squads)
+		{
+			auto iter = std::find_if(squad.units.begin(), squad.units.end(), [&unit](const auto& unitInSquad)
+			{
+				return unitInSquad.get().getID() == unit.getID();
+			});
+			if (iter != squad.units.end())
+			{
+				return &squad;
+			}
+		}
+
+		return nullptr;
+	}
+
 	const int MAX_UNITS_ON_HOLD = 3;
 }
 
@@ -534,7 +551,7 @@ void FactionAI::onWorkerEnteredIdleState(Worker& worker, const Map& map)
 	}
 }
 
-void FactionAI::onUnitTakenDamage(const TakeDamageEvent& gameEvent, Unit& unit, const Map& map, FactionHandler& factionHandler) const
+void FactionAI::onUnitTakenDamage(const TakeDamageEvent& gameEvent, Unit& unit, const Map& map, FactionHandler& factionHandler) 
 {
 	assert(!unit.isDead());
 	if (!factionHandler.isFactionActive(gameEvent.senderFaction))
@@ -571,7 +588,14 @@ void FactionAI::onUnitTakenDamage(const TakeDamageEvent& gameEvent, Unit& unit, 
 		const Entity* targetEntity = opposingFaction.getEntity(gameEvent.senderID, gameEvent.senderEntityType);
 		if (targetEntity)
 		{
-			unit.moveToAttackPosition(*targetEntity, opposingFaction, map, factionHandler);
+			AISquad* squad = getSquad(m_squads, unit);
+			if (squad)
+			{
+				for (auto& unitInSquad : squad->units)
+				{
+					unitInSquad.get().moveToAttackPosition(*targetEntity, opposingFaction, map, factionHandler);
+				}
+			}
 		}	
 	}
 }

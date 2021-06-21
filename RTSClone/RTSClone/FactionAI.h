@@ -46,7 +46,7 @@ public:
 
 	void onUnitEnteredIdleState(Unit& unit, const Map& map, FactionHandler& factionHandler) override;
 	void onWorkerEnteredIdleState(Worker& worker, const Map& map) override;
-	void onUnitTakenDamage(const TakeDamageEvent& gameEvent, Unit& unit, const Map& map, FactionHandler& factionHandler) const override;
+	void onUnitTakenDamage(const TakeDamageEvent& gameEvent, Unit& unit, const Map& map, FactionHandler& factionHandler) override;
 	bool increaseShield(const Laboratory& laboratory) override;
 	Entity* createBuilding(const Map& map, const Worker& worker) override;
 	void setTargetFaction(FactionHandler& factionHandler);
