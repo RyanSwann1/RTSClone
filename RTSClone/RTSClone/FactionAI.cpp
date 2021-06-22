@@ -82,48 +82,6 @@ namespace
 	const int MAX_UNITS_ON_HOLD = 3;
 }
 
-//AIUnattachedToBaseWorkers
-AIUnattachedToBaseWorkers::AIUnattachedToBaseWorkers()
-	: m_unattachedToBaseWorkers() {}
-
-bool AIUnattachedToBaseWorkers::isEmpty() const
-{
-	return m_unattachedToBaseWorkers.empty();
-}
-
-Worker& AIUnattachedToBaseWorkers::getClosestWorker(const glm::vec3& position)
-{
-	assert(!m_unattachedToBaseWorkers.empty());
-	std::sort(m_unattachedToBaseWorkers.begin(), m_unattachedToBaseWorkers.end(), [&position](const auto& a, const auto& b)
-	{
-		return Globals::getSqrDistance(position, a.get().getPosition()) > Globals::getSqrDistance(position, b.get().getPosition());
-	});
-	Worker& worker = m_unattachedToBaseWorkers.back();
-	m_unattachedToBaseWorkers.pop_back();
-	return worker;
-}
-
-void AIUnattachedToBaseWorkers::addWorker(Worker& _worker)
-{
-	if (std::find_if(m_unattachedToBaseWorkers.cbegin(), m_unattachedToBaseWorkers.cend(), [&_worker](const auto& worker)
-	{
-		return _worker.getID() == worker.get().getID();
-	}) == m_unattachedToBaseWorkers.cend())
-	{
-		m_unattachedToBaseWorkers.emplace_back(_worker);
-	}
-}
-
-void AIUnattachedToBaseWorkers::remove(const Worker& _worker)
-{
-	auto iter = std::find_if(m_unattachedToBaseWorkers.begin(), m_unattachedToBaseWorkers.end(), [&_worker](const auto& worker)
-	{
-		return _worker.getID() == worker.get().getID();
-	});
-	assert(iter != m_unattachedToBaseWorkers.end());
-	m_unattachedToBaseWorkers.erase(iter);
-}
-
 //FactionAI
 FactionAI::FactionAI(eFactionController factionController, const glm::vec3& hqStartingPosition,
 	int startingResources, int startingPopulationCap, AI::eBehaviour behaviour, const BaseHandler& baseHandler)
@@ -131,17 +89,15 @@ FactionAI::FactionAI(eFactionController factionController, const glm::vec3& hqSt
 	m_baseHandler(baseHandler),
 	m_behaviour(behaviour),
 	m_actionPriorityQueue(AIPriorityActionCompare),
-	m_occupiedBases(baseHandler, *this),
+	m_occupiedBases(baseHandler, getController()),
 	m_baseExpansionTimer(Globals::getRandomNumber(AI::MIN_BASE_EXPANSION_TIME, AI::MAX_BASE_EXPANSION_TIME), true),
 	m_actionQueue(),
 	m_delayTimer(AI::DELAY_TIMER_EXPIRATION, true),
 	m_spawnTimer(Globals::getRandomNumber(AI::MIN_SPAWN_TIMER_EXPIRATION, AI::MAX_SPAWN_TIMER_EXPIRATION), true),
 	m_targetFaction(eFactionController::None)
 {
-	for (const auto& actionType : AI::STARTING_BUILD_ORDERS[static_cast<size_t>(m_behaviour)])
-	{
-		m_actionQueue.emplace(actionType, *m_occupiedBases.getBase(getMainHeadquartersPosition()));
-	}
+	//AIOccupiedBase& startingOccupiedBase = m_occupiedBases.addBase(m_baseHandler.getBase(getMainHeadquartersPosition()));
+
 
 	m_unitsOnHold.reserve(m_units.capacity());
 }
@@ -195,17 +151,23 @@ void FactionAI::handleEvent(const GameEvent& gameEvent, const Map& map, FactionH
 	}
 	break;
 	case eGameEventType::AttachFactionToBase:
-	{
-		AIOccupiedBase* occupiedBase = m_occupiedBases.getBase(gameEvent.data.attachFactionToBase.position);
-		assert(occupiedBase && occupiedBase->getFactionController() == getController());
-		if (!m_unattachedToBaseWorkers.isEmpty())
+	{	
+		AIOccupiedBase& occupiedBase = m_occupiedBases.addBase(m_baseHandler.getBase(gameEvent.data.attachFactionToBase.position));
+		if (m_occupiedBases.bases.size() == 1)
 		{
-			for (const auto& mineral : occupiedBase->base.get().minerals)
+			for (const auto& actionType : AI::STARTING_BUILD_ORDERS[static_cast<size_t>(m_behaviour)])
 			{
-				Worker& worker = m_unattachedToBaseWorkers.getClosestWorker(occupiedBase->base.get().getCenteredPosition());
+				m_actionQueue.emplace(actionType, occupiedBase);
+			}
+		}
+		else if(!m_unattachedToBaseWorkers.isEmpty())
+		{
+			for (const auto& mineral : occupiedBase.base.get().minerals)
+			{
+				Worker& worker = m_unattachedToBaseWorkers.getClosestWorker(mineral.getPosition());
 				worker.moveTo(mineral, map);
-				m_occupiedBases.addWorker(worker, occupiedBase->base.get());
-				
+				occupiedBase.addWorker(worker);
+
 				if (m_unattachedToBaseWorkers.isEmpty())
 				{
 					break;
@@ -216,13 +178,10 @@ void FactionAI::handleEvent(const GameEvent& gameEvent, const Map& map, FactionH
 	break;
 	case eGameEventType::DetachFactionFromBase:
 	{
-		AIOccupiedBase* base = m_occupiedBases.getBase(gameEvent.data.detachFactionFromBase.position);
-		assert(base && base->base.get().owningFactionController == getController());
-		for (auto& worker : base->workers)
+		for (Worker& worker : m_occupiedBases.removeBase(m_baseHandler.getBase(gameEvent.data.attachFactionToBase.position)))
 		{
 			m_unattachedToBaseWorkers.addWorker(worker);
 		}
-		base->workers.clear();
 	}
 	break;
 	}
@@ -260,19 +219,16 @@ void FactionAI::update(float deltaTime, const Map & map, FactionHandler& faction
 			}
 		}
 
-		for (auto& occupiedBase : m_occupiedBases.getBases())
+		for (auto& occupiedBase : m_occupiedBases.bases)
 		{
-			if (occupiedBase.base.get().owningFactionController == getController())
+			if (occupiedBase->workers.size() < AI::MIN_WORKERS_AT_BASE)
 			{
-				if (occupiedBase.workers.size() < AI::MIN_WORKERS_AT_BASE)
-				{
-					m_actionQueue.emplace(eAIActionType::SpawnWorker, occupiedBase);
-				}
-				else if (occupiedBase.workers.size() < occupiedBase.base.get().minerals.size())
-				{
-					m_actionPriorityQueue.emplace(getEntityModifier(eEntityType::Worker, m_behaviour), eAIActionType::SpawnWorker, occupiedBase);
-				}	
+				m_actionQueue.emplace(eAIActionType::SpawnWorker, *occupiedBase);
 			}
+			else if (occupiedBase->workers.size() < occupiedBase->base.get().minerals.size())
+			{
+				m_actionPriorityQueue.emplace(getEntityModifier(eEntityType::Worker, m_behaviour), eAIActionType::SpawnWorker, *occupiedBase);
+			}	
 		}
 	}
 
@@ -508,14 +464,13 @@ void FactionAI::onWorkerEnteredIdleState(Worker& worker, const Map& map)
 	{
 		for (const auto& base : m_occupiedBases.getSortedBases(worker.getPosition()))
 		{
-			if (&base.base.get() != &nearestBase &&
-				base.base.get().owningFactionController == getController())
+			if (&base->base.get() != &nearestBase)
 			{
-				nearestMineral = m_baseHandler.getNearestAvailableMineralAtBase(*this, base.base, worker.getPosition());
+				nearestMineral = m_baseHandler.getNearestAvailableMineralAtBase(*this, base->base, worker.getPosition());
 				if (nearestMineral)
 				{
 					m_occupiedBases.removeWorker(worker);
-					m_occupiedBases.addWorker(worker, base.base);
+					m_occupiedBases.addWorker(worker, base->base);
 					worker.moveTo(*nearestMineral, map);
 				}
 			}
@@ -588,7 +543,7 @@ bool FactionAI::increaseShield(const Laboratory& laboratory)
 	if (!Faction::increaseShield(laboratory))
 	{
 		AIOccupiedBase* occupiedBase = m_occupiedBases.getBase(laboratory);
-		if (occupiedBase && occupiedBase->base.get().owningFactionController == getController())
+		if (occupiedBase)
 		{
 			m_actionQueue.emplace(eAIActionType::IncreaseShield, *occupiedBase);
 		}
@@ -616,7 +571,7 @@ Entity* FactionAI::createBuilding(const Map& map, const Worker& worker)
 				if (getCurrentShieldAmount() == 0)
 				{
 					AIOccupiedBase* occupiedBase = m_occupiedBases.getBase(*spawnedBuilding);
-					if (occupiedBase && occupiedBase->base.get().owningFactionController == getController())
+					if (occupiedBase)
 					{
 						m_actionQueue.emplace(eAIActionType::IncreaseShield, *occupiedBase);
 					}
@@ -631,7 +586,7 @@ Entity* FactionAI::createBuilding(const Map& map, const Worker& worker)
 	else
 	{
 		AIOccupiedBase* occupiedBase = m_occupiedBases.getBase(worker);
-		if (occupiedBase && occupiedBase->base.get().owningFactionController == getController())
+		if (occupiedBase)
 		{
 			const glm::vec3& basePosition = occupiedBase->base.get().getCenteredPosition();
 			switch (worker.getBuildingCommands().front().entityType)
@@ -700,7 +655,7 @@ Entity* FactionAI::createWorker(const Map& map, const Headquarters& headquarters
 	if (!spawnedWorker)
 	{
 		AIOccupiedBase* occupiedBase = m_occupiedBases.getBase(headquarters);
-		assert(occupiedBase && occupiedBase->base.get().owningFactionController == getController());
+		assert(occupiedBase);
 		m_actionQueue.emplace(eAIActionType::SpawnWorker, *occupiedBase);
 	}
 	else

@@ -3,6 +3,7 @@
 #include "glm/glm.hpp"
 #include <functional>
 #include <vector>
+#include <memory.h>
 
 enum class eEntityType;
 enum class eFactionController;
@@ -33,32 +34,33 @@ struct AIOccupiedBase
 class FactionAI;
 class Headquarters;
 class BaseHandler;
-class AIOccupiedBases
+class AIUnattachedToBaseWorkers;
+struct AIOccupiedBases
 {
-public:
-	AIOccupiedBases(const BaseHandler& baseHandler, const FactionAI& owningFaction);
+	AIOccupiedBases(const BaseHandler& baseHandler, eFactionController owningFaction);
 	AIOccupiedBases(const AIOccupiedBases&) = delete;
 	AIOccupiedBases& operator=(const AIOccupiedBases&) = delete;
 	AIOccupiedBases(AIOccupiedBases&&) = delete;
 	AIOccupiedBases& operator=(AIOccupiedBases&&) = delete;
 
-	std::vector<AIOccupiedBase>& getBases();
 	AIOccupiedBase& getBase(const Base& base);
 	AIOccupiedBase* getBase(const glm::vec3& position);
 	AIOccupiedBase* getBase(const Entity& entity);
 
-	const std::vector<AIOccupiedBase>& getSortedBases(const glm::vec3& position);
+	const std::vector<std::unique_ptr<AIOccupiedBase>>& getSortedBases(const glm::vec3& position);
 
 	void addWorker(Worker& worker, const Headquarters& headquarters);
 	void addWorker(Worker& worker, const Base& base);
 	void removeWorker(const Worker& worker);
 
+	AIOccupiedBase& addBase(const Base& base);
+	std::vector<std::reference_wrapper<Worker>> removeBase(const Base& base);
 	void addBuilding(const Worker& worker, Entity& building);
 	void removeBuilding(const Entity& building);
 
-private:
-	const FactionAI& m_owningFaction;
-	std::vector<AIOccupiedBase> m_bases;
-
 	AIOccupiedBase* getBaseWithWorker(const Worker& worker);
+	
+	std::vector<std::unique_ptr<AIOccupiedBase>> bases;
+private:
+	const eFactionController m_owningFaction;
 };			
