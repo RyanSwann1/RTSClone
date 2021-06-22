@@ -169,6 +169,7 @@
     <ClCompile Include="AdjacentPositions.cpp" />
     <ClCompile Include="AIAction.cpp" />
     <ClCompile Include="AIOccupiedBases.cpp" />
+    <ClCompile Include="AIUnattachedToBaseWorkers.cpp" />
     <ClCompile Include="Barracks.cpp" />
     <ClCompile Include="Entity.cpp" />
     <ClCompile Include="Faction.cpp" />
@@ -232,6 +233,7 @@
     <ClInclude Include="AIAction.h" />
     <ClInclude Include="AI.h" />
     <ClInclude Include="AIOccupiedBases.h" />
+    <ClInclude Include="AIUnattachedToBaseWorkers.h" />
     <ClInclude Include="assimp\include\ai_assert.h" />
     <ClInclude Include="assimp\include\anim.h" />
     <ClInclude Include="assimp\include\camera.h" />
