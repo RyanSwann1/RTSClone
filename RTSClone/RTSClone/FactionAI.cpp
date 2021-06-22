@@ -84,21 +84,18 @@ namespace
 
 //FactionAI
 FactionAI::FactionAI(eFactionController factionController, const glm::vec3& hqStartingPosition,
-	int startingResources, int startingPopulationCap, AI::eBehaviour behaviour, const BaseHandler& baseHandler)
+	int startingResources, int startingPopulationCap, AIConstants::eBehaviour behaviour, const BaseHandler& baseHandler)
 	: Faction(factionController, hqStartingPosition, startingResources, startingPopulationCap),
 	m_baseHandler(baseHandler),
 	m_behaviour(behaviour),
 	m_actionPriorityQueue(AIPriorityActionCompare),
 	m_occupiedBases(baseHandler, getController()),
-	m_baseExpansionTimer(Globals::getRandomNumber(AI::MIN_BASE_EXPANSION_TIME, AI::MAX_BASE_EXPANSION_TIME), true),
+	m_baseExpansionTimer(Globals::getRandomNumber(AIConstants::MIN_BASE_EXPANSION_TIME, AIConstants::MAX_BASE_EXPANSION_TIME), true),
 	m_actionQueue(),
-	m_delayTimer(AI::DELAY_TIMER_EXPIRATION, true),
-	m_spawnTimer(Globals::getRandomNumber(AI::MIN_SPAWN_TIMER_EXPIRATION, AI::MAX_SPAWN_TIMER_EXPIRATION), true),
+	m_delayTimer(AIConstants::DELAY_TIMER_EXPIRATION, true),
+	m_spawnTimer(Globals::getRandomNumber(AIConstants::MIN_SPAWN_TIMER_EXPIRATION, AIConstants::MAX_SPAWN_TIMER_EXPIRATION), true),
 	m_targetFaction(eFactionController::None)
 {
-	//AIOccupiedBase& startingOccupiedBase = m_occupiedBases.addBase(m_baseHandler.getBase(getMainHeadquartersPosition()));
-
-
 	m_unitsOnHold.reserve(m_units.capacity());
 }
 
@@ -155,7 +152,7 @@ void FactionAI::handleEvent(const GameEvent& gameEvent, const Map& map, FactionH
 		AIOccupiedBase& occupiedBase = m_occupiedBases.addBase(m_baseHandler.getBase(gameEvent.data.attachFactionToBase.position));
 		if (m_occupiedBases.bases.size() == 1)
 		{
-			for (const auto& actionType : AI::STARTING_BUILD_ORDERS[static_cast<size_t>(m_behaviour)])
+			for (const auto& actionType : AIConstants::STARTING_BUILD_ORDERS[static_cast<size_t>(m_behaviour)])
 			{
 				m_actionQueue.emplace(actionType, occupiedBase);
 			}
@@ -221,7 +218,7 @@ void FactionAI::update(float deltaTime, const Map & map, FactionHandler& faction
 
 		for (auto& occupiedBase : m_occupiedBases.bases)
 		{
-			if (occupiedBase->workers.size() < AI::MIN_WORKERS_AT_BASE)
+			if (occupiedBase->workers.size() < AIConstants::MIN_WORKERS_AT_BASE)
 			{
 				m_actionQueue.emplace(eAIActionType::SpawnWorker, *occupiedBase);
 			}
@@ -234,9 +231,9 @@ void FactionAI::update(float deltaTime, const Map & map, FactionHandler& faction
 
 	switch (m_behaviour)
 	{
-	case AI::eBehaviour::Defensive:
+	case AIConstants::eBehaviour::Defensive:
 		break;
-	case AI::eBehaviour::Aggressive:
+	case AIConstants::eBehaviour::Aggressive:
 		m_spawnTimer.update(deltaTime);
 		if (m_spawnTimer.isExpired())
 		{

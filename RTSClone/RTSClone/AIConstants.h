@@ -6,7 +6,7 @@
 #include <array>
 #include <vector>
 
-namespace AI
+namespace AIConstants
 {
 	constexpr float DELAY_TIMER_EXPIRATION = 5.0f;
 	constexpr float IDLE_TIMER_EXPIRATION = 1.0f;

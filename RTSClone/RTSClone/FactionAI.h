@@ -5,7 +5,7 @@
 #include "Timer.h"
 #include "AIOccupiedBases.h"
 #include "AIAction.h"
-#include "AI.h"
+#include "AIConstants.h"
 #include "AIUnattachedToBaseWorkers.h"
 #include <queue>
 #include <vector>
@@ -22,7 +22,7 @@ class FactionAI : public Faction
 {
 public:
 	FactionAI(eFactionController factionController, const glm::vec3& hqStartingPosition, 
-		int startingResources, int startingPopulationCap, AI::eBehaviour behaviour, const BaseHandler& baseHandler);
+		int startingResources, int startingPopulationCap, AIConstants::eBehaviour behaviour, const BaseHandler& baseHandler);
 
 	bool isWithinRangeOfBuildings(const glm::vec3& position, float distance) const;
 
@@ -44,7 +44,7 @@ protected:
 
 private:
 	const BaseHandler& m_baseHandler;
-	const AI::eBehaviour m_behaviour;
+	const AIConstants::eBehaviour m_behaviour;
 	AIPriorityActionQueue m_actionPriorityQueue;
 	AIUnattachedToBaseWorkers m_unattachedToBaseWorkers;
 	AIOccupiedBases m_occupiedBases;

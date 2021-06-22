@@ -231,7 +231,7 @@
     <ClInclude Include="ActiveStatus.h" />
     <ClInclude Include="AdjacentPositions.h" />
     <ClInclude Include="AIAction.h" />
-    <ClInclude Include="AI.h" />
+    <ClInclude Include="AIConstants.h" />
     <ClInclude Include="AIOccupiedBases.h" />
     <ClInclude Include="AIUnattachedToBaseWorkers.h" />
     <ClInclude Include="assimp\include\ai_assert.h" />
