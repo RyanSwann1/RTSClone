@@ -79,7 +79,7 @@ namespace
 		return nullptr;
 	}
 
-	const int MAX_UNITS_ON_HOLD = 3;
+	constexpr int MAX_UNITS_ON_HOLD = 3;
 }
 
 //FactionAI
@@ -225,7 +225,20 @@ void FactionAI::update(float deltaTime, const Map & map, FactionHandler& faction
 			else if (occupiedBase->workers.size() < occupiedBase->base.get().minerals.size())
 			{
 				m_actionPriorityQueue.emplace(getEntityModifier(eEntityType::Worker, m_behaviour), eAIActionType::SpawnWorker, *occupiedBase);
-			}	
+			}
+
+			if (occupiedBase->turretCount < AIConstants::getMaxTurretCount(m_behaviour))
+			{
+				m_actionPriorityQueue.emplace(getEntityModifier(eEntityType::Worker, m_behaviour), eAIActionType::SpawnWorker, *occupiedBase);
+			}
+			if (occupiedBase->barracksCount < AIConstants::getMaxBarracksCount(m_behaviour))
+			{
+				m_actionPriorityQueue.emplace(getEntityModifier(eEntityType::Barracks, m_behaviour), eAIActionType::BuildBarracks, *occupiedBase);
+			}
+			if (occupiedBase->supplyDepotCount < AIConstants::getMaxSupplyDepotCount(m_behaviour))
+			{
+				m_actionPriorityQueue.emplace(getEntityModifier(eEntityType::SupplyDepot, m_behaviour), eAIActionType::BuildSupplyDepot, *occupiedBase);
+			}
 		}
 	}
 
