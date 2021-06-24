@@ -12,6 +12,8 @@
 //AIOccupiedBase
 AIOccupiedBase::AIOccupiedBase(const Base& base)
 	: base(base),
+	actionQueue(),
+	actionPriorityQueue(AIPriorityActionCompare),
 	workers(),
 	buildings(),
 	turretCount(0),

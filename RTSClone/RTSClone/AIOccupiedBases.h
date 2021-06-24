@@ -1,8 +1,10 @@
 #pragma once
 
 #include "glm/glm.hpp"
+#include "AIAction.h"
 #include <functional>
 #include <vector>
+#include <queue>
 #include <memory.h>
 
 enum class eEntityType;
@@ -23,6 +25,8 @@ struct AIOccupiedBase
 	const Entity* removeBuilding(const Entity& building);
 	
 	std::reference_wrapper<const Base> base;
+	std::queue<AIAction> actionQueue;
+	AIPriorityActionQueue actionPriorityQueue;
 	std::vector<std::reference_wrapper<Worker>> workers;
 	std::vector<std::reference_wrapper<Entity>> buildings;
 	int turretCount;

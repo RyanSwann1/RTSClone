@@ -45,11 +45,9 @@ protected:
 private:
 	const BaseHandler& m_baseHandler;
 	const AIConstants::eBehaviour m_behaviour;
-	AIPriorityActionQueue m_actionPriorityQueue;
 	AIUnattachedToBaseWorkers m_unattachedToBaseWorkers;
 	AIOccupiedBases m_occupiedBases;
 	Timer m_baseExpansionTimer;
-	std::queue<AIAction> m_actionQueue;
 	Timer m_delayTimer;
 	Timer m_spawnTimer;
 	eFactionController m_targetFaction;
