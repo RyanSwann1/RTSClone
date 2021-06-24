@@ -59,5 +59,5 @@ private:
 	Worker* getAvailableWorker(const glm::vec3& position, AIOccupiedBase& occupiedBase);
 
 	bool build(const Map& map, eEntityType entityType, AIOccupiedBase& occupiedBase, Worker* worker = nullptr);
-	bool handleAction(const AIAction& action, const Map& map);
+	bool handleAction(const AIAction& action, const Map& map, AIOccupiedBase& occupiedBase);
 };

@@ -3,14 +3,13 @@
 #include <assert.h>
 
 //AIAction
-AIAction::AIAction(eAIActionType actionType, AIOccupiedBase& base)
-	: actionType(actionType),
-	base(base)
+AIAction::AIAction(eAIActionType actionType)
+	: actionType(actionType)
 {}
 
 //AIPriorityAction
-AIPriorityAction::AIPriorityAction(int weight, eAIActionType actionType, AIOccupiedBase& base)
-	: AIAction(actionType, base),
+AIPriorityAction::AIPriorityAction(int weight, eAIActionType actionType)
+	: AIAction(actionType),
 	weight(weight)
 {}
 

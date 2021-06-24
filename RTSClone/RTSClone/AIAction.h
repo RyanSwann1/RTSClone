@@ -15,18 +15,16 @@ enum class eAIActionType
 	IncreaseShield
 };
 
-struct AIOccupiedBase;
 struct AIAction
 {
-	AIAction(eAIActionType actionType, AIOccupiedBase& base);
+	AIAction(eAIActionType actionType);
 
 	eAIActionType actionType;
-	std::reference_wrapper<AIOccupiedBase> base;
 };
 
 struct AIPriorityAction : public AIAction
 {
-	AIPriorityAction(int weight, eAIActionType actionType, AIOccupiedBase& base);
+	AIPriorityAction(int weight, eAIActionType actionType);
 
 	int weight;
 };
