@@ -61,24 +61,28 @@ namespace AIConstants
 
 	inline int getMaxTurretCount(eBehaviour behaviour)
 	{
+		static_assert(static_cast<int>(eBehaviour::Max) == 1);
 		if (behaviour == eBehaviour::Defensive) { return DEFENSIVE_MAX_TURRETS; }
 		else { return AGGRESSIVE_MAX_TURRETS; }
 	}
 
 	inline int getMaxBarracksCount(eBehaviour behaviour)
 	{
+		static_assert(static_cast<int>(eBehaviour::Max) == 1);
 		if (behaviour == eBehaviour::Defensive) { return DEFENSIVE_MAX_BARRACKS; }
 		else { return AGGRESSIVE_MAX_BARRACKS; }
 	}
 
 	inline int getMaxSupplyDepotCount(eBehaviour behaviour)
 	{
+		static_assert(static_cast<int>(eBehaviour::Max) == 1);
 		if (behaviour == eBehaviour::Defensive) { return DEFENSIVE_MAX_SUPPLY_DEPOT; }
 		else { return AGGRESSIVE_MAX_SUPPLY_DEPOT; }
 	}
 
 	inline int getEntityModifier(eEntityType entityType, eBehaviour behaviour)
 	{
+		static_assert(static_cast<int>(eBehaviour::Max) == 1);
 		if (behaviour == eBehaviour::Defensive) { return ENTITY_MODIFIERS_DEFENSIVE[static_cast<int>(behaviour)]; }
 		else { return ENTITY_MODIFIERS_AGGRESSIVE[static_cast<int>(behaviour)]; }
 	}
