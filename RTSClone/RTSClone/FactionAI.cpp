@@ -201,40 +201,40 @@ void FactionAI::update(float deltaTime, const Map & map, FactionHandler& faction
 
 		for (auto& occupiedBase : m_occupiedBases.bases)
 		{
-			if (!occupiedBase->actionQueue.empty())
+			if (!occupiedBase.actionQueue.empty())
 			{
-				if (handleAction(occupiedBase->actionQueue.front(), map, *occupiedBase))
+				if (handleAction(occupiedBase.actionQueue.front(), map, occupiedBase))
 				{
-					occupiedBase->actionQueue.pop();
+					occupiedBase.actionQueue.pop();
 				}
 			}
-			if (!occupiedBase->actionPriorityQueue.empty())
+			if (!occupiedBase.actionPriorityQueue.empty())
 			{
-				if (handleAction(occupiedBase->actionPriorityQueue.top(), map, *occupiedBase))
+				if (handleAction(occupiedBase.actionPriorityQueue.top(), map, occupiedBase))
 				{
-					occupiedBase->actionPriorityQueue.pop();
+					occupiedBase.actionPriorityQueue.pop();
 				}
 			}
-			if (occupiedBase->workers.size() < AIConstants::MIN_WORKERS_AT_BASE)
+			if (occupiedBase.workers.size() < AIConstants::MIN_WORKERS_AT_BASE)
 			{
-				occupiedBase->actionQueue.emplace(eAIActionType::SpawnWorker);
+				occupiedBase.actionQueue.emplace(eAIActionType::SpawnWorker);
 			}
-			else if (occupiedBase->workers.size() < occupiedBase->base.get().minerals.size())
+			else if (occupiedBase.workers.size() < occupiedBase.base.get().minerals.size())
 			{
-				occupiedBase->actionPriorityQueue.emplace(getEntityModifier(eEntityType::Worker, m_behaviour), eAIActionType::SpawnWorker);
+				occupiedBase.actionPriorityQueue.emplace(getEntityModifier(eEntityType::Worker, m_behaviour), eAIActionType::SpawnWorker);
 			}
 
-			if (occupiedBase->turretCount < AIConstants::getMaxTurretCount(m_behaviour))
+			if (occupiedBase.turretCount < AIConstants::getMaxTurretCount(m_behaviour))
 			{
-				occupiedBase->actionPriorityQueue.emplace(getEntityModifier(eEntityType::Worker, m_behaviour), eAIActionType::SpawnWorker);
+				occupiedBase.actionPriorityQueue.emplace(getEntityModifier(eEntityType::Worker, m_behaviour), eAIActionType::SpawnWorker);
 			}
-			if (occupiedBase->barracksCount < AIConstants::getMaxBarracksCount(m_behaviour))
+			if (occupiedBase.barracksCount < AIConstants::getMaxBarracksCount(m_behaviour))
 			{
-				occupiedBase->actionPriorityQueue.emplace(getEntityModifier(eEntityType::Barracks, m_behaviour), eAIActionType::BuildBarracks);
+				occupiedBase.actionPriorityQueue.emplace(getEntityModifier(eEntityType::Barracks, m_behaviour), eAIActionType::BuildBarracks);
 			}
-			if (occupiedBase->supplyDepotCount < AIConstants::getMaxSupplyDepotCount(m_behaviour))
+			if (occupiedBase.supplyDepotCount < AIConstants::getMaxSupplyDepotCount(m_behaviour))
 			{
-				occupiedBase->actionPriorityQueue.emplace(getEntityModifier(eEntityType::SupplyDepot, m_behaviour), eAIActionType::BuildSupplyDepot);
+				occupiedBase.actionPriorityQueue.emplace(getEntityModifier(eEntityType::SupplyDepot, m_behaviour), eAIActionType::BuildSupplyDepot);
 			}
 		}
 	}
@@ -471,13 +471,13 @@ void FactionAI::onWorkerEnteredIdleState(Worker& worker, const Map& map)
 	{
 		for (const auto& base : m_occupiedBases.getSortedBases(worker.getPosition()))
 		{
-			if (&base->base.get() != &nearestBase)
+			if (&base.base.get() != &nearestBase)
 			{
-				nearestMineral = m_baseHandler.getNearestAvailableMineralAtBase(*this, base->base, worker.getPosition());
+				nearestMineral = m_baseHandler.getNearestAvailableMineralAtBase(*this, base.base, worker.getPosition());
 				if (nearestMineral)
 				{
 					m_occupiedBases.removeWorker(worker);
-					m_occupiedBases.addWorker(worker, base->base);
+					m_occupiedBases.addWorker(worker, base.base);
 					worker.moveTo(*nearestMineral, map);
 				}
 			}

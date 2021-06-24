@@ -29,8 +29,10 @@ struct AIPriorityAction : public AIAction
 	int weight;
 };
 
-const auto AIPriorityActionCompare = [](const auto& a, const auto& b) -> bool { return b.weight > a.weight; };
-using AIPriorityActionQueue = std::priority_queue<AIPriorityAction, std::vector<AIPriorityAction>, decltype(AIPriorityActionCompare)>;
+struct AIPriorityActionCompare {
+	bool operator()(const AIPriorityAction& a, const AIPriorityAction& b) { return b.weight > a.weight; }
+};
+using AIPriorityActionQueue = std::priority_queue<AIPriorityAction, std::vector<AIPriorityAction>, AIPriorityActionCompare>;
 
 enum class eEntityType;
 bool convertActionTypeToEntityType(eAIActionType actionType, eEntityType& entityType);

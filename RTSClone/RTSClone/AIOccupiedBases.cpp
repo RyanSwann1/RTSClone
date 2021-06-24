@@ -13,7 +13,7 @@
 AIOccupiedBase::AIOccupiedBase(const Base& base)
 	: base(base),
 	actionQueue(),
-	actionPriorityQueue(AIPriorityActionCompare),
+	actionPriorityQueue(),
 	workers(),
 	buildings(),
 	turretCount(0),
@@ -104,21 +104,21 @@ AIOccupiedBase* AIOccupiedBases::getBase(const glm::vec3& position)
 {
 	auto base = std::find_if(bases.begin(), bases.end(), [&position](const auto& base)
 	{
-		return base->base.get().getCenteredPosition() == position;
+		return base.base.get().getCenteredPosition() == position;
 	});
 	
-	return base != bases.end() ? &*(*base) : nullptr;
+	return base != bases.end() ? &(*base) : nullptr;
 }
 
 AIOccupiedBase& AIOccupiedBases::getBase(const Base& _base) 
 {
 	auto iter = std::find_if(bases.begin(), bases.end(), [&_base](const auto& base)
 	{
-		return _base.getCenteredPosition() == base->base.get().getCenteredPosition();
+		return _base.getCenteredPosition() == base.base.get().getCenteredPosition();
 	});
 
 	assert(iter != bases.end());
-	return *(*iter);
+	return (*iter);
 }
 
 AIOccupiedBase* AIOccupiedBases::getBase(const Entity& entity)
@@ -145,11 +145,11 @@ AIOccupiedBase* AIOccupiedBases::getBase(const Entity& entity)
 		case eEntityType::Laboratory:
 			for (auto& base : bases)
 			{
-				const Entity* building = base->getBuilding(entity);
+				const Entity* building = base.getBuilding(entity);
 				if (building && building->getID() == entity.getID())
 				{
-					assert(base->base.get().owningFactionController == m_owningFaction);
-					occupiedBase = &*base;
+					assert(base.base.get().owningFactionController == m_owningFaction);
+					occupiedBase = &base;
 					break;
 				}
 			}
@@ -163,11 +163,11 @@ AIOccupiedBase* AIOccupiedBases::getBase(const Entity& entity)
 	return occupiedBase;
 }
 
-const std::vector<std::unique_ptr<AIOccupiedBase>>& AIOccupiedBases::getSortedBases(const glm::vec3& position)
+const std::vector<AIOccupiedBase>& AIOccupiedBases::getSortedBases(const glm::vec3& position)
 {
 	std::sort(bases.begin(), bases.end(), [&position](const auto& a, const auto& b)
-		{ return Globals::getSqrDistance(a->base.get().getCenteredPosition(), position) < 
-			Globals::getSqrDistance(b->base.get().getCenteredPosition(), position); });
+		{ return Globals::getSqrDistance(a.base.get().getCenteredPosition(), position) < 
+			Globals::getSqrDistance(b.base.get().getCenteredPosition(), position); });
 
 	return bases;
 }
@@ -176,34 +176,34 @@ void AIOccupiedBases::addWorker(Worker& worker, const Headquarters& headquarters
 {
 	auto base = std::find_if(bases.begin(), bases.end(), [&headquarters](const auto& base)
 	{
-		return base->base.get().getCenteredPosition() == headquarters.getPosition();
+		return base.base.get().getCenteredPosition() == headquarters.getPosition();
 	});
 
-	assert(base != bases.end() && (*base)->base.get().owningFactionController == m_owningFaction);
-	(*base)->addWorker(worker);
+	assert(base != bases.end() && (*base).base.get().owningFactionController == m_owningFaction);
+	(*base).addWorker(worker);
 }
 
 void AIOccupiedBases::addWorker(Worker& worker, const Base& base)
 {
 	auto iter = std::find_if(bases.begin(), bases.end(), [&base](const auto& existingBase)
 	{
-		return existingBase->base.get().getCenteredPosition() == base.getCenteredPosition();
+		return existingBase.base.get().getCenteredPosition() == base.getCenteredPosition();
 	});
 	
 	assert(iter != bases.end() && base.owningFactionController == m_owningFaction);
-	(*iter)->addWorker(worker);
+	iter->addWorker(worker);
 }
 
 void AIOccupiedBases::removeWorker(const Worker& worker)
 {
 	for (auto& base : bases)
 	{
-		for (auto iter = base->workers.begin(); iter != base->workers.end(); ++iter)
+		for (auto iter = base.workers.begin(); iter != base.workers.end(); ++iter)
 		{
 			if (iter->get().getID() == worker.getID())
 			{
-				assert(base->base.get().owningFactionController == m_owningFaction);
-				base->workers.erase(iter);
+				assert(base.base.get().owningFactionController == m_owningFaction);
+				base.workers.erase(iter);
 				return;
 			}
 		}
@@ -213,18 +213,18 @@ void AIOccupiedBases::removeWorker(const Worker& worker)
 AIOccupiedBase& AIOccupiedBases::addBase(const Base& base)
 {
 	assert(base.owningFactionController == m_owningFaction);
-	bases.push_back(std::make_unique<AIOccupiedBase>(base));
-	return *bases.back();
+	bases.emplace_back(base);
+	return bases.back();
 }
 
 std::vector<std::reference_wrapper<Worker>> AIOccupiedBases::removeBase(const Base& base)
 {
 	auto iter = std::find_if(bases.begin(), bases.end(), [&base](const auto& existingBase)
 	{
-		return existingBase->base.get().position == base.position;
+		return existingBase.base.get().position == base.position;
 	});
 	assert(iter != bases.end());
-	std::vector<std::reference_wrapper<Worker>> workers = std::move((*iter)->workers);
+	std::vector<std::reference_wrapper<Worker>> workers = std::move(iter->workers);
 	bases.erase(iter);
 	return workers;
 }
@@ -276,23 +276,23 @@ void AIOccupiedBases::removeBuilding(const Entity& building)
 	const Entity* buildingRemoved = nullptr;
 	for (auto& base : bases)
 	{
-		buildingRemoved = base->removeBuilding(building);
+		buildingRemoved = base.removeBuilding(building);
 		if (buildingRemoved)
 		{
-			assert(base->base.get().owningFactionController == m_owningFaction);
+			assert(base.base.get().owningFactionController == m_owningFaction);
 			switch (building.getEntityType())
 			{
 			case eEntityType::Barracks:
-				--base->barracksCount;
+				--base.barracksCount;
 				break;
 			case eEntityType::SupplyDepot:
-				--base->supplyDepotCount;
+				--base.supplyDepotCount;
 				break;
 			case eEntityType::Laboratory:
-				--base->laboratoryCount;
+				--base.laboratoryCount;
 				break;
 			case eEntityType::Turret:
-				--base->turretCount;
+				--base.turretCount;
 				break;
 			default:
 				assert(false);
@@ -310,14 +310,14 @@ AIOccupiedBase* AIOccupiedBases::getBaseWithWorker(const Worker& worker)
 	int workerID = worker.getID();
 	for (auto& base : bases)
 	{
-		auto iter = std::find_if(base->workers.cbegin(), base->workers.cend(), [workerID](const auto& worker)
+		auto iter = std::find_if(base.workers.cbegin(), base.workers.cend(), [workerID](const auto& worker)
 		{
 			return worker.get().getID() == workerID;
 		});
-		if (iter != base->workers.cend())
+		if (iter != base.workers.cend())
 		{
-			assert(base->base.get().owningFactionController == m_owningFaction);
-			return &*base;
+			assert(base.base.get().owningFactionController == m_owningFaction);
+			return &base;
 		}
 	}
 

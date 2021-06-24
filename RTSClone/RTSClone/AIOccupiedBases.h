@@ -51,7 +51,7 @@ struct AIOccupiedBases
 	AIOccupiedBase* getBase(const glm::vec3& position);
 	AIOccupiedBase* getBase(const Entity& entity);
 
-	const std::vector<std::unique_ptr<AIOccupiedBase>>& getSortedBases(const glm::vec3& position);
+	const std::vector<AIOccupiedBase>& getSortedBases(const glm::vec3& position);
 
 	void addWorker(Worker& worker, const Headquarters& headquarters);
 	void addWorker(Worker& worker, const Base& base);
@@ -64,7 +64,7 @@ struct AIOccupiedBases
 
 	AIOccupiedBase* getBaseWithWorker(const Worker& worker);
 	
-	std::vector<std::unique_ptr<AIOccupiedBase>> bases;
+	std::vector<AIOccupiedBase> bases;
 private:
 	const eFactionController m_owningFaction;
 };			
