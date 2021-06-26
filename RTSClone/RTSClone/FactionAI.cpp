@@ -484,17 +484,20 @@ void FactionAI::onWorkerEnteredIdleState(Worker& worker, const Map& map)
 		}
 	}
 
-	for (auto& occupiedBase : m_occupiedBases.bases)
+	if (worker.getCurrentState() == eWorkerState::Idle)
 	{
-		if (!occupiedBase.actionQueue.empty())
+		for (auto& occupiedBase : m_occupiedBases.bases)
 		{
-			eEntityType entityType;
-			if (convertActionTypeToEntityType(occupiedBase.actionQueue.front().actionType, entityType) &&
-				Globals::BUILDING_TYPES.isMatch(entityType) &&
-				build(map, entityType, occupiedBase, &worker))
+			if (!occupiedBase.actionQueue.empty())
 			{
-				occupiedBase.actionQueue.pop();
-				break;
+				eEntityType entityType;
+				if (convertActionTypeToEntityType(occupiedBase.actionQueue.front().actionType, entityType) &&
+					Globals::BUILDING_TYPES.isMatch(entityType) &&
+					build(map, entityType, occupiedBase, &worker))
+				{
+					occupiedBase.actionQueue.pop();
+					break;
+				}
 			}
 		}
 	}
