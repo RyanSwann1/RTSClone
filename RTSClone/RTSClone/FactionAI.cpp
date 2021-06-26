@@ -484,17 +484,20 @@ void FactionAI::onWorkerEnteredIdleState(Worker& worker, const Map& map)
 		}
 	}
 
-	//TODO: Fix
-	//if (!m_actionQueue.empty())
-	//{
-	//	eEntityType entityType;
-	//	if (convertActionTypeToEntityType(m_actionQueue.front().actionType, entityType) &&
-	//		Globals::BUILDING_TYPES.isMatch(entityType) &&
-	//		build(map, entityType, m_actionQueue.front().base.get(), &worker))
-	//	{
-	//		m_actionQueue.pop();
-	//	}
-	//}
+	for (auto& occupiedBase : m_occupiedBases.bases)
+	{
+		if (!occupiedBase.actionQueue.empty())
+		{
+			eEntityType entityType;
+			if (convertActionTypeToEntityType(occupiedBase.actionQueue.front().actionType, entityType) &&
+				Globals::BUILDING_TYPES.isMatch(entityType) &&
+				build(map, entityType, occupiedBase, &worker))
+			{
+				occupiedBase.actionQueue.pop();
+				break;
+			}
+		}
+	}
 }
 
 void FactionAI::onUnitTakenDamage(const TakeDamageEvent& gameEvent, Unit& unit, const Map& map, FactionHandler& factionHandler) 
