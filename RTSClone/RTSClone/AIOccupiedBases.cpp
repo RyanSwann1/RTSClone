@@ -37,6 +37,61 @@ bool AIOccupiedBase::isWorkerAdded(const Worker& worker) const
 	return iter != workers.cend();
 }
 
+int AIOccupiedBase::getQueuedAIActionTypeCount(eAIActionType actionType) const
+{
+	int count = actionPriorityQueue.getActionTypeCount(actionType);
+	for (auto action : actionQueue)
+	{
+		if (action.actionType == actionType)
+		{
+			++count;
+		}
+	}
+
+	return count;
+}
+
+int AIOccupiedBase::getWorkerBuildQueueCount(eEntityType entityType) const
+{
+	int count = 0;
+	for (const auto& worker : workers)
+	{
+		for (const auto& buildingInQueue : worker.get().getBuildingCommands())
+		{
+			if (buildingInQueue.entityType == entityType)
+			{
+				++count;
+			}
+		}
+	}
+
+	return count;
+}
+
+int AIOccupiedBase::getSpawnedEntityCount(eEntityType entityType) const
+{
+	switch (entityType)
+	{
+		case eEntityType::Worker:
+			return static_cast<int>(workers.size());
+		case eEntityType::SupplyDepot:
+			return supplyDepotCount;
+		case eEntityType::Barracks:
+			return barracksCount;
+		case eEntityType::Turret:
+			return turretCount;
+		case eEntityType::Laboratory:
+			return laboratoryCount;
+		case eEntityType::Unit:
+		case eEntityType::Headquarters:
+			break;
+		default:
+			assert(false);
+	}
+
+	return 0;
+}
+
 const Entity* AIOccupiedBase::getBuilding(const Entity& building) const
 {
 	int buildingID = building.getID();

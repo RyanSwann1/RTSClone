@@ -18,7 +18,9 @@ struct AIOccupiedBase
 
 	eFactionController getFactionController() const;
 	bool isWorkerAdded(const Worker& worker) const;
-
+	int getQueuedAIActionTypeCount(eAIActionType actionType) const;
+	int getWorkerBuildQueueCount(eEntityType entityType) const;
+	int getSpawnedEntityCount(eEntityType entityType) const;
 
 	const Entity* getBuilding(const Entity& building) const;
 	Entity* getBuilding(eEntityType entityType) const;

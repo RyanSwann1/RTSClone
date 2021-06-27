@@ -79,6 +79,33 @@ namespace
 		return nullptr;
 	}
 
+	bool isWorkerSpawnable(const AIOccupiedBase& occupiedBase, int cap)
+	{
+		return occupiedBase.getQueuedAIActionTypeCount(eAIActionType::SpawnWorker) + 
+			static_cast<int>(occupiedBase.workers.size()) < cap; 
+	}
+
+	bool isTurretSpawnable(const AIOccupiedBase& occupiedBase, int cap)
+	{
+		return occupiedBase.getQueuedAIActionTypeCount(eAIActionType::BuildTurret) + 
+			occupiedBase.getWorkerBuildQueueCount(eEntityType::Turret) + 
+			occupiedBase.turretCount < cap;
+	}
+
+	bool isBarracksSpawnable(const AIOccupiedBase& occupiedBase, int cap)
+	{
+		return occupiedBase.getQueuedAIActionTypeCount(eAIActionType::BuildBarracks) +
+			occupiedBase.getWorkerBuildQueueCount(eEntityType::Barracks) +
+			occupiedBase.barracksCount < cap;
+	}
+
+	bool isSupplyDepotSpawnable(const AIOccupiedBase& occupiedBase, int cap)
+	{
+		return occupiedBase.getQueuedAIActionTypeCount(eAIActionType::BuildSupplyDepot) +
+			occupiedBase.getWorkerBuildQueueCount(eEntityType::SupplyDepot) +
+			occupiedBase.supplyDepotCount < cap;
+	}
+
 	constexpr int MAX_UNITS_ON_HOLD = 3;
 }
 
@@ -218,27 +245,27 @@ void FactionAI::update(float deltaTime, const Map & map, FactionHandler& faction
 			}
 
 			//Worker
-			if (occupiedBase.workers.size() < AIConstants::MIN_WORKERS_AT_BASE)
+			if (isWorkerSpawnable(occupiedBase, AIConstants::MIN_WORKERS_AT_BASE))
 			{
 				occupiedBase.actionQueue.emplace_back(eAIActionType::SpawnWorker);
 			}
-			else if (occupiedBase.workers.size() < occupiedBase.base.get().minerals.size())
+			else if (isWorkerSpawnable(occupiedBase, static_cast<int>(occupiedBase.base.get().minerals.size())))
 			{
 				occupiedBase.actionPriorityQueue.emplace(getEntityModifier(eEntityType::Worker, m_behaviour), eAIActionType::SpawnWorker);
 			}
 
 			//Turret
-			if (occupiedBase.turretCount < AIConstants::getMaxTurretCount(m_behaviour))
+			if (isTurretSpawnable(occupiedBase, AIConstants::getMaxTurretCount(m_behaviour)))
 			{
 				occupiedBase.actionPriorityQueue.emplace(getEntityModifier(eEntityType::Turret, m_behaviour), eAIActionType::BuildTurret);
 			}
 			//Barracks
-			if (occupiedBase.barracksCount < AIConstants::getMaxBarracksCount(m_behaviour))
+			if (isBarracksSpawnable(occupiedBase, AIConstants::getMaxBarracksCount(m_behaviour)))
 			{
 				occupiedBase.actionPriorityQueue.emplace(getEntityModifier(eEntityType::Barracks, m_behaviour), eAIActionType::BuildBarracks);
 			}
 			//Supply Depot
-			if (occupiedBase.supplyDepotCount < AIConstants::getMaxSupplyDepotCount(m_behaviour))
+			if (isSupplyDepotSpawnable(occupiedBase, AIConstants::getMaxSupplyDepotCount(m_behaviour)))
 			{
 				occupiedBase.actionPriorityQueue.emplace(getEntityModifier(eEntityType::SupplyDepot, m_behaviour), eAIActionType::BuildSupplyDepot);
 			}
