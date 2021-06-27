@@ -152,7 +152,7 @@ void FactionAI::handleEvent(const GameEvent& gameEvent, const Map& map, FactionH
 		{
 			for (const auto& actionType : AIConstants::STARTING_BUILD_ORDERS[static_cast<size_t>(m_behaviour)])
 			{
-				occupiedBase.actionQueue.emplace(actionType);
+				occupiedBase.actionQueue.emplace_back(actionType);
 			}
 		}
 		else if(!m_unattachedToBaseWorkers.isEmpty())
@@ -201,11 +201,12 @@ void FactionAI::update(float deltaTime, const Map & map, FactionHandler& faction
 
 		for (auto& occupiedBase : m_occupiedBases.bases)
 		{
+			//Update action queues
 			if (!occupiedBase.actionQueue.empty())
 			{
 				if (handleAction(occupiedBase.actionQueue.front(), map, occupiedBase))
 				{
-					occupiedBase.actionQueue.pop();
+					occupiedBase.actionQueue.pop_front();
 				}
 			}
 			if (!occupiedBase.actionPriorityQueue.empty())
@@ -215,23 +216,28 @@ void FactionAI::update(float deltaTime, const Map & map, FactionHandler& faction
 					occupiedBase.actionPriorityQueue.pop();
 				}
 			}
+
+			//Worker
 			if (occupiedBase.workers.size() < AIConstants::MIN_WORKERS_AT_BASE)
 			{
-				occupiedBase.actionQueue.emplace(eAIActionType::SpawnWorker);
+				occupiedBase.actionQueue.emplace_back(eAIActionType::SpawnWorker);
 			}
 			else if (occupiedBase.workers.size() < occupiedBase.base.get().minerals.size())
 			{
 				occupiedBase.actionPriorityQueue.emplace(getEntityModifier(eEntityType::Worker, m_behaviour), eAIActionType::SpawnWorker);
 			}
 
+			//Turret
 			if (occupiedBase.turretCount < AIConstants::getMaxTurretCount(m_behaviour))
 			{
-				occupiedBase.actionPriorityQueue.emplace(getEntityModifier(eEntityType::Worker, m_behaviour), eAIActionType::SpawnWorker);
+				occupiedBase.actionPriorityQueue.emplace(getEntityModifier(eEntityType::Turret, m_behaviour), eAIActionType::BuildTurret);
 			}
+			//Barracks
 			if (occupiedBase.barracksCount < AIConstants::getMaxBarracksCount(m_behaviour))
 			{
 				occupiedBase.actionPriorityQueue.emplace(getEntityModifier(eEntityType::Barracks, m_behaviour), eAIActionType::BuildBarracks);
 			}
+			//Supply Depot
 			if (occupiedBase.supplyDepotCount < AIConstants::getMaxSupplyDepotCount(m_behaviour))
 			{
 				occupiedBase.actionPriorityQueue.emplace(getEntityModifier(eEntityType::SupplyDepot, m_behaviour), eAIActionType::BuildSupplyDepot);
@@ -275,7 +281,7 @@ void FactionAI::update(float deltaTime, const Map & map, FactionHandler& faction
 
 					for (const auto& building : availableWorker->getBuildingCommands())
 					{
-						currentBase->actionQueue.emplace(convertEntityToActionType(building.entityType));
+						currentBase->actionQueue.emplace_back(convertEntityToActionType(building.entityType));
 					}
 				}	
 
@@ -495,7 +501,7 @@ void FactionAI::onWorkerEnteredIdleState(Worker& worker, const Map& map)
 					Globals::BUILDING_TYPES.isMatch(entityType) &&
 					build(map, entityType, occupiedBase, &worker))
 				{
-					occupiedBase.actionQueue.pop();
+					occupiedBase.actionQueue.pop_front();
 					break;
 				}
 			}
@@ -559,7 +565,7 @@ bool FactionAI::increaseShield(const Laboratory& laboratory)
 		AIOccupiedBase* occupiedBase = m_occupiedBases.getBase(laboratory);
 		if (occupiedBase)
 		{
-			occupiedBase->actionQueue.emplace(eAIActionType::IncreaseShield);
+			occupiedBase->actionQueue.emplace_back(eAIActionType::IncreaseShield);
 		}
 		
 		return false;
@@ -587,7 +593,7 @@ Entity* FactionAI::createBuilding(const Map& map, const Worker& worker)
 					AIOccupiedBase* occupiedBase = m_occupiedBases.getBase(*spawnedBuilding);
 					if (occupiedBase)
 					{
-						occupiedBase->actionQueue.emplace(eAIActionType::IncreaseShield);
+						occupiedBase->actionQueue.emplace_back(eAIActionType::IncreaseShield);
 					}
 				}
 			break;
@@ -606,16 +612,16 @@ Entity* FactionAI::createBuilding(const Map& map, const Worker& worker)
 			switch (worker.getBuildingCommands().front().entityType)
 			{
 			case eEntityType::SupplyDepot:
-				occupiedBase->actionQueue.emplace(eAIActionType::BuildSupplyDepot);
+				occupiedBase->actionQueue.emplace_back(eAIActionType::BuildSupplyDepot);
 				break;
 			case eEntityType::Barracks:
-				occupiedBase->actionQueue.emplace(eAIActionType::BuildBarracks); 
+				occupiedBase->actionQueue.emplace_back(eAIActionType::BuildBarracks); 
 				break;
 			case eEntityType::Turret:
-				occupiedBase->actionQueue.emplace(eAIActionType::BuildTurret);
+				occupiedBase->actionQueue.emplace_back(eAIActionType::BuildTurret);
 				break;
 			case eEntityType::Laboratory:
-				occupiedBase->actionQueue.emplace(eAIActionType::BuildLaboratory);
+				occupiedBase->actionQueue.emplace_back(eAIActionType::BuildLaboratory);
 				break;
 			default:
 				assert(false);
@@ -635,7 +641,7 @@ Entity* FactionAI::createUnit(const Map& map, const Barracks& barracks, FactionH
 		if (occupiedBase)
 		{
 			assert(occupiedBase->base.get().owningFactionController == getController());
-			occupiedBase->actionQueue.emplace(eAIActionType::SpawnUnit);
+			occupiedBase->actionQueue.emplace_back(eAIActionType::SpawnUnit);
 		}
 	}
 	else
@@ -670,7 +676,7 @@ Entity* FactionAI::createWorker(const Map& map, const Headquarters& headquarters
 	{
 		AIOccupiedBase* occupiedBase = m_occupiedBases.getBase(headquarters);
 		assert(occupiedBase);
-		occupiedBase->actionQueue.emplace(eAIActionType::SpawnWorker);
+		occupiedBase->actionQueue.emplace_back(eAIActionType::SpawnWorker);
 	}
 	else
 	{

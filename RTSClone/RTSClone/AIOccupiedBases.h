@@ -4,7 +4,7 @@
 #include "AIAction.h"
 #include <functional>
 #include <vector>
-#include <queue>
+#include <deque>
 #include <memory.h>
 
 enum class eEntityType;
@@ -18,6 +18,8 @@ struct AIOccupiedBase
 
 	eFactionController getFactionController() const;
 	bool isWorkerAdded(const Worker& worker) const;
+
+
 	const Entity* getBuilding(const Entity& building) const;
 	Entity* getBuilding(eEntityType entityType) const;
 	void addWorker(Worker& worker);
@@ -25,7 +27,7 @@ struct AIOccupiedBase
 	const Entity* removeBuilding(const Entity& building);
 	
 	std::reference_wrapper<const Base> base;
-	std::queue<AIAction> actionQueue;
+	std::deque<AIAction> actionQueue;
 	AIPriorityActionQueue actionPriorityQueue;
 	std::vector<std::reference_wrapper<Worker>> workers;
 	std::vector<std::reference_wrapper<Entity>> buildings;
