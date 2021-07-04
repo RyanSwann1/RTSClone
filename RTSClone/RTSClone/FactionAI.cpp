@@ -46,14 +46,14 @@ namespace
 	{
 		for (auto squad = squads.begin(); squad != squads.end(); ++squad)
 		{
-			auto iter = std::find_if(squad->units.begin(), squad->units.end(), [&unit](const auto& squadUnit)
+			auto iter = std::find_if(squad->begin(), squad->end(), [&unit](const auto& squadUnit)
 			{
 				return squadUnit.get().getID() == unit.getID();
 			});
-			if (iter != squad->units.end())
+			if (iter != squad->end())
 			{
-				squad->units.erase(iter);
-				if (squad->units.empty())
+				squad->erase(iter);
+				if (squad->empty())
 				{
 					squads.erase(squad);
 				}
@@ -66,11 +66,11 @@ namespace
 	{
 		for (auto& squad : squads)
 		{
-			auto iter = std::find_if(squad.units.begin(), squad.units.end(), [&unit](const auto& unitInSquad)
+			auto iter = std::find_if(squad.begin(), squad.end(), [&unit](const auto& unitInSquad)
 			{
 				return unitInSquad.get().getID() == unit.getID();
 			});
-			if (iter != squad.units.end())
+			if (iter != squad.end())
 			{
 				return &squad;
 			}
@@ -576,7 +576,7 @@ void FactionAI::onUnitTakenDamage(const TakeDamageEvent& gameEvent, Unit& unit, 
 			AISquad* squad = getSquad(m_squads, unit);
 			if (squad)
 			{
-				for (auto& unitInSquad : squad->units)
+				for (auto& unitInSquad : *squad)
 				{
 					unitInSquad.get().moveToAttackPosition(*targetEntity, opposingFaction, map, factionHandler);
 				}
@@ -686,7 +686,7 @@ Entity* FactionAI::createUnit(const Map& map, const Barracks& barracks, FactionH
 			for (auto iter = m_unitsOnHold.begin(); iter != m_unitsOnHold.end();)
 			{
 				Unit& unitOnHold = *iter;
-				m_squads.back().units.push_back(unitOnHold);
+				m_squads.back().push_back(unitOnHold);
 				iter = m_unitsOnHold.erase(iter);
 				onUnitEnteredIdleState(unitOnHold, map, factionHandler);
 			}

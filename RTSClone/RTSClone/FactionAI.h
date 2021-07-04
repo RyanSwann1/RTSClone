@@ -11,10 +11,7 @@
 #include <vector>
 #include <functional>
 
-struct AISquad
-{
-	std::vector<std::reference_wrapper<Unit>> units;
-};
+using AISquad = std::vector<std::reference_wrapper<Unit>>;
 
 class BaseHandler;
 class FactionHandler;
