@@ -88,6 +88,7 @@ Level::Level(std::vector<SceneryGameObject>&& scenery, FactionsContainer&& facti
 
 	m_camera.setPosition({ cameraStartingPosition.x, m_camera.position.y, cameraStartingPosition.y }, 
 		m_playableArea.getSize(), windowSize, true);
+	m_camera.maxDistanceFromGround = m_camera.position.y;
 }
 
 std::unique_ptr<Level> Level::create(const std::string& levelName, glm::ivec2 windowSize)
@@ -215,26 +216,31 @@ void Level::handleInput(glm::uvec2 windowSize, const sf::Window& window, const s
 			*m_baseHandler, m_minimap, getSize());
 	}
 
-	if (currentSFMLEvent.type == sf::Event::MouseButtonPressed)
+	switch (currentSFMLEvent.type)
 	{
-		for (auto& faction : m_factions)
-		{
-			if (faction)
+		case sf::Event::MouseButtonPressed:
+			for (auto& faction : m_factions)
 			{
-				switch (faction.get()->getController())
+				if (faction)
 				{
-				case eFactionController::AI_1:
-				case eFactionController::AI_2:					
-				case eFactionController::AI_3:
-					static_cast<FactionAI&>(*faction).selectEntity(m_camera.getRayToGroundPlaneIntersection(window));
-					break;
-				case eFactionController::Player:
-					break;
-				default:
-					assert(false);
+					switch (faction.get()->getController())
+					{
+					case eFactionController::AI_1:
+					case eFactionController::AI_2:
+					case eFactionController::AI_3:
+						static_cast<FactionAI&>(*faction).selectEntity(m_camera.getRayToGroundPlaneIntersection(window));
+						break;
+					case eFactionController::Player:
+						break;
+					default:
+						assert(false);
+					}
 				}
 			}
-		}
+		break;
+		case sf::Event::MouseWheelScrolled:
+			m_camera.zoom(window, currentSFMLEvent.mouseWheelScroll.delta);
+		break;
 	}
 
 	uiManager.handleInput(window, m_factionHandler, m_camera, currentSFMLEvent);

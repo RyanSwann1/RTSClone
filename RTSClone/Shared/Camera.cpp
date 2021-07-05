@@ -3,6 +3,7 @@
 #include "glm/gtc/matrix_transform.hpp"
 #include "glm/gtx/projection.hpp"
 #include <limits>
+#include "glm/gtx/norm.hpp"
 
 namespace
 {
@@ -15,6 +16,8 @@ namespace
 	const float MOVEMENT_SPEED = 110.0f;
 	const float MOUSE_MOVEMENT_SPEED = 90.0f;
 	const float Z_OFFSET = 25.0f;
+	constexpr float MAX_CAMERA_ZOOM = 200.f;
+	constexpr float MIN_CAMERA_DISTANCE_TO_GROUND = 40.f;
 #endif // GAME
 
 	const float SENSITIVITY = 4.0f;
@@ -80,7 +83,8 @@ Camera::Camera()
 	right(),
 	rotation(STARTING_ROTATION),
 	position(STARTING_POSITION),
-	velocity()
+	velocity(),
+	maxDistanceFromGround(0.f)
 {
 	setFront();
 	right = glm::normalize(glm::cross(front, up));
@@ -186,7 +190,25 @@ void Camera::setPosition(const glm::vec3& newPosition, const glm::vec3& levelSiz
 	{
 		position.z = applyZOffset ? newPosition.z - Z_OFFSET : newPosition.z;
 	}
+}
 
+void Camera::zoom(const sf::Window& window, int mouseWheelDelta)
+{
+	glm::vec3 groundIntersection = getRayToGroundPlaneIntersection(window);
+	glm::vec3 newPosition(position);
+	if(mouseWheelDelta > 0)
+	{	
+		newPosition += glm::normalize(groundIntersection - position) * ZOOM_STEP;
+	}
+	else if(mouseWheelDelta < 0)
+	{
+		newPosition += glm::normalize(groundIntersection - position) * -ZOOM_STEP;
+	}
+
+	if(newPosition.y >= MIN_CAMERA_DISTANCE_TO_GROUND && newPosition.y <= maxDistanceFromGround)
+	{
+		position = newPosition;
+	}
 }
 #endif // GAME
 

@@ -31,12 +31,14 @@ struct Camera
 	glm::vec3 getRayToGroundPlaneIntersection(glm::ivec2 windowSize, glm::ivec2 mousePosition, const glm::vec3& startingPosition) const;
 	void setPosition(const glm::vec3& newPosition, const glm::vec3& levelSize, glm::ivec2 windowSize, bool applyZOffset = false);
 	void update(float deltaTime, const sf::Window& window, glm::ivec2 windowSize, const glm::vec3& levelSize);
-#endif // GAME
+	void zoom(const sf::Window& window, int mouseWheelDelta);
+#endif // GAME 
 
 	const float FOV;
 	const float sensitivity;
 	const float nearPlaneDistance;
 	const float farPlaneDistance;
+	float maxDistanceFromGround;
 	glm::vec3 front;
 	glm::vec3 up;
 	glm::vec3 right;
