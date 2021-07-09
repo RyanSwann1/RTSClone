@@ -12,8 +12,8 @@ public:
 	GameObject(const Model& model, const glm::vec3& startingPosition, glm::vec3 startingRotation = glm::vec3(0.0f));
 	GameObject(const GameObject&) = delete;
 	GameObject& operator=(const GameObject&) = delete;
-	GameObject(GameObject&&) noexcept;
-	GameObject& operator=(GameObject&&) noexcept;
+	GameObject(GameObject&&) = default;
+	GameObject& operator=(GameObject&&) = default;
 
 	glm::vec3& getRotation();
 	const Model& getModel() const;

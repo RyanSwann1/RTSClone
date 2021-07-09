@@ -22,24 +22,6 @@ GameObject::GameObject(const Model& model, const glm::vec3& startingPosition, gl
 	m_AABB.reset(m_position, m_model);
 }
 
-GameObject::GameObject(GameObject&& rhs) noexcept
-	: m_position(rhs.m_position),
-	m_rotation(rhs.m_rotation),
-	m_AABB(std::move(rhs.m_AABB)),
-	m_model(rhs.m_model)
-{}
-
-GameObject& GameObject::operator=(GameObject&& rhs) noexcept
-{
-	assert(this != &rhs);
-	m_position = rhs.m_position;
-	m_rotation = rhs.m_rotation;
-	m_AABB = std::move(rhs.m_AABB);
-	m_model = rhs.m_model;
-
-	return *this;
-}
-
 glm::vec3& GameObject::getRotation()
 {
 	return m_rotation;
