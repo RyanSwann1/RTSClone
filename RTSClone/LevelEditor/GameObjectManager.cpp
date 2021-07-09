@@ -26,7 +26,7 @@ GameObject* GameObjectManager::getGameObject(const glm::vec3 & position)
 	return nullptr;
 }
 
-void GameObjectManager::addGameObject(const Model& model, const glm::vec3& position)
+void GameObjectManager::addGameObject(Model& model, const glm::vec3& position)
 {
 	auto gameObject = std::find_if(m_gameObjects.cbegin(), m_gameObjects.cend(), [&position](const auto& gameObject)
 	{

@@ -4,7 +4,7 @@
 #include "Model.h"
 #include "ModelManager.h"
 
-GameObject::GameObject(const Model& model)
+GameObject::GameObject(Model& model)
 	: position(),
 	rotation(),
 	aabb(),
@@ -13,7 +13,7 @@ GameObject::GameObject(const Model& model)
 	aabb.reset(position, model);
 }
 
-GameObject::GameObject(const Model& model, const glm::vec3& startingPosition, glm::vec3 startingRotation)
+GameObject::GameObject(Model& model, const glm::vec3& startingPosition, glm::vec3 startingRotation)
 	: position(startingPosition),
 	rotation(startingRotation),
 	aabb(),

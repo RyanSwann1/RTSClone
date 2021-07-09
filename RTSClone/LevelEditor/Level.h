@@ -14,7 +14,7 @@ struct PlannedEntity
 
 	int modelNameIDSelected;
 	glm::vec3 position;
-	const Model* model;
+	Model* model;
 };
 
 struct Camera;

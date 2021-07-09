@@ -19,7 +19,7 @@ public:
 
 	GameObject* getGameObject(const glm::vec3& position);
 	
-	void addGameObject(const Model& model, const glm::vec3& position);
+	void addGameObject(Model& model, const glm::vec3& position);
 	void removeGameObject(const GameObject& removal);
 	void render(ShaderHandler& shaderHandler, const GameObject* selectedGameObject) const;
 

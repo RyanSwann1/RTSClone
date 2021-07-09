@@ -51,6 +51,7 @@ public:
 	bool isAllModelsLoaded() const;
 
 #ifdef LEVEL_EDITOR
+	Model& getModel(const std::string& modelName);
 	bool isModelLoaded(const std::string& modelName) const;
 	const std::vector<std::string>& getModelNames() const;
 #endif // LEVEL_EDITOR
