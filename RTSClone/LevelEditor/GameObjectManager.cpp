@@ -15,7 +15,7 @@ GameObject* GameObjectManager::getGameObject(const glm::vec3 & position)
 {
 	auto gameObject = std::find_if(m_gameObjects.begin(), m_gameObjects.end(), [&position](const auto& gameObject)
 	{
-		return gameObject->getAABB().contains(position);
+		return gameObject->aabb.contains(position);
 	});
 
 	if (gameObject != m_gameObjects.end())
@@ -30,7 +30,7 @@ void GameObjectManager::addGameObject(const Model& model, const glm::vec3& posit
 {
 	auto gameObject = std::find_if(m_gameObjects.cbegin(), m_gameObjects.cend(), [&position](const auto& gameObject)
 	{
-		return gameObject->getPosition() == position;
+		return gameObject->position == position;
 	});
 	if (gameObject == m_gameObjects.cend())
 	{
@@ -102,9 +102,9 @@ std::ostream& operator<<(std::ostream& ostream, const GameObjectManager& gameObj
 	ostream << Globals::TEXT_HEADER_SCENERY << "\n";
 	for (const auto& gameObject : gameObjectManager.m_gameObjects)
 	{
-		ostream << gameObject->getModel().modelName << " " <<
-			gameObject->getRotation().x << " " << gameObject->getRotation().y << " " << gameObject->getRotation().z << " " <<
-			gameObject->getPosition().x << " " << gameObject->getPosition().y << " " << gameObject->getPosition().z << "\n";
+		ostream << gameObject->model.get().modelName << " " <<
+			gameObject->rotation.x << " " << gameObject->rotation.y << " " << gameObject->rotation.z << " " <<
+			gameObject->rotation.x << " " << gameObject->rotation.y << " " << gameObject->rotation.z << "\n";
 	}
 	
 	return ostream;

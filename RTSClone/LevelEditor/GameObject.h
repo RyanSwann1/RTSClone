@@ -5,9 +5,8 @@
 
 class ShaderHandler;
 struct Model;
-class GameObject
+struct GameObject
 {
-public:
 	GameObject(const Model& model);
 	GameObject(const Model& model, const glm::vec3& startingPosition, glm::vec3 startingRotation = glm::vec3(0.0f));
 	GameObject(const GameObject&) = delete;
@@ -15,24 +14,15 @@ public:
 	GameObject(GameObject&&) = default;
 	GameObject& operator=(GameObject&&) = default;
 
-	glm::vec3& getRotation();
-	const Model& getModel() const;
-	const glm::vec3& getRotation() const;
-	const glm::vec3& getPosition() const;
-	const AABB& getAABB() const;
-
 	void setPosition(const glm::vec3& position);
-	void setRotation(const glm::vec3 rotation);
-
 	void render(ShaderHandler& shaderHandler, bool highlight = false) const;
 
 #ifdef RENDER_AABB
 	void renderAABB(ShaderHandler& shaderHandler);
 #endif // RENDER_AABB
 
-private:
-	glm::vec3 m_position;
-	glm::vec3 m_rotation;
-	AABB m_AABB;
-	std::reference_wrapper<const Model> m_model;
+	glm::vec3 position;
+	glm::vec3 rotation;
+	AABB aabb;
+	std::reference_wrapper<const Model> model;
 };

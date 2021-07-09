@@ -309,7 +309,7 @@ void Level::handleSelectedEntityGUI()
 		
 		ImGui::NewLine();
 		ImGui::Text("Position");
-		glm::vec3 position = m_selectedGameObject->getPosition();
+		glm::vec3 position = m_selectedGameObject->position;
 		if (ImGui::InputFloat("x", &position.x, Globals::NODE_SIZE) ||
 			ImGui::InputFloat("y", &position.y, 1.0f) ||
 			ImGui::InputFloat("z", &position.z, Globals::NODE_SIZE))
@@ -319,11 +319,11 @@ void Level::handleSelectedEntityGUI()
 
 		ImGui::NewLine();
 		ImGui::Text("Rotation");
-		if(ImGui::InputFloat("yy", &m_selectedGameObject->getRotation().y, 90.0f))
+		if(ImGui::InputFloat("yy", &m_selectedGameObject->rotation.y, 90.0f))
 		{
-			if (glm::abs(m_selectedGameObject->getRotation().y) >= 360.0f)
+			if (glm::abs(m_selectedGameObject->rotation.y) >= 360.0f)
 			{
-				m_selectedGameObject->setRotation({ m_selectedGameObject->getRotation().x, 0.0f, m_selectedGameObject->getRotation().z });
+				m_selectedGameObject->rotation = { m_selectedGameObject->rotation.x, 0.0f, m_selectedGameObject->rotation.z };
 			}
 		}
 
