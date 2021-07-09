@@ -2,7 +2,7 @@
 
 #include "glm/glm.hpp"
 #include "GameObject.h"
-#include <list>
+#include <vector>
 #include <memory>
 #include <ostream>
 
@@ -18,7 +18,6 @@ public:
 	GameObjectManager& operator=(GameObjectManager&&) = delete;
 
 	GameObject* getGameObject(const glm::vec3& position);
-	const std::list<GameObject>& getGameObjects() const;
 	
 	void addGameObject(const Model& model, const glm::vec3& position);
 	void removeGameObject(const GameObject& removal);
@@ -32,5 +31,5 @@ public:
 #endif // RENDER_AABB
 
 private:
-	std::list<GameObject> m_gameObjects;
+	std::vector<std::unique_ptr<GameObject>> m_gameObjects;
 };

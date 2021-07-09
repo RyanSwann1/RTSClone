@@ -15,31 +15,26 @@ GameObject* GameObjectManager::getGameObject(const glm::vec3 & position)
 {
 	auto gameObject = std::find_if(m_gameObjects.begin(), m_gameObjects.end(), [&position](const auto& gameObject)
 	{
-		return gameObject.getAABB().contains(position);
+		return gameObject->getAABB().contains(position);
 	});
 
 	if (gameObject != m_gameObjects.end())
 	{
-		return &(*gameObject);
+		return &*(*gameObject);
 	}
 
 	return nullptr;
-}
-
-const std::list<GameObject>& GameObjectManager::getGameObjects() const
-{
-	return m_gameObjects;
 }
 
 void GameObjectManager::addGameObject(const Model& model, const glm::vec3& position)
 {
 	auto gameObject = std::find_if(m_gameObjects.cbegin(), m_gameObjects.cend(), [&position](const auto& gameObject)
 	{
-		return gameObject.getPosition() == position;
+		return gameObject->getPosition() == position;
 	});
 	if (gameObject == m_gameObjects.cend())
 	{
-		m_gameObjects.emplace_back(model, position);
+		m_gameObjects.emplace_back(std::make_unique<GameObject>(model, position));
 	}
 }
 
@@ -47,7 +42,7 @@ void GameObjectManager::removeGameObject(const GameObject& removal)
 {
 	auto gameObject = std::find_if(m_gameObjects.cbegin(), m_gameObjects.cend(), [&removal](const auto& gameObject)
 	{
-		return &gameObject == &removal;
+		return &*gameObject == &removal;
 	});
 
 	assert(gameObject != m_gameObjects.cend());
@@ -58,13 +53,13 @@ void GameObjectManager::render(ShaderHandler& shaderHandler, const GameObject* s
 {
 	for (const auto& gameObject : m_gameObjects)
 	{
-		if (selectedGameObject && &gameObject == &(*selectedGameObject))
+		if (selectedGameObject && &*gameObject == &(*selectedGameObject))
 		{
-			gameObject.render(shaderHandler, true);
+			gameObject->render(shaderHandler, true);
 		}
 		else
 		{
-			gameObject.render(shaderHandler);
+			gameObject->render(shaderHandler);
 		}
 	}
 }
@@ -74,7 +69,7 @@ void GameObjectManager::renderGameObjectAABB(ShaderHandler& shaderHandler)
 {
 	for (auto& gameObject : m_gameObjects)
 	{
-		gameObject.renderAABB(shaderHandler);	
+		gameObject->renderAABB(shaderHandler);	
 	}
 }
 #endif // RENDER_AABB
@@ -89,7 +84,7 @@ const std::ifstream& operator>>(std::ifstream& file, GameObjectManager& gameObje
 		glm::vec3 position;
 		stream >> modelName >> rotation.x >> rotation.y >> rotation.z >> position.x >> position.y >> position.z;
 
-		gameObjectManager.m_gameObjects.emplace_back(ModelManager::getInstance().getModel(modelName), position, rotation);
+		gameObjectManager.m_gameObjects.emplace_back(std::make_unique<GameObject>(ModelManager::getInstance().getModel(modelName), position, rotation));
 	};
 
 	auto conditional = [](const std::string& line)
@@ -107,9 +102,9 @@ std::ostream& operator<<(std::ostream& ostream, const GameObjectManager& gameObj
 	ostream << Globals::TEXT_HEADER_SCENERY << "\n";
 	for (const auto& gameObject : gameObjectManager.m_gameObjects)
 	{
-		ostream << gameObject.getModel().modelName << " " <<
-			gameObject.getRotation().x << " " << gameObject.getRotation().y << " " << gameObject.getRotation().z << " " <<
-			gameObject.getPosition().x << " " << gameObject.getPosition().y << " " << gameObject.getPosition().z << "\n";
+		ostream << gameObject->getModel().modelName << " " <<
+			gameObject->getRotation().x << " " << gameObject->getRotation().y << " " << gameObject->getRotation().z << " " <<
+			gameObject->getPosition().x << " " << gameObject->getPosition().y << " " << gameObject->getPosition().z << "\n";
 	}
 	
 	return ostream;
