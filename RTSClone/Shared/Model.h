@@ -27,8 +27,13 @@ struct Model
 
 	const std::string modelName;
 	const bool renderFromCentrePosition;
+#ifdef LEVEL_EDITOR
+	glm::vec3 AABBSizeFromCenter;
+	glm::vec3 scale;
+#else
 	const glm::vec3 AABBSizeFromCenter;
 	const glm::vec3 scale;
+#endif // LEVEL_EDITOR
 	const std::vector<Mesh> meshes;
 	
 private:

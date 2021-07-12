@@ -339,6 +339,14 @@ void Level::handleSelectedEntityGUI()
 			}
 		}
 
+		ImGui::NewLine();
+		ImGui::Text("Scale");
+		float scale = 0.f;
+		if (ImGui::InputFloat("size", &scale, 0.2f))
+		{
+			m_selectedGameObject->model.get().scale += scale;
+		}
+
 		ImGui::EndChild();
 	}
 }
