@@ -89,6 +89,7 @@ int main()
 	eWindowState currentWindowState = eWindowState::None;
 	glm::ivec2 lastMousePosition = { 0, 0 };
 	bool mouseMoved = false;
+	bool quitLevel = false;
 
 	std::cout << glGetError() << "\n";
 	std::cout << glGetError() << "\n";
@@ -104,7 +105,7 @@ int main()
 		{
 			if (level)
 			{
-				level->handleInput(currentSFMLEvent, camera, window, deltaTime, windowSize);
+				level->handleInput(currentSFMLEvent, camera, window, deltaTime, windowSize, quitLevel);
 			}
 
 			switch (currentSFMLEvent.type)
@@ -113,7 +114,7 @@ int main()
 				window.close();
 				break;
 			case sf::Event::KeyPressed:
-				if (currentSFMLEvent.key.code == sf::Keyboard::Escape)
+				if (!level && currentSFMLEvent.key.code == sf::Keyboard::Escape)
 				{
 					window.close();
 				}
@@ -143,6 +144,12 @@ int main()
 			camera.onMouseMove(window, deltaTime);
 			window.setMouseCursorVisible(false);
 			ImGui::SetMouseCursor(ImGuiMouseCursor_::ImGuiMouseCursor_None);
+		}
+		if (quitLevel)
+		{
+			assert(level);
+			level.reset();
+			quitLevel = false;
 		}
 		camera.update(deltaTime, window, lastMousePosition);
 		lastMousePosition = { sf::Mouse::getPosition(window).x, sf::Mouse::getPosition(window).y };
@@ -312,7 +319,6 @@ int main()
 		if (level)
 		{
 			level->renderDebug(*shaderHandler);
-			//level->renderPlayableArea(*shaderHandler);
 		}
 
 #ifdef RENDER_AABB

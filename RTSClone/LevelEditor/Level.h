@@ -27,10 +27,11 @@ public:
 	Level& operator=(Level&&) = delete;
 	static std::unique_ptr<Level> create(const std::string& levelName);
 	static std::unique_ptr<Level> load(const std::string& levelName);
-
+	
 	const std::string& getName() const;
 
-	void handleInput(const sf::Event& currentSFMLEvent, const Camera& camera, const sf::Window& window, float deltaTime, glm::uvec2 windowSize);
+	void handleInput(const sf::Event& currentSFMLEvent, const Camera& camera, const sf::Window& window, float deltaTime, 
+		glm::uvec2 windowSize, bool& quitLevel);
 	void handleModelNamesGUI();
 	void handlePlayersGUI();
 	void handleSelectedEntityGUI();

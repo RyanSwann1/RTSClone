@@ -158,7 +158,8 @@ const std::string& Level::getName() const
 	return m_levelName;
 }
 
-void Level::handleInput(const sf::Event& currentSFMLEvent, const Camera& camera, const sf::Window& window, float deltaTime, glm::uvec2 windowSize)
+void Level::handleInput(const sf::Event& currentSFMLEvent, const Camera& camera, const sf::Window& window, float deltaTime, 
+	glm::uvec2 windowSize, bool& quitLevel)
 {
 	switch (currentSFMLEvent.type)
 	{
@@ -169,6 +170,20 @@ void Level::handleInput(const sf::Event& currentSFMLEvent, const Camera& camera,
 			{
 				m_gameObjectManager.removeGameObject(*m_selectedGameObject);
 				m_selectedGameObject = nullptr;
+			}
+		}
+		else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Escape))
+		{
+			if (m_selectedBase || m_selectedGameObject || m_selectedMineral)
+			{
+				m_selectedBase = nullptr;
+				m_selectedGameObject = nullptr;
+				m_selectedMineral = nullptr;
+			}
+			else
+			{
+				assert(!quitLevel);
+				quitLevel = true;
 			}
 		}
 		break;
