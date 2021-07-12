@@ -164,6 +164,7 @@
     <ClCompile Include="..\Shared\Quad.cpp" />
     <ClCompile Include="..\Shared\ShaderHandler.cpp" />
     <ClCompile Include="GameObjectManager.cpp" />
+    <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="Level.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
@@ -194,6 +195,7 @@
     <ClInclude Include="..\Shared\Quad.h" />
     <ClInclude Include="..\Shared\ShaderHandler.h" />
     <ClInclude Include="GameObjectManager.h" />
+    <ClInclude Include="GameObject.h" />
     <ClInclude Include="Level.h" />
     <ClInclude Include="Notes.h" />
   </ItemGroup>
