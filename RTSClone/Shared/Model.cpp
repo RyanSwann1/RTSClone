@@ -74,13 +74,13 @@ void Model::render(ShaderHandler& shaderHandler, const glm::vec3& position, cons
 	}
 }
 
-void Model::render(ShaderHandler& shaderHandler, const glm::vec3& position, glm::vec3 rotation) const
+void Model::render(ShaderHandler& shaderHandler, const glm::vec3& position, glm::vec3 rotation, bool highlight) const
 {	
 	setModelMatrix(shaderHandler, position, rotation);
 
 	for (const auto& mesh : meshes)
 	{
-		mesh.render(shaderHandler, false);
+		mesh.render(shaderHandler, highlight);
 	}
 }
 

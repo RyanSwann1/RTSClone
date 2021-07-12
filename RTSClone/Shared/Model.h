@@ -19,7 +19,7 @@ struct Model
 
 	void render(ShaderHandler& shaderHandler, const glm::vec3& position, const glm::vec3& additionalColor, float opacity,
 		glm::vec3 rotation = glm::vec3(0.0f)) const;
-	void render(ShaderHandler& shaderHandler, const glm::vec3& position, glm::vec3 rotation = glm::vec3(0.0f)) const;
+	void render(ShaderHandler& shaderHandler, const glm::vec3& position, glm::vec3 rotation = glm::vec3(0.0f), bool highlight = false) const;
 #ifdef GAME
 	void render(ShaderHandler& shaderHandler, eFactionController owningFactionController, const glm::vec3& position,
 		glm::vec3 rotation, bool highlight = false) const;

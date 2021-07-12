@@ -30,7 +30,7 @@ void GameObject::setPosition(const glm::vec3& _position)
 
 void GameObject::render(ShaderHandler& shaderHandler, bool highlight) const
 {
-	model.get().render(shaderHandler, position, rotation);
+	model.get().render(shaderHandler, position, rotation, highlight);
 }
 
 #ifdef RENDER_AABB
