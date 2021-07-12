@@ -208,8 +208,7 @@ void Level::handleInput(const sf::Event& currentSFMLEvent, const Camera& camera,
 	break;
 	case sf::Event::MouseMoved:
 		if (!ImGui::IsWindowHovered(ImGuiHoveredFlags_::ImGuiHoveredFlags_AnyWindow) &&
-			!ImGui::IsAnyItemHovered() && 
-			sf::Mouse::isButtonPressed(sf::Mouse::Left))
+			!ImGui::IsAnyItemHovered())
 		{
 			glm::vec3 planeIntersection(0.0f);
 			if (camera.getRayToGroundIntersection(window, windowSize, planeIntersection))
@@ -256,6 +255,11 @@ void Level::handleModelNamesGUI()
 		{
 			m_plannedEntity.modelNameIDSelected = i;
 			m_plannedEntity.model = &ModelManager::getInstance().getModel(modelNames[i]);
+			m_selectedBase = nullptr;
+			m_selectedGameObject = nullptr;
+			m_selectedMineral = nullptr;
+
+			break;
 		}	
 	}
 
