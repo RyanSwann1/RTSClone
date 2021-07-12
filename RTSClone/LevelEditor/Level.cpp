@@ -175,25 +175,7 @@ void Level::handleInput(const sf::Event& currentSFMLEvent, const Camera& camera,
 	case sf::Event::MouseButtonReleased:
 		if (!ImGui::IsWindowHovered(ImGuiHoveredFlags_::ImGuiHoveredFlags_AnyWindow) &&
 			!ImGui::IsAnyItemHovered())
-		{
-			glm::vec3 planeIntersection(0.0f);
-			if (camera.getRayToGroundIntersection(window, windowSize, planeIntersection))
-			{
-				if (m_selectedGameObject && 
-					m_gameObjectManager.getGameObject(planeIntersection) != m_selectedGameObject)
-				{
-					m_selectedGameObject = nullptr;
-				}
-			}
-			else
-			{
-				m_selectedGameObject = nullptr;
-			}
-
-			m_selectedBase = nullptr;
-			m_selectedMineral = nullptr;
-			m_selectedGameObject = nullptr;
-		}
+		{}
 		break;
 	case sf::Event::MouseButtonPressed:
 		if (!ImGui::IsWindowHovered(ImGuiHoveredFlags_::ImGuiHoveredFlags_AnyWindow) &&
@@ -222,17 +204,12 @@ void Level::handleInput(const sf::Event& currentSFMLEvent, const Camera& camera,
 					}
 				}
 			}
-			else if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Right))
-			{
-				m_plannedEntity.model = nullptr;
-				m_selectedGameObject = nullptr;
-				m_selectedBase = nullptr;
-			}
 		}
 	break;
 	case sf::Event::MouseMoved:
 		if (!ImGui::IsWindowHovered(ImGuiHoveredFlags_::ImGuiHoveredFlags_AnyWindow) &&
-			!ImGui::IsAnyItemHovered())
+			!ImGui::IsAnyItemHovered() && 
+			sf::Mouse::isButtonPressed(sf::Mouse::Left))
 		{
 			glm::vec3 planeIntersection(0.0f);
 			if (camera.getRayToGroundIntersection(window, windowSize, planeIntersection))
