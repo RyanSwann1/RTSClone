@@ -100,6 +100,10 @@ int main()
 		float deltaTime = gameClock.restart().asSeconds();
 		
 		//Handle Input
+		if (level)
+		{
+			level->handleImmediateInput(camera, window, windowSize);
+		}
 		sf::Event currentSFMLEvent;
 		while (window.pollEvent(currentSFMLEvent))
 		{

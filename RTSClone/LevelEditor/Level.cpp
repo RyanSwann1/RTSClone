@@ -158,6 +158,49 @@ const std::string& Level::getName() const
 	return m_levelName;
 }
 
+void Level::handleImmediateInput(const Camera& camera, const sf::Window& window, glm::uvec2 windowSize)
+{
+	//Left Click
+	{
+		static bool leftButtonPressed = false;
+		if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left))
+		{
+			if (!leftButtonPressed && !ImGui::IsWindowHovered(ImGuiHoveredFlags_::ImGuiHoveredFlags_AnyWindow) &&
+				!ImGui::IsAnyItemHovered())
+			{
+				leftButtonPressed = true;
+				if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left))
+				{
+					glm::vec3 planeIntersection(0.0f);
+					if (camera.getRayToGroundIntersection(window, windowSize, planeIntersection))
+					{
+						if (m_plannedEntity.model)
+						{
+							m_gameObjectManager.addGameObject(*m_plannedEntity.model, m_plannedEntity.position);
+						}
+						else
+						{
+							m_selectedGameObject = m_gameObjectManager.getGameObject(planeIntersection);
+							if (!m_selectedGameObject)
+							{
+								m_selectedBase = getBase(m_mainBases, m_secondaryBases, planeIntersection);
+								if (!m_selectedBase)
+								{
+									m_selectedMineral = getBaseMineral(m_mainBases, m_secondaryBases, planeIntersection);
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+		else
+		{
+			leftButtonPressed = false;
+		}
+	}
+}
+
 void Level::handleInput(const sf::Event& currentSFMLEvent, const Camera& camera, const sf::Window& window, float deltaTime, 
 	glm::uvec2 windowSize, bool& quitLevel)
 {
@@ -193,33 +236,6 @@ void Level::handleInput(const sf::Event& currentSFMLEvent, const Camera& camera,
 		{}
 		break;
 	case sf::Event::MouseButtonPressed:
-		if (!ImGui::IsWindowHovered(ImGuiHoveredFlags_::ImGuiHoveredFlags_AnyWindow) &&
-			!ImGui::IsAnyItemHovered())
-		{
-			if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left))
-			{
-				glm::vec3 planeIntersection(0.0f);
-				if (camera.getRayToGroundIntersection(window, windowSize, planeIntersection))
-				{
-					if (m_plannedEntity.model)
-					{
-						m_gameObjectManager.addGameObject(*m_plannedEntity.model, m_plannedEntity.position);
-					}
-					else
-					{
-						m_selectedGameObject = m_gameObjectManager.getGameObject(planeIntersection);
-						if (!m_selectedGameObject)
-						{
-							m_selectedBase = getBase(m_mainBases, m_secondaryBases, planeIntersection);
-							if (!m_selectedBase)
-							{
-								m_selectedMineral = getBaseMineral(m_mainBases, m_secondaryBases, planeIntersection);
-							}
-						}
-					}
-				}
-			}
-		}
 	break;
 	case sf::Event::MouseMoved:
 		if (!ImGui::IsWindowHovered(ImGuiHoveredFlags_::ImGuiHoveredFlags_AnyWindow) &&

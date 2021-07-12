@@ -30,6 +30,7 @@ public:
 	
 	const std::string& getName() const;
 
+	void handleImmediateInput(const Camera& camera, const sf::Window& window, glm::uvec2 windowSize);
 	void handleInput(const sf::Event& currentSFMLEvent, const Camera& camera, const sf::Window& window, float deltaTime, 
 		glm::uvec2 windowSize, bool& quitLevel);
 	void handleModelNamesGUI();
