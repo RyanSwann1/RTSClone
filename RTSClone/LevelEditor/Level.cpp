@@ -217,11 +217,12 @@ void Level::handleInput(const sf::Event& currentSFMLEvent, const Camera& camera,
 		}
 		else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Escape))
 		{
-			if (m_selectedBase || m_selectedGameObject || m_selectedMineral)
+			if (m_selectedBase || m_selectedGameObject || m_selectedMineral || m_plannedEntity.model)
 			{
 				m_selectedBase = nullptr;
 				m_selectedGameObject = nullptr;
 				m_selectedMineral = nullptr;
+				m_plannedEntity.model = nullptr;
 			}
 			else
 			{
