@@ -36,9 +36,9 @@ const std::vector<Mineral>& Base::getMinerals() const
 #endif // GAME
 
 #ifdef LEVEL_EDITOR
-Base::Base(const glm::vec3& position)
-	: quad(position, MAIN_BASE_QUAD_SIZE, MAIN_BASE_QUAD_COLOR),
-	position(position),
+Base::Base()
+	: quad(glm::vec3(0.f), MAIN_BASE_QUAD_SIZE, MAIN_BASE_QUAD_COLOR),
+	position(0.f),
 	minerals(Globals::MAX_MINERALS)
 {}
 

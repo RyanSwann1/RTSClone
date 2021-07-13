@@ -10,26 +10,7 @@
 
 namespace
 {
-	const std::array<glm::vec3, static_cast<size_t>(eFactionController::Max) + 1> FACTION_STARTING_POSITIONS =
-	{
-		glm::vec3(4.0f * static_cast<float>(Globals::NODE_SIZE),
-		Globals::GROUND_HEIGHT,
-		3.0f * static_cast<float>(Globals::NODE_SIZE)),
-
-		glm::vec3(11.0f * static_cast<float>(Globals::NODE_SIZE),
-		Globals::GROUND_HEIGHT,
-		3.0f * static_cast<float>(Globals::NODE_SIZE)),
-
-		glm::vec3(4.0f * static_cast<float>(Globals::NODE_SIZE),
-		Globals::GROUND_HEIGHT,
-		13.0f * static_cast<float>(Globals::NODE_SIZE)),
-
-		glm::vec3(14.0f * static_cast<float>(Globals::NODE_SIZE),
-		Globals::GROUND_HEIGHT,
-		13.0f * static_cast<float>(Globals::NODE_SIZE)),
-	};
-
-
+	constexpr size_t MINIMUM_MAIN_BASE_COUNT = 2;
 	constexpr int MAX_MAP_SIZE = 60 * Globals::NODE_SIZE;
 	constexpr int DEFAULT_STARTING_RESOURCES = 100;
 	constexpr int DEFAULT_STARTING_POPULATION_CAP = 5;
@@ -126,9 +107,7 @@ Level::Level(const std::string& levelName)
 
 	if (!LevelFileHandler::loadLevelFromFile(*this))
 	{
-		m_mainBases.emplace_back(FACTION_STARTING_POSITIONS[static_cast<int>(eFactionController::Player)]);
-		m_mainBases.emplace_back(FACTION_STARTING_POSITIONS[static_cast<int>(eFactionController::AI_1)]);
-
+		m_mainBases.resize(MINIMUM_MAIN_BASE_COUNT);
 		LevelFileHandler::saveLevelToFile(*this);
 	}
 }
@@ -407,7 +386,7 @@ void Level::handleMainBasesGui()
 		{
 			if (newMainBaseQuantity > static_cast<int>(m_mainBases.size()))
 			{
-				m_mainBases.emplace_back(FACTION_STARTING_POSITIONS[newMainBaseQuantity - 1]);
+				m_mainBases.emplace_back();
 			}
 			else
 			{
@@ -429,7 +408,7 @@ void Level::handleSecondaryBaseGUI()
 		{
 			if (secondaryBaseQuantity > static_cast<int>(m_secondaryBases.size()))
 			{
-				m_secondaryBases.emplace_back(FACTION_STARTING_POSITIONS[secondaryBaseQuantity - 1]);
+				m_secondaryBases.emplace_back();
 			}
 			else
 			{

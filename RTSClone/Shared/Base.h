@@ -10,7 +10,7 @@
 struct Base
 {
 #ifdef LEVEL_EDITOR
-	Base(const glm::vec3& position);
+	Base();
 #endif // LEVEL_EDITOR
 	Base(const glm::vec3& position, std::vector<Mineral>&& minerals);
 
