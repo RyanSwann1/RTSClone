@@ -23,6 +23,8 @@ struct GameObject
 
 	glm::vec3 position;
 	glm::vec3 rotation;
+	glm::vec3 scale;
 	AABB aabb;
 	std::reference_wrapper<Model> model;
+	bool useLocalScale;
 };

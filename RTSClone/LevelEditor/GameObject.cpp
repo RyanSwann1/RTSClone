@@ -7,8 +7,10 @@
 GameObject::GameObject(Model& model)
 	: position(),
 	rotation(),
+	scale(model.scale),
 	aabb(),
-	model(model)
+	model(model),
+	useLocalScale(false)
 {
 	aabb.reset(position, model);
 }
@@ -16,8 +18,10 @@ GameObject::GameObject(Model& model)
 GameObject::GameObject(Model& model, const glm::vec3& startingPosition, glm::vec3 startingRotation)
 	: position(startingPosition),
 	rotation(startingRotation),
+	scale(model.scale),
 	aabb(),
-	model(model)
+	model(model),
+	useLocalScale(false)
 {
 	aabb.reset(position, model);
 }
@@ -30,7 +34,7 @@ void GameObject::setPosition(const glm::vec3& _position)
 
 void GameObject::render(ShaderHandler& shaderHandler, bool highlight) const
 {
-	model.get().render(shaderHandler, position, rotation, highlight);
+	model.get().render(shaderHandler, *this, highlight);
 }
 
 #ifdef RENDER_AABB

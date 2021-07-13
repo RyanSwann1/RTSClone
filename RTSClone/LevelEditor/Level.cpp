@@ -341,11 +341,21 @@ void Level::handleSelectedEntityGUI()
 		}
 
 		ImGui::NewLine();
-		ImGui::Text("Scale");
-		float scale = 0.f;
-		if (ImGui::InputFloat("size", &scale, 0.2f))
+		ImGui::Text("Local Scale");
+		float localScale = 0.f;
+		if (ImGui::InputFloat("LocalScale", &localScale, 0.2f))
 		{
-			m_selectedGameObject->model.get().scale += scale;
+			m_selectedGameObject->scale += localScale;
+			m_selectedGameObject->useLocalScale = true;
+		}
+
+		ImGui::NewLine();
+		ImGui::Text("Global Scale");
+		float globalScale = 0.f;
+		if (ImGui::InputFloat("GlobalScale", &globalScale, 0.2f))
+		{
+			m_selectedGameObject->model.get().scale += globalScale;
+			m_selectedGameObject->useLocalScale = false;
 		}
 
 		ImGui::EndChild();

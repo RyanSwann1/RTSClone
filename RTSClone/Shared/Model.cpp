@@ -6,6 +6,8 @@
 #include "glm/gtx/transform.hpp"
 #ifdef GAME
 #include "Entity.h"
+#else
+#include "GameObject.h"
 #endif // GAME
 
 Model::Model(bool renderFromCentrePosition, const glm::vec3& AABBSizeFromCenter, const glm::vec3& scale,
@@ -46,6 +48,36 @@ void Model::setModelMatrix(ShaderHandler& shaderHandler, glm::vec3 position, con
 		model = glm::translate(model, position);
 		model = glm::scale(model, scale);
 		model = glm::rotate(model, glm::radians(rotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
+	}
+
+	shaderHandler.setUniformMat4f(eShaderType::Default, "uModel", model);
+}
+
+void Model::setModelMatrix(ShaderHandler& shaderHandler, const GameObject& gameObject) const
+{
+	glm::vec3 gameObjectPosition = gameObject.position;
+	glm::vec3 gameObjectScale = scale;
+	if(gameObject.useLocalScale)
+	{
+		gameObjectScale = gameObject.scale;
+	}
+	glm::mat4 model = glm::mat4(1.0f);
+	if (renderFromCentrePosition)
+	{
+		gameObjectPosition.x += AABBSizeFromCenter.x;
+		gameObjectPosition.z -= AABBSizeFromCenter.z;
+
+		model = glm::translate(model, gameObjectPosition);
+		model = glm::scale(model, gameObjectScale);
+		model = glm::translate(model, glm::vec3(-AABBSizeFromCenter.x, 0.0f, AABBSizeFromCenter.z));
+		model = glm::rotate(model, glm::radians(gameObject.rotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
+		model = glm::translate(model, glm::vec3(AABBSizeFromCenter.x, 0.0f, -AABBSizeFromCenter.z));
+	}
+	else
+	{
+		model = glm::translate(model, gameObjectPosition);
+		model = glm::scale(model, gameObjectScale);
+		model = glm::rotate(model, glm::radians(gameObject.rotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
 	}
 
 	shaderHandler.setUniformMat4f(eShaderType::Default, "uModel", model);
@@ -93,6 +125,16 @@ void Model::render(ShaderHandler& shaderHandler, eFactionController owningFactio
 	for (const auto& mesh : meshes)
 	{
 		mesh.render(shaderHandler, owningFactionController, highlight);
+	}
+}
+#else
+void Model::render(ShaderHandler& shaderHandler, const GameObject& gameObject, bool highlight /*= false*/) const
+{
+	setModelMatrix(shaderHandler, gameObject);
+
+	for (const auto& mesh : meshes)
+	{
+		mesh.render(shaderHandler, highlight);
 	}
 }
 #endif // GAME
