@@ -15,6 +15,7 @@ struct GameObject
 	GameObject& operator=(GameObject&&) = default;
 
 	void setPosition(const glm::vec3& position);
+	void rotate(float y);
 	void render(ShaderHandler& shaderHandler, bool highlight = false) const;
 
 #ifdef RENDER_AABB

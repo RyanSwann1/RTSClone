@@ -30,18 +30,19 @@ namespace
 	};
 
 
-	const int MAX_MAP_SIZE = 60 * Globals::NODE_SIZE;
-	const int DEFAULT_STARTING_RESOURCES = 100;
-	const int DEFAULT_STARTING_POPULATION_CAP = 5;
-	const glm::ivec2 DEFAULT_MAP_SIZE = { 30, 30 };
-	const float ENTITY_TRANSLATE_SPEED = 5.0f;
-	const glm::vec3 PLAYABLE_AREA_GROUND_COLOR = { 1.0f, 1.0f, 0.5f };
-	const glm::vec3 MAIN_BASE_QUAD_COLOR = { 1.0f, 0.0f, 0.0f };
-	const glm::vec3 SECONDARY_BASE_QUAD_COLOR = { 0.0f, 1.0f, 0.0f };
-	const float PLAYABLE_AREA_OPACITY = 0.1f;
+	constexpr int MAX_MAP_SIZE = 60 * Globals::NODE_SIZE;
+	constexpr int DEFAULT_STARTING_RESOURCES = 100;
+	constexpr int DEFAULT_STARTING_POPULATION_CAP = 5;
+	constexpr glm::ivec2 DEFAULT_MAP_SIZE = { 30, 30 };
+	constexpr float ENTITY_TRANSLATE_SPEED = 5.0f;
+	constexpr glm::vec3 PLAYABLE_AREA_GROUND_COLOR = { 1.0f, 1.0f, 0.5f };
+	constexpr glm::vec3 MAIN_BASE_QUAD_COLOR = { 1.0f, 0.0f, 0.0f };
+	constexpr glm::vec3 SECONDARY_BASE_QUAD_COLOR = { 0.0f, 1.0f, 0.0f };
+	constexpr float PLAYABLE_AREA_OPACITY = 0.1f;
+	constexpr float GAMEOBJECT_Y_ROTATION = 90.f;
 
-	const int MIN_FACTIONS = 2;
-	const int DEFAULT_FACTIONS_COUNT = 2;
+	constexpr int MIN_FACTIONS = 2;
+	constexpr int DEFAULT_FACTIONS_COUNT = 2;
 
 	Base* getBase(std::vector<Base>& mainBases, std::vector<Base>& secondaryBases, const glm::vec3& position)
 	{
@@ -230,6 +231,13 @@ void Level::handleInput(const sf::Event& currentSFMLEvent, const Camera& camera,
 				quitLevel = true;
 			}
 		}
+		else if (sf::Keyboard::isKeyPressed(sf::Keyboard::R))
+		{
+			if (m_selectedGameObject)
+			{
+				m_selectedGameObject->rotate(GAMEOBJECT_Y_ROTATION);
+			}
+		}
 		break;
 	case sf::Event::MouseButtonReleased:
 		if (!ImGui::IsWindowHovered(ImGuiHoveredFlags_::ImGuiHoveredFlags_AnyWindow) &&
@@ -332,12 +340,10 @@ void Level::handleSelectedEntityGUI()
 
 		ImGui::NewLine();
 		ImGui::Text("Rotation");
-		if(ImGui::InputFloat("yy", &m_selectedGameObject->rotation.y, 90.0f))
+		float yRotation = m_selectedGameObject->rotation.y;
+		if(ImGui::InputFloat("yy", &yRotation, GAMEOBJECT_Y_ROTATION))
 		{
-			if (glm::abs(m_selectedGameObject->rotation.y) >= 360.0f)
-			{
-				m_selectedGameObject->rotation = { m_selectedGameObject->rotation.x, 0.0f, m_selectedGameObject->rotation.z };
-			}
+			m_selectedGameObject->rotate(yRotation);
 		}
 
 		ImGui::NewLine();

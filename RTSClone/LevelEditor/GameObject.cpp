@@ -32,6 +32,15 @@ void GameObject::setPosition(const glm::vec3& _position)
 	aabb.update(position);
 }
 
+void GameObject::rotate(float y)
+{
+	rotation.y += y;
+	if (glm::abs(y) >= 360.0f)
+	{
+		rotation = { rotation.x, 0.0f, rotation.z };
+	}
+}
+
 void GameObject::render(ShaderHandler& shaderHandler, bool highlight) const
 {
 	model.get().render(shaderHandler, *this, highlight);
