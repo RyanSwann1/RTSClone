@@ -53,14 +53,8 @@ void GameObjectManager::render(ShaderHandler& shaderHandler, const GameObject* s
 {
 	for (const auto& gameObject : m_gameObjects)
 	{
-		if (selectedGameObject && &*gameObject == &(*selectedGameObject))
-		{
-			gameObject->render(shaderHandler, true);
-		}
-		else
-		{
-			gameObject->render(shaderHandler);
-		}
+		bool highlight = selectedGameObject && gameObject.get() == &(*selectedGameObject);
+		gameObject->render(shaderHandler, highlight);
 	}
 }
 
