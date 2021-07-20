@@ -132,9 +132,6 @@
     <ClCompile Include="Laboratory.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="RenderPathMesh.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="GameMessages.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -178,6 +175,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="AIUnattachedToBaseWorkers.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Shared\RenderPrimitiveMesh.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -440,9 +440,6 @@
     <ClInclude Include="Laboratory.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="RenderPathMesh.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Entity.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -495,6 +492,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="AIUnattachedToBaseWorkers.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Shared\RenderPrimitiveMesh.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -12,7 +12,7 @@
 #include "GameMessages.h"
 #include "GameMessenger.h"
 #ifdef RENDER_PATHING
-#include "RenderPathMesh.h"
+#include "RenderPrimitiveMesh.h"
 #endif // RENDER_PATHING
 
 namespace
@@ -395,6 +395,6 @@ void Unit::switchToState(eUnitState newState, const Map& map, FactionHandler& fa
 #ifdef RENDER_PATHING
 void Unit::renderPathMesh(ShaderHandler& shaderHandler)
 {
-	RenderPathMesh::render(shaderHandler, m_pathToPosition, m_renderPathMesh);
+	RenderPrimitiveMesh::render(shaderHandler, m_pathToPosition, m_renderPathMesh);
 }
 #endif // RENDER_PATHING

@@ -165,6 +165,7 @@
     <ClCompile Include="..\Shared\ModelManager.cpp" />
     <ClCompile Include="..\Shared\OpenGLResource.cpp" />
     <ClCompile Include="..\Shared\Quad.cpp" />
+    <ClCompile Include="..\Shared\RenderPrimitiveMesh.cpp" />
     <ClCompile Include="..\Shared\ShaderHandler.cpp" />
     <ClCompile Include="AdjacentPositions.cpp" />
     <ClCompile Include="AIAction.cpp" />
@@ -186,7 +187,6 @@
     <ClCompile Include="MiniMap.cpp" />
     <ClCompile Include="Projectile.cpp" />
     <ClCompile Include="ProjectileHandler.cpp" />
-    <ClCompile Include="RenderPathMesh.cpp" />
     <ClCompile Include="SceneryGameObject.cpp" />
     <ClCompile Include="EntitySelector.cpp" />
     <ClCompile Include="Sprite.cpp" />
@@ -227,6 +227,7 @@
     <ClInclude Include="..\Shared\ModelManager.h" />
     <ClInclude Include="..\Shared\OpenGLResource.h" />
     <ClInclude Include="..\Shared\Quad.h" />
+    <ClInclude Include="..\Shared\RenderPrimitiveMesh.h" />
     <ClInclude Include="..\Shared\ShaderHandler.h" />
     <ClInclude Include="ActiveStatus.h" />
     <ClInclude Include="AdjacentPositions.h" />
@@ -281,7 +282,6 @@
     <ClInclude Include="Laboratory.h" />
     <ClInclude Include="MinHeap.h" />
     <ClInclude Include="MiniMap.h" />
-    <ClInclude Include="RenderPathMesh.h" />
     <ClInclude Include="SceneryGameObject.h" />
     <ClInclude Include="Level.h" />
     <ClInclude Include="EntitySelector.h" />

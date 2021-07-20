@@ -14,7 +14,7 @@
 #include "GameMessages.h"
 #include "Base.h"
 #ifdef RENDER_PATHING
-#include "RenderPathMesh.h"
+#include "RenderPrimitiveMesh.h"
 #endif // RENDER_PATHING
 
 namespace
@@ -456,7 +456,7 @@ void Worker::renderBuildingCommands(ShaderHandler& shaderHandler) const
 
 void Worker::renderPathMesh(ShaderHandler& shaderHandler)
 {
-	RenderPathMesh::render(shaderHandler, m_pathToPosition, m_renderPathMesh);
+	RenderPrimitiveMesh::render(shaderHandler, m_pathToPosition, m_renderPathMesh);
 }
 
 void Worker::switchTo(eWorkerState newState, const Map& map, const Mineral* mineralToHarvest)
