@@ -45,7 +45,7 @@ public:
 
 #ifdef RENDER_AABB
 	void render(ShaderHandler& shaderHandler);
-	Mesh m_mesh;
+	Mesh mesh;
 #endif // RENDER_AABB
 
 private:
