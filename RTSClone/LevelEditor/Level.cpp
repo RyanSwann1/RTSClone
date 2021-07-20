@@ -243,17 +243,17 @@ void Level::handleInput(const sf::Event& currentSFMLEvent, const Camera& camera,
 				else if (m_selectedGameObject && sf::Mouse::isButtonPressed(sf::Mouse::Button::Left))
 				{
 					glm::vec3 position = Globals::convertToNodePosition(planeIntersection);
-					m_selectedGameObject->setPosition({ position.x, Globals::GROUND_HEIGHT, position.z });
+					m_selectedGameObject->setPosition({ position.x, m_selectedGameObject->position.y, position.z });
 				}
 				else if (m_selectedBase && sf::Mouse::isButtonPressed(sf::Mouse::Button::Left))
 				{
 					glm::vec3 position = Globals::convertToNodePosition(planeIntersection);
-					m_selectedBase->setPosition({ position.x, Globals::GROUND_HEIGHT, position.z });
+					m_selectedBase->setPosition({ position.x, m_selectedBase->position.y, position.z });
 				}
 				else if (m_selectedMineral && sf::Mouse::isButtonPressed(sf::Mouse::Button::Left))
 				{
 					glm::vec3 position = Globals::convertToNodePosition(planeIntersection);
-					m_selectedMineral->setPosition({ position.x, Globals::GROUND_HEIGHT, position.z });
+					m_selectedMineral->setPosition({ position.x, m_selectedMineral->getPosition().y, position.z });
 				}
 			}
 		}
