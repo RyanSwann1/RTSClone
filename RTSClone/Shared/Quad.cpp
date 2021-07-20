@@ -36,10 +36,10 @@ Quad::Quad(const glm::vec3& position, const glm::vec3& size, const glm::vec3& co
 	m_position(position),
 	m_size(size),
 	m_color(color),
-	m_AABB(position, m_size),
+	m_AABB(m_position, m_size),
 	m_VAO(),
 	m_VBO(GL_ARRAY_BUFFER)
-{}
+{}  
 
 const glm::vec3& Quad::getSize() const
 {

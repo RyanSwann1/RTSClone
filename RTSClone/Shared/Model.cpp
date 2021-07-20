@@ -53,35 +53,7 @@ void Model::setModelMatrix(ShaderHandler& shaderHandler, glm::vec3 position, con
 	shaderHandler.setUniformMat4f(eShaderType::Default, "uModel", model);
 }
 
-void Model::setModelMatrix(ShaderHandler& shaderHandler, const GameObject& gameObject) const
-{
-	glm::vec3 gameObjectPosition = gameObject.position;
-	glm::vec3 gameObjectScale = scale;
-	if(gameObject.useLocalScale)
-	{
-		gameObjectScale = gameObject.scale;
-	}
-	glm::mat4 model = glm::mat4(1.0f);
-	if (renderFromCentrePosition)
-	{
-		gameObjectPosition.x += AABBSizeFromCenter.x;
-		gameObjectPosition.z -= AABBSizeFromCenter.z;
 
-		model = glm::translate(model, gameObjectPosition);
-		model = glm::scale(model, gameObjectScale);
-		model = glm::translate(model, glm::vec3(-AABBSizeFromCenter.x, 0.0f, AABBSizeFromCenter.z));
-		model = glm::rotate(model, glm::radians(gameObject.rotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
-		model = glm::translate(model, glm::vec3(AABBSizeFromCenter.x, 0.0f, -AABBSizeFromCenter.z));
-	}
-	else
-	{
-		model = glm::translate(model, gameObjectPosition);
-		model = glm::scale(model, gameObjectScale);
-		model = glm::rotate(model, glm::radians(gameObject.rotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
-	}
-
-	shaderHandler.setUniformMat4f(eShaderType::Default, "uModel", model);
-}
 
 std::unique_ptr<Model> Model::create(const std::string & fileName, bool renderFromCentrePosition, 
 	const glm::vec3& AABBSizeFromCenter, const glm::vec3& scale)
@@ -136,5 +108,35 @@ void Model::render(ShaderHandler& shaderHandler, const GameObject& gameObject, b
 	{
 		mesh.render(shaderHandler, highlight);
 	}
+}
+
+void Model::setModelMatrix(ShaderHandler& shaderHandler, const GameObject& gameObject) const
+{
+	glm::vec3 gameObjectPosition = gameObject.position;
+	glm::vec3 gameObjectScale = scale;
+	if (gameObject.useLocalScale)
+	{
+		gameObjectScale = gameObject.scale;
+	}
+	glm::mat4 model = glm::mat4(1.0f);
+	if (renderFromCentrePosition)
+	{
+		gameObjectPosition.x += AABBSizeFromCenter.x;
+		gameObjectPosition.z -= AABBSizeFromCenter.z;
+
+		model = glm::translate(model, gameObjectPosition);
+		model = glm::scale(model, gameObjectScale);
+		model = glm::translate(model, glm::vec3(-AABBSizeFromCenter.x, 0.0f, AABBSizeFromCenter.z));
+		model = glm::rotate(model, glm::radians(gameObject.rotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
+		model = glm::translate(model, glm::vec3(AABBSizeFromCenter.x, 0.0f, -AABBSizeFromCenter.z));
+	}
+	else
+	{
+		model = glm::translate(model, gameObjectPosition);
+		model = glm::scale(model, gameObjectScale);
+		model = glm::rotate(model, glm::radians(gameObject.rotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
+	}
+
+	shaderHandler.setUniformMat4f(eShaderType::Default, "uModel", model);
 }
 #endif // GAME

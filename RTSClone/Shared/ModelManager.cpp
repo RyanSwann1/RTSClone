@@ -180,6 +180,14 @@ const Model& ModelManager::getModel(const std::string& modelName) const
 	return *(*model);
 }
 
+
+
+bool ModelManager::isAllModelsLoaded() const
+{
+	return m_loadedAllModels;
+}
+
+#ifdef LEVEL_EDITOR
 Model& ModelManager::getModel(const std::string& modelName)
 {
 	auto model = std::find_if(m_models.cbegin(), m_models.cend(), [&modelName](const auto& model)
@@ -191,12 +199,6 @@ Model& ModelManager::getModel(const std::string& modelName)
 	return *(*model);
 }
 
-bool ModelManager::isAllModelsLoaded() const
-{
-	return m_loadedAllModels;
-}
-
-#ifdef LEVEL_EDITOR
 bool ModelManager::isModelLoaded(const std::string& modelName) const
 {
 	auto model = std::find_if(m_models.cbegin(), m_models.cend(), [&modelName](const auto& model)

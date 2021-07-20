@@ -5,26 +5,22 @@
 #include "ModelManager.h"
 
 GameObject::GameObject(Model& model)
-	: position(),
-	rotation(),
+	: position(0.f),
+	rotation(0.f),
 	scale(model.scale),
-	aabb(),
+	aabb(position, model),
 	model(model),
 	useLocalScale(false)
-{
-	aabb.reset(position, model);
-}
+{}
 
 GameObject::GameObject(Model& model, const glm::vec3& startingPosition, glm::vec3 startingRotation)
 	: position(startingPosition),
 	rotation(startingRotation),
 	scale(model.scale),
-	aabb(),
+	aabb(position, model),
 	model(model),
 	useLocalScale(false)
-{
-	aabb.reset(position, model);
-}
+{}
 
 void GameObject::setPosition(const glm::vec3& _position)
 {
