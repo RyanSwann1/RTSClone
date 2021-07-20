@@ -96,6 +96,9 @@
     <ClCompile Include="..\Shared\OpenGLResource.cpp">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="..\Shared\RenderPrimitiveMesh.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Shared\imgui\imstb_truetype.h">
@@ -183,6 +186,9 @@
       <Filter>src</Filter>
     </ClInclude>
     <ClInclude Include="..\Shared\OpenGLResource.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Shared\RenderPrimitiveMesh.h">
       <Filter>src</Filter>
     </ClInclude>
   </ItemGroup>

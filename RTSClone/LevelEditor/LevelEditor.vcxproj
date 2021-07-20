@@ -162,6 +162,7 @@
     <ClCompile Include="..\Shared\ModelManager.cpp" />
     <ClCompile Include="..\Shared\OpenGLResource.cpp" />
     <ClCompile Include="..\Shared\Quad.cpp" />
+    <ClCompile Include="..\Shared\RenderPrimitiveMesh.cpp" />
     <ClCompile Include="..\Shared\ShaderHandler.cpp" />
     <ClCompile Include="GameObjectManager.cpp" />
     <ClCompile Include="GameObject.cpp" />
@@ -193,6 +194,7 @@
     <ClInclude Include="..\Shared\ModelManager.h" />
     <ClInclude Include="..\Shared\OpenGLResource.h" />
     <ClInclude Include="..\Shared\Quad.h" />
+    <ClInclude Include="..\Shared\RenderPrimitiveMesh.h" />
     <ClInclude Include="..\Shared\ShaderHandler.h" />
     <ClInclude Include="GameObjectManager.h" />
     <ClInclude Include="GameObject.h" />
