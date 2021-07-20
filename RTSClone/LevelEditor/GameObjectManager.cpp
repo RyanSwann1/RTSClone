@@ -67,7 +67,7 @@ void GameObjectManager::render(ShaderHandler& shaderHandler, const GameObject* s
 #ifdef RENDER_AABB
 void GameObjectManager::renderGameObjectAABB(ShaderHandler& shaderHandler)
 {
-	for (auto& gameObject : m_gameObjects)
+	for (const auto& gameObject : m_gameObjects)
 	{
 		gameObject->renderAABB(shaderHandler);	
 	}
@@ -104,7 +104,7 @@ std::ostream& operator<<(std::ostream& ostream, const GameObjectManager& gameObj
 	{
 		ostream << gameObject->model.get().modelName << " " <<
 			gameObject->rotation.x << " " << gameObject->rotation.y << " " << gameObject->rotation.z << " " <<
-			gameObject->rotation.x << " " << gameObject->rotation.y << " " << gameObject->rotation.z << "\n";
+			gameObject->position.x << " " << gameObject->position.y << " " << gameObject->position.z << "\n";
 	}
 	
 	return ostream;
