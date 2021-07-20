@@ -318,6 +318,21 @@ void Level::handleSelectedEntityGUI()
 		}
 
 		ImGui::NewLine();
+		ImGui::Text("Global Height");
+		float height = 0.f;
+		if (ImGui::InputFloat("height", &height, 1.f))
+		{
+			m_selectedGameObject->position.y += height;
+			for (auto& gameObject : m_gameObjectManager.m_gameObjects)
+			{
+				if (gameObject->model.get().modelName == m_selectedGameObject->model.get().modelName)
+				{
+					gameObject->position.y = m_selectedGameObject->position.y;
+				}	
+			}
+		}
+
+		ImGui::NewLine();
 		ImGui::Text("Rotation");
 		float yRotation = m_selectedGameObject->rotation.y;
 		if(ImGui::InputFloat("yy", &yRotation, GAMEOBJECT_Y_ROTATION))
@@ -328,7 +343,7 @@ void Level::handleSelectedEntityGUI()
 		ImGui::NewLine();
 		ImGui::Text("Local Scale");
 		float localScale = 0.f;
-		if (ImGui::InputFloat("LocalScale", &localScale, 0.2f))
+		if (ImGui::InputFloat("LocalScale", &localScale, 1.f))
 		{
 			m_selectedGameObject->scale += localScale;
 			m_selectedGameObject->useLocalScale = true;
@@ -337,7 +352,7 @@ void Level::handleSelectedEntityGUI()
 		ImGui::NewLine();
 		ImGui::Text("Global Scale");
 		float globalScale = 0.f;
-		if (ImGui::InputFloat("GlobalScale", &globalScale, 0.2f))
+		if (ImGui::InputFloat("GlobalScale", &globalScale, 1.f))
 		{
 			m_selectedGameObject->model.get().scale += globalScale;
 			m_selectedGameObject->useLocalScale = false;

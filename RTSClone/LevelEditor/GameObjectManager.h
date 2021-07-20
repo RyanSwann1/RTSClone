@@ -8,9 +8,8 @@
 
 struct Model;
 class ShaderHandler;
-class GameObjectManager
+struct GameObjectManager
 {
-public:
 	GameObjectManager();
 	GameObjectManager(const GameObjectManager&) = delete;
 	GameObjectManager& operator=(const GameObjectManager&) = delete;
@@ -30,6 +29,5 @@ public:
 	void renderGameObjectAABB(ShaderHandler& shaderHandler);
 #endif // RENDER_AABB
 
-private:
 	std::vector<std::unique_ptr<GameObject>> m_gameObjects;
 };
