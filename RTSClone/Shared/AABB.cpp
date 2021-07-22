@@ -22,8 +22,7 @@ AABB::AABB()
 	m_top(0.0f),
 	m_bottom(0.0f),
 	m_forward(0.0f),
-	m_back(0.0f),
-	m_position(0.f)
+	m_back(0.0f)
 {}
 
 AABB::AABB(const glm::vec3& position, const glm::vec3& size)
@@ -32,8 +31,7 @@ AABB::AABB(const glm::vec3& position, const glm::vec3& size)
 	m_top(0.0f),
 	m_bottom(0.0f),
 	m_forward(0.0f),
-	m_back(0.0f),
-	m_position(position)
+	m_back(0.0f)
 {
 	reset(position, size);
 }
@@ -44,8 +42,7 @@ AABB::AABB(const glm::vec3& position, const Model& model)
 	m_top(0.0f),
 	m_bottom(0.0f),
 	m_forward(0.0f),
-	m_back(0.0f),
-	m_position(position)
+	m_back(0.0f)
 {
 	reset(position, model);
 }
@@ -85,6 +82,15 @@ AABB::AABB(const std::vector<Unit*>& selectedUnits)
 	}
 }
 #endif // GAME
+
+AABB::AABB(float left, float right, float forward, float back)
+	: m_left(left),
+	m_right(right),
+	m_top(0.f),
+	m_bottom(0.f),
+	m_forward(forward),
+	m_back(back)
+{}
 
 glm::vec3 AABB::getMax() const
 {
@@ -184,7 +190,6 @@ void AABB::adjustBack(float size)
 
 void AABB::update(const glm::vec3& position)
 {
-	m_position = position;
 	float x = (m_right - m_left) / 2.0f;
 	float y = (m_top - m_bottom) / 2.0f;
 	float z = (m_forward - m_back) / 2.0f;
@@ -199,34 +204,7 @@ void AABB::update(const glm::vec3& position)
 
 void AABB::update(const glm::vec3& position, const glm::vec3& size)
 {
-	m_position = position;
 	reset(position, size);
-}
-
-void AABB::updateSize(const glm::vec3& size)
-{
-	if (size.x > 0.f)
-	{
-		m_right += size.x;
-	}
-	else if(size.x < 0.f)
-	{
-		m_left += size.x;
-	}
-
-	if (size.z > 0.f)
-	{
-		m_forward += size.z;
-	}
-	else if (size.z < 0.f)
-	{
-		m_back += size.z;
-	}
-	//size.x ? m_right += size.x : m_left += size.x;
-	//size.z ? m_forward += size.z : m_back += size.z;
-
-	glm::vec3 position = getCenterPosition();
-	//reset(m_position, size);
 }
 
 void AABB::reset(const glm::vec3& position, const Model& model)

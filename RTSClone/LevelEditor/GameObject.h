@@ -9,6 +9,8 @@ struct GameObject
 {
 	GameObject(Model& model);
 	GameObject(Model& model, const glm::vec3& startingPosition, glm::vec3 startingRotation = glm::vec3(0.0f));
+	GameObject(Model& model, const glm::vec3& startingPosition, const glm::vec3& rotation, const glm::vec3& scale, 
+		float left, float right, float forward, float back, bool useLocalScale);
 	GameObject(const GameObject&) = delete;
 	GameObject& operator=(const GameObject&) = delete;
 	GameObject(GameObject&&) = default;

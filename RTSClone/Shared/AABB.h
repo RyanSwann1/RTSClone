@@ -20,6 +20,7 @@ public:
 	AABB();
 	AABB(const glm::vec3& position, const glm::vec3& size);
 	AABB(const glm::vec3& position, const Model& model);
+	AABB(float left, float right, float forward, float back);
 #ifdef GAME
 	AABB(const std::vector<Unit*>& selectedUnits);
 #endif // GAME
@@ -48,7 +49,6 @@ public:
 
 	void update(const glm::vec3& position);
 	void update(const glm::vec3& position, const glm::vec3& size);
-	void updateSize(const glm::vec3& size);
 	void reset(const glm::vec3& position, const Model& model);
 	void reset(const glm::vec3& position, const glm::vec3& size);
 	void reset();
@@ -65,5 +65,4 @@ private:
 	float m_bottom;
 	float m_forward;
 	float m_back;
-	glm::vec3 m_position;
 };

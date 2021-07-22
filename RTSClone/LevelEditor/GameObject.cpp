@@ -22,6 +22,16 @@ GameObject::GameObject(Model& model, const glm::vec3& startingPosition, glm::vec
 	useLocalScale(false)
 {}
 
+GameObject::GameObject(Model& model, const glm::vec3& startingPosition, const glm::vec3& rotation, const glm::vec3& scale, 
+	float left, float right, float forward, float back, bool useLocalScale)
+	: position(startingPosition),
+	rotation(rotation),
+	scale(scale),
+	aabb(left, right, forward, back),
+	model(model),
+	useLocalScale(useLocalScale)
+{}
+
 void GameObject::setPosition(const glm::vec3& _position)
 {
 	position = _position;
