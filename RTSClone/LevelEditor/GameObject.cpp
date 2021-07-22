@@ -28,6 +28,13 @@ void GameObject::setPosition(const glm::vec3& _position)
 	aabb.update(position);
 }
 
+void GameObject::move(const glm::vec3& _position)
+{
+	glm::vec3 oldPosition = position;
+	position = _position;
+	aabb.move(oldPosition, position);
+}
+
 void GameObject::rotate(float y)
 {
 	rotation.y += y;

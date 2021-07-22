@@ -22,7 +22,8 @@ AABB::AABB()
 	m_top(0.0f),
 	m_bottom(0.0f),
 	m_forward(0.0f),
-	m_back(0.0f)
+	m_back(0.0f),
+	m_position(0.f)
 {}
 
 AABB::AABB(const glm::vec3& position, const glm::vec3& size)
@@ -31,7 +32,8 @@ AABB::AABB(const glm::vec3& position, const glm::vec3& size)
 	m_top(0.0f),
 	m_bottom(0.0f),
 	m_forward(0.0f),
-	m_back(0.0f)
+	m_back(0.0f),
+	m_position(position)
 {
 	reset(position, size);
 }
@@ -42,7 +44,8 @@ AABB::AABB(const glm::vec3& position, const Model& model)
 	m_top(0.0f),
 	m_bottom(0.0f),
 	m_forward(0.0f),
-	m_back(0.0f)
+	m_back(0.0f),
+	m_position(position)
 {
 	reset(position, model);
 }
@@ -101,6 +104,11 @@ glm::vec3 AABB::getCenterPosition() const
 	return glm::vec3(m_left + (width / 2.0f), Globals::GROUND_HEIGHT, m_back + (depth / 2.0f));
 }
 
+glm::vec3 AABB::getSize() const
+{
+	return { m_right - m_left, m_top - m_bottom, m_forward - m_back };
+}
+
 float AABB::getLeft() const
 {
 	return m_left;
@@ -146,8 +154,37 @@ bool AABB::contains(const AABB& other) const
 		m_back < other.m_forward;
 }
 
+void AABB::move(const glm::vec3& currentPosition, const glm::vec3& position)
+{
+	m_right = position.x + (m_right - currentPosition.x);
+	m_left = position.x + (m_left - currentPosition.x);
+	m_forward = position.z + (m_forward - currentPosition.z);
+	m_back = position.z + (m_back - currentPosition.z);
+}
+
+void AABB::adjustRight(float size)
+{
+	m_right += size;
+}
+
+void AABB::adjustLeft(float size)
+{
+	m_left += size;
+}
+
+void AABB::adjustForward(float size)
+{
+	m_forward += size;
+}
+
+void AABB::adjustBack(float size)
+{
+	m_back += size;
+}
+
 void AABB::update(const glm::vec3& position)
 {
+	m_position = position;
 	float x = (m_right - m_left) / 2.0f;
 	float y = (m_top - m_bottom) / 2.0f;
 	float z = (m_forward - m_back) / 2.0f;
@@ -162,7 +199,34 @@ void AABB::update(const glm::vec3& position)
 
 void AABB::update(const glm::vec3& position, const glm::vec3& size)
 {
+	m_position = position;
 	reset(position, size);
+}
+
+void AABB::updateSize(const glm::vec3& size)
+{
+	if (size.x > 0.f)
+	{
+		m_right += size.x;
+	}
+	else if(size.x < 0.f)
+	{
+		m_left += size.x;
+	}
+
+	if (size.z > 0.f)
+	{
+		m_forward += size.z;
+	}
+	else if (size.z < 0.f)
+	{
+		m_back += size.z;
+	}
+	//size.x ? m_right += size.x : m_left += size.x;
+	//size.z ? m_forward += size.z : m_back += size.z;
+
+	glm::vec3 position = getCenterPosition();
+	//reset(m_position, size);
 }
 
 void AABB::reset(const glm::vec3& position, const Model& model)

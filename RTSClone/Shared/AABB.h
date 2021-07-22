@@ -27,6 +27,7 @@ public:
 	glm::vec3 getMax() const;
 	glm::vec3 getMin() const;
 	glm::vec3 getCenterPosition() const;
+	glm::vec3 getSize() const;
 	float getLeft() const;
 	float getRight() const;
 	float getTop() const;
@@ -37,8 +38,17 @@ public:
 	bool contains(const glm::vec3& position) const;
 	bool contains(const AABB& other) const;
 	
+#ifdef LEVEL_EDITOR
+	void move(const glm::vec3& currentPosition, const glm::vec3& position);
+	void adjustRight(float size);
+	void adjustLeft(float size);
+	void adjustForward(float size);
+	void adjustBack(float size);
+#endif // LEVEL_EDITOR
+
 	void update(const glm::vec3& position);
 	void update(const glm::vec3& position, const glm::vec3& size);
+	void updateSize(const glm::vec3& size);
 	void reset(const glm::vec3& position, const Model& model);
 	void reset(const glm::vec3& position, const glm::vec3& size);
 	void reset();
@@ -55,4 +65,5 @@ private:
 	float m_bottom;
 	float m_forward;
 	float m_back;
+	glm::vec3 m_position;
 };

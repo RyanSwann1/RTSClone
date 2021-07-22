@@ -243,7 +243,7 @@ void Level::handleInput(const sf::Event& currentSFMLEvent, const Camera& camera,
 				else if (m_selectedGameObject && sf::Mouse::isButtonPressed(sf::Mouse::Button::Left))
 				{
 					glm::vec3 position = Globals::convertToNodePosition(planeIntersection);
-					m_selectedGameObject->setPosition({ position.x, m_selectedGameObject->position.y, position.z });
+					m_selectedGameObject->move({ position.x, m_selectedGameObject->position.y, position.z });
 				}
 				else if (m_selectedBase && sf::Mouse::isButtonPressed(sf::Mouse::Button::Left))
 				{
@@ -356,6 +356,38 @@ void Level::handleSelectedEntityGUI()
 		{
 			m_selectedGameObject->model.get().scale += globalScale;
 			m_selectedGameObject->useLocalScale = false;
+		}
+
+		ImGui::NewLine();
+		ImGui::Text("AABB Forward Size");
+		float aabbForwardSize = 0.f;
+		if (ImGui::InputFloat("AABB Forward Size", &aabbForwardSize, Globals::NODE_SIZE))
+		{
+			m_selectedGameObject->aabb.adjustForward(aabbForwardSize);
+		}
+
+		ImGui::NewLine();
+		ImGui::Text("AABB Back Size");
+		float aabbBackSize = 0.f;
+		if (ImGui::InputFloat("AABB Back Size", &aabbBackSize, Globals::NODE_SIZE))
+		{
+			m_selectedGameObject->aabb.adjustBack(aabbBackSize);
+		}
+
+		ImGui::NewLine();
+		ImGui::Text("AABB Right Size");
+		float aabbRightSize = 0.f;
+		if (ImGui::InputFloat("AABB Right Size", &aabbRightSize, Globals::NODE_SIZE))
+		{
+			m_selectedGameObject->aabb.adjustRight(aabbRightSize);
+		}
+
+		ImGui::NewLine();
+		ImGui::Text("AABB Left Size");
+		float aabbLeftSize = 0.f;
+		if (ImGui::InputFloat("AABB Left Size", &aabbLeftSize, Globals::NODE_SIZE))
+		{
+			m_selectedGameObject->aabb.adjustLeft(aabbLeftSize);
 		}
 
 		ImGui::EndChild();
