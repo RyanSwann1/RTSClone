@@ -50,12 +50,13 @@ Base::Base(const glm::vec3& position, std::vector<Mineral>&& minerals)
 
 void Base::setPosition(const glm::vec3 & _position)
 {
+	glm::vec3 oldPosition = position;
 	position = _position;
 	quad.setPosition(position);
 
 	for (auto& mineral : minerals)
 	{
-		mineral.setPosition(position);
+		mineral.setPosition(position + (mineral.getPosition() - oldPosition));
 	}
 }
 #endif // LEVEL_EDITOR
