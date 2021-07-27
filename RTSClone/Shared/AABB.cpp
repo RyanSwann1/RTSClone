@@ -160,6 +160,7 @@ bool AABB::contains(const AABB& other) const
 		m_back < other.m_forward;
 }
 
+#ifdef LEVEL_EDITOR
 void AABB::move(const glm::vec3& currentPosition, const glm::vec3& position)
 {
 	m_right = position.x + (m_right - currentPosition.x);
@@ -187,6 +188,7 @@ void AABB::adjustBack(float size)
 {
 	m_back += size;
 }
+#endif // LEVEL_EDITOR
 
 void AABB::update(const glm::vec3& position)
 {

@@ -51,6 +51,7 @@ void RenderPrimitiveMesh::generate(const std::vector<glm::vec3>& path, Mesh& mes
 	mesh.attachToVAO();
 }
 
+#ifdef RENDER_AABB
 void RenderPrimitiveMesh::generate(AABB& aabb)
 {
 	aabb.mesh.vertices.clear();
@@ -77,6 +78,14 @@ void RenderPrimitiveMesh::generate(AABB& aabb)
 	aabb.mesh.attachToVAO();
 }
 
+void RenderPrimitiveMesh::render(ShaderHandler& shaderHandler, AABB& aabb, const glm::vec3& colour, float opacity)
+{
+	shaderHandler.setUniformVec3(eShaderType::Debug, "uColor", colour);
+	shaderHandler.setUniform1f(eShaderType::Debug, "uOpacity", opacity);
+	aabb.mesh.renderDebugMesh(shaderHandler);
+}
+#endif // RENDER_AABB
+
 void RenderPrimitiveMesh::render(ShaderHandler& shaderHandler, const std::vector<glm::vec3>& pathToPosition, Mesh& renderPathMesh)
 {
 	if (!pathToPosition.empty())
@@ -86,13 +95,6 @@ void RenderPrimitiveMesh::render(ShaderHandler& shaderHandler, const std::vector
 		RenderPrimitiveMesh::generate(pathToPosition, renderPathMesh);
 		renderPathMesh.renderDebugMesh(shaderHandler);
 	}
-}
-
-void RenderPrimitiveMesh::render(ShaderHandler& shaderHandler, AABB& aabb, const glm::vec3& colour, float opacity)
-{
-	shaderHandler.setUniformVec3(eShaderType::Debug, "uColor", colour);
-	shaderHandler.setUniform1f(eShaderType::Debug, "uOpacity", opacity);
-	aabb.mesh.renderDebugMesh(shaderHandler);
 }
 
 void RenderPrimitiveMesh::render(ShaderHandler& shaderHandler, const glm::vec3& position, Mesh& mesh)

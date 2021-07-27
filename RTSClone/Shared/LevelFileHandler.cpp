@@ -314,11 +314,21 @@ void loadScenery(std::ifstream& file, std::vector<SceneryGameObject>& scenery)
 	{
 		std::stringstream stream{ line };
 		std::string modelName;
-		glm::vec3 rotation;
-		glm::vec3 position;
-		stream >> modelName >> rotation.x >> rotation.y >> rotation.z >> position.x >> position.y >> position.z;
+		glm::vec3 rotation(0.f);
+		glm::vec3 position(0.f);
+		glm::vec3 scale(0.f);
+		float left = 0.f, right = 0.f, forward = 0.f, back = 0.f;
+		bool useLocalScale = false;
+		stream >>
+			modelName >>
+			rotation.x >> rotation.y >> rotation.z >>
+			position.x >> position.y >> position.z >>
+			scale.x >> scale.y >> scale.z >>
+			left >> right >> forward >> back >>
+			useLocalScale;
 
-		scenery.emplace_back(ModelManager::getInstance().getModel(modelName), position, rotation);
+		const Model& model = ModelManager::getInstance().getModel(modelName);
+		scenery.emplace_back(model, position, rotation, scale, left, right, forward, back);
 	};
 
 	auto conditional = [](const std::string& line)

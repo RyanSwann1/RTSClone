@@ -115,7 +115,7 @@ std::ostream& operator<<(std::ostream& ostream, const GameObjectManager& gameObj
 			go.position.x << " " << go.position.y << " " << go.position.z << " " <<
 			go.scale.x << " " << go.scale.y << " " << go.scale.z << " " <<
 			go.aabb.getLeft() << " " << go.aabb.getRight() << " " << go.aabb.getForward() << " " << go.aabb.getBack() << " " <<
-			go.useLocalScale;
+			go.useLocalScale << "\n";
 	}
 	
 	return ostream;

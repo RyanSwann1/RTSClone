@@ -5,11 +5,13 @@
 #include "Globals.h"
 #include "Model.h"
 
-SceneryGameObject::SceneryGameObject(const Model& model, const glm::vec3& position, const glm::vec3& rotation)
+SceneryGameObject::SceneryGameObject(const Model& model, const glm::vec3& position, const glm::vec3& rotation,
+	const glm::vec3& scale, float left, float right, float forward, float back)
 	: m_model(model),
-	m_AABB(position, model),
+	m_AABB(left, right, forward, back),
 	m_position(position),
 	m_rotation(rotation),
+	m_scale(scale),
 	m_active()
 {
 	broadcastToMessenger<GameMessages::AddAABBToMap>({ m_AABB });
@@ -21,6 +23,16 @@ SceneryGameObject::~SceneryGameObject()
 	{
 		broadcastToMessenger<GameMessages::RemoveAABBFromMap>({ m_AABB });
 	}
+}
+
+const glm::vec3& SceneryGameObject::getScale() const
+{
+	return m_scale;
+}
+
+const glm::vec3& SceneryGameObject::getRotation() const
+{
+	return m_rotation;
 }
 
 const glm::vec3& SceneryGameObject::getPosition() const
@@ -35,7 +47,7 @@ const AABB & SceneryGameObject::getAABB() const
 
 void SceneryGameObject::render(ShaderHandler& shaderHandler) const
 {
-	m_model.get().render(shaderHandler, m_position, m_rotation);
+	m_model.get().render(shaderHandler, *this);
 }
 
 #ifdef RENDER_AABB

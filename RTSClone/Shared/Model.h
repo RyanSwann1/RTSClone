@@ -7,8 +7,10 @@
 
 #ifdef LEVEL_EDITOR
 struct GameObject;
-#endif // LEVEL_EDITOR
+#else 
+class SceneryGameObject;
 enum class eFactionController;
+#endif // LEVEL_EDITOR
 class ShaderHandler;
 struct Model 
 {
@@ -26,6 +28,7 @@ struct Model
 #ifdef GAME
 	void render(ShaderHandler& shaderHandler, eFactionController owningFactionController, const glm::vec3& position,
 		glm::vec3 rotation, bool highlight = false) const;
+	void render(ShaderHandler& shaderHandler, const SceneryGameObject& gameObject) const;
 #else
 	void render(ShaderHandler& shaderHandler, const GameObject& gameObject, bool highlight = false) const;
 #endif // GAME
@@ -49,5 +52,7 @@ private:
 	void setModelMatrix(ShaderHandler& shaderHandler, glm::vec3 position, const glm::vec3& rotation) const;
 #ifdef LEVEL_EDITOR
 	void setModelMatrix(ShaderHandler& shaderHandler, const GameObject& gameObject) const;
+	#else
+	void setModelMatrix(ShaderHandler& shaderHandler, const SceneryGameObject& gameObject) const;
 #endif // LEVEL_EDITOR
 };

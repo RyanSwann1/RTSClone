@@ -11,8 +11,8 @@
 
 namespace
 {
-	const float TIME_BETWEEN_UNIT_STATE = 0.05f;
-	const glm::vec3 TERRAIN_COLOR = { 0.9098039f, 0.5176471f, 0.3882353f };
+	constexpr float TIME_BETWEEN_UNIT_STATE = 0.05f;
+	constexpr glm::vec3 TERRAIN_COLOR = { 0.9098039f, 0.5176471f, 0.3882353f };
 
 	int getActiveFactionCount(const FactionsContainer& factions)
 	{
@@ -112,7 +112,7 @@ std::unique_ptr<Level> Level::create(const std::string& levelName, glm::ivec2 wi
 	int AIBehaviourIndex = 0;
 	
 	assert(factionCount < static_cast<int>(eFactionController::Max) + 1 && 
-		factionCount < static_cast<int>(baseHandler->getBases().size()));
+		factionCount <= static_cast<int>(baseHandler->getBases().size()));
 	for (int i = 0; i < factionCount; ++i)
 	{
 		assert(!factions[i]);
