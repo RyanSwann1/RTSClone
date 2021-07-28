@@ -205,7 +205,7 @@ void Entity::render(ShaderHandler& shaderHandler, eFactionController owningFacti
 
 void Entity::renderHealthBar(ShaderHandler& shaderHandler, const Camera& camera, glm::uvec2 windowSize) const
 {
-	if (isSelected())
+	if (m_selected)
 	{
 		float width = Globals::ENTITIES_STAT_BAR_WIDTH[static_cast<int>(getEntityType())];
 		float yOffset = ENTITIES_YOFFSET_HEALTH[static_cast<int>(getEntityType())];
@@ -221,12 +221,16 @@ void Entity::renderHealthBar(ShaderHandler& shaderHandler, const Camera& camera,
 
 void Entity::renderShieldBar(ShaderHandler& shaderHandler, const Camera& camera, glm::uvec2 windowSize) const
 {
-	if (isSelected() && m_shield > 0)
+	if (m_selected && m_maximumShield > 0)
 	{
 		float width = Globals::ENTITIES_STAT_BAR_WIDTH[static_cast<int>(getEntityType())];
 		float yOffset = ENTITIES_YOFFSET_SHIELD[static_cast<int>(getEntityType())];
 
 		m_statbarSprite.render(m_position, windowSize, width, width, DEFAULT_STAT_BAR_HEIGHT, yOffset,
+			shaderHandler, camera, Globals::BACKGROUND_BAR_COLOR);
+
+		float currentShield = static_cast<float>(m_shield) / static_cast<float>(m_maximumShield);
+		m_statbarSprite.render(m_position, windowSize, width, width * currentShield, DEFAULT_STAT_BAR_HEIGHT, yOffset,
 			shaderHandler, camera, Globals::SHIELD_BAR_COLOR);
 	}
 }
