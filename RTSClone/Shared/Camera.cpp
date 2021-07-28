@@ -16,7 +16,6 @@ namespace
 	const float MOVEMENT_SPEED = 110.0f;
 	const float MOUSE_MOVEMENT_SPEED = 90.0f;
 	const float Z_OFFSET = 25.0f;
-	constexpr float MAX_CAMERA_ZOOM = 200.f;
 	constexpr float MIN_CAMERA_DISTANCE_TO_GROUND = 40.f;
 #endif // GAME
 
@@ -25,7 +24,7 @@ namespace
 	const float FAR_PLANE_DISTANCE = 1750.0f;
 	const float FIELD_OF_VIEW = 50.0f;
 	const float MOUSE_MOVE_BOUNDARY = 0.95f;
-	const glm::vec3 STARTING_POSITION = { 0.0f, 72.0f, 43.0f };
+	const glm::vec3 STARTING_POSITION = { 0.0f, 82.5f, 43.0f };
 	const glm::vec3 STARTING_ROTATION = { -70.0f, 0.0f, 0.0f };
 
 	const float ZOOM_STEP = 7.5f;

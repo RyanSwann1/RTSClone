@@ -21,9 +21,9 @@ namespace
 	constexpr glm::vec3 SECONDARY_BASE_QUAD_COLOR = { 0.0f, 1.0f, 0.0f };
 	constexpr float PLAYABLE_AREA_OPACITY = 0.1f;
 	constexpr float GAMEOBJECT_Y_ROTATION = 90.f;
-
 	constexpr int MIN_FACTIONS = 2;
 	constexpr int DEFAULT_FACTIONS_COUNT = 2;
+
 
 	Base* getBase(std::vector<Base>& mainBases, std::vector<Base>& secondaryBases, const glm::vec3& position)
 	{
@@ -102,8 +102,8 @@ Level::Level(const std::string& levelName)
 	m_factionStartingPopulationCap(DEFAULT_STARTING_POPULATION_CAP),
 	m_factionCount(DEFAULT_FACTIONS_COUNT)
 {
-	m_mainBases.reserve(static_cast<size_t>(eFactionController::Max) + 1);
-	m_secondaryBases.reserve(static_cast<size_t>(eFactionController::Max) + 1);
+	m_mainBases.reserve(Globals::MAX_MAIN_BASES);
+	m_secondaryBases.reserve(Globals::MAX_SECONDARY_BASES);
 
 	if (!LevelFileHandler::loadLevelFromFile(*this))
 	{
@@ -429,7 +429,7 @@ void Level::handleMainBasesGui()
 	int newMainBaseQuantity = static_cast<int>(m_mainBases.size());
 	if (ImGui::InputInt("Main Bases", &newMainBaseQuantity, 1, ImGuiInputTextFlags_ReadOnly))
 	{
-		if (newMainBaseQuantity >= MIN_FACTIONS && newMainBaseQuantity <= static_cast<int>(eFactionController::Max) + 1)
+		if (newMainBaseQuantity >= MIN_FACTIONS && newMainBaseQuantity <= Globals::MAX_MAIN_BASES)
 		{
 			if (newMainBaseQuantity > static_cast<int>(m_mainBases.size()))
 			{
@@ -451,7 +451,7 @@ void Level::handleSecondaryBaseGUI()
 	int secondaryBaseQuantity = static_cast<int>(m_secondaryBases.size());
 	if (ImGui::InputInt("Secondary Bases", &secondaryBaseQuantity, 1, ImGuiInputTextFlags_ReadOnly))
 	{
-		if (secondaryBaseQuantity >= 0 && secondaryBaseQuantity <= static_cast<int>(eFactionController::Max) + 1)
+		if (secondaryBaseQuantity >= 0 && secondaryBaseQuantity <= Globals::MAX_SECONDARY_BASES)
 		{
 			if (secondaryBaseQuantity > static_cast<int>(m_secondaryBases.size()))
 			{

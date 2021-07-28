@@ -1,54 +1,119 @@
 #Faction Count
-3
+4
 #Main Base Quantity
 4
 #Main Base Location_1
-36 0 36
+108 0 828
 #Main Base Location_2
-198 0 198
+84 0 90
 #Main Base Location_3
-198 0 36
+798 0 96
 #Main Base Location_4
-42 0 192
+822 0 816
 #Main Base Minerals_1
-30 0 6
-24 0 12
-18 0 18
-12 0 24
-6 0 30
+84 0 894
+72 0 888
+66 0 876
+60 0 864
+48 0 858
 #Main Base Minerals_2
-246 0 210
-240 0 216
-234 0 222
-228 0 228
-222 0 234
+36 0 66
+42 0 60
+48 0 54
+54 0 48
+60 0 42
 #Main Base Minerals_3
-228 0 12
-222 0 6
-234 0 18
-240 0 24
-246 0 30
+870 0 72
+858 0 60
+840 0 54
+822 0 54
+870 0 96
 #Main Base Minerals_4
-36 0 246
-30 0 240
-24 0 234
-18 0 228
-12 0 222
+900 0 870
+882 0 882
+870 0 894
+888 0 876
+858 0 900
+#Secondary Base Quantity
+8
+#Secondary Base Location_1
+114 0 258
+#Secondary Base Location_2
+294 0 84
+#Secondary Base Location_3
+120 0 624
+#Secondary Base Location_4
+294 0 846
+
+582 0 90
+
+840 0 360
+
+840 0 654
+
+696 0 834
+#Secondary Base Minerals_1
+60 0 276
+60 0 264
+60 0 252
+60 0 240
+60 0 228
+#Secondary Base Minerals_2
+252 0 36
+270 0 36
+282 0 36
+294 0 36
+306 0 36
+#Secondary Base Minerals_3
+48 0 648
+48 0 636
+48 0 624
+48 0 612
+48 0 600
+#Secondary Base Minerals_4
+318 0 906
+306 0 906
+294 0 906
+282 0 906
+270 0 906
+#Secondary Base Minerals_5
+564 0 48
+576 0 48
+588 0 48
+600 0 48
+612 0 48
+#Secondary Base Minerals_6
+882 0 330
+882 0 342
+882 0 354
+882 0 366
+882 0 378
+#Secondary Base Minerals_7
+906 0 642
+906 0 654
+906 0 666
+906 0 678
+906 0 690
+#Secondary Base Minerals_8
+708 0 906
+690 0 906
+672 0 900
+720 0 906
+696 0 906
 #Faction Starting Population
-40
+50
 #Faction Starting Resources
-510
+500
 #Map Size
-42 42
+156 156
 #Scenery
-alienBones.obj 0 0 0 84 0 66
-meteorFull.obj 0 0 0 12 0 96
-rocksTall.obj 0 0 0 84 0 12
-meteorHalf.obj 0 0 0 156 0 90
-meteorHalf.obj 0 0 0 84 0 168
-rocksTall.obj 0 0 0 108 0 114
-alienBones.obj 0 0 0 60 0 108
-meteorHalf.obj 0 0 0 78 0 108
-meteorHalf.obj 0 0 0 162 0 156
-alienBones.obj 0 0 0 222 0 120
-alienBones.obj 0 0 0 114 0 210
+meteorFull.obj 0 0 0 336 0 282 1 1 1 331 341 287 277 0
+meteorFull.obj 0 0 0 570 0 258 1 1 1 565 575 263 253 0
+meteorHalf.obj 0 0 0 288 0 408 1 1 1 283 293 413 403 0
+meteorHalf.obj 0 0 0 330 0 648 1 1 1 325 335 653 643 0
+meteorHalf.obj 0 0 0 510 0 690 1 1 1 505 515 695 685 0
+meteorHalf.obj 0 0 0 636 0 492 1 1 1 631 641 497 487 0
+meteorHalf.obj 0 0 0 432 -6 462 1 1 1 427 437 467 457 0
+meteorHalf.obj 0 0 0 432 0 462 1 1 1 427 437 467 457 0
+meteorHalf.obj 0 0 0 378 0 504 1 1 1 373 383 509 499 0
+meteorHalf.obj 0 0 0 294 0 474 5 5 5 259 329 503 445 1

@@ -17,9 +17,9 @@
 
 namespace
 {
-	const float MOVEMENT_SPEED = 7.5f;
-	const float TIME_BETWEEN_ATTACK = 1.0f;
-	const int DAMAGE = 1;
+	constexpr float MOVEMENT_SPEED = 10.f;
+	constexpr float TIME_BETWEEN_ATTACK = 1.0f;
+	constexpr int DAMAGE = 1;
 }
 
 Unit::Unit(Faction& owningFaction, const glm::vec3& startingPosition, const glm::vec3& startingRotation, const Map& map,

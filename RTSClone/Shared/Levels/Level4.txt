@@ -1,0 +1,37 @@
+#Faction Count
+2
+#Main Base Quantity
+2
+#Main Base Location_1
+144 0 126
+#Main Base Location_2
+42 0 42
+#Main Base Minerals_1
+174 0 144
+168 0 150
+162 0 156
+156 0 162
+150 0 168
+#Main Base Minerals_2
+36 0 12
+30 0 18
+24 0 24
+18 0 30
+12 0 36
+#Secondary Base Quantity
+0
+#Faction Starting Population
+5
+#Faction Starting Resources
+100
+#Map Size
+30 30
+#Scenery
+meteorFull.obj 0 0 0 120 0 48 4 4 4 97 143 71 25 1
+meteorHalf.obj 0 0 0 162 0 18 1 1 1 157 167 23 13 0
+meteorHalf.obj 0 0 0 30 0 162 1 1 1 25 35 167 157 0
+meteorHalf.obj 0 0 0 54 0 144 1 1 1 49 59 149 139 0
+meteorHalf.obj 0 0 0 60 0 102 1 1 1 55 65 107 97 0
+alienBones.obj 0 0 0 108 0 114 3 3 3 85 113 137 109 1
+alienBones.obj 0 0 0 30 0 96 2 2 2 13 35 113 91 1
+alienBones.obj 0 0 0 162 0 84 1 1 1 157 167 89 79 0
