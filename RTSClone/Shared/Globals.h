@@ -27,6 +27,14 @@ namespace Globals
 	constexpr size_t MAX_MAIN_BASES = static_cast<size_t>(eFactionController::Max) + 1;
 	constexpr size_t MAX_SECONDARY_BASES = MAX_MAIN_BASES * 2;
 
+	constexpr size_t MAX_UNITS = 50;
+	constexpr size_t MAX_WORKERS = 50;
+	constexpr size_t MAX_HEADQUARTERS = 4;
+	constexpr size_t MAX_SUPPLY_DEPOTS = 20;
+	constexpr size_t MAX_BARRACKS = 20;
+	constexpr size_t MAX_TURRETS = 20;
+	constexpr size_t MAX_LABORATORIES = 1;
+
 	inline const std::array<std::string, MAX_MAIN_BASES> TEXT_HEADER_MAIN_BASES
 	{
 		TEXT_HEADER_BEGINNING + "Main Base Location_1",

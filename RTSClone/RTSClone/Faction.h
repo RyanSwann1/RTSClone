@@ -33,10 +33,12 @@ public:
 	bool isAffordable(eEntityType entityType) const;
 	bool isAffordable(int resourceAmount) const;
 	bool isCollidingWithWorkerBuildQueue(const AABB& AABB) const;
+	bool isBuildingInAllWorkersQueue(eEntityType entityType) const;
 	int getCurrentShieldAmount() const;
 	int getCurrentPopulationAmount() const;
 	int getMaximumPopulationAmount() const;
 	int getCurrentResourceAmount() const;
+	int getLaboratoryCount() const;
 	const Headquarters& getMainHeadquarters() const;
 	const Headquarters& getClosestHeadquarters(const glm::vec3& position) const;
 	const glm::vec3& getMainHeadquartersPosition() const;

@@ -54,6 +54,7 @@ public:
 	eWorkerState getCurrentState() const;
 	bool isHoldingResources() const;
 	bool isRepairing() const;
+	bool isInBuildQueue(eEntityType entityType) const;
 	int extractResources();	
 
 	void repairEntity(const Entity& entity, const Map& map);

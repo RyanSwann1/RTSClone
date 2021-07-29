@@ -101,6 +101,14 @@ bool Worker::isRepairing() const
 	return m_repairTargetEntity.getID() != Globals::INVALID_ENTITY_ID;
 }
 
+bool Worker::isInBuildQueue(eEntityType entityType) const
+{
+	return std::find_if(m_buildQueue.cbegin(), m_buildQueue.cend(), [entityType](const auto& buildingInQueue)
+	{
+		return entityType == buildingInQueue.entityType;
+	}) != m_buildQueue.cend();
+}
+
 int Worker::extractResources()
 {
 	assert(isHoldingResources());
@@ -121,6 +129,13 @@ bool Worker::build(const glm::vec3& buildPosition, const Map& map, eEntityType e
 {
 	assert((baseToExpandTo && entityType == eEntityType::Headquarters) || (!baseToExpandTo && entityType != eEntityType::Headquarters));
 	assert((baseToExpandTo && baseToExpandTo->owningFactionController == eFactionController::None) || !baseToExpandTo);
+	
+	if (entityType == eEntityType::Laboratory && 
+		(m_owningFaction.get().getLaboratoryCount() == Globals::MAX_LABORATORIES || m_owningFaction.get().isBuildingInAllWorkersQueue(entityType)))
+	{
+		return false;
+	}
+
 	AABB buildingAABB(buildPosition, ModelManager::getInstance().getModel(entityType));
 	assert(map.isWithinBounds(buildingAABB) && !map.isAABBOccupied(buildingAABB));
 
