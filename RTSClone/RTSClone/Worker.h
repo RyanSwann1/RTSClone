@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Entity.h"
+#include "MovingEntity.h"
 #include "Timer.h"
 #include "AdjacentPositions.h"
 #include "TargetEntity.h"
@@ -8,9 +8,6 @@
 #include <vector>
 #include <deque>
 #include <functional>
-#ifdef RENDER_PATHING
-#include "Mesh.h"
-#endif // RENDER_PATHING
 
 //https://stackoverflow.com/questions/50182913/what-are-the-principles-involved-for-an-hierarchical-state-machine-and-how-to-i - HSM
 //https://gameprogrammingpatterns.com/state.html
@@ -41,7 +38,7 @@ struct BuildingInWorkerQueue
 struct Base;
 class Faction;
 class Mineral;
-class Worker : public Entity
+class Worker : public MovingEntity
 {
 public:
 	Worker(Faction& owningFaction, const Map& map, const glm::vec3& startingPosition, const glm::vec3& startingRotation);
@@ -77,16 +74,12 @@ public:
 private:
 	std::reference_wrapper<Faction> m_owningFaction;
 	eWorkerState m_currentState;
-	std::vector<glm::vec3> m_pathToPosition;
 	std::deque<BuildingInWorkerQueue> m_buildQueue;
 	const Base* m_baseToExpandTo;
 	RepairTargetEntity m_repairTargetEntity;
 	int m_currentResourceAmount;
 	Timer m_taskTimer;
 	const Mineral* m_mineralToHarvest;
-#ifdef RENDER_PATHING
-	Mesh m_renderPathMesh;
-#endif // RENDER_PATHING
 
 	void switchTo(eWorkerState newState, const Map& map, const Mineral* mineralToHarvest = nullptr);
 	void moveTo(const glm::vec3& destination, const Map& map, const AABB& ignoreAABB, eWorkerState state = eWorkerState::Moving);

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Entity.h"
+#include "MovingEntity.h"
 #include "AdjacentPositions.h"
 #include "Timer.h"
 #include "TargetEntity.h"
@@ -9,10 +9,6 @@
 #include "TypeComparison.h"
 #include <functional>
 #include <vector>
-#include <list>
-#ifdef RENDER_PATHING
-#include "Mesh.h"
-#endif // RENDER_PATHING
 
 enum class eUnitState
 {
@@ -27,7 +23,7 @@ class Faction;
 class Map;
 class ShaderHandler;
 class FactionHandler;
-class Unit : public Entity
+class Unit : public MovingEntity
 {
 public:
 	Unit(Faction& owningFaction, const glm::vec3& startingPosition, const glm::vec3& startingRotation, const Map& map,
@@ -57,13 +53,9 @@ public:
 
 private:
 	std::reference_wrapper<Faction> m_owningFaction;
-	std::vector<glm::vec3> m_pathToPosition;
 	eUnitState m_currentState;
 	Timer m_attackTimer;
 	TargetEntity m_targetEntity;
-#ifdef RENDER_PATHING
-	Mesh m_renderPathMesh;
-#endif // RENDER_PATHING
 
 	void switchToState(eUnitState newState, const Map& map, FactionHandler& factionHandler,
 		const Entity* targetEntity = nullptr, const Faction* targetFaction = nullptr);

@@ -24,10 +24,9 @@ namespace
 
 Unit::Unit(Faction& owningFaction, const glm::vec3& startingPosition, const glm::vec3& startingRotation, const Map& map,
 	FactionHandler& factionHandler)
-	: Entity(ModelManager::getInstance().getModel(UNIT_MODEL_NAME), startingPosition, eEntityType::Unit, 
+	: MovingEntity(ModelManager::getInstance().getModel(UNIT_MODEL_NAME), startingPosition, eEntityType::Unit, 
 		Globals::UNIT_STARTING_HEALTH, owningFaction.getCurrentShieldAmount(), startingRotation),
 	m_owningFaction(owningFaction),
-	m_pathToPosition(),
 	m_currentState(eUnitState::Idle),
 	m_attackTimer(TIME_BETWEEN_ATTACK, true),
 	m_targetEntity()
@@ -37,10 +36,9 @@ Unit::Unit(Faction& owningFaction, const glm::vec3& startingPosition, const glm:
 
 Unit::Unit(Faction & owningFaction, const glm::vec3 & startingPosition, const glm::vec3 & startingRotation, 
 	const glm::vec3 & destination, FactionHandler& factionHandler, const Map& map)
-	: Entity(ModelManager::getInstance().getModel(UNIT_MODEL_NAME), startingPosition, eEntityType::Unit,
+	: MovingEntity(ModelManager::getInstance().getModel(UNIT_MODEL_NAME), startingPosition, eEntityType::Unit,
 		Globals::UNIT_STARTING_HEALTH, owningFaction.getCurrentShieldAmount(), startingRotation),
 	m_owningFaction(owningFaction),
-	m_pathToPosition(),
 	m_currentState(eUnitState::Idle),
 	m_attackTimer(TIME_BETWEEN_ATTACK, true),
 	m_targetEntity()

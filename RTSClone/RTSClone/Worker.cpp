@@ -41,7 +41,7 @@ BuildingInWorkerQueue::BuildingInWorkerQueue(const glm::vec3& position, eEntityT
 
 //Worker
 Worker::Worker(Faction& owningFaction, const Map& map, const glm::vec3& startingPosition, const glm::vec3& startingRotation)
-	: Entity(ModelManager::getInstance().getModel(WORKER_MODEL_NAME), startingPosition, eEntityType::Worker, 
+	: MovingEntity(ModelManager::getInstance().getModel(WORKER_MODEL_NAME), startingPosition, eEntityType::Worker, 
 		Globals::WORKER_STARTING_HEALTH, owningFaction.getCurrentShieldAmount(), startingRotation),
 	m_owningFaction(owningFaction),
 	m_currentState(eWorkerState::Idle),
@@ -57,7 +57,7 @@ Worker::Worker(Faction& owningFaction, const Map& map, const glm::vec3& starting
 
 Worker::Worker(Faction& owningFaction, const glm::vec3 & startingPosition, const glm::vec3 & destination, const Map & map,
 	const glm::vec3& startingRotation)
-	: Entity(ModelManager::getInstance().getModel(WORKER_MODEL_NAME), startingPosition, eEntityType::Worker, Globals::WORKER_STARTING_HEALTH,
+	: MovingEntity(ModelManager::getInstance().getModel(WORKER_MODEL_NAME), startingPosition, eEntityType::Worker, Globals::WORKER_STARTING_HEALTH,
 		owningFaction.getCurrentShieldAmount(), startingRotation),
 	m_owningFaction(owningFaction),
 	m_currentState(eWorkerState::Idle),

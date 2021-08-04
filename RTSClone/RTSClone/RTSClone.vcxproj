@@ -282,6 +282,7 @@
     <ClInclude Include="Laboratory.h" />
     <ClInclude Include="MinHeap.h" />
     <ClInclude Include="MiniMap.h" />
+    <ClInclude Include="MovingEntity.h" />
     <ClInclude Include="SceneryGameObject.h" />
     <ClInclude Include="Level.h" />
     <ClInclude Include="EntitySelector.h" />
