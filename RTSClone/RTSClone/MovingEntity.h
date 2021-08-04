@@ -13,7 +13,7 @@ protected:
 		: Entity(model, startingPosition, entityType, health, shield, startingRotation)
 	{}
 
-	std::vector<glm::vec3> m_pathToPosition;
+	std::vector<glm::vec3> m_movementPath;
 #ifdef RENDER_PATHING
 	Mesh m_renderPathMesh;
 #endif // RENDER_PATHING
