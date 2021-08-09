@@ -122,6 +122,7 @@ void FactionPlayerPlannedBuilding::handleInput(const sf::Event& event, const Cam
             m_position = position;
         }
     }
+
 }
 
 void FactionPlayerPlannedBuilding::render(ShaderHandler& shaderHandler, const BaseHandler& baseHandler, const Map& map) const
@@ -158,12 +159,15 @@ bool FactionPlayerPlannedBuilding::isOnValidPosition(const BaseHandler& baseHand
     return false;
 }
 
-//factionPlayer
+//FactionPlayer
 FactionPlayer::FactionPlayer(const glm::vec3& hqStartingPosition, int startingResources, int startingPopulation)
     : Faction(eFactionController::Player, hqStartingPosition, startingResources, startingPopulation),
+    m_plannedBuilding(),
     m_entitySelector(),
     m_previousPlaneIntersection(),
-    m_attackMoveSelected(false)
+    m_attackMoveSelected(false),
+    m_addToDestinationQueue(false),
+    m_selectedEntities()
 {}
 
 const std::vector<Entity*>& FactionPlayer::getSelectedEntities() const
@@ -215,7 +219,13 @@ void FactionPlayer::handleInput(const sf::Event& currentSFMLEvent, const sf::Win
         case sf::Keyboard::A:
             m_attackMoveSelected = true;
             break;
+        case sf::Keyboard::LShift:
+            m_addToDestinationQueue = true;
+            break;
         }
+        break;
+    case sf::Event::KeyReleased:
+        m_addToDestinationQueue = false;
         break;
     }
 }
@@ -375,7 +385,7 @@ int FactionPlayer::instructWorkerToBuild(const Map& map, const BaseHandler& base
     return workerID;
 }
 
-void FactionPlayer::moveSingularSelectedEntity(const glm::vec3& planeIntersection, const Map& map, Entity& selectedEntity, 
+void FactionPlayer::moveSingularSelectedEntity(const glm::vec3& destination, const Map& map, Entity& selectedEntity, 
     FactionHandler& factionHandler, const BaseHandler& baseHandler) const
 {
     switch (selectedEntity.getEntityType())
@@ -383,13 +393,29 @@ void FactionPlayer::moveSingularSelectedEntity(const glm::vec3& planeIntersectio
     case eEntityType::Unit:
     {
         eUnitState state = (m_attackMoveSelected ? eUnitState::AttackMoving : eUnitState::Moving);
-        static_cast<Unit&>(selectedEntity).moveTo(planeIntersection, map, factionHandler, state);
+        Unit& unit = static_cast<Unit&>(selectedEntity);
+        if (m_addToDestinationQueue)
+        {
+            if (unit.getPathToPosition().empty())
+            {
+               unit.moveTo(destination, map, factionHandler);
+            }
+            else
+            {
+                unit.addToDestinationQueue(destination);
+            }
+        }
+        else
+        {
+            unit.clearDestinationQueue();
+            unit.moveTo(destination, map, factionHandler);
+        }
     }
         break;
     case eEntityType::Worker:
     {
         Worker& selectedWorker = static_cast<Worker&>(selectedEntity);
-        const Mineral* mineralToHarvest = baseHandler.getMineral(planeIntersection);
+        const Mineral* mineralToHarvest = baseHandler.getMineral(destination);
         if (mineralToHarvest)
         {
             bool mineralValid = false;
@@ -411,9 +437,9 @@ void FactionPlayer::moveSingularSelectedEntity(const glm::vec3& planeIntersectio
         else
         {
             auto selectedEntity = std::find_if(m_allEntities.cbegin(), m_allEntities.cend(), 
-                [&planeIntersection, &selectedWorker](const auto& entity)
+                [&destination, &selectedWorker](const auto& entity)
             {
-                return entity.get().getAABB().contains(planeIntersection) && entity.get().getID() != selectedWorker.getID();
+                return entity.get().getAABB().contains(destination) && entity.get().getID() != selectedWorker.getID();
             });
             if (selectedEntity != m_allEntities.cend() &&
                 (*selectedEntity).get().getHealth() < (*selectedEntity).get().getMaximumHealth())
@@ -422,7 +448,22 @@ void FactionPlayer::moveSingularSelectedEntity(const glm::vec3& planeIntersectio
             }
             else
             {
-                selectedWorker.moveTo(planeIntersection, map);
+                if (m_addToDestinationQueue)
+                {
+                    if (selectedWorker.getPathToPosition().empty())
+                    {
+                        selectedWorker.moveTo(destination, map);
+                    }
+                    else
+                    {
+                        selectedWorker.addToDestinationQueue(destination);
+                    }
+                }
+                else
+                {
+                    selectedWorker.clearDestinationQueue();
+                    selectedWorker.moveTo(destination, map);
+                }
             }
         }
     }
@@ -432,11 +473,11 @@ void FactionPlayer::moveSingularSelectedEntity(const glm::vec3& planeIntersectio
     }
 }
 
-void FactionPlayer::moveMultipleSelectedEntities(const glm::vec3& planeIntersection, const Map& map, 
+void FactionPlayer::moveMultipleSelectedEntities(const glm::vec3& destination, const Map& map, 
     FactionHandler& factionHandler, const BaseHandler& baseHandler)
 {
     assert(!m_selectedEntities.empty());
-    const Base* base = baseHandler.getBaseAtMineral(planeIntersection);
+    const Base* base = baseHandler.getBaseAtMineral(destination);
     if (base)
     {
         for (auto& selectedUnit : m_selectedEntities)
@@ -453,9 +494,9 @@ void FactionPlayer::moveMultipleSelectedEntities(const glm::vec3& planeIntersect
     }
     else
     {
-        auto selectedEntity = std::find_if(m_allEntities.cbegin(), m_allEntities.cend(), [&planeIntersection](const auto& entity)
+        auto selectedEntity = std::find_if(m_allEntities.cbegin(), m_allEntities.cend(), [&destination](const auto& entity)
         {
-            return entity.get().getAABB().contains(planeIntersection);
+            return entity.get().getAABB().contains(destination);
         });
 
         if (selectedEntity != m_allEntities.cend())
@@ -483,14 +524,46 @@ void FactionPlayer::moveMultipleSelectedEntities(const glm::vec3& planeIntersect
                 case eEntityType::Unit:
                 {
                     eUnitState state = (m_attackMoveSelected ? eUnitState::AttackMoving : eUnitState::Moving);
-                    glm::vec3 destination = planeIntersection - (averagePosition - selectedEntity->getPosition());
-                    static_cast<Unit&>(*selectedEntity).moveTo(destination, map, factionHandler, state);
+                    glm::vec3 destination = destination - (averagePosition - selectedEntity->getPosition());
+                    Unit& unit = static_cast<Unit&>(*selectedEntity);
+                    if (m_addToDestinationQueue)
+                    {
+                        if (unit.getPathToPosition().empty())
+                        {
+                            unit.moveTo(destination, map, factionHandler);
+                        }
+                        else
+                        {
+                            unit.addToDestinationQueue(destination);
+                        }
+                    }
+                    else
+                    {
+                        unit.clearDestinationQueue();
+                        unit.moveTo(destination, map, factionHandler);
+                    }
                 }
                 break;
                 case eEntityType::Worker:
                 {
-                    glm::vec3 destination = planeIntersection - (averagePosition - selectedEntity->getPosition());
-                    static_cast<Worker&>(*selectedEntity).moveTo(destination, map);
+                    glm::vec3 destination = destination - (averagePosition - selectedEntity->getPosition());
+                    Worker& worker = static_cast<Worker&>(*selectedEntity);
+                    if (m_addToDestinationQueue)
+                    {
+                        if (worker.getPathToPosition().empty())
+                        {
+                            worker.moveTo(destination, map);
+                        }
+                        else
+                        {
+                            worker.addToDestinationQueue(destination);
+                        }
+                    }
+                    else
+                    {
+                        worker.clearDestinationQueue();
+                        worker.moveTo(destination, map);
+                    }
                 }
                 break;
                 default:

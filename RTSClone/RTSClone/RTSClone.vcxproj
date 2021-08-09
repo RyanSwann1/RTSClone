@@ -185,6 +185,7 @@
     <ClCompile Include="Level.cpp" />
     <ClCompile Include="MinHeap.cpp" />
     <ClCompile Include="MiniMap.cpp" />
+    <ClCompile Include="MovingEntity.cpp" />
     <ClCompile Include="Projectile.cpp" />
     <ClCompile Include="ProjectileHandler.cpp" />
     <ClCompile Include="SceneryGameObject.cpp" />

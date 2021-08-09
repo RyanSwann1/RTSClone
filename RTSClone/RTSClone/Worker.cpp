@@ -189,7 +189,16 @@ void Worker::update(float deltaTime, const Map& map, FactionHandler& factionHand
 	case eWorkerState::Moving:
 		if (m_movementPath.empty())
 		{
-			switchTo(eWorkerState::Idle, map);
+			if (!m_destinationQueue.empty())
+			{
+				glm::vec3 destination = m_destinationQueue.front();
+				m_destinationQueue.pop_front();
+				moveTo(destination, map);
+			}
+			else
+			{
+				switchTo(eWorkerState::Idle, map);
+			}
 		}
 		break;
 	case eWorkerState::MovingToMinerals:
@@ -388,7 +397,7 @@ void Worker::moveTo(const Entity& target, const Map& map, eWorkerState state)
 	}
 }
 
-void Worker::moveTo(const glm::vec3& destination, const Map& map, eWorkerState state)
+void Worker::moveTo(const glm::vec3& destination, const Map& map, eWorkerState state /*= eWorkerState::Moving*/)
 {
 	glm::vec3 previousDestination = Globals::getNextPathDestination(m_movementPath, m_position);
 
@@ -480,7 +489,12 @@ void Worker::switchTo(eWorkerState newState, const Map& map, const Mineral* mine
 	switch (m_currentState)
 	{
 	case eWorkerState::Idle:
+	break;
 	case eWorkerState::Moving:
+		if (m_currentState != newState) 
+		{	
+			clearDestinationQueue();
+		}
 	break;
 	case eWorkerState::MovingToMinerals:
 	case eWorkerState::ReturningMineralsToHeadquarters:

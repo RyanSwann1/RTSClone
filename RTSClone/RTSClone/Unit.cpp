@@ -149,7 +149,8 @@ void Unit::moveTo(const glm::vec3& destination, const Map& map, FactionHandler& 
 	{
 		if (previousDestination != m_position)
 		{
-			PathFinding::getInstance().getPathToPosition(*this, previousDestination, m_movementPath, map, createAdjacentPositions(map, factionHandler, *this));
+			PathFinding::getInstance().getPathToPosition(*this, previousDestination, m_movementPath, map,
+				createAdjacentPositions(map, factionHandler, *this));
 
 			switchToState(state, map, factionHandler);
 		}
@@ -228,7 +229,16 @@ void Unit::update(float deltaTime, FactionHandler& factionHandler, const Map& ma
 		}
 		else if (m_movementPath.empty())
 		{
-			switchToState(eUnitState::Idle, map, factionHandler);
+			if (!m_destinationQueue.empty())
+			{
+				glm::vec3 destination = m_destinationQueue.front();
+				m_destinationQueue.pop_front();
+				moveTo(destination, map, factionHandler);
+			}
+			else
+			{
+				switchToState(eUnitState::Idle, map, factionHandler);
+			}
 		}
 		break;
 	case eUnitState::AttackMoving:
@@ -332,6 +342,7 @@ void Unit::switchToState(eUnitState newState, const Map& map, FactionHandler& fa
 {
 	assert(targetEntity && targetFaction || !targetEntity && !targetFaction);
 
+	//On Exit current state
 	switch (m_currentState)
 	{
 	case eUnitState::Idle:
@@ -342,8 +353,13 @@ void Unit::switchToState(eUnitState newState, const Map& map, FactionHandler& fa
 			broadcastToMessenger<GameMessages::RemoveUnitPositionFromMap>({ m_position, getID() });
 		}
 		break;
-	case eUnitState::AttackMoving:
 	case eUnitState::Moving:
+		if (m_currentState != newState)
+		{
+			clearDestinationQueue();
+		}
+		break;
+	case eUnitState::AttackMoving:
 		break;
 	default:
 		assert(false);

@@ -52,15 +52,16 @@ private:
 	EntitySelector m_entitySelector;
 	glm::vec3 m_previousPlaneIntersection;
 	bool m_attackMoveSelected;
+	bool m_addToDestinationQueue;
 	std::vector<Entity*> m_selectedEntities;
 
 	void onEntityRemoval(const Entity& entity) override;
 
 	void instructWorkerReturnMinerals(const Map& map, const Headquarters& headquarters);
 	int instructWorkerToBuild(const Map& map, const BaseHandler& baseHandler);
-	void moveSingularSelectedEntity(const glm::vec3& mouseToGroundPosition, const Map& map, Entity& selectedEntity, 
+	void moveSingularSelectedEntity(const glm::vec3& destination, const Map& map, Entity& selectedEntity, 
 		FactionHandler& factionHandler, const BaseHandler& baseHandler) const;
-	void moveMultipleSelectedEntities(const glm::vec3& mouseToGroundPosition, const Map& map, FactionHandler& factionHandler,
+	void moveMultipleSelectedEntities(const glm::vec3& destination, const Map& map, FactionHandler& factionHandler,
 		const BaseHandler& baseHandler);
 
 	void onLeftClick(const sf::Window& window, const Camera& camera, const Map& map, const BaseHandler& baseHandler);
