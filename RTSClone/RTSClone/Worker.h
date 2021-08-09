@@ -47,7 +47,7 @@ public:
 	
 	const Mineral* getMineralToHarvest() const;
 	const std::deque<BuildingInWorkerQueue>& getBuildingCommands() const;
-	const std::vector<glm::vec3>& getPathToPosition() const;
+	const std::vector<glm::vec3>& getMovementPath() const;
 	eWorkerState getCurrentState() const;
 	bool isHoldingResources() const;
 	bool isRepairing() const;

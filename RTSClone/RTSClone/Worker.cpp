@@ -81,7 +81,7 @@ const std::deque<BuildingInWorkerQueue>& Worker::getBuildingCommands() const
 	return m_buildQueue;
 }
 
-const std::vector<glm::vec3>& Worker::getPathToPosition() const
+const std::vector<glm::vec3>& Worker::getMovementPath() const
 {
 	return m_movementPath;
 }

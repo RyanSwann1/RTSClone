@@ -746,15 +746,15 @@ void Faction::revalidateExistingUnitPaths(const Map& map, FactionHandler& factio
 {
     for (auto& unit : m_units)
     {
-        if (!unit->getPathToPosition().empty())
+        if (!unit->getMovementPath().empty())
         {
-            unit->moveTo(unit->getPathToPosition().front(), map, factionHandler, unit->getCurrentState());
+            unit->moveTo(unit->getMovementPath().front(), map, factionHandler, unit->getCurrentState());
         }
     }
 
     for (auto& worker : m_workers)
     {
-        if (!worker->getPathToPosition().empty())
+        if (!worker->getMovementPath().empty())
         {
             switch (worker->getCurrentState())
             {
@@ -762,8 +762,8 @@ void Faction::revalidateExistingUnitPaths(const Map& map, FactionHandler& factio
             case eWorkerState::ReturningMineralsToHeadquarters:
             case eWorkerState::MovingToBuildingPosition:
             case eWorkerState::MovingToRepairPosition:
-                assert(!worker->getPathToPosition().empty());
-                worker->moveTo(worker->getPathToPosition().front(), map, worker->getCurrentState());
+                assert(!worker->getMovementPath().empty());
+                worker->moveTo(worker->getMovementPath().front(), map, worker->getCurrentState());
                 break;
             case eWorkerState::MovingToMinerals:
                 assert(worker->getMineralToHarvest());

@@ -69,7 +69,7 @@ const Faction& Unit::getOwningFaction() const
 	return m_owningFaction;
 }
 
-const std::vector<glm::vec3>& Unit::getPathToPosition() const
+const std::vector<glm::vec3>& Unit::getMovementPath() const
 {
 	return m_movementPath;
 }

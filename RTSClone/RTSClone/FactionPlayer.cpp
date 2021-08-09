@@ -396,7 +396,7 @@ void FactionPlayer::moveSingularSelectedEntity(const glm::vec3& destination, con
         Unit& unit = static_cast<Unit&>(selectedEntity);
         if (m_addToDestinationQueue)
         {
-            if (unit.getPathToPosition().empty())
+            if (unit.getMovementPath().empty())
             {
                unit.moveTo(destination, map, factionHandler);
             }
@@ -450,7 +450,7 @@ void FactionPlayer::moveSingularSelectedEntity(const glm::vec3& destination, con
             {
                 if (m_addToDestinationQueue)
                 {
-                    if (selectedWorker.getPathToPosition().empty())
+                    if (selectedWorker.getMovementPath().empty())
                     {
                         selectedWorker.moveTo(destination, map);
                     }
@@ -528,7 +528,7 @@ void FactionPlayer::moveMultipleSelectedEntities(const glm::vec3& destination, c
                     Unit& unit = static_cast<Unit&>(*selectedEntity);
                     if (m_addToDestinationQueue)
                     {
-                        if (unit.getPathToPosition().empty())
+                        if (unit.getMovementPath().empty())
                         {
                             unit.moveTo(destination, map, factionHandler);
                         }
@@ -550,7 +550,7 @@ void FactionPlayer::moveMultipleSelectedEntities(const glm::vec3& destination, c
                     Worker& worker = static_cast<Worker&>(*selectedEntity);
                     if (m_addToDestinationQueue)
                     {
-                        if (worker.getPathToPosition().empty())
+                        if (worker.getMovementPath().empty())
                         {
                             worker.moveTo(destination, map);
                         }
