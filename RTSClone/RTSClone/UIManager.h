@@ -29,10 +29,11 @@ public:
 	}
 
 protected:
-	Widget()
-		: m_active(false),
+	Widget(bool active = false)
+		: m_active(active),
 		m_receivedMessage()
 	{}
+
 	bool m_active;
 	MessageType m_receivedMessage;
 };
@@ -60,6 +61,14 @@ struct WinningFactionWidget : public Widget<GameMessages::UIDisplayWinner>
 	void render(const sf::Window& window);
 };
 
+class Mineral;
+struct SelectedMineralWidget : public Widget<GameMessages::UIDisplaySelectedMineral>
+{
+	SelectedMineralWidget(int mineralQuantity);
+	void render(const sf::Window& window);
+	const int mineralQuantity;
+};
+
 struct GameEvent;
 struct Camera;
 class FactionHandler;
@@ -82,11 +91,14 @@ public:
 private:
 	PlayerDetailsWidget m_playerDetailsWidget;
 	std::unique_ptr<SelectedEntityWidget> m_selectedEntityWidget;
+	std::unique_ptr<SelectedMineralWidget> m_selectedMineralWidget;
 	WinningFactionWidget m_winningFactionWidget;
 
 	void onDisplayPlayerDetails(const GameMessages::UIDisplayPlayerDetails& gameMessage);
 	void onDisplayEntity(const GameMessages::UIDisplaySelectedEntity& gameMessage);
 	void onDisplayWinningFaction(const GameMessages::UIDisplayWinner& gameMessage);
+	void onDisplayMineral(const GameMessages::UIDisplaySelectedMineral& gameMessage);
 	void onClearDisplayEntity(GameMessages::UIClearDisplaySelectedEntity message);
+	void onClearSelectedMineral(GameMessages::UIClearSelectedMineral message);
 	void onClearDisplayWinner(GameMessages::UIClearWinner message);
 };

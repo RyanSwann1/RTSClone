@@ -32,13 +32,13 @@ public:
 
 	void subscribe(const std::function<void(const Message&)>& callback, const void* ownerAddress)
 	{
-		assert(!isRegistered(ownerAddress));
+		assert(ownerAddress && !isRegistered(ownerAddress));
 		m_listeners.emplace_back(callback, ownerAddress);
 	}
 
 	void unsubscribe(const void* ownerAddress)
 	{
-		assert(isRegistered(ownerAddress));
+		assert(ownerAddress && isRegistered(ownerAddress));
 		auto listener = std::find_if(m_listeners.begin(), m_listeners.end(), [ownerAddress](const auto& listener)
 		{
 			return listener.ownerAddress == ownerAddress;
@@ -75,12 +75,14 @@ private:
 template <typename Message>
 void subscribeToMessenger(const std::function<void(const Message&)>& callback, const void* ownerAddress)
 {
+	assert(ownerAddress);
 	GameMessenger<Message>::getInstance().subscribe(callback, ownerAddress);
 }
 
 template <typename Message>
 void unsubscribeToMessenger(const void* ownerAddress)
 {
+	assert(ownerAddress);
 	GameMessenger<Message>::getInstance().unsubscribe(ownerAddress);
 }
 

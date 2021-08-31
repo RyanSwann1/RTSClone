@@ -12,6 +12,7 @@ class AABB;
 namespace GameMessages
 {
 	struct UIClearDisplaySelectedEntity {};
+	struct UIClearSelectedMineral {};
 	struct UIClearWinner {};
 
 	struct AddAABBToMap
@@ -91,5 +92,13 @@ namespace GameMessages
 		UIDisplayWinner(eFactionController winningFaction);
 
 		eFactionController winningFaction;
+	};
+
+	struct UIDisplaySelectedMineral
+	{
+		UIDisplaySelectedMineral(int mineralQuantity = 0)
+			: mineralQuantity(mineralQuantity) {}
+
+		const int mineralQuantity;
 	};
 }

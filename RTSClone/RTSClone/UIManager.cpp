@@ -7,6 +7,7 @@
 #include "Globals.h"
 #include "Camera.h"
 #include "FactionPlayer.h"
+#include "Mineral.h"
 #include <imgui/imgui.h>
 #include <string>
 #include <sstream>
@@ -210,10 +211,27 @@ void WinningFactionWidget::render(const sf::Window& window)
 	}
 }
 
+//SelectedMineralWidget
+SelectedMineralWidget::SelectedMineralWidget(int mineralQuantity)
+	: Widget(true),
+	mineralQuantity(mineralQuantity)
+{}
+
+void SelectedMineralWidget::render(const sf::Window& window)
+{
+	if (m_active)
+	{
+		ImGui::Begin("Selected Mineral", nullptr);
+		ImGui::Text(std::to_string(mineralQuantity).c_str());
+		ImGui::End();
+	}
+}
+
 //UIManager
 UIManager::UIManager()
 	: m_playerDetailsWidget(),	
 	m_selectedEntityWidget(),
+	m_selectedMineralWidget(),
 	m_winningFactionWidget()
 {
 	subscribeToMessenger<GameMessages::UIDisplayPlayerDetails>([this](const GameMessages::UIDisplayPlayerDetails& gameMessage)
@@ -222,11 +240,17 @@ UIManager::UIManager()
 	subscribeToMessenger<GameMessages::UIDisplaySelectedEntity>([this](const GameMessages::UIDisplaySelectedEntity& gameMessage)
 		{ return onDisplayEntity(gameMessage); }, this);
 
+	subscribeToMessenger<GameMessages::UIDisplaySelectedMineral>([this](const GameMessages::UIDisplaySelectedMineral& gameMessage)
+		{ return onDisplayMineral(gameMessage); }, this);
+
 	subscribeToMessenger<GameMessages::UIDisplayWinner>([this](const GameMessages::UIDisplayWinner& gameMessage)
 		{ return onDisplayWinningFaction(gameMessage); }, this);
 
 	subscribeToMessenger<GameMessages::UIClearDisplaySelectedEntity>([this](
 		GameMessages::UIClearDisplaySelectedEntity gameMessage) { return onClearDisplayEntity(gameMessage); }, this);
+
+	subscribeToMessenger<GameMessages::UIClearSelectedMineral>([this](
+		GameMessages::UIClearSelectedMineral gameMessage) { return onClearSelectedMineral(gameMessage); }, this);
 
 	subscribeToMessenger<GameMessages::UIClearWinner>([this](
 		GameMessages::UIClearWinner gameMessage) { return onClearDisplayWinner(gameMessage); }, this);
@@ -236,6 +260,8 @@ UIManager::~UIManager()
 {
 	unsubscribeToMessenger<GameMessages::UIDisplayPlayerDetails>(this);
 	unsubscribeToMessenger<GameMessages::UIDisplaySelectedEntity>(this);
+	unsubscribeToMessenger<GameMessages::UIClearSelectedMineral>(this);
+	unsubscribeToMessenger<GameMessages::UIDisplaySelectedMineral>(this);
 	unsubscribeToMessenger<GameMessages::UIDisplayWinner>(this);
 	unsubscribeToMessenger<GameMessages::UIClearDisplaySelectedEntity>(this);
 	unsubscribeToMessenger<GameMessages::UIClearWinner>(this);
@@ -339,6 +365,10 @@ void UIManager::render(const sf::Window& window)
 	{
 		m_selectedEntityWidget->render(window);
 	}
+	if (m_selectedMineralWidget)
+	{
+		m_selectedMineralWidget->render(window);
+	}
 	m_winningFactionWidget.render(window);
 }
 
@@ -357,6 +387,11 @@ void UIManager::onClearDisplayEntity(GameMessages::UIClearDisplaySelectedEntity)
 	m_selectedEntityWidget.reset();
 }
 
+void UIManager::onClearSelectedMineral(GameMessages::UIClearSelectedMineral message)
+{
+	m_selectedMineralWidget.reset();
+}
+
 void UIManager::onClearDisplayWinner(GameMessages::UIClearWinner)
 {
 	m_winningFactionWidget.deactivate();
@@ -365,4 +400,9 @@ void UIManager::onClearDisplayWinner(GameMessages::UIClearWinner)
 void UIManager::onDisplayWinningFaction(const GameMessages::UIDisplayWinner& gameMessage)
 {
 	m_winningFactionWidget.set(gameMessage);
+}
+
+void UIManager::onDisplayMineral(const GameMessages::UIDisplaySelectedMineral& gameMessage)
+{
+	m_selectedMineralWidget = std::make_unique<SelectedMineralWidget>(gameMessage.mineralQuantity);
 }

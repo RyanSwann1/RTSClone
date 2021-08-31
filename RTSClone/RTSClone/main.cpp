@@ -84,9 +84,11 @@ int main()
 	GameMessenger<GameMessages::NewMapSize>::getInstance();
 
 	GameMessenger<GameMessages::UIClearDisplaySelectedEntity>::getInstance();
+	GameMessenger<GameMessages::UIClearSelectedMineral>::getInstance();
 	GameMessenger<GameMessages::UIClearWinner>::getInstance();
 	GameMessenger<GameMessages::UIDisplayPlayerDetails>::getInstance();
 	GameMessenger<GameMessages::UIDisplaySelectedEntity>::getInstance();
+	GameMessenger<GameMessages::UIDisplaySelectedMineral>::getInstance();
 	GameMessenger<GameMessages::UIDisplayWinner>::getInstance();
 
 	PathFinding::getInstance();
@@ -147,7 +149,7 @@ int main()
 				if (!levelName.empty() && ImGui::Button(levelName.c_str()))
 				{
 					broadcastToMessenger<GameMessages::UIClearWinner>({});
-					level = Level::create(levelName, windowSize);
+					level = Level::load(levelName, windowSize);
 					assert(level);
 					if (!level)
 					{

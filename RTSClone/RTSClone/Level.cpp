@@ -91,7 +91,7 @@ Level::Level(std::vector<SceneryGameObject>&& scenery, FactionsContainer&& facti
 	m_camera.maxDistanceFromGround = m_camera.position.y;
 }
 
-std::unique_ptr<Level> Level::create(const std::string& levelName, glm::ivec2 windowSize)
+std::unique_ptr<Level> Level::load(const std::string& levelName, glm::ivec2 windowSize)
 {
 	std::vector<Base> mainBases;
 	std::vector<SceneryGameObject> scenery;
@@ -176,6 +176,7 @@ const glm::vec3& Level::getSize() const
 Level::~Level()
 {
 	broadcastToMessenger<GameMessages::UIClearDisplaySelectedEntity>({});
+	broadcastToMessenger<GameMessages::UIClearSelectedMineral>({});
 }
 
 const Faction* Level::getWinningFaction() const
@@ -219,6 +220,8 @@ void Level::handleInput(glm::uvec2 windowSize, const sf::Window& window, const s
 	switch (currentSFMLEvent.type)
 	{
 		case sf::Event::MouseButtonPressed:
+		{
+			glm::vec3 position = m_camera.getRayToGroundPlaneIntersection(window);
 			for (auto& faction : m_factions)
 			{
 				if (faction)
@@ -228,7 +231,7 @@ void Level::handleInput(glm::uvec2 windowSize, const sf::Window& window, const s
 					case eFactionController::AI_1:
 					case eFactionController::AI_2:
 					case eFactionController::AI_3:
-						static_cast<FactionAI&>(*faction).selectEntity(m_camera.getRayToGroundPlaneIntersection(window));
+						static_cast<FactionAI&>(*faction).selectEntity(position);// m_camera.getRayToGroundPlaneIntersection(window));
 						break;
 					case eFactionController::Player:
 						break;
@@ -237,6 +240,25 @@ void Level::handleInput(glm::uvec2 windowSize, const sf::Window& window, const s
 					}
 				}
 			}
+
+			assert(m_baseHandler);
+			bool mineralSelected = false;
+			for (const auto& base : m_baseHandler->getBases())
+			{
+				for (const auto& mineral : base.getMinerals())
+				{
+					if (mineral.getAABB().contains(position))
+					{
+						mineralSelected = true;
+						broadcastToMessenger<GameMessages::UIDisplaySelectedMineral>({ mineral.getQuantity() });
+					}
+				}
+			}
+			if (!mineralSelected)
+			{
+				broadcastToMessenger<GameMessages::UIClearSelectedMineral>({});
+			}
+		}
 		break;
 		case sf::Event::MouseWheelScrolled:
 			m_camera.zoom(window, currentSFMLEvent.mouseWheelScroll.delta);

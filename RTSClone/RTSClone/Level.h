@@ -28,7 +28,7 @@ public:
 	Level& operator=(Level&&) = delete;
 	~Level();
 
-	static std::unique_ptr<Level> create(const std::string& levelName, glm::ivec2 windowSize);
+	static std::unique_ptr<Level> load(const std::string& levelName, glm::ivec2 windowSize);
 
 	const std::vector<SceneryGameObject>& getSceneryGameObjects() const;
 	const BaseHandler& getBaseHandler() const;
