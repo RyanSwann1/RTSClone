@@ -231,7 +231,7 @@ void Level::handleInput(glm::uvec2 windowSize, const sf::Window& window, const s
 					case eFactionController::AI_1:
 					case eFactionController::AI_2:
 					case eFactionController::AI_3:
-						static_cast<FactionAI&>(*faction).selectEntity(position);// m_camera.getRayToGroundPlaneIntersection(window));
+						static_cast<FactionAI&>(*faction).selectEntity(position);
 						break;
 					case eFactionController::Player:
 						break;
