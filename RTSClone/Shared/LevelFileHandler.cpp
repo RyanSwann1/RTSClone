@@ -24,7 +24,7 @@ namespace
 
 int loadBaseQuantity(std::ifstream& file, const std::string& conditionalName);
 void loadBasePosition(std::ifstream& file, const std::string& textHeader, glm::vec3& position);
-void loadBaseMinerals(std::ifstream& file, const std::string& textHeader, std::vector<Mineral>& minerals);
+void loadBaseMinerals(std::ifstream& file, const std::string& textHeader, std::vector<Mineral>& minerals, int mineralQuantity);
 
 #ifdef GAME
 void loadScenery(std::ifstream& file, std::vector<SceneryGameObject>& scenery);
@@ -79,6 +79,25 @@ int LevelFileHandler::loadFactionStartingResources(std::ifstream& file)
 	return factionStartingResources;
 }
 
+int LevelFileHandler::loadMineralQuantity(std::ifstream& file)
+{
+	int mineralQuantity = 0;
+	auto data = [&mineralQuantity](const std::string& line)
+	{
+		std::stringstream stream{ line };
+		stream >> mineralQuantity;
+	};
+
+	auto conditional = [](const std::string& line)
+	{
+		return line == Globals::TEXT_HEADER_MINERAL_QUANTITY;
+	};
+
+	LevelFileHandler::loadFromFile(file, data, conditional);
+
+	return mineralQuantity;
+}
+
 int LevelFileHandler::loadFactionStartingPopulation(std::ifstream& file)
 {
 	int factionStartingPopulation = 0;
@@ -98,7 +117,7 @@ int LevelFileHandler::loadFactionStartingPopulation(std::ifstream& file)
 	return factionStartingPopulation;
 }
 
-void LevelFileHandler::loadAllMainBases(std::ifstream& file, std::vector<Base>& mainBases)
+void LevelFileHandler::loadAllMainBases(std::ifstream& file, std::vector<Base>& mainBases, int mineralQuantity)
 {
 	assert(file.is_open());
 
@@ -108,13 +127,13 @@ void LevelFileHandler::loadAllMainBases(std::ifstream& file, std::vector<Base>& 
 		loadBasePosition(file, Globals::TEXT_HEADER_MAIN_BASES[i], mainBasePosition);
 
 		std::vector<Mineral> minerals;
-		loadBaseMinerals(file, Globals::TEXT_HEADER_MAIN_BASE_MINERALS[i], minerals);
+		loadBaseMinerals(file, Globals::TEXT_HEADER_MAIN_BASE_MINERALS[i], minerals, mineralQuantity);
 
 		mainBases.emplace_back(mainBasePosition, std::move(minerals));
 	}
 }
 
-void LevelFileHandler::loadAllSecondaryBases(std::ifstream& file, std::vector<Base>& secondaryBases)
+void LevelFileHandler::loadAllSecondaryBases(std::ifstream& file, std::vector<Base>& secondaryBases, int mineralQuantity)
 {
 	assert(file.is_open());
 
@@ -124,7 +143,7 @@ void LevelFileHandler::loadAllSecondaryBases(std::ifstream& file, std::vector<Ba
 		loadBasePosition(file, Globals::TEXT_HEADER_SECONDARY_BASES[i], mainBasePosition);
 
 		std::vector<Mineral> minerals;
-		loadBaseMinerals(file, Globals::TEXT_HEADER_SECONDARY_BASE_MINERALS[i], minerals);
+		loadBaseMinerals(file, Globals::TEXT_HEADER_SECONDARY_BASE_MINERALS[i], minerals, mineralQuantity);
 
 		secondaryBases.emplace_back(mainBasePosition, std::move(minerals));
 	}
@@ -276,8 +295,9 @@ bool LevelFileHandler::loadLevelFromFile(const std::string& fileName, std::vecto
 	factionStartingResources = loadFactionStartingResources(file);
 	factionStartingPopulation = loadFactionStartingPopulation(file);
 	factionCount = loadFactionCount(file);
-	loadAllMainBases(file, bases);
-	loadAllSecondaryBases(file, bases);
+	int mineralQuantity = loadMineralQuantity(file);
+	loadAllMainBases(file, bases, mineralQuantity);
+	loadAllSecondaryBases(file, bases, mineralQuantity);
 
 	return true;
 }
@@ -358,16 +378,16 @@ void loadBasePosition(std::ifstream& file, const std::string& textHeader, glm::v
 	LevelFileHandler::loadFromFile(file, data, conditional);
 }
 
-void loadBaseMinerals(std::ifstream& file, const std::string& textHeader, std::vector<Mineral>& minerals)
+void loadBaseMinerals(std::ifstream& file, const std::string& textHeader, std::vector<Mineral>& minerals, int mineralQuantity)
 {
 	assert(file.is_open());
 
-	auto data = [&minerals](const std::string& line)
+	auto data = [&minerals, mineralQuantity](const std::string& line)
 	{
 		std::stringstream stream{ line };
 		glm::vec3 position;
 		stream >> position.x >> position.y >> position.z;
-		minerals.emplace_back(position);
+		minerals.emplace_back(position, mineralQuantity);
 	};
 
 	auto conditional = [textHeader](const std::string& line)

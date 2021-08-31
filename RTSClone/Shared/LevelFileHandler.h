@@ -18,11 +18,12 @@ class Level;
 #endif // LEVEL_EDITOR
 namespace LevelFileHandler
 { 
-	void loadAllMainBases(std::ifstream& file, std::vector<Base>& mainBases);
-	void loadAllSecondaryBases(std::ifstream& file, std::vector<Base>& secondaryBases);
+	void loadAllMainBases(std::ifstream& file, std::vector<Base>& mainBases, int mineralQuantity);
+	void loadAllSecondaryBases(std::ifstream& file, std::vector<Base>& secondaryBases, int mineralQuantity);
 	int loadFactionCount(std::ifstream& file);
 	int loadFactionStartingPopulation(std::ifstream& file);
 	int loadFactionStartingResources(std::ifstream& file);
+	int loadMineralQuantity(std::ifstream& file);
 	glm::ivec2 loadMapSizeFromFile(std::ifstream& file);
 
 	void loadFromFile(std::ifstream& file, const std::function<void(const std::string&)>& data,
