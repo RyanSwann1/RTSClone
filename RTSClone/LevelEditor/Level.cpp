@@ -14,6 +14,7 @@ namespace
 	constexpr int MAX_MAP_SIZE = 60 * Globals::NODE_SIZE;
 	constexpr int DEFAULT_STARTING_RESOURCES = 100;
 	constexpr int DEFAULT_STARTING_POPULATION_CAP = 5;
+	constexpr int DEFAULT_MINERAL_QUANTITY = 100;
 	constexpr glm::ivec2 DEFAULT_MAP_SIZE = { 30, 30 };
 	constexpr float ENTITY_TRANSLATE_SPEED = 5.0f;
 	constexpr glm::vec3 PLAYABLE_AREA_GROUND_COLOR = { 1.0f, 1.0f, 0.5f };
@@ -100,7 +101,8 @@ Level::Level(const std::string& levelName)
 	m_selectedMineral(nullptr),
 	m_factionStartingResources(DEFAULT_STARTING_RESOURCES),
 	m_factionStartingPopulationCap(DEFAULT_STARTING_POPULATION_CAP),
-	m_factionCount(DEFAULT_FACTIONS_COUNT)
+	m_factionCount(DEFAULT_FACTIONS_COUNT),
+	m_mineralQuantity(DEFAULT_MINERAL_QUANTITY)
 {
 	m_mainBases.reserve(Globals::MAX_MAIN_BASES);
 	m_secondaryBases.reserve(Globals::MAX_SECONDARY_BASES);
@@ -420,6 +422,15 @@ void Level::handleLevelDetailsGUI(bool& showGUIWindow)
 			m_factionStartingPopulationCap = Globals::WORKER_POPULATION_COST;
 		}
 	}
+	ImGui::Text("Starting Mineral Quantity");
+	if (ImGui::InputInt("Mineral Quantity", &m_mineralQuantity, 100))
+	{
+		if (m_factionStartingPopulationCap <= 0)
+		{
+			m_factionStartingPopulationCap = DEFAULT_MINERAL_QUANTITY;
+		}
+	}
+
 	ImGui::End();
 }
 
@@ -534,6 +545,7 @@ const std::ifstream& operator>>(std::ifstream& file, Level& level)
 	level.m_factionStartingResources = LevelFileHandler::loadFactionStartingResources(file);
 	level.m_factionStartingPopulationCap = LevelFileHandler::loadFactionStartingPopulation(file);
 	level.m_factionCount = LevelFileHandler::loadFactionCount(file);
+	level.m_mineralQuantity = LevelFileHandler::loadMineralQuantity(file);
 
 	level.m_mainBases.clear();
 	LevelFileHandler::loadAllMainBases(file, level.m_mainBases);
@@ -597,6 +609,9 @@ std::ostream& operator<<(std::ostream& file, const Level& level)
 
 	file << Globals::TEXT_HEADER_MAP_SIZE << "\n";
 	file << level.m_size.x << " " << level.m_size.y << "\n";
+
+	file << Globals::TEXT_HEADER_MINERAL_QUANTITY << "\n";
+	file << level.m_mineralQuantity << "\n";
 	
 	file << level.m_gameObjectManager;
 

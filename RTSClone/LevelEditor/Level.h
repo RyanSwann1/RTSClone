@@ -66,4 +66,5 @@ private:
 	int m_factionStartingResources;
 	int m_factionStartingPopulationCap;
 	int m_factionCount;
+	int m_mineralQuantity;
 };

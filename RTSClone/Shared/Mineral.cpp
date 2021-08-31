@@ -24,8 +24,9 @@ Mineral::Mineral(const glm::vec3& startingPosition)
 #endif // LEVEL_EDITOR
 
 #ifdef GAME
-Mineral::Mineral(const glm::vec3& startingPosition)
-	: m_status(),// m_active(true),
+Mineral::Mineral(const glm::vec3& startingPosition, int quantity)
+	: m_status(),
+	m_quantity(quantity),
 	m_position(Globals::convertToMiddleGridPosition(startingPosition)),
 	m_AABB(),
 	m_model(ModelManager::getInstance().getModel(MINERALS_MODEL_NAME))
@@ -41,6 +42,12 @@ Mineral::~Mineral()
 		broadcastToMessenger<GameMessages::RemoveAABBFromMap>({ m_AABB });
 	}
 }
+
+int Mineral::getQuantity() const
+{
+	return m_quantity;
+}
+
 #endif // GAME
 
 const glm::vec3& Mineral::getPosition() const

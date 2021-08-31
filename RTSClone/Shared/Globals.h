@@ -24,6 +24,7 @@ namespace Globals
 	inline const std::string TEXT_HEADER_FACTION_STARTING_POPULATION = TEXT_HEADER_BEGINNING + "Faction Starting Population";
 	inline const std::string TEXT_HEADER_FACTION_COUNT = TEXT_HEADER_BEGINNING + "Faction Count";
 	inline const std::string TEXT_HEADER_MAIN_BASE_QUANTITY = TEXT_HEADER_BEGINNING + "Main Base Quantity";
+	inline const std::string TEXT_HEADER_MINERAL_QUANTITY = TEXT_HEADER_BEGINNING + "Mineral Quantity";
 	constexpr size_t MAX_MAIN_BASES = static_cast<size_t>(eFactionController::Max) + 1;
 	constexpr size_t MAX_SECONDARY_BASES = MAX_MAIN_BASES * 2;
 

@@ -74,6 +74,8 @@
 500
 #Map Size
 114 114
+#Mineral Quantity
+600
 #Scenery
 meteorHalf.obj 0 0 0 438 0 372 1 1 1 433 443 377 367 0
 meteorHalf.obj 0 0 0 270 0 246 5 5 5 241 299 275 217 1
