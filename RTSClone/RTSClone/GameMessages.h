@@ -96,9 +96,9 @@ namespace GameMessages
 
 	struct UIDisplaySelectedMineral
 	{
-		UIDisplaySelectedMineral(int mineralQuantity = 0)
-			: mineralQuantity(mineralQuantity) {}
+		UIDisplaySelectedMineral(const Mineral& mineral)
+			: mineral(mineral) {}
 
-		const int mineralQuantity;
+		const Mineral& mineral;
 	};
 }

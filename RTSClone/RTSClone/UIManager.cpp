@@ -212,9 +212,9 @@ void WinningFactionWidget::render(const sf::Window& window)
 }
 
 //SelectedMineralWidget
-SelectedMineralWidget::SelectedMineralWidget(int mineralQuantity)
-	: Widget(true),
-	mineralQuantity(mineralQuantity)
+SelectedMineralWidget::SelectedMineralWidget(const Mineral& mineral)
+	: Widget(mineral, true),
+	mineral(mineral)
 {}
 
 void SelectedMineralWidget::render(const sf::Window& window)
@@ -222,7 +222,7 @@ void SelectedMineralWidget::render(const sf::Window& window)
 	if (m_active)
 	{
 		ImGui::Begin("Selected Mineral", nullptr);
-		ImGui::Text(std::to_string(mineralQuantity).c_str());
+		ImGui::Text(std::to_string(mineral.getQuantity()).c_str());
 		ImGui::End();
 	}
 }
@@ -404,5 +404,5 @@ void UIManager::onDisplayWinningFaction(const GameMessages::UIDisplayWinner& gam
 
 void UIManager::onDisplayMineral(const GameMessages::UIDisplaySelectedMineral& gameMessage)
 {
-	m_selectedMineralWidget = std::make_unique<SelectedMineralWidget>(gameMessage.mineralQuantity);
+	m_selectedMineralWidget = std::make_unique<SelectedMineralWidget>(gameMessage.mineral);
 }

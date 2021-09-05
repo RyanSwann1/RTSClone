@@ -250,7 +250,7 @@ void Level::handleInput(glm::uvec2 windowSize, const sf::Window& window, const s
 					if (mineral.getAABB().contains(position))
 					{
 						mineralSelected = true;
-						broadcastToMessenger<GameMessages::UIDisplaySelectedMineral>({ mineral.getQuantity() });
+						broadcastToMessenger<GameMessages::UIDisplaySelectedMineral>({ mineral });
 					}
 				}
 			}

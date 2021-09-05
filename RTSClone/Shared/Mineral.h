@@ -23,6 +23,7 @@ public:
 	Mineral(const glm::vec3& startingPosition, int quantity);
 	~Mineral();
 	int getQuantity() const;
+	int extractQuantity(int quantityToExtract) const;
 #endif // GAME
 
 	const glm::vec3& getPosition() const;
@@ -36,7 +37,7 @@ public:
 private:
 #ifdef GAME
 	ActiveStatus m_status;
-	int m_quantity;
+	mutable int m_quantity;
 #endif // GAME
 	glm::vec3 m_position;
 	AABB m_AABB;

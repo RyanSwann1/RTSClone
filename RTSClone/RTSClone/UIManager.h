@@ -33,6 +33,10 @@ protected:
 		: m_active(active),
 		m_receivedMessage()
 	{}
+	Widget(const MessageType& message, bool active = false)
+		: m_active(active),
+		m_receivedMessage(message)
+	{}
 
 	bool m_active;
 	MessageType m_receivedMessage;
@@ -64,9 +68,9 @@ struct WinningFactionWidget : public Widget<GameMessages::UIDisplayWinner>
 class Mineral;
 struct SelectedMineralWidget : public Widget<GameMessages::UIDisplaySelectedMineral>
 {
-	SelectedMineralWidget(int mineralQuantity);
+	SelectedMineralWidget(const Mineral& mineral);
 	void render(const sf::Window& window);
-	const int mineralQuantity;
+	const Mineral& mineral;
 };
 
 struct GameEvent;

@@ -48,6 +48,11 @@ int Mineral::getQuantity() const
 	return m_quantity;
 }
 
+int Mineral::extractQuantity(int quantityToExtract) const
+{
+	m_quantity = std::max(0, m_quantity - quantityToExtract);
+	return m_quantity > 0 ? quantityToExtract : m_quantity;
+}
 #endif // GAME
 
 const glm::vec3& Mineral::getPosition() const
