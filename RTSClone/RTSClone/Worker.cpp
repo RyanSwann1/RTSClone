@@ -19,17 +19,17 @@
 
 namespace
 {
-	const float HARVEST_EXPIRATION_TIME = 2.0f;
-	const float REPAIR_EXPIRATION_TIME = 3.5f;
-	const float BUILD_EXPIRATION_TIME = 2.0f;
-	const float MOVEMENT_SPEED = 7.5f;
-	const int RESOURCE_CAPACITY = 30;
-	const int RESOURCE_INCREMENT = 10;
-	const int REPAIR_HEALTH_AMOUNT = 1;
-	const float REPAIR_DISTANCE = static_cast<float>(Globals::NODE_SIZE) * 3.0f;
-	const float WORKER_PROGRESS_BAR_WIDTH = 60.0f;
-	const float WORKER_PROGRESS_BAR_YOFFSET = 30.0f;
-	const float MAX_DISTANCE_BUILD_HEADQUARTERS = static_cast<float>(Globals::NODE_SIZE) * 12.0f;
+	constexpr float HARVEST_EXPIRATION_TIME = 2.0f;
+	constexpr float REPAIR_EXPIRATION_TIME = 3.5f;
+	constexpr float BUILD_EXPIRATION_TIME = 2.0f;
+	constexpr float MOVEMENT_SPEED = 7.5f;
+	constexpr int RESOURCE_CAPACITY = 30;
+	constexpr int RESOURCE_INCREMENT = 10;
+	constexpr int REPAIR_HEALTH_AMOUNT = 1;
+	constexpr float REPAIR_DISTANCE = static_cast<float>(Globals::NODE_SIZE) * 3.0f;
+	constexpr float WORKER_PROGRESS_BAR_WIDTH = 60.0f;
+	constexpr float WORKER_PROGRESS_BAR_YOFFSET = 30.0f;
+	constexpr float MAX_DISTANCE_BUILD_HEADQUARTERS = static_cast<float>(Globals::NODE_SIZE) * 12.0f;
 }
 
 //BuildingInWorkerQueue
@@ -231,7 +231,15 @@ void Worker::update(float deltaTime, const Map& map, FactionHandler& factionHand
 			if (m_taskTimer.isExpired())
 			{
 				m_taskTimer.resetElaspedTime();
-				m_currentResourceAmount += RESOURCE_INCREMENT;
+				int harvestedResource = m_mineralToHarvest->extractQuantity(RESOURCE_INCREMENT);
+				if (harvestedResource)
+				{
+					m_currentResourceAmount += RESOURCE_INCREMENT;
+				}
+				else
+				{
+					switchTo(eWorkerState::Idle, map);
+				}
 			}
 		}
 		else
