@@ -18,9 +18,9 @@
 
 namespace
 {
-    const float PLANNED_BUILDING_OPACITY = 0.3f;
-    const glm::vec3 VALID_PLANNED_BUILDING_COLOR{ 0.0f, 1.0f, 0.0f };
-    const glm::vec3 INVALID_PLANNED_BUILDING_COLOR{ 1.0f, 0.0f, 0.0f };
+    constexpr float PLANNED_BUILDING_OPACITY = 0.3f;
+    constexpr glm::vec3 VALID_PLANNED_BUILDING_COLOR{ 0.0f, 1.0f, 0.0f };
+    constexpr glm::vec3 INVALID_PLANNED_BUILDING_COLOR{ 1.0f, 0.0f, 0.0f };
 
     void moveSelectedEntitiesToAttackPosition(std::vector<Entity*>& selectedEntities, const Entity& targetEntity, 
         const Faction& targetFaction, const Map& map, FactionHandler& factionHandler)

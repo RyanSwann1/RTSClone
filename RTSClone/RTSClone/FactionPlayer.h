@@ -70,60 +70,69 @@ private:
 
 	template <class Entity>
 	void selectEntity(std::vector<std::unique_ptr<Entity>>& entities, const glm::vec3& mouseToGroundPosition, bool selectAllEntities = false,
-		int selectEntityID = Globals::INVALID_ENTITY_ID)
+		int selectEntityID = Globals::INVALID_ENTITY_ID);
+
+	template <class Entity>
+	void selectEntities(std::vector<std::unique_ptr<Entity>>& units);
+
+	template <class Entity>
+	void deselectEntities(std::vector<std::unique_ptr<Entity>>& entities);
+};
+
+template<class Entity>
+inline void FactionPlayer::selectEntity(std::vector<std::unique_ptr<Entity>>& entities, const glm::vec3& mouseToGroundPosition, bool selectAllEntities, int selectEntityID)
+{
+	auto selectedEntity = std::find_if(entities.begin(), entities.end(), [&mouseToGroundPosition](const auto& entity)
 	{
-		auto selectedEntity = std::find_if(entities.begin(), entities.end(), [&mouseToGroundPosition](const auto& entity)
-		{
-			return entity->getAABB().contains(mouseToGroundPosition);
-		});
-		if (selectedEntity != entities.end())
-		{
-			if (selectAllEntities)
-			{
-				for (auto& entity : entities)
-				{
-					entity->setSelected(true);
-				}
-			}
-			else
-			{
-				for (auto& entity : entities)
-				{
-					entity->setSelected(entity->getAABB().contains(mouseToGroundPosition));
-				}
-			}
-		}
-		else 
+		return entity->getAABB().contains(mouseToGroundPosition);
+	});
+	if (selectedEntity != entities.end())
+	{
+		if (selectAllEntities)
 		{
 			for (auto& entity : entities)
 			{
-				if (selectEntityID == entity->getID())
-				{
-					entity->setSelected(true);
-				}
-				else
-				{
-					entity->setSelected(false);
-				}
+				entity->setSelected(true);
+			}
+		}
+		else
+		{
+			for (auto& entity : entities)
+			{
+				entity->setSelected(entity->getAABB().contains(mouseToGroundPosition));
 			}
 		}
 	}
-
-	template <class Entity>
-	void selectEntities(std::vector<std::unique_ptr<Entity>>& units)
-	{
-		for (auto& unit : units)
-		{
-			unit->setSelected(m_entitySelector.getAABB().contains(unit->getAABB()));
-		}
-	}
-
-	template <class Entity>
-	void deselectEntities(std::vector<std::unique_ptr<Entity>>& entities)
+	else
 	{
 		for (auto& entity : entities)
 		{
-			entity->setSelected(false);
+			if (selectEntityID == entity->getID())
+			{
+				entity->setSelected(true);
+			}
+			else
+			{
+				entity->setSelected(false);
+			}
 		}
 	}
-};
+}
+
+template <class Entity>
+void FactionPlayer::selectEntities(std::vector<std::unique_ptr<Entity>>& units)
+{
+	for (auto& unit : units)
+	{
+		unit->setSelected(m_entitySelector.getAABB().contains(unit->getAABB()));
+	}	
+}
+
+template <class Entity>
+void FactionPlayer::deselectEntities(std::vector<std::unique_ptr<Entity>>& entities)
+{
+	for (auto& entity : entities)
+	{
+		entity->setSelected(false);
+	}
+}
