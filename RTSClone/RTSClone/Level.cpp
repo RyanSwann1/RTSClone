@@ -14,21 +14,6 @@ namespace
 	constexpr float TIME_BETWEEN_UNIT_STATE = 0.05f;
 	constexpr glm::vec3 TERRAIN_COLOR = { 0.9098039f, 0.5176471f, 0.3882353f };
 
-	int getActiveFactionCount(const FactionsContainer& factions)
-	{
-		int activeFactions = 0;
-		for (const auto& faction : factions)
-		{
-			if (faction)
-			{
-				++activeFactions;
-			}
-		}
-
-		assert(activeFactions > 0);
-		return activeFactions;
-	}
-
 	bool isFactionActive(const FactionsContainer& factions, eFactionController factionController)
 	{
 		return factions[static_cast<int>(factionController)].get();
@@ -67,24 +52,25 @@ Level::Level(std::vector<SceneryGameObject>&& scenery, FactionsContainer&& facti
 	m_factionHandler(m_factions),
 	m_projectileHandler()
 {
-	for (auto& faction : m_factions)
+	auto& factionHandler = m_factionHandler;
+	std::for_each(m_factions.begin(), m_factions.end(), [&factionHandler](auto& faction)
 	{
 		if (faction)
 		{
 			switch (faction->getController())
 			{
-				case eFactionController::Player:
+			case eFactionController::Player:
 				break;
-				case eFactionController::AI_1:
-				case eFactionController::AI_2:
-				case eFactionController::AI_3:
-					static_cast<FactionAI&>(*faction.get()).setTargetFaction(m_factionHandler);
+			case eFactionController::AI_1:
+			case eFactionController::AI_2:
+			case eFactionController::AI_3:
+				static_cast<FactionAI&>(*faction.get()).setTargetFaction(factionHandler);
 				break;
-				default:
+			default:
 				assert(false);
-			}	
+			}
 		}
-	}
+	});
 
 	m_camera.setPosition({ cameraStartingPosition.x, m_camera.position.y, cameraStartingPosition.y }, 
 		m_playableArea.getSize(), windowSize, true);
@@ -181,20 +167,15 @@ Level::~Level()
 
 const Faction* Level::getWinningFaction() const
 {
-	const Faction* winningFaction = nullptr;
-	if (getActiveFactionCount(m_factions) == 1)
+	size_t factionCount = std::count_if(m_factions.cbegin(), m_factions.cend(), [](auto& faction) { return faction.get(); });
+	if (factionCount == 1)
 	{
-		for (const auto& faction : m_factions)
-		{
-			if (faction)
-			{
-				winningFaction = faction.get(); 
-				break;
-			}
-		}
+		auto winningFaction = std::find_if(m_factions.cbegin(), m_factions.cend(), [](auto& faction) { return faction.get(); });
+		assert(winningFaction != m_factions.cend());
+		return winningFaction->get();
 	}
 
-	return winningFaction;
+	return nullptr;
 }
 
 void Level::handleInput(glm::uvec2 windowSize, const sf::Window& window, const sf::Event& currentSFMLEvent, const Map& map,
@@ -222,7 +203,7 @@ void Level::handleInput(glm::uvec2 windowSize, const sf::Window& window, const s
 		case sf::Event::MouseButtonPressed:
 		{
 			glm::vec3 position = m_camera.getRayToGroundPlaneIntersection(window);
-			for (auto& faction : m_factions)
+			std::for_each(m_factions.begin(), m_factions.end(), [&position](auto& faction)
 			{
 				if (faction)
 				{
@@ -239,7 +220,7 @@ void Level::handleInput(glm::uvec2 windowSize, const sf::Window& window, const s
 						assert(false);
 					}
 				}
-			}
+			});
 
 			assert(m_baseHandler);
 			bool mineralSelected = false;
@@ -274,16 +255,17 @@ void Level::update(float deltaTime, const Map& map, UIManager& uiManager, glm::u
 	{
 		m_camera.update(deltaTime, window, windowSize, m_playableArea.getSize());
 	}
+
 	m_unitStateHandlerTimer.update(deltaTime);
 
-	for (auto& faction : m_factions)
+	std::for_each(m_factions.begin(), m_factions.end(), [deltaTime, &map, this](auto& faction)
 	{
 		if (faction)
 		{
 			faction->update(deltaTime, map, m_factionHandler, m_unitStateHandlerTimer);
 		}
-	}
-	
+	});
+
 	if (m_unitStateHandlerTimer.isExpired())
 	{
 		m_unitStateHandlerTimer.resetElaspedTime();
@@ -315,24 +297,24 @@ void Level::renderEntitySelector(const sf::Window& window, ShaderHandler& shader
 
 void Level::renderPlannedBuildings(ShaderHandler& shaderHandler) const
 {
-	for (auto& faction : m_factions)
+	std::for_each(m_factions.cbegin(), m_factions.cend(), [&shaderHandler](auto& faction)
 	{
-		if (faction)
+		if(faction)
 		{
 			faction->renderPlannedBuildings(shaderHandler);
 		}
-	}
+	});
 }
 
 void Level::renderEntityStatusBars(ShaderHandler& shaderHandler, glm::uvec2 windowSize) const
 {
-	for (const auto& faction : m_factions)
+	std::for_each(m_factions.cbegin(), m_factions.cend(), [&shaderHandler, windowSize, this](auto& faction)
 	{
 		if (faction)
 		{
 			faction->renderEntityStatusBars(shaderHandler, m_camera, windowSize);
 		}
-	}
+	});
 }
 
 void Level::renderTerrain(ShaderHandler& shaderHandler) const
@@ -360,18 +342,15 @@ void Level::renderMinimap(ShaderHandler& shaderHandler, glm::uvec2 windowSize, c
 
 void Level::render(ShaderHandler& shaderHandler) const
 {
-	for (const auto& gameObject : m_scenery)
+	std::for_each(m_scenery.cbegin(), m_scenery.cend(), [&shaderHandler](auto& gameObject)
 	{
 		gameObject.render(shaderHandler);
-	}
+	});
 
-	for(const auto& faction : m_factions)
+	std::for_each(m_factions.cbegin(), m_factions.cend(), [&shaderHandler](auto& faction)
 	{
-		if (faction)
-		{
-			faction->render(shaderHandler);
-		}
-	}
+		if (faction) { faction->render(shaderHandler); }
+	});
 
 	m_baseHandler->renderMinerals(shaderHandler);
 	m_projectileHandler.render(shaderHandler);
@@ -380,18 +359,18 @@ void Level::render(ShaderHandler& shaderHandler) const
 #ifdef RENDER_AABB
 void Level::renderAABB(ShaderHandler& shaderHandler)
 {
-	for (auto& faction : m_factions)
+	std::for_each(m_factions.begin(), m_factions.end(), [&shaderHandler](auto& faction)
 	{
 		if (faction)
 		{
 			faction->renderAABB(shaderHandler);
 		}
-	}
+	});
 
-	for (auto& sceneryGameObject : m_scenery)
+	std::for_each(m_scenery.begin(), m_scenery.end(), [&shaderHandler](auto& faction)
 	{
 		sceneryGameObject.renderAABB(shaderHandler);
-	}
+	});
 
 	m_projectileHandler.renderAABB(shaderHandler);
 }
@@ -400,13 +379,13 @@ void Level::renderAABB(ShaderHandler& shaderHandler)
 #ifdef RENDER_PATHING
 void Level::renderPathing(ShaderHandler& shaderHandler)
 {
-	for (auto& faction : m_factions)
+	std::for_each(m_factions.cbegin(), m_factions.cend(), [&shaderHandler](auto& faction)
 	{
 		if (faction)
 		{
 			faction->renderPathing(shaderHandler);
 		}
-	}
+	});
 }
 #endif // RENDER_PATHING
 
@@ -436,26 +415,26 @@ void Level::handleEvent(const GameEvent& gameEvent, const Map& map)
 		m_projectileHandler.addProjectile(gameEvent);
 		break;
 	case eGameEventType::RevalidateMovementPaths:
-		for (auto& faction : m_factions)
+		std::for_each(m_factions.begin(), m_factions.end(), [&gameEvent, &map, this](auto& faction)
 		{
 			if (faction)
 			{
 				faction->handleEvent(gameEvent, map, m_factionHandler);
 			}
-		}
+		});
 		break;
 	case eGameEventType::EliminateFaction:
 		if (isFactionActive(m_factions, gameEvent.data.eliminateFaction.factionController))
 		{
 			m_factions[static_cast<int>(gameEvent.data.eliminateFaction.factionController)].reset();
-			for (auto& faction : m_factions)
+			std::for_each(m_factions.begin(), m_factions.end(), [&gameEvent, this](auto& faction)
 			{
 				if (faction && faction->getController() != eFactionController::Player)
 				{
 					static_cast<FactionAI&>(*faction).onFactionElimination(
 						m_factionHandler, gameEvent.data.eliminateFaction.factionController);
 				}
-			}
+			});
 		}
 		break;
 	case eGameEventType::PlayerActivatePlannedBuilding:
