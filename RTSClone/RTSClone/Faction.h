@@ -103,63 +103,73 @@ private:
 
 	//Presumes entity already found in all entities container
 	template <class T>
-	void removeEntity(std::vector<std::unique_ptr<T>>& entityContainer, int entityID, 
-		std::vector<std::reference_wrapper<Entity>>::iterator entity)
-	{
-		assert(entity != m_allEntities.cend());
-		
-		auto iter = std::find_if(entityContainer.begin(), entityContainer.end(), [entityID](const auto& entity)
-		{
-			return entity->getID() == entityID;
-		});
-	
-		assert(iter != entityContainer.end());
-
-		onEntityRemoval((*entity).get());
-		entityContainer.erase(iter);
-		m_allEntities.erase(entity);
-	}
+	void removeEntity(std::vector<std::unique_ptr<T>>& entityContainer, int entityID,
+		std::vector<std::reference_wrapper<Entity>>::iterator entity);
 
 	template <typename T>
-	void removeEntity(std::vector<std::unique_ptr<T>>& entityContainer, int entityID)
-	{
-		auto iter = std::find_if(m_allEntities.begin(), m_allEntities.end(), [entityID](const auto& entity)
-		{
-			return entity.get().getID() == entityID;
-		});
-		if (iter != m_allEntities.end())
-		{
-			auto entity = std::find_if(entityContainer.begin(), entityContainer.end(), [entityID](const auto& entity)
-			{
-				return entity->getID() == entityID;
-			});
-			assert(entity != entityContainer.end());
-
-			onEntityRemoval(*(*entity));
-			m_allEntities.erase(iter);
-			entityContainer.erase(entity);
-		}
-	}
+	void removeEntity(std::vector<std::unique_ptr<T>>& entityContainer, int entityID);
 
 	template <typename T>
-	const Entity* getEntity(const T& entityContainer, int entityID) const
-	{
-		auto entity = std::find_if(entityContainer.cbegin(), entityContainer.cend(), [entityID](const auto& entity)
-		{
-			return entity->getID() == entityID;
-		});
-
-		return (entity != entityContainer.cend() ? &*(*entity) : nullptr);
-	}
+	const Entity* getEntity(const T& entityContainer, int entityID) const;
 
 	template <typename T> 
-	const Entity* getEntity(const T& entityContainer, int entityID, const AABB& entityAABB) const
-	{
-		auto entity = std::find_if(entityContainer.cbegin(), entityContainer.cend(), [&entityAABB, entityID](const auto& entity)
-		{
-			return entity.get()->getID() == entityID && entity.get()->getAABB().contains(entityAABB);
-		});
-
-		return (entity != entityContainer.cend() ? &*(*entity) : nullptr);
-	}
+	const Entity* getEntity(const T& entityContainer, int entityID, const AABB& entityAABB) const;
 };
+
+template <class T>
+void Faction::removeEntity(std::vector<std::unique_ptr<T>>& entityContainer, int entityID, std::vector<std::reference_wrapper<Entity>>::iterator entity)
+{
+	assert(entity != m_allEntities.cend());
+
+	auto iter = std::find_if(entityContainer.begin(), entityContainer.end(), [entityID](const auto& entity)
+	{
+		return entity->getID() == entityID;
+	});
+
+	assert(iter != entityContainer.end());
+
+	onEntityRemoval((*entity).get());
+	entityContainer.erase(iter);
+	m_allEntities.erase(entity);
+}
+
+template <typename T>
+void Faction::removeEntity(std::vector<std::unique_ptr<T>>& entityContainer, int entityID)
+{
+	auto iter = std::find_if(m_allEntities.begin(), m_allEntities.end(), [entityID](const auto& entity)
+	{
+		return entity.get().getID() == entityID;
+	});
+	if (iter != m_allEntities.end())
+	{
+		auto entity = std::find_if(entityContainer.begin(), entityContainer.end(), [entityID](const auto& entity)
+		{
+			return entity->getID() == entityID;
+		});
+		assert(entity != entityContainer.end());
+
+		onEntityRemoval(*(*entity));
+		m_allEntities.erase(iter);
+		entityContainer.erase(entity);
+	}
+}
+
+template <typename T>
+const Entity* Faction::getEntity(const T& entityContainer, int entityID) const
+{
+	auto entity = std::find_if(entityContainer.cbegin(), entityContainer.cend(), [entityID](const auto& entity)
+	{
+		return entity->getID() == entityID;
+	});
+	return (entity != entityContainer.cend() ? &*(*entity) : nullptr);
+}
+
+template <typename T>
+const Entity* Faction::getEntity(const T& entityContainer, int entityID, const AABB& entityAABB) const
+{
+	auto entity = std::find_if(entityContainer.cbegin(), entityContainer.cend(), [&entityAABB, entityID](const auto& entity)
+	{
+		return entity.get()->getID() == entityID && entity.get()->getAABB().contains(entityAABB);
+	});
+	return (entity != entityContainer.cend() ? &*(*entity) : nullptr);
+}
