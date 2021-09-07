@@ -3,6 +3,21 @@
 #include "GameEventHandler.h"
 #include "FactionHandler.h"
 
+namespace
+{
+	bool isHitEntity(const Projectile& projectile, const FactionHandler& factionHandler)
+	{
+		const Entity* entity = nullptr;
+		if (factionHandler.isFactionActive(projectile.getSenderEvent().targetFaction))
+		{
+			const Faction& targetFaction = factionHandler.getFaction(projectile.getSenderEvent().targetFaction);
+			entity = targetFaction.getEntity(projectile.getAABB(), projectile.getSenderEvent().targetID, projectile.getSenderEvent().targetEntityType);
+		}
+
+		return entity;
+	}
+}
+
 ProjectileHandler::ProjectileHandler()
 	: m_projectiles()
 {}
@@ -14,33 +29,23 @@ void ProjectileHandler::addProjectile(const GameEvent& gameEvent)
 
 void ProjectileHandler::update(float deltaTime, const FactionHandler& factionHandler)
 {
-	for (auto projectile = m_projectiles.begin(); projectile != m_projectiles.end();)
-	{	
-		projectile->update(deltaTime);
+	std::for_each(m_projectiles.begin(), m_projectiles.end(), [deltaTime](auto& projectile)
+	{
+		projectile.update(deltaTime);
+	});
 
-		const Entity* entity = nullptr;
-		if (factionHandler.isFactionActive(projectile->getSenderEvent().targetFaction))
+	auto iter = std::remove_if(m_projectiles.begin(), m_projectiles.end(), [&factionHandler](auto& projectile)
+	{
+		bool hitEntity = isHitEntity(projectile, factionHandler);
+		if (hitEntity)
 		{
-			const Faction& targetFaction = factionHandler.getFaction(projectile->getSenderEvent().targetFaction);
-			entity = targetFaction.getEntity(projectile->getAABB(), projectile->getSenderEvent().targetID, projectile->getSenderEvent().targetEntityType);
+			GameEventHandler::getInstance().gameEvents.push(GameEvent::createTakeDamage(projectile.getSenderEvent().senderFaction,
+				projectile.getSenderEvent().senderID, projectile.getSenderEvent().senderEntityType, projectile.getSenderEvent().targetFaction,
+				projectile.getSenderEvent().targetID, projectile.getSenderEvent().damage));
 		}
-
-		if (entity || projectile->isReachedDestination())
-		{
-			if (entity)
-			{
-				GameEventHandler::getInstance().gameEvents.push(GameEvent::createTakeDamage(projectile->getSenderEvent().senderFaction,
-					projectile->getSenderEvent().senderID, projectile->getSenderEvent().senderEntityType, projectile->getSenderEvent().targetFaction,
-					projectile->getSenderEvent().targetID, projectile->getSenderEvent().damage));
-			}
-
-			projectile = m_projectiles.erase(projectile);
-		}
-		else
-		{
-			++projectile;
-		}
-	}
+		return hitEntity || projectile.isReachedDestination();
+	});
+	m_projectiles.erase(iter, m_projectiles.end());
 }
 
 void ProjectileHandler::render(ShaderHandler& shaderHandler) const
