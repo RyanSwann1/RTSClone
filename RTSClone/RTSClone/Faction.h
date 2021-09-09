@@ -12,6 +12,7 @@
 #include <vector>
 #include <functional>
 #include <memory>
+#include <optional>
 
 struct Camera;
 struct GameEvent;

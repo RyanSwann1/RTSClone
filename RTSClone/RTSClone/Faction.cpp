@@ -79,20 +79,18 @@ const Headquarters& Faction::getMainHeadquarters() const
 
 const Headquarters& Faction::getClosestHeadquarters(const glm::vec3& position) const
 {
-    const Headquarters* closestHeadquarters = nullptr;
-    float distance = std::numeric_limits<float>::max();
-    for (const auto& headquarters : m_headquarters)
-    {
-        float result = Globals::getSqrDistance(headquarters->getPosition(), position);
-        if (result < distance)
-        {
-            distance = result;
-            closestHeadquarters = headquarters.get();
-        }
-    }
+	const Headquarters* closestHeadquarters = nullptr;
+	float distance = std::numeric_limits<float>::max();
+	for (const auto& headquarters : m_headquarters)
+	{
+		float result = Globals::getSqrDistance(headquarters->getPosition(), position);
+		if (result < distance)
+			distance = result;
+		closestHeadquarters = headquarters.get();
+	}
 
-    assert(closestHeadquarters);
-    return *closestHeadquarters;
+	assert(closestHeadquarters);
+	return *closestHeadquarters;
 }
 
 const glm::vec3& Faction::getMainHeadquartersPosition() const
@@ -120,7 +118,6 @@ const Entity* Faction::getEntity(const glm::vec3& position, float maxDistance, b
 {
     const Entity* closestEntity = nullptr;
     float closestEntityDistance = maxDistance * maxDistance;
-    
     if (prioritizeUnits)
     {
         for (const auto& entity : m_allEntities)
@@ -200,15 +197,7 @@ const Entity* Faction::getEntity(const glm::vec3& position) const
     {
         return entity.get().getAABB().contains(position);
     });
-
-    if (entity != m_allEntities.cend())
-    {
-        return &(*entity).get();
-    }
-    else
-    {
-        return nullptr;
-    }
+    return entity != m_allEntities.cend() ? &(*entity).get() : nullptr;
 }
 
 const Entity* Faction::getEntity(int entityID, eEntityType entityType) const
@@ -391,40 +380,40 @@ void Faction::handleWorkerCollisions(const Map& map)
         return worker != handledWorkers.cend();
     };
 
-    for (auto& worker : m_workers)
+    std::for_each(m_workers.begin(), m_workers.end(), [this, &map, foundWorker](auto& worker)
     {
-        if (worker->getCurrentState() == eWorkerState::Idle)
-        {
-            if (map.isCollidable(worker->getPosition()))
-            {
-                glm::vec3 destination(0.f);
-                if(PathFinding::getInstance().getClosestAvailablePosition(*worker, m_workers, map, destination))
-                {
-                    worker->moveTo(destination, map);
-                }
-            }
-            else
-            {
-                for (const auto& otherWorker : m_workers)
-                {
-                    if (worker->getID() != otherWorker->getID() &&
-                        foundWorker(otherWorker->getID()) &&
-                        otherWorker->getCurrentState() == eWorkerState::Idle &&
-                        worker->getAABB().contains(otherWorker->getAABB()))
-                    {
-                        glm::vec3 destination(0.f);
-                        if(PathFinding::getInstance().getClosestAvailablePosition(*worker, m_workers, map, destination))
-                        {
+		if (worker->getCurrentState() == eWorkerState::Idle)
+		{
+			if (map.isCollidable(worker->getPosition()))
+			{
+				glm::vec3 destination(0.f);
+				if (PathFinding::getInstance().getClosestAvailablePosition(*worker, m_workers, map, destination))
+				{
+					worker->moveTo(destination, map);
+				}
+			}
+			else
+			{
+				for (const auto& otherWorker : m_workers)
+				{
+					if (worker->getID() != otherWorker->getID() &&
+						foundWorker(otherWorker->getID()) &&
+						otherWorker->getCurrentState() == eWorkerState::Idle &&
+						worker->getAABB().contains(otherWorker->getAABB()))
+					{
+						glm::vec3 destination(0.f);
+						if (PathFinding::getInstance().getClosestAvailablePosition(*worker, m_workers, map, destination))
+						{
 							worker->moveTo(destination, map);
 							break;
-                        }
-                    }
-                }
-            }
-        }
+						}
+					}
+				}
+			}
+		}
 
-        handledWorkers.push_back(*worker.get());
-    }
+		handledWorkers.push_back(*worker.get());
+    });
 
     handledWorkers.clear();
 }
@@ -520,33 +509,33 @@ void Faction::renderPlannedBuildings(ShaderHandler& shaderHandler) const
 
 void Faction::renderEntityStatusBars(ShaderHandler& shaderHandler, const Camera& camera, glm::uvec2 windowSize) const
 {
-    for (const auto& entity : m_allEntities)
+    std::for_each(m_allEntities.cbegin(), m_allEntities.cend(), [&shaderHandler, &camera, windowSize](const auto& entity)
     {
-        entity.get().renderHealthBar(shaderHandler, camera, windowSize);
-        entity.get().renderShieldBar(shaderHandler, camera, windowSize);
+		entity.get().renderHealthBar(shaderHandler, camera, windowSize);
+		entity.get().renderShieldBar(shaderHandler, camera, windowSize);
 
-        switch (entity.get().getEntityType())
-        {
-        case eEntityType::Barracks:
-            static_cast<Barracks&>((entity).get()).renderProgressBar(shaderHandler, camera, windowSize);
-            break;
-        case eEntityType::Headquarters:
-            static_cast<Headquarters&>((entity).get()).renderProgressBar(shaderHandler, camera, windowSize);
-            break;
-        case eEntityType::Worker:
-            static_cast<Worker&>((entity).get()).renderProgressBar(shaderHandler, camera, windowSize);
-            break;
-        case eEntityType::Laboratory:
-            static_cast<Laboratory&>((entity).get()).renderProgressBar(shaderHandler, camera, windowSize);
-            break;
-        case eEntityType::SupplyDepot:
-        case eEntityType::Turret:
-        case eEntityType::Unit:
-            break;
-        default:
-            assert(false);
-        }
-    }
+		switch (entity.get().getEntityType())
+		{
+		case eEntityType::Barracks:
+			static_cast<Barracks&>((entity).get()).renderProgressBar(shaderHandler, camera, windowSize);
+			break;
+		case eEntityType::Headquarters:
+			static_cast<Headquarters&>((entity).get()).renderProgressBar(shaderHandler, camera, windowSize);
+			break;
+		case eEntityType::Worker:
+			static_cast<Worker&>((entity).get()).renderProgressBar(shaderHandler, camera, windowSize);
+			break;
+		case eEntityType::Laboratory:
+			static_cast<Laboratory&>((entity).get()).renderProgressBar(shaderHandler, camera, windowSize);
+			break;
+		case eEntityType::SupplyDepot:
+		case eEntityType::Turret:
+		case eEntityType::Unit:
+			break;
+		default:
+			assert(false);
+		}
+    });
 }
 
 #ifdef RENDER_PATHING
@@ -744,41 +733,41 @@ void Faction::increasePopulationLimit()
 
 void Faction::revalidateExistingUnitPaths(const Map& map, FactionHandler& factionHandler)
 {
-    for (auto& unit : m_units)
+    std::for_each(m_units.begin(), m_units.end(), [&map, &factionHandler](auto& unit)
     {
-        if (!unit->getMovementPath().empty())
-        {
-            unit->moveTo(unit->getMovementPath().front(), map, factionHandler, unit->getCurrentState());
-        }
-    }
+		if (!unit->getMovementPath().empty())
+		{
+			unit->moveTo(unit->getMovementPath().front(), map, factionHandler, unit->getCurrentState());
+		}
+    });
 
-    for (auto& worker : m_workers)
+    std::for_each(m_workers.begin(), m_workers.end(), [&map, &factionHandler](auto& worker)
     {
-        if (!worker->getMovementPath().empty())
-        {
-            switch (worker->getCurrentState())
-            {
-            case eWorkerState::Moving:
-            case eWorkerState::ReturningMineralsToHeadquarters:
-            case eWorkerState::MovingToBuildingPosition:
-            case eWorkerState::MovingToRepairPosition:
-                assert(!worker->getMovementPath().empty());
-                worker->moveTo(worker->getMovementPath().front(), map, worker->getCurrentState());
-                break;
-            case eWorkerState::MovingToMinerals:
-                assert(worker->getMineralToHarvest());
-                worker->moveTo(*worker->getMineralToHarvest(), map);
-                break;
-            case eWorkerState::Idle:
-            case eWorkerState::Harvesting:
-            case eWorkerState::Building:
-            case eWorkerState::Repairing:
-                break;
-            default:
-                assert(false);
-            }
-        }
-    }
+		if (!worker->getMovementPath().empty())
+		{
+			switch (worker->getCurrentState())
+			{
+			case eWorkerState::Moving:
+			case eWorkerState::ReturningMineralsToHeadquarters:
+			case eWorkerState::MovingToBuildingPosition:
+			case eWorkerState::MovingToRepairPosition:
+				assert(!worker->getMovementPath().empty());
+				worker->moveTo(worker->getMovementPath().front(), map, worker->getCurrentState());
+				break;
+			case eWorkerState::MovingToMinerals:
+				assert(worker->getMineralToHarvest());
+				worker->moveTo(*worker->getMineralToHarvest(), map);
+				break;
+			case eWorkerState::Idle:
+			case eWorkerState::Harvesting:
+			case eWorkerState::Building:
+			case eWorkerState::Repairing:
+				break;
+			default:
+				assert(false);
+			}
+		}
+    });
 }
 
 bool Faction::isMineralInUse(const Mineral& mineral) const
