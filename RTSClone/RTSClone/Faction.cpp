@@ -509,7 +509,7 @@ void Faction::renderPlannedBuildings(ShaderHandler& shaderHandler) const
 
 void Faction::renderEntityStatusBars(ShaderHandler& shaderHandler, const Camera& camera, glm::uvec2 windowSize) const
 {
-    std::for_each(m_allEntities.cbegin(), m_allEntities.cend(), [&shaderHandler, &camera, windowSize](const auto& entity)
+    std::for_each(m_allEntities.cbegin(), m_allEntities.cend(), [&](const auto& entity)
     {
 		entity.get().renderHealthBar(shaderHandler, camera, windowSize);
 		entity.get().renderShieldBar(shaderHandler, camera, windowSize);
@@ -632,8 +632,7 @@ Entity* Faction::createBuilding(const Map& map, const Worker& worker)
 
     eEntityType entityType = worker.getBuildingCommands().front().entityType;
     const glm::vec3& position = worker.getBuildingCommands().front().position;
-    if (isAffordable(entityType) && 
-        !map.isPositionOccupied(position))
+    if (isAffordable(entityType) && !map.isPositionOccupied(position))
     {
         Entity* addedBuilding = nullptr;
         switch (entityType)
@@ -772,16 +771,10 @@ void Faction::revalidateExistingUnitPaths(const Map& map, FactionHandler& factio
 
 bool Faction::isMineralInUse(const Mineral& mineral) const
 {
-    for (const auto& worker : m_workers)
+    return std::any_of(m_workers.cbegin(), m_workers.cend(), [&mineral](auto& worker)
     {
-        if (worker->getMineralToHarvest() && 
-            &(*worker->getMineralToHarvest()) == &mineral)
-        {
-            return true;
-        }
-    }
-
-    return false;
+        return worker->getMineralToHarvest() && worker->getMineralToHarvest()->getPosition() == mineral.getPosition();
+    });
 }
 
 Entity* Faction::createUnit(const Map& map, const Barracks& barracks, FactionHandler& factionHandler)

@@ -8,6 +8,7 @@
 #include "GameMessenger.h"
 #include "GameEventHandler.h"
 #include <limits>
+#include <algorithm>
 
 //Levels
 //Strategyt level - general - thgought about game state as a whole  where units are - lacing resources? Or attack enemy base - all high level
@@ -29,17 +30,12 @@ namespace
 	bool isBaseClosest(const BaseHandler& baseHandler, const glm::vec3& position, const Headquarters& headquarters)
 	{
 		const Base& baseOnHeadquarters = baseHandler.getBase(headquarters.getPosition());
-		for (const auto& base : baseHandler.getBases())
+		return std::any_of(baseHandler.getBases().cbegin(), baseHandler.getBases().cend(), [&](const auto& base)
 		{
-			if (&baseOnHeadquarters != &base &&
-				Globals::getSqrDistance(base.getCenteredPosition(), position) < 
-				Globals::getSqrDistance(baseOnHeadquarters.getCenteredPosition(), position))
-			{
-				return false;
-			}
-		}
-
-		return true;
+			return &baseOnHeadquarters != &base &&
+				Globals::getSqrDistance(base.getCenteredPosition(), position) <
+				Globals::getSqrDistance(baseOnHeadquarters.getCenteredPosition(), position);
+		});
 	}
 
 	void removeFromSquad(std::vector<AISquad>& squads, const Unit& unit)
@@ -129,8 +125,9 @@ void FactionAI::setTargetFaction(FactionHandler& factionHandler)
 	m_targetFaction = eFactionController::None;
 
 	assert(!m_headquarters.empty());
-	float targetFactionDistance = std::numeric_limits<float>::max();
-	for (const auto& opposingFaction : factionHandler.getOpposingFactions(getController()))
+	const auto& opposingFactions = factionHandler.getOpposingFactions(getController());
+	std::for_each(opposingFactions.cbegin(), opposingFactions.cend(), 
+		[&, targetFactionDistance = std::numeric_limits<float>::max()](const auto& opposingFaction) mutable
 	{
 		const Headquarters& opposingHeadquarters = opposingFaction.get().getClosestHeadquarters(m_headquarters.front()->getPosition());
 		float distance = Globals::getSqrDistance(opposingHeadquarters.getPosition(), m_headquarters.front()->getPosition());
@@ -139,7 +136,7 @@ void FactionAI::setTargetFaction(FactionHandler& factionHandler)
 			m_targetFaction = opposingFaction.get().getController();
 			targetFactionDistance = distance;
 		}
-	}
+	});
 }
 
 void FactionAI::onFactionElimination(FactionHandler& factionHandler, eFactionController eliminatedFaction)
@@ -226,7 +223,7 @@ void FactionAI::update(float deltaTime, const Map & map, FactionHandler& faction
 	{
 		m_delayTimer.resetElaspedTime();
 
-		for (auto& occupiedBase : m_occupiedBases.bases)
+		std::for_each(m_occupiedBases.bases.begin(), m_occupiedBases.bases.end(), [&map, this](auto& occupiedBase)
 		{
 			//Update action queues
 			if (!occupiedBase.actionQueue.empty())
@@ -269,7 +266,7 @@ void FactionAI::update(float deltaTime, const Map & map, FactionHandler& faction
 			{
 				occupiedBase.actionPriorityQueue.emplace(getEntityModifier(eEntityType::SupplyDepot, m_behaviour), eAIActionType::BuildSupplyDepot);
 			}
-		}
+		});
 	}
 
 	switch (m_behaviour)
@@ -435,7 +432,7 @@ Worker* FactionAI::getAvailableWorker(const glm::vec3& position, AIOccupiedBase&
 
 bool FactionAI::isWithinRangeOfBuildings(const glm::vec3& position, float distance) const
 {
-	for (const auto& entity : m_allEntities)
+	return std::any_of(m_allEntities.cbegin(), m_allEntities.cend(), [&](auto& entity)
 	{
 		switch (entity.get().getEntityType())
 		{
@@ -463,9 +460,9 @@ bool FactionAI::isWithinRangeOfBuildings(const glm::vec3& position, float distan
 		default:
 			assert(false);
 		}
-	}
 
-	return false;
+		return false;
+	});
 }
 
 void FactionAI::onUnitEnteredIdleState(Unit& unit, const Map& map, FactionHandler& factionHandler)
@@ -808,7 +805,7 @@ bool FactionAI::handleAction(const AIAction& action, const Map& map, AIOccupiedB
 	{
 		eEntityType entityType;
 		if (convertActionTypeToEntityType(action.actionType, entityType) &&
-		build(map, entityType, occupiedBase, nullptr))
+			build(map, entityType, occupiedBase, nullptr))
 		{
 			return true;
 		}

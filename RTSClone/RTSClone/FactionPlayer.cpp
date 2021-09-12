@@ -480,7 +480,7 @@ void FactionPlayer::moveMultipleSelectedEntities(const glm::vec3& destination, c
     const Base* base = baseHandler.getBaseAtMineral(destination);
     if (base)
     {
-        for (auto& selectedUnit : m_selectedEntities)
+        std::for_each(m_selectedEntities.begin(), m_selectedEntities.end(), [&](auto& selectedUnit)
         {
             if (selectedUnit->getEntityType() == eEntityType::Worker)
             {
@@ -490,7 +490,7 @@ void FactionPlayer::moveMultipleSelectedEntities(const glm::vec3& destination, c
                     static_cast<Worker&>(*selectedUnit).moveTo(*mineral, map);
                 }
             }
-        }
+        });
     }
     else
     {
@@ -501,7 +501,7 @@ void FactionPlayer::moveMultipleSelectedEntities(const glm::vec3& destination, c
 
         if (selectedEntity != m_allEntities.cend())
         {
-            for (auto& selectedUnit : m_selectedEntities)
+            std::for_each(m_selectedEntities.begin(), m_selectedEntities.end(), [&](auto& selectedUnit)
             {
                 if (selectedUnit->getEntityType() == eEntityType::Worker &&
                     (*selectedEntity).get().getID() != selectedUnit->getID() &&
@@ -512,12 +512,12 @@ void FactionPlayer::moveMultipleSelectedEntities(const glm::vec3& destination, c
 
                     static_cast<Worker&>(*selectedUnit).repairEntity((*selectedEntity), map);
                 }
-            }
+            });
         }
         else
         {
             glm::vec3 averagePosition = getAveragePosition(m_selectedEntities);
-            for (auto& selectedEntity : m_selectedEntities)
+            std::for_each(m_selectedEntities.begin(), m_selectedEntities.end(), [&](auto& selectedEntity)
             {
                 switch (selectedEntity->getEntityType())
                 {
@@ -569,7 +569,7 @@ void FactionPlayer::moveMultipleSelectedEntities(const glm::vec3& destination, c
                 default:
                     assert(false);
                 }
-            }
+            });
         }
     }
 }
