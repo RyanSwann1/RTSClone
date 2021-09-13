@@ -150,7 +150,7 @@ const Entity* AIOccupiedBase::removeBuilding(const Entity& building)
 //AIOccupiedBases
 AIOccupiedBases::AIOccupiedBases(const BaseHandler& baseHandler, eFactionController owningFaction)
 	: bases(),
-	m_owningFaction(owningFaction)
+	owningFaction(owningFaction)
 {
 	bases.reserve(baseHandler.getBases().size());
 }
@@ -184,7 +184,7 @@ AIOccupiedBase* AIOccupiedBases::getBase(const Entity& entity)
 		case eEntityType::Headquarters:
 		{
 			AIOccupiedBase* base = getBase(entity.getPosition());
-			assert(base && base->base.get().owningFactionController == m_owningFaction);
+			assert(base && base->base.get().owningFactionController == owningFaction);
 			if (base)
 			{
 				occupiedBase = base;
@@ -203,7 +203,7 @@ AIOccupiedBase* AIOccupiedBases::getBase(const Entity& entity)
 				const Entity* building = base.getBuilding(entity);
 				if (building && building->getID() == entity.getID())
 				{
-					assert(base.base.get().owningFactionController == m_owningFaction);
+					assert(base.base.get().owningFactionController == owningFaction);
 					occupiedBase = &base;
 					break;
 				}
@@ -234,7 +234,7 @@ void AIOccupiedBases::addWorker(Worker& worker, const Headquarters& headquarters
 		return base.base.get().getCenteredPosition() == headquarters.getPosition();
 	});
 
-	assert(base != bases.end() && (*base).base.get().owningFactionController == m_owningFaction);
+	assert(base != bases.end() && (*base).base.get().owningFactionController == owningFaction);
 	(*base).addWorker(worker);
 }
 
@@ -245,7 +245,7 @@ void AIOccupiedBases::addWorker(Worker& worker, const Base& base)
 		return existingBase.base.get().getCenteredPosition() == base.getCenteredPosition();
 	});
 	
-	assert(iter != bases.end() && base.owningFactionController == m_owningFaction);
+	assert(iter != bases.end() && base.owningFactionController == owningFaction);
 	iter->addWorker(worker);
 }
 
@@ -257,7 +257,7 @@ void AIOccupiedBases::removeWorker(const Worker& worker)
 		{
 			if (iter->get().getID() == worker.getID())
 			{
-				assert(base.base.get().owningFactionController == m_owningFaction);
+				assert(base.base.get().owningFactionController == owningFaction);
 				base.workers.erase(iter);
 				return;
 			}
@@ -267,7 +267,7 @@ void AIOccupiedBases::removeWorker(const Worker& worker)
 
 AIOccupiedBase& AIOccupiedBases::addBase(const Base& base)
 {
-	assert(base.owningFactionController == m_owningFaction);
+	assert(base.owningFactionController == owningFaction);
 	bases.emplace_back(base);
 	return bases.back();
 }
@@ -287,7 +287,7 @@ std::vector<std::reference_wrapper<Worker>> AIOccupiedBases::removeBase(const Ba
 void AIOccupiedBases::addBuilding(const Worker& worker, Entity& building)
 {
 	AIOccupiedBase* occupiedBase = getBaseWithWorker(worker);
-	assert(occupiedBase && occupiedBase->base.get().owningFactionController == m_owningFaction);
+	assert(occupiedBase && occupiedBase->base.get().owningFactionController == owningFaction);
 	if (occupiedBase)
 	{
 		assert(std::find_if(occupiedBase->buildings.cbegin(), occupiedBase->buildings.cend(), [&building](const auto& i)
@@ -334,7 +334,7 @@ void AIOccupiedBases::removeBuilding(const Entity& building)
 		buildingRemoved = base.removeBuilding(building);
 		if (buildingRemoved)
 		{
-			assert(base.base.get().owningFactionController == m_owningFaction);
+			assert(base.base.get().owningFactionController == owningFaction);
 			switch (building.getEntityType())
 			{
 			case eEntityType::Barracks:
@@ -371,7 +371,7 @@ AIOccupiedBase* AIOccupiedBases::getBaseWithWorker(const Worker& worker)
 		});
 		if (iter != base.workers.cend())
 		{
-			assert(base.base.get().owningFactionController == m_owningFaction);
+			assert(base.base.get().owningFactionController == owningFaction);
 			return &base;
 		}
 	}

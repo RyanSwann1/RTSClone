@@ -69,6 +69,5 @@ struct AIOccupiedBases
 	AIOccupiedBase* getBaseWithWorker(const Worker& worker);
 	
 	std::vector<AIOccupiedBase> bases;
-private:
-	const eFactionController m_owningFaction;
+	const eFactionController owningFaction;
 };			
