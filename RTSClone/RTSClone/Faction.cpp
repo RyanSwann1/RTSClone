@@ -71,10 +71,9 @@ int Faction::getLaboratoryCount() const
     return static_cast<int>(m_laboratories.size());
 }
 
-const Headquarters& Faction::getMainHeadquarters() const
+const Headquarters* Faction::getMainHeadquarters() const
 {
-    assert(!m_headquarters.empty());
-    return *m_headquarters.front();
+    return !m_headquarters.empty() ? &*m_headquarters.front() : nullptr;
 }
 
 const Headquarters& Faction::getClosestHeadquarters(const glm::vec3& position) const
