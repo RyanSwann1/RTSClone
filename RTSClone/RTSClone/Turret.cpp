@@ -52,8 +52,7 @@ void Turret::update(float deltaTime, FactionHandler& factionHandler, const Map& 
 		{
 			for (const auto& opposingFaction : factionHandler.getOpposingFactions(m_owningFaction.get().getController()))
 			{
-				const Entity* targetEntity = opposingFaction.get().getEntity(m_position, TURRET_ATTACK_RANGE);
-				if (targetEntity)
+				if (const Entity* targetEntity = opposingFaction.get().getEntity(m_position, TURRET_ATTACK_RANGE))
 				{
 					m_targetEntity.set(opposingFaction.get().getController(), targetEntity->getID(), targetEntity->getEntityType());
 					switchToState(eTurretState::Attacking);
@@ -66,10 +65,11 @@ void Turret::update(float deltaTime, FactionHandler& factionHandler, const Map& 
 	case eTurretState::Attacking:
 	{
 		assert(m_targetEntity.getID() != Globals::INVALID_ENTITY_ID);
-		if (m_stateHandlerTimer.isExpired() && factionHandler.isFactionActive(m_targetEntity.getFactionController()))
+		const Faction* opposingFaction = factionHandler.getFaction(m_targetEntity.getFactionController());
+		if (m_stateHandlerTimer.isExpired() 
+			&& opposingFaction)
 		{
-			const Faction& opposingFaction = factionHandler.getFaction(m_targetEntity.getFactionController());
-			const Entity* targetEntity = opposingFaction.getEntity(m_targetEntity.getID(), m_targetEntity.getType());
+			const Entity* targetEntity = opposingFaction->getEntity(m_targetEntity.getID(), m_targetEntity.getType());
 			if (targetEntity &&
 				Globals::getSqrDistance(targetEntity->getPosition(), m_position) <= TURRET_ATTACK_RANGE * TURRET_ATTACK_RANGE &&
 				PathFinding::getInstance().isTargetInLineOfSight(m_position, *targetEntity, map, m_AABB))
@@ -82,17 +82,18 @@ void Turret::update(float deltaTime, FactionHandler& factionHandler, const Map& 
 			}
 		}
 
-		if (m_attackTimer.isExpired() && factionHandler.isFactionActive(m_targetEntity.getFactionController()))
+		if (opposingFaction 
+			&& m_attackTimer.isExpired() 
+			&& factionHandler.isFactionActive(m_targetEntity.getFactionController()))
 		{
-			const Faction& opposingFaction = factionHandler.getFaction(m_targetEntity.getFactionController());
-			const Entity* targetEntity = opposingFaction.getEntity(m_targetEntity.getID(), m_targetEntity.getType());
+			const Entity* targetEntity = opposingFaction->getEntity(m_targetEntity.getID(), m_targetEntity.getType());
 			if (targetEntity &&
 				Globals::getSqrDistance(targetEntity->getPosition(), m_position) <= TURRET_ATTACK_RANGE * TURRET_ATTACK_RANGE &&
 				PathFinding::getInstance().isTargetInLineOfSight(m_position, *targetEntity, map, m_AABB))
 			{
 				m_rotation.y = Globals::getAngle(targetEntity->getPosition(), m_position, 270.0f);
 				GameEventHandler::getInstance().gameEvents.push(GameEvent::createSpawnProjectile(m_owningFaction.get().getController(), getID(),
-					getEntityType(), opposingFaction.getController(), targetEntity->getID(), targetEntity->getEntityType(), 
+					getEntityType(), opposingFaction->getController(), targetEntity->getID(), targetEntity->getEntityType(), 
 					TURRET_DAMAGE, m_position, targetEntity->getPosition()));
 				
 				m_attackTimer.resetElaspedTime();

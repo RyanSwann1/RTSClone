@@ -289,9 +289,10 @@ void UIManager::handleInput(const sf::Window& window, const FactionHandler& fact
 			}
 		}
 
-		if (!selectedEntity && 
-			factionHandler.isFactionActive(eFactionController::Player) &&
-			static_cast<const FactionPlayer&>(factionHandler.getFaction(eFactionController::Player)).getSelectedEntities().size() != 1)
+		if (const FactionPlayer* factionPlayer; 
+			!selectedEntity 
+			&& (factionPlayer = factionHandler.getFactionPlayer())
+			&& factionPlayer->getSelectedEntities().size() != 1)
 		{
 			m_selectedEntityWidget.reset();
 		}
@@ -318,10 +319,9 @@ void UIManager::update(const FactionHandler& factionHandler)
 {
 	if (m_selectedEntityWidget)
 	{
-		if (factionHandler.isFactionActive(m_selectedEntityWidget->factionController))
+		if (const Faction* faction = factionHandler.getFaction(m_selectedEntityWidget->factionController))
 		{
-			const Entity* targetEntity =
-				factionHandler.getFaction(m_selectedEntityWidget->factionController).getEntity(m_selectedEntityWidget->ID, m_selectedEntityWidget->entityType);
+			const Entity* targetEntity = faction->getEntity(m_selectedEntityWidget->ID, m_selectedEntityWidget->entityType);
 			if (!targetEntity)
 			{
 				m_selectedEntityWidget.reset();

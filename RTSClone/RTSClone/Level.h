@@ -15,8 +15,6 @@
 #include <memory>
 #include <SFML/Graphics.hpp>
 
-using FactionsContainer = std::array<std::unique_ptr<Faction>, static_cast<size_t>(eFactionController::Max) + 1>;
-
 class UIManager;
 class ShaderHandler;
 class Level
@@ -68,7 +66,6 @@ private:
 	const std::vector<SceneryGameObject> m_scenery;
 	Camera m_camera;
 	MiniMap m_minimap;
-	FactionsContainer m_factions;
 	Timer m_unitStateHandlerTimer;
 	FactionHandler m_factionHandler;
 	ProjectileHandler m_projectileHandler;

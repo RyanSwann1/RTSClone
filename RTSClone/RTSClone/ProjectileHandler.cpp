@@ -8,10 +8,10 @@ namespace
 	bool isHitEntity(const Projectile& projectile, const FactionHandler& factionHandler)
 	{
 		const Entity* entity = nullptr;
-		if (factionHandler.isFactionActive(projectile.getSenderEvent().targetFaction))
+		if (const Faction* targetFaction = factionHandler.getFaction(projectile.getSenderEvent().targetFaction))
 		{
-			const Faction& targetFaction = factionHandler.getFaction(projectile.getSenderEvent().targetFaction);
-			entity = targetFaction.getEntity(projectile.getAABB(), projectile.getSenderEvent().targetID, projectile.getSenderEvent().targetEntityType);
+			entity = 
+				targetFaction->getEntity(projectile.getAABB(), projectile.getSenderEvent().targetID, projectile.getSenderEvent().targetEntityType);
 		}
 
 		return entity;

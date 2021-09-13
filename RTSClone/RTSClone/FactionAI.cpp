@@ -475,11 +475,10 @@ void FactionAI::onUnitEnteredIdleState(Unit& unit, const Map& map, FactionHandle
 	});
 	if (unitOnHold == m_unitsOnHold.cend() && m_targetFaction != eFactionController::None)
 	{
-		if (factionHandler.isFactionActive(m_targetFaction))
+		if (const Faction* targetFaction = factionHandler.getFaction(m_targetFaction))
 		{
-			const Faction& targetFaction = factionHandler.getFaction(m_targetFaction);
-			const Headquarters& targetHeadquarters = targetFaction.getClosestHeadquarters(unit.getPosition());
-			unit.moveToAttackPosition(targetHeadquarters, targetFaction, map, factionHandler);
+			const Headquarters& targetHeadquarters = targetFaction->getClosestHeadquarters(unit.getPosition());
+			unit.moveToAttackPosition(targetHeadquarters, *targetFaction, map, factionHandler);
 		}
 		else
 		{
@@ -544,10 +543,9 @@ void FactionAI::onUnitTakenDamage(const TakeDamageEvent& gameEvent, Unit& unit, 
 	bool changeTargetEntity = false;
 	if(unit.getTargetEntity().getID() != Globals::INVALID_ENTITY_ID)
 	{
-		if (factionHandler.isFactionActive(unit.getTargetEntity().getFactionController()))
+		if (const Faction* opposingFaction = factionHandler.getFaction(unit.getTargetEntity().getFactionController()))
 		{
-			const Faction& opposingFaction = factionHandler.getFaction(unit.getTargetEntity().getFactionController());
-			const Entity* targetEntity = opposingFaction.getEntity(unit.getTargetEntity().getID(), unit.getTargetEntity().getType());
+			const Entity* targetEntity = opposingFaction->getEntity(unit.getTargetEntity().getID(), unit.getTargetEntity().getType());
 			if (!targetEntity)
 			{
 				changeTargetEntity = true;
@@ -564,10 +562,11 @@ void FactionAI::onUnitTakenDamage(const TakeDamageEvent& gameEvent, Unit& unit, 
 		changeTargetEntity = true;
 	}
 
-	if (changeTargetEntity)
+	if (const Faction* opposingFaction; 
+		changeTargetEntity
+		&& (opposingFaction= factionHandler.getFaction(gameEvent.senderFaction)))
 	{
-		const Faction& opposingFaction = factionHandler.getFaction(gameEvent.senderFaction);
-		const Entity* targetEntity = opposingFaction.getEntity(gameEvent.senderID, gameEvent.senderEntityType);
+		const Entity* targetEntity = opposingFaction->getEntity(gameEvent.senderID, gameEvent.senderEntityType);
 		if (targetEntity)
 		{
 			AISquad* squad = getSquad(m_squads, unit);
@@ -575,7 +574,7 @@ void FactionAI::onUnitTakenDamage(const TakeDamageEvent& gameEvent, Unit& unit, 
 			{
 				for (auto& unitInSquad : *squad)
 				{
-					unitInSquad.get().moveToAttackPosition(*targetEntity, opposingFaction, map, factionHandler);
+					unitInSquad.get().moveToAttackPosition(*targetEntity, *opposingFaction, map, factionHandler);
 				}
 			}
 		}	

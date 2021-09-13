@@ -19,8 +19,8 @@ namespace
 	}
 }
 
-FactionHandler::FactionHandler(const std::array<std::unique_ptr<Faction>, static_cast<size_t>(eFactionController::Max) + 1>& factions)
-	: m_factions(factions),
+FactionHandler::FactionHandler(FactionsContainer&& factions)
+	: m_factions(std::move(factions)),
 	m_opposingFactions()
 {
 	m_opposingFactions.reserve(static_cast<size_t>(getFactionCount(m_factions)));
@@ -31,7 +31,12 @@ bool FactionHandler::isFactionActive(eFactionController factionController) const
 	return m_factions[static_cast<int>(factionController)].get();
 }
 
-const std::array<std::unique_ptr<Faction>, static_cast<size_t>(eFactionController::Max) + 1>& FactionHandler::getFactions() const
+const FactionsContainer& FactionHandler::getFactions() const
+{
+	return m_factions;
+}
+
+FactionsContainer& FactionHandler::getFactions()
 {
 	return m_factions;
 }
@@ -51,27 +56,53 @@ const std::vector<std::reference_wrapper<const Faction>>& FactionHandler::getOpp
 	return m_opposingFactions;
 }
 
-const Faction& FactionHandler::getFaction(eFactionController factionController) const
+const FactionPlayer* FactionHandler::getFactionPlayer() const
 {
-	assert(m_factions[static_cast<int>(factionController)] &&
-		m_factions[static_cast<int>(factionController)]->getController() == factionController);
-
-	return *m_factions[static_cast<int>(factionController)].get();
+	Faction* factionPlayer = m_factions[static_cast<int>(eFactionController::Player)].get();
+	return factionPlayer ? static_cast<const FactionPlayer*>(factionPlayer) : nullptr;
 }
 
-const Faction& FactionHandler::getRandomOpposingFaction(eFactionController senderFaction) const
+FactionPlayer* FactionHandler::getFactionPlayer()
 {
-	assert(getFactionCount(m_factions) >= 2);
+	Faction* factionPlayer = m_factions[static_cast<int>(eFactionController::Player)].get();
+	return factionPlayer ? static_cast<FactionPlayer*>(factionPlayer) : nullptr;
+}
 
+Faction* FactionHandler::getFaction(eFactionController factionController)
+{
+	return m_factions[static_cast<int>(factionController)].get();
+}
+
+const Faction* FactionHandler::getFaction(eFactionController factionController) const
+{
+	return m_factions[static_cast<int>(factionController)].get();
+}
+
+const Faction* FactionHandler::getRandomOpposingFaction(eFactionController senderFaction) const
+{
 	const Faction* opposingFaction = nullptr;
-	while (!opposingFaction)
+	if (getFactionCount(m_factions) > 1)
 	{
-		int i = Globals::getRandomNumber(0, static_cast<int>(m_factions.size()) - 1);
-		if (m_factions[i] && m_factions[i].get()->getController() != senderFaction)
+		while (!opposingFaction)
 		{
-			opposingFaction = m_factions[i].get();
+			int i = Globals::getRandomNumber(0, static_cast<int>(m_factions.size()) - 1);
+			if (m_factions[i] && m_factions[i].get()->getController() != senderFaction)
+			{
+				opposingFaction = m_factions[i].get();
+			}
 		}
 	}
 
-	return *opposingFaction;
+	return opposingFaction;
+}
+
+bool FactionHandler::removeFaction(eFactionController faction)
+{
+	if (m_factions[static_cast<int>(faction)])
+	{
+		m_factions[static_cast<int>(faction)].reset();
+		return true;
+	}
+
+	return false;
 }
