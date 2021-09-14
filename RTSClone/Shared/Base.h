@@ -51,7 +51,7 @@ public:
 	const Mineral* getNearestAvailableMineralAtBase(const Faction& faction, const Mineral& mineral, const glm::vec3& position) const;
 	const Mineral* getMineral(const glm::vec3& position) const;
 	const Base* getBaseAtMineral(const glm::vec3& position) const;
-	const Base& getNearestBase(const glm::vec3& position) const;
+	const Base* getNearestBase(const glm::vec3& position) const;
 	const Base* getNearestUnusedBase(const glm::vec3& position) const;
 	const Base& getBase(const glm::vec3& position) const;
 	const Base& getBase(const Mineral& mineral) const;

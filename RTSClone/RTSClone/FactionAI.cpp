@@ -502,29 +502,30 @@ void FactionAI::onWorkerEnteredIdleState(Worker& worker, const Map& map)
 	assert(worker.getCurrentState() == eWorkerState::Idle);
 	if (const Headquarters* nearestHeadquarters = getClosestHeadquarters(worker.getPosition()))
 	{
-		const Base& nearestBase = m_baseHandler.getNearestBase(nearestHeadquarters->getPosition());
-		const Mineral* nearestMineral = m_baseHandler.getNearestAvailableMineralAtBase(*this, nearestBase, worker.getPosition());
-		if (nearestMineral)
+		if (const Base* nearestBase = m_baseHandler.getNearestBase(nearestHeadquarters->getPosition()))
 		{
-			worker.moveTo(*nearestMineral, map);
-		}
-		else
-		{
-			for (const auto& base : m_occupiedBases.getSortedBases(worker.getPosition()))
+			if (const Mineral* nearestMineral = m_baseHandler.getNearestAvailableMineralAtBase(*this, *nearestBase, worker.getPosition()))
 			{
-				if (&base.base.get() != &nearestBase)
+				worker.moveTo(*nearestMineral, map);
+			}
+			else
+			{
+				for (const auto& base : m_occupiedBases.getSortedBases(worker.getPosition()))
 				{
-					nearestMineral = m_baseHandler.getNearestAvailableMineralAtBase(*this, base.base, worker.getPosition());
-					if (nearestMineral)
+					if (&base.base.get() != &*nearestBase)
 					{
-						m_occupiedBases.removeWorker(worker);
-						m_occupiedBases.addWorker(worker, base.base);
-						worker.moveTo(*nearestMineral, map);
+						nearestMineral = m_baseHandler.getNearestAvailableMineralAtBase(*this, base.base, worker.getPosition());
+						if (nearestMineral)
+						{
+							m_occupiedBases.removeWorker(worker);
+							m_occupiedBases.addWorker(worker, base.base);
+							worker.moveTo(*nearestMineral, map);
+						}
 					}
 				}
 			}
 		}
-	}//.getPosition())
+	}
 
 
 	if (worker.getCurrentState() == eWorkerState::Idle)

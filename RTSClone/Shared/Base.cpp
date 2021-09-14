@@ -175,11 +175,11 @@ const Base* BaseHandler::getBaseAtMineral(const glm::vec3& position) const
 	return nullptr;
 }
 
-const Base& BaseHandler::getNearestBase(const glm::vec3& position) const
+const Base* BaseHandler::getNearestBase(const glm::vec3& position) const
 {
-	float closestDistance = std::numeric_limits<float>::max();
 	const Base* closestBase = nullptr;
-	for (const auto& base : m_bases)
+	std::for_each(m_bases.cbegin(), m_bases.cend(), 
+		[&, closestDistance = std::numeric_limits<float>::max()](const auto& base) mutable
 	{
 		float distance = Globals::getSqrDistance(base.position, position);
 		if (distance < closestDistance)
@@ -187,10 +187,9 @@ const Base& BaseHandler::getNearestBase(const glm::vec3& position) const
 			closestBase = &base;
 			closestDistance = distance;
 		}
-	}
+	});
 
-	assert(closestBase);
-	return *closestBase;
+	return closestBase;
 }
 
 const Base* BaseHandler::getNearestUnusedBase(const glm::vec3& position) const
