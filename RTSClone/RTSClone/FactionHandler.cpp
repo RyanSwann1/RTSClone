@@ -74,8 +74,13 @@ const Faction* FactionHandler::getFaction(eFactionController factionController) 
 
 const Faction* FactionHandler::getRandomOpposingFaction(eFactionController senderFaction) const
 {
+	bool opposingFactionActive = std::any_of(m_factions.cbegin(), m_factions.cend(), [this, senderFaction](const auto& faction)
+	{
+		return faction.get() && faction.get()->getController() != senderFaction;
+	});
+
 	const Faction* opposingFaction = nullptr;
-	if (getFactionCount(m_factions) > 1)
+	if (getFactionCount(m_factions) > 1 && opposingFactionActive)
 	{
 		while (!opposingFaction)
 		{
