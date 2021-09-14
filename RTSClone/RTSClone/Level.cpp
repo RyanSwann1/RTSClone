@@ -84,8 +84,10 @@ std::unique_ptr<Level> Level::load(const std::string& levelName, glm::ivec2 wind
 			factions[i] = std::make_unique<FactionPlayer>(baseHandler->getBases()[i].position,
 				factionStartingResources, factionStartingPopulation);
 
-			const glm::vec3& headquartersPosition = factions[i]->getMainHeadquartersPosition();
-			cameraStartingPosition = { headquartersPosition.z, headquartersPosition.x };
+			if (const Headquarters* mainHeadquarters = factions[i]->getMainHeadquarters())
+			{
+				cameraStartingPosition = { mainHeadquarters->getPosition().z, mainHeadquarters->getPosition().x };
+			}
 		}
 			break;
 		case eFactionController::AI_1:

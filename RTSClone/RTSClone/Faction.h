@@ -42,7 +42,6 @@ public:
 	int getLaboratoryCount() const;
 	const Headquarters* getMainHeadquarters() const;
 	const Headquarters* getClosestHeadquarters(const glm::vec3& position) const;
-	const glm::vec3& getMainHeadquartersPosition() const;
 	eFactionController getController() const;
 	const std::vector<std::unique_ptr<Unit>>& getUnits() const;
 	const std::vector<std::reference_wrapper<Entity>>& getAllEntities() const;

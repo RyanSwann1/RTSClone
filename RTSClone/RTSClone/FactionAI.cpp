@@ -293,9 +293,12 @@ void FactionAI::update(float deltaTime, const Map & map, FactionHandler& faction
 	}
 
 	m_baseExpansionTimer.update(deltaTime);
-	if (m_baseExpansionTimer.isExpired() && isAffordable(eEntityType::Headquarters))
+	if (const Headquarters* mainHeadquarters;
+		m_baseExpansionTimer.isExpired() 
+		&& isAffordable(eEntityType::Headquarters)
+		&& (mainHeadquarters = getMainHeadquarters()))
 	{
-		const Base* availableBase = m_baseHandler.getNearestUnusedBase(getMainHeadquartersPosition());
+		const Base* availableBase = m_baseHandler.getNearestUnusedBase(mainHeadquarters->getPosition());
 		if (availableBase)
 		{
 			Worker* availableWorker = getAvailableWorker(availableBase->position);
