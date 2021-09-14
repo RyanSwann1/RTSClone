@@ -4,18 +4,12 @@
 
 namespace
 {
-	int getFactionCount(const std::array<std::unique_ptr<Faction>, static_cast<size_t>(eFactionController::Max) + 1>& factions)
+	int getFactionCount(const FactionsContainer& factions)
 	{
-		int factionCount = 0;
-		for (const auto& faction : factions)
+		return static_cast<int>(std::count_if(factions.cbegin(), factions.cend(), [&](const auto& faction)
 		{
-			if (faction)
-			{
-				++factionCount;
-			}
-		}
-
-		return factionCount;
+			return faction.get();
+		}));
 	}
 }
 
