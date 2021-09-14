@@ -111,10 +111,10 @@ const std::vector<std::reference_wrapper<Entity>>& Faction::getAllEntities() con
 const Entity* Faction::getEntity(const glm::vec3& position, float maxDistance, bool prioritizeUnits) const
 {
     const Entity* closestEntity = nullptr;
-    float closestEntityDistance = maxDistance * maxDistance;
     if (prioritizeUnits)
     {
-        for (const auto& entity : m_allEntities)
+        std::for_each(m_allEntities.cbegin(), m_allEntities.cend(),
+            [&, closestEntityDistance = maxDistance * maxDistance](const auto& entity) mutable
         {
             float distance = Globals::getSqrDistance(entity.get().getPosition(), position);
             if (!closestEntity && distance < closestEntityDistance)
@@ -122,7 +122,7 @@ const Entity* Faction::getEntity(const glm::vec3& position, float maxDistance, b
                 closestEntity = &entity.get();
                 closestEntityDistance = distance;
             }
-            else if (closestEntity && Globals::BUILDING_TYPES.isMatch(closestEntity->getEntityType()) && 
+            else if (closestEntity && Globals::BUILDING_TYPES.isMatch(closestEntity->getEntityType()) &&
                 Globals::UNIT_TYPES.isMatch(entity.get().getEntityType()) &&
                 Globals::getSqrDistance(entity.get().getPosition(), position) < maxDistance * maxDistance)
             {
@@ -134,11 +134,12 @@ const Entity* Faction::getEntity(const glm::vec3& position, float maxDistance, b
                 closestEntity = &entity.get();
                 closestEntityDistance = distance;
             }
-        }
+        });
     }
     else
     {
-        for (const auto& entity : m_allEntities)
+        std::for_each(m_allEntities.cbegin(), m_allEntities.cend(),
+            [&, closestEntityDistance = maxDistance * maxDistance](const auto& entity) mutable
         {
             float distance = Globals::getSqrDistance(entity.get().getPosition(), position);
             if (distance < closestEntityDistance)
@@ -146,7 +147,7 @@ const Entity* Faction::getEntity(const glm::vec3& position, float maxDistance, b
                 closestEntity = &entity.get();
                 closestEntityDistance = distance;
             }
-        }
+        });
     }
 
     return closestEntity;
