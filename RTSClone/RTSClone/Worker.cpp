@@ -242,10 +242,9 @@ void Worker::update(float deltaTime, const Map& map, FactionHandler& factionHand
 				}
 			}
 		}
-		else
+		else if(const Headquarters* headquarters = m_owningFaction.get().getClosestHeadquarters(m_position))
 		{
-			const Headquarters& headquarters = m_owningFaction.get().getClosestHeadquarters(m_position);
-			moveTo(headquarters, map, eWorkerState::ReturningMineralsToHeadquarters);
+			moveTo(*headquarters, map, eWorkerState::ReturningMineralsToHeadquarters);
 		}
 		break;
 	case eWorkerState::MovingToBuildingPosition:

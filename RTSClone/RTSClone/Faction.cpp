@@ -76,20 +76,21 @@ const Headquarters* Faction::getMainHeadquarters() const
     return !m_headquarters.empty() ? &*m_headquarters.front() : nullptr;
 }
 
-const Headquarters& Faction::getClosestHeadquarters(const glm::vec3& position) const
+const Headquarters* Faction::getClosestHeadquarters(const glm::vec3& position) const
 {
 	const Headquarters* closestHeadquarters = nullptr;
-	float distance = std::numeric_limits<float>::max();
-	for (const auto& headquarters : m_headquarters)
-	{
-		float result = Globals::getSqrDistance(headquarters->getPosition(), position);
-		if (result < distance)
-			distance = result;
-		closestHeadquarters = headquarters.get();
-	}
+    std::for_each(m_headquarters.cbegin(), m_headquarters.cend(), 
+        [&, distance = std::numeric_limits<float>::max()](const auto& headquarters) mutable
+    {
+        float result = Globals::getSqrDistance(headquarters->getPosition(), position);
+        if (result < distance)
+        {
+            distance = result;
+            closestHeadquarters = headquarters.get();
+        }
+    });
 
-	assert(closestHeadquarters);
-	return *closestHeadquarters;
+	return closestHeadquarters;
 }
 
 const glm::vec3& Faction::getMainHeadquartersPosition() const

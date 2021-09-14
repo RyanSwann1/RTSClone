@@ -129,12 +129,14 @@ void FactionAI::setTargetFaction(FactionHandler& factionHandler)
 	std::for_each(opposingFactions.cbegin(), opposingFactions.cend(), 
 		[&, targetFactionDistance = std::numeric_limits<float>::max()](const auto& opposingFaction) mutable
 	{
-		const Headquarters& opposingHeadquarters = opposingFaction.get().getClosestHeadquarters(m_headquarters.front()->getPosition());
-		float distance = Globals::getSqrDistance(opposingHeadquarters.getPosition(), m_headquarters.front()->getPosition());
-		if (distance < targetFactionDistance)
+		if (const Headquarters* opposingHeadquarters = opposingFaction.get().getClosestHeadquarters(m_headquarters.front()->getPosition()))
 		{
-			m_targetFaction = opposingFaction.get().getController();
-			targetFactionDistance = distance;
+			float distance = Globals::getSqrDistance(opposingHeadquarters->getPosition(), m_headquarters.front()->getPosition());
+			if (distance < targetFactionDistance)
+			{
+				m_targetFaction = opposingFaction.get().getController();
+				targetFactionDistance = distance;
+			}
 		}
 	});
 }
@@ -480,8 +482,10 @@ void FactionAI::onUnitEnteredIdleState(Unit& unit, const Map& map, FactionHandle
 	{
 		if (const Faction* targetFaction = factionHandler.getFaction(m_targetFaction))
 		{
-			const Headquarters& targetHeadquarters = targetFaction->getClosestHeadquarters(unit.getPosition());
-			unit.moveToAttackPosition(targetHeadquarters, *targetFaction, map, factionHandler);
+			if (const Headquarters* nearestHeadquarters = targetFaction->getClosestHeadquarters(unit.getPosition()))
+			{
+				unit.moveToAttackPosition(*nearestHeadquarters, *targetFaction, map, factionHandler);
+			}
 		}
 		else
 		{
@@ -493,28 +497,32 @@ void FactionAI::onUnitEnteredIdleState(Unit& unit, const Map& map, FactionHandle
 void FactionAI::onWorkerEnteredIdleState(Worker& worker, const Map& map)
 {
 	assert(worker.getCurrentState() == eWorkerState::Idle);
-	const Base& nearestBase = m_baseHandler.getNearestBase(getClosestHeadquarters(worker.getPosition()).getPosition());
-	const Mineral* nearestMineral = m_baseHandler.getNearestAvailableMineralAtBase(*this, nearestBase, worker.getPosition());
-	if (nearestMineral)
+	if (const Headquarters* nearestHeadquarters = getClosestHeadquarters(worker.getPosition()))
 	{
-		worker.moveTo(*nearestMineral, map);
-	}
-	else
-	{
-		for (const auto& base : m_occupiedBases.getSortedBases(worker.getPosition()))
+		const Base& nearestBase = m_baseHandler.getNearestBase(nearestHeadquarters->getPosition());
+		const Mineral* nearestMineral = m_baseHandler.getNearestAvailableMineralAtBase(*this, nearestBase, worker.getPosition());
+		if (nearestMineral)
 		{
-			if (&base.base.get() != &nearestBase)
+			worker.moveTo(*nearestMineral, map);
+		}
+		else
+		{
+			for (const auto& base : m_occupiedBases.getSortedBases(worker.getPosition()))
 			{
-				nearestMineral = m_baseHandler.getNearestAvailableMineralAtBase(*this, base.base, worker.getPosition());
-				if (nearestMineral)
+				if (&base.base.get() != &nearestBase)
 				{
-					m_occupiedBases.removeWorker(worker);
-					m_occupiedBases.addWorker(worker, base.base);
-					worker.moveTo(*nearestMineral, map);
+					nearestMineral = m_baseHandler.getNearestAvailableMineralAtBase(*this, base.base, worker.getPosition());
+					if (nearestMineral)
+					{
+						m_occupiedBases.removeWorker(worker);
+						m_occupiedBases.addWorker(worker, base.base);
+						worker.moveTo(*nearestMineral, map);
+					}
 				}
 			}
 		}
-	}
+	}//.getPosition())
+
 
 	if (worker.getCurrentState() == eWorkerState::Idle)
 	{
