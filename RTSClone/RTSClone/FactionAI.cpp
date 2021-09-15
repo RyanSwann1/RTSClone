@@ -29,13 +29,17 @@ namespace
 {
 	bool isBaseClosest(const BaseHandler& baseHandler, const glm::vec3& position, const Headquarters& headquarters)
 	{
-		const Base& baseOnHeadquarters = baseHandler.getBase(headquarters.getPosition());
-		return std::any_of(baseHandler.getBases().cbegin(), baseHandler.getBases().cend(), [&](const auto& base)
+		if (const Base* baseOnHeadquarters = baseHandler.getBase(headquarters.getPosition()))
 		{
-			return &baseOnHeadquarters != &base &&
-				Globals::getSqrDistance(base.getCenteredPosition(), position) <
-				Globals::getSqrDistance(baseOnHeadquarters.getCenteredPosition(), position);
-		});
+			return std::any_of(baseHandler.getBases().cbegin(), baseHandler.getBases().cend(), [&](const auto& base)
+			{
+				return &*baseOnHeadquarters != &base &&
+					Globals::getSqrDistance(base.getCenteredPosition(), position) <
+					Globals::getSqrDistance(baseOnHeadquarters->getCenteredPosition(), position);
+			});
+		}
+
+		return false;
 	}
 
 	void removeFromSquad(std::vector<AISquad>& squads, const Unit& unit)
@@ -173,25 +177,28 @@ void FactionAI::handleEvent(const GameEvent& gameEvent, const Map& map, FactionH
 	break;
 	case eGameEventType::AttachFactionToBase:
 	{	
-		AIOccupiedBase& occupiedBase = m_occupiedBases.addBase(m_baseHandler.getBase(gameEvent.data.attachFactionToBase.position));
-		if (m_occupiedBases.bases.size() == 1)
+		if (const Base* base = m_baseHandler.getBase(gameEvent.data.attachFactionToBase.position))
 		{
-			for (const auto& actionType : AIConstants::STARTING_BUILD_ORDERS[static_cast<size_t>(m_behaviour)])
+			AIOccupiedBase& occupiedBase = m_occupiedBases.addBase(*base);
+			if (m_occupiedBases.bases.size() == 1)
 			{
-				occupiedBase.actionQueue.emplace_back(actionType);
-			}
-		}
-		else if(!m_unattachedToBaseWorkers.isEmpty())
-		{
-			for (const auto& mineral : occupiedBase.base.get().minerals)
-			{
-				Worker& worker = m_unattachedToBaseWorkers.getClosestWorker(mineral.getPosition());
-				worker.moveTo(mineral, map);
-				occupiedBase.addWorker(worker);
-
-				if (m_unattachedToBaseWorkers.isEmpty())
+				for (const auto& actionType : AIConstants::STARTING_BUILD_ORDERS[static_cast<size_t>(m_behaviour)])
 				{
-					break;
+					occupiedBase.actionQueue.emplace_back(actionType);
+				}
+			}
+			else if (!m_unattachedToBaseWorkers.isEmpty())
+			{
+				for (const auto& mineral : occupiedBase.base.get().minerals)
+				{
+					Worker& worker = m_unattachedToBaseWorkers.getClosestWorker(mineral.getPosition());
+					worker.moveTo(mineral, map);
+					occupiedBase.addWorker(worker);
+
+					if (m_unattachedToBaseWorkers.isEmpty())
+					{
+						break;
+					}
 				}
 			}
 		}
@@ -199,9 +206,12 @@ void FactionAI::handleEvent(const GameEvent& gameEvent, const Map& map, FactionH
 	break;
 	case eGameEventType::DetachFactionFromBase:
 	{
-		for (Worker& worker : m_occupiedBases.removeBase(m_baseHandler.getBase(gameEvent.data.attachFactionToBase.position)))
+		if (const Base* base = m_baseHandler.getBase(gameEvent.data.attachFactionToBase.position))
 		{
-			m_unattachedToBaseWorkers.addWorker(worker);
+			for (auto& worker : m_occupiedBases.removeBase(*base))
+			{
+				m_unattachedToBaseWorkers.addWorker(worker);
+			}
 		}
 	}
 	break;

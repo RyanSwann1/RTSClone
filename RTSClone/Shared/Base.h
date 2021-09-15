@@ -53,7 +53,7 @@ public:
 	const Base* getBaseAtMineral(const glm::vec3& position) const;
 	const Base* getNearestBase(const glm::vec3& position) const;
 	const Base* getNearestUnusedBase(const glm::vec3& position) const;
-	const Base& getBase(const glm::vec3& position) const;
+	const Base* getBase(const glm::vec3& position) const;
 	const Base& getBase(const Mineral& mineral) const;
 
 	void handleEvent(const GameEvent& gameEvent);

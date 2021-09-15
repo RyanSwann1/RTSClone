@@ -210,14 +210,18 @@ const Base* BaseHandler::getNearestUnusedBase(const glm::vec3& position) const
 	return closestBase;
 }
 
-const Base& BaseHandler::getBase(const glm::vec3& position) const
+const Base* BaseHandler::getBase(const glm::vec3& position) const
 {
 	auto base = std::find_if(m_bases.cbegin(), m_bases.cend(), [&position](const auto& base)
 	{
 		return base.getCenteredPosition() == position;	
 	});
-	assert(base != m_bases.cend());
-	return (*base);
+	if (base != m_bases.cend())
+	{
+		return &(*base);
+	}
+
+	return nullptr;
 }
 
 const Base& BaseHandler::getBase(const Mineral& _mineral) const

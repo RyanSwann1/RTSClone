@@ -361,10 +361,12 @@ int FactionPlayer::instructWorkerToBuild(const Map& map, const BaseHandler& base
             {
 				if (m_plannedBuilding->getEntityType() == eEntityType::Headquarters)
 				{
-                    const Base& base = baseHandler.getBase(m_plannedBuilding->getPosition());
-                    if ((*selectedWorker)->build(base.getCenteredPosition(), map, m_plannedBuilding->getEntityType(), &base))
+                    if (const Base* base = baseHandler.getBase(m_plannedBuilding->getPosition()))
                     {
-                        m_plannedBuilding.reset();
+                        if ((*selectedWorker)->build(base->getCenteredPosition(), map, m_plannedBuilding->getEntityType(), base))
+                        {
+                            m_plannedBuilding.reset();
+                        }
                     }
 				}
                 else
