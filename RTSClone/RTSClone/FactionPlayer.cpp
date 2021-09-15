@@ -524,45 +524,45 @@ void FactionPlayer::moveMultipleSelectedEntities(const glm::vec3& destination, c
                 case eEntityType::Unit:
                 {
                     eUnitState state = (m_attackMoveSelected ? eUnitState::AttackMoving : eUnitState::Moving);
-                    glm::vec3 destination = destination - (averagePosition - selectedEntity->getPosition());
+                    glm::vec3 position = destination - (averagePosition - selectedEntity->getPosition());
                     Unit& unit = static_cast<Unit&>(*selectedEntity);
                     if (m_addToDestinationQueue)
                     {
                         if (unit.getMovementPath().empty())
                         {
-                            unit.moveTo(destination, map, factionHandler);
+                            unit.moveTo(position, map, factionHandler);
                         }
                         else
                         {
-                            unit.addToDestinationQueue(destination);
+                            unit.addToDestinationQueue(position);
                         }
                     }
                     else
                     {
                         unit.clearDestinationQueue();
-                        unit.moveTo(destination, map, factionHandler);
+                        unit.moveTo(position, map, factionHandler);
                     }
                 }
                 break;
                 case eEntityType::Worker:
                 {
-                    glm::vec3 destination = destination - (averagePosition - selectedEntity->getPosition());
+                    glm::vec3 position = destination - (averagePosition - selectedEntity->getPosition());
                     Worker& worker = static_cast<Worker&>(*selectedEntity);
                     if (m_addToDestinationQueue)
                     {
                         if (worker.getMovementPath().empty())
                         {
-                            worker.moveTo(destination, map);
+                            worker.moveTo(position, map);
                         }
                         else
                         {
-                            worker.addToDestinationQueue(destination);
+                            worker.addToDestinationQueue(position);
                         }
                     }
                     else
                     {
                         worker.clearDestinationQueue();
-                        worker.moveTo(destination, map);
+                        worker.moveTo(position, map);
                     }
                 }
                 break;

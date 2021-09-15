@@ -76,16 +76,16 @@ const Faction* FactionHandler::getRandomOpposingFaction(eFactionController sende
 {
 	bool opposingFactionActive = std::any_of(m_factions.cbegin(), m_factions.cend(), [this, senderFaction](const auto& faction)
 	{
-		return faction.get() && faction.get()->getController() != senderFaction;
+		return faction.get() && faction->getController() != senderFaction;
 	});
 
 	const Faction* opposingFaction = nullptr;
-	if (getFactionCount(m_factions) > 1 && opposingFactionActive)
+	if (opposingFactionActive && getFactionCount(m_factions) > 1)
 	{
 		while (!opposingFaction)
 		{
 			int i = Globals::getRandomNumber(0, static_cast<int>(m_factions.size()) - 1);
-			if (m_factions[i] && m_factions[i].get()->getController() != senderFaction)
+			if (m_factions[i] && m_factions[i]->getController() != senderFaction)
 			{
 				opposingFaction = m_factions[i].get();
 			}
