@@ -129,14 +129,17 @@ const Mineral* BaseHandler::getNearestAvailableMineralAtBase(const Faction& fact
 	const glm::vec3& position) const
 {
 	assert(faction.isMineralInUse(_mineral));
-	std::array<const Mineral*, Globals::MAX_MINERALS> minerals = getClosestMinerals(getBase(_mineral).minerals, position);
-	for (const auto& mineral : minerals)
+	if (const Base* base = getBase(_mineral))
 	{
-		assert(mineral);
-		if (&(*mineral) != &_mineral &&
-			!faction.isMineralInUse(*mineral))
+		std::array<const Mineral*, Globals::MAX_MINERALS> minerals = getClosestMinerals(base->minerals, position);
+		for (const auto& mineral : minerals)
 		{
-			return mineral;
+			assert(mineral);
+			if (&(*mineral) != &_mineral &&
+				!faction.isMineralInUse(*mineral))
+			{
+				return mineral;
+			}
 		}
 	}
 
@@ -224,7 +227,7 @@ const Base* BaseHandler::getBase(const glm::vec3& position) const
 	return nullptr;
 }
 
-const Base& BaseHandler::getBase(const Mineral& _mineral) const
+const Base* BaseHandler::getBase(const Mineral& _mineral) const
 {
 	for (const auto& base : m_bases)
 	{
@@ -232,12 +235,12 @@ const Base& BaseHandler::getBase(const Mineral& _mineral) const
 		{
 			if (&mineral == &_mineral)
 			{
-				return base;
+				return &base;
 			}
 		}
 	}
 
-	assert(false);
+	return nullptr;
 }
 
 Base& BaseHandler::getBase(const glm::vec3& position)

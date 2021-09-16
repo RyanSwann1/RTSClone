@@ -54,7 +54,7 @@ public:
 	const Base* getNearestBase(const glm::vec3& position) const;
 	const Base* getNearestUnusedBase(const glm::vec3& position) const;
 	const Base* getBase(const glm::vec3& position) const;
-	const Base& getBase(const Mineral& mineral) const;
+	const Base* getBase(const Mineral& mineral) const;
 
 	void handleEvent(const GameEvent& gameEvent);
 	void renderMinerals(ShaderHandler& shaderHandler) const;
