@@ -129,8 +129,8 @@ void Faction::removeEntity(std::vector<std::unique_ptr<T>>& entityContainer, int
 	assert(iter != entityContainer.end());
 
 	onEntityRemoval((*entity).get());
-	entityContainer.erase(iter);
 	m_allEntities.erase(entity);
+	entityContainer.erase(iter);
 }
 
 template <typename T>
