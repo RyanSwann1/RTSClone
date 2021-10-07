@@ -51,7 +51,6 @@ struct AIOccupiedBases
 	AIOccupiedBases(AIOccupiedBases&&) = delete;
 	AIOccupiedBases& operator=(AIOccupiedBases&&) = delete;
 
-	AIOccupiedBase& getBase(const Base& base);
 	AIOccupiedBase* getBase(const glm::vec3& position);
 	AIOccupiedBase* getBase(const Entity& entity);
 

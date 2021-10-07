@@ -165,17 +165,6 @@ AIOccupiedBase* AIOccupiedBases::getBase(const glm::vec3& position)
 	return base != bases.end() ? &(*base) : nullptr;
 }
 
-AIOccupiedBase& AIOccupiedBases::getBase(const Base& _base) 
-{
-	auto iter = std::find_if(bases.begin(), bases.end(), [&_base](const auto& base)
-	{
-		return _base.getCenteredPosition() == base.base.get().getCenteredPosition();
-	});
-
-	assert(iter != bases.end());
-	return (*iter);
-}
-
 AIOccupiedBase* AIOccupiedBases::getBase(const Entity& entity)
 {
 	AIOccupiedBase* occupiedBase = nullptr;
