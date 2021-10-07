@@ -413,14 +413,17 @@ bool PathFinding::setUnitAttackPosition(const Unit& unit, const Entity& targetEn
 void PathFinding::getPathToPosition(const Entity& entity, const glm::vec3& destination, std::vector<glm::vec3>& pathToPosition, 
 	const Map& map, AdjacentPositions adjacentPositions)
 {
+	glm::ivec2 destinationOnGrid = Globals::convertToGridPosition(destination);
 	pathToPosition.clear();
-	if (entity.getPosition() == destination || !map.isWithinBounds(destination))
+	if (entity.getPosition() == destination || 
+		!map.isWithinBounds(destination) || 
+		map.isPositionOccupied(destinationOnGrid))
 	{
 		return;
 	}
 
 	glm::ivec2 startingPositionOnGrid = Globals::convertToGridPosition(entity.getPosition());
-	glm::ivec2 destinationOnGrid = Globals::convertToGridPosition(destination);
+
 	std::fill(m_thetaGraph.begin(), m_thetaGraph.end(), ThetaStarGraphNode());
 	m_thetaFrontier.clear();
 	m_thetaFrontier.add({ startingPositionOnGrid, startingPositionOnGrid, 0.f, Globals::getDistance(destinationOnGrid, startingPositionOnGrid) });
