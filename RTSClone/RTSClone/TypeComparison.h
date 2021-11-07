@@ -1,26 +1,21 @@
 #pragma once
 
 #include <bitset>
-#include <vector>
+#include <array>
 
-template <class Type>
+template <class Type, size_t Size>
 class TypeComparison 
 {
 public:
-	TypeComparison(const TypeComparison&) = delete;
-	TypeComparison& operator=(const TypeComparison&) = delete;
-	TypeComparison(TypeComparison&&) = delete;
-	TypeComparison& operator=(TypeComparison&&) = delete;
-
-	TypeComparison(const std::vector<Type>& cubeTypes)
+	constexpr TypeComparison(std::array<Type, Size> types)
 	{
-		for (auto cubeType : cubeTypes)
+		for (auto type : types)
 		{
-			bitset.set(static_cast<int>(cubeType));
+			bitset.set(static_cast<int>(type));
 		}
 	}
 
-	const std::bitset<static_cast<int>(Type::Max) + 1>& getBitSet() const
+	std::bitset<static_cast<int>(Type::Max) + 1> getBitSet() const
 	{
 		return bitset;
 	}
@@ -39,5 +34,5 @@ public:
 	}
 
 private:
-	std::bitset<static_cast<int>(Type::Max) + 1> bitset{ 0 };
+	std::bitset<static_cast<int>(Type::Max) + 1> bitset = { 0 };
 };

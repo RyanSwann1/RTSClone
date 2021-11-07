@@ -109,7 +109,7 @@ namespace Globals
 	constexpr int LABORATORY_STARTING_HEALTH = 10;
 
 	constexpr int STARTING_RESOURCES = 1500;
-	constexpr int STARTING_POPULATION = 50;
+	constexpr int STARTING_POPULATION = 60;
 	constexpr int WORKER_RESOURCE_COST = 50;
 	constexpr int SUPPLY_DEPOT_RESOURCE_COST = 50;
 	constexpr int BARRACKS_RESOURCE_COST = 50;
@@ -176,17 +176,17 @@ namespace Globals
 	constexpr int MAX_FACTION_SHIELD_AMOUNT = 5;
 	constexpr int FACTION_SHIELD_INCREASE_COST = 100;
 
-	inline const glm::vec3 PROGRESS_BAR_COLOR = { 1.0f, 1.0f, 0.4f };
+	constexpr glm::vec3 PROGRESS_BAR_COLOR = { 1.0f, 1.0f, 0.4f };
 	inline const glm::vec3 HEALTH_BAR_COLOR = { 0.0f, 0.8f, 0.0f };
 	inline const glm::vec3 SHIELD_BAR_COLOR = { 0.0f, 1.0f, 1.0f };
 	inline const glm::vec3 BACKGROUND_BAR_COLOR = { 0.0f, 0.0f, 0.0f };
 	constexpr float DEFAULT_PROGRESS_BAR_HEIGHT = 5.0f;
 
 #ifdef GAME
-	inline const TypeComparison<eEntityType> BUILDING_TYPES({ eEntityType::Headquarters, eEntityType::Barracks, 
+	inline const TypeComparison<eEntityType, 5> BUILDING_TYPES({ eEntityType::Headquarters, eEntityType::Barracks, 
 		eEntityType::SupplyDepot, eEntityType::Turret, eEntityType::Laboratory});
-	inline const TypeComparison<eEntityType> UNIT_TYPES({ eEntityType::Unit, eEntityType::Worker });
-	inline const TypeComparison<eEntityType> ATTACKING_ENTITY_TYPES({ eEntityType::Unit, eEntityType::Turret });
+	inline const TypeComparison<eEntityType, 2> UNIT_TYPES({ eEntityType::Unit, eEntityType::Worker });
+	inline const TypeComparison<eEntityType, 2> ATTACKING_ENTITY_TYPES({ eEntityType::Unit, eEntityType::Turret });
 #endif // GAME
 
 	inline void print(const std::string& text)
