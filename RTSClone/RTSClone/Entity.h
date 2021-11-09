@@ -23,6 +23,7 @@ public:
 	Entity& operator=(const Entity&) = delete;
 	Entity(Entity&&) = default;
 	Entity& operator=(Entity&&) = default;
+	virtual ~Entity() {};
 
 	eEntityType getEntityType() const;
 	int getMaximumHealth() const;
@@ -53,7 +54,7 @@ public:
 protected:	
 	Entity(const Model& model, const glm::vec3& startingPosition, eEntityType entityType, 
 		int health, int shield, glm::vec3 startingRotation = glm::vec3(0.0f));
-	virtual ~Entity() {}
+	
 	
 	void update(float deltaTime);
 	

@@ -146,14 +146,14 @@ void MiniMap::render(ShaderHandler& shaderHandler, glm::uvec2 windowSize, const 
 		default:
 			assert(false);
 		}
-		for (const auto& entity : faction.get()->getAllEntities())
+		for (const auto& entity : faction.get()->getEntities())
 		{
-			const glm::vec3& entityPosition = entity.get().getPosition();
+			const glm::vec3& entityPosition = entity->getPosition();
 			glm::vec2 convertedEntityPosition((entityPosition.z / level.getSize().x) * m_size.x, (entityPosition.x / level.getSize().z) * m_size.y);
 			convertedEntityPosition += m_position;
 
 			glm::vec2 size(1.0f);
-			switch (entity.get().getEntityType())
+			switch (entity->getEntityType())
 			{
 			case eEntityType::Unit:
 				size = SMALL_SIZE;

@@ -99,8 +99,7 @@ PathFinding::~PathFinding()
 	//GameMessenger::getInstance().unsubscribe<GameMessages::NewMapSize>(this);
 }
 
-bool PathFinding::getClosestAvailablePosition(const Worker& worker, const std::vector<std::unique_ptr<Worker>>& workers, 
-	const Map& map, glm::vec3& outPosition)
+bool PathFinding::getClosestAvailablePosition(const Worker& worker, const std::vector<Worker*>& workers, const Map& map, glm::vec3& outPosition)
 {
 	m_BFSGraph.reset(m_BFSFrontier);
 	m_BFSFrontier.emplace(Globals::convertToGridPosition(worker.getPosition()));

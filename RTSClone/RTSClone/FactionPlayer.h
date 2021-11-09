@@ -68,19 +68,19 @@ private:
 	void onRightClick(const sf::Window& window, const Camera& camera, FactionHandler& factionHandler, const Map& map, 
 		const BaseHandler& baseHandler, const MiniMap& minimap, const glm::vec3& levelSize);
 
-	template <class Entity>
-	void selectEntity(std::vector<std::unique_ptr<Entity>>& entities, const glm::vec3& mouseToGroundPosition, bool selectAllEntities = false,
+	template <typename Entity>
+	void selectEntity(std::vector<Entity*>& entities, const glm::vec3& mouseToGroundPosition, bool selectAllEntities = false,
 		int selectEntityID = Globals::INVALID_ENTITY_ID);
 
-	template <class Entity>
-	void selectEntities(std::vector<std::unique_ptr<Entity>>& units);
+	template <typename T>
+	void selectEntities(std::vector<T>& units);
 
-	template <class Entity>
-	void deselectEntities(std::vector<std::unique_ptr<Entity>>& entities);
+	template <typename T>
+	void deselectEntities(std::vector<T>& entities);
 };
 
-template<class Entity>
-inline void FactionPlayer::selectEntity(std::vector<std::unique_ptr<Entity>>& entities, const glm::vec3& mouseToGroundPosition, bool selectAllEntities, int selectEntityID)
+template<typename Entity>
+inline void FactionPlayer::selectEntity(std::vector<Entity*>& entities, const glm::vec3& mouseToGroundPosition, bool selectAllEntities, int selectEntityID)
 {
 	auto selectedEntity = std::find_if(entities.begin(), entities.end(), [&mouseToGroundPosition](const auto& entity)
 	{
@@ -119,8 +119,8 @@ inline void FactionPlayer::selectEntity(std::vector<std::unique_ptr<Entity>>& en
 	}
 }
 
-template <class Entity>
-void FactionPlayer::selectEntities(std::vector<std::unique_ptr<Entity>>& units)
+template <typename T>
+void FactionPlayer::selectEntities(std::vector<T>& units)
 {
 	for (auto& unit : units)
 	{
@@ -128,8 +128,8 @@ void FactionPlayer::selectEntities(std::vector<std::unique_ptr<Entity>>& units)
 	}	
 }
 
-template <class Entity>
-void FactionPlayer::deselectEntities(std::vector<std::unique_ptr<Entity>>& entities)
+template <typename T>
+void FactionPlayer::deselectEntities(std::vector<T>& entities)
 {
 	for (auto& entity : entities)
 	{

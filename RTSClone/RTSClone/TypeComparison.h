@@ -7,7 +7,7 @@ template <class Type, size_t Size>
 class TypeComparison 
 {
 public:
-	constexpr TypeComparison(std::array<Type, Size> types)
+	constexpr TypeComparison(const std::array<Type, Size>& types)
 	{
 		for (auto type : types)
 		{

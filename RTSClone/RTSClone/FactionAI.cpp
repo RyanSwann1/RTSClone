@@ -163,15 +163,15 @@ void FactionAI::handleEvent(const GameEvent& gameEvent, const Map& map, FactionH
 	{
 		assert(gameEvent.data.takeDamage.senderFaction != getController());
 		int targetID = gameEvent.data.takeDamage.targetID;
-		auto entity = std::find_if(m_allEntities.begin(), m_allEntities.end(), [targetID](const auto& entity)
+		auto entity = std::find_if(m_entities.begin(), m_entities.end(), [targetID](const auto& entity)
 		{
-			return entity.get().getID() == targetID;
+			return entity->getID() == targetID;
 		});
 
-		if (entity != m_allEntities.end() &&
-			(*entity).get().getEntityType() == eEntityType::Headquarters)
+		if (entity != m_entities.end() &&
+			(*entity)->getEntityType() == eEntityType::Headquarters)
 		{
-			instructWorkersToRepair(static_cast<Headquarters&>((*entity).get()), map);
+			instructWorkersToRepair(*(*entity), map);
 		}
 	}
 	break;
@@ -220,9 +220,9 @@ void FactionAI::handleEvent(const GameEvent& gameEvent, const Map& map, FactionH
 
 void FactionAI::selectEntity(const glm::vec3& position)
 {
-	for (auto& entity : m_allEntities)
+	for (auto& entity : m_entities)
 	{
-		entity.get().setSelected(entity.get().getAABB().contains(position));
+		entity->setSelected(entity->getAABB().contains(position));
 	}
 }
 
@@ -350,15 +350,15 @@ void FactionAI::onEntityRemoval(const Entity& entity)
 	}
 }
 
-void FactionAI::instructWorkersToRepair(const Headquarters& HQ, const Map& map)
+void FactionAI::instructWorkersToRepair(const Entity& entity, const Map& map)
 {
-	AIOccupiedBase* occupiedBase = m_occupiedBases.getBase(HQ);
+	AIOccupiedBase* occupiedBase = m_occupiedBases.getBase(entity);
 	assert(occupiedBase && occupiedBase->base.get().owningFactionController == getController());
 	for (auto& worker : occupiedBase->workers)
 	{
 		if (!worker.get().isRepairing())
 		{
-			worker.get().repairEntity(HQ, map);
+			worker.get().repairEntity(entity, map);
 		}
 	}
 }
@@ -450,16 +450,16 @@ Worker* FactionAI::getAvailableWorker(const glm::vec3& position, AIOccupiedBase&
 
 bool FactionAI::isWithinRangeOfBuildings(const glm::vec3& position, float distance) const
 {
-	return std::any_of(m_allEntities.cbegin(), m_allEntities.cend(), [&](auto& entity)
+	for (const auto& entity : m_entities)
 	{
-		switch (entity.get().getEntityType())
+		switch (entity->getEntityType())
 		{
 		case eEntityType::Headquarters:
 		case eEntityType::SupplyDepot:
 		case eEntityType::Barracks:
 		case eEntityType::Turret:
 		case eEntityType::Laboratory:
-			if (Globals::getSqrDistance(entity.get().getPosition(), position) <= distance * distance)
+			if (Globals::getSqrDistance(entity->getPosition(), position) <= distance * distance)
 			{
 				return true;
 			}
@@ -467,7 +467,7 @@ bool FactionAI::isWithinRangeOfBuildings(const glm::vec3& position, float distan
 		case eEntityType::Unit:
 			break;
 		case eEntityType::Worker:
-			for (const auto& buildingCommand : static_cast<Worker&>(entity.get()).getBuildingCommands())
+			for (const auto& buildingCommand : static_cast<Worker&>(*entity).getBuildingCommands())
 			{
 				if (Globals::getSqrDistance(buildingCommand.position, position) <= distance * distance)
 				{
@@ -480,7 +480,7 @@ bool FactionAI::isWithinRangeOfBuildings(const glm::vec3& position, float distan
 		}
 
 		return false;
-	});
+	}
 }
 
 void FactionAI::onUnitEnteredIdleState(Unit& unit, const Map& map, FactionHandler& factionHandler)

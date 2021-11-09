@@ -47,8 +47,7 @@ namespace
         }
     }
 
-    void setSelectedEntities(std::vector<Entity*>& selectedUnits, std::vector<std::unique_ptr<Unit>>& units, 
-        std::vector<std::unique_ptr<Worker>>& workers)
+    void setSelectedEntities(std::vector<Entity*>& selectedUnits, std::vector<Unit*>& units, std::vector<Worker*>& workers)
     {
         selectedUnits.clear();
 
@@ -197,10 +196,10 @@ void FactionPlayer::handleInput(const sf::Event& currentSFMLEvent, const sf::Win
         {
             if (m_entitySelector.isActive() && !m_selectedEntities.empty())
             {
-                deselectEntities<Headquarters>(m_headquarters);
-                deselectEntities<Barracks>(m_barracks);
-                deselectEntities<Turret>(m_turrets);
-                deselectEntities<SupplyDepot>(m_supplyDepots);
+                deselectEntities<Headquarters*>(m_headquarters);
+                deselectEntities<Barracks*>(m_barracks);
+                deselectEntities<Turret*>(m_turrets);
+                deselectEntities<SupplyDepot*>(m_supplyDepots);
             }
 
             m_entitySelector.reset();
@@ -246,19 +245,19 @@ void FactionPlayer::handleEvent(const GameEvent& gameEvent, const Map& map, Fact
     case eGameEventType::PlayerSpawnEntity:
     {
         int targetEntityID = gameEvent.data.playerSpawnEntity.targetID;
-        auto entity = std::find_if(m_allEntities.begin(), m_allEntities.end(), [targetEntityID](const auto& entity)
+        auto entity = std::find_if(m_entities.begin(), m_entities.end(), [targetEntityID](const auto& entity)
         {
-            return entity.get().getID() == targetEntityID;
+            return entity->getID() == targetEntityID;
         });
-        if (entity != m_allEntities.end())
+        if (entity != m_entities.end())
         {
-            switch ((*entity).get().getEntityType())
+            switch ((*entity)->getEntityType())
             {
             case eEntityType::Barracks:
-                static_cast<Barracks&>((*entity).get()).addUnitToSpawnQueue();
+                static_cast<Barracks&>(*(*entity)).addUnitToSpawnQueue();
                 break;
             case eEntityType::Headquarters:
-                static_cast<Headquarters&>((*entity).get()).addWorkerToSpawnQueue();
+                static_cast<Headquarters&>(*(*entity)).addWorkerToSpawnQueue();
                 break;
             default:
                 assert(false);
@@ -276,8 +275,8 @@ void FactionPlayer::update(float deltaTime, const Map& map, FactionHandler& fact
 
     if (m_entitySelector.isActive())
     {
-        selectEntities<Unit>(m_units);
-        selectEntities<Worker>(m_workers);
+        selectEntities<Unit*>(m_units);
+        selectEntities<Worker*>(m_workers);
         setSelectedEntities(m_selectedEntities, m_units, m_workers);
 
         if (m_selectedEntities.size() == 1)
@@ -438,15 +437,15 @@ void FactionPlayer::moveSingularSelectedEntity(const glm::vec3& destination, con
         }
         else
         {
-            auto selectedEntity = std::find_if(m_allEntities.cbegin(), m_allEntities.cend(), 
+            auto selectedEntity = std::find_if(m_entities.cbegin(), m_entities.cend(), 
                 [&destination, &selectedWorker](const auto& entity)
             {
-                return entity.get().getAABB().contains(destination) && entity.get().getID() != selectedWorker.getID();
+                return entity->getAABB().contains(destination) && entity->getID() != selectedWorker.getID();
             });
-            if (selectedEntity != m_allEntities.cend() &&
-                (*selectedEntity).get().getHealth() < (*selectedEntity).get().getMaximumHealth())
+            if (selectedEntity != m_entities.cend() &&
+                (*selectedEntity)->getHealth() < (*selectedEntity)->getMaximumHealth())
             {
-                selectedWorker.repairEntity((*selectedEntity), map);
+                selectedWorker.repairEntity(*(*selectedEntity), map);
             }
             else
             {
@@ -496,24 +495,28 @@ void FactionPlayer::moveMultipleSelectedEntities(const glm::vec3& destination, c
     }
     else
     {
-        auto selectedEntity = std::find_if(m_allEntities.cbegin(), m_allEntities.cend(), [&destination](const auto& entity)
+        auto selectedEntity = std::find_if(m_entities.cbegin(), m_entities.cend(), [&destination](const auto& entity)
         {
-            return entity.get().getAABB().contains(destination);
+            return entity->getAABB().contains(destination);
         });
 
-        if (selectedEntity != m_allEntities.cend())
+        if (selectedEntity != m_entities.cend())
         {
+            for (auto& selectedWorker : m_selectedEntities)
+            {
+                if (selectedWorker->getEntityType() == eEntityType::Worker &&
+                    (*selectedEntity)->getID() != selectedWorker->getID() &&
+                    (*selectedEntity)->getHealth() < (*selectedEntity)->getMaximumHealth())
+                {
+                    glm::vec3 destination = PathFinding::getInstance().getClosestPositionToAABB(selectedWorker->getPosition(),
+                        (*selectedEntity)->getAABB(), map);
+
+                    static_cast<Worker&>(*selectedWorker).repairEntity(*(*selectedEntity), map);
+                }
+            }
             std::for_each(m_selectedEntities.begin(), m_selectedEntities.end(), [&](auto& selectedUnit)
             {
-                if (selectedUnit->getEntityType() == eEntityType::Worker &&
-                    (*selectedEntity).get().getID() != selectedUnit->getID() &&
-                    (*selectedEntity).get().getHealth() < (*selectedEntity).get().getMaximumHealth())
-                {
-                    glm::vec3 destination = PathFinding::getInstance().getClosestPositionToAABB(selectedUnit->getPosition(),
-                        (*selectedEntity).get().getAABB(), map);
 
-                    static_cast<Worker&>(*selectedUnit).repairEntity((*selectedEntity), map);
-                }
             });
         }
         else

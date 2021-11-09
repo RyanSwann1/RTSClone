@@ -51,7 +51,7 @@ private:
 	std::vector<std::reference_wrapper<Unit>> m_unitsOnHold;
 	std::vector<AISquad> m_squads;
 
-	void instructWorkersToRepair(const Headquarters& HQ, const Map& map);
+	void instructWorkersToRepair(const Entity& entity, const Map& map);
 	Worker* getAvailableWorker(const glm::vec3& position);
 	Worker* getAvailableWorker(const glm::vec3& position, AIOccupiedBase& occupiedBase);
 
