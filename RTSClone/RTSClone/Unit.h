@@ -47,10 +47,6 @@ public:
 		const Timer& unitStateHandlerTimer);
 	void takeDamage(const TakeDamageEvent& gameEvent, const Map& map, FactionHandler& factionHandler) override;
 
-#ifdef RENDER_PATHING
-	void renderPathMesh(ShaderHandler& shaderHandler);
-#endif // RENDER_PATHING
-
 private:
 	std::reference_wrapper<Faction> m_owningFaction;
 	eUnitState m_currentState;

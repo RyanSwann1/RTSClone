@@ -11,6 +11,9 @@ class MovingEntity : public Entity
 public:
 	void addToDestinationQueue(const glm::vec3& position);
 	void clearDestinationQueue();
+#ifdef RENDER_PATHING
+	void renderPathMesh(ShaderHandler& shaderHandler);
+#endif // RENDER_PATHING
 
 protected:
 	MovingEntity(const Model& model, const glm::vec3& startingPosition, eEntityType entityType,

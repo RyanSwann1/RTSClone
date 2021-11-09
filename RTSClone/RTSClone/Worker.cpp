@@ -485,11 +485,6 @@ void Worker::renderBuildingCommands(ShaderHandler& shaderHandler) const
 	}
 }
 
-void Worker::renderPathMesh(ShaderHandler& shaderHandler)
-{
-	RenderPrimitiveMesh::render(shaderHandler, m_movementPath, m_renderPathMesh);
-}
-
 void Worker::switchTo(eWorkerState newState, const Map& map, const Mineral* mineralToHarvest)
 {
 	//On Exit Current State

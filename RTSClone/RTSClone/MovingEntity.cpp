@@ -1,4 +1,5 @@
 #include "MovingEntity.h"
+#include "RenderPrimitiveMesh.h"
 
 void MovingEntity::addToDestinationQueue(const glm::vec3& position)
 {	
@@ -21,3 +22,10 @@ MovingEntity::MovingEntity(const Model& model, const glm::vec3& startingPosition
 	int health, int shield, glm::vec3 startingRotation /*= glm::vec3(0.0f)*/)
 	: Entity(model, startingPosition, entityType, health, shield, startingRotation)
 {}
+
+#ifdef RENDER_PATHING
+void MovingEntity::renderPathMesh(ShaderHandler& shaderHandler)
+{
+	RenderPrimitiveMesh::render(shaderHandler, m_movementPath, m_renderPathMesh);
+}
+#endif // RENDER_PATHING

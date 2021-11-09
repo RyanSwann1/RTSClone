@@ -411,10 +411,3 @@ void Unit::switchToState(eUnitState newState, const Map& map, FactionHandler& fa
 		assert(false);
 	}
 }
-
-#ifdef RENDER_PATHING
-void Unit::renderPathMesh(ShaderHandler& shaderHandler)
-{
-	RenderPrimitiveMesh::render(shaderHandler, m_movementPath, m_renderPathMesh);
-}
-#endif // RENDER_PATHING

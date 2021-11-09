@@ -67,10 +67,6 @@ public:
 	void renderProgressBar(ShaderHandler& shaderHandler, const Camera& camera, glm::uvec2 windowSize) const;
 	void renderBuildingCommands(ShaderHandler& shaderHandler) const;
 
-#ifdef RENDER_PATHING
-	void renderPathMesh(ShaderHandler& shaderHandler);
-#endif // RENDER_PATHING
-
 private:
 	std::reference_wrapper<Faction> m_owningFaction;
 	eWorkerState m_currentState;
