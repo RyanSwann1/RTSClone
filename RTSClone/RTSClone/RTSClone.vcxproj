@@ -279,6 +279,7 @@
     <ClInclude Include="Entity.h" />
     <ClInclude Include="EntityType.h" />
     <ClInclude Include="FactionHandler.h" />
+    <ClInclude Include="GameMessengerSubscriber.h" />
     <ClInclude Include="Headquarters.h" />
     <ClInclude Include="Laboratory.h" />
     <ClInclude Include="MinHeap.h" />

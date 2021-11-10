@@ -503,6 +503,9 @@
     <ClInclude Include="MovingEntity.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="GameMessengerSubscriber.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="assimp\include\color4.inl">
