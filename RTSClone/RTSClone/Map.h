@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Globals.h"
+#include "GameMessengerSubscriber.h"
 
 namespace GameMessages
 {
@@ -17,9 +18,8 @@ public:
 	Map();
 	Map(const Map&) = delete;
 	Map& operator=(const Map&) = delete;
-	Map(Map&&) = delete;
-	Map& operator=(Map&&) = delete;
-	~Map();
+	Map(Map&&) = default;
+	Map& operator=(Map&&) = default;
 
 	bool isCollidable(const glm::vec3& position) const;
 	const glm::ivec2& getSize() const;
@@ -36,7 +36,13 @@ private:
 	glm::ivec2 m_size;
 	std::vector<bool> m_map;
 	std::vector<int> m_unitMap;
-	
+
+	GameMessengerSubscriber<GameMessages::AddAABBToMap> m_addABBID;
+	GameMessengerSubscriber<GameMessages::RemoveAABBFromMap> m_removeABBBFromMapID;
+	GameMessengerSubscriber<GameMessages::AddUnitPositionToMap> m_addUnitPositionToMapID;
+	GameMessengerSubscriber<GameMessages::RemoveUnitPositionFromMap> m_removeUnitPositionFromMapID;
+	GameMessengerSubscriber<GameMessages::NewMapSize> m_setSizeID;
+
 	void addAABB(const GameMessages::AddAABBToMap& message);
 	void removeAABB(const GameMessages::RemoveAABBFromMap& message);
 	void addUnitPosition(const GameMessages::AddUnitPositionToMap& message);

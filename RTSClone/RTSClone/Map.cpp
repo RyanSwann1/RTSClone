@@ -8,26 +8,13 @@
 
 Map::Map()
 	: m_size(),
-	m_map()
-{
-	subscribeToMessenger<GameMessages::AddAABBToMap>([this](const GameMessages::AddAABBToMap& message) { return addAABB(message); }, this);
-	subscribeToMessenger<GameMessages::RemoveAABBFromMap>([this](const GameMessages::RemoveAABBFromMap& message) { return removeAABB(message); }, this);
-	subscribeToMessenger<GameMessages::AddUnitPositionToMap>([this](const GameMessages::AddUnitPositionToMap& message) { return addUnitPosition(message); }, this);
-	subscribeToMessenger<GameMessages::RemoveUnitPositionFromMap>(
-		[this](const GameMessages::RemoveUnitPositionFromMap& message) { return removeUnitPosition(message); }, this);
-
-	subscribeToMessenger<GameMessages::NewMapSize>(
-		[this](const GameMessages::NewMapSize& gameMessage) { return setSize(gameMessage); }, this);
-}
-
-Map::~Map()
-{
-	unsubscribeToMessenger<GameMessages::AddAABBToMap>(this);
-	unsubscribeToMessenger<GameMessages::RemoveAABBFromMap>(this);
-	unsubscribeToMessenger<GameMessages::AddUnitPositionToMap>(this);
-	unsubscribeToMessenger<GameMessages::RemoveUnitPositionFromMap>(this);
-	unsubscribeToMessenger<GameMessages::NewMapSize>(this);
-}
+	m_map(),
+	m_addABBID([this](const GameMessages::AddAABBToMap& message) { return addAABB(message); }),
+	m_removeABBBFromMapID([this](const GameMessages::RemoveAABBFromMap& message) { return removeAABB(message); }),
+	m_addUnitPositionToMapID([this](const GameMessages::AddUnitPositionToMap& message) { return addUnitPosition(message); }),
+	m_removeUnitPositionFromMapID([this](const GameMessages::RemoveUnitPositionFromMap& message) { return removeUnitPosition(message); }),
+	m_setSizeID([this](const GameMessages::NewMapSize& gameMessage) { return setSize(gameMessage); })
+{}
 
 bool Map::isCollidable(const glm::vec3& position) const
 {
