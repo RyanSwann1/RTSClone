@@ -17,18 +17,9 @@ GraphNode::GraphNode(const glm::ivec2& cameFrom)
 //Graph
 Graph::Graph()
 	: m_size(),
-	m_graph()
-{
-	subscribeToMessenger<GameMessages::NewMapSize>(
-		[this](const GameMessages::NewMapSize& gameMessage) { return onNewMapSize(gameMessage); }, this);
-}
-
-Graph::~Graph()
-{
-	//Currently exists within static memory
-	//Don't unsub
-	//GameMessenger::getInstance().unsubscribe<GameMessages::NewMapSize>(this);
-}
+	m_graph(),
+	m_onNewMapSizeID([this](const GameMessages::NewMapSize& gameMessage) { return onNewMapSize(gameMessage); })
+{}
 
 void Graph::reset(std::queue<glm::ivec2>& frontier)
 {

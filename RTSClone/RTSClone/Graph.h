@@ -2,6 +2,7 @@
 
 #include "Globals.h"
 #include "glm/glm.hpp"
+#include "GameMessengerSubscriber.h"
 #include <array>
 #include <vector>
 #include <queue>
@@ -26,9 +27,8 @@ public:
 	Graph();
 	Graph(const Graph&) = delete;
 	Graph& operator=(const Graph&) = delete;
-	Graph(Graph&&) = delete;
-	Graph& operator=(Graph&&) = delete;
-	~Graph();
+	Graph(Graph&&) = default;
+	Graph& operator=(Graph&&) = default;
 
 	bool isEmpty() const;
 	const glm::ivec2& getPreviousPosition(const glm::ivec2& position, const Map& map) const;
@@ -40,7 +40,8 @@ public:
 private:
 	glm::ivec2 m_size;
 	std::vector<GraphNode> m_graph;
-
+	GameMessengerSubscriber<GameMessages::NewMapSize> m_onNewMapSizeID;
+	
 	void onNewMapSize(const GameMessages::NewMapSize& gameMessage);
 	void reset();
 };
