@@ -548,6 +548,7 @@ void Worker::switchTo(eWorkerState newState, const Map& map, const Mineral* mine
 
 	
 	//On Enter New State
+	eWorkerState oldState = m_currentState;
 	m_currentState = newState;
 	switch (newState)
 	{
@@ -555,7 +556,10 @@ void Worker::switchTo(eWorkerState newState, const Map& map, const Mineral* mine
 		assert(m_buildQueue.empty());
 		m_taskTimer.setActive(false);
 		m_movementPath.clear();
-		m_owningFaction.get().onWorkerEnteredIdleState(*this, map);
+		if (oldState != eWorkerState::Idle)
+		{
+			m_owningFaction.get().onWorkerEnteredIdleState(*this, map);
+		}
 		break;
 	case eWorkerState::Moving:
 	case eWorkerState::ReturningMineralsToHeadquarters:
