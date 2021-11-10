@@ -86,18 +86,9 @@ PathFinding::PathFinding()
 	m_BFSGraph(),
 	m_BFSFrontier(),
 	m_thetaGraph(),
-	m_thetaFrontier()
-{
-	subscribeToMessenger<GameMessages::NewMapSize>(
-		[this](const GameMessages::NewMapSize& gameMessage) { return onNewMapSize(gameMessage); }, this);
-}
-
-PathFinding::~PathFinding()
-{
-	//Currently exists within static memory
-	//Don't unsub
-	//GameMessenger::getInstance().unsubscribe<GameMessages::NewMapSize>(this);
-}
+	m_thetaFrontier(),
+	m_onNewMapSizeID([this](const GameMessages::NewMapSize& gameMessage) { return onNewMapSize(gameMessage); })
+{}
 
 bool PathFinding::getClosestAvailablePosition(const Worker& worker, const std::vector<Worker*>& workers, const Map& map, glm::vec3& outPosition)
 {

@@ -7,6 +7,7 @@
 #include "Graph.h"
 #include "Worker.h"
 #include "MinHeap.h"
+#include "GameMessengerSubscriber.h"
 #include <vector>
 #include <queue>
 #include <array>
@@ -45,7 +46,6 @@ public:
 	PathFinding& operator=(const PathFinding&) = delete;
 	PathFinding(PathFinding&&) = delete;
 	PathFinding& operator=(PathFinding&&) = delete;
-	~PathFinding();
 
 	static PathFinding& getInstance()
 	{
@@ -85,6 +85,7 @@ private:
 	//ThetaStar
 	std::vector<ThetaStarGraphNode> m_thetaGraph;
 	MinHeap m_thetaFrontier;
+	GameMessengerSubscriber<GameMessages::NewMapSize> m_onNewMapSizeID;
 
 	void expandFrontier(const MinHeapNode& currentNode, const Map& map, glm::ivec2 destinationOnGrid, AdjacentPositions adjacentPositions,
 		const Entity& entity);
