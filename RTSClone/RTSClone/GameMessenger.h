@@ -3,19 +3,20 @@
 #include <functional>
 #include <vector>
 #include <assert.h>
+#include <algorithm>
 
 template <typename Message>
-class GameMessenger 
+class GameMessenger
 {
 	struct Listener
 	{
-		Listener(const std::function<void(const Message&)>& callback, const void* ownerAddress)
+		Listener(const std::function<void(const Message&)>& callback, int ID)
 			: callback(callback),
-			ownerAddress(ownerAddress)
+			ID(ID)
 		{}
 
 		std::function<void(const Message&)> callback;
-		const void* ownerAddress;
+		int ID;
 	};
 
 public:
@@ -30,18 +31,18 @@ public:
 		return instance;
 	}
 
-	void subscribe(const std::function<void(const Message&)>& callback, const void* ownerAddress)
+	[[nodiscard]] int subscribe(const std::function<void(const Message&)>& callback)
 	{
-		assert(ownerAddress && !isRegistered(ownerAddress));
-		m_listeners.emplace_back(callback, ownerAddress);
+		int ID = m_uniqueID++;
+		m_listeners.emplace_back(callback, ID);
+		return ID;
 	}
 
-	void unsubscribe(const void* ownerAddress)
+	void unsubscribe(int ID)
 	{
-		assert(ownerAddress && isRegistered(ownerAddress));
-		auto listener = std::find_if(m_listeners.begin(), m_listeners.end(), [ownerAddress](const auto& listener)
+		auto listener = std::find_if(m_listeners.begin(), m_listeners.end(), [ID](const auto& listener)
 		{
-			return listener.ownerAddress == ownerAddress;
+			return listener.ID == ID;
 		});
 		assert(listener != m_listeners.cend());
 		m_listeners.erase(listener);
@@ -59,31 +60,20 @@ public:
 private:
 	GameMessenger() {}
 
-	std::vector<Listener> m_listeners;
-
-	bool isRegistered(const void* ownerAddress) const
-	{
-		auto listener = std::find_if(m_listeners.cbegin(), m_listeners.cend(), [ownerAddress](const auto& listener)
-		{
-			return listener.ownerAddress == ownerAddress;
-		});
-
-		return listener != m_listeners.cend();
-	}
+	std::vector<Listener> m_listeners	= {};
+	int m_uniqueID						= { 0 };
 };
 
 template <typename Message>
-void subscribeToMessenger(const std::function<void(const Message&)>& callback, const void* ownerAddress)
+[[nodiscard]] int subscribeToMessenger(const std::function<void(const Message&)>& callback)
 {
-	assert(ownerAddress);
-	GameMessenger<Message>::getInstance().subscribe(callback, ownerAddress);
+	return GameMessenger<Message>::getInstance().subscribe(callback);
 }
 
 template <typename Message>
-void unsubscribeToMessenger(const void* ownerAddress)
+void unsubscribeToMessenger(int ID)
 {
-	assert(ownerAddress);
-	GameMessenger<Message>::getInstance().unsubscribe(ownerAddress);
+	GameMessenger<Message>::getInstance().unsubscribe(ID);
 }
 
 template <typename Message>
