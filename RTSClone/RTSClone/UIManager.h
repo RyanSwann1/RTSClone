@@ -4,6 +4,7 @@
 #include "FactionController.h"
 #include "GameMessages.h"
 #include "TargetEntity.h"
+#include "GameMessengerSubscriber.h"
 #include <SFML/Graphics.hpp>
 #include <memory>
 
@@ -84,7 +85,6 @@ public:
 	UIManager& operator=(const UIManager&) = delete;
 	UIManager(UIManager&&) = delete;
 	UIManager& operator=(UIManager&&) = delete;
-	~UIManager();
 
 	void handleInput(const sf::Window& window, const FactionHandler& factionHandler, const Camera& camera,
 		const sf::Event& currentSFMLEvent);
@@ -96,7 +96,14 @@ private:
 	PlayerDetailsWidget m_playerDetailsWidget;
 	std::unique_ptr<SelectedEntityWidget> m_selectedEntityWidget;
 	std::unique_ptr<SelectedMineralWidget> m_selectedMineralWidget;
-	WinningFactionWidget m_winningFactionWidget;
+	WinningFactionWidget m_winningFactionWidget;	
+	GameMessengerSubscriber<GameMessages::UIDisplayPlayerDetails> m_onDisplayPlayerDetailsID;
+	GameMessengerSubscriber<GameMessages::UIDisplaySelectedEntity> m_onDisplayEntityID;
+	GameMessengerSubscriber<GameMessages::UIDisplayWinner> m_onDisplayWinningFactionID;
+	GameMessengerSubscriber<GameMessages::UIDisplaySelectedMineral> m_onDisplayMineralID;
+	GameMessengerSubscriber<GameMessages::UIClearDisplaySelectedEntity> m_onClearDisplayEntityID;
+	GameMessengerSubscriber<GameMessages::UIClearSelectedMineral> m_onClearSelectedMineralID;
+	GameMessengerSubscriber<GameMessages::UIClearWinner> m_onClearDisplayWinnerID;
 
 	void onDisplayPlayerDetails(const GameMessages::UIDisplayPlayerDetails& gameMessage);
 	void onDisplayEntity(const GameMessages::UIDisplaySelectedEntity& gameMessage);
