@@ -48,17 +48,9 @@ float MinHeapNode::getCost() const
 
 MinHeap::MinHeap()
 	: m_heap(),
-	m_indexes()
-{
-	subscribeToMessenger<GameMessages::NewMapSize>(
-		[this](const GameMessages::NewMapSize& gameMessage) { return onNewMapSize(gameMessage); }, this);
-}
-
-MinHeap::~MinHeap()
-{
-	//Don't unsub, currently existing in static memory
-	//unsubscribeToMessenger<GameMessages::NewMapSize>(this);
-}
+	m_indexes(),
+	m_onNewMapSizeID([this](const GameMessages::NewMapSize& gameMessage) { return onNewMapSize(gameMessage); })
+{}
 
 bool MinHeap::isEmpty() const
 {

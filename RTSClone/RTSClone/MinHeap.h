@@ -4,6 +4,7 @@
 
 #include "glm/glm.hpp"
 #include "glm/gtx/hash.hpp"
+#include "GameMessengerSubscriber.h"
 #include <unordered_map>
 #include <vector>
 
@@ -30,9 +31,8 @@ public:
 	MinHeap();
 	MinHeap(const MinHeap&) = delete;
 	MinHeap& operator=(const MinHeap&) = delete;
-	MinHeap(MinHeap&&) = delete;
-	MinHeap& operator=(MinHeap&&) = delete;
-	~MinHeap();
+	MinHeap(MinHeap&&) = default;
+	MinHeap& operator=(MinHeap&&) = default;
 
 	bool isEmpty() const;
 
@@ -44,6 +44,7 @@ public:
 private:
 	std::vector<MinHeapNode> m_heap;
 	std::unordered_map<glm::ivec2, size_t> m_indexes;
+	GameMessengerSubscriber<GameMessages::NewMapSize> m_onNewMapSizeID;
 
 	void sortNode(size_t i);
 	void swap(size_t index1, size_t index2);
