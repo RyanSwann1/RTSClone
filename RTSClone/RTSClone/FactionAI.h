@@ -48,7 +48,7 @@ private:
 	Timer m_delayTimer;
 	Timer m_spawnTimer;
 	eFactionController m_targetFaction;
-	std::vector<std::reference_wrapper<Unit>> m_unitsOnHold;
+	std::vector<Unit*> m_unitsOnHold;
 	std::vector<AISquad> m_squads;
 
 	void instructWorkersToRepair(const Entity& entity, const Map& map);

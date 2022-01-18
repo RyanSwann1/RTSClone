@@ -489,7 +489,7 @@ void FactionAI::onUnitEnteredIdleState(Unit& unit, const Map& map, FactionHandle
 	int unitID = unit.getID();
 	auto unitOnHold = std::find_if(m_unitsOnHold.cbegin(), m_unitsOnHold.cend(), [unitID](const auto& unit)
 	{
-		return unit.get().getID() == unitID;
+		return unit->getID() == unitID;
 	});
 	if (unitOnHold == m_unitsOnHold.cend() && m_targetFaction != eFactionController::None)
 	{
@@ -696,17 +696,17 @@ Entity* FactionAI::createUnit(const Map& map, const Barracks& barracks, FactionH
 	{
 		assert(std::find_if(m_unitsOnHold.cbegin(), m_unitsOnHold.cend(), [spawnedUnit](const auto& unit)
 		{
-			return unit.get().getID() == spawnedUnit->getID();
+			return unit->getID() == spawnedUnit->getID();
 		}) == m_unitsOnHold.cend());
 
 		assert(spawnedUnit->getEntityType() == eEntityType::Unit);
-		m_unitsOnHold.push_back(static_cast<Unit&>(*spawnedUnit));
+		m_unitsOnHold.push_back(static_cast<Unit*>(spawnedUnit));
 		if (m_unitsOnHold.size() == MAX_UNITS_ON_HOLD)
 		{
 			m_squads.emplace_back();
 			for (auto iter = m_unitsOnHold.begin(); iter != m_unitsOnHold.end();)
 			{
-				Unit& unitOnHold = *iter;
+				Unit& unitOnHold = *(*iter);
 				m_squads.back().push_back(unitOnHold);
 				iter = m_unitsOnHold.erase(iter);
 				onUnitEnteredIdleState(unitOnHold, map, factionHandler);
