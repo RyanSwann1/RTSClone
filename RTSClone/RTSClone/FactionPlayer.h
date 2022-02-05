@@ -3,6 +3,7 @@
 #include "Faction.h"
 #include "EntitySelector.h"
 #include <SFML/Graphics.hpp>
+#include <optional>
 
 class BaseHandler;
 struct Camera;
@@ -11,10 +12,6 @@ class FactionPlayerPlannedBuilding
 {	
 public:
 	FactionPlayerPlannedBuilding(const PlayerActivatePlannedBuildingEvent& gameEvent, const glm::vec3& position);
-	FactionPlayerPlannedBuilding(const FactionPlayerPlannedBuilding&) = delete;
-	FactionPlayerPlannedBuilding& operator=(const FactionPlayerPlannedBuilding&) = delete;
-	FactionPlayerPlannedBuilding(FactionPlayerPlannedBuilding&&) = delete;
-	FactionPlayerPlannedBuilding& operator=(FactionPlayerPlannedBuilding&&) = delete;
 
 	bool isOnValidPosition(const BaseHandler& baseHandler, const Map& map) const;
 	const glm::vec3& getPosition() const;
@@ -25,9 +22,9 @@ public:
 	void render(ShaderHandler& shaderHandler, const BaseHandler& baseHandler, const Map& map) const;
 
 private:
-	const Model& m_model;
-	const int m_builderID;
-	const eEntityType m_entityType;
+	std::reference_wrapper<const Model> m_model;
+	int m_builderID;
+	eEntityType m_entityType;
 	glm::vec3 m_position;
 };
 
@@ -48,7 +45,7 @@ public:
 	void renderEntitySelector(const sf::Window& window, ShaderHandler& shaderHandler) const;
 
 private:
-	std::unique_ptr<FactionPlayerPlannedBuilding> m_plannedBuilding;
+	std::optional<FactionPlayerPlannedBuilding> m_plannedBuilding;
 	EntitySelector m_entitySelector;
 	glm::vec3 m_previousPlaneIntersection;
 	bool m_attackMoveSelected;

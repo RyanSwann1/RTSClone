@@ -127,7 +127,7 @@ void FactionPlayerPlannedBuilding::handleInput(const sf::Event& event, const Cam
 void FactionPlayerPlannedBuilding::render(ShaderHandler& shaderHandler, const BaseHandler& baseHandler, const Map& map) const
 {
     glm::vec3 color = (isOnValidPosition(baseHandler, map) ? VALID_PLANNED_BUILDING_COLOR : INVALID_PLANNED_BUILDING_COLOR);
-    m_model.render(shaderHandler, m_position, color, PLANNED_BUILDING_OPACITY);
+    m_model.get().render(shaderHandler, m_position, color, PLANNED_BUILDING_OPACITY);
 }
 
 bool FactionPlayerPlannedBuilding::isOnValidPosition(const BaseHandler& baseHandler, const Map& map) const
@@ -240,7 +240,7 @@ void FactionPlayer::handleEvent(const GameEvent& gameEvent, const Map& map, Fact
             m_selectedEntities.front()->getEntityType() == eEntityType::Worker);
 
         m_plannedBuilding = 
-            std::make_unique<FactionPlayerPlannedBuilding>(gameEvent.data.playerActivatePlannedBuilding, m_selectedEntities.front()->getPosition());
+            std::optional<FactionPlayerPlannedBuilding>(std::in_place, gameEvent.data.playerActivatePlannedBuilding, m_selectedEntities.front()->getPosition());
         break;
     case eGameEventType::PlayerSpawnEntity:
     {
