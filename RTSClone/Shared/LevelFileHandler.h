@@ -9,6 +9,7 @@
 #include <functional>
 #include <array>
 #include <fstream>
+#include <optional>
 
 class Faction;
 struct Base;
@@ -16,6 +17,9 @@ class SceneryGameObject;
 #ifdef LEVEL_EDITOR
 class Level;
 #endif // LEVEL_EDITOR
+#ifdef GAME
+#include "Level.h"
+#endif // GAME
 namespace LevelFileHandler
 { 
 	void loadAllMainBases(std::ifstream& file, std::vector<Base>& mainBases, int mineralQuantity);
@@ -38,10 +42,7 @@ namespace LevelFileHandler
 #endif // LEVEL_EDITOR
 
 #ifdef GAME
-	bool loadLevelFromFile(const std::string& fileName, std::vector<SceneryGameObject>& scenery,
-		std::vector<Base>& bases, int& factionStartingResources,
-		int& factionStartingPopulation, int& factionCount, glm::vec3& size);
-
+	std::optional<LevelDetailsFromFile> loadLevelFromFile(std::string_view fileName);
 	std::array<std::string, Globals::MAX_LEVELS> loadLevelNames();
 #endif // GAME
 };

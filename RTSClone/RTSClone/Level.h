@@ -14,19 +14,27 @@
 #include <vector>
 #include <memory>
 #include <SFML/Graphics.hpp>
+#include <optional>
+
+struct LevelDetailsFromFile
+{
+	std::vector<SceneryGameObject> scenery	= {};
+	std::vector<Base> bases					= {};
+	int factionStartingResources			= 0;
+	int factionStartingPopulation			= 0;
+	int factionCount						= 0;
+	glm::vec3 size							= {};
+};
 
 class UIManager;
 class ShaderHandler;
 class Level
 {
 public:
-	Level(const Level&) = delete;
-	Level& operator=(const Level&) = delete;
-	Level(Level&&) = delete;
-	Level& operator=(Level&&) = delete;
+	Level(LevelDetailsFromFile&& levelDetails, glm::ivec2 windowSize);
 	~Level();
 
-	static std::unique_ptr<Level> load(const std::string& levelName, glm::ivec2 windowSize);
+	static std::unique_ptr<Level> load(std::string_view levelName, glm::ivec2 windowSize);
 
 	const std::vector<SceneryGameObject>& getSceneryGameObjects() const;
 	const BaseHandler& getBaseHandler() const;
@@ -57,13 +65,9 @@ public:
 #endif // RENDER_PATHING
 
 private:
-	Level(std::vector<SceneryGameObject>&& scenery, FactionsContainer&& factions, 
-		std::unique_ptr<BaseHandler>&& baseHandler, const glm::vec3& size, 
-		glm::vec2 cameraStartingPosition, glm::ivec2 windowSize);
-
-	const Quad m_playableArea;
-	const std::unique_ptr<BaseHandler> m_baseHandler;
-	const std::vector<SceneryGameObject> m_scenery;
+	Quad m_playableArea;
+	BaseHandler m_baseHandler;
+	std::vector<SceneryGameObject> m_scenery;
 	Camera m_camera;
 	MiniMap m_minimap;
 	Timer m_unitStateHandlerTimer;

@@ -278,28 +278,27 @@ glm::ivec2 LevelFileHandler::loadMapSizeFromFile(std::ifstream& file)
 }
 
 #ifdef GAME
-bool LevelFileHandler::loadLevelFromFile(const std::string& fileName, std::vector<SceneryGameObject>& scenery,
-	std::vector<Base>& bases, int& factionStartingResources, int& factionStartingPopulation,
-	int& factionCount, glm::vec3& size)
+std::optional<LevelDetailsFromFile> LevelFileHandler::loadLevelFromFile(std::string_view fileName)
 {
-	std::ifstream file(Globals::SHARED_FILE_DIRECTORY + LEVELS_FILE_DIRECTORY + fileName);
+	std::ifstream file(Globals::SHARED_FILE_DIRECTORY + LEVELS_FILE_DIRECTORY + fileName.data());
 	if (!file.is_open())
 	{
-		return false;
+		return {};
 	}
 
+	LevelDetailsFromFile levelDetails = {};
 	glm::ivec2 levelSize = loadMapSizeFromFile(file);
-	size = { levelSize.x * Globals::NODE_SIZE, 0.0f, levelSize.y * Globals::NODE_SIZE };
+	levelDetails.size = { levelSize.x * Globals::NODE_SIZE, 0.0f, levelSize.y * Globals::NODE_SIZE };
 	broadcastToMessenger<GameMessages::NewMapSize>({ levelSize });
-	loadScenery(file, scenery);
-	factionStartingResources = loadFactionStartingResources(file);
-	factionStartingPopulation = loadFactionStartingPopulation(file);
-	factionCount = loadFactionCount(file);
+	loadScenery(file, levelDetails.scenery);
+	levelDetails.factionStartingResources = loadFactionStartingResources(file);
+	levelDetails.factionStartingPopulation = loadFactionStartingPopulation(file);
+	levelDetails.factionCount = loadFactionCount(file);
 	int mineralQuantity = loadMineralQuantity(file);
-	loadAllMainBases(file, bases, mineralQuantity);
-	loadAllSecondaryBases(file, bases, mineralQuantity);
+	loadAllMainBases(file, levelDetails.bases, mineralQuantity);
+	loadAllSecondaryBases(file, levelDetails.bases, mineralQuantity);
 
-	return true;
+	return levelDetails;
 }
 
 std::array<std::string, Globals::MAX_LEVELS> LevelFileHandler::loadLevelNames()

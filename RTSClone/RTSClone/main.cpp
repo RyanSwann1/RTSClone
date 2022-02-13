@@ -97,7 +97,7 @@ int main()
 	UIManager uiManager;
 	Map map;
 	const std::array<std::string, Globals::MAX_LEVELS> levelNames = LevelFileHandler::loadLevelNames();
-	std::unique_ptr<Level> level; 
+	std::unique_ptr<Level> currentLevel = {};
 
 	std::cout << glGetError() << "\n";
 	std::cout << glGetError() << "\n";
@@ -118,27 +118,27 @@ int main()
 			case sf::Event::KeyPressed:
 				if (currentSFMLEvent.key.code == sf::Keyboard::Escape)
 				{
-					(level ? level.reset() : window.close());
+					(currentLevel ? currentLevel.reset() : window.close());
 				}
 				break;
 			}
 
-			if (level)
+			if (currentLevel)
 			{
-				level->handleInput(windowSize, window, currentSFMLEvent, map, uiManager);
+				currentLevel->handleInput(windowSize, window, currentSFMLEvent, map, uiManager);
 			}
 		}
 
 		ImGui_SFML_OpenGL3::startFrame();
 		//ImGui::ShowDemoWindow();
 
-		if (level)
+		if (currentLevel)
 		{
-			const Faction* winningFaction = level->getWinningFaction();
+			const Faction* winningFaction = currentLevel->getWinningFaction();
 			if (winningFaction)
 			{
 				broadcastToMessenger<GameMessages::UIDisplayWinner>({ winningFaction->getController() });
-				level.reset();
+				currentLevel.reset();
 			}
 		}
 		else
@@ -149,9 +149,9 @@ int main()
 				if (!levelName.empty() && ImGui::Button(levelName.c_str()))
 				{
 					broadcastToMessenger<GameMessages::UIClearWinner>({});
-					level = Level::load(levelName, windowSize);
-					assert(level);
-					if (!level)
+					currentLevel = Level::load(levelName, windowSize);
+					assert(currentLevel);
+					if (!currentLevel)
 					{
 						std::cout << "Unable to load " << levelName << "\n";
 					}
@@ -164,16 +164,16 @@ int main()
 		
 		//Update
 		uiManager.render(window);
-		if (level)
+		if (currentLevel)
 		{	
-			level->update(deltaTime, map, uiManager, windowSize, window);
+			currentLevel->update(deltaTime, map, uiManager, windowSize, window);
 		}
 
 		//Render
-		if (level)
+		if (currentLevel)
 		{
-			glm::mat4 view = level->getCamera().getView();
-			glm::mat4 projection = level->getCamera().getProjection(glm::ivec2(window.getSize().x, window.getSize().y));
+			glm::mat4 view = currentLevel->getCamera().getView();
+			glm::mat4 projection = currentLevel->getCamera().getProjection(glm::ivec2(window.getSize().x, window.getSize().y));
 
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -182,14 +182,14 @@ int main()
 			shaderHandler->setUniformMat4f(eShaderType::Default, "uProjection", projection);
 			shaderHandler->setUniform1f(eShaderType::Default, "uOpacity", 1.0f);
 
-			level->render(*shaderHandler);
+			currentLevel->render(*shaderHandler);
 		
 			glDisable(GL_CULL_FACE);
 			shaderHandler->switchToShader(eShaderType::Debug);
 			shaderHandler->setUniformMat4f(eShaderType::Debug, "uView", view);
 			shaderHandler->setUniformMat4f(eShaderType::Debug, "uProjection", projection);
 
-			level->renderTerrain(*shaderHandler);
+			currentLevel->renderTerrain(*shaderHandler);
 			
 			glEnable(GL_CULL_FACE);
 			glEnable(GL_BACK);
@@ -205,20 +205,20 @@ int main()
 			level->renderAABB(*shaderHandler);
 #endif // RENDER_AABB
 #ifdef RENDER_PATHING
-			level->renderPathing(*shaderHandler);
+			currentLevel->renderPathing(*shaderHandler);
 #endif // RENDER_PATHING
 			glDisable(GL_CULL_FACE);
 			shaderHandler->switchToShader(eShaderType::Default);
 			shaderHandler->setUniform1f(eShaderType::Default, "uOpacity", 0.35f);
-			level->renderPlayerPlannedBuilding(*shaderHandler, map);
-			level->renderPlannedBuildings(*shaderHandler);
+			currentLevel->renderPlayerPlannedBuilding(*shaderHandler, map);
+			currentLevel->renderPlannedBuildings(*shaderHandler);
 			shaderHandler->switchToShader(eShaderType::Debug);
-			level->renderBasePositions(*shaderHandler);
+			currentLevel->renderBasePositions(*shaderHandler);
 
 			shaderHandler->switchToShader(eShaderType::Widjet);
-			level->renderEntityStatusBars(*shaderHandler, windowSize);
-			level->renderEntitySelector(window, *shaderHandler);
-			level->renderMinimap(*shaderHandler, windowSize, window);
+			currentLevel->renderEntityStatusBars(*shaderHandler, windowSize);
+			currentLevel->renderEntitySelector(window, *shaderHandler);
+			currentLevel->renderMinimap(*shaderHandler, windowSize, window);
 			glEnable(GL_CULL_FACE);
 		}
 
@@ -228,7 +228,7 @@ int main()
 		window.display();
 	}
 
-	level.reset();
+	currentLevel.reset();
 	ImGui_SFML_OpenGL3::shutdown();
 
 	return 0;

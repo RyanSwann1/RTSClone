@@ -7,12 +7,13 @@
 
 using FactionsContainer = std::array<std::unique_ptr<Faction>, static_cast<size_t>(eFactionController::Max) + 1>;
 
+struct LevelDetailsFromFile;
+class BaseHandler;
 class FactionPlayer;
-class Unit;
 class FactionHandler
 {
 public:
-	FactionHandler(FactionsContainer&& factions);
+	FactionHandler(const BaseHandler& baseHandler, const LevelDetailsFromFile& levelDetails);
 	FactionHandler(const FactionHandler&) = delete;
 	FactionHandler& operator=(const FactionHandler&) = delete;
 	FactionHandler(FactionHandler&&) = delete;
@@ -32,6 +33,6 @@ public:
 	bool removeFaction(eFactionController faction);
 
 private:
-	FactionsContainer m_factions;
-	std::vector<std::reference_wrapper<const Faction>> m_opposingFactions;
+	FactionsContainer m_factions = {};
+	std::vector<std::reference_wrapper<const Faction>> m_opposingFactions = {};
 };

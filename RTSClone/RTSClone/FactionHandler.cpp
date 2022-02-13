@@ -1,6 +1,8 @@
 #include "FactionHandler.h"
 #include "FactionPlayer.h"
 #include "Unit.h"
+#include "Base.h"
+#include "Level.h"
 
 namespace
 {
@@ -13,11 +15,36 @@ namespace
 	}
 }
 
-FactionHandler::FactionHandler(FactionsContainer&& factions)
-	: m_factions(std::move(factions)),
-	m_opposingFactions()
+FactionHandler::FactionHandler(const BaseHandler& baseHandler, const LevelDetailsFromFile& levelDetails)
 {
-	m_opposingFactions.reserve(static_cast<size_t>(getFactionCount(m_factions)));
+	static_assert(static_cast<int>(AIConstants::eBehaviour::Max) == 1, "Current assigning of AI behaviour relies on only two behaviours");
+	int AIBehaviourIndex = 0;
+
+	assert(levelDetails.factionCount < static_cast<int>(eFactionController::Max) + 1 &&
+		levelDetails.factionCount <= static_cast<int>(baseHandler.getBases().size()));
+	for (int i = 0; i < levelDetails.factionCount; ++i)
+	{
+		assert(!m_factions[i]);
+		switch (eFactionController(i))
+		{
+		case eFactionController::Player:
+			m_factions[i] = std::make_unique<FactionPlayer>(baseHandler.getBases()[i].position,
+				levelDetails.factionStartingResources, levelDetails.factionStartingPopulation);
+			break;
+		case eFactionController::AI_1:
+		case eFactionController::AI_2:
+		case eFactionController::AI_3:
+			m_factions[i] = std::make_unique<FactionAI>(eFactionController(i), baseHandler.getBases()[i].position,
+				levelDetails.factionStartingResources, levelDetails.factionStartingPopulation,
+				static_cast<AIConstants::eBehaviour>(AIBehaviourIndex), baseHandler);
+			AIBehaviourIndex ^= 1;
+			break;
+		default:
+			assert(false);
+		}
+	}
+
+	m_opposingFactions.reserve(m_factions.size());
 }
 
 bool FactionHandler::isFactionActive(eFactionController factionController) const
