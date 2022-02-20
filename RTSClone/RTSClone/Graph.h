@@ -17,14 +17,9 @@ class Graph
 {
 public:
 	Graph();
-	Graph(const Graph&) = delete;
-	Graph& operator=(const Graph&) = delete;
-	Graph(Graph&&) = default;
-	Graph& operator=(Graph&&) = default;
 
 	bool is_frontier_empty() const;
 	glm::ivec2 pop_frontier();
-	bool is_empty() const;
 	bool is_position_visited(glm::ivec2 position, const Map& map) const;
 
 	void reset(glm::ivec2 startingPosition);

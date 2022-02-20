@@ -47,11 +47,6 @@ glm::ivec2 Graph::pop_frontier()
 	return position;
 }
 
-bool Graph::is_empty() const
-{
-	return m_graph.empty();
-}
-
 bool Graph::is_position_visited(glm::ivec2 position, const Map& map) const
 {
 	assert(map.isWithinBounds(position));
