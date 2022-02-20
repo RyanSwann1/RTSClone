@@ -6,15 +6,7 @@
 #include <array>
 #include <vector>
 #include <queue>
-
-struct GraphNode
-{
-	GraphNode();
-	GraphNode(const glm::ivec2& cameFrom);
-
-	glm::ivec2 cameFrom;
-	bool visited;
-};
+#include <optional>
 
 namespace GameMessages
 {
@@ -30,18 +22,19 @@ public:
 	Graph(Graph&&) = default;
 	Graph& operator=(Graph&&) = default;
 
-	bool isEmpty() const;
-	const glm::ivec2& getPreviousPosition(const glm::ivec2& position, const Map& map) const;
-	bool isPositionVisited(const glm::ivec2& position, const Map& map) const;
+	bool is_frontier_empty() const;
+	glm::ivec2 pop_frontier();
+	bool is_empty() const;
+	bool is_position_visited(glm::ivec2 position, const Map& map) const;
 
-	void reset(std::queue<glm::ivec2>& frontier);
-	void addToGraph(const glm::ivec2& position, const glm::ivec2& cameFromPosition, const Map& map);
+	void reset(glm::ivec2 startingPosition);
+	void add(glm::ivec2 position, glm::ivec2 cameFromPosition, const Map& map);
 
 private:
-	glm::ivec2 m_size;
-	std::vector<GraphNode> m_graph;
+	std::queue<glm::ivec2> m_frontier = {};
+	glm::ivec2 m_size = { 0, 0 };
+	std::vector<std::optional<glm::ivec2>> m_graph = {};
 	GameMessengerSubscriber<GameMessages::NewMapSize> m_onNewMapSizeID;
 	
-	void onNewMapSize(const GameMessages::NewMapSize& gameMessage);
-	void reset();
+	void new_map_size(const GameMessages::NewMapSize& gameMessage);
 };

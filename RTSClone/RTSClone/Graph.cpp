@@ -2,72 +2,63 @@
 #include "GameMessages.h"
 #include "GameMessenger.h"
 #include "Map.h"
-
-//GraphNode
-GraphNode::GraphNode()
-	: cameFrom(),
-	visited(false)
-{}
-
-GraphNode::GraphNode(const glm::ivec2& cameFrom)
-	: cameFrom(cameFrom),
-	visited(true)
-{}
+#include <algorithm>
 
 //Graph
 Graph::Graph()
-	: m_size(),
-	m_graph(),
-	m_onNewMapSizeID([this](const GameMessages::NewMapSize& gameMessage) { return onNewMapSize(gameMessage); })
+	: m_onNewMapSizeID([this](const GameMessages::NewMapSize& gameMessage) { return new_map_size(gameMessage); })
 {}
 
-void Graph::reset(std::queue<glm::ivec2>& frontier)
+void Graph::add(glm::ivec2 position, glm::ivec2 cameFromPosition, const Map& map)
 {
-	reset();
-	std::queue<glm::ivec2> empty;
-	frontier.swap(empty);
-}
-
-void Graph::addToGraph(const glm::ivec2& position, const glm::ivec2& cameFromPosition, const Map& map)
-{
-	assert(map.isWithinBounds(position) && !m_graph[Globals::convertTo1D(position, map.getSize())].visited);
-	if (map.isWithinBounds(position) && !m_graph[Globals::convertTo1D(position, map.getSize())].visited)
+	assert(map.isWithinBounds(position) && !m_graph[Globals::convertTo1D(position, map.getSize())]);
+	if (map.isWithinBounds(position) && !m_graph[Globals::convertTo1D(position, map.getSize())])
 	{
-		m_graph[Globals::convertTo1D(position, map.getSize())] = GraphNode(cameFromPosition);
+		m_graph[Globals::convertTo1D(position, map.getSize())] = cameFromPosition;
+		m_frontier.push(position);
+		assert(m_frontier.size() <= (m_size.x * m_size.y));
 	}
 }
 
-void Graph::onNewMapSize(const GameMessages::NewMapSize& gameMessage)
+void Graph::new_map_size(const GameMessages::NewMapSize& gameMessage)
 {
 	m_size = gameMessage.mapSize;
-	reset();
+	m_graph.resize(static_cast<size_t>(m_size.x * m_size.y));
+	m_graph.assign(m_graph.size(), {});
 }
 
-void Graph::reset()
+void Graph::reset(glm::ivec2 startingPosition)
 {
-	m_graph.clear();
-	m_graph.resize(static_cast<size_t>(m_size.x * m_size.y), {});
+	m_frontier = {};
+	m_frontier.push(startingPosition);
+	m_graph.assign(m_graph.size(), {});
 }
 
-bool Graph::isEmpty() const
+bool Graph::is_frontier_empty() const
+{
+	return m_frontier.empty();
+}
+
+glm::ivec2 Graph::pop_frontier()
+{
+	assert(!m_frontier.empty());
+	glm::ivec2 position = m_frontier.front();
+	m_frontier.pop();
+	return position;
+}
+
+bool Graph::is_empty() const
 {
 	return m_graph.empty();
 }
 
-const glm::ivec2& Graph::getPreviousPosition(const glm::ivec2& position, const Map& map) const
-{
-	assert(map.isWithinBounds(position) && m_graph[Globals::convertTo1D(position, map.getSize())].visited);
-	if (map.isWithinBounds(position) && m_graph[Globals::convertTo1D(position, map.getSize())].visited)
-	{
-		return m_graph[Globals::convertTo1D(position, map.getSize())].cameFrom;
-	}
-}
-
-bool Graph::isPositionVisited(const glm::ivec2& position, const Map& map) const
+bool Graph::is_position_visited(glm::ivec2 position, const Map& map) const
 {
 	assert(map.isWithinBounds(position));
 	if (map.isWithinBounds(position))
 	{
-		return m_graph[Globals::convertTo1D(position, map.getSize())].visited;
+		return m_graph[Globals::convertTo1D(position, map.getSize())].has_value();
 	}
+
+	return false;
 }

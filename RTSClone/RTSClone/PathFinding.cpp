@@ -17,26 +17,6 @@
 
 namespace
 {
-	bool isFrontierWithinSizeLimit(const std::queue<glm::ivec2>& frontier, const glm::ivec2& mapSize)
-	{
-		return static_cast<int>(frontier.size()) <= mapSize.x * mapSize.y;
-	}
-
-	bool isPathWithinSizeLimit(const std::vector<glm::vec3>& pathToPosition, const glm::ivec2& mapSize)
-	{
-		return static_cast<int>(pathToPosition.size()) <= mapSize.x * mapSize.y;
-	}
-
-	bool isWithinBuildingPositionsRange(const std::vector<glm::vec3>& buildPositions, const glm::vec3& position)
-	{
-		auto buildPosition = std::find_if(buildPositions.cbegin(), buildPositions.cend(), [&position](const auto& buildPosition)
-		{
-			return Globals::getSqrDistance(buildPosition, position) < static_cast<float>(Globals::NODE_SIZE) * 5.0f;
-		});
-
-		return buildPosition != buildPositions.cend();
-	}
-
 	struct IsInLineOfSightObject
 	{
 		IsInLineOfSightObject(const glm::vec3& _startingPosition, const glm::vec3& _endingPosition)
@@ -58,6 +38,21 @@ namespace
 		glm::vec3 direction;
 		float distance;
 	};
+
+	bool isPathWithinSizeLimit(const std::vector<glm::vec3>& pathToPosition, const glm::ivec2& mapSize)
+	{
+		return static_cast<int>(pathToPosition.size()) <= mapSize.x * mapSize.y;
+	}
+
+	bool isWithinBuildingPositionsRange(const std::vector<glm::vec3>& buildPositions, const glm::vec3& position)
+	{
+		auto buildPosition = std::find_if(buildPositions.cbegin(), buildPositions.cend(), [&position](const auto& buildPosition)
+		{
+			return Globals::getSqrDistance(buildPosition, position) < static_cast<float>(Globals::NODE_SIZE) * 5.0f;
+		});
+
+		return buildPosition != buildPositions.cend();
+	}
 }
 
 //ThetaStarGraphNode
@@ -82,20 +77,13 @@ float ThetaStarGraphNode::getF() const
 
 //PathFinding
 PathFinding::PathFinding()
-	: m_sharedContainer(),
-	m_BFSGraph(),
-	m_BFSFrontier(),
-	m_thetaGraph(),
-	m_thetaFrontier(),
-	m_onNewMapSizeID([this](const GameMessages::NewMapSize& gameMessage) { return onNewMapSize(gameMessage); })
+	: m_onNewMapSizeID([this](const GameMessages::NewMapSize& gameMessage) { return onNewMapSize(gameMessage); })
 {}
 
 bool PathFinding::getClosestAvailablePosition(const Worker& worker, const std::vector<Worker*>& workers, const Map& map, glm::vec3& outPosition)
 {
-	m_BFSGraph.reset(m_BFSFrontier);
-	m_BFSFrontier.emplace(Globals::convertToGridPosition(worker.getPosition()));
+	m_bfsGraph.reset(Globals::convertToGridPosition(worker.getPosition()));
 	bool availablePositionFound = false;
-
 	int workerID = worker.getID();
 	auto workerCollision = [workerID, &workers](glm::ivec2 position) -> bool
 	{
@@ -106,11 +94,9 @@ bool PathFinding::getClosestAvailablePosition(const Worker& worker, const std::v
 		return worker != workers.cend();
 	};
 
-	while (!availablePositionFound && !m_BFSFrontier.empty())
+	while (!availablePositionFound && !m_bfsGraph.is_frontier_empty())
 	{
-		glm::ivec2 position = m_BFSFrontier.front();
-		m_BFSFrontier.pop();
-
+		glm::ivec2 position = m_bfsGraph.pop_frontier();
 		for (const auto& adjacentPosition : getAdjacentPositions(position, map))// getRandomAdjacentPositions(position, map, unit))
 		{
 			if (adjacentPosition.valid && workerCollision(adjacentPosition.position))
@@ -119,14 +105,11 @@ bool PathFinding::getClosestAvailablePosition(const Worker& worker, const std::v
 				availablePositionFound = true;
 				break;
 			}
-			else if (!m_BFSGraph.isPositionVisited(adjacentPosition.position, map))
+			else if (!m_bfsGraph.is_position_visited(adjacentPosition.position, map))
 			{
-				m_BFSGraph.addToGraph(adjacentPosition.position, position, map);
-				m_BFSFrontier.push(adjacentPosition.position);
+				m_bfsGraph.add(adjacentPosition.position, position, map);
 			}
 		}
-
-		assert(isFrontierWithinSizeLimit(m_BFSFrontier, map.getSize()));
 	}
 
 	return availablePositionFound;
@@ -139,23 +122,19 @@ bool PathFinding::isBuildingSpawnAvailable(const glm::vec3& startingPosition, eE
 	AABB buildingAABB(startingPosition, ModelManager::getInstance().getModel(buildingEntityType));
 	for (int i = 0; i < 5; ++i)
 	{
-		m_BFSGraph.reset(m_BFSFrontier);
-		m_BFSFrontier = std::queue<glm::ivec2>();
-		m_BFSFrontier.emplace(Globals::convertToGridPosition(startingPosition));
+		m_bfsGraph.reset(Globals::convertToGridPosition(startingPosition));
 		bool buildPositionFound = false;
-		while (!m_BFSFrontier.empty() && !buildPositionFound)
+		while (!m_bfsGraph.is_frontier_empty() && !buildPositionFound)
 		{
-			glm::ivec2 position = m_BFSFrontier.front();
-			m_BFSFrontier.pop();
-
+			glm::ivec2 position = m_bfsGraph.pop_frontier();
 			for (const auto& adjacentPosition : getAllAdjacentPositions(position, map))
 			{
 				if (adjacentPosition.valid)
 				{
 					buildingAABB.update(Globals::convertToWorldPosition(adjacentPosition.position));
 					if (!map.isAABBOccupied(buildingAABB) &&
-						!owningFaction.isWithinRangeOfBuildings(Globals::convertToWorldPosition(adjacentPosition.position), Globals::NODE_SIZE * 4.0f) && 
-						!baseHandler.isWithinRangeOfMinerals(Globals::convertToWorldPosition(adjacentPosition.position), Globals::NODE_SIZE * 6.0f) &&
+						!owningFaction.isWithinRangeOfBuildings(Globals::convertToWorldPosition(adjacentPosition.position), Globals::NODE_SIZE * 6.0f) && 
+						!baseHandler.isWithinRangeOfMinerals(Globals::convertToWorldPosition(adjacentPosition.position), Globals::NODE_SIZE * 8.0f) &&
 						!isWithinBuildingPositionsRange(m_sharedContainer, Globals::convertToWorldPosition(adjacentPosition.position)))
 					{
 						buildPositionFound = true;
@@ -163,10 +142,9 @@ bool PathFinding::isBuildingSpawnAvailable(const glm::vec3& startingPosition, eE
 						break;
 					}
 				}
-				if (!m_BFSGraph.isPositionVisited(adjacentPosition.position, map))
+				if (!m_bfsGraph.is_position_visited(adjacentPosition.position, map))
 				{
-					m_BFSGraph.addToGraph(adjacentPosition.position, position, map);
-					m_BFSFrontier.push(adjacentPosition.position);
+					m_bfsGraph.add(adjacentPosition.position, position, map);
 				}
 			}
 		}
@@ -262,15 +240,11 @@ bool PathFinding::isTargetInLineOfSight(const Unit& unit, const Entity& targetEn
 
 bool PathFinding::getClosestAvailableEntitySpawnPosition(const EntitySpawnerBuilding& building, const Map& map, glm::vec3& spawnPosition)
 {
-	m_BFSGraph.reset(m_BFSFrontier);
-	m_BFSFrontier.push(Globals::convertToGridPosition(building.getPosition()));
+	m_bfsGraph.reset(Globals::convertToGridPosition(building.getPosition()));
 	bool availablePositionFound = false;
-
-	while (!m_BFSFrontier.empty() && !availablePositionFound)
+	while (!m_bfsGraph.is_frontier_empty() && !availablePositionFound)
 	{
-		glm::ivec2 position = m_BFSFrontier.front();
-		m_BFSFrontier.pop();
-
+		glm::ivec2 position = m_bfsGraph.pop_frontier();
 		for (const auto& adjacentPosition : getAdjacentPositions(position, map, building))
 		{
 			if (adjacentPosition.valid && !building.getAABB().contains(Globals::convertToWorldPosition(adjacentPosition.position)))
@@ -279,14 +253,11 @@ bool PathFinding::getClosestAvailableEntitySpawnPosition(const EntitySpawnerBuil
 				availablePositionFound = true;
 				break;
 			}
-			else if (!m_BFSGraph.isPositionVisited(adjacentPosition.position, map))
+			else if (!m_bfsGraph.is_position_visited(adjacentPosition.position, map))
 			{
-				m_BFSGraph.addToGraph(adjacentPosition.position, position, map);
-				m_BFSFrontier.push(adjacentPosition.position);
-			}	
+				m_bfsGraph.add(adjacentPosition.position, position, map);
+			}
 		}
-
-		assert(isFrontierWithinSizeLimit(m_BFSFrontier, map.getSize()));
 	}
 
 	return availablePositionFound;
@@ -294,15 +265,12 @@ bool PathFinding::getClosestAvailableEntitySpawnPosition(const EntitySpawnerBuil
 
 bool PathFinding::getRandomPositionOutsideAABB(const Entity& building, const Map& map, glm::vec3& positionOutsideAABB)
 {
-	m_BFSGraph.reset(m_BFSFrontier);
-	m_BFSFrontier.push(Globals::convertToGridPosition(building.getPosition()));
+	m_bfsGraph.reset(Globals::convertToGridPosition(building.getPosition()));
 	bool availablePositionFound = false;
 
-	while (!m_BFSFrontier.empty() && !availablePositionFound)
+	while (!m_bfsGraph.is_frontier_empty() && !availablePositionFound)
 	{
-		glm::ivec2 position = m_BFSFrontier.front();
-		m_BFSFrontier.pop();
-
+	 	glm::ivec2 position = m_bfsGraph.pop_frontier();
 		for (const auto& adjacentPosition : getRandomAdjacentPositions(position, map, building.getAABB()))
 		{
 			if (adjacentPosition.valid && !building.getAABB().contains(Globals::convertToWorldPosition(adjacentPosition.position)))
@@ -311,14 +279,11 @@ bool PathFinding::getRandomPositionOutsideAABB(const Entity& building, const Map
 				availablePositionFound = true;
 				break;
 			}
-			else if (!m_BFSGraph.isPositionVisited(adjacentPosition.position, map))
+			else if (!m_bfsGraph.is_position_visited(adjacentPosition.position, map))
 			{
-				m_BFSGraph.addToGraph(adjacentPosition.position, position, map);
-				m_BFSFrontier.push(adjacentPosition.position);
+				m_bfsGraph.add(adjacentPosition.position, position, map);
 			}
 		}
-
-		assert(isFrontierWithinSizeLimit(m_BFSFrontier, map.getSize()));
 	}
 
 	return availablePositionFound;

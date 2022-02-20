@@ -79,9 +79,7 @@ public:
 private:
 	PathFinding();
 	std::vector<glm::vec3> m_sharedContainer;
-	//BFS
-	Graph m_BFSGraph;
-	std::queue<glm::ivec2> m_BFSFrontier;
+	Graph m_bfsGraph;
 	//ThetaStar
 	std::vector<ThetaStarGraphNode> m_thetaGraph;
 	MinHeap m_thetaFrontier;
