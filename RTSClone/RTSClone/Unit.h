@@ -35,10 +35,8 @@ public:
 	~Unit();
 
 	TargetEntity getTargetEntity() const;
-	const Faction& getOwningFaction() const;
 	const std::vector<glm::vec3>& getMovementPath() const;
 	float getAttackRange() const;
-	eFactionController getOwningFactionController() const;
 	eUnitState getCurrentState() const;
 
 	void add_destination(const glm::vec3& position, const Map& map, FactionHandler& factionHandler);
@@ -55,7 +53,7 @@ public:
 
 private:
 	Movement m_movement = {};
-	std::reference_wrapper<Faction> m_owningFaction;
+	eFactionController m_owningFaction;
 	eUnitState m_currentState = eUnitState::Idle;
 	Timer m_attackTimer;
 	TargetEntity m_targetEntity = {};

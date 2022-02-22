@@ -26,7 +26,7 @@ Unit::Unit(Faction& owningFaction, const glm::vec3& startingPosition, const glm:
 	FactionHandler& factionHandler)
 	: Entity(ModelManager::getInstance().getModel(UNIT_MODEL_NAME), startingPosition, eEntityType::Unit, 
 		Globals::UNIT_STARTING_HEALTH, owningFaction.getCurrentShieldAmount(), startingRotation),
-	m_owningFaction(owningFaction),
+	m_owningFaction(owningFaction.getController()),
 	m_attackTimer(TIME_BETWEEN_ATTACK, true)
 {
 	broadcastToMessenger<GameMessages::AddUnitPositionToMap>({ m_position, getID() });
@@ -36,7 +36,7 @@ Unit::Unit(Faction & owningFaction, const glm::vec3 & startingPosition, const gl
 	const glm::vec3 & destination, FactionHandler& factionHandler, const Map& map)
 	: Entity(ModelManager::getInstance().getModel(UNIT_MODEL_NAME), startingPosition, eEntityType::Unit,
 		Globals::UNIT_STARTING_HEALTH, owningFaction.getCurrentShieldAmount(), startingRotation),
-	m_owningFaction(owningFaction),
+	m_owningFaction(owningFaction.getController()),
 	m_attackTimer(TIME_BETWEEN_ATTACK, true)
 {
 	moveTo(destination, map, factionHandler);
@@ -60,11 +60,6 @@ TargetEntity Unit::getTargetEntity() const
 	return m_targetEntity;
 }
 
-const Faction& Unit::getOwningFaction() const
-{
-	return m_owningFaction;
-}
-
 const std::vector<glm::vec3>& Unit::getMovementPath() const
 {
 	return m_movement.path;
@@ -73,11 +68,6 @@ const std::vector<glm::vec3>& Unit::getMovementPath() const
 float Unit::getAttackRange() const
 {
 	return Globals::UNIT_ATTACK_RANGE;
-}
-
-eFactionController Unit::getOwningFactionController() const
-{
-	return m_owningFaction.get().getController();
 }
 
 eUnitState Unit::getCurrentState() const
@@ -197,7 +187,7 @@ void Unit::update(float deltaTime, FactionHandler& factionHandler, const Map& ma
 		assert(m_movement.path.empty() && m_targetEntity.getID() == Globals::INVALID_ENTITY_ID);
 		if (unitStateHandlerTimer.isExpired())
 		{
-			for (const auto& opposingFaction : factionHandler.getOpposingFactions(m_owningFaction.get().getController()))
+			for (const auto& opposingFaction : factionHandler.getOpposingFactions(m_owningFaction))
 			{
 				const Entity* targetEntity = opposingFaction.get().getEntity(m_position, Globals::UNIT_ATTACK_RANGE, true);
 				if (targetEntity)
@@ -260,7 +250,7 @@ void Unit::update(float deltaTime, FactionHandler& factionHandler, const Map& ma
 		assert(m_targetEntity.getID() == Globals::INVALID_ENTITY_ID);
 		if (unitStateHandlerTimer.isExpired())
 		{
-			for (const auto& opposingFaction : factionHandler.getOpposingFactions(m_owningFaction.get().getController()))
+			for (const auto& opposingFaction : factionHandler.getOpposingFactions(m_owningFaction))
 			{
 				const Entity* targetEntity = opposingFaction.get().getEntity(m_position, Globals::UNIT_ATTACK_RANGE);
 				if (targetEntity && PathFinding::getInstance().isTargetInLineOfSight(m_position, *targetEntity, map))
@@ -327,7 +317,7 @@ void Unit::update(float deltaTime, FactionHandler& factionHandler, const Map& ma
 				const Entity* targetEntity = targetFaction->getEntity(m_targetEntity.getID(), m_targetEntity.getType());
 				if (targetEntity && Globals::getSqrDistance(targetEntity->getPosition(), m_position) <= Globals::UNIT_ATTACK_RANGE * Globals::UNIT_ATTACK_RANGE)
 				{
-					GameEventHandler::getInstance().gameEvents.push(GameEvent::createSpawnProjectile(m_owningFaction.get().getController(), getID(),
+					GameEventHandler::getInstance().gameEvents.push(GameEvent::createSpawnProjectile(m_owningFaction, getID(),
 						getEntityType(), targetFaction->getController(), targetEntity->getID(), targetEntity->getEntityType(),
 						DAMAGE, m_position, targetEntity->getPosition()));
 
@@ -390,8 +380,7 @@ void Unit::switchToState(eUnitState newState, const Map& map, FactionHandler& fa
 	case eUnitState::Idle:
 		m_targetEntity.reset();
 		m_movement.path.clear();
-		GameEventHandler::getInstance().gameEvents.push(GameEvent::create_entity_idle(getID(), m_owningFaction.get().getController()));
-		//m_owningFaction.get().onUnitEnteredIdleState(*this, map, factionHandler);
+		GameEventHandler::getInstance().gameEvents.push(GameEvent::create_entity_idle(getID(), m_owningFaction));
 		break;
 	case eUnitState::AttackMoving:
 		assert(!m_movement.path.empty());
