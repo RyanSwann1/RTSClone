@@ -180,9 +180,6 @@
     <ClCompile Include="..\Shared\RenderPrimitiveMesh.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="MovingEntity.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="assimp\include\Compiler\poppack1.h">
@@ -500,7 +497,7 @@
     <ClInclude Include="..\Shared\RenderPrimitiveMesh.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="MovingEntity.h">
+    <ClInclude Include="Movement.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="GameMessengerSubscriber.h">

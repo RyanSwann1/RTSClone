@@ -1,6 +1,7 @@
 #pragma once
 
-#include "MovingEntity.h"
+#include "Entity.h"
+#include "Movement.h"
 #include "Timer.h"
 #include "AdjacentPositions.h"
 #include "TargetEntity.h"
@@ -38,7 +39,7 @@ struct BuildingInWorkerQueue
 struct Base;
 class Faction;
 class Mineral;
-class Worker : public MovingEntity
+class Worker : public Entity
 {
 public:
 	Worker(Faction& owningFaction, const Map& map, const glm::vec3& startingPosition, const glm::vec3& startingRotation);
@@ -54,6 +55,8 @@ public:
 	bool isInBuildQueue(eEntityType entityType) const;
 	int extractResources();	
 
+	void add_destination(const glm::vec3& position, const Map& map);
+	void clear_destinations();
 	void repairEntity(const Entity& entity, const Map& map);
 	bool build(const glm::vec3& buildPosition, const Map& map, eEntityType entityType, const Base* baseToExpandTo = nullptr,
 		bool clearBuildQueue = false);
@@ -66,9 +69,13 @@ public:
 	void render(ShaderHandler& shaderHandler, eFactionController owningFactionController) const;
 	void renderProgressBar(ShaderHandler& shaderHandler, const Camera& camera, glm::uvec2 windowSize) const;
 	void renderBuildingCommands(ShaderHandler& shaderHandler) const;
+#ifdef RENDER_PATHING
+	void render_path(ShaderHandler& shaderHandler);
+#endif // RENDER_PATHING
 
 private:
 	std::reference_wrapper<Faction> m_owningFaction;
+	Movement m_movement = {};
 	eWorkerState m_currentState;
 	std::deque<BuildingInWorkerQueue> m_buildQueue;
 	const Base* m_baseToExpandTo;

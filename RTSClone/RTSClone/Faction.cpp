@@ -533,12 +533,12 @@ void Faction::renderPathing(ShaderHandler& shaderHandler)
 {
     for (auto& unit : m_units)
     {
-        unit->renderPathMesh(shaderHandler);
+        unit->render_path(shaderHandler);
     }
 
     for (auto& worker : m_workers)
     {
-        worker->renderPathMesh(shaderHandler);
+        worker->render_path(shaderHandler);
     }
 }
 #endif // RENDER_PATHING

@@ -4,7 +4,6 @@
 #include "Map.h"
 #include <algorithm>
 
-//Graph
 Graph::Graph()
 	: m_onNewMapSizeID([this](const GameMessages::NewMapSize& gameMessage) { return new_map_size(gameMessage); })
 {}

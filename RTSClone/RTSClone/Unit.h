@@ -1,6 +1,7 @@
 #pragma once
 
-#include "MovingEntity.h"
+#include "Entity.h"
+#include "Movement.h"
 #include "AdjacentPositions.h"
 #include "Timer.h"
 #include "TargetEntity.h"
@@ -9,6 +10,7 @@
 #include "TypeComparison.h"
 #include <functional>
 #include <vector>
+#include <queue>
 
 enum class eUnitState
 {
@@ -23,7 +25,7 @@ class Faction;
 class Map;
 class ShaderHandler;
 class FactionHandler;
-class Unit : public MovingEntity
+class Unit : public Entity
 {
 public:
 	Unit(Faction& owningFaction, const glm::vec3& startingPosition, const glm::vec3& startingRotation, const Map& map,
@@ -39,6 +41,8 @@ public:
 	eFactionController getOwningFactionController() const;
 	eUnitState getCurrentState() const;
 
+	void add_destination(const glm::vec3& position, const Map& map, FactionHandler& factionHandler);
+	void clear_destinations();
 	void moveToAttackPosition(const Entity& targetEntity, const Faction& targetFaction, const Map& map, 
 		FactionHandler& factionHandler);
 	void moveTo(const glm::vec3& destination, const Map& map, FactionHandler& factionHandler,
@@ -46,12 +50,16 @@ public:
 	void update(float deltaTime, FactionHandler& factionHandler, const Map& map,
 		const Timer& unitStateHandlerTimer);
 	void takeDamage(const TakeDamageEvent& gameEvent, const Map& map, FactionHandler& factionHandler) override;
+#ifdef RENDER_PATHING
+	void render_path(ShaderHandler& shaderHandler);
+#endif // RENDER_PATHING
 
 private:
+	Movement m_movement = {};
 	std::reference_wrapper<Faction> m_owningFaction;
-	eUnitState m_currentState;
+	eUnitState m_currentState = eUnitState::Idle;
 	Timer m_attackTimer;
-	TargetEntity m_targetEntity;
+	TargetEntity m_targetEntity = {};
 
 	void switchToState(eUnitState newState, const Map& map, FactionHandler& factionHandler,
 		const Entity* targetEntity = nullptr, const Faction* targetFaction = nullptr);

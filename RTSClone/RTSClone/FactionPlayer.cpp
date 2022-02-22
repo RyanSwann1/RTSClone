@@ -397,18 +397,10 @@ void FactionPlayer::moveSingularSelectedEntity(const glm::vec3& destination, con
         Unit& unit = static_cast<Unit&>(selectedEntity);
         if (m_addToDestinationQueue)
         {
-            if (unit.getMovementPath().empty())
-            {
-               unit.moveTo(destination, map, factionHandler);
-            }
-            else
-            {
-                unit.addToDestinationQueue(destination);
-            }
+            unit.add_destination(destination, map, factionHandler);
         }
         else
         {
-            unit.clearDestinationQueue();
             unit.moveTo(destination, map, factionHandler);
         }
     }
@@ -451,19 +443,11 @@ void FactionPlayer::moveSingularSelectedEntity(const glm::vec3& destination, con
             {
                 if (m_addToDestinationQueue)
                 {
-                    if (selectedWorker.getMovementPath().empty())
-                    {
-                        selectedWorker.moveTo(destination, map);
-                    }
-                    else
-                    {
-                        selectedWorker.addToDestinationQueue(destination);
-                    }
+                    selectedWorker.add_destination(destination, map);
                 }
                 else
-                {
-                    selectedWorker.clearDestinationQueue();
-                    selectedWorker.moveTo(destination, map);
+                { 
+                    selectedWorker.moveTo(destination, map, eWorkerState::Moving);
                 }
             }
         }
@@ -514,10 +498,6 @@ void FactionPlayer::moveMultipleSelectedEntities(const glm::vec3& destination, c
                     static_cast<Worker&>(*selectedWorker).repairEntity(*(*selectedEntity), map);
                 }
             }
-            std::for_each(m_selectedEntities.begin(), m_selectedEntities.end(), [&](auto& selectedUnit)
-            {
-
-            });
         }
         else
         {
@@ -533,18 +513,10 @@ void FactionPlayer::moveMultipleSelectedEntities(const glm::vec3& destination, c
                     Unit& unit = static_cast<Unit&>(*selectedEntity);
                     if (m_addToDestinationQueue)
                     {
-                        if (unit.getMovementPath().empty())
-                        {
-                            unit.moveTo(position, map, factionHandler);
-                        }
-                        else
-                        {
-                            unit.addToDestinationQueue(position);
-                        }
+                        unit.add_destination(position, map, factionHandler);
                     }
                     else
                     {
-                        unit.clearDestinationQueue();
                         unit.moveTo(position, map, factionHandler);
                     }
                 }
@@ -555,18 +527,10 @@ void FactionPlayer::moveMultipleSelectedEntities(const glm::vec3& destination, c
                     Worker& worker = static_cast<Worker&>(*selectedEntity);
                     if (m_addToDestinationQueue)
                     {
-                        if (worker.getMovementPath().empty())
-                        {
-                            worker.moveTo(position, map);
-                        }
-                        else
-                        {
-                            worker.addToDestinationQueue(position);
-                        }
+                        worker.add_destination(position, map);
                     }
                     else
                     {
-                        worker.clearDestinationQueue();
                         worker.moveTo(position, map);
                     }
                 }
