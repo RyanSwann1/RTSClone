@@ -350,6 +350,18 @@ void FactionAI::onEntityRemoval(const Entity& entity)
 	}
 }
 
+void FactionAI::on_entity_taken_damage(const TakeDamageEvent& gameEvent, Entity& entity, const Map& map, FactionHandler& factionHandler)
+{
+	assert(!entity.isDead());
+
+	switch (entity.getEntityType())
+	{
+	case eEntityType::Unit:
+		on_unit_taken_damage(gameEvent, static_cast<Unit&>(entity), map, factionHandler);
+		break;
+	}
+}
+
 void FactionAI::instructWorkersToRepair(const Entity& entity, const Map& map)
 {
 	AIOccupiedBase* occupiedBase = m_occupiedBases.getBase(entity);
@@ -554,55 +566,6 @@ void FactionAI::onWorkerEnteredIdleState(Worker& worker, const Map& map)
 				}
 			}
 		}
-	}
-}
-
-void FactionAI::onUnitTakenDamage(const TakeDamageEvent& gameEvent, Unit& unit, const Map& map, FactionHandler& factionHandler) 
-{
-	assert(!unit.isDead());
-	if (!factionHandler.isFactionActive(gameEvent.senderFaction))
-	{
-		return;
-	}
-	
-	bool changeTargetEntity = false;
-	if(unit.getTargetEntity().getID() != Globals::INVALID_ENTITY_ID)
-	{
-		if (const Faction* opposingFaction = factionHandler.getFaction(unit.getTargetEntity().getFactionController()))
-		{
-			const Entity* targetEntity = opposingFaction->getEntity(unit.getTargetEntity().getID(), unit.getTargetEntity().getType());
-			if (!targetEntity)
-			{
-				changeTargetEntity = true;
-			}
-			else if (!Globals::ATTACKING_ENTITY_TYPES.isMatch(targetEntity->getEntityType()) &&
-				Globals::ATTACKING_ENTITY_TYPES.isMatch(gameEvent.senderEntityType))
-			{
-				changeTargetEntity = true;
-			}
-		}
-	}
-	else
-	{
-		changeTargetEntity = true;
-	}
-
-	if (const Faction* opposingFaction; 
-		changeTargetEntity
-		&& (opposingFaction= factionHandler.getFaction(gameEvent.senderFaction)))
-	{
-		const Entity* targetEntity = opposingFaction->getEntity(gameEvent.senderID, gameEvent.senderEntityType);
-		if (targetEntity)
-		{
-			AISquad* squad = getSquad(m_squads, unit);
-			if (squad)
-			{
-				for (auto& unitInSquad : *squad)
-				{
-					unitInSquad.get().moveToAttackPosition(*targetEntity, *opposingFaction, map, factionHandler);
-				}
-			}
-		}	
 	}
 }
 
@@ -840,4 +803,53 @@ bool FactionAI::handleAction(const AIAction& action, const Map& map, AIOccupiedB
 	}
 
 	return false;
+}
+
+void FactionAI::on_unit_taken_damage(const TakeDamageEvent& gameEvent, Unit& unit, const Map& map, FactionHandler& factionHandler)
+{
+	assert(!unit.isDead());
+	if (!factionHandler.isFactionActive(gameEvent.senderFaction))
+	{
+		return;
+	}
+
+	bool changeTargetEntity = false;
+	if (unit.getTargetEntity().getID() != Globals::INVALID_ENTITY_ID)
+	{
+		if (const Faction* opposingFaction = factionHandler.getFaction(unit.getTargetEntity().getFactionController()))
+		{
+			const Entity* targetEntity = opposingFaction->getEntity(unit.getTargetEntity().getID(), unit.getTargetEntity().getType());
+			if (!targetEntity)
+			{
+				changeTargetEntity = true;
+			}
+			else if (!Globals::ATTACKING_ENTITY_TYPES.isMatch(targetEntity->getEntityType()) &&
+				Globals::ATTACKING_ENTITY_TYPES.isMatch(gameEvent.senderEntityType))
+			{
+				changeTargetEntity = true;
+			}
+		}
+	}
+	else
+	{
+		changeTargetEntity = true;
+	}
+
+	if (const Faction* opposingFaction;
+		changeTargetEntity
+		&& (opposingFaction = factionHandler.getFaction(gameEvent.senderFaction)))
+	{
+		const Entity* targetEntity = opposingFaction->getEntity(gameEvent.senderID, gameEvent.senderEntityType);
+		if (targetEntity)
+		{
+			AISquad* squad = getSquad(m_squads, unit);
+			if (squad)
+			{
+				for (auto& unitInSquad : *squad)
+				{
+					unitInSquad.get().moveToAttackPosition(*targetEntity, *opposingFaction, map, factionHandler);
+				}
+			}
+		}
+	}
 }

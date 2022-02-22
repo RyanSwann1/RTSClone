@@ -52,7 +52,6 @@ public:
 	void addResources(Worker& worker);
 	virtual void onUnitEnteredIdleState(Unit& unit, const Map& map, FactionHandler& factionHandler) {}
 	virtual void onWorkerEnteredIdleState(Worker& worker, const Map& map) {}
-	virtual void onUnitTakenDamage(const TakeDamageEvent& gameEvent, Unit& unit, const Map& map, FactionHandler& factionHandler) {}
 	virtual Entity* createUnit(const Map& map, const Barracks& barracks, FactionHandler& factionHandler);
 	virtual Entity* createWorker(const Map& map, const Headquarters& headquarters);
 	virtual Entity* createBuilding(const Map& map, const Worker& worker);
@@ -75,6 +74,9 @@ protected:
 	Faction(eFactionController factionController, const glm::vec3& hqStartingPosition, 
 		int startingResources, int startingPopulationCap);
 
+	virtual void on_entity_taken_damage(const TakeDamageEvent& gameEvent, Entity& entity, const Map& map, FactionHandler& factionHandler) {}
+	virtual void onEntityRemoval(const Entity& entity) {}
+
 	std::vector<std::unique_ptr<Entity>> m_entities;
 	std::vector<Unit*> m_units;
 	std::vector<Worker*> m_workers;
@@ -83,8 +85,6 @@ protected:
 	std::vector<Turret*> m_turrets;
 	std::vector<Headquarters*> m_headquarters;
 	std::vector<Laboratory*> m_laboratories;
-
-	virtual void onEntityRemoval(const Entity& entity) {}
 
 private:
 	const eFactionController m_controller;

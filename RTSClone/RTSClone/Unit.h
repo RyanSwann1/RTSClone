@@ -49,7 +49,6 @@ public:
 		eUnitState state = eUnitState::Moving);
 	void update(float deltaTime, FactionHandler& factionHandler, const Map& map,
 		const Timer& unitStateHandlerTimer);
-	void takeDamage(const TakeDamageEvent& gameEvent, const Map& map, FactionHandler& factionHandler) override;
 #ifdef RENDER_PATHING
 	void render_path(ShaderHandler& shaderHandler);
 #endif // RENDER_PATHING

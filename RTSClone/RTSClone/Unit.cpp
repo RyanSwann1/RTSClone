@@ -347,15 +347,6 @@ void Unit::update(float deltaTime, FactionHandler& factionHandler, const Map& ma
 	m_attackTimer.update(deltaTime);
 }
 
-void Unit::takeDamage(const TakeDamageEvent& gameEvent, const Map& map, FactionHandler& factionHandler)
-{
-	Entity::takeDamage(gameEvent, map, factionHandler);	
-	if (!isDead())
-	{
-		m_owningFaction.get().onUnitTakenDamage(gameEvent, *this, map, factionHandler);
-	}
-}
-
 #ifdef RENDER_PATHING
 void Unit::render_path(ShaderHandler& shaderHandler) 
 {

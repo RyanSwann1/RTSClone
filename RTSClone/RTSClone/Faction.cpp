@@ -235,57 +235,40 @@ void Faction::handleEvent(const GameEvent& gameEvent, const Map& map, FactionHan
         {
             return entity->getID() == targetID;
         });
-
         if (entity != m_entities.end())
         {
             (*entity)->takeDamage(gameEvent.data.takeDamage, map, factionHandler);
+            if (!(*entity)->isDead())
+            {
+                on_entity_taken_damage(gameEvent.data.takeDamage, *(*entity), map, factionHandler);
+                break;
+            }
             switch ((*entity)->getEntityType())
             {
             case eEntityType::Worker:
-                if ((*entity)->isDead())
-                {
-                    removeEntity<Worker*>(m_workers, targetID, entity);
-                }
+                removeEntity<Worker*>(m_workers, targetID, entity);
                 break;
             case eEntityType::Unit:
-                if ((*entity)->isDead())
-                {
-                    removeEntity<Unit*>(m_units, targetID, entity);
-                }
+                removeEntity<Unit*>(m_units, targetID, entity);
                 break;
             case eEntityType::SupplyDepot:
-                if ((*entity)->isDead())
-                {
-                    removeEntity<SupplyDepot*>(m_supplyDepots, targetID, entity);
-                }
+                removeEntity<SupplyDepot*>(m_supplyDepots, targetID, entity);
                 break;
             case eEntityType::Barracks:
-                if ((*entity)->isDead())
-                {
-                    removeEntity<Barracks*>(m_barracks, targetID, entity);
-                }
+                removeEntity<Barracks*>(m_barracks, targetID, entity);
                 break;
             case eEntityType::Headquarters:
-                if ((*entity)->isDead())
+                removeEntity<Headquarters*>(m_headquarters, targetID, entity);
+                if (m_headquarters.empty())
                 {
-                    removeEntity<Headquarters*>(m_headquarters, targetID, entity);
-                    if (m_headquarters.empty())
-                    {
-                        GameEventHandler::getInstance().gameEvents.push(GameEvent::createEliminateFaction(m_controller));
-                    }
+                    GameEventHandler::getInstance().gameEvents.push(GameEvent::createEliminateFaction(m_controller));
                 }
                 break;
             case eEntityType::Turret:
-                if ((*entity)->isDead())
-                {
-                    removeEntity<Turret*>(m_turrets, targetID, entity);
-                }
+                removeEntity<Turret*>(m_turrets, targetID, entity);
                 break;
             case eEntityType::Laboratory:
-                if ((*entity)->isDead())
-                {
-                    removeEntity<Laboratory*>(m_laboratories, targetID, entity);
-                }
+                removeEntity<Laboratory*>(m_laboratories, targetID, entity);
                 break;
             default:
                 assert(false);
