@@ -332,6 +332,19 @@ void Faction::handleEvent(const GameEvent& gameEvent, const Map& map, FactionHan
 			assert(false);
         }
         break;
+    case eGameEventType::EntityIdle:
+    {
+        const int entityID = gameEvent.data.entityIdle.entityID;
+        auto entity = std::find_if(m_entities.begin(), m_entities.end(), [entityID](const auto& entity)
+        {
+            return entity->getID() == entityID;
+        });
+        if (entity != m_entities.cend())
+        {
+            on_entity_idle(*(*entity), map, factionHandler);
+        }
+    }
+        break;
     }
 }
 

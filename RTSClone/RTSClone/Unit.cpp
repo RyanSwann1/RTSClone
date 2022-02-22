@@ -390,7 +390,8 @@ void Unit::switchToState(eUnitState newState, const Map& map, FactionHandler& fa
 	case eUnitState::Idle:
 		m_targetEntity.reset();
 		m_movement.path.clear();
-		m_owningFaction.get().onUnitEnteredIdleState(*this, map, factionHandler);
+		GameEventHandler::getInstance().gameEvents.push(GameEvent::create_entity_idle(getID(), m_owningFaction.get().getController()));
+		//m_owningFaction.get().onUnitEnteredIdleState(*this, map, factionHandler);
 		break;
 	case eUnitState::AttackMoving:
 		assert(!m_movement.path.empty());

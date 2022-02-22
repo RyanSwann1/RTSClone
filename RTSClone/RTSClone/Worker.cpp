@@ -581,7 +581,7 @@ void Worker::switchTo(eWorkerState newState, const Map& map, const Mineral* mine
 		m_movement.path.clear();
 		if (oldState != eWorkerState::Idle)
 		{
-			m_owningFaction.get().onWorkerEnteredIdleState(*this, map);
+			GameEventHandler::getInstance().gameEvents.push(GameEvent::create_entity_idle(getID(), m_owningFaction.get().getController()));
 		}
 		break;
 	case eWorkerState::Moving:

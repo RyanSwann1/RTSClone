@@ -419,5 +419,11 @@ void Level::handleEvent(const GameEvent& gameEvent, const Map& map)
 			faction->handleEvent(gameEvent, map, m_factionHandler);
 		}
 		break;
+	case eGameEventType::EntityIdle:
+		if (Faction* faction = m_factionHandler.getFaction(gameEvent.data.entityIdle.faction))
+		{
+			faction->handleEvent(gameEvent, map, m_factionHandler);
+		}
+		break;
 	}
 }

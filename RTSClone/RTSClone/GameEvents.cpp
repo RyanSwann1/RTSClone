@@ -75,6 +75,11 @@ GameEvent GameEvent::createDetachFactionFromBase(eFactionController factionContr
 	return { eGameEventType::DetachFactionFromBase, AttachFactionToBaseEvent{factionController, position} };
 }
 
+GameEvent GameEvent::create_entity_idle(int entityID, eFactionController faction)
+{
+	return { eGameEventType::EntityIdle, EntityIdleEvent{entityID, faction} };
+}
+
 GameEvent GameEvent::createEliminateFaction(eFactionController factionController)
 {
 	return { eGameEventType::EliminateFaction, EliminateFactionEvent{factionController} };

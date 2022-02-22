@@ -22,9 +22,7 @@ public:
 		int startingResources, int startingPopulationCap, AIConstants::eBehaviour behaviour, const BaseHandler& baseHandler);
 
 	bool isWithinRangeOfBuildings(const glm::vec3& position, float distance) const;
-
-	void onUnitEnteredIdleState(Unit& unit, const Map& map, FactionHandler& factionHandler) override;
-	void onWorkerEnteredIdleState(Worker& worker, const Map& map) override;
+	
 	bool increaseShield(const Laboratory& laboratory) override;
 	Entity* createBuilding(const Map& map, const Worker& worker) override;
 	void setTargetFaction(FactionHandler& factionHandler);
@@ -38,6 +36,7 @@ public:
 protected:
 	void onEntityRemoval(const Entity& entity) override;
 	void on_entity_taken_damage(const TakeDamageEvent& gameEvent, Entity& entity, const Map& map, FactionHandler& factionHandler) override;
+	void on_entity_idle(Entity& entity, const Map& map, FactionHandler& factionHandler) override;
 
 private:
 	const BaseHandler& m_baseHandler;
@@ -58,4 +57,6 @@ private:
 	bool build(const Map& map, eEntityType entityType, AIOccupiedBase& occupiedBase, Worker* worker = nullptr);
 	bool handleAction(const AIAction& action, const Map& map, AIOccupiedBase& occupiedBase);
 	void on_unit_taken_damage(const TakeDamageEvent& gameEvent, Unit& unit, const Map& map, FactionHandler& factionHandler);
+	void on_unit_idle(Unit& unit, const Map& map, FactionHandler& factionHandler);
+	void on_worker_idle(Worker& worker, const Map& map);
 };

@@ -362,6 +362,19 @@ void FactionAI::on_entity_taken_damage(const TakeDamageEvent& gameEvent, Entity&
 	}
 }
 
+void FactionAI::on_entity_idle(Entity& entity, const Map& map, FactionHandler& factionHandler)
+{
+	switch (entity.getEntityType())
+	{
+	case eEntityType::Unit:
+		on_unit_idle(static_cast<Unit&>(entity), map, factionHandler);
+		break;
+	case eEntityType::Worker:
+		on_worker_idle(static_cast<Worker&>(entity), map);
+		break;
+	}
+}
+
 void FactionAI::instructWorkersToRepair(const Entity& entity, const Map& map)
 {
 	AIOccupiedBase* occupiedBase = m_occupiedBases.getBase(entity);
@@ -495,80 +508,6 @@ bool FactionAI::isWithinRangeOfBuildings(const glm::vec3& position, float distan
 	}
 }
 
-void FactionAI::onUnitEnteredIdleState(Unit& unit, const Map& map, FactionHandler& factionHandler)
-{
-	assert(unit.getCurrentState() == eUnitState::Idle);
-	int unitID = unit.getID();
-	auto unitOnHold = std::find_if(m_unitsOnHold.cbegin(), m_unitsOnHold.cend(), [unitID](const auto& unit)
-	{
-		return unit->getID() == unitID;
-	});
-	if (unitOnHold == m_unitsOnHold.cend() && m_targetFaction != eFactionController::None)
-	{
-		if (const Faction* targetFaction = factionHandler.getFaction(m_targetFaction))
-		{
-			if (const Headquarters* nearestHeadquarters = targetFaction->getClosestHeadquarters(unit.getPosition()))
-			{
-				unit.moveToAttackPosition(*nearestHeadquarters, *targetFaction, map, factionHandler);
-			}
-		}
-		else
-		{
-			m_targetFaction = eFactionController::None;
-		}
-	}
-}
-
-void FactionAI::onWorkerEnteredIdleState(Worker& worker, const Map& map)
-{
-	assert(worker.getCurrentState() == eWorkerState::Idle);
-	if (const Headquarters* nearestHeadquarters = getClosestHeadquarters(worker.getPosition()))
-	{
-		if (const Base* nearestBase = m_baseHandler.getNearestBase(nearestHeadquarters->getPosition()))
-		{
-			if (const Mineral* nearestMineral = m_baseHandler.getNearestAvailableMineralAtBase(*this, *nearestBase, worker.getPosition()))
-			{
-				worker.moveTo(*nearestMineral, map);
-			}
-			else
-			{
-				for (const auto& base : m_occupiedBases.getSortedBases(worker.getPosition()))
-				{
-					if (&base.base.get() != &*nearestBase)
-					{
-						nearestMineral = m_baseHandler.getNearestAvailableMineralAtBase(*this, base.base, worker.getPosition());
-						if (nearestMineral)
-						{
-							m_occupiedBases.removeWorker(worker);
-							m_occupiedBases.addWorker(worker, base.base);
-							worker.moveTo(*nearestMineral, map);
-						}
-					}
-				}
-			}
-		}
-	}
-
-
-	if (worker.getCurrentState() == eWorkerState::Idle)
-	{
-		for (auto& occupiedBase : m_occupiedBases.bases)
-		{
-			if (!occupiedBase.actionQueue.empty())
-			{
-				eEntityType entityType;
-				if (convertActionTypeToEntityType(occupiedBase.actionQueue.front().actionType, entityType) &&
-					Globals::BUILDING_TYPES.isMatch(entityType) &&
-					build(map, entityType, occupiedBase, &worker))
-				{
-					occupiedBase.actionQueue.pop_front();
-					break;
-				}
-			}
-		}
-	}
-}
-
 bool FactionAI::increaseShield(const Laboratory& laboratory)
 {
 	if (!Faction::increaseShield(laboratory))
@@ -672,7 +611,7 @@ Entity* FactionAI::createUnit(const Map& map, const Barracks& barracks, FactionH
 				Unit& unitOnHold = *(*iter);
 				m_squads.back().push_back(unitOnHold);
 				iter = m_unitsOnHold.erase(iter);
-				onUnitEnteredIdleState(unitOnHold, map, factionHandler);
+				on_unit_idle(unitOnHold, map, factionHandler);
 			}
 		}
 	}
@@ -848,6 +787,80 @@ void FactionAI::on_unit_taken_damage(const TakeDamageEvent& gameEvent, Unit& uni
 				for (auto& unitInSquad : *squad)
 				{
 					unitInSquad.get().moveToAttackPosition(*targetEntity, *opposingFaction, map, factionHandler);
+				}
+			}
+		}
+	}
+}
+
+void FactionAI::on_unit_idle(Unit& unit, const Map& map, FactionHandler& factionHandler)
+{
+	assert(unit.getCurrentState() == eUnitState::Idle);
+	int unitID = unit.getID();
+	auto unitOnHold = std::find_if(m_unitsOnHold.cbegin(), m_unitsOnHold.cend(), [unitID](const auto& unit)
+	{
+		return unit->getID() == unitID;
+	});
+	if (unitOnHold == m_unitsOnHold.cend() && m_targetFaction != eFactionController::None)
+	{
+		if (const Faction* targetFaction = factionHandler.getFaction(m_targetFaction))
+		{
+			if (const Headquarters* nearestHeadquarters = targetFaction->getClosestHeadquarters(unit.getPosition()))
+			{
+				unit.moveToAttackPosition(*nearestHeadquarters, *targetFaction, map, factionHandler);
+			}
+		}
+		else
+		{
+			m_targetFaction = eFactionController::None;
+		}
+	}
+}
+
+void FactionAI::on_worker_idle(Worker& worker, const Map& map)
+{
+	assert(worker.getCurrentState() == eWorkerState::Idle);
+	if (const Headquarters* nearestHeadquarters = getClosestHeadquarters(worker.getPosition()))
+	{
+		if (const Base* nearestBase = m_baseHandler.getNearestBase(nearestHeadquarters->getPosition()))
+		{
+			if (const Mineral* nearestMineral = m_baseHandler.getNearestAvailableMineralAtBase(*this, *nearestBase, worker.getPosition()))
+			{
+				worker.moveTo(*nearestMineral, map);
+			}
+			else
+			{
+				for (const auto& base : m_occupiedBases.getSortedBases(worker.getPosition()))
+				{
+					if (&base.base.get() != &*nearestBase)
+					{
+						nearestMineral = m_baseHandler.getNearestAvailableMineralAtBase(*this, base.base, worker.getPosition());
+						if (nearestMineral)
+						{
+							m_occupiedBases.removeWorker(worker);
+							m_occupiedBases.addWorker(worker, base.base);
+							worker.moveTo(*nearestMineral, map);
+						}
+					}
+				}
+			}
+		}
+	}
+
+
+	if (worker.getCurrentState() == eWorkerState::Idle)
+	{
+		for (auto& occupiedBase : m_occupiedBases.bases)
+		{
+			if (!occupiedBase.actionQueue.empty())
+			{
+				eEntityType entityType;
+				if (convertActionTypeToEntityType(occupiedBase.actionQueue.front().actionType, entityType) &&
+					Globals::BUILDING_TYPES.isMatch(entityType) &&
+					build(map, entityType, occupiedBase, &worker))
+				{
+					occupiedBase.actionQueue.pop_front();
+					break;
 				}
 			}
 		}

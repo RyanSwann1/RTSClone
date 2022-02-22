@@ -50,8 +50,6 @@ public:
 	const Entity* getEntity(const glm::vec3& position) const;
 
 	void addResources(Worker& worker);
-	virtual void onUnitEnteredIdleState(Unit& unit, const Map& map, FactionHandler& factionHandler) {}
-	virtual void onWorkerEnteredIdleState(Worker& worker, const Map& map) {}
 	virtual Entity* createUnit(const Map& map, const Barracks& barracks, FactionHandler& factionHandler);
 	virtual Entity* createWorker(const Map& map, const Headquarters& headquarters);
 	virtual Entity* createBuilding(const Map& map, const Worker& worker);
@@ -75,6 +73,7 @@ protected:
 		int startingResources, int startingPopulationCap);
 
 	virtual void on_entity_taken_damage(const TakeDamageEvent& gameEvent, Entity& entity, const Map& map, FactionHandler& factionHandler) {}
+	virtual void on_entity_idle(Entity& entity, const Map& map, FactionHandler& factionHandler) {}
 	virtual void onEntityRemoval(const Entity& entity) {}
 
 	std::vector<std::unique_ptr<Entity>> m_entities;
