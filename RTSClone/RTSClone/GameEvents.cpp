@@ -80,6 +80,11 @@ GameEvent GameEvent::create_entity_idle(int entityID, eFactionController faction
 	return { eGameEventType::EntityIdle, EntityIdleEvent{entityID, faction} };
 }
 
+GameEvent GameEvent::create_add_faction_resources(int quantity, eFactionController faction)
+{
+	return { eGameEventType::AddFactionResources, AddFactionResourcesEvent{quantity, faction} };
+}
+
 GameEvent GameEvent::createEliminateFaction(eFactionController factionController)
 {
 	return { eGameEventType::EliminateFaction, EliminateFactionEvent{factionController} };

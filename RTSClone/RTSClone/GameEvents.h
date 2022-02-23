@@ -19,7 +19,8 @@ enum class eGameEventType
 	IncreaseFactionShield,
 	AttachFactionToBase,
 	DetachFactionFromBase,
-	EntityIdle
+	EntityIdle,
+	AddFactionResources
 };
 
 struct GameEvent_0
@@ -145,6 +146,12 @@ struct EntityIdleEvent
 	eFactionController faction;
 };
 
+struct AddFactionResourcesEvent
+{
+	int quantity = { 0 };
+	eFactionController faction;
+};
+
 union GameEvents
 {
 	RevalidateMovementPathsEvent			revalidateMovementPaths;
@@ -161,6 +168,7 @@ union GameEvents
 	AttachFactionToBaseEvent				attachFactionToBase;
 	DetachFactionFromBaseEvent				detachFactionFromBase;
 	EntityIdleEvent							entityIdle;
+	AddFactionResourcesEvent				addFactionResources;
 
 	GameEvents(RevalidateMovementPathsEvent gameEvent)			:	revalidateMovementPaths(gameEvent) {}
 	GameEvents(ResetTargetEntityGUIEvent gameEvent)				:	resetTargetEntityGUI(gameEvent) {}
@@ -176,6 +184,7 @@ union GameEvents
 	GameEvents(const AttachFactionToBaseEvent& gameEvent)		:   attachFactionToBase(gameEvent) {}
 	GameEvents(const DetachFactionFromBaseEvent& gameEvent)		:	detachFactionFromBase(gameEvent) {}
 	GameEvents(EntityIdleEvent gameEvent)						:   entityIdle(gameEvent) {}
+	GameEvents(AddFactionResourcesEvent gameEvent)				:   addFactionResources(gameEvent) {}
 };
 
 struct GameEvent
@@ -213,6 +222,7 @@ struct GameEvent
 	static GameEvent createDetachFactionFromBase(eFactionController factionController, const glm::vec3& position);
 
 	static GameEvent create_entity_idle(int entityID, eFactionController faction);
+	static GameEvent create_add_faction_resources(int quantity, eFactionController faction);
 
 	eGameEventType type;
 	GameEvents data;

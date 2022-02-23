@@ -345,12 +345,10 @@ void Faction::handleEvent(const GameEvent& gameEvent, const Map& map, FactionHan
         }
     }
         break;
+    case eGameEventType::AddFactionResources:
+        m_currentResourceAmount += gameEvent.data.addFactionResources.quantity;
+        break;
     }
-}
-
-void Faction::addResources(Worker& worker)
-{
-    m_currentResourceAmount += worker.extractResources();
 }
 
 void Faction::handleWorkerCollisions(const Map& map)

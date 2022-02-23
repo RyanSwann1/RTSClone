@@ -220,7 +220,9 @@ void Worker::update(float deltaTime, const Map& map, FactionHandler& factionHand
 		assert(isHoldingResources());
 		if (m_movement.path.empty())
 		{
-			m_owningFaction.get().addResources(*this);
+			GameEventHandler::getInstance().gameEvents.emplace(
+				GameEvent::create_add_faction_resources(m_currentResourceAmount, m_owningFaction.get().getController()));
+			m_currentResourceAmount = 0;
 			if (m_mineralToHarvest)
 			{
 				moveTo(*m_mineralToHarvest, map);

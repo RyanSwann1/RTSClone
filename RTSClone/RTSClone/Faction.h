@@ -49,7 +49,6 @@ public:
 	const Entity* getEntity(int entityID, eEntityType entityType) const;
 	const Entity* getEntity(const glm::vec3& position) const;
 
-	void addResources(Worker& worker);
 	virtual Entity* createUnit(const Map& map, const Barracks& barracks, FactionHandler& factionHandler);
 	virtual Entity* createWorker(const Map& map, const Headquarters& headquarters);
 	virtual Entity* createBuilding(const Map& map, const Worker& worker);
