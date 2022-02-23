@@ -56,7 +56,7 @@ int AIOccupiedBase::getWorkerBuildQueueCount(eEntityType entityType) const
 	int count = 0;
 	for (const auto& worker : workers)
 	{
-		for (const auto& buildingInQueue : worker.get().getBuildingCommands())
+		for (const auto& buildingInQueue : worker.get().get_scheduled_buildings())
 		{
 			if (buildingInQueue.entityType == entityType)
 			{

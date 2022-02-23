@@ -57,7 +57,7 @@ private:
 	eFactionController m_owningFaction			= eFactionController::None;
 	eUnitState m_currentState					= eUnitState::Idle;
 	Timer m_attackTimer							= {};
-	std::optional<TargetEntity> m_target	= {};
+	std::optional<TargetEntity> m_target		= {};
 
 	void switchToState(eUnitState newState, const Map& map, FactionHandler& factionHandler,
 		const Entity* targetEntity = nullptr, const Faction* targetFaction = nullptr);

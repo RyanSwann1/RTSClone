@@ -28,9 +28,9 @@ enum class eWorkerState
 	Max = Repairing
 };
 
-struct BuildingInWorkerQueue
+struct WorkerScheduledBuilding
 {
-	BuildingInWorkerQueue(const glm::vec3& position, eEntityType entityType);
+	WorkerScheduledBuilding(const glm::vec3& position, eEntityType entityType);
 
 	glm::vec3 position;
 	eEntityType entityType;
@@ -48,7 +48,7 @@ public:
 		const glm::vec3& startingRotation);
 	
 	const Mineral* getMineralToHarvest() const;
-	const std::deque<BuildingInWorkerQueue>& getBuildingCommands() const;
+	const std::deque<WorkerScheduledBuilding>& get_scheduled_buildings() const;
 	const std::vector<glm::vec3>& getMovementPath() const;
 	eWorkerState getCurrentState() const;
 	bool isHoldingResources() const;
@@ -74,14 +74,14 @@ public:
 #endif // RENDER_PATHING
 
 private:
-	Faction* m_owningFaction = nullptr;
-	Movement m_movement = {};
-	eWorkerState m_currentState = eWorkerState::Idle;
-	std::deque<BuildingInWorkerQueue> m_buildQueue = {};
-	std::optional<RepairTargetEntity> m_repairTargetEntity = {};
-	int m_currentResourceAmount = { 0 };
-	Timer m_taskTimer = {};
-	const Mineral* m_mineralToHarvest = nullptr;
+	Faction* m_owningFaction								= nullptr;
+	Movement m_movement										= {};
+	eWorkerState m_currentState								= eWorkerState::Idle;
+	std::deque<WorkerScheduledBuilding> m_buildQueue			= {};
+	std::optional<RepairTargetEntity> m_repairTargetEntity	= {};
+	int m_currentResourceAmount								= { 0 };
+	Timer m_taskTimer										= {};
+	const Mineral* m_mineralToHarvest						= nullptr;
 
 	void switchTo(eWorkerState newState, const Map& map, const Mineral* mineralToHarvest = nullptr);
 	void moveTo(const glm::vec3& destination, const Map& map, const AABB& ignoreAABB, eWorkerState state = eWorkerState::Moving);

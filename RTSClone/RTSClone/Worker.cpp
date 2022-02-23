@@ -33,7 +33,7 @@ namespace
 }
 
 //BuildingInWorkerQueue
-BuildingInWorkerQueue::BuildingInWorkerQueue(const glm::vec3& position, eEntityType entityType)
+WorkerScheduledBuilding::WorkerScheduledBuilding(const glm::vec3& position, eEntityType entityType)
 	: position(Globals::convertToMiddleGridPosition(Globals::convertToNodePosition(position))),
 	entityType(entityType),
 	model(ModelManager::getInstance().getModel(entityType))
@@ -62,7 +62,7 @@ const Mineral* Worker::getMineralToHarvest() const
 	return m_mineralToHarvest;
 }
 
-const std::deque<BuildingInWorkerQueue>& Worker::getBuildingCommands() const
+const std::deque<WorkerScheduledBuilding>& Worker::get_scheduled_buildings() const
 {
 	return m_buildQueue;
 }

@@ -588,12 +588,12 @@ bool Faction::isCollidingWithWorkerBuildQueue(const AABB& AABB) const
 {
     for (const auto& worker : m_workers)
     {
-        auto buildingCommand = std::find_if(worker->getBuildingCommands().cbegin(), worker->getBuildingCommands().cend(),
+        auto buildingCommand = std::find_if(worker->get_scheduled_buildings().cbegin(), worker->get_scheduled_buildings().cend(),
             [&AABB](const auto& buildingCommand)
         {
             return AABB.contains(buildingCommand.position);
         });
-        if (buildingCommand != worker->getBuildingCommands().cend())
+        if (buildingCommand != worker->get_scheduled_buildings().cend())
         {
             return true;
         }
@@ -612,10 +612,10 @@ bool Faction::isBuildingInAllWorkersQueue(eEntityType entityType) const
 
 Entity* Faction::createBuilding(const Map& map, const Worker& worker)
 {
-    assert(worker.getCurrentState() == eWorkerState::Building && !worker.getBuildingCommands().empty());
+    assert(worker.getCurrentState() == eWorkerState::Building && !worker.get_scheduled_buildings().empty());
 
-    eEntityType entityType = worker.getBuildingCommands().front().entityType;
-    const glm::vec3& position = worker.getBuildingCommands().front().position;
+    eEntityType entityType = worker.get_scheduled_buildings().front().entityType;
+    const glm::vec3& position = worker.get_scheduled_buildings().front().position;
     if (isAffordable(entityType) && !map.isPositionOccupied(position))
     {
         Entity* addedBuilding = nullptr;

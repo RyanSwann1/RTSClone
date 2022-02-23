@@ -321,7 +321,7 @@ void FactionAI::update(float deltaTime, const Map & map, FactionHandler& faction
 				{
 					m_occupiedBases.removeWorker(*availableWorker);
 
-					for (const auto& building : availableWorker->getBuildingCommands())
+					for (const auto& building : availableWorker->get_scheduled_buildings())
 					{
 						currentBase->actionQueue.emplace_back(convertEntityToActionType(building.entityType));
 					}
@@ -492,7 +492,7 @@ bool FactionAI::isWithinRangeOfBuildings(const glm::vec3& position, float distan
 		case eEntityType::Unit:
 			break;
 		case eEntityType::Worker:
-			for (const auto& buildingCommand : static_cast<Worker&>(*entity).getBuildingCommands())
+			for (const auto& buildingCommand : static_cast<Worker&>(*entity).get_scheduled_buildings())
 			{
 				if (Globals::getSqrDistance(buildingCommand.position, position) <= distance * distance)
 				{
@@ -559,7 +559,7 @@ Entity* FactionAI::createBuilding(const Map& map, const Worker& worker)
 		if (occupiedBase)
 		{
 			const glm::vec3& basePosition = occupiedBase->base.get().getCenteredPosition();
-			switch (worker.getBuildingCommands().front().entityType)
+			switch (worker.get_scheduled_buildings().front().entityType)
 			{
 			case eEntityType::SupplyDepot:
 				occupiedBase->actionQueue.emplace_back(eAIActionType::BuildSupplyDepot);
