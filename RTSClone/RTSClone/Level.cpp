@@ -347,29 +347,51 @@ void Level::renderPathing(ShaderHandler& shaderHandler)
 
 void Level::handleEvent(const GameEvent& gameEvent, const Map& map)
 {
+	Faction* faction = { nullptr };
 	switch (gameEvent.type)
 	{
 	case eGameEventType::IncreaseFactionShield:
-		if (Faction* faction = m_factionHandler.getFaction(gameEvent.data.increaseFactionShield.factionController))
-		{
-			faction->handleEvent(gameEvent, map, m_factionHandler);
-		}
+		faction = m_factionHandler.getFaction(gameEvent.data.increaseFactionShield.factionController);
 		break;
 	case eGameEventType::TakeDamage:
-		if (Faction* faction = m_factionHandler.getFaction(gameEvent.data.takeDamage.targetFaction))
-		{
-			faction->handleEvent(gameEvent, map, m_factionHandler);
-		}
+		faction = m_factionHandler.getFaction(gameEvent.data.takeDamage.targetFaction);
 		break;
 	case eGameEventType::RepairEntity:
-		if (Faction* faction = m_factionHandler.getFaction(gameEvent.data.repairEntity.factionController))
+		faction = m_factionHandler.getFaction(gameEvent.data.repairEntity.factionController);
+		break;
+	case eGameEventType::PlayerActivatePlannedBuilding:
+	case eGameEventType::PlayerSpawnEntity:
+		if (FactionPlayer* factionPlayer = m_factionHandler.getFactionPlayer())
 		{
-			faction->handleEvent(gameEvent, map, m_factionHandler);
+			factionPlayer->handleEvent(gameEvent, map, m_factionHandler);
 		}
 		break;
-	case eGameEventType::SpawnProjectile:
-		m_projectileHandler.addProjectile(gameEvent);
+	case eGameEventType::AttachFactionToBase:
+		faction = m_factionHandler.getFaction(gameEvent.data.attachFactionToBase.factionController);
+		m_baseHandler.handleEvent(gameEvent);
 		break;
+	case eGameEventType::DetachFactionFromBase:
+		faction = m_factionHandler.getFaction(gameEvent.data.detachFactionFromBase.factionController);
+		m_baseHandler.handleEvent(gameEvent);
+		break;
+	case eGameEventType::ForceSelfDestructEntity:
+		faction = m_factionHandler.getFaction(gameEvent.data.forceSelfDestructEntity.factionController);
+		break;
+	case eGameEventType::EntityIdle:
+		faction = m_factionHandler.getFaction(gameEvent.data.entityIdle.faction);
+		break;
+	case eGameEventType::AddFactionResources:
+		faction = m_factionHandler.getFaction(gameEvent.data.addFactionResources.faction);
+		break;
+	}
+
+	if (faction) 
+	{
+		faction->handleEvent(gameEvent, map, m_factionHandler);
+	}
+
+	switch (gameEvent.type)
+	{
 	case eGameEventType::RevalidateMovementPaths:
 		std::for_each(m_factionHandler.getFactions().begin(), m_factionHandler.getFactions().end(), [&gameEvent, &map, this](auto& faction)
 		{
@@ -392,38 +414,8 @@ void Level::handleEvent(const GameEvent& gameEvent, const Map& map)
 			});
 		}
 		break;
-	case eGameEventType::PlayerActivatePlannedBuilding:
-	case eGameEventType::PlayerSpawnEntity:
-		if (FactionPlayer* factionPlayer = m_factionHandler.getFactionPlayer())
-		{
-			factionPlayer->handleEvent(gameEvent, map, m_factionHandler);
-		}
-		break;
-	case eGameEventType::AttachFactionToBase:
-		m_baseHandler.handleEvent(gameEvent);
-		if (Faction* faction = m_factionHandler.getFaction(gameEvent.data.attachFactionToBase.factionController))
-		{
-			faction->handleEvent(gameEvent, map, m_factionHandler);
-		}
-		break;
-	case eGameEventType::DetachFactionFromBase:
-		if (Faction* faction = m_factionHandler.getFaction(gameEvent.data.detachFactionFromBase.factionController))
-		{
-			faction->handleEvent(gameEvent, map, m_factionHandler);
-		}
-		m_baseHandler.handleEvent(gameEvent);
-		break;
-	case eGameEventType::ForceSelfDestructEntity:
-		if (Faction* faction = m_factionHandler.getFaction(gameEvent.data.forceSelfDestructEntity.factionController))
-		{
-			faction->handleEvent(gameEvent, map, m_factionHandler);
-		}
-		break;
-	case eGameEventType::EntityIdle:
-		if (Faction* faction = m_factionHandler.getFaction(gameEvent.data.entityIdle.faction))
-		{
-			faction->handleEvent(gameEvent, map, m_factionHandler);
-		}
+	case eGameEventType::SpawnProjectile:
+		m_projectileHandler.addProjectile(gameEvent);
 		break;
 	}
 }
