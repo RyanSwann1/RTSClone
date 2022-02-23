@@ -46,7 +46,6 @@ Worker::Worker(Faction& owningFaction, const Map& map, const glm::vec3& starting
 	m_owningFaction(owningFaction),
 	m_currentState(eWorkerState::Idle),
 	m_buildQueue(),
-	m_baseToExpandTo(nullptr),
 	m_repairTargetEntity(),
 	m_currentResourceAmount(0),
 	m_taskTimer(0.0f, false),
@@ -62,7 +61,6 @@ Worker::Worker(Faction& owningFaction, const glm::vec3 & startingPosition, const
 	m_owningFaction(owningFaction),
 	m_currentState(eWorkerState::Idle),
 	m_buildQueue(),
-	m_baseToExpandTo(nullptr),
 	m_repairTargetEntity(),
 	m_currentResourceAmount(0),
 	m_taskTimer(0.0f, false),
@@ -141,12 +139,8 @@ void Worker::repairEntity(const Entity& entity, const Map& map)
 	m_repairTargetEntity.set(entity.getEntityType(), entity.getID());
 }
 
-bool Worker::build(const glm::vec3& buildPosition, const Map& map, eEntityType entityType, const Base* baseToExpandTo,
-	bool clearBuildQueue)
-{
-	assert((baseToExpandTo && entityType == eEntityType::Headquarters) || (!baseToExpandTo && entityType != eEntityType::Headquarters));
-	assert((baseToExpandTo && baseToExpandTo->owningFactionController == eFactionController::None) || !baseToExpandTo);
-	
+bool Worker::build(const glm::vec3& buildPosition, const Map& map, eEntityType entityType, bool clearBuildQueue)
+{	
 	if (entityType == eEntityType::Laboratory && 
 		(m_owningFaction.get().getLaboratoryCount() == Globals::MAX_LABORATORIES || m_owningFaction.get().isBuildingInAllWorkersQueue(entityType)))
 	{
@@ -162,7 +156,6 @@ bool Worker::build(const glm::vec3& buildPosition, const Map& map, eEntityType e
 		{
 			m_buildQueue.clear();
 		}
-		m_baseToExpandTo = baseToExpandTo;
 		if (m_buildQueue.empty())
 		{
 			moveTo(buildPosition, map, eWorkerState::MovingToBuildingPosition);
@@ -266,11 +259,7 @@ void Worker::update(float deltaTime, const Map& map, FactionHandler& factionHand
 		break;
 	case eWorkerState::MovingToBuildingPosition:
 		assert(!m_buildQueue.empty());
-		if (m_baseToExpandTo && m_baseToExpandTo->owningFactionController != eFactionController::None)
-		{
-			switchTo(eWorkerState::Idle, map);
-		}
-		else if (m_movement.path.empty())
+		if (m_movement.path.empty())
 		{
 			switchTo(eWorkerState::Building, map);
 		}
@@ -443,33 +432,6 @@ void Worker::moveTo(const glm::vec3& destination, const Map& map, eWorkerState s
 	}
 }
 
-void Worker::moveTo(const Base& base, const Map& map)
-{
-	assert(base.owningFactionController == eFactionController::None);
-
-	glm::vec3 previousDestination = Globals::getNextPathDestination(m_movement.path, m_position);
-
-	m_baseToExpandTo = &base;
-	PathFinding::getInstance().getPathToPosition(*this, m_baseToExpandTo->getCenteredPosition(), m_movement.path, 
-		map, createAdjacentPositions(map));
-	if (!m_movement.path.empty())
-	{
-		switchTo(eWorkerState::MovingToBuildingPosition, map);
-	}
-	else
-	{
-		if (previousDestination != m_position)
-		{
-			m_movement.path.push_back(previousDestination);
-			switchTo(eWorkerState::Moving, map);
-		}
-		else
-		{
-			switchTo(eWorkerState::Idle, map);
-		}
-	}
-}
-
 void Worker::render(ShaderHandler& shaderHandler, eFactionController owningFactionController) const
 {
 	if (m_currentResourceAmount > 0 && m_currentState != eWorkerState::Harvesting)
@@ -546,7 +508,6 @@ void Worker::switchTo(eWorkerState newState, const Map& map, const Mineral* mine
 			newState != eWorkerState::Building)
 		{
 			m_buildQueue.clear();
-			m_baseToExpandTo = nullptr;
 		}
 		break;
 	case eWorkerState::MovingToRepairPosition:

@@ -327,7 +327,7 @@ void FactionAI::update(float deltaTime, const Map & map, FactionHandler& faction
 					}
 				}	
 
-				availableWorker->build(availableBase->getCenteredPosition(), map, eEntityType::Headquarters, availableBase, true);
+				availableWorker->build(availableBase->getCenteredPosition(), map, eEntityType::Headquarters, true);
 				m_unattachedToBaseWorkers.addWorker(*availableWorker);
 			}
 		}

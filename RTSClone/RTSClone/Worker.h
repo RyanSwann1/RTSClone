@@ -58,10 +58,9 @@ public:
 	void add_destination(const glm::vec3& position, const Map& map);
 	void clear_destinations();
 	void repairEntity(const Entity& entity, const Map& map);
-	bool build(const glm::vec3& buildPosition, const Map& map, eEntityType entityType, const Base* baseToExpandTo = nullptr,
+	bool build(const glm::vec3& buildPosition, const Map& map, eEntityType entityType,
 		bool clearBuildQueue = false);
 	void update(float deltaTime, const Map& map, FactionHandler& factionHandler, const Timer& unitStateHandlerTimer);
-	void moveTo(const Base& base, const Map& map);
 	void moveTo(const Mineral& mineral, const Map& map);
 	void moveTo(const Entity& target, const Map& map, eWorkerState state);
 	void moveTo(const glm::vec3& destination, const Map& map, eWorkerState state = eWorkerState::Moving);
@@ -78,7 +77,6 @@ private:
 	Movement m_movement = {};
 	eWorkerState m_currentState;
 	std::deque<BuildingInWorkerQueue> m_buildQueue;
-	const Base* m_baseToExpandTo;
 	RepairTargetEntity m_repairTargetEntity;
 	int m_currentResourceAmount;
 	Timer m_taskTimer;
