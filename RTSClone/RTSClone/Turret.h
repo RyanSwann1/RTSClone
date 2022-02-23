@@ -3,12 +3,7 @@
 #include "Entity.h"
 #include "TargetEntity.h"
 #include "Timer.h"
-
-enum class eTurretState
-{
-	Idle,
-	Attacking
-};	
+#include <optional>
 
 class Faction;
 class Map;
@@ -25,10 +20,7 @@ public:
 
 private:
 	std::reference_wrapper<const Faction> m_owningFaction;
-	TargetEntity m_targetEntity;
-	eTurretState m_currentState;
-	Timer m_stateHandlerTimer;
-	Timer m_attackTimer;
-
-	void switchToState(eTurretState newState);
+	std::optional<TargetEntity> m_target	= {};
+	Timer m_stateHandlerTimer				= {};
+	Timer m_attackTimer						= {};
 };

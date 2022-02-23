@@ -11,21 +11,11 @@ struct RepairTargetEntity
 	const int ID;
 };
 
-class TargetEntity
+struct TargetEntity
 {
-public:
-	TargetEntity();
-	TargetEntity(eFactionController targetFactionController, int targetID, eEntityType targetType);
+	TargetEntity(eFactionController controller, int ID, eEntityType type);
 
-	eEntityType getType() const;
-	eFactionController getFactionController() const;
-	int getID() const;
-
-	void set(eFactionController targetFactionController, int ID, eEntityType type);
-	void reset();
-
-private:
-	eFactionController m_targetFactionController;
-	int m_targetID;
-	eEntityType m_targetType;
+	const eFactionController controller;
+	const int ID;
+	const eEntityType type;
 };

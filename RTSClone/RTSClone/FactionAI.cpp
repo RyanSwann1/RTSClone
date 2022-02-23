@@ -753,11 +753,11 @@ void FactionAI::on_unit_taken_damage(const TakeDamageEvent& gameEvent, Unit& uni
 	}
 
 	bool changeTargetEntity = false;
-	if (unit.getTargetEntity().getID() != Globals::INVALID_ENTITY_ID)
+	if (std::optional<TargetEntity> target = unit.getTargetEntity())
 	{
-		if (const Faction* opposingFaction = factionHandler.getFaction(unit.getTargetEntity().getFactionController()))
+		if (const Faction* opposingFaction = factionHandler.getFaction(target->controller))
 		{
-			const Entity* targetEntity = opposingFaction->getEntity(unit.getTargetEntity().getID(), unit.getTargetEntity().getType());
+			const Entity* targetEntity = opposingFaction->getEntity(target->ID, target->type);
 			if (!targetEntity)
 			{
 				changeTargetEntity = true;

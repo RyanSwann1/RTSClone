@@ -55,9 +55,9 @@ Unit::~Unit()
 	}
 }
 
-TargetEntity Unit::getTargetEntity() const
+std::optional<TargetEntity> Unit::getTargetEntity() const
 {
-	return m_targetEntity;
+	return m_target;
 }
 
 const std::vector<glm::vec3>& Unit::getMovementPath() const
@@ -184,7 +184,7 @@ void Unit::update(float deltaTime, FactionHandler& factionHandler, const Map& ma
 	switch (m_currentState)
 	{
 	case eUnitState::Idle:
-		assert(m_movement.path.empty() && m_targetEntity.getID() == Globals::INVALID_ENTITY_ID);
+		assert(m_movement.path.empty() && !m_target);
 		if (unitStateHandlerTimer.isExpired())
 		{
 			for (const auto& opposingFaction : factionHandler.getOpposingFactions(m_owningFaction))
@@ -199,15 +199,15 @@ void Unit::update(float deltaTime, FactionHandler& factionHandler, const Map& ma
 		}
 		break;
 	case eUnitState::Moving:
-		if (m_targetEntity.getID() != Globals::INVALID_ENTITY_ID)
+		if (m_target)
 		{
 			if (unitStateHandlerTimer.isExpired())
 			{
 				const Faction* targetFaction = nullptr;
 				const Entity* targetEntity = nullptr;
-				if (targetFaction = factionHandler.getFaction(m_targetEntity.getFactionController()))
+				if (targetFaction = factionHandler.getFaction(m_target->controller))
 				{
-					targetEntity = targetFaction->getEntity(m_targetEntity.getID(), m_targetEntity.getType());
+					targetEntity = targetFaction->getEntity(m_target->ID, m_target->type);
 				}
 
 				if (targetEntity)
@@ -247,7 +247,7 @@ void Unit::update(float deltaTime, FactionHandler& factionHandler, const Map& ma
 		}
 		break;
 	case eUnitState::AttackMoving:
-		assert(m_targetEntity.getID() == Globals::INVALID_ENTITY_ID);
+		assert(!m_target);
 		if (unitStateHandlerTimer.isExpired())
 		{
 			for (const auto& opposingFaction : factionHandler.getOpposingFactions(m_owningFaction))
@@ -267,15 +267,15 @@ void Unit::update(float deltaTime, FactionHandler& factionHandler, const Map& ma
 	case eUnitState::AttackingTarget:
 		assert(Globals::isOnMiddlePosition(m_position) && 
 			m_movement.path.empty() && 
-			m_targetEntity.getID() != Globals::INVALID_ENTITY_ID);
+			m_target);
 		
 		if (unitStateHandlerTimer.isExpired())
 		{
-			if (factionHandler.isFactionActive(m_targetEntity.getFactionController()))
+			if (factionHandler.isFactionActive(m_target->controller))
 			{
-				if (const Faction* targetFaction = factionHandler.getFaction(m_targetEntity.getFactionController()))
+				if (const Faction* targetFaction = factionHandler.getFaction(m_target->controller))
 				{
-					const Entity* targetEntity = targetFaction->getEntity(m_targetEntity.getID(), m_targetEntity.getType());
+					const Entity* targetEntity = targetFaction->getEntity(m_target->ID, m_target->type);
 					if (!targetEntity)
 					{
 						targetEntity = targetFaction->getEntity(m_position, Globals::UNIT_ATTACK_RANGE);
@@ -286,7 +286,7 @@ void Unit::update(float deltaTime, FactionHandler& factionHandler, const Map& ma
 						}
 						else
 						{
-							m_targetEntity.set(targetFaction->getController(), targetEntity->getID(), targetEntity->getEntityType());
+							m_target.emplace(targetFaction->getController(), targetEntity->getID(), targetEntity->getEntityType());
 						}
 					}
 					else
@@ -310,11 +310,11 @@ void Unit::update(float deltaTime, FactionHandler& factionHandler, const Map& ma
 			}
 		}
 
-		if (m_attackTimer.isExpired() && factionHandler.isFactionActive(m_targetEntity.getFactionController()))
+		if (m_attackTimer.isExpired() && factionHandler.isFactionActive(m_target->controller))
 		{
-			if (const Faction* targetFaction = factionHandler.getFaction(m_targetEntity.getFactionController()))
+			if (const Faction* targetFaction = factionHandler.getFaction(m_target->controller))
 			{
-				const Entity* targetEntity = targetFaction->getEntity(m_targetEntity.getID(), m_targetEntity.getType());
+				const Entity* targetEntity = targetFaction->getEntity(m_target->ID, m_target->type);
 				if (targetEntity && Globals::getSqrDistance(targetEntity->getPosition(), m_position) <= Globals::UNIT_ATTACK_RANGE * Globals::UNIT_ATTACK_RANGE)
 				{
 					GameEventHandler::getInstance().gameEvents.push(GameEvent::createSpawnProjectile(m_owningFaction, getID(),
@@ -325,7 +325,7 @@ void Unit::update(float deltaTime, FactionHandler& factionHandler, const Map& ma
 				}
 			}
 		}
-		else if (!factionHandler.isFactionActive(m_targetEntity.getFactionController()))
+		else if (!factionHandler.isFactionActive(m_target->controller))
 		{
 			switchToState(eUnitState::Idle, map, factionHandler);
 			break;
@@ -378,14 +378,14 @@ void Unit::switchToState(eUnitState newState, const Map& map, FactionHandler& fa
 	switch (newState)
 	{
 	case eUnitState::Idle:
-		m_targetEntity.reset();
+		m_target.reset();
 		m_movement.path.clear();
 		GameEventHandler::getInstance().gameEvents.push(GameEvent::create_entity_idle(getID(), m_owningFaction));
 		break;
 	case eUnitState::AttackMoving:
 		assert(!m_movement.path.empty());
 		broadcastToMessenger<GameMessages::AddUnitPositionToMap>({ m_movement.path.front(), getID()  });
-		m_targetEntity.reset();
+		m_target.reset();
 		break;
 	case eUnitState::AttackingTarget:
 		assert(m_movement.path.empty());
@@ -394,17 +394,17 @@ void Unit::switchToState(eUnitState newState, const Map& map, FactionHandler& fa
 			m_attackTimer.resetElaspedTime();
 		}
 		assert(targetEntity && targetFaction);
-		m_targetEntity.set(targetFaction->getController(), targetEntity->getID(), targetEntity->getEntityType());
+		m_target.emplace(targetFaction->getController(), targetEntity->getID(), targetEntity->getEntityType());
 		break;
 	case eUnitState::Moving:
 		assert(!m_movement.path.empty());
 		if (targetEntity && targetFaction)
 		{
-			m_targetEntity.set(targetFaction->getController(), targetEntity->getID(), targetEntity->getEntityType());
+			m_target.emplace(targetFaction->getController(), targetEntity->getID(), targetEntity->getEntityType());
 		}
 		else
 		{
-			m_targetEntity.reset();
+			m_target.reset();
 		}
 		broadcastToMessenger<GameMessages::AddUnitPositionToMap>({ m_movement.path.front(), getID() });
 		break;

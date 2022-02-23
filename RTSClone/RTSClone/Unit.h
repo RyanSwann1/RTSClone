@@ -11,6 +11,7 @@
 #include <functional>
 #include <vector>
 #include <queue>
+#include <optional>
 
 enum class eUnitState
 {
@@ -34,7 +35,7 @@ public:
 		const glm::vec3& destination, FactionHandler& factionHandler, const Map& map);
 	~Unit();
 
-	TargetEntity getTargetEntity() const;
+	std::optional<TargetEntity> getTargetEntity() const;
 	const std::vector<glm::vec3>& getMovementPath() const;
 	float getAttackRange() const;
 	eUnitState getCurrentState() const;
@@ -52,11 +53,11 @@ public:
 #endif // RENDER_PATHING
 
 private:
-	Movement m_movement = {};
-	eFactionController m_owningFaction;
-	eUnitState m_currentState = eUnitState::Idle;
-	Timer m_attackTimer;
-	TargetEntity m_targetEntity = {};
+	Movement m_movement							= {};
+	eFactionController m_owningFaction			= eFactionController::None;
+	eUnitState m_currentState					= eUnitState::Idle;
+	Timer m_attackTimer							= {};
+	std::optional<TargetEntity> m_target	= {};
 
 	void switchToState(eUnitState newState, const Map& map, FactionHandler& factionHandler,
 		const Entity* targetEntity = nullptr, const Faction* targetFaction = nullptr);
