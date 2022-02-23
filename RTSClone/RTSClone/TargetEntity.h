@@ -3,21 +3,12 @@
 #include "FactionController.h"
 #include "EntityType.h"
 
-class RepairTargetEntity
+struct RepairTargetEntity
 {
-public:
-	RepairTargetEntity();
-	RepairTargetEntity(eEntityType entityType, int targetID);
+	RepairTargetEntity(eEntityType type, int ID);
 
-	eEntityType getType() const;
-	int getID() const;
-
-	void set(eEntityType type, int ID);
-	void reset();
-
-private:
-	eEntityType m_type;
-	int m_ID;
+	const eEntityType type;
+	const int ID;
 };
 
 class TargetEntity

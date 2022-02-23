@@ -9,6 +9,7 @@
 #include <vector>
 #include <deque>
 #include <functional>
+#include <optional>
 
 //https://stackoverflow.com/questions/50182913/what-are-the-principles-involved-for-an-hierarchical-state-machine-and-how-to-i - HSM
 //https://gameprogrammingpatterns.com/state.html
@@ -73,14 +74,14 @@ public:
 #endif // RENDER_PATHING
 
 private:
-	std::reference_wrapper<Faction> m_owningFaction;
+	Faction* m_owningFaction = nullptr;
 	Movement m_movement = {};
-	eWorkerState m_currentState;
-	std::deque<BuildingInWorkerQueue> m_buildQueue;
-	RepairTargetEntity m_repairTargetEntity;
-	int m_currentResourceAmount;
+	eWorkerState m_currentState = eWorkerState::Idle;
+	std::deque<BuildingInWorkerQueue> m_buildQueue = {};
+	std::optional<RepairTargetEntity> m_repairTargetEntity = {};
+	int m_currentResourceAmount = { 0 };
 	Timer m_taskTimer = {};
-	const Mineral* m_mineralToHarvest;
+	const Mineral* m_mineralToHarvest = nullptr;
 
 	void switchTo(eWorkerState newState, const Map& map, const Mineral* mineralToHarvest = nullptr);
 	void moveTo(const glm::vec3& destination, const Map& map, const AABB& ignoreAABB, eWorkerState state = eWorkerState::Moving);
