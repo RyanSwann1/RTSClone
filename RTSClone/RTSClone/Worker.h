@@ -79,7 +79,7 @@ private:
 	std::deque<BuildingInWorkerQueue> m_buildQueue;
 	RepairTargetEntity m_repairTargetEntity;
 	int m_currentResourceAmount;
-	Timer m_taskTimer;
+	Timer m_taskTimer = {};
 	const Mineral* m_mineralToHarvest;
 
 	void switchTo(eWorkerState newState, const Map& map, const Mineral* mineralToHarvest = nullptr);

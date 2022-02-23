@@ -48,7 +48,6 @@ Worker::Worker(Faction& owningFaction, const Map& map, const glm::vec3& starting
 	m_buildQueue(),
 	m_repairTargetEntity(),
 	m_currentResourceAmount(0),
-	m_taskTimer(0.0f, false),
 	m_mineralToHarvest(nullptr)
 {
 	switchTo(eWorkerState::Idle, map);

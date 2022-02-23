@@ -3,6 +3,7 @@
 class Timer
 {
 public:
+	Timer() = default;
 	Timer(float expirationTime, bool active);
 
 	float getExpiredTime() const;
@@ -17,7 +18,7 @@ public:
 	void resetExpirationTime(float newExpirationTime);
 
 private:
-	float m_expirationTime;
-	float m_elaspedTime;
-	bool m_active;
+	float m_expirationTime	= 0.f;
+	float m_elaspedTime		= 0.f;
+	bool m_active			= false;
 };
