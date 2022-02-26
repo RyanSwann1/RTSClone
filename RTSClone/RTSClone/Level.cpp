@@ -1,6 +1,5 @@
 #include "Level.h"
 #include "LevelFileHandler.h"
-#include "GameEventHandler.h"
 #include "GameMessenger.h"
 #include "GameMessages.h"
 #include "ModelManager.h"
@@ -13,6 +12,7 @@ namespace
 {
 	constexpr float TIME_BETWEEN_UNIT_STATE = 0.05f;
 	constexpr glm::vec3 TERRAIN_COLOR = { 0.9098039f, 0.5176471f, 0.3882353f };
+	std::queue<GameEvent> gameEvents = {};
 }
 
 //Level
@@ -82,6 +82,11 @@ std::unique_ptr<Level> Level::load(std::string_view levelName, glm::ivec2 window
 	}
 
 	return std::make_unique<Level>(std::move(*levelDetails), windowSize);
+}
+
+void Level::add_event(const GameEvent& gameEvent)
+{
+	gameEvents.push(gameEvent);
 }
 
 const std::vector<SceneryGameObject>& Level::getSceneryGameObjects() const
@@ -229,13 +234,11 @@ void Level::update(float deltaTime, const Map& map, UIManager& uiManager, glm::u
 
 	m_projectileHandler.update(deltaTime, m_factionHandler);
 
-	std::queue<GameEvent>& gameEvents = GameEventHandler::getInstance().gameEvents;
-	int gameEventsSize = static_cast<int>(gameEvents.size());
-	for (int i = 0; i < gameEventsSize; ++i)
+	const size_t gameEventsSize = gameEvents.size();
+	for (size_t i = 0; i < gameEventsSize; ++i)
 	{
-		const GameEvent& gameEvent = gameEvents.front();
-		handleEvent(gameEvent, map);
-		uiManager.handleEvent(gameEvent);
+		handleEvent(gameEvents.front(), map);
+		uiManager.handleEvent(gameEvents.front());
 
 		gameEvents.pop();
 	}

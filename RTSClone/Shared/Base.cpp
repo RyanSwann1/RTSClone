@@ -1,8 +1,8 @@
 #include "Base.h"
 #include "Globals.h"
+#include "GameEvents.h"
 #ifdef GAME
 #include "Faction.h"
-#include "GameEventHandler.h"
 #include <limits>
 #endif // GAME
 

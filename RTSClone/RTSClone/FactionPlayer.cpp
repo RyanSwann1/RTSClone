@@ -9,7 +9,6 @@
 #include "GameMessenger.h"
 #include "GameMessages.h"
 #include "GameEvents.h"
-#include "GameEventHandler.h"
 #include "FactionHandler.h"
 #include "Level.h"
 #include <assert.h>
@@ -281,12 +280,12 @@ void FactionPlayer::update(float deltaTime, const Map& map, FactionHandler& fact
 
         if (m_selectedEntities.size() == 1)
         {
-            GameEventHandler::getInstance().gameEvents.push(
+            Level::add_event(
                 GameEvent::createSetTargetEntityGUI(getController(), m_selectedEntities.back()->getID(), m_selectedEntities.back()->getEntityType()));
         }
         else if (!m_selectedEntities.empty())
         {
-            GameEventHandler::getInstance().gameEvents.push(GameEvent::createResetTargetEntityGUI());
+            Level::add_event(GameEvent::createResetTargetEntityGUI());
         }
     }
 

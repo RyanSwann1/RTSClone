@@ -3,10 +3,10 @@
 #include "FactionHandler.h"
 #include "Globals.h"
 #include "PathFinding.h"
-#include "GameEventHandler.h"
 #include "GameEvents.h"
 #include "GameMessages.h"
 #include "GameMessenger.h"
+#include "Level.h"
 
 namespace
 {
@@ -70,7 +70,7 @@ void Turret::update(float deltaTime, FactionHandler& factionHandler, const Map& 
 				PathFinding::getInstance().isTargetInLineOfSight(m_position, *targetEntity, map, m_AABB))
 			{
 				m_rotation.y = Globals::getAngle(targetEntity->getPosition(), m_position, 270.0f);
-				GameEventHandler::getInstance().gameEvents.push(GameEvent::createSpawnProjectile(m_owningFaction.get().getController(), getID(),
+				Level::add_event(GameEvent::createSpawnProjectile(m_owningFaction.get().getController(), getID(),
 					getEntityType(), opposingFaction->getController(), targetEntity->getID(), targetEntity->getEntityType(),
 					TURRET_DAMAGE, m_position, targetEntity->getPosition()));
 

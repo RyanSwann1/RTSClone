@@ -4,13 +4,13 @@
 #include "PathFinding.h"
 #include "ModelManager.h"
 #include "Faction.h"
-#include "GameEventHandler.h"
 #include "GameEvents.h"
 #include "FactionHandler.h"
 #include "PathFinding.h"
 #include "glm/gtx/vector_angle.hpp"
 #include "GameMessages.h"
 #include "GameMessenger.h"
+#include "Level.h"
 #ifdef RENDER_PATHING
 #include "RenderPrimitiveMesh.h"
 #endif // RENDER_PATHING
@@ -317,7 +317,7 @@ void Unit::update(float deltaTime, FactionHandler& factionHandler, const Map& ma
 				const Entity* targetEntity = targetFaction->getEntity(m_target->ID, m_target->type);
 				if (targetEntity && Globals::getSqrDistance(targetEntity->getPosition(), m_position) <= Globals::UNIT_ATTACK_RANGE * Globals::UNIT_ATTACK_RANGE)
 				{
-					GameEventHandler::getInstance().gameEvents.push(GameEvent::createSpawnProjectile(m_owningFaction, getID(),
+					Level::add_event(GameEvent::createSpawnProjectile(m_owningFaction, getID(),
 						getEntityType(), targetFaction->getController(), targetEntity->getID(), targetEntity->getEntityType(),
 						DAMAGE, m_position, targetEntity->getPosition()));
 
@@ -380,7 +380,7 @@ void Unit::switchToState(eUnitState newState, const Map& map, FactionHandler& fa
 	case eUnitState::Idle:
 		m_target.reset();
 		m_movement.path.clear();
-		GameEventHandler::getInstance().gameEvents.push(GameEvent::create_entity_idle(getID(), m_owningFaction));
+		Level::add_event(GameEvent::create_entity_idle({ getID(), m_owningFaction }));
 		break;
 	case eUnitState::AttackMoving:
 		assert(!m_movement.path.empty());

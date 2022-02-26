@@ -35,6 +35,7 @@ public:
 	~Level();
 
 	static std::unique_ptr<Level> load(std::string_view levelName, glm::ivec2 windowSize);
+	static void add_event(const GameEvent& gameEvent);
 
 	const std::vector<SceneryGameObject>& getSceneryGameObjects() const;
 	const BaseHandler& getBaseHandler() const;

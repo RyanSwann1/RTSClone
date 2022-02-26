@@ -75,10 +75,10 @@ GameEvent GameEvent::createDetachFactionFromBase(eFactionController factionContr
 	return { eGameEventType::DetachFactionFromBase, AttachFactionToBaseEvent{factionController, position} };
 }
 
-GameEvent GameEvent::create_entity_idle(int entityID, eFactionController faction)
+GameEvent GameEvent::create_entity_idle(EntityIdleEvent event)
 {
-	return { eGameEventType::EntityIdle, EntityIdleEvent{entityID, faction} };
-}
+	return { eGameEventType::EntityIdle, event }; 
+};
 
 GameEvent GameEvent::create_add_faction_resources(int quantity, eFactionController faction)
 {

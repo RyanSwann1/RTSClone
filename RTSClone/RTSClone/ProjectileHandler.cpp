@@ -1,7 +1,7 @@
 #include "ProjectileHandler.h"
 #include "Faction.h"
-#include "GameEventHandler.h"
 #include "FactionHandler.h"
+#include "Level.h"
 
 namespace
 {
@@ -39,7 +39,7 @@ void ProjectileHandler::update(float deltaTime, const FactionHandler& factionHan
 		bool hitEntity = isHitEntity(projectile, factionHandler);
 		if (hitEntity)
 		{
-			GameEventHandler::getInstance().gameEvents.push(GameEvent::createTakeDamage(projectile.getSenderEvent().senderFaction,
+			Level::add_event(GameEvent::createTakeDamage(projectile.getSenderEvent().senderFaction,
 				projectile.getSenderEvent().senderID, projectile.getSenderEvent().senderEntityType, projectile.getSenderEvent().targetFaction,
 				projectile.getSenderEvent().targetID, projectile.getSenderEvent().damage));
 		}

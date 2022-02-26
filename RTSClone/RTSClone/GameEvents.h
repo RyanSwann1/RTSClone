@@ -142,14 +142,14 @@ struct DetachFactionFromBaseEvent : public GameEvent_7
 
 struct EntityIdleEvent
 {
-	int entityID;
-	eFactionController faction;
+	int entityID = { 0 };
+	eFactionController faction = eFactionController::None;
 };
 
 struct AddFactionResourcesEvent
 {
 	int quantity = { 0 };
-	eFactionController faction;
+	eFactionController faction = eFactionController::None;
 };
 
 union GameEvents
@@ -221,7 +221,7 @@ struct GameEvent
 	static GameEvent createAttachFactionToBase(eFactionController factionController, const glm::vec3& position);
 	static GameEvent createDetachFactionFromBase(eFactionController factionController, const glm::vec3& position);
 
-	static GameEvent create_entity_idle(int entityID, eFactionController faction);
+	static GameEvent create_entity_idle(EntityIdleEvent event);
 	static GameEvent create_add_faction_resources(int quantity, eFactionController faction);
 
 	eGameEventType type;

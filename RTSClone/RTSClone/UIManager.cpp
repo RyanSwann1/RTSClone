@@ -2,12 +2,12 @@
 #include "GameMessages.h"
 #include "GameMessenger.h"
 #include "GameEvents.h"
-#include "GameEventHandler.h"
 #include "FactionHandler.h"
 #include "Globals.h"
 #include "Camera.h"
 #include "FactionPlayer.h"
 #include "Mineral.h"
+#include "Level.h"
 #include <imgui/imgui.h>
 #include <string>
 #include <sstream>
@@ -127,7 +127,7 @@ void SelectedEntityWidget::render(const sf::Window& window)
 
 				if (ImGui::Button("Spawn Worker"))
 				{
-					GameEventHandler::getInstance().gameEvents.push(GameEvent::createPlayerSpawnUnit(
+					Level::add_event(GameEvent::createPlayerSpawnUnit(
 						eEntityType::Worker, m_receivedMessage.entityID));
 				}
 			}
@@ -139,8 +139,7 @@ void SelectedEntityWidget::render(const sf::Window& window)
 
 				if (ImGui::Button("Spawn Unit"))
 				{
-					GameEventHandler::getInstance().gameEvents.push(GameEvent::createPlayerSpawnUnit(
-						eEntityType::Unit, m_receivedMessage.entityID));
+					Level::add_event(GameEvent::createPlayerSpawnUnit(eEntityType::Unit, m_receivedMessage.entityID));
 				}
 			}
 			break;
@@ -149,27 +148,27 @@ void SelectedEntityWidget::render(const sf::Window& window)
 			{
 				if (ImGui::Button(ENTITY_NAME_CONVERSIONS[static_cast<int>(eEntityType::Headquarters)].c_str()))
 				{
-					GameEventHandler::getInstance().gameEvents.push(GameEvent::createPlayerActivatePlannedBuilding(
+					Level::add_event(GameEvent::createPlayerActivatePlannedBuilding(
 						eEntityType::Headquarters, m_receivedMessage.entityID));
 				}
 				if (ImGui::Button(ENTITY_NAME_CONVERSIONS[static_cast<int>(eEntityType::Barracks)].c_str()))
 				{
-					GameEventHandler::getInstance().gameEvents.push(GameEvent::createPlayerActivatePlannedBuilding(
+					Level::add_event(GameEvent::createPlayerActivatePlannedBuilding(
 						eEntityType::Barracks, m_receivedMessage.entityID));
 				}
 				if (ImGui::Button(ENTITY_NAME_CONVERSIONS[static_cast<int>(eEntityType::SupplyDepot)].c_str()))
 				{
-					GameEventHandler::getInstance().gameEvents.push(GameEvent::createPlayerActivatePlannedBuilding(
+					Level::add_event(GameEvent::createPlayerActivatePlannedBuilding(
 						eEntityType::SupplyDepot, m_receivedMessage.entityID));
 				}
 				if (ImGui::Button(ENTITY_NAME_CONVERSIONS[static_cast<int>(eEntityType::Turret)].c_str()))
 				{
-					GameEventHandler::getInstance().gameEvents.push(GameEvent::createPlayerActivatePlannedBuilding(
+					Level::add_event(GameEvent::createPlayerActivatePlannedBuilding(
 						eEntityType::Turret, m_receivedMessage.entityID));
 				}
 				if (ImGui::Button(ENTITY_NAME_CONVERSIONS[static_cast<int>(eEntityType::Laboratory)].c_str()))
 				{
-					GameEventHandler::getInstance().gameEvents.push(GameEvent::createPlayerActivatePlannedBuilding(
+					Level::add_event(GameEvent::createPlayerActivatePlannedBuilding(
 						eEntityType::Laboratory, m_receivedMessage.entityID));
 				}
 			}
@@ -179,8 +178,7 @@ void SelectedEntityWidget::render(const sf::Window& window)
 			{
 				if (ImGui::Button("Upgrade Shield"))
 				{
-					GameEventHandler::getInstance().gameEvents.push(GameEvent::createIncreaseFactionShield(
-						m_receivedMessage.owningFaction));
+					Level::add_event(GameEvent::createIncreaseFactionShield(m_receivedMessage.owningFaction));
 				}
 			}
 			break;

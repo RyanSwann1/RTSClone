@@ -4,7 +4,6 @@
 #include "Headquarters.h"
 #include "Globals.h"
 #include "Turret.h"
-#include "GameEventHandler.h"
 #include "GameEvents.h"
 #include "FactionAI.h"
 #include <assert.h>

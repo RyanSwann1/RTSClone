@@ -5,7 +5,6 @@
 #include "PathFinding.h"
 #include "Faction.h"
 #include "SupplyDepot.h"
-#include "GameEventHandler.h"
 #include "GameEvents.h"
 #include "FactionHandler.h"
 #include "ShaderHandler.h"
@@ -13,6 +12,7 @@
 #include "GameMessenger.h"
 #include "GameMessages.h"
 #include "Base.h"
+#include "Level.h"
 #ifdef RENDER_PATHING
 #include "RenderPrimitiveMesh.h"
 #endif // RENDER_PATHING
@@ -209,8 +209,7 @@ void Worker::update(float deltaTime, const Map& map, FactionHandler& factionHand
 		assert(isHoldingResources());
 		if (m_movement.path.empty())
 		{
-			GameEventHandler::getInstance().gameEvents.emplace(
-				GameEvent::create_add_faction_resources(m_currentResourceAmount, m_owningFaction->getController()));
+			Level::add_event(GameEvent::create_add_faction_resources(m_currentResourceAmount, m_owningFaction->getController()));
 			m_currentResourceAmount = 0;
 			if (m_mineralToHarvest)
 			{
@@ -280,8 +279,7 @@ void Worker::update(float deltaTime, const Map& map, FactionHandler& factionHand
 					}
 					else
 					{
-						GameEventHandler::getInstance().gameEvents.emplace(
-							GameEvent::createForceSelfDestructEntity(m_owningFaction->getController(), getID(), getEntityType()));
+						Level::add_event(GameEvent::createForceSelfDestructEntity(m_owningFaction->getController(), getID(), getEntityType()));
 					}
 				}
 			}
@@ -317,7 +315,7 @@ void Worker::update(float deltaTime, const Map& map, FactionHandler& factionHand
 				{
 					m_rotation.y = Globals::getAngle(targetEntity->getPosition(), m_position);
 
-					GameEventHandler::getInstance().gameEvents.push(GameEvent::createRepairEntity(
+					Level::add_event(GameEvent::createRepairEntity(
 						m_owningFaction->getController(), m_repairTargetEntity->ID, m_repairTargetEntity->type));
 				}
 			}
@@ -533,7 +531,7 @@ void Worker::switchTo(eWorkerState newState, const Map& map, const Mineral* mine
 		m_movement.path.clear();
 		if (oldState != eWorkerState::Idle)
 		{
-			GameEventHandler::getInstance().gameEvents.push(GameEvent::create_entity_idle(getID(), m_owningFaction->getController()));
+			Level::add_event(GameEvent::create_entity_idle({ getID(), m_owningFaction->getController() }));
 		}
 		break;
 	case eWorkerState::Moving:

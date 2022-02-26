@@ -341,9 +341,6 @@
     <ClInclude Include="GameMessages.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="GameEventHandler.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Projectile.h">
       <Filter>Header Files</Filter>
     </ClInclude>

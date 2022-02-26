@@ -11,7 +11,6 @@
 #include "FactionAI.h"
 #include "ModelManager.h"
 #include "Mineral.h"
-#include "GameEventHandler.h"
 #include <imgui/imgui.h>
 #include <imgui_impl/imgui_wrapper.h>
 #include "ProjectileHandler.h"

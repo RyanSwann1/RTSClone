@@ -1,9 +1,9 @@
 #include "Faction.h"
-#include "GameEventHandler.h"
 #include "ModelManager.h"
 #include "GameEvents.h"
 #include "TypeComparison.h"
 #include "FactionHandler.h"
+#include "Level.h"
 
 namespace
 {
@@ -261,7 +261,7 @@ void Faction::handleEvent(const GameEvent& gameEvent, const Map& map, FactionHan
                 removeEntity<Headquarters*>(m_headquarters, targetID, entity);
                 if (m_headquarters.empty())
                 {
-                    GameEventHandler::getInstance().gameEvents.push(GameEvent::createEliminateFaction(m_controller));
+                    Level::add_event(GameEvent::createEliminateFaction(m_controller));
                 }
                 break;
             case eEntityType::Turret:
@@ -319,7 +319,7 @@ void Faction::handleEvent(const GameEvent& gameEvent, const Map& map, FactionHan
             removeEntity<Headquarters*>(m_headquarters, gameEvent.data.forceSelfDestructEntity.entityID);
 			if (m_headquarters.empty())
 			{
-				GameEventHandler::getInstance().gameEvents.push(GameEvent::createEliminateFaction(m_controller));
+                Level::add_event(GameEvent::createEliminateFaction(m_controller));
 			}
 			break;
 		case eEntityType::Turret:
@@ -659,7 +659,7 @@ Entity* Faction::createBuilding(const Map& map, const Worker& worker)
         if (addedBuilding)
         {
             reduceResources(entityType);
-            GameEventHandler::getInstance().gameEvents.push(GameEvent::createRevalidateMovementPaths());
+            Level::add_event(GameEvent::createRevalidateMovementPaths());
 
             return addedBuilding;
         }

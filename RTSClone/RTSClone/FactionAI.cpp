@@ -6,7 +6,6 @@
 #include "Level.h"
 #include "GameMessages.h"
 #include "GameMessenger.h"
-#include "GameEventHandler.h"
 #include <limits>
 #include <algorithm>
 
@@ -723,9 +722,8 @@ bool FactionAI::handleAction(const AIAction& action, const Map& map, AIOccupiedB
 
 		break;
 	case eAIActionType::IncreaseShield:
-		GameEventHandler::getInstance().gameEvents.push(GameEvent::createIncreaseFactionShield(getController()));
+		Level::add_event(GameEvent::createIncreaseFactionShield(getController()));
 		return true;
-		break;
 	case eAIActionType::SpawnUnit:
 	case eAIActionType::SpawnWorker:
 	{
