@@ -1,6 +1,6 @@
 #pragma once
 
-#include "ProjectileHandler.h"
+#include "Projectile.h"
 #include "FactionPlayer.h"
 #include "FactionAI.h"
 #include "SceneryGameObject.h"
@@ -66,6 +66,7 @@ public:
 #endif // RENDER_PATHING
 
 private:
+	std::vector<Projectile> m_projectiles;
 	Quad m_playableArea;
 	BaseHandler m_baseHandler;
 	std::vector<SceneryGameObject> m_scenery;
@@ -73,7 +74,6 @@ private:
 	MiniMap m_minimap;
 	Timer m_unitStateHandlerTimer;
 	FactionHandler m_factionHandler;
-	ProjectileHandler m_projectileHandler;
 
 	void handleEvent(const GameEvent& gameEvent, const Map& map);
 };	

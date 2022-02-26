@@ -185,7 +185,6 @@
     <ClCompile Include="MinHeap.cpp" />
     <ClCompile Include="MiniMap.cpp" />
     <ClCompile Include="Projectile.cpp" />
-    <ClCompile Include="ProjectileHandler.cpp" />
     <ClCompile Include="SceneryGameObject.cpp" />
     <ClCompile Include="EntitySelector.cpp" />
     <ClCompile Include="Sprite.cpp" />
@@ -299,7 +298,6 @@
     <ClInclude Include="GameMessages.h" />
     <ClInclude Include="Graph.h" />
     <ClInclude Include="Projectile.h" />
-    <ClInclude Include="ProjectileHandler.h" />
     <ClInclude Include="UniqueIDGenerator.h" />
     <ClInclude Include="Worker.h" />
     <ClInclude Include="EntitySpawnerBuilding.h" />

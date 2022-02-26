@@ -13,6 +13,18 @@ namespace
 	constexpr float TIME_BETWEEN_UNIT_STATE = 0.05f;
 	constexpr glm::vec3 TERRAIN_COLOR = { 0.9098039f, 0.5176471f, 0.3882353f };
 	std::queue<GameEvent> gameEvents = {};
+
+	bool is_hit_entity(const Projectile& projectile, const FactionHandler& factionHandler)
+	{
+		const Entity* entity = nullptr;
+		if (const Faction* targetFaction = factionHandler.getFaction(projectile.getSenderEvent().targetFaction))
+		{
+			entity =
+				targetFaction->getEntity(projectile.getAABB(), projectile.getSenderEvent().targetID, projectile.getSenderEvent().targetEntityType);
+		}
+
+		return entity;
+	}
 }
 
 //Level
@@ -23,8 +35,7 @@ Level::Level(LevelDetailsFromFile&& levelDetails, glm::ivec2 windowSize)
 	m_camera(),
 	m_minimap(),
 	m_unitStateHandlerTimer(TIME_BETWEEN_UNIT_STATE, true),
-	m_factionHandler(m_baseHandler, levelDetails),
-	m_projectileHandler()
+	m_factionHandler(m_baseHandler, levelDetails)
 {
 	for (auto& faction : m_factionHandler.getFactions())
 	{
@@ -232,7 +243,22 @@ void Level::update(float deltaTime, const Map& map, UIManager& uiManager, glm::u
 		m_unitStateHandlerTimer.resetElaspedTime();
 	}
 
-	m_projectileHandler.update(deltaTime, m_factionHandler);
+	for (auto& projectile : m_projectiles)
+	{
+		projectile.update(deltaTime);
+	}
+
+	m_projectiles.erase(std::remove_if(m_projectiles.begin(), m_projectiles.end(), [this](auto& projectile)
+	{
+		bool hitEntity = is_hit_entity(projectile, this->m_factionHandler);
+		if (hitEntity)
+		{
+			Level::add_event(GameEvent::create<TakeDamageEvent>({ projectile.getSenderEvent().senderFaction,
+				projectile.getSenderEvent().senderID, projectile.getSenderEvent().senderEntityType, projectile.getSenderEvent().targetFaction,
+				projectile.getSenderEvent().targetID, projectile.getSenderEvent().damage }));
+		}
+		return hitEntity || projectile.isReachedDestination();
+	}), m_projectiles.end());
 
 	const size_t gameEventsSize = gameEvents.size();
 	for (size_t i = 0; i < gameEventsSize; ++i)
@@ -312,7 +338,10 @@ void Level::render(ShaderHandler& shaderHandler) const
 	});
 
 	m_baseHandler.renderMinerals(shaderHandler);
-	m_projectileHandler.render(shaderHandler);
+	for (const auto& projectile : m_projectiles)
+	{
+		projectile.render(shaderHandler);
+	}
 }
 
 #ifdef RENDER_AABB
@@ -418,7 +447,7 @@ void Level::handleEvent(const GameEvent& gameEvent, const Map& map)
 		}
 		break;
 	case eGameEventType::SpawnProjectile:
-		m_projectileHandler.addProjectile(gameEvent);
+		m_projectiles.emplace_back(gameEvent.data.spawnProjectile);
 		break;
 	}
 }

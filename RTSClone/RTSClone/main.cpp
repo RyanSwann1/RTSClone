@@ -13,7 +13,6 @@
 #include "Mineral.h"
 #include <imgui/imgui.h>
 #include <imgui_impl/imgui_wrapper.h>
-#include "ProjectileHandler.h"
 #include "Level.h"
 #include "UIManager.h"
 #include "GameMessenger.h"
