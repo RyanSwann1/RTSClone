@@ -209,7 +209,7 @@ void Worker::update(float deltaTime, const Map& map, FactionHandler& factionHand
 		assert(isHoldingResources());
 		if (m_movement.path.empty())
 		{
-			Level::add_event(GameEvent::create_add_faction_resources(m_currentResourceAmount, m_owningFaction->getController()));
+			Level::add_event(GameEvent::create<AddFactionResourcesEvent>({ m_currentResourceAmount, m_owningFaction->getController() }));
 			m_currentResourceAmount = 0;
 			if (m_mineralToHarvest)
 			{
@@ -279,7 +279,7 @@ void Worker::update(float deltaTime, const Map& map, FactionHandler& factionHand
 					}
 					else
 					{
-						Level::add_event(GameEvent::createForceSelfDestructEntity(m_owningFaction->getController(), getID(), getEntityType()));
+						Level::add_event(GameEvent::create<SelfDestructEntityEvent>({m_owningFaction->getController(), getID(), getEntityType()}));
 					}
 				}
 			}
@@ -315,8 +315,8 @@ void Worker::update(float deltaTime, const Map& map, FactionHandler& factionHand
 				{
 					m_rotation.y = Globals::getAngle(targetEntity->getPosition(), m_position);
 
-					Level::add_event(GameEvent::createRepairEntity(
-						m_owningFaction->getController(), m_repairTargetEntity->ID, m_repairTargetEntity->type));
+					Level::add_event(GameEvent::create<RepairEntityEvent>({
+						m_owningFaction->getController(), m_repairTargetEntity->ID, m_repairTargetEntity->type }));
 				}
 			}
 			else
@@ -531,7 +531,7 @@ void Worker::switchTo(eWorkerState newState, const Map& map, const Mineral* mine
 		m_movement.path.clear();
 		if (oldState != eWorkerState::Idle)
 		{
-			Level::add_event(GameEvent::create_entity_idle({ getID(), m_owningFaction->getController() }));
+			Level::add_event(GameEvent::create<EntityIdleEvent>({ getID(), m_owningFaction->getController() }));
 		}
 		break;
 	case eWorkerState::Moving:

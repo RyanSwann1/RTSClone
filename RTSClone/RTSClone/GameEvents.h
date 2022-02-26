@@ -23,71 +23,69 @@ enum class eGameEventType
 	AddFactionResources
 };
 
-struct GameEvent_0
+struct RevalidateMovementPathsEvent
 {
-	GameEvent_0() {}
+	static const eGameEventType type = { eGameEventType::RevalidateMovementPaths };
 };
-struct RevalidateMovementPathsEvent : public GameEvent_0 {};
-struct ResetTargetEntityGUIEvent : public GameEvent_0 {};
 
-struct GameEvent_1
+struct ResetTargetEntityGUIEvent
 {
-	GameEvent_1(eEntityType entityType, int targetID);
+	static const eGameEventType type = { eGameEventType::ResetTargetEntityGUI };
+};
 
+struct PlayerSpawnEntity
+{
+	static const eGameEventType type = { eGameEventType::PlayerSpawnEntity };
 	eEntityType entityType;
 	int targetID;
 };
-struct PlayerSpawnEntity : public GameEvent_1 {
-	PlayerSpawnEntity(eEntityType entityType, int targetID) :
-		GameEvent_1(entityType, targetID) {}
-};
-struct PlayerActivatePlannedBuildingEvent : public GameEvent_1 {
-	PlayerActivatePlannedBuildingEvent(eEntityType entityType, int targetID) :
-		GameEvent_1(entityType, targetID) {}
-};
 
-struct GameEvent_2
+struct PlayerActivatePlannedBuildingEvent
 {
-	GameEvent_2(eFactionController senderFaction);
+	static const eGameEventType type = { eGameEventType::PlayerActivatePlannedBuilding };
+	eEntityType entityType;
+	int targetID;
+};
 
+struct EliminateFactionEvent 
+{
+	static const eGameEventType type = { eGameEventType::EliminateFaction };
 	eFactionController factionController;
 };
-struct EliminateFactionEvent : public GameEvent_2 {
-	EliminateFactionEvent(eFactionController factionController) :
-		GameEvent_2(factionController) {}
-};
-struct IncreaseFactionShieldEvent : public GameEvent_2
+
+struct IncreaseFactionShieldEvent 
 {
-	IncreaseFactionShieldEvent(eFactionController factionController) :
-		GameEvent_2(factionController) {}
+	static const eGameEventType type = { eGameEventType::IncreaseFactionShield };
+	eFactionController factionController;
 };
 
-struct GameEvent_3
+struct SelfDestructEntityEvent
 {
-	GameEvent_3(eFactionController senderFaction, int senderID, eEntityType entityType);
-
+	static const eGameEventType type = { eGameEventType::ForceSelfDestructEntity };
 	eFactionController factionController;
 	int entityID;
 	eEntityType entityType;
 };
-struct RepairEntityEvent : public GameEvent_3 {
-	RepairEntityEvent(eFactionController factionController, int senderID, eEntityType entityType) :
-		GameEvent_3(factionController, senderID, entityType) {}
-};
-struct SetTargetEntityGUIEvent : public GameEvent_3 {
-	SetTargetEntityGUIEvent(eFactionController factionController, int senderID, eEntityType entityType) :
-		GameEvent_3(factionController, senderID, entityType) {}
-};
-struct ForceSelfDestructEntityEvent : public GameEvent_3 {
-	ForceSelfDestructEntityEvent(eFactionController factionController, int senderID, eEntityType entityType) :
-		GameEvent_3(factionController, senderID, entityType) {}
-};
 
-struct GameEvent_4
+struct SetTargetEntityGUIEvent
 {
-	GameEvent_4(eFactionController senderFaction, int senderID, eEntityType senderEntityType,
-		eFactionController targetFaction, int targetID, int damage);
+	static const eGameEventType type = { eGameEventType::SetTargetEntityGUI };
+	eFactionController factionController;
+	int entityID;
+	eEntityType entityType;
+};
 
+struct RepairEntityEvent
+{
+	static const eGameEventType type = { eGameEventType::RepairEntity };
+	eFactionController factionController;
+	int entityID;
+	eEntityType entityType;
+};
+
+struct TakeDamageEvent
+{
+	static const eGameEventType type = { eGameEventType::TakeDamage };
 	eFactionController senderFaction;
 	int senderID;
 	eEntityType senderEntityType;
@@ -95,17 +93,10 @@ struct GameEvent_4
 	int targetID;
 	int damage;
 };
-struct TakeDamageEvent : public GameEvent_4 {
-	TakeDamageEvent(eFactionController senderFaction, int senderID, eEntityType senderEntityType, eFactionController targetFaction,
-		int targetID, int damage) : GameEvent_4(senderFaction, senderID, senderEntityType, targetFaction, targetID, damage) {}
-}; 
 
-struct GameEvent_5
+struct SpawnProjectileEvent
 {
-	GameEvent_5(eFactionController senderFaction, int senderID, eEntityType senderEntityType, 
-		eFactionController targetFaction, int targetID, eEntityType targetEntityType,
-		int damage, const glm::vec3& startingPosition, const glm::vec3& endingPosition);
-
+	static const eGameEventType type = { eGameEventType::SpawnProjectile };
 	eFactionController senderFaction;
 	int senderID;
 	eEntityType senderEntityType;
@@ -116,38 +107,31 @@ struct GameEvent_5
 	glm::vec3 spawnPosition;
 	glm::vec3 destination;
 };
-struct SpawnProjectileEvent : public GameEvent_5 {
-	SpawnProjectileEvent(eFactionController senderFaction, int senderID, eEntityType senderEntityType, eFactionController targetFaction,
-		int targetID, eEntityType targetEntityType, int damage, const glm::vec3& startingPosition, const glm::vec3& endingPosition)
-		: GameEvent_5(senderFaction, senderID, senderEntityType, targetFaction, targetID, targetEntityType, damage, startingPosition, endingPosition) {}
-};
 
-struct GameEvent_7
+struct AttachFactionToBaseEvent
 {
-	GameEvent_7(eFactionController factionController, const glm::vec3& position);
-
+	static const eGameEventType type = { eGameEventType::AttachFactionToBase };
 	eFactionController factionController;
 	glm::vec3 position;
 };
-struct AttachFactionToBaseEvent : public GameEvent_7
+
+struct DetachFactionFromBaseEvent
 {
-	AttachFactionToBaseEvent(eFactionController factionController, const glm::vec3& position)
-		: GameEvent_7(factionController, position) {}
-};
-struct DetachFactionFromBaseEvent : public GameEvent_7
-{
-	DetachFactionFromBaseEvent(eFactionController factionController, const glm::vec3& position)
-		: GameEvent_7(factionController, position) {}
+	static const eGameEventType type = { eGameEventType::DetachFactionFromBase };
+	eFactionController factionController;
+	glm::vec3 position;
 };
 
 struct EntityIdleEvent
 {
+	static const eGameEventType type = { eGameEventType::EntityIdle };
 	int entityID = { 0 };
 	eFactionController faction = eFactionController::None;
 };
 
 struct AddFactionResourcesEvent
 {
+	static const eGameEventType type = { eGameEventType::AddFactionResources };
 	int quantity = { 0 };
 	eFactionController faction = eFactionController::None;
 };
@@ -162,7 +146,7 @@ union GameEvents
 	IncreaseFactionShieldEvent				increaseFactionShield;
 	RepairEntityEvent						repairEntity;
 	SetTargetEntityGUIEvent					setTargetEntityGUI;
-	ForceSelfDestructEntityEvent			forceSelfDestructEntity;
+	SelfDestructEntityEvent					forceSelfDestructEntity;
 	TakeDamageEvent							takeDamage;
 	SpawnProjectileEvent					spawnProjectile;
 	AttachFactionToBaseEvent				attachFactionToBase;
@@ -178,7 +162,7 @@ union GameEvents
 	GameEvents(EliminateFactionEvent gameEvent)					:	eliminateFaction(gameEvent) {}
 	GameEvents(const RepairEntityEvent& gameEvent)				:	repairEntity(gameEvent) {}
 	GameEvents(const SetTargetEntityGUIEvent& gameEvent)		:	setTargetEntityGUI(gameEvent) {}
-	GameEvents(const ForceSelfDestructEntityEvent& gameEvent)	:	forceSelfDestructEntity(gameEvent) {}
+	GameEvents(const SelfDestructEntityEvent& gameEvent)		:	forceSelfDestructEntity(gameEvent) {}
 	GameEvents(const TakeDamageEvent& gameEvent)				:   takeDamage(gameEvent) {}
 	GameEvents(const SpawnProjectileEvent& gameEvent)			:	spawnProjectile(gameEvent) {}
 	GameEvents(const AttachFactionToBaseEvent& gameEvent)		:   attachFactionToBase(gameEvent) {}
@@ -191,38 +175,11 @@ struct GameEvent
 {
 	GameEvent() = delete;
 	
-	//GameEvent_0
-	static GameEvent createRevalidateMovementPaths();
-	static GameEvent createResetTargetEntityGUI();
-
-	//GameEvent_1
-	static GameEvent createPlayerSpawnUnit(eEntityType entityType, int targetID);
-	static GameEvent createPlayerActivatePlannedBuilding(eEntityType, int targetID);
-
-	//GameEvent_2
-	static GameEvent createEliminateFaction(eFactionController factionController);
-	static GameEvent createIncreaseFactionShield(eFactionController factionController);
-	
-	//GameEvent_3
-	static GameEvent createRepairEntity(eFactionController senderFaction, int senderID, eEntityType entityType);
-	static GameEvent createSetTargetEntityGUI(eFactionController senderFaction, int senderID, eEntityType entityType);
-	static GameEvent createForceSelfDestructEntity(eFactionController senderFaction, int senderID, eEntityType entityType);
-
-	//GameEvent_4
-	static GameEvent createTakeDamage(eFactionController senderFaction, int senderID, eEntityType senderEntityType, 
-		eFactionController targetFaction, int targetID, int damage);
-
-	//GameEvent_5
-	static GameEvent createSpawnProjectile(eFactionController senderFaction, int senderID, eEntityType senderEntityType,
-		eFactionController targetFaction, int targetID, eEntityType targetEntityType, int damage, const glm::vec3& startingPosition, 
-		const glm::vec3& endingPosition);
-
-	//GameEvent_7
-	static GameEvent createAttachFactionToBase(eFactionController factionController, const glm::vec3& position);
-	static GameEvent createDetachFactionFromBase(eFactionController factionController, const glm::vec3& position);
-
-	static GameEvent create_entity_idle(EntityIdleEvent event);
-	static GameEvent create_add_faction_resources(int quantity, eFactionController faction);
+	template <typename T>
+	static GameEvent create(const T& gameEvent)
+	{
+		return { gameEvent.type, gameEvent };
+	}
 
 	eGameEventType type;
 	GameEvents data;

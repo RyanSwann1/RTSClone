@@ -177,7 +177,6 @@
     <ClCompile Include="FactionAI.cpp" />
     <ClCompile Include="FactionHandler.cpp" />
     <ClCompile Include="FactionPlayer.cpp" />
-    <ClCompile Include="GameEvents.cpp" />
     <ClCompile Include="GameMessages.cpp" />
     <ClCompile Include="Graph.cpp" />
     <ClCompile Include="Headquarters.cpp" />

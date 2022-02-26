@@ -17,12 +17,12 @@ Headquarters::Headquarters(const glm::vec3& startingPosition, Faction& owningFac
 		Globals::HQ_STARTING_HEALTH, owningFaction, ModelManager::getInstance().getModel(HQ_MODEL_NAME),
 		MAX_WORKERS_IN_SPAWN_QUEUE)
 {
-	Level::add_event(GameEvent::createAttachFactionToBase(owningFaction.getController(), m_position));
+	Level::add_event(GameEvent::create<AttachFactionToBaseEvent>({ owningFaction.getController(), m_position }));
 }
 
 Headquarters::~Headquarters()
 {
-	Level::add_event(GameEvent::createDetachFactionFromBase(m_owningFaction.get().getController(), m_position));
+	Level::add_event(GameEvent::create<DetachFactionFromBaseEvent>({ m_owningFaction.get().getController(), m_position }));
 }
 
 void Headquarters::update(float deltaTime, const Map& map, FactionHandler& factionHandler)

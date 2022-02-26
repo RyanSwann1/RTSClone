@@ -281,11 +281,11 @@ void FactionPlayer::update(float deltaTime, const Map& map, FactionHandler& fact
         if (m_selectedEntities.size() == 1)
         {
             Level::add_event(
-                GameEvent::createSetTargetEntityGUI(getController(), m_selectedEntities.back()->getID(), m_selectedEntities.back()->getEntityType()));
+                GameEvent::create<SetTargetEntityGUIEvent>({ getController(), m_selectedEntities.back()->getID(), m_selectedEntities.back()->getEntityType() }));
         }
         else if (!m_selectedEntities.empty())
         {
-            Level::add_event(GameEvent::createResetTargetEntityGUI());
+            Level::add_event(GameEvent::create<ResetTargetEntityGUIEvent>({}));
         }
     }
 

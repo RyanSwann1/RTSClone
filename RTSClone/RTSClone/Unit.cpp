@@ -317,9 +317,9 @@ void Unit::update(float deltaTime, FactionHandler& factionHandler, const Map& ma
 				const Entity* targetEntity = targetFaction->getEntity(m_target->ID, m_target->type);
 				if (targetEntity && Globals::getSqrDistance(targetEntity->getPosition(), m_position) <= Globals::UNIT_ATTACK_RANGE * Globals::UNIT_ATTACK_RANGE)
 				{
-					Level::add_event(GameEvent::createSpawnProjectile(m_owningFaction, getID(),
+					Level::add_event(GameEvent::create<SpawnProjectileEvent>({ m_owningFaction, getID(),
 						getEntityType(), targetFaction->getController(), targetEntity->getID(), targetEntity->getEntityType(),
-						DAMAGE, m_position, targetEntity->getPosition()));
+						DAMAGE, m_position, targetEntity->getPosition() }));
 
 					m_attackTimer.resetElaspedTime();
 				}
@@ -380,7 +380,7 @@ void Unit::switchToState(eUnitState newState, const Map& map, FactionHandler& fa
 	case eUnitState::Idle:
 		m_target.reset();
 		m_movement.path.clear();
-		Level::add_event(GameEvent::create_entity_idle({ getID(), m_owningFaction }));
+		Level::add_event(GameEvent::create<EntityIdleEvent>({ getID(), m_owningFaction }));
 		break;
 	case eUnitState::AttackMoving:
 		assert(!m_movement.path.empty());

@@ -261,7 +261,7 @@ void Faction::handleEvent(const GameEvent& gameEvent, const Map& map, FactionHan
                 removeEntity<Headquarters*>(m_headquarters, targetID, entity);
                 if (m_headquarters.empty())
                 {
-                    Level::add_event(GameEvent::createEliminateFaction(m_controller));
+                    Level::add_event(GameEvent::create<EliminateFactionEvent>({}));
                 }
                 break;
             case eEntityType::Turret:
@@ -319,7 +319,7 @@ void Faction::handleEvent(const GameEvent& gameEvent, const Map& map, FactionHan
             removeEntity<Headquarters*>(m_headquarters, gameEvent.data.forceSelfDestructEntity.entityID);
 			if (m_headquarters.empty())
 			{
-                Level::add_event(GameEvent::createEliminateFaction(m_controller));
+                Level::add_event(GameEvent::create<EliminateFactionEvent>({}));
 			}
 			break;
 		case eEntityType::Turret:
@@ -659,7 +659,7 @@ Entity* Faction::createBuilding(const Map& map, const Worker& worker)
         if (addedBuilding)
         {
             reduceResources(entityType);
-            Level::add_event(GameEvent::createRevalidateMovementPaths());
+            Level::add_event(GameEvent::create<RevalidateMovementPathsEvent>({}));
 
             return addedBuilding;
         }

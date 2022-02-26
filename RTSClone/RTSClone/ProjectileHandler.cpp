@@ -39,9 +39,9 @@ void ProjectileHandler::update(float deltaTime, const FactionHandler& factionHan
 		bool hitEntity = isHitEntity(projectile, factionHandler);
 		if (hitEntity)
 		{
-			Level::add_event(GameEvent::createTakeDamage(projectile.getSenderEvent().senderFaction,
+			Level::add_event(GameEvent::create<TakeDamageEvent>({ projectile.getSenderEvent().senderFaction,
 				projectile.getSenderEvent().senderID, projectile.getSenderEvent().senderEntityType, projectile.getSenderEvent().targetFaction,
-				projectile.getSenderEvent().targetID, projectile.getSenderEvent().damage));
+				projectile.getSenderEvent().targetID, projectile.getSenderEvent().damage }));
 		}
 		return hitEntity || projectile.isReachedDestination();
 	});

@@ -722,7 +722,7 @@ bool FactionAI::handleAction(const AIAction& action, const Map& map, AIOccupiedB
 
 		break;
 	case eAIActionType::IncreaseShield:
-		Level::add_event(GameEvent::createIncreaseFactionShield(getController()));
+		Level::add_event(GameEvent::create<IncreaseFactionShieldEvent>({ getController() }));
 		return true;
 	case eAIActionType::SpawnUnit:
 	case eAIActionType::SpawnWorker:
