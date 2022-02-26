@@ -1,38 +1,40 @@
 #pragma once
 
 #include "GameMessenger.h"
-#include <functional>
 
-template <typename T>
+template <typename Message, typename ID = int, typename ReturnType = void>
 class GameMessengerSubscriber
 { 
 public:
-	explicit GameMessengerSubscriber(const std::function<void(const T&)>& callback)
-		: ID(subscribeToMessenger<T>(callback))
+	GameMessengerSubscriber(const std::function<ReturnType(const Message&)>& callback)
+		: id(subscribeToMessenger<Message, ID, ReturnType>(callback))
+	{}
+	GameMessengerSubscriber(const ID id, const std::function<ReturnType(const Message&)>& callback)
+		: id(subscribeToMessenger<Message, ID, ReturnType>(id, callback))
 	{}
 	GameMessengerSubscriber(const GameMessengerSubscriber&) = delete;
 	GameMessengerSubscriber& operator=(const GameMessengerSubscriber&) = delete;
 	GameMessengerSubscriber(GameMessengerSubscriber&& rhs)
-		: ID(rhs.ID)
+		: id(rhs.id)
 	{
-		rhs.ID = INVALID_ID;
+		rhs.active = false;
 	}
 	GameMessengerSubscriber& operator=(GameMessengerSubscriber&& rhs)
 	{
-		ID = rhs.ID;
-		rhs.ID = INVALID_ID;
+		id = rhs.id;
+		rhs.active = false;
 
 		return *this;
 	}
 	~GameMessengerSubscriber()
 	{
-		if (ID != INVALID_ID)
+		if (!active)
 		{
-			unsubscribeToMessenger<T>(ID);
+			unsubscribeToMessenger<Message, ID, ReturnType>(id);
 		}
 	}
 
 private:
-	int ID;
-	const int INVALID_ID = -1;
+	ID id;
+	bool active = true;
 };
