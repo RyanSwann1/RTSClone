@@ -9,7 +9,6 @@
 #include "FactionController.h"
 #include "Turret.h"
 #include "Laboratory.h"
-#include "GameMessengerSubscriber.h"
 #include "GameMessages.h"
 #include <vector>
 #include <functional>

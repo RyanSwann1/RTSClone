@@ -2,7 +2,7 @@
 
 #include "Globals.h"
 #include "glm/glm.hpp"
-#include "GameMessengerSubscriber.h"
+#include "GameMessenger.h"
 #include <array>
 #include <vector>
 #include <queue>

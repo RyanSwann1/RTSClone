@@ -97,25 +97,44 @@ private:
 };
 
 template <typename Message, typename ID = int, typename ReturnType = void>
-[[nodiscard]] ID subscribeToMessenger(const std::function<ReturnType(const Message&)>& callback)
-{
-	return GameMessenger<Message, ID, ReturnType>::getInstance().subscribe(callback);
-}
-
-template <typename Message, typename ID = int, typename ReturnType = void>
-[[nodiscard]] ID subscribeToMessenger(const ID id, const std::function<ReturnType(const Message&)>& callback)
-{
-	return GameMessenger<Message, ID, ReturnType>::getInstance().subscribe(id, callback);
-}
-
-template <typename Message, typename ID = int, typename ReturnType = void>
-void unsubscribeToMessenger(ID id)
-{
-	GameMessenger<Message, ID, ReturnType>::getInstance().unsubscribe(id);
-}
-
-template <typename Message, typename ID = int, typename ReturnType = void>
 void broadcastToMessenger(const Message& message)
 {
 	GameMessenger<Message, ID, ReturnType>::getInstance().broadcast(message);
 }
+
+template <typename Message, typename ID = int, typename ReturnType = void>
+class GameMessengerSubscriber
+{
+public:
+	GameMessengerSubscriber(const std::function<ReturnType(const Message&)>& callback)
+		: id(GameMessenger<Message, ID, ReturnType>::getInstance().subscribe(callback))
+	{}
+	GameMessengerSubscriber(const ID id, const std::function<ReturnType(const Message&)>& callback)
+		: id(GameMessenger<Message, ID, ReturnType>::getInstance().subscribe(id, callback))
+	{}
+	GameMessengerSubscriber(const GameMessengerSubscriber&) = delete;
+	GameMessengerSubscriber& operator=(const GameMessengerSubscriber&) = delete;
+	GameMessengerSubscriber(GameMessengerSubscriber&& rhs)
+		: id(rhs.id)
+	{
+		rhs.active = false;
+	}
+	GameMessengerSubscriber& operator=(GameMessengerSubscriber&& rhs)
+	{
+		id = rhs.id;
+		rhs.active = false;
+
+		return *this;
+	}
+	~GameMessengerSubscriber()
+	{
+		if (!active)
+		{
+			GameMessenger<Message, ID, ReturnType>::getInstance().unsubscribe(id);
+		}
+	}
+
+private:
+	ID id;
+	bool active = true;
+};

@@ -4,7 +4,7 @@
 #include "FactionController.h"
 #include "GameMessages.h"
 #include "TargetEntity.h"
-#include "GameMessengerSubscriber.h"
+#include "GameMessenger.h"
 #include <SFML/Graphics.hpp>
 #include <memory>
 

@@ -205,7 +205,7 @@ void WinningFactionWidget::render(const sf::Window& window)
 
 //SelectedMineralWidget
 SelectedMineralWidget::SelectedMineralWidget(const Mineral& mineral)
-	: Widget(mineral, true),
+	: Widget({ mineral }, true),
 	mineral(mineral)
 {}
 

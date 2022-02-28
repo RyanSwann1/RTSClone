@@ -177,7 +177,6 @@
     <ClCompile Include="FactionAI.cpp" />
     <ClCompile Include="FactionHandler.cpp" />
     <ClCompile Include="FactionPlayer.cpp" />
-    <ClCompile Include="GameMessages.cpp" />
     <ClCompile Include="Graph.cpp" />
     <ClCompile Include="Headquarters.cpp" />
     <ClCompile Include="Laboratory.cpp" />
@@ -276,7 +275,6 @@
     <ClInclude Include="Entity.h" />
     <ClInclude Include="EntityType.h" />
     <ClInclude Include="FactionHandler.h" />
-    <ClInclude Include="GameMessengerSubscriber.h" />
     <ClInclude Include="Headquarters.h" />
     <ClInclude Include="Laboratory.h" />
     <ClInclude Include="MinHeap.h" />

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Globals.h"
-#include "GameMessengerSubscriber.h"
+#include "GameMessenger.h"
 
 namespace GameMessages
 {

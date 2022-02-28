@@ -6,7 +6,6 @@
 
 class Entity;
 class Mineral;
-class SceneryGameObject;
 class AABB;
 class Worker;
 class Map;
@@ -19,94 +18,61 @@ namespace GameMessages
 
 	struct AddAABBToMap
 	{
-		AddAABBToMap(const AABB & aabb)
-			: aabb(aabb) {}
 		const AABB& aabb;
 	};
 
 	struct RemoveAABBFromMap
 	{
-		RemoveAABBFromMap(const AABB& aabb)
-			: aabb(aabb) {}
 		const AABB& aabb;
 	};
 
 	struct AddUnitPositionToMap
 	{
-		AddUnitPositionToMap(const glm::vec3& position, int ID)
-			: position(position),
-			ID(ID)
-		{}
-
 		const glm::vec3& position;
-		int ID;
+		const int ID = Globals::INVALID_ENTITY_ID;
 	};
 
 	struct RemoveUnitPositionFromMap
 	{
-		RemoveUnitPositionFromMap(const glm::vec3& position, int ID)
-			: position(position),
-			ID(ID)
-		{}
-
 		const glm::vec3& position;
-		int ID;
+		const int ID = Globals::INVALID_ENTITY_ID;
 	};
 
 	struct NewMapSize 
 	{
-		NewMapSize(glm::ivec2 mapSize)
-			: mapSize(mapSize)
-		{}
-
 		const glm::ivec2 mapSize;
 	};
 
 	struct UIDisplayPlayerDetails 
 	{
-		UIDisplayPlayerDetails();
-		UIDisplayPlayerDetails(int resourceAmount, int currentPopulationAmount, int maximumPopulationAmount);
-
-		int resourceAmount;
-		int currentPopulationAmount;
-		int maximumPopulationAmount;
+		int resourceAmount = 0;
+		int currentPopulationAmount = 0;
+		int maximumPopulationAmount = 0;
 	};
 
 	struct UIDisplaySelectedEntity 
 	{
-		UIDisplaySelectedEntity();
-		UIDisplaySelectedEntity(eFactionController owningFaction, int entityID, eEntityType entityType, int health,
-			int shield);
-		UIDisplaySelectedEntity(eFactionController owningFaction, int entityID, eEntityType entityType, int health,
-			int shield, int queueSize);
-
-		eFactionController owningFaction;
-		int entityID;
+		eFactionController owningFaction = eFactionController::None;
+		int entityID = Globals::INVALID_ENTITY_ID;
 		eEntityType entityType;
-		int health;
-		int shield;
-		int queueSize;
+		int health = 0;
+		int shield = 0;
+		int queueSize = 0;
 	};
 
 	struct UIDisplayWinner
 	{
-		UIDisplayWinner();
-		UIDisplayWinner(eFactionController winningFaction);
-
-		eFactionController winningFaction;
+		eFactionController winningFaction = eFactionController::None;
 	};
 
 	struct UIDisplaySelectedMineral
 	{
-		UIDisplaySelectedMineral(const Mineral& mineral)
-			: mineral(mineral) {}
-
 		const Mineral& mineral;
 	};
 
 	struct GetEntity
 	{
-		const int entityID;
+		const int entityID = Globals::INVALID_ENTITY_ID;
 	};
 
 	struct GetClosestHeadquarters

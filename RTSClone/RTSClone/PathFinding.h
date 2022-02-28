@@ -7,7 +7,7 @@
 #include "Graph.h"
 #include "Worker.h"
 #include "MinHeap.h"
-#include "GameMessengerSubscriber.h"
+#include "GameMessenger.h"
 #include <vector>
 #include <queue>
 #include <array>
