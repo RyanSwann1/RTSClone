@@ -8,6 +8,8 @@ class Entity;
 class Mineral;
 class SceneryGameObject;
 class AABB;
+class Worker;
+class Map;
 //Caller is not meant to go out of scope. 
 namespace GameMessages
 {
@@ -100,5 +102,21 @@ namespace GameMessages
 			: mineral(mineral) {}
 
 		const Mineral& mineral;
+	};
+
+	struct GetEntity
+	{
+		const int entityID;
+	};
+
+	struct GetClosestHeadquarters
+	{
+		const glm::vec3 position;
+	};
+
+	struct CreateBuilding
+	{
+		const Worker& worker;
+		const Map& map;
 	};
 }

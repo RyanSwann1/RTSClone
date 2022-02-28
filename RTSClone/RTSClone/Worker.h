@@ -77,7 +77,7 @@ private:
 	Faction* m_owningFaction								= nullptr;
 	Movement m_movement										= {};
 	eWorkerState m_currentState								= eWorkerState::Idle;
-	std::deque<WorkerScheduledBuilding> m_buildQueue			= {};
+	std::deque<WorkerScheduledBuilding> m_buildQueue		= {};
 	std::optional<RepairTargetEntity> m_repairTargetEntity	= {};
 	int m_currentResourceAmount								= { 0 };
 	Timer m_taskTimer										= {};

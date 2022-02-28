@@ -4,34 +4,29 @@
 #include "TypeComparison.h"
 #include "FactionHandler.h"
 #include "Level.h"
+#include "GameMessages.h"
+#include "GameMessenger.h"
 
 namespace
 {
-    constexpr size_t MAX_ENTITIES = 
-        Globals::MAX_UNITS + 
+    constexpr size_t MAX_ENTITIES =
+        Globals::MAX_UNITS +
         Globals::MAX_WORKERS +
         Globals::MAX_HEADQUARTERS +
         Globals::MAX_SUPPLY_DEPOTS +
         Globals::MAX_BARRACKS +
         Globals::MAX_TURRETS +
         Globals::MAX_LABORATORIES;
-}
+};
 
-Faction::Faction(eFactionController factionController, const glm::vec3& hqStartingPosition, 
+Faction::Faction(eFactionController factionController, const glm::vec3& hqStartingPosition,
     int startingResources, int startingPopulationCap)
-    : m_entities(),
-    m_units(),
-    m_workers(),
-    m_supplyDepots(),
-    m_barracks(),
-    m_turrets(),
-    m_headquarters(),
-    m_laboratories(),
-    m_controller(factionController),
+    : m_controller(factionController),
     m_currentResourceAmount(startingResources),
-    m_currentPopulationAmount(0),
     m_currentPopulationLimit(startingPopulationCap),
-    m_currentShieldAmount(0)
+    m_getClosestHeadquatersSubscriber(getController(), [this](const GameMessages::GetClosestHeadquarters& message) { return get_closest_headquarters(message); }),
+    m_getEntitySubscriber(getController(), [this](const GameMessages::GetEntity& message) { return get_entity(message); }),
+    m_createBuildingSubscriber(getController(), [this](const GameMessages::CreateBuilding& message) { return create_building(message); })
 {
     m_entities.reserve(MAX_ENTITIES);
     m_units.reserve(Globals::MAX_UNITS);
@@ -402,6 +397,94 @@ void Faction::handleWorkerCollisions(const Map& map)
     handledWorkers.clear();
 }
 
+const Headquarters* Faction::get_closest_headquarters(const GameMessages::GetClosestHeadquarters& message) const
+{
+    const Headquarters* closestHeadquarters = nullptr;
+    float distance = std::numeric_limits<float>::max();
+    for (const auto& headquarters : m_headquarters)
+    {
+        const float result = Globals::getSqrDistance(headquarters->getPosition(), message.position);
+        if (result < distance)
+        {
+            distance = result;
+            closestHeadquarters = headquarters;
+        }
+    }
+
+    return closestHeadquarters;
+}
+
+const Entity* Faction::get_entity(const GameMessages::GetEntity& message) const
+{
+    auto entity = std::find_if(m_entities.cbegin(), m_entities.cend(), [message](const auto& entity)
+    {
+        return entity->getID() == message.entityID;
+    });
+    if (entity != m_entities.cend())
+    {
+        return &*(*entity);
+    }
+    return nullptr;
+}
+
+Entity* Faction::create_building(const GameMessages::CreateBuilding& message)
+{
+    assert(message.worker.getCurrentState() == eWorkerState::Building && !message.worker.get_scheduled_buildings().empty());
+
+    eEntityType entityType = message.worker.get_scheduled_buildings().front().entityType;
+    const glm::vec3& position = message.worker.get_scheduled_buildings().front().position;
+    if (isAffordable(entityType) && !message.map.isPositionOccupied(position))
+    {
+        Entity* addedBuilding = nullptr;
+        switch (entityType)
+        {
+        case eEntityType::SupplyDepot:
+            if (m_supplyDepots.size() < Globals::MAX_SUPPLY_DEPOTS)
+            {
+                addedBuilding = createEntity<SupplyDepot>(m_supplyDepots, position);
+                increasePopulationLimit();
+            }
+            break;
+        case eEntityType::Barracks:
+            if (m_barracks.size() < Globals::MAX_BARRACKS)
+            {
+                addedBuilding = createEntity<Barracks>(m_barracks, position);
+            }
+            break;
+        case eEntityType::Turret:
+            if (m_turrets.size() < Globals::MAX_TURRETS)
+            {
+                addedBuilding = createEntity<Turret>(m_turrets, position);
+            }
+            break;
+        case eEntityType::Headquarters:
+            if (m_headquarters.size() < Globals::MAX_HEADQUARTERS)
+            {
+                addedBuilding = createEntity<Headquarters>(m_headquarters, position);
+            }
+            break;
+        case eEntityType::Laboratory:
+            if (m_laboratories.size() < Globals::MAX_LABORATORIES)
+            {
+                addedBuilding = createEntity<Laboratory>(m_laboratories, position);
+            }
+            break;
+        default:
+            assert(false);
+        }
+
+        if (addedBuilding)
+        {
+            reduceResources(entityType);
+            Level::add_event(GameEvent::create<RevalidateMovementPathsEvent>({}));
+
+            return addedBuilding;
+        }
+    }
+
+    return nullptr;
+}
+
 void Faction::update(float deltaTime, const Map& map, FactionHandler& factionHandler, const Timer& unitStateHandlerTimer)
 {
     for (auto& unit : m_units)
@@ -608,64 +691,6 @@ bool Faction::isBuildingInAllWorkersQueue(eEntityType entityType) const
     {
         return worker->isInBuildQueue(entityType);
     }) != m_workers.cend();
-}
-
-Entity* Faction::createBuilding(const Map& map, const Worker& worker)
-{
-    assert(worker.getCurrentState() == eWorkerState::Building && !worker.get_scheduled_buildings().empty());
-
-    eEntityType entityType = worker.get_scheduled_buildings().front().entityType;
-    const glm::vec3& position = worker.get_scheduled_buildings().front().position;
-    if (isAffordable(entityType) && !map.isPositionOccupied(position))
-    {
-        Entity* addedBuilding = nullptr;
-        switch (entityType)
-        {
-        case eEntityType::SupplyDepot:
-			if (m_supplyDepots.size() < Globals::MAX_SUPPLY_DEPOTS)
-			{
-                addedBuilding = createEntity<SupplyDepot>(m_supplyDepots, position);
-				increasePopulationLimit();
-			}
-            break;
-        case eEntityType::Barracks:
-            if (m_barracks.size() < Globals::MAX_BARRACKS)
-            {
-                addedBuilding = createEntity<Barracks>(m_barracks, position);
-            }
-            break;
-        case eEntityType::Turret:
-            if (m_turrets.size() < Globals::MAX_TURRETS)
-            {
-                addedBuilding = createEntity<Turret>(m_turrets, position);
-            }
-            break;
-        case eEntityType::Headquarters:
-            if (m_headquarters.size() < Globals::MAX_HEADQUARTERS)
-            {
-                addedBuilding = createEntity<Headquarters>(m_headquarters, position);
-            }
-            break;
-        case eEntityType::Laboratory:
-            if (m_laboratories.size() < Globals::MAX_LABORATORIES)
-            {
-                addedBuilding = createEntity<Laboratory>(m_laboratories, position);
-            }
-            break;
-        default:
-            assert(false);
-        }
-
-        if (addedBuilding)
-        {
-            reduceResources(entityType);
-            Level::add_event(GameEvent::create<RevalidateMovementPathsEvent>({}));
-
-            return addedBuilding;
-        }
-    }
-
-    return nullptr;
 }
 
 bool Faction::increaseShield(const Laboratory& laboratory)

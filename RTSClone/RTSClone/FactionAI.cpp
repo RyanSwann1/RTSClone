@@ -374,6 +374,64 @@ void FactionAI::on_entity_idle(Entity& entity, const Map& map, FactionHandler& f
 	}
 }
 
+Entity* FactionAI::create_building(const GameMessages::CreateBuilding& message)
+{
+	Entity* spawnedBuilding = Faction::create_building(message);
+	if (spawnedBuilding)
+	{
+		switch (spawnedBuilding->getEntityType())
+		{
+		case eEntityType::SupplyDepot:
+		case eEntityType::Turret:
+		case eEntityType::Barracks:
+			m_occupiedBases.addBuilding(message.worker, *spawnedBuilding);
+			break;
+		case eEntityType::Laboratory:
+			m_occupiedBases.addBuilding(message.worker, *spawnedBuilding);
+			if (getCurrentShieldAmount() == 0)
+			{
+				AIOccupiedBase* occupiedBase = m_occupiedBases.getBase(*spawnedBuilding);
+				if (occupiedBase)
+				{
+					occupiedBase->actionQueue.emplace_back(eAIActionType::IncreaseShield);
+				}
+			}
+			break;
+		case eEntityType::Headquarters:
+			break;
+		default:
+			assert(false);
+		}
+	}
+	else
+	{
+		AIOccupiedBase* occupiedBase = m_occupiedBases.getBase(message.worker);
+		if (occupiedBase)
+		{
+			const glm::vec3& basePosition = occupiedBase->base.get().getCenteredPosition();
+			switch (message.worker.get_scheduled_buildings().front().entityType)
+			{
+			case eEntityType::SupplyDepot:
+				occupiedBase->actionQueue.emplace_back(eAIActionType::BuildSupplyDepot);
+				break;
+			case eEntityType::Barracks:
+				occupiedBase->actionQueue.emplace_back(eAIActionType::BuildBarracks);
+				break;
+			case eEntityType::Turret:
+				occupiedBase->actionQueue.emplace_back(eAIActionType::BuildTurret);
+				break;
+			case eEntityType::Laboratory:
+				occupiedBase->actionQueue.emplace_back(eAIActionType::BuildLaboratory);
+				break;
+			default:
+				assert(false);
+			}
+		}
+	}
+
+	return spawnedBuilding;
+}
+
 void FactionAI::instructWorkersToRepair(const Entity& entity, const Map& map)
 {
 	AIOccupiedBase* occupiedBase = m_occupiedBases.getBase(entity);
@@ -521,64 +579,6 @@ bool FactionAI::increaseShield(const Laboratory& laboratory)
 	}
 
 	return true;
-}
-
-Entity* FactionAI::createBuilding(const Map& map, const Worker& worker)
-{
-	Entity* spawnedBuilding = Faction::createBuilding(map, worker);
-	if (spawnedBuilding)
-	{
-		switch (spawnedBuilding->getEntityType())
-		{
-			case eEntityType::SupplyDepot:
-			case eEntityType::Turret:
-			case eEntityType::Barracks:
-				m_occupiedBases.addBuilding(worker, *spawnedBuilding);
-			break;
-			case eEntityType::Laboratory:
-				m_occupiedBases.addBuilding(worker, *spawnedBuilding);
-				if (getCurrentShieldAmount() == 0)
-				{
-					AIOccupiedBase* occupiedBase = m_occupiedBases.getBase(*spawnedBuilding);
-					if (occupiedBase)
-					{
-						occupiedBase->actionQueue.emplace_back(eAIActionType::IncreaseShield);
-					}
-				}
-			break;
-			case eEntityType::Headquarters:
-			break;
-			default:
-				assert(false);
-		}
-	}
-	else
-	{
-		AIOccupiedBase* occupiedBase = m_occupiedBases.getBase(worker);
-		if (occupiedBase)
-		{
-			const glm::vec3& basePosition = occupiedBase->base.get().getCenteredPosition();
-			switch (worker.get_scheduled_buildings().front().entityType)
-			{
-			case eEntityType::SupplyDepot:
-				occupiedBase->actionQueue.emplace_back(eAIActionType::BuildSupplyDepot);
-				break;
-			case eEntityType::Barracks:
-				occupiedBase->actionQueue.emplace_back(eAIActionType::BuildBarracks); 
-				break;
-			case eEntityType::Turret:
-				occupiedBase->actionQueue.emplace_back(eAIActionType::BuildTurret);
-				break;
-			case eEntityType::Laboratory:
-				occupiedBase->actionQueue.emplace_back(eAIActionType::BuildLaboratory);
-				break;
-			default:
-				assert(false);
-			}
-		}
-	}
-
-	return spawnedBuilding;
 }
 
 Entity* FactionAI::createUnit(const Map& map, const Barracks& barracks, FactionHandler& factionHandler)

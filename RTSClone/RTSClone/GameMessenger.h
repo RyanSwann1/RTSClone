@@ -31,7 +31,7 @@ public:
 		return instance;
 	}
 
-	[[nodiscard]] ID subscribe(ID id, const std::function<ReturnType(const Message&)>& callback)
+	[[nodiscard]] ID subscribe(const ID id, const std::function<ReturnType(const Message&)>& callback)
 	{
 		static_assert(!std::is_same<int, ID>());
 		assert(!is_listener_registered(id));

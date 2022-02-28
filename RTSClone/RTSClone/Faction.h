@@ -9,6 +9,8 @@
 #include "FactionController.h"
 #include "Turret.h"
 #include "Laboratory.h"
+#include "GameMessengerSubscriber.h"
+#include "GameMessages.h"
 #include <vector>
 #include <functional>
 #include <memory>
@@ -51,7 +53,6 @@ public:
 
 	virtual Entity* createUnit(const Map& map, const Barracks& barracks, FactionHandler& factionHandler);
 	virtual Entity* createWorker(const Map& map, const Headquarters& headquarters);
-	virtual Entity* createBuilding(const Map& map, const Worker& worker);
 	virtual bool increaseShield(const Laboratory& laboratory);
 	virtual void handleEvent(const GameEvent& gameEvent, const Map& map, FactionHandler& factionHandler);
 	virtual void update(float deltaTime, const Map& map, FactionHandler& factionHandler, const Timer& unitStateHandlerTimer);
@@ -75,6 +76,8 @@ protected:
 	virtual void on_entity_idle(Entity& entity, const Map& map, FactionHandler& factionHandler) {}
 	virtual void onEntityRemoval(const Entity& entity) {}
 
+	virtual Entity* create_building(const GameMessages::CreateBuilding& message);
+
 	std::vector<std::unique_ptr<Entity>> m_entities;
 	std::vector<Unit*> m_units;
 	std::vector<Worker*> m_workers;
@@ -85,11 +88,15 @@ protected:
 	std::vector<Laboratory*> m_laboratories;
 
 private:
-	const eFactionController m_controller;
-	int m_currentResourceAmount;
-	int m_currentPopulationAmount;
-	int m_currentPopulationLimit;
-	int m_currentShieldAmount;
+	const eFactionController m_controller	= eFactionController::None;
+	int m_currentResourceAmount				= 0;
+	int m_currentPopulationAmount			= 0;
+	int m_currentPopulationLimit			= 0;
+	int m_currentShieldAmount				= 0;
+	GameMessengerSubscriber<GameMessages::GetClosestHeadquarters,
+		eFactionController, const Headquarters*> m_getClosestHeadquatersSubscriber;
+	GameMessengerSubscriber<GameMessages::GetEntity, eFactionController, const Entity*> m_getEntitySubscriber;
+	GameMessengerSubscriber<GameMessages::CreateBuilding, eFactionController, const Entity*> m_createBuildingSubscriber;
 
 	void reduceResources(eEntityType addedEntityType);
 	void increaseCurrentPopulationAmount(eEntityType entityType);
@@ -97,6 +104,9 @@ private:
 	void increasePopulationLimit();
 	void revalidateExistingUnitPaths(const Map& map, FactionHandler& factionHandler);
 	void handleWorkerCollisions(const Map& map);
+
+	const Headquarters* get_closest_headquarters(const GameMessages::GetClosestHeadquarters& message) const;
+	const Entity* get_entity(const GameMessages::GetEntity& message) const;
 
 	//Presumes entity already found in all entities container
 	template <typename T>

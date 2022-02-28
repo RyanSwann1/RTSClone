@@ -24,7 +24,6 @@ public:
 	bool isWithinRangeOfBuildings(const glm::vec3& position, float distance) const;
 	
 	bool increaseShield(const Laboratory& laboratory) override;
-	Entity* createBuilding(const Map& map, const Worker& worker) override;
 	void setTargetFaction(FactionHandler& factionHandler);
 	void onFactionElimination(FactionHandler& factionHandler, eFactionController eliminatedFaction);
 	void handleEvent(const GameEvent& gameEvent, const Map& map, FactionHandler& factionHandler) override;
@@ -37,6 +36,7 @@ protected:
 	void onEntityRemoval(const Entity& entity) override;
 	void on_entity_taken_damage(const TakeDamageEvent& gameEvent, Entity& entity, const Map& map, FactionHandler& factionHandler) override;
 	void on_entity_idle(Entity& entity, const Map& map, FactionHandler& factionHandler) override;
+	Entity* create_building(const GameMessages::CreateBuilding& message) override;
 
 private:
 	const BaseHandler& m_baseHandler;
