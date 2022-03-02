@@ -434,7 +434,7 @@
     <ClInclude Include="TypeComparison.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="UniqueIDGenerator.h">
+    <ClInclude Include="IDGenerator.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\Shared\Base.h">

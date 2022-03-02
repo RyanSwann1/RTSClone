@@ -3,7 +3,7 @@
 #include "ShaderHandler.h"
 #include "ModelManager.h"
 #include "Globals.h"
-#include "UniqueIDGenerator.h"
+#include "IDGenerator.h"
 #include "FactionController.h"
 #include "Faction.h"
 #include "GameEvents.h"
@@ -63,7 +63,7 @@ Entity::Entity(const Model& model, const glm::vec3& startingPosition, eEntityTyp
 	m_position(startingPosition),
 	m_rotation(startingRotation),
 	m_AABB(),
-	m_ID(UniqueIDGenerator::getInstance().getUniqueID()),
+	m_ID(id_generator::new_id()),
 	m_maximumShield(shield),
 	m_shield(m_maximumShield),
 	m_maximumHealth(health),

@@ -296,7 +296,7 @@
     <ClInclude Include="GameMessages.h" />
     <ClInclude Include="Graph.h" />
     <ClInclude Include="Projectile.h" />
-    <ClInclude Include="UniqueIDGenerator.h" />
+    <ClInclude Include="IDGenerator.h" />
     <ClInclude Include="Worker.h" />
     <ClInclude Include="EntitySpawnerBuilding.h" />
     <ClInclude Include="Map.h" />
