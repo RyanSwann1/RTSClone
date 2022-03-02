@@ -326,7 +326,7 @@ void FactionAI::update(float deltaTime, const Map & map, FactionHandler& faction
 					}
 				}	
 
-				availableWorker->build(availableBase->getCenteredPosition(), map, eEntityType::Headquarters, true);
+				availableWorker->build(*this, availableBase->getCenteredPosition(), map, eEntityType::Headquarters, true);
 				m_unattachedToBaseWorkers.addWorker(*availableWorker);
 			}
 		}
@@ -656,14 +656,14 @@ bool FactionAI::build(const Map& map, eEntityType entityType, AIOccupiedBase& oc
 		{
 			if (worker)
 			{
-				return worker->build(buildPosition, map, entityType);
+				return worker->build(*this, buildPosition, map, entityType);
 			}
 			else
 			{
 				Worker* availableWorker = getAvailableWorker(buildPosition, occupiedBase);
 				if (availableWorker)
 				{
-					return availableWorker->build(buildPosition, map, entityType);
+					return availableWorker->build(*this, buildPosition, map, entityType);
 				}
 			}
 		}

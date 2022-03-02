@@ -40,19 +40,19 @@ WorkerScheduledBuilding::WorkerScheduledBuilding(const glm::vec3& position, eEnt
 {}
 
 //Worker
-Worker::Worker(Faction& owningFaction, const Map& map, const glm::vec3& startingPosition, const glm::vec3& startingRotation)
+Worker::Worker(const Faction& owningFaction, const Map& map, const glm::vec3& startingPosition, const glm::vec3& startingRotation)
 	: Entity(ModelManager::getInstance().getModel(WORKER_MODEL_NAME), startingPosition, eEntityType::Worker, 
 		Globals::WORKER_STARTING_HEALTH, owningFaction.getCurrentShieldAmount(), startingRotation),
-	m_owningFaction(&owningFaction)
+	m_owningFaction(owningFaction.getController())
 {
 	switchTo(eWorkerState::Idle, map);
 }
 
-Worker::Worker(Faction& owningFaction, const glm::vec3 & startingPosition, const glm::vec3 & destination, const Map & map,
+Worker::Worker(const Faction& owningFaction, const glm::vec3 & startingPosition, const glm::vec3 & destination, const Map & map,
 	const glm::vec3& startingRotation)
 	: Entity(ModelManager::getInstance().getModel(WORKER_MODEL_NAME), startingPosition, eEntityType::Worker, Globals::WORKER_STARTING_HEALTH,
 		owningFaction.getCurrentShieldAmount(), startingRotation),
-	m_owningFaction(&owningFaction)
+	m_owningFaction(owningFaction.getController())
 {
 	moveTo(destination, map);
 }
@@ -127,10 +127,10 @@ void Worker::repairEntity(const Entity& entity, const Map& map)
 	m_repairTargetEntity.emplace(entity.getEntityType(), entity.getID());
 }
 
-bool Worker::build(const glm::vec3& buildPosition, const Map& map, eEntityType entityType, bool clearBuildQueue)
+bool Worker::build(const Faction& owningFaction, const glm::vec3& buildPosition, const Map& map, eEntityType entityType, bool clearBuildQueue)
 {	
 	if (entityType == eEntityType::Laboratory && 
-		(m_owningFaction->getLaboratoryCount() == Globals::MAX_LABORATORIES || m_owningFaction->isBuildingInAllWorkersQueue(entityType)))
+		(owningFaction.getLaboratoryCount() == Globals::MAX_LABORATORIES || owningFaction.isBuildingInAllWorkersQueue(entityType)))
 	{
 		return false;
 	}
@@ -138,7 +138,7 @@ bool Worker::build(const glm::vec3& buildPosition, const Map& map, eEntityType e
 	AABB buildingAABB(buildPosition, ModelManager::getInstance().getModel(entityType));
 	assert(map.isWithinBounds(buildingAABB) && !map.isAABBOccupied(buildingAABB));
 
-	if (!m_owningFaction->isCollidingWithWorkerBuildQueue(ModelManager::getInstance().getModelAABB(buildPosition, entityType)))
+	if (!owningFaction.isCollidingWithWorkerBuildQueue(ModelManager::getInstance().getModelAABB(buildPosition, entityType)))
 	{
 		if (clearBuildQueue)
 		{
@@ -209,7 +209,7 @@ void Worker::update(float deltaTime, const Map& map, FactionHandler& factionHand
 		assert(isHoldingResources());
 		if (m_movement.path.empty())
 		{
-			Level::add_event(GameEvent::create<AddFactionResourcesEvent>({ m_currentResourceAmount, m_owningFaction->getController() }));
+			Level::add_event(GameEvent::create<AddFactionResourcesEvent>({ m_currentResourceAmount, m_owningFaction }));
 			m_currentResourceAmount = 0;
 			if (m_mineralToHarvest)
 			{
@@ -243,7 +243,7 @@ void Worker::update(float deltaTime, const Map& map, FactionHandler& factionHand
 				}
 			}
 		}
-		else if (const Headquarters* headquarters = closestHeadquartersMessenger.broadcast(m_owningFaction->getController(), { m_position }))
+		else if (const Headquarters* headquarters = closestHeadquartersMessenger.broadcast(m_owningFaction, { m_position }))
 		{
 			moveTo(*headquarters, map, eWorkerState::ReturningMineralsToHeadquarters);
 		}
@@ -263,7 +263,7 @@ void Worker::update(float deltaTime, const Map& map, FactionHandler& factionHand
 		assert(m_movement.path.empty() && !m_buildQueue.empty() && m_taskTimer.isActive());
 		if (m_taskTimer.isExpired())
 		{
-			const Entity* building = createBuildingMessenger.broadcast(m_owningFaction->getController(), { *this, map });
+			const Entity* building = createBuildingMessenger.broadcast(m_owningFaction, { *this, map });
 			m_buildQueue.pop_front();
 			if (!building)
 			{
@@ -285,7 +285,7 @@ void Worker::update(float deltaTime, const Map& map, FactionHandler& factionHand
 					}
 					else
 					{
-						Level::add_event(GameEvent::create<SelfDestructEntityEvent>({ m_owningFaction->getController(), getID(), getEntityType() }));
+						Level::add_event(GameEvent::create<SelfDestructEntityEvent>({ m_owningFaction, getID(), getEntityType() }));
 					}
 				}
 			}
@@ -301,7 +301,7 @@ void Worker::update(float deltaTime, const Map& map, FactionHandler& factionHand
 			switchTo(eWorkerState::Repairing, map);
 		}
 		else if (unitStateHandlerTimer.isExpired() &&
-			!gameMessenger.broadcast(m_owningFaction->getController(), { m_repairTargetEntity->ID }))
+			!gameMessenger.broadcast(m_owningFaction, { m_repairTargetEntity->ID }))
 		{
 			switchTo(eWorkerState::Idle, map);
 		}
@@ -317,7 +317,7 @@ void Worker::update(float deltaTime, const Map& map, FactionHandler& factionHand
 		if (m_taskTimer.isExpired())
 		{
 			m_taskTimer.resetElaspedTime();
-			const Entity* targetEntity = gameMessenger.broadcast(m_owningFaction->getController(), { m_repairTargetEntity->ID });
+			const Entity* targetEntity = gameMessenger.broadcast(m_owningFaction, { m_repairTargetEntity->ID });
 			if (targetEntity && targetEntity->getHealth() < targetEntity->getMaximumHealth())
 			{
 				if (Globals::getSqrDistance(targetEntity->getPosition(), m_position) > REPAIR_DISTANCE * REPAIR_DISTANCE)
@@ -329,7 +329,7 @@ void Worker::update(float deltaTime, const Map& map, FactionHandler& factionHand
 					m_rotation.y = Globals::getAngle(targetEntity->getPosition(), m_position);
 
 					Level::add_event(GameEvent::create<RepairEntityEvent>({
-						m_owningFaction->getController(), m_repairTargetEntity->ID, m_repairTargetEntity->type }));
+						m_owningFaction, m_repairTargetEntity->ID, m_repairTargetEntity->type }));
 				}
 			}
 			else
@@ -339,7 +339,7 @@ void Worker::update(float deltaTime, const Map& map, FactionHandler& factionHand
 		}
 		else if (unitStateHandlerTimer.isExpired())
 		{
-			const Entity* targetEntity = gameMessenger.broadcast(m_owningFaction->getController(), { m_repairTargetEntity->ID });
+			const Entity* targetEntity = gameMessenger.broadcast(m_owningFaction, { m_repairTargetEntity->ID });
 			if (targetEntity && targetEntity->getHealth() < targetEntity->getMaximumHealth())
 			{
 				if (Globals::getSqrDistance(targetEntity->getPosition(), m_position) > REPAIR_DISTANCE * REPAIR_DISTANCE)
@@ -463,7 +463,7 @@ void Worker::renderBuildingCommands(ShaderHandler& shaderHandler) const
 	for (const auto& building : m_buildQueue)
 	{
 		building.model.get().render(
-			shaderHandler, m_owningFaction->getController(), building.position, glm::vec3(0.0f), false);
+			shaderHandler, m_owningFaction, building.position, glm::vec3(0.0f), false);
 	}
 }
 
@@ -546,7 +546,7 @@ void Worker::switchTo(eWorkerState newState, const Map& map, const Mineral* mine
 		m_movement.path.clear();
 		if (oldState != eWorkerState::Idle)
 		{
-			Level::add_event(GameEvent::create<EntityIdleEvent>({ getID(), m_owningFaction->getController() }));
+			Level::add_event(GameEvent::create<EntityIdleEvent>({ getID(), m_owningFaction }));
 		}
 		break;
 	case eWorkerState::Moving:

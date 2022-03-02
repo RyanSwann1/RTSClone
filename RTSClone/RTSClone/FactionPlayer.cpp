@@ -120,7 +120,6 @@ void FactionPlayerPlannedBuilding::handleInput(const sf::Event& event, const Cam
             m_position = position;
         }
     }
-
 }
 
 void FactionPlayerPlannedBuilding::render(ShaderHandler& shaderHandler, const BaseHandler& baseHandler, const Map& map) const
@@ -133,28 +132,7 @@ bool FactionPlayerPlannedBuilding::isOnValidPosition(const BaseHandler& baseHand
 {
     AABB buildingAABB(m_position, ModelManager::getInstance().getModel(m_entityType));
     assert(Globals::isOnMiddlePosition(m_position) && map.isWithinBounds(buildingAABB));
-    if (!map.isAABBOccupied(buildingAABB))
-    {
-        switch (m_entityType)
-        {
-        case eEntityType::Headquarters:
-        {
-            for (const auto& base : baseHandler.getBases())
-            {
-                if (base.getCenteredPosition() == m_position)
-                {
-                    return true;
-                }
-            }
-            
-            return false;
-        }
-        default:
-            return true;
-        }
-    }
-
-    return false;
+    return !map.isAABBOccupied(buildingAABB);
 }
 
 //FactionPlayer
@@ -361,7 +339,7 @@ int FactionPlayer::instructWorkerToBuild(const Map& map, const BaseHandler& base
 				{
                     if (const Base* base = baseHandler.getBase(m_plannedBuilding->getPosition()))
                     {
-                        if ((*selectedWorker)->build(base->getCenteredPosition(), map, m_plannedBuilding->getEntityType()))
+                        if ((*selectedWorker)->build(*this, base->getCenteredPosition(), map, m_plannedBuilding->getEntityType()))
                         {
                             m_plannedBuilding.reset();
                         }
@@ -369,7 +347,7 @@ int FactionPlayer::instructWorkerToBuild(const Map& map, const BaseHandler& base
 				}
                 else
                 {
-					if ((*selectedWorker)->build(m_plannedBuilding->getPosition(), map, m_plannedBuilding->getEntityType()))
+					if ((*selectedWorker)->build(*this, m_plannedBuilding->getPosition(), map, m_plannedBuilding->getEntityType()))
 					{
 						m_plannedBuilding.reset();
 					}

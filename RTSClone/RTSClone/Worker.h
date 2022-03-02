@@ -43,8 +43,8 @@ class Mineral;
 class Worker : public Entity
 {
 public:
-	Worker(Faction& owningFaction, const Map& map, const glm::vec3& startingPosition, const glm::vec3& startingRotation);
-	Worker(Faction& owningFaction, const glm::vec3& startingPosition, const glm::vec3& destination, const Map& map, 
+	Worker(const Faction& owningFaction, const Map& map, const glm::vec3& startingPosition, const glm::vec3& startingRotation);
+	Worker(const Faction& owningFaction, const glm::vec3& startingPosition, const glm::vec3& destination, const Map& map, 
 		const glm::vec3& startingRotation);
 	
 	const Mineral* getMineralToHarvest() const;
@@ -59,7 +59,7 @@ public:
 	void add_destination(const glm::vec3& position, const Map& map);
 	void clear_destinations();
 	void repairEntity(const Entity& entity, const Map& map);
-	bool build(const glm::vec3& buildPosition, const Map& map, eEntityType entityType,
+	bool build(const Faction& owningFaction, const glm::vec3& buildPosition, const Map& map, eEntityType entityType,
 		bool clearBuildQueue = false);
 	void update(float deltaTime, const Map& map, FactionHandler& factionHandler, const Timer& unitStateHandlerTimer);
 	void moveTo(const Mineral& mineral, const Map& map);
@@ -74,7 +74,7 @@ public:
 #endif // RENDER_PATHING
 
 private:
-	Faction* m_owningFaction								= nullptr;
+	eFactionController m_owningFaction						= eFactionController::None;
 	Movement m_movement										= {};
 	eWorkerState m_currentState								= eWorkerState::Idle;
 	std::deque<WorkerScheduledBuilding> m_buildQueue		= {};
