@@ -79,7 +79,7 @@ private:
 	eWorkerState m_currentState								= eWorkerState::Idle;
 	std::deque<WorkerScheduledBuilding> m_buildQueue		= {};
 	std::optional<RepairTargetEntity> m_repairTargetEntity	= {};
-	int m_currentResourceAmount								= { 0 };
+	std::optional<int> m_resources							= {};
 	Timer m_taskTimer										= {};
 	const Mineral* m_mineralToHarvest						= nullptr;
 

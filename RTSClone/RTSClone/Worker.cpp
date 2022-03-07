@@ -79,7 +79,7 @@ eWorkerState Worker::getCurrentState() const
 
 bool Worker::isHoldingResources() const
 {
-	return m_currentResourceAmount > 0;
+	return m_currentResourceAmount.has_value();
 }
 
 bool Worker::isRepairing() const
@@ -98,10 +98,13 @@ bool Worker::isInBuildQueue(eEntityType entityType) const
 int Worker::extractResources()
 {
 	assert(isHoldingResources());
-	int resources = m_currentResourceAmount;
-	m_currentResourceAmount = 0;
-
-	return resources;
+	if (m_currentResourceAmount)
+	{
+		const int resources = *m_currentResourceAmount;
+		m_currentResourceAmount = std::nullopt;
+		return resources;
+	}
+	return 0;
 }
 
 void Worker::add_destination(const glm::vec3& position, const Map& map)
@@ -209,7 +212,7 @@ void Worker::update(float deltaTime, const Map& map, FactionHandler& factionHand
 		assert(isHoldingResources());
 		if (m_movement.path.empty())
 		{
-			Level::add_event(GameEvent::create<AddFactionResourcesEvent>({ m_currentResourceAmount, m_owningFaction }));
+			Level::add_event(GameEvent::create<AddFactionResourcesEvent>({ *m_currentResourceAmount, m_owningFaction }));
 			m_currentResourceAmount = 0;
 			if (m_mineralToHarvest)
 			{
@@ -235,7 +238,7 @@ void Worker::update(float deltaTime, const Map& map, FactionHandler& factionHand
 				int harvestedResource = m_mineralToHarvest->extractQuantity(RESOURCE_INCREMENT);
 				if (harvestedResource)
 				{
-					m_currentResourceAmount += RESOURCE_INCREMENT;
+					*m_currentResourceAmount += RESOURCE_INCREMENT;
 				}
 				else
 				{
