@@ -79,7 +79,7 @@ eWorkerState Worker::getCurrentState() const
 
 bool Worker::isHoldingResources() const
 {
-	return m_currentResourceAmount.has_value();
+	return m_resources.has_value();
 }
 
 bool Worker::isRepairing() const
@@ -98,10 +98,10 @@ bool Worker::isInBuildQueue(eEntityType entityType) const
 int Worker::extractResources()
 {
 	assert(isHoldingResources());
-	if (m_currentResourceAmount)
+	if (m_resources)
 	{
-		const int resources = *m_currentResourceAmount;
-		m_currentResourceAmount = std::nullopt;
+		const int resources = *m_resources;
+		m_resources = std::nullopt;
 		return resources;
 	}
 	return 0;
@@ -212,8 +212,8 @@ void Worker::update(float deltaTime, const Map& map, FactionHandler& factionHand
 		assert(isHoldingResources());
 		if (m_movement.path.empty())
 		{
-			Level::add_event(GameEvent::create<AddFactionResourcesEvent>({ *m_currentResourceAmount, m_owningFaction }));
-			m_currentResourceAmount = 0;
+			Level::add_event(GameEvent::create<AddFactionResourcesEvent>({ *m_resources, m_owningFaction }));
+			m_resources = std::nullopt;
 			if (m_mineralToHarvest)
 			{
 				moveTo(*m_mineralToHarvest, map);
@@ -226,11 +226,11 @@ void Worker::update(float deltaTime, const Map& map, FactionHandler& factionHand
 		break;
 	case eWorkerState::Harvesting:
 	{
-		assert(m_currentResourceAmount <= RESOURCE_CAPACITY &&
+		assert(m_resources <= RESOURCE_CAPACITY &&
 			m_taskTimer.isActive() &&
 			m_mineralToHarvest);
 		const auto& closestHeadquartersMessenger = GameMessenger<GameMessages::GetClosestHeadquarters, eFactionController, const Headquarters*>::getInstance();
-		if (m_currentResourceAmount < RESOURCE_CAPACITY)
+		if (m_resources < RESOURCE_CAPACITY)
 		{
 			if (m_taskTimer.isExpired())
 			{
@@ -238,7 +238,14 @@ void Worker::update(float deltaTime, const Map& map, FactionHandler& factionHand
 				int harvestedResource = m_mineralToHarvest->extractQuantity(RESOURCE_INCREMENT);
 				if (harvestedResource)
 				{
-					*m_currentResourceAmount += RESOURCE_INCREMENT;
+					if (!m_resources)
+					{
+						m_resources.emplace(RESOURCE_INCREMENT);
+					}
+					else
+					{
+						*m_resources += RESOURCE_INCREMENT;
+					}
 				}
 				else
 				{
@@ -441,7 +448,7 @@ void Worker::moveTo(const glm::vec3& destination, const Map& map, eWorkerState s
 
 void Worker::render(ShaderHandler& shaderHandler, eFactionController owningFactionController) const
 {
-	if (m_currentResourceAmount > 0 && m_currentState != eWorkerState::Harvesting)
+	if (m_resources && m_currentState != eWorkerState::Harvesting)
 	{
 		//ModelManager::getInstance().getModel(eModelName::WorkerMineral).render(
 			//shaderHandler, { m_position.x - 0.5f, m_position.y, m_position.z - 0.5f });
