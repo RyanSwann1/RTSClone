@@ -7,8 +7,8 @@
 #include "Unit.h"
 #include "Map.h"
 #include "glm/gtc/matrix_transform.hpp"
-#include "FactionPlayer.h"
-#include "FactionAI.h"
+#include "Factions/FactionPlayer.h"
+#include "Factions/FactionAI.h"
 #include "ModelManager.h"
 #include "Mineral.h"
 #include <imgui/imgui.h>

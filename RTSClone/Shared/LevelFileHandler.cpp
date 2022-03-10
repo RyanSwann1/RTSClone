@@ -4,8 +4,8 @@
 #include <ostream>
 #endif // LEVEL_EDITOR
 #ifdef GAME
-#include "FactionPlayer.h"
-#include "FactionAI.h"
+#include "Factions/FactionPlayer.h"
+#include "Factions/FactionAI.h"
 #include "SceneryGameObject.h"
 #include "GameMessages.h"
 #include "GameMessenger.h"

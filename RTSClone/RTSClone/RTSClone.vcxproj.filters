@@ -42,13 +42,13 @@
     <ClCompile Include="Worker.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="FactionPlayer.cpp">
+    <ClCompile Include="Factions\FactionPlayer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Faction.cpp">
+    <ClCompile Include="Factions\Faction.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="FactionAI.cpp">
+    <ClCompile Include="Factions\FactionAI.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Projectile.cpp">
@@ -90,7 +90,7 @@
     <ClCompile Include="..\Shared\FactionController.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="FactionHandler.cpp">
+    <ClCompile Include="Factions\FactionHandler.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\Shared\imgui\imgui.cpp">
@@ -317,13 +317,13 @@
     <ClInclude Include="EntityType.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="FactionPlayer.h">
+    <ClInclude Include="Factions\FactionPlayer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Faction.h">
+    <ClInclude Include="Factions\Faction.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="FactionAI.h">
+    <ClInclude Include="Factions\FactionAI.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="GameMessenger.h">
@@ -377,7 +377,7 @@
     <ClInclude Include="..\Shared\FactionController.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="FactionHandler.h">
+    <ClInclude Include="Factions\FactionHandler.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\Shared\imgui\imconfig.h">

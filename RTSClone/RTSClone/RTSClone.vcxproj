@@ -173,10 +173,10 @@
     <ClCompile Include="AIUnattachedToBaseWorkers.cpp" />
     <ClCompile Include="Barracks.cpp" />
     <ClCompile Include="Entity.cpp" />
-    <ClCompile Include="Faction.cpp" />
-    <ClCompile Include="FactionAI.cpp" />
-    <ClCompile Include="FactionHandler.cpp" />
-    <ClCompile Include="FactionPlayer.cpp" />
+    <ClCompile Include="Factions\Faction.cpp" />
+    <ClCompile Include="Factions\FactionAI.cpp" />
+    <ClCompile Include="Factions\FactionHandler.cpp" />
+    <ClCompile Include="Factions\FactionPlayer.cpp" />
     <ClCompile Include="Graph.cpp" />
     <ClCompile Include="Headquarters.cpp" />
     <ClCompile Include="Laboratory.cpp" />
@@ -274,7 +274,7 @@
     <ClInclude Include="Barracks.h" />
     <ClInclude Include="Entity.h" />
     <ClInclude Include="EntityType.h" />
-    <ClInclude Include="FactionHandler.h" />
+    <ClInclude Include="Factions\FactionHandler.h" />
     <ClInclude Include="Headquarters.h" />
     <ClInclude Include="Laboratory.h" />
     <ClInclude Include="MinHeap.h" />
@@ -288,9 +288,9 @@
     <ClInclude Include="TypeComparison.h" />
     <ClInclude Include="UIManager.h" />
     <ClInclude Include="TargetEntity.h" />
-    <ClInclude Include="Faction.h" />
-    <ClInclude Include="FactionAI.h" />
-    <ClInclude Include="FactionPlayer.h" />
+    <ClInclude Include="Factions\Faction.h" />
+    <ClInclude Include="Factions\FactionAI.h" />
+    <ClInclude Include="Factions\FactionPlayer.h" />
     <ClInclude Include="GameEvents.h" />
     <ClInclude Include="GameMessenger.h" />
     <ClInclude Include="GameMessages.h" />

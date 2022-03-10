@@ -1,10 +1,10 @@
 #pragma once
 
 #include "Projectile.h"
-#include "FactionPlayer.h"
-#include "FactionAI.h"
+#include "Factions/FactionPlayer.h"
+#include "Factions/FactionAI.h"
 #include "SceneryGameObject.h"
-#include "FactionHandler.h"
+#include "Factions/FactionHandler.h"
 #include "Timer.h"
 #include "Base.h"
 #include "Quad.h"

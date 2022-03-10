@@ -5,11 +5,11 @@
 #include "Worker.h"
 #include "ModelManager.h"
 #include "AdjacentPositions.h"
-#include "Faction.h"
+#include "Factions/Faction.h"
 #include "GameMessenger.h"
 #include "GameMessages.h"
-#include "FactionHandler.h"
-#include "FactionAI.h"
+#include "Factions/FactionHandler.h"
+#include "Factions/FactionAI.h"
 #include "Base.h"
 #include <limits>
 #include <queue>

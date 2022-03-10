@@ -2,7 +2,7 @@
 #include "Globals.h"
 #include "GameEvents.h"
 #ifdef GAME
-#include "Faction.h"
+#include "Factions/Faction.h"
 #include <limits>
 #endif // GAME
 

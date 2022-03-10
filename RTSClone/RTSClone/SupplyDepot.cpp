@@ -3,7 +3,7 @@
 #include "GameMessages.h"
 #include "Globals.h"
 #include "ModelManager.h"
-#include "Faction.h"
+#include "Factions/Faction.h"
 
 SupplyDepot::SupplyDepot(const glm::vec3& startingPosition, const Faction& owningFaction)
 	: Entity(ModelManager::getInstance().getModel(SUPPLY_DEPOT_MODEL_NAME), startingPosition, eEntityType::SupplyDepot, 

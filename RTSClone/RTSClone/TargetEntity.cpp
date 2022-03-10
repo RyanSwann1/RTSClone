@@ -1,6 +1,6 @@
 #include "TargetEntity.h"
 #include "Globals.h"
-#include "FactionHandler.h"
+#include "Factions/FactionHandler.h"
 
 RepairTargetEntity::RepairTargetEntity(eEntityType type, int ID)
 	: type(type),

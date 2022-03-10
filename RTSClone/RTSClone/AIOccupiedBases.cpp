@@ -5,7 +5,7 @@
 #include "Globals.h"
 #include "Turret.h"
 #include "GameEvents.h"
-#include "FactionAI.h"
+#include "Factions/FactionAI.h"
 #include <assert.h>
 
 //AIOccupiedBase
