@@ -43,8 +43,6 @@ FactionHandler::FactionHandler(const BaseHandler& baseHandler, const LevelDetail
 			assert(false);
 		}
 	}
-
-	m_opposingFactions.reserve(m_factions.size());
 }
 
 bool FactionHandler::isFactionActive(eFactionController factionController) const
@@ -62,19 +60,20 @@ FactionsContainer& FactionHandler::getFactions()
 	return m_factions;
 }
 
-const std::vector<std::reference_wrapper<const Faction>>& FactionHandler::getOpposingFactions(eFactionController factionController)
+opposing_factions FactionHandler::getOpposingFactions(eFactionController controller) const
 {
-	m_opposingFactions.clear();
-
-	for (const auto& faction : m_factions)
+	opposing_factions opposingFactions = {};
+	assert(opposingFactions.size() == m_factions.size());
+	std::transform(m_factions.cbegin(), m_factions.cend(), opposingFactions.begin(), [controller](const auto& faction) -> const Faction*
 	{
-		if (faction && faction->getController() != factionController)
+		if (faction && faction->getController() != controller)
 		{
-			m_opposingFactions.push_back(*faction.get());
-		}  
-	}
+			return faction.get();
+		}
+		return nullptr;
+	});
 
-	return m_opposingFactions;
+	return opposingFactions;
 }
 
 const FactionPlayer* FactionHandler::getFactionPlayer() const

@@ -128,20 +128,24 @@ void FactionAI::setTargetFaction(FactionHandler& factionHandler)
 	m_targetFaction = eFactionController::None;
 
 	assert(!m_headquarters.empty());
-	const auto& opposingFactions = factionHandler.getOpposingFactions(getController());
-	std::for_each(opposingFactions.cbegin(), opposingFactions.cend(), 
-		[&, targetFactionDistance = std::numeric_limits<float>::max()](const auto& opposingFaction) mutable
+	//const auto& opposingFactions = ;
+	float targetFactionDistance = std::numeric_limits<float>::max();
+	for (const Faction* opposingFaction : factionHandler.getOpposingFactions(getController()))
 	{
-		if (const Headquarters* opposingHeadquarters = opposingFaction.get().getClosestHeadquarters(m_headquarters.front()->getPosition()))
+		if (!opposingFaction)
+		{
+			continue;
+		}
+		if (const Headquarters* opposingHeadquarters = opposingFaction->getClosestHeadquarters(m_headquarters.front()->getPosition()))
 		{
 			float distance = Globals::getSqrDistance(opposingHeadquarters->getPosition(), m_headquarters.front()->getPosition());
 			if (distance < targetFactionDistance)
 			{
-				m_targetFaction = opposingFaction.get().getController();
+				m_targetFaction = opposingFaction->getController();
 				targetFactionDistance = distance;
 			}
 		}
-	});
+	}
 }
 
 void FactionAI::onFactionElimination(FactionHandler& factionHandler, eFactionController eliminatedFaction)
@@ -152,7 +156,7 @@ void FactionAI::onFactionElimination(FactionHandler& factionHandler, eFactionCon
 	}
 }
 
-void FactionAI::handleEvent(const GameEvent& gameEvent, const Map& map, FactionHandler& factionHandler)
+void FactionAI::handleEvent(const GameEvent& gameEvent, const Map& map, const FactionHandler& factionHandler)
 {
 	Faction::handleEvent(gameEvent, map, factionHandler);
 
@@ -225,7 +229,7 @@ void FactionAI::selectEntity(const glm::vec3& position)
 	}
 }
 
-void FactionAI::update(float deltaTime, const Map & map, FactionHandler& factionHandler, const Timer& unitStateHandlerTimer)
+void FactionAI::update(float deltaTime, const Map & map, const FactionHandler& factionHandler, const Timer& unitStateHandlerTimer)
 {
 	Faction::update(deltaTime, map, factionHandler, unitStateHandlerTimer);
 
@@ -349,7 +353,7 @@ void FactionAI::onEntityRemoval(const Entity& entity)
 	}
 }
 
-void FactionAI::on_entity_taken_damage(const TakeDamageEvent& gameEvent, Entity& entity, const Map& map, FactionHandler& factionHandler)
+void FactionAI::on_entity_taken_damage(const TakeDamageEvent& gameEvent, Entity& entity, const Map& map, const FactionHandler& factionHandler)
 {
 	assert(!entity.isDead());
 
@@ -361,7 +365,7 @@ void FactionAI::on_entity_taken_damage(const TakeDamageEvent& gameEvent, Entity&
 	}
 }
 
-void FactionAI::on_entity_idle(Entity& entity, const Map& map, FactionHandler& factionHandler)
+void FactionAI::on_entity_idle(Entity& entity, const Map& map, const FactionHandler& factionHandler)
 {
 	switch (entity.getEntityType())
 	{
@@ -581,7 +585,7 @@ bool FactionAI::increaseShield(const Laboratory& laboratory)
 	return true;
 }
 
-Entity* FactionAI::createUnit(const Map& map, const Barracks& barracks, FactionHandler& factionHandler)
+Entity* FactionAI::createUnit(const Map& map, const Barracks& barracks, const FactionHandler& factionHandler)
 {
 	Entity* spawnedUnit = Faction::createUnit(map, barracks, factionHandler);
 	if (!spawnedUnit)
@@ -742,7 +746,7 @@ bool FactionAI::handleAction(const AIAction& action, const Map& map, AIOccupiedB
 	return false;
 }
 
-void FactionAI::on_unit_taken_damage(const TakeDamageEvent& gameEvent, Unit& unit, const Map& map, FactionHandler& factionHandler)
+void FactionAI::on_unit_taken_damage(const TakeDamageEvent& gameEvent, Unit& unit, const Map& map, const FactionHandler& factionHandler)
 {
 	assert(!unit.isDead());
 	if (!factionHandler.isFactionActive(gameEvent.senderFaction))
@@ -784,14 +788,14 @@ void FactionAI::on_unit_taken_damage(const TakeDamageEvent& gameEvent, Unit& uni
 			{
 				for (auto& unitInSquad : *squad)
 				{
-					unitInSquad.get().moveToAttackPosition(*targetEntity, *opposingFaction, map, factionHandler);
+					unitInSquad.get().moveToAttackPosition(*targetEntity, *opposingFaction, map);
 				}
 			}
 		}
 	}
 }
 
-void FactionAI::on_unit_idle(Unit& unit, const Map& map, FactionHandler& factionHandler)
+void FactionAI::on_unit_idle(Unit& unit, const Map& map, const FactionHandler& factionHandler)
 {
 	assert(unit.getCurrentState() == eUnitState::Idle);
 	int unitID = unit.getID();
@@ -805,7 +809,7 @@ void FactionAI::on_unit_idle(Unit& unit, const Map& map, FactionHandler& faction
 		{
 			if (const Headquarters* nearestHeadquarters = targetFaction->getClosestHeadquarters(unit.getPosition()))
 			{
-				unit.moveToAttackPosition(*nearestHeadquarters, *targetFaction, map, factionHandler);
+				unit.moveToAttackPosition(*nearestHeadquarters, *targetFaction, map);
 			}
 		}
 		else
@@ -817,7 +821,11 @@ void FactionAI::on_unit_idle(Unit& unit, const Map& map, FactionHandler& faction
 
 void FactionAI::on_worker_idle(Worker& worker, const Map& map)
 {
-	assert(worker.getCurrentState() == eWorkerState::Idle);
+	if (worker.getCurrentState() != eWorkerState::Idle)
+	{
+		return;
+	}
+	//assert(worker.getCurrentState() == eWorkerState::Idle);
 	if (const Headquarters* nearestHeadquarters = getClosestHeadquarters(worker.getPosition()))
 	{
 		if (const Base* nearestBase = m_baseHandler.getNearestBase(nearestHeadquarters->getPosition()))

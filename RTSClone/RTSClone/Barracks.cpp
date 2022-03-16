@@ -1,7 +1,7 @@
 #include "Barracks.h"
 #include "ModelManager.h"
 #include "Globals.h"
-#include "Faction.h"
+#include "Factions/Faction.h"
 
 namespace
 {
@@ -17,7 +17,7 @@ Barracks::Barracks(const glm::vec3& startingPosition, Faction& owningFaction)
 		MAX_UNITS_IN_SPAWN_QUEUE)
 {}
 
-void Barracks::update(float deltaTime, const Map& map, FactionHandler& factionHandler)
+void Barracks::update(float deltaTime, const Map& map, const FactionHandler& factionHandler)
 {
 	EntitySpawnerBuilding::update(deltaTime, Globals::UNIT_RESOURCE_COST, Globals::UNIT_POPULATION_COST,
 		MAX_UNITS_IN_SPAWN_QUEUE, map, factionHandler);
@@ -47,7 +47,7 @@ void Barracks::renderProgressBar(ShaderHandler& shaderHandler, const Camera& cam
 	}
 }
 
-const Entity* Barracks::spawnEntity(const Map& map, FactionHandler& factionHandler) const
+const Entity* Barracks::spawnEntity(const Map& map, const FactionHandler& factionHandler) const
 {
 	return m_owningFaction.get().createUnit(map, *this, factionHandler);
 }

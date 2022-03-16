@@ -31,7 +31,7 @@ public:
 	int getShield() const;
 	bool isDead() const;
 	
-	void takeDamage(const TakeDamageEvent& gameEvent, const Map& map, FactionHandler& factionHandler);
+	void takeDamage(const TakeDamageEvent& gameEvent, const Map& map);
 	void repair();
 	void increaseMaximumShield(const Faction& owningFaction);
 	void render(ShaderHandler& shaderHandler, eFactionController owningFactionController) const;

@@ -32,10 +32,10 @@ protected:
 
 	bool isEntityAddableToSpawnQueue(int maxEntitiesInSpawnQueue, int resourceCost, int populationCost) const;
 	void addEntityToSpawnQueue(eEntityType entityType);
-	virtual const Entity* spawnEntity(const Map& map, FactionHandler& factionHandler) const = 0;
+	virtual const Entity* spawnEntity(const Map& map, const FactionHandler& factionHandler) const = 0;
 
 	void update(float deltaTime, int resourceCost, int populationCost, 
-		int maxEntityInSpawnQueue, const Map& map, FactionHandler& factionHandler);
+		int maxEntityInSpawnQueue, const Map& map, const FactionHandler& factionHandler);
 
 	std::reference_wrapper<Faction> m_owningFaction;
 	std::vector<eEntityType> m_spawnQueue;

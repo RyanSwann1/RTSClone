@@ -38,9 +38,9 @@ AdjacentPositions createAdjacentPositions(const Map& map)
 	return [&](const glm::ivec2& position) { return getAdjacentPositions(position, map); };
 }
 
-AdjacentPositions createAdjacentPositions(const Map& map, FactionHandler& factionHandler, const Unit& unit)
+AdjacentPositions createAdjacentPositions(const Map& map, const Unit& unit)
 {
-	return [&](const glm::ivec2& position) { return getAdjacentPositions(position, map, factionHandler, unit); };
+	return [&](const glm::ivec2& position) { return getAdjacentPositions(position, map, unit); };
 }
 
 AdjacentPositionsContainer getAdjacentPositions(const glm::ivec2 & position,
@@ -60,8 +60,7 @@ AdjacentPositionsContainer getAdjacentPositions(const glm::ivec2 & position,
 	return adjacentPositions;
 }
 
-AdjacentPositionsContainer getRandomAdjacentPositions(const glm::ivec2& position, 
-	const Map& map, const AABB& ignoreAABB)
+AdjacentPositionsContainer getRandomAdjacentPositions(const glm::ivec2& position, const Map& map, const AABB& ignoreAABB)
 {
 	static std::random_device rd;
 	static std::mt19937 g(rd());
@@ -155,8 +154,7 @@ AdjacentPositionsContainer getAdjacentPositions(const glm::ivec2& position, cons
 	return adjacentPositions;
 }
 
-AdjacentPositionsContainer getAdjacentPositions(const glm::ivec2& position, 
-	const Map& map, FactionHandler& factionHandler, const Unit& unit)
+AdjacentPositionsContainer getAdjacentPositions(const glm::ivec2& position, const Map& map, const Unit& unit)
 {
 	AdjacentPositionsContainer adjacentPositions;
 	for (int i = 0; i < static_cast<int>(ALL_DIRECTIONS_ON_GRID.size()); ++i)
@@ -173,8 +171,7 @@ AdjacentPositionsContainer getAdjacentPositions(const glm::ivec2& position,
 	return adjacentPositions;
 }
 
-AdjacentPositionsContainer getAdjacentPositions(const glm::ivec2& position, const Map& map, 
-	FactionHandler& factionHandler, const Unit& unit, const AABB& ignoreAABB)
+AdjacentPositionsContainer getAdjacentPositions(const glm::ivec2& position, const Map& map, const Unit& unit, const AABB& ignoreAABB)
 {
 	AdjacentPositionsContainer adjacentPositions;
 	for (int i = 0; i < static_cast<int>(ALL_DIRECTIONS_ON_GRID.size()); ++i)

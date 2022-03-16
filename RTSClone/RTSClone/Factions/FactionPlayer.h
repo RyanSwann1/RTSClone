@@ -37,9 +37,9 @@ public:
 	const std::vector<Entity*>& getSelectedEntities() const;
 
 	void handleInput(const sf::Event& currentSFMLEvent, const sf::Window& window, const Camera& camera, const Map& map, 
-		FactionHandler& factionHandler, const BaseHandler& baseHandler, const MiniMap& miniMap, const glm::vec3& levelSize);
-	void handleEvent(const GameEvent& gameEvent, const Map& map, FactionHandler& factionHandler) override;
-	void update(float deltaTime, const Map& map, FactionHandler& factionHandler, const Timer& unitStateHandlerTimer) override;
+		const FactionHandler& factionHandler, const BaseHandler& baseHandler, const MiniMap& miniMap, const glm::vec3& levelSize);
+	void handleEvent(const GameEvent& gameEvent, const Map& map, const FactionHandler& factionHandler) override;
+	void update(float deltaTime, const Map& map, const FactionHandler& factionHandler, const Timer& unitStateHandlerTimer) override;
 	void render(ShaderHandler& shaderHandler) const override;
 	void renderPlannedBuilding(ShaderHandler& shaderHandler, const BaseHandler& baseHandler, const Map& map) const;
 	void renderEntitySelector(const sf::Window& window, ShaderHandler& shaderHandler) const;
@@ -56,13 +56,11 @@ private:
 
 	void instructWorkerReturnMinerals(const Map& map, const Headquarters& headquarters);
 	int instructWorkerToBuild(const Map& map, const BaseHandler& baseHandler);
-	void moveSingularSelectedEntity(const glm::vec3& destination, const Map& map, Entity& selectedEntity, 
-		FactionHandler& factionHandler, const BaseHandler& baseHandler) const;
-	void moveMultipleSelectedEntities(const glm::vec3& destination, const Map& map, FactionHandler& factionHandler,
-		const BaseHandler& baseHandler);
+	void moveSingularSelectedEntity(const glm::vec3& destination, const Map& map, Entity& selectedEntity, const BaseHandler& baseHandler) const;
+	void moveMultipleSelectedEntities(const glm::vec3& destination, const Map& map, const BaseHandler& baseHandler);
 
 	void onLeftClick(const sf::Window& window, const Camera& camera, const Map& map, const BaseHandler& baseHandler);
-	void onRightClick(const sf::Window& window, const Camera& camera, FactionHandler& factionHandler, const Map& map, 
+	void onRightClick(const sf::Window& window, const Camera& camera, const FactionHandler& factionHandler, const Map& map, 
 		const BaseHandler& baseHandler, const MiniMap& minimap, const glm::vec3& levelSize);
 
 	template <typename Entity>

@@ -29,10 +29,9 @@ class FactionHandler;
 class Unit : public Entity
 {
 public:
-	Unit(Faction& owningFaction, const glm::vec3& startingPosition, const glm::vec3& startingRotation, const Map& map,
-		FactionHandler& factionHandler);
+	Unit(Faction& owningFaction, const glm::vec3& startingPosition, const glm::vec3& startingRotation, const Map& map);
 	Unit(Faction& owningFaction, const glm::vec3& startingPosition, const glm::vec3& startingRotation,
-		const glm::vec3& destination, FactionHandler& factionHandler, const Map& map);
+		const glm::vec3& destination, const Map& map);
 	~Unit();
 
 	std::optional<TargetEntity> getTargetEntity() const;
@@ -40,13 +39,11 @@ public:
 	float getAttackRange() const;
 	eUnitState getCurrentState() const;
 
-	void add_destination(const glm::vec3& position, const Map& map, FactionHandler& factionHandler);
+	void add_destination(const glm::vec3& position, const Map& map);
 	void clear_destinations();
-	void moveToAttackPosition(const Entity& targetEntity, const Faction& targetFaction, const Map& map, 
-		FactionHandler& factionHandler);
-	void moveTo(const glm::vec3& destination, const Map& map, FactionHandler& factionHandler,
-		eUnitState state = eUnitState::Moving);
-	void update(float deltaTime, FactionHandler& factionHandler, const Map& map,
+	void moveToAttackPosition(const Entity& targetEntity, const Faction& targetFaction, const Map& map);
+	void moveTo(const glm::vec3& destination, const Map& map, eUnitState state = eUnitState::Moving);
+	void update(float deltaTime, const FactionHandler& factionHandler, const Map& map,
 		const Timer& unitStateHandlerTimer);
 #ifdef RENDER_PATHING
 	void render_path(ShaderHandler& shaderHandler);
@@ -59,6 +56,5 @@ private:
 	Timer m_attackTimer							= {};
 	std::optional<TargetEntity> m_target		= {};
 
-	void switchToState(eUnitState newState, const Map& map, FactionHandler& factionHandler,
-		const Entity* targetEntity = nullptr, const Faction* targetFaction = nullptr);
+	void switchToState(eUnitState newState, const Map& map, const Entity* targetEntity = nullptr, const Faction* targetFaction = nullptr);
 };

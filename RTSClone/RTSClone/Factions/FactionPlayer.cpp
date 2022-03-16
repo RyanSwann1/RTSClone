@@ -22,7 +22,7 @@ namespace
     constexpr glm::vec3 INVALID_PLANNED_BUILDING_COLOR{ 1.0f, 0.0f, 0.0f };
 
     void moveSelectedEntitiesToAttackPosition(std::vector<Entity*>& selectedEntities, const Entity& targetEntity, 
-        const Faction& targetFaction, const Map& map, FactionHandler& factionHandler)
+        const Faction& targetFaction, const Map& map)
     {
         assert(!selectedEntities.empty());
         std::sort(selectedEntities.begin(), selectedEntities.end(), [&](const auto& selectedUnitA, const auto& selectedUnitB)
@@ -36,7 +36,7 @@ namespace
             switch (selectedEntity->getEntityType())
             {
             case eEntityType::Unit:
-                static_cast<Unit&>(*selectedEntity).moveToAttackPosition(targetEntity, targetFaction, map, factionHandler);
+                static_cast<Unit&>(*selectedEntity).moveToAttackPosition(targetEntity, targetFaction, map);
                 break;
             case eEntityType::Worker:
                 break;
@@ -152,7 +152,7 @@ const std::vector<Entity*>& FactionPlayer::getSelectedEntities() const
 }
 
 void FactionPlayer::handleInput(const sf::Event& currentSFMLEvent, const sf::Window& window, const Camera& camera, 
-    const Map& map, FactionHandler& factionHandler, const BaseHandler& baseHandler, const MiniMap& miniMap, 
+    const Map& map, const FactionHandler& factionHandler, const BaseHandler& baseHandler, const MiniMap& miniMap, 
     const glm::vec3& levelSize)
 {
     switch (currentSFMLEvent.type)
@@ -206,7 +206,7 @@ void FactionPlayer::handleInput(const sf::Event& currentSFMLEvent, const sf::Win
     }
 }
 
-void FactionPlayer::handleEvent(const GameEvent& gameEvent, const Map& map, FactionHandler& factionHandler)
+void FactionPlayer::handleEvent(const GameEvent& gameEvent, const Map& map, const FactionHandler& factionHandler)
 {
     Faction::handleEvent(gameEvent, map, factionHandler);
 
@@ -246,7 +246,7 @@ void FactionPlayer::handleEvent(const GameEvent& gameEvent, const Map& map, Fact
     }
 }
 
-void FactionPlayer::update(float deltaTime, const Map& map, FactionHandler& factionHandler, const Timer& unitStateHandlerTimer)
+void FactionPlayer::update(float deltaTime, const Map& map, const FactionHandler& factionHandler, const Timer& unitStateHandlerTimer)
 {
     Faction::update(deltaTime, map, factionHandler, unitStateHandlerTimer);
 
@@ -363,8 +363,7 @@ int FactionPlayer::instructWorkerToBuild(const Map& map, const BaseHandler& base
     return workerID;
 }
 
-void FactionPlayer::moveSingularSelectedEntity(const glm::vec3& destination, const Map& map, Entity& selectedEntity, 
-    FactionHandler& factionHandler, const BaseHandler& baseHandler) const
+void FactionPlayer::moveSingularSelectedEntity(const glm::vec3& destination, const Map& map, Entity& selectedEntity, const BaseHandler& baseHandler) const
 {
     switch (selectedEntity.getEntityType())
     {
@@ -374,11 +373,11 @@ void FactionPlayer::moveSingularSelectedEntity(const glm::vec3& destination, con
         Unit& unit = static_cast<Unit&>(selectedEntity);
         if (m_addToDestinationQueue)
         {
-            unit.add_destination(destination, map, factionHandler);
+            unit.add_destination(destination, map);
         }
         else
         {
-            unit.moveTo(destination, map, factionHandler);
+            unit.moveTo(destination, map);
         }
     }
         break;
@@ -435,8 +434,7 @@ void FactionPlayer::moveSingularSelectedEntity(const glm::vec3& destination, con
     }
 }
 
-void FactionPlayer::moveMultipleSelectedEntities(const glm::vec3& destination, const Map& map, 
-    FactionHandler& factionHandler, const BaseHandler& baseHandler)
+void FactionPlayer::moveMultipleSelectedEntities(const glm::vec3& destination, const Map& map, const BaseHandler& baseHandler)
 {
     assert(!m_selectedEntities.empty());
     const Base* base = baseHandler.getBaseAtMineral(destination);
@@ -490,11 +488,11 @@ void FactionPlayer::moveMultipleSelectedEntities(const glm::vec3& destination, c
                     Unit& unit = static_cast<Unit&>(*selectedEntity);
                     if (m_addToDestinationQueue)
                     {
-                        unit.add_destination(position, map, factionHandler);
+                        unit.add_destination(position, map);
                     }
                     else
                     {
-                        unit.moveTo(position, map, factionHandler);
+                        unit.moveTo(position, map);
                     }
                 }
                 break;
@@ -549,7 +547,7 @@ void FactionPlayer::onLeftClick(const sf::Window& window, const Camera& camera, 
     }
 }
 
-void FactionPlayer::onRightClick(const sf::Window& window, const Camera& camera, FactionHandler& factionHandler, const Map& map,
+void FactionPlayer::onRightClick(const sf::Window& window, const Camera& camera, const FactionHandler& factionHandler, const Map& map,
     const BaseHandler& baseHandler, const MiniMap& minimap, const glm::vec3& levelSize)
 {
     m_plannedBuilding.reset();
@@ -569,12 +567,17 @@ void FactionPlayer::onRightClick(const sf::Window& window, const Camera& camera,
     const Faction* targetFaction = nullptr;
     const Entity* targetEntity = nullptr;
 
-    for (const auto& opposingFactions : factionHandler.getOpposingFactions(getController()))
+    for (const Faction* opposingFaction : factionHandler.getOpposingFactions(getController()))
     {
-        targetEntity = opposingFactions.get().getEntity(position);
+        if (!opposingFaction)
+        {
+            continue;
+        }
+
+        targetEntity = opposingFaction->getEntity(position);
         if (targetEntity)
         {
-            targetFaction = &opposingFactions.get();
+            targetFaction = &*opposingFaction;
             break;
         }
     }
@@ -588,8 +591,7 @@ void FactionPlayer::onRightClick(const sf::Window& window, const Camera& camera,
             switch (m_selectedEntities.back()->getEntityType())
             {
             case eEntityType::Unit:
-                static_cast<Unit&>(*m_selectedEntities.back()).
-                    moveToAttackPosition(*targetEntity, *targetFaction, map, factionHandler);
+                static_cast<Unit&>(*m_selectedEntities.back()).moveToAttackPosition(*targetEntity, *targetFaction, map);
                 break;
             case eEntityType::Worker:
                 break;
@@ -599,7 +601,7 @@ void FactionPlayer::onRightClick(const sf::Window& window, const Camera& camera,
         }
         else if (!m_selectedEntities.empty())
         {
-            moveSelectedEntitiesToAttackPosition(m_selectedEntities, *targetEntity, *targetFaction, map, factionHandler);
+            moveSelectedEntitiesToAttackPosition(m_selectedEntities, *targetEntity, *targetFaction, map);
         }
     }
     else
@@ -626,11 +628,11 @@ void FactionPlayer::onRightClick(const sf::Window& window, const Camera& camera,
 
         if (m_selectedEntities.size() == 1)
         {
-            moveSingularSelectedEntity(position, map, *m_selectedEntities.front(), factionHandler, baseHandler);
+            moveSingularSelectedEntity(position, map, *m_selectedEntities.front(), baseHandler);
         }
         else if (!m_selectedEntities.empty())
         {
-            moveMultipleSelectedEntities(position, map, factionHandler, baseHandler);
+            moveMultipleSelectedEntities(position, map, baseHandler);
         }
     }
 }

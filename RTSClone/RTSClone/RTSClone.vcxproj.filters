@@ -87,9 +87,6 @@
     <ClCompile Include="SceneryGameObject.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\Shared\FactionController.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Factions\FactionHandler.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -169,6 +166,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\Shared\RenderPrimitiveMesh.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Shared\FactionController.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -374,9 +374,6 @@
     <ClInclude Include="SceneryGameObject.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\Shared\FactionController.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Factions\FactionHandler.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -483,6 +480,15 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Movement.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Shared\FactionController.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Callbacks\WorkerCallbacks.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Callbacks\MineralCallbacks.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

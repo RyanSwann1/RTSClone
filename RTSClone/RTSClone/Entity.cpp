@@ -5,7 +5,7 @@
 #include "Globals.h"
 #include "IDGenerator.h"
 #include "FactionController.h"
-#include "Faction.h"
+#include "Factions/Faction.h"
 #include "GameEvents.h"
 #include "glm/gtc/matrix_transform.hpp"
 #include "Camera.h"
@@ -145,7 +145,7 @@ int Entity::getShield() const
 	return m_shield;
 }
 
-void Entity::takeDamage(const TakeDamageEvent& gameEvent, const Map& map, FactionHandler& factionHandler)
+void Entity::takeDamage(const TakeDamageEvent& gameEvent, const Map& map)
 {
 	if (m_shield > 0)
 	{

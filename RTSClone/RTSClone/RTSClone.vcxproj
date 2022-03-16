@@ -272,6 +272,8 @@
     <ClInclude Include="assimp\include\vector3.h" />
     <ClInclude Include="assimp\include\version.h" />
     <ClInclude Include="Barracks.h" />
+    <ClInclude Include="Callbacks\MineralCallbacks.h" />
+    <ClInclude Include="Callbacks\WorkerCallbacks.h" />
     <ClInclude Include="Entity.h" />
     <ClInclude Include="EntityType.h" />
     <ClInclude Include="Factions\FactionHandler.h" />

@@ -8,7 +8,6 @@
 #include "Factions/Faction.h"
 #include "GameMessenger.h"
 #include "GameMessages.h"
-#include "Factions/FactionHandler.h"
 #include "Factions/FactionAI.h"
 #include "Base.h"
 #include <limits>
@@ -311,8 +310,7 @@ glm::vec3 PathFinding::getClosestPositionToAABB(const glm::vec3& entityPosition,
 	return closestPosition;
 }
 
-bool PathFinding::setUnitAttackPosition(const Unit& unit, const Entity& targetEntity, std::vector<glm::vec3>& pathToPosition,
-	const Map& map, FactionHandler& factionHandler)
+bool PathFinding::setUnitAttackPosition(const Unit& unit, const Entity& targetEntity, std::vector<glm::vec3>& pathToPosition, const Map& map)
 {
 	assert(unit.getID() != targetEntity.getID());
 
@@ -358,7 +356,7 @@ bool PathFinding::setUnitAttackPosition(const Unit& unit, const Entity& targetEn
 		}
 		else
 		{
-			expandFrontier(currentNode, map, destinationOnGrid, createAdjacentPositions(map, factionHandler, unit), unit);
+			expandFrontier(currentNode, map, destinationOnGrid, createAdjacentPositions(map, unit), unit);
 		}
 	}
 

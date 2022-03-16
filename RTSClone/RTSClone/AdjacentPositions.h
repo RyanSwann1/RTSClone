@@ -20,13 +20,12 @@ using AdjacentPositionsContainer = std::array<AdjacentPosition, ALL_DIRECTIONS_O
 using AdjacentPositions = std::function<std::array<AdjacentPosition, ALL_DIRECTIONS_ON_GRID.size()>(const glm::ivec2&)>;
 
 class AABB;
-class FactionHandler;
 class Worker;
 class Map;
 class Unit;
 class EntitySpawnerBuilding;
 
-AdjacentPositions createAdjacentPositions(const Map& map, FactionHandler& factionHandler, const Unit& unit);
+AdjacentPositions createAdjacentPositions(const Map& map, const Unit& unit);
 AdjacentPositions createAdjacentPositions(const Map& map, const AABB& ignoreAABB);
 AdjacentPositions createAdjacentPositions(const Map& map);
 
@@ -47,7 +46,7 @@ AdjacentPositionsContainer getAdjacentPositions(const glm::ivec2& position, cons
 	const AABB& ignoreAABB);
 
 AdjacentPositionsContainer getAdjacentPositions(const glm::ivec2& position, const Map& map,
-	FactionHandler& factionHandler, const Unit& unit);
+	const Unit& unit);
 
 AdjacentPositionsContainer getAdjacentPositions(const glm::ivec2& position, const Map& map,
-	FactionHandler& factionHandler, const Unit& unit, const AABB& ignoreAABB);
+	const Unit& unit, const AABB& ignoreAABB);

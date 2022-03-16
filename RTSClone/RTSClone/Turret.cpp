@@ -35,7 +35,7 @@ Turret::~Turret()
 	}
 }
 
-void Turret::update(float deltaTime, FactionHandler& factionHandler, const Map& map)
+void Turret::update(float deltaTime, const FactionHandler& factionHandler, const Map& map)
 {
 	Entity::update(deltaTime);
 	m_stateHandlerTimer.update(deltaTime);
@@ -82,11 +82,15 @@ void Turret::update(float deltaTime, FactionHandler& factionHandler, const Map& 
 	{
 		if (m_stateHandlerTimer.isExpired())
 		{
-			for (const auto& opposingFaction : factionHandler.getOpposingFactions(m_owningFaction.get().getController()))
+			for (const Faction* opposingFaction : factionHandler.getOpposingFactions(m_owningFaction.get().getController()))
 			{
-				if (const Entity* targetEntity = opposingFaction.get().getEntity(m_position, TURRET_ATTACK_RANGE))
+				if (!opposingFaction)
 				{
-					m_target.emplace(opposingFaction.get().getController(), targetEntity->getID(), targetEntity->getEntityType());
+					continue;
+				}
+				if (const Entity* targetEntity = opposingFaction->getEntity(m_position, TURRET_ATTACK_RANGE))
+				{
+					m_target.emplace(opposingFaction->getController(), targetEntity->getID(), targetEntity->getEntityType());
 					m_attackTimer.resetElaspedTime();
 					break;
 				}

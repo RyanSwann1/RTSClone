@@ -218,7 +218,7 @@ const Entity* Faction::getEntity(int entityID, eEntityType entityType) const
     return entity;
 }
 
-void Faction::handleEvent(const GameEvent& gameEvent, const Map& map, FactionHandler& factionHandler)
+void Faction::handleEvent(const GameEvent& gameEvent, const Map& map, const FactionHandler& factionHandler)
 {
     switch (gameEvent.type)
     {
@@ -232,7 +232,7 @@ void Faction::handleEvent(const GameEvent& gameEvent, const Map& map, FactionHan
         });
         if (entity != m_entities.end())
         {
-            (*entity)->takeDamage(gameEvent.data.takeDamage, map, factionHandler);
+            (*entity)->takeDamage(gameEvent.data.takeDamage, map);
             if (!(*entity)->isDead())
             {
                 on_entity_taken_damage(gameEvent.data.takeDamage, *(*entity), map, factionHandler);
@@ -272,7 +272,7 @@ void Faction::handleEvent(const GameEvent& gameEvent, const Map& map, FactionHan
     }
         break;
     case eGameEventType::RevalidateMovementPaths:
-        revalidateExistingUnitPaths(map, factionHandler);
+        revalidateExistingUnitPaths(map);
         break;
     case eGameEventType::RepairEntity:
     {
@@ -485,7 +485,7 @@ Entity* Faction::create_building(const GameMessages::CreateBuilding& message)
     return nullptr;
 }
 
-void Faction::update(float deltaTime, const Map& map, FactionHandler& factionHandler, const Timer& unitStateHandlerTimer)
+void Faction::update(float deltaTime, const Map& map, const FactionHandler& factionHandler, const Timer& unitStateHandlerTimer)
 {
     for (auto& unit : m_units)
     {
@@ -733,17 +733,17 @@ void Faction::increasePopulationLimit()
     m_currentPopulationLimit += Globals::POPULATION_INCREMENT;
 }
 
-void Faction::revalidateExistingUnitPaths(const Map& map, FactionHandler& factionHandler)
+void Faction::revalidateExistingUnitPaths(const Map& map)
 {
-    std::for_each(m_units.begin(), m_units.end(), [&map, &factionHandler](auto& unit)
+    std::for_each(m_units.begin(), m_units.end(), [&map](auto& unit)
     {
 		if (!unit->getMovementPath().empty())
 		{
-			unit->moveTo(unit->getMovementPath().front(), map, factionHandler, unit->getCurrentState());
+			unit->moveTo(unit->getMovementPath().front(), map, unit->getCurrentState());
 		}
     });
 
-    std::for_each(m_workers.begin(), m_workers.end(), [&map, &factionHandler](auto& worker)
+    std::for_each(m_workers.begin(), m_workers.end(), [&map](auto& worker)
     {
 		if (!worker->getMovementPath().empty())
 		{
@@ -780,7 +780,7 @@ bool Faction::isMineralInUse(const Mineral& mineral) const
     });
 }
 
-Entity* Faction::createUnit(const Map& map, const Barracks& barracks, FactionHandler& factionHandler)
+Entity* Faction::createUnit(const Map& map, const Barracks& barracks, const FactionHandler& factionHandler)
 {
     assert(barracks.getCurrentSpawnCount() > 0);
     glm::vec3 startingPosition(0.0f);
@@ -794,11 +794,11 @@ Entity* Faction::createUnit(const Map& map, const Barracks& barracks, FactionHan
         if (barracks.isWaypointActive())
         {
             createdUnit = m_entities.emplace_back(std::make_unique<Unit>(
-                *this, startingPosition, startingRotation, barracks.getWaypointPosition(), factionHandler, map)).get();
+                *this, startingPosition, startingRotation, barracks.getWaypointPosition(), map)).get();
         }
         else
         {
-            createdUnit = m_entities.emplace_back(std::make_unique<Unit>(*this, startingPosition, startingRotation, map, factionHandler)).get();
+            createdUnit = m_entities.emplace_back(std::make_unique<Unit>(*this, startingPosition, startingRotation, map)).get();
         }
 
         reduceResources(eEntityType::Unit);

@@ -26,16 +26,16 @@ public:
 	bool increaseShield(const Laboratory& laboratory) override;
 	void setTargetFaction(FactionHandler& factionHandler);
 	void onFactionElimination(FactionHandler& factionHandler, eFactionController eliminatedFaction);
-	void handleEvent(const GameEvent& gameEvent, const Map& map, FactionHandler& factionHandler) override;
+	void handleEvent(const GameEvent& gameEvent, const Map& map, const FactionHandler& factionHandler) override;
 	void selectEntity(const glm::vec3& position);
-	Entity* createUnit(const Map& map, const Barracks& barracks, FactionHandler& factionHandler) override;
+	Entity* createUnit(const Map& map, const Barracks& barracks, const FactionHandler& factionHandler) override;
 	Entity* createWorker(const Map& map, const Headquarters& headquarters) override;
-	void update(float deltaTime, const Map& map, FactionHandler& factionHandler, const Timer& unitStateHandlerTimer) override;
+	void update(float deltaTime, const Map& map, const FactionHandler& factionHandler, const Timer& unitStateHandlerTimer) override;
 
 protected:
 	void onEntityRemoval(const Entity& entity) override;
-	void on_entity_taken_damage(const TakeDamageEvent& gameEvent, Entity& entity, const Map& map, FactionHandler& factionHandler) override;
-	void on_entity_idle(Entity& entity, const Map& map, FactionHandler& factionHandler) override;
+	void on_entity_taken_damage(const TakeDamageEvent& gameEvent, Entity& entity, const Map& map, const FactionHandler& factionHandler) override;
+	void on_entity_idle(Entity& entity, const Map& map, const FactionHandler& factionHandler) override;
 	Entity* create_building(const GameMessages::CreateBuilding& message) override;
 
 private:
@@ -56,7 +56,7 @@ private:
 
 	bool build(const Map& map, eEntityType entityType, AIOccupiedBase& occupiedBase, Worker* worker = nullptr);
 	bool handleAction(const AIAction& action, const Map& map, AIOccupiedBase& occupiedBase);
-	void on_unit_taken_damage(const TakeDamageEvent& gameEvent, Unit& unit, const Map& map, FactionHandler& factionHandler);
-	void on_unit_idle(Unit& unit, const Map& map, FactionHandler& factionHandler);
+	void on_unit_taken_damage(const TakeDamageEvent& gameEvent, Unit& unit, const Map& map, const FactionHandler& factionHandler);
+	void on_unit_idle(Unit& unit, const Map& map, const FactionHandler& factionHandler);
 	void on_worker_idle(Worker& worker, const Map& map);
 };

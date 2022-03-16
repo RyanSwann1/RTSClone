@@ -2,10 +2,10 @@
 #include "GameMessages.h"
 #include "GameMessenger.h"
 #include "GameEvents.h"
-#include "FactionHandler.h"
+#include "Factions/FactionHandler.h"
 #include "Globals.h"
 #include "Camera.h"
-#include "FactionPlayer.h"
+#include "Factions/FactionPlayer.h"
 #include "Mineral.h"
 #include "Level.h"
 #include <imgui/imgui.h>

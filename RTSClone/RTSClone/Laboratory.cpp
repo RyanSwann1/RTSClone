@@ -3,7 +3,7 @@
 #include "Globals.h"
 #include "GameMessenger.h"
 #include "GameMessages.h"
-#include "Faction.h"
+#include "Factions/Faction.h"
 #include "ShaderHandler.h"
 #include "Camera.h"
 #include "GameEvents.h"

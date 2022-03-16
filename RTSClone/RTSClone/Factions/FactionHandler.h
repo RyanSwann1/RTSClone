@@ -6,6 +6,7 @@
 #include <functional>
 
 using FactionsContainer = std::array<std::unique_ptr<Faction>, static_cast<size_t>(eFactionController::Max) + 1>;
+using opposing_factions = std::array<const Faction*, static_cast<size_t>(eFactionController::Max) + 1>;
 
 struct LevelDetailsFromFile;
 class BaseHandler;
@@ -23,7 +24,7 @@ public:
 	
 	const FactionsContainer& getFactions() const;
 	FactionsContainer& getFactions();
-	const std::vector<std::reference_wrapper<const Faction>>& getOpposingFactions(eFactionController factionController);
+	opposing_factions getOpposingFactions(eFactionController controller) const;
 	const FactionPlayer* getFactionPlayer() const;
 	FactionPlayer* getFactionPlayer();
 	Faction* getFaction(eFactionController factionController);
@@ -34,5 +35,4 @@ public:
 
 private:
 	FactionsContainer m_factions = {};
-	std::vector<std::reference_wrapper<const Faction>> m_opposingFactions = {};
 };

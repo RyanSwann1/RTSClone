@@ -1,7 +1,7 @@
 #include "Headquarters.h"
 #include "ModelManager.h"
 #include "Globals.h"
-#include "Faction.h"
+#include "Factions/Faction.h"
 #include "Level.h"
 
 namespace
@@ -25,7 +25,7 @@ Headquarters::~Headquarters()
 	Level::add_event(GameEvent::create<DetachFactionFromBaseEvent>({ m_owningFaction.get().getController(), m_position }));
 }
 
-void Headquarters::update(float deltaTime, const Map& map, FactionHandler& factionHandler)
+void Headquarters::update(float deltaTime, const Map& map, const FactionHandler& factionHandler)
 {
 	EntitySpawnerBuilding::update(deltaTime, Globals::WORKER_RESOURCE_COST, Globals::WORKER_POPULATION_COST,
 		MAX_WORKERS_IN_SPAWN_QUEUE, map, factionHandler);
@@ -55,7 +55,7 @@ void Headquarters::renderProgressBar(ShaderHandler& shaderHandler, const Camera&
 	}
 }
 
-const Entity* Headquarters::spawnEntity(const Map& map, FactionHandler& factionHandler) const
+const Entity* Headquarters::spawnEntity(const Map& map, const FactionHandler& factionHandler) const
 {
 	return m_owningFaction.get().createWorker(map, *this);
 }

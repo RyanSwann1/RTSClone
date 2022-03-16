@@ -166,7 +166,7 @@ bool Worker::build(const Faction& owningFaction, const glm::vec3& buildPosition,
 	return false;
 }
 
-void Worker::update(float deltaTime, const Map& map, FactionHandler& factionHandler, const Timer& unitStateHandlerTimer)
+void Worker::update(float deltaTime, const Map& map, const FactionHandler& factionHandler, const Timer& unitStateHandlerTimer)
 {
 	Entity::update(deltaTime);
 

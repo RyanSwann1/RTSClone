@@ -61,7 +61,7 @@ public:
 	void repairEntity(const Entity& entity, const Map& map);
 	bool build(const Faction& owningFaction, const glm::vec3& buildPosition, const Map& map, eEntityType entityType,
 		bool clearBuildQueue = false);
-	void update(float deltaTime, const Map& map, FactionHandler& factionHandler, const Timer& unitStateHandlerTimer);
+	void update(float deltaTime, const Map& map, const FactionHandler& factionHandler, const Timer& unitStateHandlerTimer);
 	void moveTo(const Mineral& mineral, const Map& map);
 	void moveTo(const Entity& target, const Map& map, eWorkerState state);
 	void moveTo(const glm::vec3& destination, const Map& map, eWorkerState state = eWorkerState::Moving);

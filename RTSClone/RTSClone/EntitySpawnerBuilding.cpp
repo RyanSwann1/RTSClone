@@ -5,7 +5,7 @@
 #include "Model.h"
 #include "Globals.h"
 #include "ModelManager.h"
-#include "Faction.h"
+#include "Factions/Faction.h"
 #include "Map.h"
 #include "ShaderHandler.h"
 
@@ -80,7 +80,7 @@ void EntitySpawnerBuilding::addEntityToSpawnQueue(eEntityType entityType)
 }
 
 void EntitySpawnerBuilding::update(float deltaTime, int resourceCost, int populationCost,
-	int maxEntityInSpawnQueue, const Map& map, FactionHandler& factionHandler)
+	int maxEntityInSpawnQueue, const Map& map, const FactionHandler& factionHandler)
 {
 	Entity::update(deltaTime);
 	m_spawnTimer.update(deltaTime);
