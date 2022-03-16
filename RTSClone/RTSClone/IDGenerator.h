@@ -4,7 +4,7 @@
 
 namespace id_generator
 {
-	inline int new_id()
+	inline int gen()
 	{
 		static std::atomic<int> id = 0;
 		return id++;
