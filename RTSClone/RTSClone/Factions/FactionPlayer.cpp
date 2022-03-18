@@ -206,9 +206,9 @@ void FactionPlayer::handleInput(const sf::Event& currentSFMLEvent, const sf::Win
     }
 }
 
-void FactionPlayer::handleEvent(const GameEvent& gameEvent, const Map& map, const FactionHandler& factionHandler)
+void FactionPlayer::handleEvent(const GameEvent& gameEvent, const Map& map, const FactionHandler& factionHandler, const BaseHandler& baseHandler)
 {
-    Faction::handleEvent(gameEvent, map, factionHandler);
+    Faction::handleEvent(gameEvent, map, factionHandler, baseHandler);
 
     switch (gameEvent.type)
     {
@@ -246,9 +246,9 @@ void FactionPlayer::handleEvent(const GameEvent& gameEvent, const Map& map, cons
     }
 }
 
-void FactionPlayer::update(float deltaTime, const Map& map, const FactionHandler& factionHandler, const Timer& unitStateHandlerTimer)
+void FactionPlayer::update(float deltaTime, const Map& map, const FactionHandler& factionHandler, const Timer& unitStateHandlerTimer, const BaseHandler& baseHandler)
 {
-    Faction::update(deltaTime, map, factionHandler, unitStateHandlerTimer);
+    Faction::update(deltaTime, map, factionHandler, unitStateHandlerTimer, baseHandler);
 
     if (m_entitySelector.isActive())
     {

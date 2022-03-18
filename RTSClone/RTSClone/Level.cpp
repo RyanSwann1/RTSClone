@@ -228,7 +228,7 @@ void Level::update(float deltaTime, const Map& map, UIManager& uiManager, glm::u
 	{
 		if (faction)
 		{
-			faction->update(deltaTime, map, m_factionHandler, m_unitStateHandlerTimer);
+			faction->update(deltaTime, map, m_factionHandler, m_unitStateHandlerTimer, m_baseHandler);
 		}
 	});
 
@@ -389,7 +389,7 @@ void Level::handleEvent(const GameEvent& gameEvent, const Map& map)
 	case eGameEventType::PlayerSpawnEntity:
 		if (FactionPlayer* factionPlayer = m_factionHandler.getFactionPlayer())
 		{
-			factionPlayer->handleEvent(gameEvent, map, m_factionHandler);
+			factionPlayer->handleEvent(gameEvent, map, m_factionHandler, m_baseHandler);
 		}
 		break;
 	case eGameEventType::AttachFactionToBase:
@@ -413,7 +413,7 @@ void Level::handleEvent(const GameEvent& gameEvent, const Map& map)
 
 	if (faction) 
 	{
-		faction->handleEvent(gameEvent, map, m_factionHandler);
+		faction->handleEvent(gameEvent, map, m_factionHandler, m_baseHandler);
 	}
 
 	switch (gameEvent.type)
@@ -423,7 +423,7 @@ void Level::handleEvent(const GameEvent& gameEvent, const Map& map)
 		{
 			if (faction)
 			{
-				faction->handleEvent(gameEvent, map, m_factionHandler);
+				faction->handleEvent(gameEvent, map, m_factionHandler, m_baseHandler);
 			}
 		});
 		break;

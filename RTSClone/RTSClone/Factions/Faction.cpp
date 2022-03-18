@@ -218,7 +218,7 @@ const Entity* Faction::getEntity(int entityID, eEntityType entityType) const
     return entity;
 }
 
-void Faction::handleEvent(const GameEvent& gameEvent, const Map& map, const FactionHandler& factionHandler)
+void Faction::handleEvent(const GameEvent& gameEvent, const Map& map, const FactionHandler& factionHandler, const BaseHandler& baseHandler)
 {
     switch (gameEvent.type)
     {
@@ -336,7 +336,7 @@ void Faction::handleEvent(const GameEvent& gameEvent, const Map& map, const Fact
         });
         if (entity != m_entities.cend())
         {
-            on_entity_idle(*(*entity), map, factionHandler);
+            on_entity_idle(*(*entity), map, factionHandler, baseHandler);
         }
     }
         break;
@@ -485,7 +485,8 @@ Entity* Faction::create_building(const GameMessages::CreateBuilding& message)
     return nullptr;
 }
 
-void Faction::update(float deltaTime, const Map& map, const FactionHandler& factionHandler, const Timer& unitStateHandlerTimer)
+void Faction::update(float deltaTime, const Map& map, const FactionHandler& factionHandler, 
+    const Timer& unitStateHandlerTimer, const BaseHandler& baseHandler)
 {
     for (auto& unit : m_units)
     {

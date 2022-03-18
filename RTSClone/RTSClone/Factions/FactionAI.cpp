@@ -112,7 +112,6 @@ namespace
 FactionAI::FactionAI(eFactionController factionController, const glm::vec3& hqStartingPosition,
 	int startingResources, int startingPopulationCap, AIConstants::eBehaviour behaviour, const BaseHandler& baseHandler)
 	: Faction(factionController, hqStartingPosition, startingResources, startingPopulationCap),
-	m_baseHandler(baseHandler),
 	m_behaviour(behaviour),
 	m_occupiedBases(baseHandler, getController()),
 	m_baseExpansionTimer(Globals::getRandomNumber(AIConstants::MIN_BASE_EXPANSION_TIME, AIConstants::MAX_BASE_EXPANSION_TIME), true),
@@ -156,9 +155,9 @@ void FactionAI::onFactionElimination(FactionHandler& factionHandler, eFactionCon
 	}
 }
 
-void FactionAI::handleEvent(const GameEvent& gameEvent, const Map& map, const FactionHandler& factionHandler)
+void FactionAI::handleEvent(const GameEvent& gameEvent, const Map& map, const FactionHandler& factionHandler, const BaseHandler& baseHandler)
 {
-	Faction::handleEvent(gameEvent, map, factionHandler);
+	Faction::handleEvent(gameEvent, map, factionHandler, baseHandler);
 
 	switch (gameEvent.type)
 	{
@@ -180,7 +179,7 @@ void FactionAI::handleEvent(const GameEvent& gameEvent, const Map& map, const Fa
 	break;
 	case eGameEventType::AttachFactionToBase:
 	{	
-		if (const Base* base = m_baseHandler.getBase(gameEvent.data.attachFactionToBase.position))
+		if (const Base* base = baseHandler.getBase(gameEvent.data.attachFactionToBase.position))
 		{
 			AIOccupiedBase& occupiedBase = m_occupiedBases.addBase(*base);
 			if (m_occupiedBases.bases.size() == 1)
@@ -209,7 +208,7 @@ void FactionAI::handleEvent(const GameEvent& gameEvent, const Map& map, const Fa
 	break;
 	case eGameEventType::DetachFactionFromBase:
 	{
-		if (const Base* base = m_baseHandler.getBase(gameEvent.data.attachFactionToBase.position))
+		if (const Base* base = baseHandler.getBase(gameEvent.data.attachFactionToBase.position))
 		{
 			for (auto& worker : m_occupiedBases.removeBase(*base))
 			{
@@ -229,28 +228,29 @@ void FactionAI::selectEntity(const glm::vec3& position)
 	}
 }
 
-void FactionAI::update(float deltaTime, const Map & map, const FactionHandler& factionHandler, const Timer& unitStateHandlerTimer)
+void FactionAI::update(float deltaTime, const Map & map, const FactionHandler& factionHandler, 
+	const Timer& unitStateHandlerTimer, const BaseHandler& baseHandler)
 {
-	Faction::update(deltaTime, map, factionHandler, unitStateHandlerTimer);
+	Faction::update(deltaTime, map, factionHandler, unitStateHandlerTimer, baseHandler);
 
 	m_delayTimer.update(deltaTime);
 	if (m_delayTimer.isExpired())
 	{
 		m_delayTimer.resetElaspedTime();
 
-		std::for_each(m_occupiedBases.bases.begin(), m_occupiedBases.bases.end(), [&map, this](auto& occupiedBase)
+		std::for_each(m_occupiedBases.bases.begin(), m_occupiedBases.bases.end(), [&map, &baseHandler, this](auto& occupiedBase)
 		{
 			//Update action queues
 			if (!occupiedBase.actionQueue.empty())
 			{
-				if (handleAction(occupiedBase.actionQueue.front(), map, occupiedBase))
+				if (handleAction(occupiedBase.actionQueue.front(), map, occupiedBase, baseHandler))
 				{
 					occupiedBase.actionQueue.pop_front();
 				}
 			}
 			if (!occupiedBase.actionPriorityQueue.empty())
 			{
-				if (handleAction(occupiedBase.actionPriorityQueue.top(), map, occupiedBase))
+				if (handleAction(occupiedBase.actionPriorityQueue.top(), map, occupiedBase, baseHandler))
 				{
 					occupiedBase.actionPriorityQueue.pop();
 				}
@@ -297,7 +297,7 @@ void FactionAI::update(float deltaTime, const Map & map, const FactionHandler& f
 			if (AIOccupiedBase* base;
 				mainHeadquarters && (base = m_occupiedBases.getBase(*mainHeadquarters)))
 			{
-				build(map, eEntityType::Unit, *base);
+				build(map, eEntityType::Unit, *base, baseHandler);
 			}
 		}
 		break;
@@ -311,7 +311,7 @@ void FactionAI::update(float deltaTime, const Map & map, const FactionHandler& f
 		&& isAffordable(eEntityType::Headquarters)
 		&& (mainHeadquarters = getMainHeadquarters()))
 	{
-		const Base* availableBase = m_baseHandler.getNearestUnusedBase(mainHeadquarters->getPosition());
+		const Base* availableBase = baseHandler.getNearestUnusedBase(mainHeadquarters->getPosition());
 		if (availableBase)
 		{
 			Worker* availableWorker = getAvailableWorker(availableBase->position);
@@ -365,7 +365,7 @@ void FactionAI::on_entity_taken_damage(const TakeDamageEvent& gameEvent, Entity&
 	}
 }
 
-void FactionAI::on_entity_idle(Entity& entity, const Map& map, const FactionHandler& factionHandler)
+void FactionAI::on_entity_idle(Entity& entity, const Map& map, const FactionHandler& factionHandler, const BaseHandler& baseHandler)
 {
 	switch (entity.getEntityType())
 	{
@@ -373,7 +373,7 @@ void FactionAI::on_entity_idle(Entity& entity, const Map& map, const FactionHand
 		on_unit_idle(static_cast<Unit&>(entity), map, factionHandler);
 		break;
 	case eEntityType::Worker:
-		on_worker_idle(static_cast<Worker&>(entity), map);
+		on_worker_idle(static_cast<Worker&>(entity), map, baseHandler);
 		break;
 	}
 }
@@ -640,7 +640,7 @@ Entity* FactionAI::createWorker(const Map& map, const Headquarters& headquarters
 	return spawnedWorker;
 }
 
-bool FactionAI::build(const Map& map, eEntityType entityType, AIOccupiedBase& occupiedBase, Worker* worker)
+bool FactionAI::build(const Map& map, eEntityType entityType, AIOccupiedBase& occupiedBase, const BaseHandler& baseHandler, Worker* worker)
 {
 	if (!isAffordable(entityType))
 	{
@@ -656,7 +656,7 @@ bool FactionAI::build(const Map& map, eEntityType entityType, AIOccupiedBase& oc
 	{
 		glm::vec3 buildPosition(0.0f);
 		if (PathFinding::getInstance().isBuildingSpawnAvailable(occupiedBase.base.get().getCenteredPosition(),
-			entityType, map, buildPosition, *this, m_baseHandler))
+			entityType, map, buildPosition, *this, baseHandler))
 		{
 			if (worker)
 			{
@@ -701,7 +701,7 @@ bool FactionAI::build(const Map& map, eEntityType entityType, AIOccupiedBase& oc
 	return false;
 }
 
-bool FactionAI::handleAction(const AIAction& action, const Map& map, AIOccupiedBase& occupiedBase)
+bool FactionAI::handleAction(const AIAction& action, const Map& map, AIOccupiedBase& occupiedBase, const BaseHandler& baseHandler)
 {
 	switch (action.actionType)
 	{
@@ -713,7 +713,7 @@ bool FactionAI::handleAction(const AIAction& action, const Map& map, AIOccupiedB
 		eEntityType entityType;
 		if (convertActionTypeToEntityType(action.actionType, entityType))
 		{
-			if (build(map, entityType, occupiedBase, nullptr))
+			if (build(map, entityType, occupiedBase, baseHandler))
 			{
 				return true;
 			}
@@ -733,7 +733,7 @@ bool FactionAI::handleAction(const AIAction& action, const Map& map, AIOccupiedB
 	{
 		eEntityType entityType;
 		if (convertActionTypeToEntityType(action.actionType, entityType) &&
-			build(map, entityType, occupiedBase, nullptr))
+			build(map, entityType, occupiedBase, baseHandler))
 		{
 			return true;
 		}
@@ -819,7 +819,7 @@ void FactionAI::on_unit_idle(Unit& unit, const Map& map, const FactionHandler& f
 	}
 }
 
-void FactionAI::on_worker_idle(Worker& worker, const Map& map)
+void FactionAI::on_worker_idle(Worker& worker, const Map& map, const BaseHandler& baseHandler)
 {
 	if (worker.getCurrentState() != eWorkerState::Idle)
 	{
@@ -828,9 +828,9 @@ void FactionAI::on_worker_idle(Worker& worker, const Map& map)
 	//assert(worker.getCurrentState() == eWorkerState::Idle);
 	if (const Headquarters* nearestHeadquarters = getClosestHeadquarters(worker.getPosition()))
 	{
-		if (const Base* nearestBase = m_baseHandler.getNearestBase(nearestHeadquarters->getPosition()))
+		if (const Base* nearestBase = baseHandler.getNearestBase(nearestHeadquarters->getPosition()))
 		{
-			if (const Mineral* nearestMineral = m_baseHandler.getNearestAvailableMineralAtBase(*this, *nearestBase, worker.getPosition()))
+			if (const Mineral* nearestMineral = baseHandler.getNearestAvailableMineralAtBase(*this, *nearestBase, worker.getPosition()))
 			{
 				worker.moveTo(*nearestMineral, map);
 			}
@@ -840,7 +840,7 @@ void FactionAI::on_worker_idle(Worker& worker, const Map& map)
 				{
 					if (&base.base.get() != &*nearestBase)
 					{
-						nearestMineral = m_baseHandler.getNearestAvailableMineralAtBase(*this, base.base, worker.getPosition());
+						nearestMineral = baseHandler.getNearestAvailableMineralAtBase(*this, base.base, worker.getPosition());
 						if (nearestMineral)
 						{
 							m_occupiedBases.removeWorker(worker);
@@ -863,7 +863,7 @@ void FactionAI::on_worker_idle(Worker& worker, const Map& map)
 				eEntityType entityType;
 				if (convertActionTypeToEntityType(occupiedBase.actionQueue.front().actionType, entityType) &&
 					Globals::BUILDING_TYPES.isMatch(entityType) &&
-					build(map, entityType, occupiedBase, &worker))
+					build(map, entityType, occupiedBase, baseHandler, &worker))
 				{
 					occupiedBase.actionQueue.pop_front();
 					break;

@@ -26,20 +26,20 @@ public:
 	bool increaseShield(const Laboratory& laboratory) override;
 	void setTargetFaction(FactionHandler& factionHandler);
 	void onFactionElimination(FactionHandler& factionHandler, eFactionController eliminatedFaction);
-	void handleEvent(const GameEvent& gameEvent, const Map& map, const FactionHandler& factionHandler) override;
+	void handleEvent(const GameEvent& gameEvent, const Map& map, const FactionHandler& factionHandler, const BaseHandler& baseHandler) override;
 	void selectEntity(const glm::vec3& position);
 	Entity* createUnit(const Map& map, const Barracks& barracks, const FactionHandler& factionHandler) override;
 	Entity* createWorker(const Map& map, const Headquarters& headquarters) override;
-	void update(float deltaTime, const Map& map, const FactionHandler& factionHandler, const Timer& unitStateHandlerTimer) override;
+	void update(float deltaTime, const Map& map, const FactionHandler& factionHandler,
+		const Timer& unitStateHandlerTimer, const BaseHandler& baseHandler) override;
 
 protected:
 	void onEntityRemoval(const Entity& entity) override;
 	void on_entity_taken_damage(const TakeDamageEvent& gameEvent, Entity& entity, const Map& map, const FactionHandler& factionHandler) override;
-	void on_entity_idle(Entity& entity, const Map& map, const FactionHandler& factionHandler) override;
+	void on_entity_idle(Entity& entity, const Map& map, const FactionHandler& factionHandler, const BaseHandler& baseHandler) override;
 	Entity* create_building(const GameMessages::CreateBuilding& message) override;
 
 private:
-	const BaseHandler& m_baseHandler;
 	const AIConstants::eBehaviour m_behaviour;
 	AIUnattachedToBaseWorkers m_unattachedToBaseWorkers;
 	AIOccupiedBases m_occupiedBases;
@@ -54,9 +54,9 @@ private:
 	Worker* getAvailableWorker(const glm::vec3& position);
 	Worker* getAvailableWorker(const glm::vec3& position, AIOccupiedBase& occupiedBase);
 
-	bool build(const Map& map, eEntityType entityType, AIOccupiedBase& occupiedBase, Worker* worker = nullptr);
-	bool handleAction(const AIAction& action, const Map& map, AIOccupiedBase& occupiedBase);
+	bool build(const Map& map, eEntityType entityType, AIOccupiedBase& occupiedBase, const BaseHandler& baseHandler, Worker* worker = nullptr);
+	bool handleAction(const AIAction& action, const Map& map, AIOccupiedBase& occupiedBase, const BaseHandler& baseHandler);
 	void on_unit_taken_damage(const TakeDamageEvent& gameEvent, Unit& unit, const Map& map, const FactionHandler& factionHandler);
 	void on_unit_idle(Unit& unit, const Map& map, const FactionHandler& factionHandler);
-	void on_worker_idle(Worker& worker, const Map& map);
+	void on_worker_idle(Worker& worker, const Map& map, const BaseHandler& baseHandler);
 };

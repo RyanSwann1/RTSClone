@@ -53,8 +53,10 @@ public:
 	virtual Entity* createUnit(const Map& map, const Barracks& barracks, const FactionHandler& factionHandler);
 	virtual Entity* createWorker(const Map& map, const Headquarters& headquarters);
 	virtual bool increaseShield(const Laboratory& laboratory);
-	virtual void handleEvent(const GameEvent& gameEvent, const Map& map, const FactionHandler& factionHandler);
-	virtual void update(float deltaTime, const Map& map, const FactionHandler& factionHandler, const Timer& unitStateHandlerTimer);
+	virtual void handleEvent(const GameEvent& gameEvent, const Map& map, const FactionHandler& factionHandler, 
+		const BaseHandler& baseHandler);
+	virtual void update(float deltaTime, const Map& map, const FactionHandler& factionHandler, 
+		const Timer& unitStateHandlerTimer, const BaseHandler& baseHandler);
 	virtual void render(ShaderHandler& shaderHandler) const;
 	void renderPlannedBuildings(ShaderHandler& shaderHandler) const;
 	void renderEntityStatusBars(ShaderHandler& shaderHandler, const Camera& camera, glm::uvec2 windowSize) const;
@@ -72,7 +74,7 @@ protected:
 		int startingResources, int startingPopulationCap);
 
 	virtual void on_entity_taken_damage(const TakeDamageEvent& gameEvent, Entity& entity, const Map& map, const FactionHandler& factionHandler) {}
-	virtual void on_entity_idle(Entity& entity, const Map& map, const FactionHandler& factionHandler) {}
+	virtual void on_entity_idle(Entity& entity, const Map& map, const FactionHandler& factionHandler, const BaseHandler& baseHandler) {}
 	virtual void onEntityRemoval(const Entity& entity) {}
 
 	virtual Entity* create_building(const GameMessages::CreateBuilding& message);
