@@ -120,7 +120,7 @@ void MiniMap::render(ShaderHandler& shaderHandler, glm::uvec2 windowSize, const 
 
 	for (const auto& gameObject : level.getSceneryGameObjects())
 	{
-		glm::vec2 convertedMineralPosition((gameObject.getPosition().z / level.getSize().x) * m_size.x, (gameObject.getPosition().x / level.getSize().z) * m_size.y);
+		glm::vec2 convertedMineralPosition((gameObject.position.z / level.getSize().x) * m_size.x, (gameObject.position.x / level.getSize().z) * m_size.y);
 		convertedMineralPosition += m_position;
 		m_entitySprite.render(convertedMineralPosition, SMALL_SIZE, SCENERY_COLOR, shaderHandler, windowSize, OPACITY);
 	}

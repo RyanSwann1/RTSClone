@@ -13,7 +13,7 @@
 
 class Faction;
 struct Base;
-class SceneryGameObject;
+struct SceneryGameObject;
 #ifdef LEVEL_EDITOR
 class Level;
 #endif // LEVEL_EDITOR

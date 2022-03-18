@@ -23,7 +23,7 @@ struct MinHeapNode
 
 namespace GameMessages
 {
-	struct NewMapSize;
+	struct MapSize;
 }
 class MinHeap
 {
@@ -44,9 +44,9 @@ public:
 private:
 	std::vector<MinHeapNode> m_heap;
 	std::unordered_map<glm::ivec2, size_t> m_indexes;
-	GameMessengerSubscriber<GameMessages::NewMapSize> m_onNewMapSizeID;
+	GameMessengerSubscriber<GameMessages::MapSize> m_onNewMapSizeID;
 
 	void sortNode(size_t i);
 	void swap(size_t index1, size_t index2);
-	void onNewMapSize(const GameMessages::NewMapSize& gameMessage);
+	void onNewMapSize(const GameMessages::MapSize& gameMessage);
 };

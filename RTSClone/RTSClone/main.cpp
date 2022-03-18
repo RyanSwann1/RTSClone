@@ -79,7 +79,7 @@ int main()
 	GameMessenger<GameMessages::RemoveAABBFromMap>::getInstance();
 	GameMessenger<GameMessages::AddUnitPositionToMap>::getInstance();
 	GameMessenger<GameMessages::RemoveUnitPositionFromMap>::getInstance();
-	GameMessenger<GameMessages::NewMapSize>::getInstance();
+	GameMessenger<GameMessages::MapSize>::getInstance();
 
 	GameMessenger<GameMessages::UIClearDisplaySelectedEntity>::getInstance();
 	GameMessenger<GameMessages::UIClearSelectedMineral>::getInstance();
@@ -93,7 +93,6 @@ int main()
 	
 	sf::Clock gameClock;
 	UIManager uiManager;
-	Map map;
 	const std::array<std::string, Globals::MAX_LEVELS> levelNames = LevelFileHandler::loadLevelNames();
 	std::optional<Level> currentLevel = {};
 
@@ -123,7 +122,7 @@ int main()
 
 			if (currentLevel)
 			{
-				currentLevel->handleInput(windowSize, window, currentSFMLEvent, map, uiManager);
+				currentLevel->handleInput(windowSize, window, currentSFMLEvent, uiManager);
 			}
 		}
 
@@ -167,7 +166,7 @@ int main()
 		uiManager.render(window);
 		if (currentLevel)
 		{	
-			currentLevel->update(deltaTime, map, uiManager, windowSize, window);
+			currentLevel->update(deltaTime, uiManager, windowSize, window);
 		}
 
 		//Render
@@ -211,7 +210,7 @@ int main()
 			glDisable(GL_CULL_FACE);
 			shaderHandler->switchToShader(eShaderType::Default);
 			shaderHandler->setUniform1f(eShaderType::Default, "uOpacity", 0.35f);
-			currentLevel->renderPlayerPlannedBuilding(*shaderHandler, map);
+			currentLevel->renderPlayerPlannedBuilding(*shaderHandler);
 			currentLevel->renderPlannedBuildings(*shaderHandler);
 			shaderHandler->switchToShader(eShaderType::Debug);
 			currentLevel->renderBasePositions(*shaderHandler);

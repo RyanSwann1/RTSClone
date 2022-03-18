@@ -49,7 +49,7 @@ float MinHeapNode::getCost() const
 MinHeap::MinHeap()
 	: m_heap(),
 	m_indexes(),
-	m_onNewMapSizeID([this](const GameMessages::NewMapSize& gameMessage) { return onNewMapSize(gameMessage); })
+	m_onNewMapSizeID([this](const GameMessages::MapSize& gameMessage) { return onNewMapSize(gameMessage); })
 {}
 
 bool MinHeap::isEmpty() const
@@ -168,7 +168,7 @@ void MinHeap::swap(size_t index1, size_t index2)
 	std::swap(m_heap[index2], m_heap[index1]);
 }
 
-void MinHeap::onNewMapSize(const GameMessages::NewMapSize& gameMessage)
+void MinHeap::onNewMapSize(const GameMessages::MapSize& gameMessage)
 {
 	clear();
 	m_heap.resize(static_cast<size_t>(gameMessage.mapSize.x * gameMessage.mapSize.y), {});

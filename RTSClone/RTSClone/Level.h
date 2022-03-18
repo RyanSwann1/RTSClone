@@ -24,6 +24,7 @@ struct LevelDetailsFromFile
 	int factionStartingPopulation			= 0;
 	int factionCount						= 0;
 	glm::vec3 size							= {};
+	glm::ivec2 gridSize						= {};
 };
 
 class UIManager;
@@ -47,14 +48,13 @@ public:
 	const glm::vec3& getSize() const;
 	const Faction* getWinningFaction() const;
 
-	void handleInput(glm::uvec2 windowSize, const sf::Window& window, const sf::Event& currentSFMLEvent, const Map& map,
-		UIManager& uiManager);
-	void update(float deltaTime, const Map& map, UIManager& uiManager, glm::uvec2 windowSize, const sf::Window& window);
+	void handleInput(glm::uvec2 windowSize, const sf::Window& window, const sf::Event& currentSFMLEvent, UIManager& uiManager);
+	void update(float deltaTime, UIManager& uiManager, glm::uvec2 windowSize, const sf::Window& window);
 	void renderEntitySelector(const sf::Window& window, ShaderHandler& shaderHandler) const;
 	void renderPlannedBuildings(ShaderHandler& shaderHandler) const;
 	void renderEntityStatusBars(ShaderHandler& shaderHandler, glm::uvec2 windowSize) const;
 	void renderTerrain(ShaderHandler& shaderHandler) const;
-	void renderPlayerPlannedBuilding(ShaderHandler& shaderHandler, const Map& map) const;
+	void renderPlayerPlannedBuilding(ShaderHandler& shaderHandler) const;
 	void renderBasePositions(ShaderHandler& shaderHandler) const;
 	void renderMinimap(ShaderHandler& shaderHandler, glm::uvec2 windowSize, const sf::Window& window) const;
 	void render(ShaderHandler& shaderHandler) const;
@@ -68,10 +68,11 @@ public:
 #endif // RENDER_PATHING
 
 private:
-	std::vector<Projectile> m_projectiles;
-	Quad m_playableArea;
 	BaseHandler m_baseHandler;
 	std::vector<SceneryGameObject> m_scenery;
+	Map m_map;
+	std::vector<Projectile> m_projectiles;
+	Quad m_playableArea;
 	Camera m_camera;
 	MiniMap m_minimap;
 	Timer m_unitStateHandlerTimer;

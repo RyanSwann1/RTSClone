@@ -10,7 +10,7 @@
 
 namespace GameMessages
 {
-	struct NewMapSize;
+	struct MapSize;
 }
 class Map;
 class Graph 
@@ -29,7 +29,7 @@ private:
 	std::queue<glm::ivec2> m_frontier = {};
 	glm::ivec2 m_size = { 0, 0 };
 	std::vector<std::optional<glm::ivec2>> m_graph = {};
-	GameMessengerSubscriber<GameMessages::NewMapSize> m_onNewMapSizeID;
+	GameMessengerSubscriber<GameMessages::MapSize> m_onNewMapSizeID;
 	
-	void new_map_size(const GameMessages::NewMapSize& gameMessage);
+	void new_map_size(const GameMessages::MapSize& gameMessage);
 };

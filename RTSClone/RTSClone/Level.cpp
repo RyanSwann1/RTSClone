@@ -29,11 +29,10 @@ namespace
 
 //Level
 Level::Level(LevelDetailsFromFile&& levelDetails, glm::ivec2 windowSize)
-	: m_playableArea(levelDetails.size, TERRAIN_COLOR),
-	m_baseHandler(std::move(levelDetails.bases)),
+	: m_baseHandler(std::move(levelDetails.bases)),
 	m_scenery(std::move(levelDetails.scenery)),
-	m_camera(),
-	m_minimap(),
+	m_playableArea(levelDetails.size, TERRAIN_COLOR),
+	m_map(m_scenery, m_baseHandler.getBases(), levelDetails.gridSize),
 	m_unitStateHandlerTimer(TIME_BETWEEN_UNIT_STATE, true),
 	m_factionHandler(m_baseHandler, levelDetails)
 {
@@ -145,8 +144,7 @@ const Faction* Level::getWinningFaction() const
 	return nullptr;
 }
 
-void Level::handleInput(glm::uvec2 windowSize, const sf::Window& window, const sf::Event& currentSFMLEvent, const Map& map,
-	UIManager& uiManager)
+void Level::handleInput(glm::uvec2 windowSize, const sf::Window& window, const sf::Event& currentSFMLEvent, UIManager& uiManager)
 {
 	if (ImGui::IsWindowHovered(ImGuiHoveredFlags_::ImGuiHoveredFlags_AnyWindow))
 	{
@@ -161,7 +159,7 @@ void Level::handleInput(glm::uvec2 windowSize, const sf::Window& window, const s
 
 	if (FactionPlayer* factionPlayer = m_factionHandler.getFactionPlayer())
 	{
-		factionPlayer->handleInput(currentSFMLEvent, window, m_camera, map, m_factionHandler,
+		factionPlayer->handleInput(currentSFMLEvent, window, m_camera, m_map, m_factionHandler,
 			m_baseHandler, m_minimap, getSize());
 	}
 
@@ -215,7 +213,7 @@ void Level::handleInput(glm::uvec2 windowSize, const sf::Window& window, const s
 	uiManager.handleInput(window, m_factionHandler, m_camera, currentSFMLEvent);
 }
 
-void Level::update(float deltaTime, const Map& map, UIManager& uiManager, glm::uvec2 windowSize, const sf::Window& window)
+void Level::update(float deltaTime, UIManager& uiManager, glm::uvec2 windowSize, const sf::Window& window)
 {
 	if (!m_minimap.isUserInteracted())
 	{
@@ -224,11 +222,11 @@ void Level::update(float deltaTime, const Map& map, UIManager& uiManager, glm::u
 
 	m_unitStateHandlerTimer.update(deltaTime);
 
-	std::for_each(m_factionHandler.getFactions().begin(), m_factionHandler.getFactions().end(), [deltaTime, &map, this](auto& faction)
+	std::for_each(m_factionHandler.getFactions().begin(), m_factionHandler.getFactions().end(), [deltaTime, this](auto& faction)
 	{
 		if (faction)
 		{
-			faction->update(deltaTime, map, m_factionHandler, m_unitStateHandlerTimer, m_baseHandler);
+			faction->update(deltaTime, m_map, m_factionHandler, m_unitStateHandlerTimer, m_baseHandler);
 		}
 	});
 
@@ -257,7 +255,7 @@ void Level::update(float deltaTime, const Map& map, UIManager& uiManager, glm::u
 	const size_t gameEventsSize = gameEvents.size();
 	for (size_t i = 0; i < gameEventsSize; ++i)
 	{
-		handleEvent(gameEvents.front(), map);
+		handleEvent(gameEvents.front(), m_map);
 		uiManager.handleEvent(gameEvents.front());
 
 		gameEvents.pop();
@@ -301,11 +299,11 @@ void Level::renderTerrain(ShaderHandler& shaderHandler) const
 	m_playableArea.render(shaderHandler);
 }
 
-void Level::renderPlayerPlannedBuilding(ShaderHandler& shaderHandler, const Map& map) const
+void Level::renderPlayerPlannedBuilding(ShaderHandler& shaderHandler) const
 {
 	if (const FactionPlayer* factionPlayer = m_factionHandler.getFactionPlayer())
 	{
-		factionPlayer->renderPlannedBuilding(shaderHandler, m_baseHandler, map);
+		factionPlayer->renderPlannedBuilding(shaderHandler, m_baseHandler, m_map);
 	}
 }
 

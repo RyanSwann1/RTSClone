@@ -4,17 +4,32 @@
 #include "Entity.h"
 #include "Mineral.h"
 #include "SceneryGameObject.h"
+#include "GameMessenger.h"
 #include <assert.h>
 
-Map::Map()
-	: m_size(),
-	m_map(),
+Map::Map(const std::vector<SceneryGameObject>& sceneryGameObjects, const std::vector<Base>& bases, glm::ivec2 size)
+	: m_size(size),
+	m_map(static_cast<size_t>(m_size.x)* static_cast<size_t>(m_size.y), false),
+	m_unitMap(static_cast<size_t>(m_size.x)* static_cast<size_t>(m_size.y), Globals::INVALID_ENTITY_ID),
 	m_addABBID([this](const GameMessages::AddAABBToMap& message) { return addAABB(message); }),
 	m_removeABBBFromMapID([this](const GameMessages::RemoveAABBFromMap& message) { return removeAABB(message); }),
 	m_addUnitPositionToMapID([this](const GameMessages::AddUnitPositionToMap& message) { return addUnitPosition(message); }),
-	m_removeUnitPositionFromMapID([this](const GameMessages::RemoveUnitPositionFromMap& message) { return removeUnitPosition(message); }),
-	m_setSizeID([this](const GameMessages::NewMapSize& gameMessage) { return setSize(gameMessage); })
-{}
+	m_removeUnitPositionFromMapID([this](const GameMessages::RemoveUnitPositionFromMap& message) { return removeUnitPosition(message); })
+{
+	broadcastToMessenger<GameMessages::MapSize>({ size });
+	for (const auto& gameObject : sceneryGameObjects)
+	{
+		editMap(gameObject.AABB, true);
+	}
+
+	for (const auto& base : bases)
+	{
+		for (const auto& mineral : base.getMinerals())
+		{
+			editMap(mineral.getAABB(), true);
+		}
+	}
+}
 
 bool Map::isCollidable(const glm::vec3& position) const
 {
@@ -118,13 +133,6 @@ void Map::addUnitPosition(const GameMessages::AddUnitPositionToMap& message)
 void Map::removeUnitPosition(const GameMessages::RemoveUnitPositionFromMap& message)
 {
 	editUnitMap(message.position, message.ID, false);
-}
-
-void Map::setSize(const GameMessages::NewMapSize& gameMessage)
-{
-	m_size = gameMessage.mapSize;
-	m_map.resize(static_cast<size_t>(m_size.x) * static_cast<size_t>(m_size.y), false);
-	m_unitMap.resize(static_cast<size_t>(m_size.x) * static_cast<size_t>(m_size.y), Globals::INVALID_ENTITY_ID);
 }
 
 int Map::getIDOnUnitMap(glm::ivec2 position) const

@@ -10,6 +10,7 @@
 #include "Turret.h"
 #include "Laboratory.h"
 #include "GameMessages.h"
+#include "Map.h"
 #include <vector>
 #include <functional>
 #include <memory>

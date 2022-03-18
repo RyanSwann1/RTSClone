@@ -38,7 +38,7 @@ namespace GameMessages
 		const int ID = Globals::INVALID_ENTITY_ID;
 	};
 
-	struct NewMapSize 
+	struct MapSize 
 	{
 		const glm::ivec2 mapSize;
 	};

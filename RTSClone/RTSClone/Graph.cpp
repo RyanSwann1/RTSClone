@@ -5,7 +5,7 @@
 #include <algorithm>
 
 Graph::Graph()
-	: m_onNewMapSizeID([this](const GameMessages::NewMapSize& gameMessage) { return new_map_size(gameMessage); })
+	: m_onNewMapSizeID([this](const GameMessages::MapSize& gameMessage) { return new_map_size(gameMessage); })
 {}
 
 void Graph::add(glm::ivec2 position, glm::ivec2 cameFromPosition, const Map& map)
@@ -19,7 +19,7 @@ void Graph::add(glm::ivec2 position, glm::ivec2 cameFromPosition, const Map& map
 	}
 }
 
-void Graph::new_map_size(const GameMessages::NewMapSize& gameMessage)
+void Graph::new_map_size(const GameMessages::MapSize& gameMessage)
 {
 	m_size = gameMessage.mapSize;
 	m_graph.resize(static_cast<size_t>(m_size.x * m_size.y));

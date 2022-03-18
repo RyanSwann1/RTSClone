@@ -16,8 +16,8 @@ class EntitySpawnerBuilding : public Entity
 public:
 	EntitySpawnerBuilding(const glm::vec3& startingPosition, eEntityType entityType, float spawnTimerExpirationTime, int health,
 		Faction& owningFaction, const Model& model, int maxEntityInSpawnQueue);
-	EntitySpawnerBuilding(EntitySpawnerBuilding&&) = default;
-	EntitySpawnerBuilding& operator=(EntitySpawnerBuilding&&) = default;
+	EntitySpawnerBuilding(EntitySpawnerBuilding&&) noexcept = default;
+	EntitySpawnerBuilding& operator=(EntitySpawnerBuilding&&) noexcept = default;
 	
 	const Timer& getSpawnTimer() const;
 	int getCurrentSpawnCount() const;

@@ -8,7 +8,7 @@
 #ifdef LEVEL_EDITOR
 struct GameObject;
 #else 
-class SceneryGameObject;
+struct SceneryGameObject;
 enum class eFactionController;
 #endif // LEVEL_EDITOR
 class ShaderHandler;

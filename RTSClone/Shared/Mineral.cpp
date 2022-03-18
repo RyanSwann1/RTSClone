@@ -25,22 +25,12 @@ Mineral::Mineral(const glm::vec3& startingPosition)
 
 #ifdef GAME
 Mineral::Mineral(const glm::vec3& startingPosition, int quantity)
-	: m_status(),
-	m_quantity(quantity),
+	: m_quantity(quantity),
 	m_position(Globals::convertToMiddleGridPosition(startingPosition)),
 	m_AABB(),
 	m_model(ModelManager::getInstance().getModel(MINERALS_MODEL_NAME))
 {
 	m_AABB.reset(m_position, m_model);
-	broadcastToMessenger<GameMessages::AddAABBToMap>({ m_AABB });
-}
-
-Mineral::~Mineral()
-{
-	if (m_status.isActive())
-	{
-		broadcastToMessenger<GameMessages::RemoveAABBFromMap>({ m_AABB });
-	}
 }
 
 int Mineral::getQuantity() const

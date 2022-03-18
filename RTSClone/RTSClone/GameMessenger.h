@@ -74,7 +74,6 @@ public:
 	void broadcast(const Message& message) const
 	{
 		static_assert(std::is_same<int, ID>());
-		assert(!m_listeners.empty());
 		for (const auto& listener : m_listeners)
 		{
 			listener.callback(message);

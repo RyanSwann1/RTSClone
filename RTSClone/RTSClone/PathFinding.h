@@ -28,7 +28,7 @@ struct ThetaStarGraphNode
 
 namespace GameMessages
 {
-	struct NewMapSize;
+	struct MapSize;
 }
 class Faction;
 class Entity;
@@ -82,9 +82,9 @@ private:
 	//ThetaStar
 	std::vector<ThetaStarGraphNode> m_thetaGraph;
 	MinHeap m_thetaFrontier;
-	GameMessengerSubscriber<GameMessages::NewMapSize> m_onNewMapSizeID;
+	GameMessengerSubscriber<GameMessages::MapSize> m_onNewMapSizeID;
 
 	void expandFrontier(const MinHeapNode& currentNode, const Map& map, glm::ivec2 destinationOnGrid, AdjacentPositions adjacentPositions,
 		const Entity& entity);
-	void onNewMapSize(const GameMessages::NewMapSize& gameMessage);
+	void onNewMapSize(const GameMessages::MapSize& gameMessage);
 };

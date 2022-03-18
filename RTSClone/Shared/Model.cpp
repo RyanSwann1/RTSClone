@@ -113,7 +113,7 @@ void Model::render(ShaderHandler& shaderHandler, const SceneryGameObject& gameOb
 
 void Model::setModelMatrix(ShaderHandler& shaderHandler, const SceneryGameObject& gameObject) const
 {
-	glm::vec3 gameObjectPosition = gameObject.getPosition();
+	glm::vec3 gameObjectPosition = gameObject.position;
 	glm::mat4 model = glm::mat4(1.0f);
 	if (renderFromCentrePosition)
 	{
@@ -121,16 +121,16 @@ void Model::setModelMatrix(ShaderHandler& shaderHandler, const SceneryGameObject
 		gameObjectPosition.z -= AABBSizeFromCenter.z;
 
 		model = glm::translate(model, gameObjectPosition);
-		model = glm::scale(model, gameObject.getScale());
+		model = glm::scale(model, gameObject.scale);
 		model = glm::translate(model, glm::vec3(-AABBSizeFromCenter.x, 0.0f, AABBSizeFromCenter.z));
-		model = glm::rotate(model, glm::radians(gameObject.getRotation().y), glm::vec3(0.0f, 1.0f, 0.0f));
+		model = glm::rotate(model, glm::radians(gameObject.rotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
 		model = glm::translate(model, glm::vec3(AABBSizeFromCenter.x, 0.0f, -AABBSizeFromCenter.z));
 	}
 	else
 	{
 		model = glm::translate(model, gameObjectPosition);
-		model = glm::scale(model, gameObject.getScale());
-		model = glm::rotate(model, glm::radians(gameObject.getRotation().y), glm::vec3(0.0f, 1.0f, 0.0f));
+		model = glm::scale(model, gameObject.scale);
+		model = glm::rotate(model, glm::radians(gameObject.rotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
 	}
 
 	shaderHandler.setUniformMat4f(eShaderType::Default, "uModel", model);
