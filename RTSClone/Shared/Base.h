@@ -13,6 +13,8 @@ struct Base
 	Base();
 #endif // LEVEL_EDITOR
 	Base(const glm::vec3& position, std::vector<Mineral>&& minerals);
+	Base(Base&&) noexcept;
+	Base& operator=(Base&&) noexcept;
 
 #ifdef GAME
 	glm::vec3 getCenteredPosition() const;
@@ -28,7 +30,7 @@ struct Base
 	std::vector<Mineral> minerals;
 #ifdef GAME
 	Quad quad;
-	eFactionController owningFactionController;
+	eFactionController owningFactionController = eFactionController::None;
 #endif // GAME
 };
 
@@ -42,8 +44,8 @@ public:
 	BaseHandler(std::vector<Base>&& m_bases);
 	BaseHandler(const BaseHandler&) = delete;
 	BaseHandler& operator=(const BaseHandler&) = delete;
-	BaseHandler(BaseHandler&&) = delete;
-	BaseHandler& operator=(BaseHandler&&) = delete;
+	BaseHandler(BaseHandler&&) noexcept = default;
+	BaseHandler& operator=(BaseHandler&&) noexcept = default;
 
 	bool isWithinRangeOfMinerals(const glm::vec3& position, float distance) const;
 	const std::vector<Base>& getBases() const;

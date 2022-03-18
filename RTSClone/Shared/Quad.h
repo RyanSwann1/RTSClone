@@ -12,8 +12,8 @@ public:
 	Quad(const glm::vec3& position, const glm::vec3& size, const glm::vec3& color, float opacity = 1.0f);
 	Quad(const Quad&) = delete;
 	Quad& operator=(const Quad&) = delete;
-	Quad(Quad&&) = default;
-	Quad& operator=(Quad&&) = default;
+	Quad(Quad&&) noexcept = default;
+	Quad& operator=(Quad&&) noexcept = default;
 
 	const glm::vec3& getSize() const;
 	const glm::vec3& getPosition() const;

@@ -17,8 +17,8 @@ public:
 	FactionHandler(const BaseHandler& baseHandler, const LevelDetailsFromFile& levelDetails);
 	FactionHandler(const FactionHandler&) = delete;
 	FactionHandler& operator=(const FactionHandler&) = delete;
-	FactionHandler(FactionHandler&&) = delete;
-	FactionHandler& operator=(FactionHandler&&) = delete;
+	FactionHandler(FactionHandler&&) noexcept = default;
+	FactionHandler& operator=(FactionHandler&&) noexcept = default;
 
 	bool isFactionActive(eFactionController factionController) const;
 	

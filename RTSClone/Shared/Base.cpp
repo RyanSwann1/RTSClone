@@ -23,6 +23,24 @@ Base::Base(const glm::vec3& position, std::vector<Mineral>&& minerals)
 	owningFactionController(eFactionController::None)
 {}
 
+Base::Base(Base&& rhs) noexcept
+	: position(std::move(rhs.position)),
+	minerals(std::move(rhs.minerals)),
+	quad(std::move(quad)),
+	owningFactionController(rhs.owningFactionController)
+{
+	std::swap(owningFactionController, rhs.owningFactionController);
+}
+
+Base& Base::operator=(Base&& rhs) noexcept
+{
+	position	= std::move(rhs.position);
+	minerals	= std::move(rhs.minerals);
+	quad		= std::move(rhs.quad);
+	std::swap(owningFactionController, rhs.owningFactionController);
+	return *this;
+}
+
 glm::vec3 Base::getCenteredPosition() const
 {
 	return Globals::convertToMiddleGridPosition(Globals::convertToNodePosition(position));

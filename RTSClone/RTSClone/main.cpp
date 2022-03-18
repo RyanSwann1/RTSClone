@@ -95,7 +95,7 @@ int main()
 	UIManager uiManager;
 	Map map;
 	const std::array<std::string, Globals::MAX_LEVELS> levelNames = LevelFileHandler::loadLevelNames();
-	std::unique_ptr<Level> currentLevel = {};
+	std::optional<Level> currentLevel = {};
 
 	std::cout << glGetError() << "\n";
 	std::cout << glGetError() << "\n";
@@ -147,8 +147,12 @@ int main()
 				if (!levelName.empty() && ImGui::Button(levelName.c_str()))
 				{
 					broadcastToMessenger<GameMessages::UIClearWinner>({});
-					currentLevel = Level::load(levelName, windowSize);
-					assert(currentLevel);
+					if (std::optional<Level> level = Level::load(levelName, windowSize))
+					{
+						assert(!currentLevel);
+						currentLevel.swap(level);
+					}
+
 					if (!currentLevel)
 					{
 						std::cout << "Unable to load " << levelName << "\n";

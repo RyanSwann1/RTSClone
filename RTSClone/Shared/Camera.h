@@ -8,8 +8,8 @@ struct Camera
 	Camera();
 	Camera(const Camera&) = delete;
 	Camera& operator=(const Camera&) = delete;
-	Camera(Camera&&) = delete;
-	Camera& operator=(Camera&&) = delete;
+	Camera(Camera&&) noexcept = default;
+	Camera& operator=(Camera&&) noexcept = default;
 
 	glm::mat4 getView() const;
 	glm::mat4 getProjection(glm::ivec2 windowSize) const;
@@ -34,10 +34,10 @@ struct Camera
 	void zoom(const sf::Window& window, int mouseWheelDelta);
 #endif // GAME 
 
-	const float FOV;
-	const float sensitivity;
-	const float nearPlaneDistance;
-	const float farPlaneDistance;
+	float FOV;
+	float sensitivity;
+	float nearPlaneDistance;
+	float farPlaneDistance;
 	float maxDistanceFromGround;
 	glm::vec3 front;
 	glm::vec3 up;

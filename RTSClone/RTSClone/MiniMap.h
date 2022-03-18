@@ -13,8 +13,8 @@ public:
 	MiniMap();
 	MiniMap(const MiniMap&) = delete;
 	MiniMap& operator=(const MiniMap&) = delete;
-	MiniMap(MiniMap&&) = delete;
-	MiniMap& operator=(MiniMap&&) = delete;
+	MiniMap(MiniMap&&) noexcept = default;
+	MiniMap& operator=(MiniMap&&) noexcept = default;
 
 	glm::vec2 getPosition() const;
 	glm::vec2 getSize() const;
@@ -27,9 +27,9 @@ public:
 		const sf::Window& window) const;
 
 private:
-	const Sprite m_background;
-	const glm::vec2 m_position;
-	const glm::vec2 m_size;
+	Sprite m_background;
+	glm::vec2 m_position;
+	glm::vec2 m_size;
 	Sprite m_entitySprite;
 	Sprite m_cameraViewSprite;
 	bool m_mouseButtonPressed;
