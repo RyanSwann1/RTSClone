@@ -147,10 +147,9 @@ int main()
 				if (!levelName.empty() && ImGui::Button(levelName.c_str()))
 				{
 					broadcastToMessenger<GameMessages::UIClearWinner>({});
-					if (std::optional<Level> level = Level::load(levelName, windowSize))
+					if (std::optional<LevelDetailsFromFile> levelDetails = Level::load(levelName, windowSize))
 					{
-						assert(!currentLevel);
-						currentLevel.swap(level);
+						currentLevel.emplace(std::move(*levelDetails), windowSize);
 					}
 
 					if (!currentLevel)

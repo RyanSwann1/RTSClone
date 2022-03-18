@@ -84,15 +84,9 @@ Level::Level(LevelDetailsFromFile&& levelDetails, glm::ivec2 windowSize)
 	m_camera.maxDistanceFromGround = m_camera.position.y;
 }
 
-std::optional<Level> Level::load(std::string_view levelName, glm::ivec2 windowSize)
+std::optional<LevelDetailsFromFile> Level::load(std::string_view levelName, glm::ivec2 windowSize)
 {
-	std::optional<LevelDetailsFromFile> levelDetails = LevelFileHandler::loadLevelFromFile(levelName);
-	if (!levelDetails)
-	{
-		return {};
-	}
-
-	return std::optional<Level>{std::in_place, std::move(*levelDetails), windowSize};
+	return LevelFileHandler::loadLevelFromFile(levelName);
 }
 
 void Level::add_event(const GameEvent& gameEvent)

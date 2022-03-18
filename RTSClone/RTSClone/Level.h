@@ -36,7 +36,7 @@ public:
 	Level(Level&&) noexcept = default;
 	~Level();
 
-	static std::optional<Level> load(std::string_view levelName, glm::ivec2 windowSize);
+	static std::optional<LevelDetailsFromFile> load(std::string_view levelName, glm::ivec2 windowSize);
 	static void add_event(const GameEvent& gameEvent);
 
 	const std::vector<SceneryGameObject>& getSceneryGameObjects() const;
