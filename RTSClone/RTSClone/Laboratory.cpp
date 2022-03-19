@@ -21,14 +21,14 @@ Laboratory::Laboratory(const glm::vec3& startingPosition, Faction& owningFaction
 	m_shieldUpgradeCounter(0),
 	m_increaseShieldTimer(INCREASE_SHIELD_TIMER_EXPIRATION, false)
 {
-	broadcastToMessenger<GameMessages::AddAABBToMap>({ m_AABB });
+	broadcast<GameMessages::AddAABBToMap>({ m_AABB });
 }
 
 Laboratory::~Laboratory()
 {
 	if (m_status.isActive())
 	{
-		broadcastToMessenger<GameMessages::RemoveAABBFromMap>({ m_AABB });
+		broadcast<GameMessages::RemoveAABBFromMap>({ m_AABB });
 	}
 }
 

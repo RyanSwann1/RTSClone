@@ -19,14 +19,14 @@ EntitySpawnerBuilding::EntitySpawnerBuilding(const glm::vec3& startingPosition, 
 	m_waypointPosition(m_position)
 {
 	m_spawnQueue.reserve(static_cast<size_t>(maxEntityInSpawnQueue));
-	broadcastToMessenger<GameMessages::AddAABBToMap>({ m_AABB });
+	broadcast<GameMessages::AddAABBToMap>({ m_AABB });
 }
 
 EntitySpawnerBuilding::~EntitySpawnerBuilding()
 {
 	if (m_status.isActive())
 	{
-		broadcastToMessenger<GameMessages::RemoveAABBFromMap>({ m_AABB });
+		broadcast<GameMessages::RemoveAABBFromMap>({ m_AABB });
 	}
 }
 

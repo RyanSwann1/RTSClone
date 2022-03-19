@@ -35,15 +35,15 @@ private:
 	std::vector<bool> m_map;
 	std::vector<int> m_unitMap;
 
-	GameMessengerSubscriber<GameMessages::AddAABBToMap> m_addABBID;
-	GameMessengerSubscriber<GameMessages::RemoveAABBFromMap> m_removeABBBFromMapID;
-	GameMessengerSubscriber<GameMessages::AddUnitPositionToMap> m_addUnitPositionToMapID;
-	GameMessengerSubscriber<GameMessages::RemoveUnitPositionFromMap> m_removeUnitPositionFromMapID;
+	BroadcasterSubscriber<GameMessages::AddAABBToMap> m_addABBID;
+	BroadcasterSubscriber<GameMessages::RemoveAABBFromMap> m_removeABBBFromMapID;
+	BroadcasterSubscriber<GameMessages::AddUnitPositionToMap> m_addUnitPositionToMapID;
+	BroadcasterSubscriber<GameMessages::RemoveUnitPositionFromMap> m_removeUnitPositionFromMapID;
 
-	void addAABB(const GameMessages::AddAABBToMap& message);
-	void removeAABB(const GameMessages::RemoveAABBFromMap& message);
-	void addUnitPosition(const GameMessages::AddUnitPositionToMap& message);
-	void removeUnitPosition(const GameMessages::RemoveUnitPositionFromMap& message);
+	void addAABB(GameMessages::AddAABBToMap&& message);
+	void removeAABB(GameMessages::RemoveAABBFromMap&& message);
+	void addUnitPosition(GameMessages::AddUnitPositionToMap&& message);
+	void removeUnitPosition(GameMessages::RemoveUnitPositionFromMap&& message);
 
 	int getIDOnUnitMap(glm::ivec2 position) const;
 

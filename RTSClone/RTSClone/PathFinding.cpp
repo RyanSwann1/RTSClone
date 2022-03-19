@@ -76,7 +76,7 @@ float ThetaStarGraphNode::getF() const
 
 //PathFinding
 PathFinding::PathFinding()
-	: m_onNewMapSizeID([this](const GameMessages::MapSize& gameMessage) { return onNewMapSize(gameMessage); })
+	: m_onNewMapSizeID([this](GameMessages::MapSize&& gameMessage) { return onNewMapSize(std::move(gameMessage)); })
 {}
 
 bool PathFinding::getClosestAvailablePosition(const Worker& worker, const std::vector<Worker*>& workers, const Map& map, glm::vec3& outPosition)
@@ -493,7 +493,7 @@ void PathFinding::expandFrontier(const MinHeapNode& currentNode, const Map& map,
 	}
 }
 
-void PathFinding::onNewMapSize(const GameMessages::MapSize& gameMessage)
+void PathFinding::onNewMapSize(GameMessages::MapSize&& gameMessage)
 {
 	m_sharedContainer.clear();
 	m_sharedContainer.reserve(

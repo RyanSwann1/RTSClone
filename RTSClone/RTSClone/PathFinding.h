@@ -82,9 +82,9 @@ private:
 	//ThetaStar
 	std::vector<ThetaStarGraphNode> m_thetaGraph;
 	MinHeap m_thetaFrontier;
-	GameMessengerSubscriber<GameMessages::MapSize> m_onNewMapSizeID;
+	BroadcasterSubscriber<GameMessages::MapSize> m_onNewMapSizeID;
 
 	void expandFrontier(const MinHeapNode& currentNode, const Map& map, glm::ivec2 destinationOnGrid, AdjacentPositions adjacentPositions,
 		const Entity& entity);
-	void onNewMapSize(const GameMessages::MapSize& gameMessage);
+	void onNewMapSize(GameMessages::MapSize&& gameMessage);
 };

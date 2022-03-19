@@ -267,7 +267,7 @@ void FactionPlayer::update(float deltaTime, const Map& map, const FactionHandler
         }
     }
 
-    broadcastToMessenger<GameMessages::UIDisplayPlayerDetails>(
+    broadcast<GameMessages::UIDisplayPlayerDetails>(
         { getCurrentResourceAmount(), getCurrentPopulationAmount(), getMaximumPopulationAmount() });
 }
 

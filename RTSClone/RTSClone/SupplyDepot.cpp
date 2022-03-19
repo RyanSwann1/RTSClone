@@ -9,14 +9,14 @@ SupplyDepot::SupplyDepot(const glm::vec3& startingPosition, const Faction& ownin
 	: Entity(ModelManager::getInstance().getModel(SUPPLY_DEPOT_MODEL_NAME), startingPosition, eEntityType::SupplyDepot, 
 		Globals::SUPPLY_DEPOT_STARTING_HEALTH, owningFaction.getCurrentShieldAmount())
 {
-	broadcastToMessenger<GameMessages::AddAABBToMap>({ m_AABB });
+	broadcast<GameMessages::AddAABBToMap>({ m_AABB });
 }
 
 SupplyDepot::~SupplyDepot()
 {
 	if (m_status.isActive())
 	{
-		broadcastToMessenger<GameMessages::RemoveAABBFromMap>({ m_AABB });
+		broadcast<GameMessages::RemoveAABBFromMap>({ m_AABB });
 	}
 }
 

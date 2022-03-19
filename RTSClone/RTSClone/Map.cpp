@@ -11,12 +11,12 @@ Map::Map(const std::vector<SceneryGameObject>& sceneryGameObjects, const std::ve
 	: m_size(size),
 	m_map(static_cast<size_t>(m_size.x)* static_cast<size_t>(m_size.y), false),
 	m_unitMap(static_cast<size_t>(m_size.x)* static_cast<size_t>(m_size.y), Globals::INVALID_ENTITY_ID),
-	m_addABBID([this](const GameMessages::AddAABBToMap& message) { return addAABB(message); }),
-	m_removeABBBFromMapID([this](const GameMessages::RemoveAABBFromMap& message) { return removeAABB(message); }),
-	m_addUnitPositionToMapID([this](const GameMessages::AddUnitPositionToMap& message) { return addUnitPosition(message); }),
-	m_removeUnitPositionFromMapID([this](const GameMessages::RemoveUnitPositionFromMap& message) { return removeUnitPosition(message); })
+	m_addABBID([this](GameMessages::AddAABBToMap&& message) { return addAABB(std::move(message)); }),
+	m_removeABBBFromMapID([this](GameMessages::RemoveAABBFromMap&& message) { return removeAABB(std::move(message)); }),
+	m_addUnitPositionToMapID([this](GameMessages::AddUnitPositionToMap&& message) { return addUnitPosition(std::move(message)); }),
+	m_removeUnitPositionFromMapID([this](GameMessages::RemoveUnitPositionFromMap&& message) { return removeUnitPosition(std::move(message)); })
 {
-	broadcastToMessenger<GameMessages::MapSize>({ size });
+	broadcast<GameMessages::MapSize>({ size });
 	for (const auto& gameObject : sceneryGameObjects)
 	{
 		editMap(gameObject.AABB, true);
@@ -115,22 +115,22 @@ bool Map::isPositionOnUnitMapAvailable(glm::ivec2 position, int senderID) const
 	return false;
 }
 
-void Map::addAABB(const GameMessages::AddAABBToMap& message)
+void Map::addAABB(GameMessages::AddAABBToMap&& message)
 {
 	editMap(message.aabb, true);
 }
 
-void Map::removeAABB(const GameMessages::RemoveAABBFromMap& message)
+void Map::removeAABB(GameMessages::RemoveAABBFromMap&& message)
 {
 	editMap(message.aabb, false);
 }
 
-void Map::addUnitPosition(const GameMessages::AddUnitPositionToMap& message)
+void Map::addUnitPosition(GameMessages::AddUnitPositionToMap&& message)
 {
 	editUnitMap(message.position, message.ID, true);
 }
 
-void Map::removeUnitPosition(const GameMessages::RemoveUnitPositionFromMap& message)
+void Map::removeUnitPosition(GameMessages::RemoveUnitPositionFromMap&& message)
 {
 	editUnitMap(message.position, message.ID, false);
 }

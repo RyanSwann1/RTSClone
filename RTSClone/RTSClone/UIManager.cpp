@@ -225,13 +225,13 @@ UIManager::UIManager()
 	m_selectedEntityWidget(),
 	m_selectedMineralWidget(),
 	m_winningFactionWidget(),
-	m_onDisplayPlayerDetailsID([this](const GameMessages::UIDisplayPlayerDetails& gameMessage) { return onDisplayPlayerDetails(gameMessage); }),
-	m_onDisplayEntityID([this](const GameMessages::UIDisplaySelectedEntity& gameMessage) { return onDisplayEntity(gameMessage); }),
-	m_onDisplayMineralID([this](const GameMessages::UIDisplaySelectedMineral& gameMessage) { return onDisplayMineral(gameMessage); }),
-	m_onDisplayWinningFactionID([this](const GameMessages::UIDisplayWinner& gameMessage){ return onDisplayWinningFaction(gameMessage); }),
-	m_onClearDisplayEntityID([this](GameMessages::UIClearDisplaySelectedEntity gameMessage) { return onClearDisplayEntity(gameMessage); }),
-	m_onClearSelectedMineralID([this](GameMessages::UIClearSelectedMineral gameMessage) { return onClearSelectedMineral(gameMessage); }),
-	m_onClearDisplayWinnerID([this](GameMessages::UIClearWinner gameMessage) { return onClearDisplayWinner(gameMessage); })
+	m_onDisplayPlayerDetailsID([this](GameMessages::UIDisplayPlayerDetails&& gameMessage) { return onDisplayPlayerDetails(std::move(gameMessage)); }),
+	m_onDisplayEntityID([this](GameMessages::UIDisplaySelectedEntity&& gameMessage) { return onDisplayEntity(std::move(gameMessage)); }),
+	m_onDisplayMineralID([this](GameMessages::UIDisplaySelectedMineral&& gameMessage) { return onDisplayMineral(std::move(gameMessage)); }),
+	m_onDisplayWinningFactionID([this](GameMessages::UIDisplayWinner&& gameMessage){ return onDisplayWinningFaction(std::move(gameMessage)); }),
+	m_onClearDisplayEntityID([this](GameMessages::UIClearDisplaySelectedEntity&& gameMessage) { return onClearDisplayEntity(std::move(gameMessage)); }),
+	m_onClearSelectedMineralID([this](GameMessages::UIClearSelectedMineral&& gameMessage) { return onClearSelectedMineral(std::move(gameMessage)); }),
+	m_onClearDisplayWinnerID([this](GameMessages::UIClearWinner&& gameMessage) { return onClearDisplayWinner(std::move(gameMessage)); })
 {}
 	
 void UIManager::handleInput(const sf::Window& window, const FactionHandler& factionHandler, const Camera& camera,
@@ -339,37 +339,37 @@ void UIManager::render(const sf::Window& window)
 	m_winningFactionWidget.render(window);
 }
 
-void UIManager::onDisplayPlayerDetails(const GameMessages::UIDisplayPlayerDetails& gameMessage)
+void UIManager::onDisplayPlayerDetails(GameMessages::UIDisplayPlayerDetails&& gameMessage)
 {
 	m_playerDetailsWidget.set(gameMessage);
 }
 
-void UIManager::onDisplayEntity(const GameMessages::UIDisplaySelectedEntity& gameMessage)
+void UIManager::onDisplayEntity(GameMessages::UIDisplaySelectedEntity&& gameMessage)
 {
 	m_selectedEntityWidget = std::make_unique<SelectedEntityWidget>(gameMessage.owningFaction, gameMessage.entityID, gameMessage.entityType);
 }
 
-void UIManager::onClearDisplayEntity(GameMessages::UIClearDisplaySelectedEntity)
+void UIManager::onClearDisplayEntity(GameMessages::UIClearDisplaySelectedEntity&&)
 {
 	m_selectedEntityWidget.reset();
 }
 
-void UIManager::onClearSelectedMineral(GameMessages::UIClearSelectedMineral message)
+void UIManager::onClearSelectedMineral(GameMessages::UIClearSelectedMineral&& message)
 {
 	m_selectedMineralWidget.reset();
 }
 
-void UIManager::onClearDisplayWinner(GameMessages::UIClearWinner)
+void UIManager::onClearDisplayWinner(GameMessages::UIClearWinner&&)
 {
 	m_winningFactionWidget.deactivate();
 }
 
-void UIManager::onDisplayWinningFaction(const GameMessages::UIDisplayWinner& gameMessage)
+void UIManager::onDisplayWinningFaction(GameMessages::UIDisplayWinner&& gameMessage)
 {
 	m_winningFactionWidget.set(gameMessage);
 }
 
-void UIManager::onDisplayMineral(const GameMessages::UIDisplaySelectedMineral& gameMessage)
+void UIManager::onDisplayMineral(GameMessages::UIDisplaySelectedMineral&& gameMessage)
 {
 	m_selectedMineralWidget = std::make_unique<SelectedMineralWidget>(gameMessage.mineral);
 }

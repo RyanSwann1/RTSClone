@@ -290,7 +290,7 @@ std::optional<LevelDetailsFromFile> LevelFileHandler::loadLevelFromFile(std::str
 	glm::ivec2 levelSize = loadMapSizeFromFile(file);
 	levelDetails.gridSize = levelSize;
 	levelDetails.size = { levelSize.x * Globals::NODE_SIZE, 0.0f, levelSize.y * Globals::NODE_SIZE };
-	broadcastToMessenger<GameMessages::MapSize>({ levelSize });
+	broadcast<GameMessages::MapSize>({ levelSize });
 	loadScenery(file, levelDetails.scenery);
 	levelDetails.factionStartingResources = loadFactionStartingResources(file);
 	levelDetails.factionStartingPopulation = loadFactionStartingPopulation(file);

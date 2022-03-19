@@ -1,57 +1,45 @@
 #pragma once
 
+#include "IDGenerator.h"
 #include <functional>
 #include <vector>
 #include <assert.h>
 #include <algorithm>
+#include <optional>
+#include <utility>
 
-template <typename Message, typename ID = int, typename ReturnType = void>
-class GameMessenger
+template <typename Message>
+class Broadcaster
 {
 	struct Listener
 	{
-		Listener(const std::function<ReturnType(const Message&)>& callback, ID id)
+		Listener(std::function<void(Message&&)> callback, const int id)
 			: callback(callback),
 			id(id)
 		{}
 
-		std::function<ReturnType(const Message&)> callback;
-		ID id;
+		std::function<void(Message&&)> callback;
+		int id;
 	};
 
 public:
-	GameMessenger(const GameMessenger&) = delete;
-	GameMessenger& operator=(const GameMessenger&) = delete;
-	GameMessenger(GameMessenger&&) = delete;
-	GameMessenger& operator=(GameMessenger&&) = delete;
-
-	static GameMessenger<Message, ID, ReturnType>& getInstance()
+	static Broadcaster<Message>& getInstance()
 	{
-		static GameMessenger<Message, ID, ReturnType> instance;
+		static Broadcaster<Message> instance;
 		return instance;
 	}
 
-	[[nodiscard]] ID subscribe(const ID id, const std::function<ReturnType(const Message&)>& callback)
-	{
-		static_assert(!std::is_same<int, ID>());
-		assert(!is_listener_registered(id));
-		m_listeners.emplace_back(callback, id);
-
-		return id;
-	}
-
-	[[nodiscard]] ID subscribe(const std::function<ReturnType(const Message&)>& callback)
-	{
-		static_assert(std::is_same<int, ID>());
-		ID id = m_uniqueID++;
+	[[nodiscard]] int subscribe(std::function<void(Message&&)> callback)
+	{	
+		const int id = id_generator::gen();
 		assert(!is_listener_registered(id));
 		m_listeners.emplace_back(callback, id);
 		return id;
 	}
 
-	void unsubscribe(ID id)
+	void unsubscribe(const int id)
 	{
-		auto listener = std::find_if(m_listeners.begin(), m_listeners.end(), [id](const auto& listener)
+		auto listener = std::find_if(m_listeners.cbegin(), m_listeners.cend(), [id](auto listener)
 			{
 				return listener.id == id;
 			});
@@ -59,82 +47,60 @@ public:
 		m_listeners.erase(listener);
 	}
 
-	ReturnType broadcast(ID id, const Message& message) const
+	void broadcast(Message&& message) const
 	{
-		static_assert(!std::is_same<int, ID>());
-		assert(!m_listeners.empty());
-		auto listener = std::find_if(m_listeners.cbegin(), m_listeners.cend(), [id](const auto& listener)
-			{
-				return listener.id == id;
-			});
-		assert(listener != m_listeners.cend());
-		return listener->callback(message);
-	}
-
-	void broadcast(const Message& message) const
-	{
-		static_assert(std::is_same<int, ID>());
 		assert(!m_listeners.empty());
 		for (const auto& listener : m_listeners)
 		{
-			listener.callback(message);
+			listener.callback(std::move(message));
 		}
 	}
 
 private:
-	GameMessenger() {}
+	Broadcaster() {}
 
-	bool is_listener_registered(const ID id) const
+	bool is_listener_registered(const int id) const
 	{
-		return std::any_of(m_listeners.cbegin(), m_listeners.cend(), [id](const auto& listener)
+		return std::any_of(m_listeners.cbegin(), m_listeners.cend(), [id](auto listener)
 		{
 			return listener.id == id;
 		});
 	}
 
-	std::vector<Listener> m_listeners	= {};
-	int m_uniqueID						= { 0 };
+	std::vector<Listener> m_listeners = {};
 };
 
-template <typename Message, typename ID = int, typename ReturnType = void>
-void broadcastToMessenger(const Message& message)
+template <typename Message>
+void broadcast(Message&& message)
 {
-	GameMessenger<Message, ID, ReturnType>::getInstance().broadcast(message);
+	Broadcaster<Message>::getInstance().broadcast(std::forward<Message>(message));
 }
 
-template <typename Message, typename ID = int, typename ReturnType = void>
-class GameMessengerSubscriber
+template <typename Message>
+class BroadcasterSubscriber
 {
 public:
-	GameMessengerSubscriber(const std::function<ReturnType(const Message&)>& callback)
-		: id(GameMessenger<Message, ID, ReturnType>::getInstance().subscribe(callback))
+	BroadcasterSubscriber(std::function<void(Message&&)> callback)
+		: id(Broadcaster<Message>::getInstance().subscribe(callback))
 	{}
-	GameMessengerSubscriber(const ID id, const std::function<ReturnType(const Message&)>& callback)
-		: id(GameMessenger<Message, ID, ReturnType>::getInstance().subscribe(id, callback))
+	BroadcasterSubscriber(const BroadcasterSubscriber&) = delete;
+	BroadcasterSubscriber& operator=(const BroadcasterSubscriber&) = delete;
+	BroadcasterSubscriber(BroadcasterSubscriber&& rhs) noexcept
+		: id(rhs.id.swap(id))
 	{}
-	GameMessengerSubscriber(const GameMessengerSubscriber&) = delete;
-	GameMessengerSubscriber& operator=(const GameMessengerSubscriber&) = delete;
-	GameMessengerSubscriber(GameMessengerSubscriber&& rhs)
-		: id(rhs.id)
+	BroadcasterSubscriber& operator=(BroadcasterSubscriber&& rhs) noexcept
 	{
-		rhs.active = false;
-	}
-	GameMessengerSubscriber& operator=(GameMessengerSubscriber&& rhs)
-	{
-		id = rhs.id;
-		rhs.active = false;
-
+		rhs.id.swap(id);
 		return *this;
 	}
-	~GameMessengerSubscriber()
+	~BroadcasterSubscriber()
 	{
-		if (!active)
+		if (!id)
 		{
-			GameMessenger<Message, ID, ReturnType>::getInstance().unsubscribe(id);
+			Broadcaster<Message>::getInstance().unsubscribe(*id);
 		}
 	}
 
 private:
-	ID id;
-	bool active = true;
+	std::optional<int> id = std::nullopt;
 };

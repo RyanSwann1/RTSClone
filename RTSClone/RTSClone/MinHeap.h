@@ -44,7 +44,7 @@ public:
 private:
 	std::vector<MinHeapNode> m_heap;
 	std::unordered_map<glm::ivec2, size_t> m_indexes;
-	GameMessengerSubscriber<GameMessages::MapSize> m_onNewMapSizeID;
+	BroadcasterSubscriber<GameMessages::MapSize> m_onNewMapSizeID;
 
 	void sortNode(size_t i);
 	void swap(size_t index1, size_t index2);

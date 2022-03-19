@@ -125,8 +125,8 @@ const glm::vec3& Level::getSize() const
 
 Level::~Level()
 {
-	broadcastToMessenger<GameMessages::UIClearDisplaySelectedEntity>({});
-	broadcastToMessenger<GameMessages::UIClearSelectedMineral>({});
+	broadcast<GameMessages::UIClearDisplaySelectedEntity>({});
+	broadcast<GameMessages::UIClearSelectedMineral>({});
 }
 
 const Faction* Level::getWinningFaction() const
@@ -195,13 +195,13 @@ void Level::handleInput(glm::uvec2 windowSize, const sf::Window& window, const s
 					if (mineral.getAABB().contains(position))
 					{
 						mineralSelected = true;
-						broadcastToMessenger<GameMessages::UIDisplaySelectedMineral>({ mineral });
+						broadcast<GameMessages::UIDisplaySelectedMineral>({ mineral });
 					}
 				}
 			}
 			if (!mineralSelected)
 			{
-				broadcastToMessenger<GameMessages::UIClearSelectedMineral>({});
+				broadcast<GameMessages::UIClearSelectedMineral>({});
 			}
 		}
 		break;

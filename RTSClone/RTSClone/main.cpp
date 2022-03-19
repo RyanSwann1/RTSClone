@@ -75,19 +75,19 @@ int main()
 		return -1;
 	}
 
-	GameMessenger<GameMessages::AddAABBToMap>::getInstance();
-	GameMessenger<GameMessages::RemoveAABBFromMap>::getInstance();
-	GameMessenger<GameMessages::AddUnitPositionToMap>::getInstance();
-	GameMessenger<GameMessages::RemoveUnitPositionFromMap>::getInstance();
-	GameMessenger<GameMessages::MapSize>::getInstance();
+	Broadcaster<GameMessages::AddAABBToMap>::getInstance();
+	Broadcaster<GameMessages::RemoveAABBFromMap>::getInstance();
+	Broadcaster<GameMessages::AddUnitPositionToMap>::getInstance();
+	Broadcaster<GameMessages::RemoveUnitPositionFromMap>::getInstance();
+	Broadcaster<GameMessages::MapSize>::getInstance();
 
-	GameMessenger<GameMessages::UIClearDisplaySelectedEntity>::getInstance();
-	GameMessenger<GameMessages::UIClearSelectedMineral>::getInstance();
-	GameMessenger<GameMessages::UIClearWinner>::getInstance();
-	GameMessenger<GameMessages::UIDisplayPlayerDetails>::getInstance();
-	GameMessenger<GameMessages::UIDisplaySelectedEntity>::getInstance();
-	GameMessenger<GameMessages::UIDisplaySelectedMineral>::getInstance();
-	GameMessenger<GameMessages::UIDisplayWinner>::getInstance();
+	Broadcaster<GameMessages::UIClearDisplaySelectedEntity>::getInstance();
+	Broadcaster<GameMessages::UIClearSelectedMineral>::getInstance();
+	Broadcaster<GameMessages::UIClearWinner>::getInstance();
+	Broadcaster<GameMessages::UIDisplayPlayerDetails>::getInstance();
+	Broadcaster<GameMessages::UIDisplaySelectedEntity>::getInstance();
+	Broadcaster<GameMessages::UIDisplaySelectedMineral>::getInstance();
+	Broadcaster<GameMessages::UIDisplayWinner>::getInstance();
 
 	PathFinding::getInstance();
 	
@@ -134,7 +134,7 @@ int main()
 			const Faction* winningFaction = currentLevel->getWinningFaction();
 			if (winningFaction)
 			{
-				broadcastToMessenger<GameMessages::UIDisplayWinner>({ winningFaction->getController() });
+				broadcast<GameMessages::UIDisplayWinner>({ winningFaction->getController() });
 				currentLevel.reset();
 			}
 		}
@@ -145,7 +145,7 @@ int main()
 			{
 				if (!levelName.empty() && ImGui::Button(levelName.c_str()))
 				{
-					broadcastToMessenger<GameMessages::UIClearWinner>({});
+					broadcast<GameMessages::UIClearWinner>({});
 					if (std::optional<LevelDetailsFromFile> levelDetails = Level::load(levelName, windowSize))
 					{
 						currentLevel.emplace(std::move(*levelDetails), windowSize);
