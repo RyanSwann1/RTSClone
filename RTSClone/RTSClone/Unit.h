@@ -43,8 +43,8 @@ public:
 	void clear_destinations();
 	void moveToAttackPosition(const Entity& targetEntity, const Faction& targetFaction, const Map& map);
 	void moveTo(const glm::vec3& destination, const Map& map, eUnitState state = eUnitState::Moving);
-	void update(float deltaTime, const FactionHandler& factionHandler, const Map& map,
-		const Timer& unitStateHandlerTimer);
+	void update(float deltaTime, const FactionHandler& factionHandler, const Map& map);
+	void delayed_update(const FactionHandler& factionHandler, const Map& map);
 #ifdef RENDER_PATHING
 	void render_path(ShaderHandler& shaderHandler);
 #endif // RENDER_PATHING

@@ -5,7 +5,6 @@
 #include "Factions/FactionAI.h"
 #include "SceneryGameObject.h"
 #include "Factions/FactionHandler.h"
-#include "Timer.h"
 #include "Base.h"
 #include "Quad.h"
 #include "MiniMap.h"
@@ -15,6 +14,7 @@
 #include <memory>
 #include <SFML/Graphics.hpp>
 #include <optional>
+#include <chrono>
 
 struct LevelDetailsFromFile
 {
@@ -75,7 +75,7 @@ private:
 	Quad m_playableArea;
 	Camera m_camera;
 	MiniMap m_minimap;
-	Timer m_unitStateHandlerTimer;
+	std::chrono::high_resolution_clock::time_point m_lastDelayedUpdate = std::chrono::high_resolution_clock::now();
 	FactionHandler m_factionHandler;
 
 	void handleEvent(const GameEvent& gameEvent, const Map& map);

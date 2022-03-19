@@ -482,17 +482,16 @@ Entity* Faction::create_building(const Worker& worker, const Map& map)
     return nullptr;
 }
 
-void Faction::update(float deltaTime, const Map& map, const FactionHandler& factionHandler, 
-    const Timer& unitStateHandlerTimer, const BaseHandler& baseHandler)
+void Faction::update(float deltaTime, const Map& map, const FactionHandler& factionHandler, const BaseHandler& baseHandler)
 {
     for (auto& unit : m_units)
     {
-        unit->update(deltaTime, factionHandler, map, unitStateHandlerTimer);
+        unit->update(deltaTime, factionHandler, map);
     }
 
     for (auto& worker : m_workers)
     {
-        worker->update(deltaTime, map, factionHandler, unitStateHandlerTimer);
+        worker->update(deltaTime, map, factionHandler);
     }
 
     for (auto& barracks : m_barracks)
@@ -519,11 +518,21 @@ void Faction::update(float deltaTime, const Map& map, const FactionHandler& fact
     {
         laboratory->update(deltaTime);
     }
+}
 
-    if (unitStateHandlerTimer.isExpired())
+void Faction::delayed_update(const Map& map, const FactionHandler& factionHandler)
+{
+    for (auto& unit : m_units)
     {
-        handleWorkerCollisions(map);
+        unit->delayed_update(factionHandler, map);
     }
+
+    for (auto& worker : m_workers)
+    {
+        worker->delayed_update(map, factionHandler);
+    }
+
+    handleWorkerCollisions(map);
 }
 
 void Faction::render(ShaderHandler& shaderHandler) const

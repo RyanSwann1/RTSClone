@@ -228,10 +228,9 @@ void FactionAI::selectEntity(const glm::vec3& position)
 	}
 }
 
-void FactionAI::update(float deltaTime, const Map & map, const FactionHandler& factionHandler, 
-	const Timer& unitStateHandlerTimer, const BaseHandler& baseHandler)
+void FactionAI::update(float deltaTime, const Map & map, const FactionHandler& factionHandler, const BaseHandler& baseHandler)
 {
-	Faction::update(deltaTime, map, factionHandler, unitStateHandlerTimer, baseHandler);
+	Faction::update(deltaTime, map, factionHandler, baseHandler);
 
 	m_delayTimer.update(deltaTime);
 	if (m_delayTimer.isExpired())

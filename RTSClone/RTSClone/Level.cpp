@@ -10,7 +10,6 @@
 
 namespace
 {
-	constexpr float TIME_BETWEEN_UNIT_STATE = 0.05f;
 	constexpr glm::vec3 TERRAIN_COLOR = { 0.9098039f, 0.5176471f, 0.3882353f };
 	std::queue<GameEvent> gameEvents = {};
 
@@ -33,7 +32,6 @@ Level::Level(LevelDetailsFromFile&& levelDetails, glm::ivec2 windowSize)
 	m_scenery(std::move(levelDetails.scenery)),
 	m_playableArea(levelDetails.size, TERRAIN_COLOR),
 	m_map(m_scenery, m_baseHandler.getBases(), levelDetails.gridSize),
-	m_unitStateHandlerTimer(TIME_BETWEEN_UNIT_STATE, true),
 	m_factionHandler(m_baseHandler, levelDetails)
 {
 	for (auto& faction : m_factionHandler.getFactions())
@@ -220,19 +218,25 @@ void Level::update(float deltaTime, UIManager& uiManager, glm::uvec2 windowSize,
 		m_camera.update(deltaTime, window, windowSize, m_playableArea.getSize());
 	}
 
-	m_unitStateHandlerTimer.update(deltaTime);
-
-	std::for_each(m_factionHandler.getFactions().begin(), m_factionHandler.getFactions().end(), [deltaTime, this](auto& faction)
+	for (auto& faction : m_factionHandler.getFactions())
 	{
 		if (faction)
 		{
-			faction->update(deltaTime, m_map, m_factionHandler, m_unitStateHandlerTimer, m_baseHandler);
+			faction->update(deltaTime, m_map, m_factionHandler, m_baseHandler);
 		}
-	});
+	}
 
-	if (m_unitStateHandlerTimer.isExpired())
+	const auto now = std::chrono::high_resolution_clock::now();
+	if (now - m_lastDelayedUpdate >= std::chrono::milliseconds(100))
 	{
-		m_unitStateHandlerTimer.resetElaspedTime();
+		for (auto& faction : m_factionHandler.getFactions())
+		{
+			if (faction)
+			{
+				faction->delayed_update(m_map, m_factionHandler);
+			}
+		}
+		m_lastDelayedUpdate = now;
 	}
 
 	for (auto& projectile : m_projectiles)

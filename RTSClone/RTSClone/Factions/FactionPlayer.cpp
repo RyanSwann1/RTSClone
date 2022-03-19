@@ -246,9 +246,9 @@ void FactionPlayer::handleEvent(const GameEvent& gameEvent, const Map& map, cons
     }
 }
 
-void FactionPlayer::update(float deltaTime, const Map& map, const FactionHandler& factionHandler, const Timer& unitStateHandlerTimer, const BaseHandler& baseHandler)
+void FactionPlayer::update(float deltaTime, const Map& map, const FactionHandler& factionHandler, const BaseHandler& baseHandler)
 {
-    Faction::update(deltaTime, map, factionHandler, unitStateHandlerTimer, baseHandler);
+    Faction::update(deltaTime, map, factionHandler, baseHandler);
 
     if (m_entitySelector.isActive())
     {

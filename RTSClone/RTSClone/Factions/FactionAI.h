@@ -30,8 +30,7 @@ public:
 	void selectEntity(const glm::vec3& position);
 	Entity* createUnit(const Map& map, const Barracks& barracks, const FactionHandler& factionHandler) override;
 	Entity* createWorker(const Map& map, const Headquarters& headquarters) override;
-	void update(float deltaTime, const Map& map, const FactionHandler& factionHandler,
-		const Timer& unitStateHandlerTimer, const BaseHandler& baseHandler) override;
+	void update(float deltaTime, const Map& map, const FactionHandler& factionHandler, const BaseHandler& baseHandler) override;
 
 protected:
 	void onEntityRemoval(const Entity& entity) override;

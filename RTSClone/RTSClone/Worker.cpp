@@ -166,7 +166,7 @@ bool Worker::build(const Faction& owningFaction, const glm::vec3& buildPosition,
 	return false;
 }
 
-void Worker::update(float deltaTime, const Map& map, const FactionHandler& factionHandler, const Timer& unitStateHandlerTimer)
+void Worker::update(float deltaTime, const Map& map, const FactionHandler& factionHandler)
 {
 	Entity::update(deltaTime);
 
@@ -307,11 +307,6 @@ void Worker::update(float deltaTime, const Map& map, const FactionHandler& facti
 		{
 			switchTo(eWorkerState::Repairing, map);
 		}
-		else if (unitStateHandlerTimer.isExpired() &&
-			!m_owningFaction->get_entity(m_repairTargetEntity->ID))
-		{
-			switchTo(eWorkerState::Idle, map);
-		}
 	}
 		break;
 	case eWorkerState::Repairing:
@@ -319,7 +314,6 @@ void Worker::update(float deltaTime, const Map& map, const FactionHandler& facti
 		assert(m_movement.path.empty() &&
 			m_repairTargetEntity &&
 			m_taskTimer.isActive());
-
 		if (m_taskTimer.isExpired())
 		{
 			m_taskTimer.resetElaspedTime();
@@ -343,33 +337,53 @@ void Worker::update(float deltaTime, const Map& map, const FactionHandler& facti
 				switchTo(eWorkerState::Idle, map);
 			}
 		}
-		else if (unitStateHandlerTimer.isExpired())
-		{
-			const Entity* targetEntity = m_owningFaction->get_entity(m_repairTargetEntity->ID);
-			if (targetEntity && targetEntity->getHealth() < targetEntity->getMaximumHealth())
-			{
-				if (Globals::getSqrDistance(targetEntity->getPosition(), m_position) > REPAIR_DISTANCE * REPAIR_DISTANCE)
-				{
-					repairEntity(*targetEntity, map);
-				}
-				else
-				{
-					m_rotation.y = Globals::getAngle(targetEntity->getPosition(), m_position);
-				}
-			}
-			else
-			{
-				switchTo(eWorkerState::Idle, map);
-			}
-		}
 	}
-
-		break;
+	break;
 	}
 
 	if (m_taskTimer.isActive())
 	{
 		m_taskTimer.update(deltaTime);
+	}
+}
+
+void Worker::delayed_update(const Map& map, const FactionHandler& factionHandler)
+{
+	switch (m_currentState)
+	{
+	
+	case eWorkerState::MovingToRepairPosition:
+	{
+		if (!m_owningFaction->get_entity(m_repairTargetEntity->ID))
+		{
+			switchTo(eWorkerState::Idle, map);
+		}
+	}
+	break;
+	case eWorkerState::Repairing:
+	{
+		assert(m_movement.path.empty() &&
+			m_repairTargetEntity &&
+			m_taskTimer.isActive());
+
+		const Entity* targetEntity = m_owningFaction->get_entity(m_repairTargetEntity->ID);
+		if (targetEntity && targetEntity->getHealth() < targetEntity->getMaximumHealth())
+		{
+			if (Globals::getSqrDistance(targetEntity->getPosition(), m_position) > REPAIR_DISTANCE * REPAIR_DISTANCE)
+			{
+				repairEntity(*targetEntity, map);
+			}
+			else
+			{
+				m_rotation.y = Globals::getAngle(targetEntity->getPosition(), m_position);
+			}
+		}
+		else
+		{
+			switchTo(eWorkerState::Idle, map);
+		}
+	}
+	break;
 	}
 }
 
