@@ -97,13 +97,13 @@ private:
 	std::unique_ptr<SelectedEntityWidget> m_selectedEntityWidget;
 	std::unique_ptr<SelectedMineralWidget> m_selectedMineralWidget;
 	WinningFactionWidget m_winningFactionWidget;	
-	BroadcasterSubscriber<GameMessages::UIDisplayPlayerDetails> m_onDisplayPlayerDetailsID;
-	BroadcasterSubscriber<GameMessages::UIDisplaySelectedEntity> m_onDisplayEntityID;
-	BroadcasterSubscriber<GameMessages::UIDisplayWinner> m_onDisplayWinningFactionID;
-	BroadcasterSubscriber<GameMessages::UIDisplaySelectedMineral> m_onDisplayMineralID;
-	BroadcasterSubscriber<GameMessages::UIClearDisplaySelectedEntity> m_onClearDisplayEntityID;
-	BroadcasterSubscriber<GameMessages::UIClearSelectedMineral> m_onClearSelectedMineralID;
-	BroadcasterSubscriber<GameMessages::UIClearWinner> m_onClearDisplayWinnerID;
+	BroadcasterSub<GameMessages::UIDisplayPlayerDetails> m_onDisplayPlayerDetailsID;
+	BroadcasterSub<GameMessages::UIDisplaySelectedEntity> m_onDisplayEntityID;
+	BroadcasterSub<GameMessages::UIDisplayWinner> m_onDisplayWinningFactionID;
+	BroadcasterSub<GameMessages::UIDisplaySelectedMineral> m_onDisplayMineralID;
+	BroadcasterSub<GameMessages::UIClearDisplaySelectedEntity> m_onClearDisplayEntityID;
+	BroadcasterSub<GameMessages::UIClearSelectedMineral> m_onClearSelectedMineralID;
+	BroadcasterSub<GameMessages::UIClearWinner> m_onClearDisplayWinnerID;
 
 	void onDisplayPlayerDetails(GameMessages::UIDisplayPlayerDetails&& gameMessage);
 	void onDisplayEntity(GameMessages::UIDisplaySelectedEntity&& gameMessage);

@@ -35,10 +35,10 @@ private:
 	std::vector<bool> m_map;
 	std::vector<int> m_unitMap;
 
-	BroadcasterSubscriber<GameMessages::AddAABBToMap> m_addABBID;
-	BroadcasterSubscriber<GameMessages::RemoveAABBFromMap> m_removeABBBFromMapID;
-	BroadcasterSubscriber<GameMessages::AddUnitPositionToMap> m_addUnitPositionToMapID;
-	BroadcasterSubscriber<GameMessages::RemoveUnitPositionFromMap> m_removeUnitPositionFromMapID;
+	BroadcasterSub<GameMessages::AddAABBToMap> m_addABBID;
+	BroadcasterSub<GameMessages::RemoveAABBFromMap> m_removeABBBFromMapID;
+	BroadcasterSub<GameMessages::AddUnitPositionToMap> m_addUnitPositionToMapID;
+	BroadcasterSub<GameMessages::RemoveUnitPositionFromMap> m_removeUnitPositionFromMapID;
 
 	void addAABB(GameMessages::AddAABBToMap&& message);
 	void removeAABB(GameMessages::RemoveAABBFromMap&& message);

@@ -77,23 +77,23 @@ void broadcast(Message&& message)
 }
 
 template <typename Message>
-class BroadcasterSubscriber
+class BroadcasterSub
 {
 public:
-	BroadcasterSubscriber(std::function<void(Message&&)> callback)
+	BroadcasterSub(std::function<void(Message&&)> callback)
 		: id(Broadcaster<Message>::getInstance().subscribe(callback))
 	{}
-	BroadcasterSubscriber(const BroadcasterSubscriber&) = delete;
-	BroadcasterSubscriber& operator=(const BroadcasterSubscriber&) = delete;
-	BroadcasterSubscriber(BroadcasterSubscriber&& rhs) noexcept
+	BroadcasterSub(const BroadcasterSub&) = delete;
+	BroadcasterSub& operator=(const BroadcasterSub&) = delete;
+	BroadcasterSub(BroadcasterSub&& rhs) noexcept
 		: id(rhs.id.swap(id))
 	{}
-	BroadcasterSubscriber& operator=(BroadcasterSubscriber&& rhs) noexcept
+	BroadcasterSub& operator=(BroadcasterSub&& rhs) noexcept
 	{
 		rhs.id.swap(id);
 		return *this;
 	}
-	~BroadcasterSubscriber()
+	~BroadcasterSub()
 	{
 		if (!id)
 		{

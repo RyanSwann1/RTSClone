@@ -29,7 +29,7 @@ private:
 	std::queue<glm::ivec2> m_frontier = {};
 	glm::ivec2 m_size = { 0, 0 };
 	std::vector<std::optional<glm::ivec2>> m_graph = {};
-	BroadcasterSubscriber<GameMessages::MapSize> m_onNewMapSizeID;
+	BroadcasterSub<GameMessages::MapSize> m_onNewMapSizeID;
 	
 	void new_map_size(const GameMessages::MapSize& gameMessage);
 };
