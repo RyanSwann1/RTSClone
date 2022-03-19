@@ -43,8 +43,8 @@ class Mineral;
 class Worker : public Entity
 {
 public:
-	Worker(const Faction& owningFaction, const Map& map, const glm::vec3& startingPosition, const glm::vec3& startingRotation);
-	Worker(const Faction& owningFaction, const glm::vec3& startingPosition, const glm::vec3& destination, const Map& map, 
+	Worker(Faction& owningFaction, const Map& map, const glm::vec3& startingPosition, const glm::vec3& startingRotation);
+	Worker(Faction& owningFaction, const glm::vec3& startingPosition, const glm::vec3& destination, const Map& map, 
 		const glm::vec3& startingRotation);
 	
 	const Mineral* getMineralToHarvest() const;
@@ -74,7 +74,7 @@ public:
 #endif // RENDER_PATHING
 
 private:
-	eFactionController m_owningFaction						= eFactionController::None;
+	Faction* m_owningFaction								= nullptr;
 	Movement m_movement										= {};
 	eWorkerState m_currentState								= eWorkerState::Idle;
 	std::deque<WorkerScheduledBuilding> m_buildQueue		= {};

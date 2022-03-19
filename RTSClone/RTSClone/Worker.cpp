@@ -40,19 +40,19 @@ WorkerScheduledBuilding::WorkerScheduledBuilding(const glm::vec3& position, eEnt
 {}
 
 //Worker
-Worker::Worker(const Faction& owningFaction, const Map& map, const glm::vec3& startingPosition, const glm::vec3& startingRotation)
+Worker::Worker(Faction& owningFaction, const Map& map, const glm::vec3& startingPosition, const glm::vec3& startingRotation)
 	: Entity(ModelManager::getInstance().getModel(WORKER_MODEL_NAME), startingPosition, eEntityType::Worker, 
 		Globals::WORKER_STARTING_HEALTH, owningFaction.getCurrentShieldAmount(), startingRotation),
-	m_owningFaction(owningFaction.getController())
+	m_owningFaction(&owningFaction)
 {
 	switchTo(eWorkerState::Idle, map);
 }
 
-Worker::Worker(const Faction& owningFaction, const glm::vec3 & startingPosition, const glm::vec3 & destination, const Map & map,
+Worker::Worker(Faction& owningFaction, const glm::vec3 & startingPosition, const glm::vec3 & destination, const Map & map,
 	const glm::vec3& startingRotation)
 	: Entity(ModelManager::getInstance().getModel(WORKER_MODEL_NAME), startingPosition, eEntityType::Worker, Globals::WORKER_STARTING_HEALTH,
 		owningFaction.getCurrentShieldAmount(), startingRotation),
-	m_owningFaction(owningFaction.getController())
+	m_owningFaction(&owningFaction)
 {
 	moveTo(destination, map);
 }
@@ -212,7 +212,7 @@ void Worker::update(float deltaTime, const Map& map, const FactionHandler& facti
 		assert(isHoldingResources());
 		if (m_movement.path.empty())
 		{
-			Level::add_event(GameEvent::create<AddFactionResourcesEvent>({ *m_resources, m_owningFaction }));
+			Level::add_event(GameEvent::create<AddFactionResourcesEvent>({ *m_resources, m_owningFaction->getController() }));
 			m_resources = std::nullopt;
 			if (m_mineralToHarvest)
 			{
@@ -229,7 +229,6 @@ void Worker::update(float deltaTime, const Map& map, const FactionHandler& facti
 		assert(m_resources <= RESOURCE_CAPACITY &&
 			m_taskTimer.isActive() &&
 			m_mineralToHarvest);
-		const auto& closestHeadquartersMessenger = GameMessenger<GameMessages::GetClosestHeadquarters, eFactionController, const Headquarters*>::getInstance();
 		if (m_resources < RESOURCE_CAPACITY)
 		{
 			if (m_taskTimer.isExpired())
@@ -253,7 +252,7 @@ void Worker::update(float deltaTime, const Map& map, const FactionHandler& facti
 				}
 			}
 		}
-		else if (const Headquarters* headquarters = closestHeadquartersMessenger.broadcast(m_owningFaction, { m_position }))
+		else if (const Headquarters* headquarters = m_owningFaction->get_closest_headquarters(m_position))
 		{
 			moveTo(*headquarters, map, eWorkerState::ReturningMineralsToHeadquarters);
 		}
@@ -269,11 +268,10 @@ void Worker::update(float deltaTime, const Map& map, const FactionHandler& facti
 		break;
 	case eWorkerState::Building:
 	{
-		const auto& createBuildingMessenger = GameMessenger<GameMessages::CreateBuilding, eFactionController, const Entity*>::getInstance();
 		assert(m_movement.path.empty() && !m_buildQueue.empty() && m_taskTimer.isActive());
 		if (m_taskTimer.isExpired())
 		{
-			const Entity* building = createBuildingMessenger.broadcast(m_owningFaction, { *this, map });
+			const Entity* building = m_owningFaction->create_building(*this, map);
 			m_buildQueue.pop_front();
 			if (!building)
 			{
@@ -295,7 +293,7 @@ void Worker::update(float deltaTime, const Map& map, const FactionHandler& facti
 					}
 					else
 					{
-						Level::add_event(GameEvent::create<SelfDestructEntityEvent>({ m_owningFaction, getID(), getEntityType() }));
+						Level::add_event(GameEvent::create<SelfDestructEntityEvent>({ m_owningFaction->getController(), getID(), getEntityType() }));
 					}
 				}
 			}
@@ -305,13 +303,12 @@ void Worker::update(float deltaTime, const Map& map, const FactionHandler& facti
 		break;
 	case eWorkerState::MovingToRepairPosition:
 	{
-		const auto& gameMessenger = GameMessenger<GameMessages::GetEntity, eFactionController, const Entity*>::getInstance();
 		if (m_movement.path.empty())
 		{
 			switchTo(eWorkerState::Repairing, map);
 		}
 		else if (unitStateHandlerTimer.isExpired() &&
-			!gameMessenger.broadcast(m_owningFaction, { m_repairTargetEntity->ID }))
+			!m_owningFaction->get_entity(m_repairTargetEntity->ID))
 		{
 			switchTo(eWorkerState::Idle, map);
 		}
@@ -323,11 +320,10 @@ void Worker::update(float deltaTime, const Map& map, const FactionHandler& facti
 			m_repairTargetEntity &&
 			m_taskTimer.isActive());
 
-		const auto& gameMessenger = GameMessenger<GameMessages::GetEntity, eFactionController, const Entity*>::getInstance();
 		if (m_taskTimer.isExpired())
 		{
 			m_taskTimer.resetElaspedTime();
-			const Entity* targetEntity = gameMessenger.broadcast(m_owningFaction, { m_repairTargetEntity->ID });
+			const Entity* targetEntity = m_owningFaction->get_entity(m_repairTargetEntity->ID);
 			if (targetEntity && targetEntity->getHealth() < targetEntity->getMaximumHealth())
 			{
 				if (Globals::getSqrDistance(targetEntity->getPosition(), m_position) > REPAIR_DISTANCE * REPAIR_DISTANCE)
@@ -339,7 +335,7 @@ void Worker::update(float deltaTime, const Map& map, const FactionHandler& facti
 					m_rotation.y = Globals::getAngle(targetEntity->getPosition(), m_position);
 
 					Level::add_event(GameEvent::create<RepairEntityEvent>({
-						m_owningFaction, m_repairTargetEntity->ID, m_repairTargetEntity->type }));
+						m_owningFaction->getController(), m_repairTargetEntity->ID, m_repairTargetEntity->type }));
 				}
 			}
 			else
@@ -349,7 +345,7 @@ void Worker::update(float deltaTime, const Map& map, const FactionHandler& facti
 		}
 		else if (unitStateHandlerTimer.isExpired())
 		{
-			const Entity* targetEntity = gameMessenger.broadcast(m_owningFaction, { m_repairTargetEntity->ID });
+			const Entity* targetEntity = m_owningFaction->get_entity(m_repairTargetEntity->ID);
 			if (targetEntity && targetEntity->getHealth() < targetEntity->getMaximumHealth())
 			{
 				if (Globals::getSqrDistance(targetEntity->getPosition(), m_position) > REPAIR_DISTANCE * REPAIR_DISTANCE)
@@ -473,7 +469,7 @@ void Worker::renderBuildingCommands(ShaderHandler& shaderHandler) const
 	for (const auto& building : m_buildQueue)
 	{
 		building.model.get().render(
-			shaderHandler, m_owningFaction, building.position, glm::vec3(0.0f), false);
+			shaderHandler, m_owningFaction->getController(), building.position, glm::vec3(0.0f), false);
 	}
 }
 
@@ -556,7 +552,7 @@ void Worker::switchTo(eWorkerState newState, const Map& map, const Mineral* mine
 		m_movement.path.clear();
 		if (oldState != eWorkerState::Idle)
 		{
-			Level::add_event(GameEvent::create<EntityIdleEvent>({ getID(), m_owningFaction }));
+			Level::add_event(GameEvent::create<EntityIdleEvent>({ getID(), m_owningFaction->getController() }));
 		}
 		break;
 	case eWorkerState::Moving:

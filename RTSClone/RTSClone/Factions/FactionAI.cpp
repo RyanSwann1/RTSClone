@@ -378,9 +378,9 @@ void FactionAI::on_entity_idle(Entity& entity, const Map& map, const FactionHand
 	}
 }
 
-Entity* FactionAI::create_building(const GameMessages::CreateBuilding& message)
+Entity* FactionAI::create_building(const Worker& worker, const Map& map)
 {
-	Entity* spawnedBuilding = Faction::create_building(message);
+	Entity* spawnedBuilding = Faction::create_building(worker, map);
 	if (spawnedBuilding)
 	{
 		switch (spawnedBuilding->getEntityType())
@@ -388,10 +388,10 @@ Entity* FactionAI::create_building(const GameMessages::CreateBuilding& message)
 		case eEntityType::SupplyDepot:
 		case eEntityType::Turret:
 		case eEntityType::Barracks:
-			m_occupiedBases.addBuilding(message.worker, *spawnedBuilding);
+			m_occupiedBases.addBuilding(worker, *spawnedBuilding);
 			break;
 		case eEntityType::Laboratory:
-			m_occupiedBases.addBuilding(message.worker, *spawnedBuilding);
+			m_occupiedBases.addBuilding(worker, *spawnedBuilding);
 			if (getCurrentShieldAmount() == 0)
 			{
 				AIOccupiedBase* occupiedBase = m_occupiedBases.getBase(*spawnedBuilding);
@@ -409,11 +409,11 @@ Entity* FactionAI::create_building(const GameMessages::CreateBuilding& message)
 	}
 	else
 	{
-		AIOccupiedBase* occupiedBase = m_occupiedBases.getBase(message.worker);
+		AIOccupiedBase* occupiedBase = m_occupiedBases.getBase(worker);
 		if (occupiedBase)
 		{
 			const glm::vec3& basePosition = occupiedBase->base.get().getCenteredPosition();
-			switch (message.worker.get_scheduled_buildings().front().entityType)
+			switch (worker.get_scheduled_buildings().front().entityType)
 			{
 			case eEntityType::SupplyDepot:
 				occupiedBase->actionQueue.emplace_back(eAIActionType::BuildSupplyDepot);

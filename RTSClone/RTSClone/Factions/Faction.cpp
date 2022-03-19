@@ -23,10 +23,7 @@ Faction::Faction(eFactionController factionController, const glm::vec3& hqStarti
     int startingResources, int startingPopulationCap)
     : m_controller(factionController),
     m_currentResourceAmount(startingResources),
-    m_currentPopulationLimit(startingPopulationCap),
-    m_getClosestHeadquatersSubscriber(getController(), [this](const GameMessages::GetClosestHeadquarters& message) { return get_closest_headquarters(message); }),
-    m_getEntitySubscriber(getController(), [this](const GameMessages::GetEntity& message) { return get_entity(message); }),
-    m_createBuildingSubscriber(getController(), [this](const GameMessages::CreateBuilding& message) { return create_building(message); })
+    m_currentPopulationLimit(startingPopulationCap)
 {
     m_entities.reserve(MAX_ENTITIES);
     m_units.reserve(Globals::MAX_UNITS);
@@ -397,13 +394,13 @@ void Faction::handleWorkerCollisions(const Map& map)
     handledWorkers.clear();
 }
 
-const Headquarters* Faction::get_closest_headquarters(const GameMessages::GetClosestHeadquarters& message) const
+const Headquarters* Faction::get_closest_headquarters(const glm::vec3& position) const
 {
     const Headquarters* closestHeadquarters = nullptr;
     float distance = std::numeric_limits<float>::max();
     for (const auto& headquarters : m_headquarters)
     {
-        const float result = Globals::getSqrDistance(headquarters->getPosition(), message.position);
+        const float result = Globals::getSqrDistance(headquarters->getPosition(), position);
         if (result < distance)
         {
             distance = result;
@@ -414,11 +411,11 @@ const Headquarters* Faction::get_closest_headquarters(const GameMessages::GetClo
     return closestHeadquarters;
 }
 
-const Entity* Faction::get_entity(const GameMessages::GetEntity& message) const
+const Entity* Faction::get_entity(const int id) const
 {
-    auto entity = std::find_if(m_entities.cbegin(), m_entities.cend(), [message](const auto& entity)
+    auto entity = std::find_if(m_entities.cbegin(), m_entities.cend(), [id](const auto& entity)
     {
-        return entity->getID() == message.entityID;
+        return entity->getID() == id;
     });
     if (entity != m_entities.cend())
     {
@@ -427,13 +424,13 @@ const Entity* Faction::get_entity(const GameMessages::GetEntity& message) const
     return nullptr;
 }
 
-Entity* Faction::create_building(const GameMessages::CreateBuilding& message)
+Entity* Faction::create_building(const Worker& worker, const Map& map)
 {
-    assert(message.worker.getCurrentState() == eWorkerState::Building && !message.worker.get_scheduled_buildings().empty());
+    assert(worker.getCurrentState() == eWorkerState::Building && !worker.get_scheduled_buildings().empty());
 
-    eEntityType entityType = message.worker.get_scheduled_buildings().front().entityType;
-    const glm::vec3& position = message.worker.get_scheduled_buildings().front().position;
-    if (isAffordable(entityType) && !message.map.isPositionOccupied(position))
+    eEntityType entityType = worker.get_scheduled_buildings().front().entityType;
+    const glm::vec3& position = worker.get_scheduled_buildings().front().position;
+    if (isAffordable(entityType) && !map.isPositionOccupied(position))
     {
         Entity* addedBuilding = nullptr;
         switch (entityType)

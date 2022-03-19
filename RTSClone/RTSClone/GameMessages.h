@@ -69,20 +69,4 @@ namespace GameMessages
 	{
 		const Mineral& mineral;
 	};
-
-	struct GetEntity
-	{
-		const int entityID = Globals::INVALID_ENTITY_ID;
-	};
-
-	struct GetClosestHeadquarters
-	{
-		const glm::vec3 position;
-	};
-
-	struct CreateBuilding
-	{
-		const Worker& worker;
-		const Map& map;
-	};
 }

@@ -50,7 +50,10 @@ public:
 	const Entity* getEntity(const AABB& AABB, int entityID, eEntityType entityType) const;
 	const Entity* getEntity(int entityID, eEntityType entityType) const;
 	const Entity* getEntity(const glm::vec3& position) const;
+	const Headquarters* get_closest_headquarters(const glm::vec3& position) const;
+	const Entity* get_entity(const int id) const;
 
+	virtual Entity* create_building(const Worker& worker, const Map& map);
 	virtual Entity* createUnit(const Map& map, const Barracks& barracks, const FactionHandler& factionHandler);
 	virtual Entity* createWorker(const Map& map, const Headquarters& headquarters);
 	virtual bool increaseShield(const Laboratory& laboratory);
@@ -78,8 +81,6 @@ protected:
 	virtual void on_entity_idle(Entity& entity, const Map& map, const FactionHandler& factionHandler, const BaseHandler& baseHandler) {}
 	virtual void onEntityRemoval(const Entity& entity) {}
 
-	virtual Entity* create_building(const GameMessages::CreateBuilding& message);
-
 	std::vector<std::unique_ptr<Entity>> m_entities;
 	std::vector<Unit*> m_units;
 	std::vector<Worker*> m_workers;
@@ -95,10 +96,6 @@ private:
 	int m_currentPopulationAmount			= 0;
 	int m_currentPopulationLimit			= 0;
 	int m_currentShieldAmount				= 0;
-	GameMessengerSubscriber<GameMessages::GetClosestHeadquarters,
-		eFactionController, const Headquarters*> m_getClosestHeadquatersSubscriber;
-	GameMessengerSubscriber<GameMessages::GetEntity, eFactionController, const Entity*> m_getEntitySubscriber;
-	GameMessengerSubscriber<GameMessages::CreateBuilding, eFactionController, const Entity*> m_createBuildingSubscriber;
 
 	void reduceResources(eEntityType addedEntityType);
 	void increaseCurrentPopulationAmount(eEntityType entityType);
@@ -107,8 +104,8 @@ private:
 	void revalidateExistingUnitPaths(const Map& map);
 	void handleWorkerCollisions(const Map& map);
 
-	const Headquarters* get_closest_headquarters(const GameMessages::GetClosestHeadquarters& message) const;
-	const Entity* get_entity(const GameMessages::GetEntity& message) const;
+	
+	
 
 	//Presumes entity already found in all entities container
 	template <typename T>
