@@ -3,92 +3,72 @@
 #include "glad.h"
 
 OpenGLResourceBuffer::OpenGLResourceBuffer(GLenum target)
-	: ID(Globals::INVALID_OPENGL_ID),
-	target(target)
+	: target(target)
 {
-	glGenBuffers(1, &ID);
+	glGenBuffers(1, &id);
 }
 
 OpenGLResourceBuffer::OpenGLResourceBuffer(OpenGLResourceBuffer&& rhs) noexcept
-	: ID(rhs.ID),
-	target(rhs.target)
+	: target(rhs.target)
 {
-	rhs.ID = Globals::INVALID_OPENGL_ID;
+	std::swap(id, rhs.id);
 }
 
 OpenGLResourceBuffer& OpenGLResourceBuffer::operator=(OpenGLResourceBuffer&& rhs) noexcept
 {
-	onDestroy();
-	ID = rhs.ID;
-	target = rhs.target;
-	rhs.ID = Globals::INVALID_OPENGL_ID;
-
+	std::swap(target, rhs.target);
+	std::swap(id, rhs.id);
 	return *this;
 }
 
 OpenGLResourceBuffer::~OpenGLResourceBuffer()
 {
-	onDestroy();
+	if (id != 0)
+	{
+		glDeleteBuffers(1, &id);
+	}
 }
 
 void OpenGLResourceBuffer::bind() const
 {
-	glBindBuffer(target, ID);
+	glBindBuffer(target, id);
 }
 
 unsigned int OpenGLResourceBuffer::getID() const
 {
-	return ID;
-}
-
-void OpenGLResourceBuffer::onDestroy()
-{
-	if (ID != Globals::INVALID_OPENGL_ID)
-	{
-		glDeleteBuffers(1, &ID);
-	}
+	return id;
 }
 
 OpenGLResourceVertexArray::OpenGLResourceVertexArray()
-	: ID(Globals::INVALID_OPENGL_ID)
 {
-	glGenVertexArrays(1, &ID);
+	glGenVertexArrays(1, &id);
 }
 
 OpenGLResourceVertexArray::OpenGLResourceVertexArray(OpenGLResourceVertexArray&& rhs) noexcept
-	: ID(rhs.ID)
 {
-	rhs.ID = Globals::INVALID_OPENGL_ID;
+	std::swap(id, rhs.id);
 }
 
 OpenGLResourceVertexArray& OpenGLResourceVertexArray::operator=(OpenGLResourceVertexArray&& rhs) noexcept
 {
-	onDestroy();
-	ID = rhs.ID;
-	rhs.ID = Globals::INVALID_OPENGL_ID;
-
+	std::swap(id, rhs.id);
 	return *this;
 }
 
 OpenGLResourceVertexArray::~OpenGLResourceVertexArray()
 {
-	onDestroy();
+	if (id != 0)
+	{
+		glDeleteVertexArrays(1, &id);
+	}
 }
 
 unsigned int OpenGLResourceVertexArray::getID() const
 {
-	return ID;
+	return id;
 }
 
 void OpenGLResourceVertexArray::bind() const
 {
-	glBindVertexArray(ID);
-}
-
-void OpenGLResourceVertexArray::onDestroy()
-{
-	if (ID != Globals::INVALID_OPENGL_ID)
-	{
-		glDeleteVertexArrays(1, &ID);
-	}
+	glBindVertexArray(id);
 }

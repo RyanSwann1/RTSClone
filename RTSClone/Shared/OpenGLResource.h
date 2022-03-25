@@ -16,10 +16,8 @@ struct OpenGLResourceBuffer
 	void bind() const;
 
 private:
-	unsigned int ID;
+	unsigned int id = { 0 };
 	GLenum target;
-
-	void onDestroy();
 };
 
 //glGenVertexArrays
@@ -36,7 +34,5 @@ struct OpenGLResourceVertexArray
 	void bind() const;
 
 private:
-	unsigned int ID;
-
-	void onDestroy();
+	unsigned int id = { 0 };
 };
