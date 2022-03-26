@@ -18,7 +18,7 @@
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Unit.cpp">
+    <ClCompile Include="Entities\Unit.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="PathFinding.cpp">
@@ -36,10 +36,10 @@
     <ClCompile Include="Graph.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="SupplyDepot.cpp">
+    <ClCompile Include="Entities\SupplyDepot.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Worker.cpp">
+    <ClCompile Include="Entities\Worker.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Factions\FactionPlayer.cpp">
@@ -114,19 +114,19 @@
     <ClCompile Include="..\Shared\Mineral.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Turret.cpp">
+    <ClCompile Include="Entities\Turret.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="TargetEntity.cpp">
+    <ClCompile Include="Entities\TargetEntity.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Sprite.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Laboratory.cpp">
+    <ClCompile Include="Entities\Laboratory.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Entity.cpp">
+    <ClCompile Include="Entities\Entity.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\Shared\Base.cpp">
@@ -141,10 +141,10 @@
     <ClCompile Include="EntitySpawnerBuilding.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Headquarters.cpp">
+    <ClCompile Include="Entities\Headquarters.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Barracks.cpp">
+    <ClCompile Include="Entities\Barracks.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\Shared\OpenGLResource.cpp">
@@ -290,7 +290,7 @@
     <ClInclude Include="assimp\include\version.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Unit.h">
+    <ClInclude Include="Entities\Unit.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="PathFinding.h">
@@ -308,13 +308,13 @@
     <ClInclude Include="Graph.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="SupplyDepot.h">
+    <ClInclude Include="Entities\SupplyDepot.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Worker.h">
+    <ClInclude Include="Entities\Worker.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="EntityType.h">
+    <ClInclude Include="Entities\EntityType.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Factions\FactionPlayer.h">
@@ -410,19 +410,19 @@
     <ClInclude Include="..\Shared\Mineral.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Turret.h">
+    <ClInclude Include="Entities\Turret.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="TargetEntity.h">
+    <ClInclude Include="Entities\TargetEntity.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Sprite.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Laboratory.h">
+    <ClInclude Include="Entities\Laboratory.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Entity.h">
+    <ClInclude Include="Entities\Entity.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="GameEvents.h">
@@ -446,10 +446,10 @@
     <ClInclude Include="EntitySpawnerBuilding.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Headquarters.h">
+    <ClInclude Include="Entities\Headquarters.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Barracks.h">
+    <ClInclude Include="Entities\Barracks.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="ActiveStatus.h">

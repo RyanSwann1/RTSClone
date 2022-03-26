@@ -1,7 +1,7 @@
 #pragma once
 
 #ifdef GAME
-#include "EntityType.h"
+#include "Entities/EntityType.h"
 #include "TypeComparison.h"
 #endif // GAME
 #include "glm/glm.hpp"

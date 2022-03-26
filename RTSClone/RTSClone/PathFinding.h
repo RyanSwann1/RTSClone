@@ -2,10 +2,10 @@
 
 #include "glm/glm.hpp"
 #include "Globals.h"
-#include "Unit.h"
+#include "Entities/Unit.h"
 #include "Map.h"
 #include "Graph.h"
-#include "Worker.h"
+#include "Entities/Worker.h"
 #include "MinHeap.h"
 #include "GameMessenger.h"
 #include <vector>

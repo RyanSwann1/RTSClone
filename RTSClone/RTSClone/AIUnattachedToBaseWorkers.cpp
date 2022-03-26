@@ -1,6 +1,6 @@
 #include "AIUnattachedToBaseWorkers.h"
 #include <algorithm>
-#include "Worker.h"
+#include "Entities/Worker.h"
 #include "Globals.h"
 
 AIUnattachedToBaseWorkers::AIUnattachedToBaseWorkers()

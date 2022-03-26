@@ -2,7 +2,7 @@
 
 #include "FactionController.h"
 #include "glm/glm.hpp"
-#include "EntityType.h"
+#include "Entities/EntityType.h"
 
 enum class eGameEventType
 {

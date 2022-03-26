@@ -2,7 +2,7 @@
 
 #include "Model.h"
 #ifdef GAME
-#include "EntityType.h"
+#include "Entities/EntityType.h"
 #endif // GAME
 
 #include <memory>

@@ -1,14 +1,14 @@
 #pragma once
 
-#include "Headquarters.h"
-#include "Barracks.h"
-#include "Worker.h"
+#include "Entities/Headquarters.h"
+#include "Entities/Barracks.h"
+#include "Entities/Worker.h"
 #include "PathFinding.h"
-#include "SupplyDepot.h"
+#include "Entities/SupplyDepot.h"
 #include "Mineral.h"
 #include "FactionController.h"
-#include "Turret.h"
-#include "Laboratory.h"
+#include "Entities/Turret.h"
+#include "Entities/Laboratory.h"
 #include "GameMessages.h"
 #include "Map.h"
 #include <vector>

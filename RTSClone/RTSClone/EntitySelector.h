@@ -9,12 +9,6 @@ struct Camera;
 class EntitySelector 
 {
 public:
-	EntitySelector();
-	EntitySelector(const EntitySelector&) = delete;
-	EntitySelector& operator=(const EntitySelector&) = delete;
-	EntitySelector(EntitySelector&&) = delete;
-	EntitySelector& operator=(EntitySelector&&) = delete;
-
 	const AABB& getAABB() const;
 	bool isActive() const;
 
@@ -25,11 +19,11 @@ public:
 
 private:
 	AABB m_AABB;
-	bool m_enabled;
+	bool m_enabled = false;
 	glm::vec2 m_startingMousePosition;
 	glm::vec3 m_worldStartingPosition;
 	OpenGLResourceVertexArray m_VAO;
-	OpenGLResourceBuffer m_VBO;
+	OpenGLResourceBuffer m_VBO = { GL_ARRAY_BUFFER };
 
 	bool isMinimumSize() const;
 };

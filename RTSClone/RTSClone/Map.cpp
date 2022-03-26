@@ -1,7 +1,7 @@
 #include "Map.h"
 #include "GameMessenger.h"
 #include "GameMessages.h"
-#include "Entity.h"
+#include "Entities/Entity.h"
 #include "Mineral.h"
 #include "SceneryGameObject.h"
 #include "GameMessenger.h"

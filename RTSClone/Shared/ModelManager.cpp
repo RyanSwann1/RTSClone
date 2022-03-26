@@ -1,6 +1,6 @@
 #include "ModelManager.h"
 #ifdef GAME
-#include "EntityType.h"
+#include "Entities/EntityType.h"
 #include "AABB.h"
 #endif // GAME
 #ifdef LEVEL_EDITOR

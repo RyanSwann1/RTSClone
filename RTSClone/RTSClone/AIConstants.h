@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Globals.h"
-#include "EntityType.h"
+#include "Entities/EntityType.h"
 #include "AIAction.h"
 #include <array>
 #include <vector>

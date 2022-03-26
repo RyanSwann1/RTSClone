@@ -1,5 +1,5 @@
 #include "AIAction.h"
-#include "EntityType.h"
+#include "Entities/EntityType.h"
 #include <assert.h>
 
 //AIAction

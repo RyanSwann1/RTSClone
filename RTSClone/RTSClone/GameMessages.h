@@ -1,6 +1,6 @@
 #pragma once
 
-#include "EntityType.h"
+#include "Entities/EntityType.h"
 #include "FactionController.h"
 #include "Globals.h"
 

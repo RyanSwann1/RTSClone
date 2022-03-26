@@ -5,7 +5,7 @@
 #include "glm/gtc/matrix_transform.hpp"
 #include "glm/gtx/transform.hpp"
 #ifdef GAME
-#include "Entity.h"
+#include "Entities/Entity.h"
 #include "SceneryGameObject.h"
 #else
 #include "GameObject.h"

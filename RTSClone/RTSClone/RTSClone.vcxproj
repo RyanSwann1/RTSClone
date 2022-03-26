@@ -171,15 +171,15 @@
     <ClCompile Include="AIAction.cpp" />
     <ClCompile Include="AIOccupiedBases.cpp" />
     <ClCompile Include="AIUnattachedToBaseWorkers.cpp" />
-    <ClCompile Include="Barracks.cpp" />
-    <ClCompile Include="Entity.cpp" />
+    <ClCompile Include="Entities\Barracks.cpp" />
+    <ClCompile Include="Entities\Entity.cpp" />
     <ClCompile Include="Factions\Faction.cpp" />
     <ClCompile Include="Factions\FactionAI.cpp" />
     <ClCompile Include="Factions\FactionHandler.cpp" />
     <ClCompile Include="Factions\FactionPlayer.cpp" />
     <ClCompile Include="Graph.cpp" />
-    <ClCompile Include="Headquarters.cpp" />
-    <ClCompile Include="Laboratory.cpp" />
+    <ClCompile Include="Entities\Headquarters.cpp" />
+    <ClCompile Include="Entities\Laboratory.cpp" />
     <ClCompile Include="Level.cpp" />
     <ClCompile Include="MinHeap.cpp" />
     <ClCompile Include="MiniMap.cpp" />
@@ -187,17 +187,17 @@
     <ClCompile Include="SceneryGameObject.cpp" />
     <ClCompile Include="EntitySelector.cpp" />
     <ClCompile Include="Sprite.cpp" />
-    <ClCompile Include="Turret.cpp" />
+    <ClCompile Include="Entities\Turret.cpp" />
     <ClCompile Include="UIManager.cpp" />
-    <ClCompile Include="TargetEntity.cpp" />
-    <ClCompile Include="Worker.cpp" />
+    <ClCompile Include="Entities\TargetEntity.cpp" />
+    <ClCompile Include="Entities\Worker.cpp" />
     <ClCompile Include="EntitySpawnerBuilding.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Map.cpp" />
     <ClCompile Include="PathFinding.cpp" />
-    <ClCompile Include="SupplyDepot.cpp" />
+    <ClCompile Include="Entities\SupplyDepot.cpp" />
     <ClCompile Include="Timer.cpp" />
-    <ClCompile Include="Unit.cpp" />
+    <ClCompile Include="Entities\Unit.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Shared\AABB.h" />
@@ -271,14 +271,14 @@
     <ClInclude Include="assimp\include\vector2.h" />
     <ClInclude Include="assimp\include\vector3.h" />
     <ClInclude Include="assimp\include\version.h" />
-    <ClInclude Include="Barracks.h" />
+    <ClInclude Include="Entities\Barracks.h" />
     <ClInclude Include="Callbacks\MineralCallbacks.h" />
     <ClInclude Include="Callbacks\WorkerCallbacks.h" />
-    <ClInclude Include="Entity.h" />
-    <ClInclude Include="EntityType.h" />
+    <ClInclude Include="Entities\Entity.h" />
+    <ClInclude Include="Entities\EntityType.h" />
     <ClInclude Include="Factions\FactionHandler.h" />
-    <ClInclude Include="Headquarters.h" />
-    <ClInclude Include="Laboratory.h" />
+    <ClInclude Include="Entities\Headquarters.h" />
+    <ClInclude Include="Entities\Laboratory.h" />
     <ClInclude Include="MinHeap.h" />
     <ClInclude Include="MiniMap.h" />
     <ClInclude Include="Movement.h" />
@@ -286,10 +286,10 @@
     <ClInclude Include="Level.h" />
     <ClInclude Include="EntitySelector.h" />
     <ClInclude Include="Sprite.h" />
-    <ClInclude Include="Turret.h" />
+    <ClInclude Include="Entities\Turret.h" />
     <ClInclude Include="TypeComparison.h" />
     <ClInclude Include="UIManager.h" />
-    <ClInclude Include="TargetEntity.h" />
+    <ClInclude Include="Entities\TargetEntity.h" />
     <ClInclude Include="Factions\Faction.h" />
     <ClInclude Include="Factions\FactionAI.h" />
     <ClInclude Include="Factions\FactionPlayer.h" />
@@ -299,13 +299,13 @@
     <ClInclude Include="Graph.h" />
     <ClInclude Include="Projectile.h" />
     <ClInclude Include="IDGenerator.h" />
-    <ClInclude Include="Worker.h" />
+    <ClInclude Include="Entities\Worker.h" />
     <ClInclude Include="EntitySpawnerBuilding.h" />
     <ClInclude Include="Map.h" />
     <ClInclude Include="PathFinding.h" />
-    <ClInclude Include="SupplyDepot.h" />
+    <ClInclude Include="Entities\SupplyDepot.h" />
     <ClInclude Include="Timer.h" />
-    <ClInclude Include="Unit.h" />
+    <ClInclude Include="Entities\Unit.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="assimp\include\color4.inl" />

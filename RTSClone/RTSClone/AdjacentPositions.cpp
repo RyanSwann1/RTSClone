@@ -1,8 +1,6 @@
 #include "AdjacentPositions.h"
 #include "Map.h"
 #include "Globals.h"
-#include "Unit.h"
-#include "Worker.h"
 #include "Factions/FactionHandler.h"
 
 const std::array<glm::ivec2, 8> ALL_DIRECTIONS_ON_GRID =

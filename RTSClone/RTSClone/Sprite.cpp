@@ -1,7 +1,7 @@
 #include "Sprite.h"
 #include "glad.h"
 #include "Globals.h"
-#include "Entity.h"
+#include "Entities/Entity.h"
 #include "Camera.h"
 #include "ShaderHandler.h"
 

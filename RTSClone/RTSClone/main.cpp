@@ -4,7 +4,6 @@
 #include <SFML/Graphics.hpp>
 #include "ModelLoader.h"
 #include "ShaderHandler.h"
-#include "Unit.h"
 #include "Map.h"
 #include "glm/gtc/matrix_transform.hpp"
 #include "Factions/FactionPlayer.h"

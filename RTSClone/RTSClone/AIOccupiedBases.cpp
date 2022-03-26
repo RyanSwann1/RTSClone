@@ -1,9 +1,9 @@
 #include "AIOccupiedBases.h"
-#include "Worker.h"
+#include "Entities/Worker.h"
 #include "Base.h"
-#include "Headquarters.h"
+#include "Entities/Headquarters.h"
 #include "Globals.h"
-#include "Turret.h"
+#include "Entities/Turret.h"
 #include "GameEvents.h"
 #include "Factions/FactionAI.h"
 #include <assert.h>

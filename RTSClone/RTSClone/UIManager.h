@@ -1,9 +1,9 @@
 #pragma once
 
-#include "EntityType.h"
+#include "Entities/EntityType.h"
 #include "FactionController.h"
 #include "GameMessages.h"
-#include "TargetEntity.h"
+#include "Entities/TargetEntity.h"
 #include "GameMessenger.h"
 #include <SFML/Graphics.hpp>
 #include <memory>

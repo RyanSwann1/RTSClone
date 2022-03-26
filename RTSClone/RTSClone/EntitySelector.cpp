@@ -33,15 +33,6 @@ namespace
     }
 };
 
-EntitySelector::EntitySelector()
-    : m_AABB(),
-    m_enabled(false),
-    m_startingMousePosition(),
-    m_worldStartingPosition(),
-    m_VAO(),
-    m_VBO(GL_ARRAY_BUFFER)
-{}
-
 const AABB& EntitySelector::getAABB() const
 {
     return m_AABB;
