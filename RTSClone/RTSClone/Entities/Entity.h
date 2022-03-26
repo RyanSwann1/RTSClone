@@ -6,7 +6,19 @@
 #include "EntityType.h"
 #include "Sprite.h"
 #include "Timer.h"
-#include "ActiveStatus.h"
+
+constexpr int INVALID_ENTITY_ID = -1;
+
+struct EntityID
+{
+	EntityID();
+	EntityID(const EntityID&) = delete;
+	EntityID& operator=(const EntityID&) = delete;
+	EntityID(EntityID&& rhs) noexcept;
+	EntityID& operator=(EntityID&& rhs) noexcept;
+
+	int id = INVALID_ENTITY_ID;
+};
 
 struct TakeDamageEvent;
 class FactionHandler;
@@ -55,25 +67,23 @@ protected:
 	Entity(const Model& model, const glm::vec3& startingPosition, eEntityType entityType, 
 		int health, int shield, glm::vec3 startingRotation = glm::vec3(0.0f));
 	
-	
 	void update(float deltaTime);
 	
-	ActiveStatus m_status;
 	Sprite m_statbarSprite;
 	glm::vec3 m_position;
 	glm::vec3 m_rotation;
 	AABB m_AABB;
 
 private:
-	int m_ID;
-	int m_maximumHealth;
-	int m_health;
-	int m_maximumShield;
-	int m_shield;
-	eEntityType m_type;
-	Timer m_shieldReplenishTimer;
+	EntityID m_id					= {};
+	int m_maximumHealth				= 0;
+	int m_health					= 0;
+	int m_maximumShield				= 0;
+	int m_shield					= 0;
+	eEntityType m_type				= {};
+	Timer m_shieldReplenishTimer	= {};
 	std::reference_wrapper<const Model> m_model;
-	bool m_selected;
+	bool m_selected					= false;
 
 	void increaseShield();
 };

@@ -14,7 +14,7 @@ SupplyDepot::SupplyDepot(const glm::vec3& startingPosition, const Faction& ownin
 
 SupplyDepot::~SupplyDepot()
 {
-	if (m_status.isActive())
+	if (getID() != INVALID_ENTITY_ID)
 	{
 		broadcast<GameMessages::RemoveAABBFromMap>({ m_AABB });
 	}

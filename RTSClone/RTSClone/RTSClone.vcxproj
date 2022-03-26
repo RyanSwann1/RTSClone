@@ -226,7 +226,6 @@
     <ClInclude Include="..\Shared\Quad.h" />
     <ClInclude Include="..\Shared\RenderPrimitiveMesh.h" />
     <ClInclude Include="..\Shared\ShaderHandler.h" />
-    <ClInclude Include="ActiveStatus.h" />
     <ClInclude Include="AdjacentPositions.h" />
     <ClInclude Include="AIAction.h" />
     <ClInclude Include="AIConstants.h" />

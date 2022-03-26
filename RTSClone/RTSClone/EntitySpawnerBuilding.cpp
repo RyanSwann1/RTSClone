@@ -24,7 +24,7 @@ EntitySpawnerBuilding::EntitySpawnerBuilding(const glm::vec3& startingPosition, 
 
 EntitySpawnerBuilding::~EntitySpawnerBuilding()
 {
-	if (m_status.isActive())
+	if (getID() != INVALID_ENTITY_ID)
 	{
 		broadcast<GameMessages::RemoveAABBFromMap>({ m_AABB });
 	}

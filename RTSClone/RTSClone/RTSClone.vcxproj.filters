@@ -452,9 +452,6 @@
     <ClInclude Include="Entities\Barracks.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ActiveStatus.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\Shared\OpenGLResource.h">
       <Filter>Header Files</Filter>
     </ClInclude>

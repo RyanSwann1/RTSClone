@@ -26,7 +26,7 @@ Laboratory::Laboratory(const glm::vec3& startingPosition, Faction& owningFaction
 
 Laboratory::~Laboratory()
 {
-	if (m_status.isActive())
+	if (getID() != INVALID_ENTITY_ID)
 	{
 		broadcast<GameMessages::RemoveAABBFromMap>({ m_AABB });
 	}

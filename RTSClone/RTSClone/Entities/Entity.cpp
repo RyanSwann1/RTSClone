@@ -58,20 +58,15 @@ namespace
 //Entity
 Entity::Entity(const Model& model, const glm::vec3& startingPosition, eEntityType entityType, 
 	int health, int shield, glm::vec3 startingRotation)
-	: m_status(),
-	m_statbarSprite(),
-	m_position(startingPosition),
+	: m_position(startingPosition),
 	m_rotation(startingRotation),
-	m_AABB(),
-	m_ID(id_generator::gen()),
 	m_maximumShield(shield),
 	m_shield(m_maximumShield),
 	m_maximumHealth(health),
 	m_health(m_maximumHealth),
 	m_type(entityType),
 	m_shieldReplenishTimer(SHIELD_REPLENISH_TIMER_EXPIRATION, false),
-	m_model(model),
-	m_selected(false)
+	m_model(model)
 {
 	switch (m_type)
 	{
@@ -117,7 +112,7 @@ void Entity::increaseShield()
 
 int Entity::getID() const
 {
-	return m_ID;
+	return m_id.id;
 }
 
 const glm::vec3& Entity::getRotation() const
@@ -270,3 +265,17 @@ void Entity::renderAABB(ShaderHandler& shaderHandler)
 }
 #endif // RENDER_AABB
 
+EntityID::EntityID()
+	: id(id_generator::gen())
+{}
+
+EntityID::EntityID(EntityID&& rhs) noexcept
+{
+	std::swap(id, rhs.id);
+}
+
+EntityID& EntityID::operator=(EntityID&& rhs) noexcept
+{
+	std::swap(id, rhs.id);
+	return *this;
+}

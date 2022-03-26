@@ -29,7 +29,7 @@ Turret::Turret(const glm::vec3& startingPosition, const Faction& owningFaction)
 
 Turret::~Turret()
 {
-	if (m_status.isActive())
+	if (getID() != INVALID_ENTITY_ID)
 	{
 		broadcast<GameMessages::RemoveAABBFromMap>({ m_AABB });
 	}
