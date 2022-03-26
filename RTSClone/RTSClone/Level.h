@@ -33,8 +33,10 @@ class Level
 {
 public:
 	Level(LevelDetailsFromFile&& levelDetails, glm::ivec2 windowSize);
-	Level& operator=(Level&&) noexcept = default;
+	Level(const Level&) = delete;
+	Level& operator=(const Level&) = delete;
 	Level(Level&&) noexcept = default;
+	Level& operator=(Level&&) noexcept = default;
 	~Level();
 
 	static std::optional<LevelDetailsFromFile> load(std::string_view levelName, glm::ivec2 windowSize);
