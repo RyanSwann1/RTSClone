@@ -46,23 +46,23 @@ namespace
         }
     }
 
-    void setSelectedEntities(std::vector<Entity*>& selectedUnits, std::vector<Unit*>& units, std::vector<Worker*>& workers)
+    void setSelectedEntities(std::vector<Entity*>& selectedUnits, std::vector<Unit>& units, std::vector<Worker>& workers)
     {
         selectedUnits.clear();
 
         for (auto& unit : units)
         {
-            if (unit->isSelected())
+            if (unit.isSelected())
             {
-                selectedUnits.push_back(&*unit);
+                selectedUnits.push_back(&unit);
             }
         }
 
         for (auto& worker : workers)
         {
-            if (worker->isSelected())
+            if (worker.isSelected())
             {
-                selectedUnits.push_back(&*worker);
+                selectedUnits.push_back(&worker);
             }
         }
     }
@@ -173,10 +173,10 @@ void FactionPlayer::handleInput(const sf::Event& currentSFMLEvent, const sf::Win
         {
             if (m_entitySelector.isActive() && !m_selectedEntities.empty())
             {
-                deselectEntities<Headquarters*>(m_headquarters);
-                deselectEntities<Barracks*>(m_barracks);
-                deselectEntities<Turret*>(m_turrets);
-                deselectEntities<SupplyDepot*>(m_supplyDepots);
+                deselectEntities<Headquarters>(m_headquarters);
+                deselectEntities<Barracks>(m_barracks);
+                deselectEntities<Turret>(m_turrets);
+                deselectEntities<SupplyDepot>(m_supplyDepots);
             }
 
             m_entitySelector.reset();
@@ -222,11 +222,11 @@ void FactionPlayer::handleEvent(const GameEvent& gameEvent, const Map& map, cons
     case eGameEventType::PlayerSpawnEntity:
     {
         int targetEntityID = gameEvent.data.playerSpawnEntity.targetID;
-        auto entity = std::find_if(m_entities.begin(), m_entities.end(), [targetEntityID](const auto& entity)
+        auto entity = std::find_if(m_allEntities.begin(), m_allEntities.end(), [targetEntityID](const auto& entity)
         {
             return entity->getID() == targetEntityID;
         });
-        if (entity != m_entities.end())
+        if (entity != m_allEntities.end())
         {
             switch ((*entity)->getEntityType())
             {
@@ -252,8 +252,8 @@ void FactionPlayer::update(float deltaTime, const Map& map, const FactionHandler
 
     if (m_entitySelector.isActive())
     {
-        selectEntities<Unit*>(m_units);
-        selectEntities<Worker*>(m_workers);
+        selectEntities<Unit>(m_units);
+        selectEntities<Worker>(m_workers);
         setSelectedEntities(m_selectedEntities, m_units, m_workers);
 
         if (m_selectedEntities.size() == 1)
@@ -312,9 +312,9 @@ void FactionPlayer::instructWorkerReturnMinerals(const Map& map, const Headquart
 {
     for (auto& worker : m_workers)
     {
-        if (worker->isSelected() && worker->isHoldingResources())
+        if (worker.isSelected() && worker.isHoldingResources())
         {
-            worker->moveTo(headquarters, map, eWorkerState::ReturningMineralsToHeadquarters);
+            worker.moveTo(headquarters, map, eWorkerState::ReturningMineralsToHeadquarters);
         }
     }
 }
@@ -328,9 +328,9 @@ int FactionPlayer::instructWorkerToBuild(const Map& map, const BaseHandler& base
         if (m_plannedBuilding->isOnValidPosition(baseHandler, map) &&
             isAffordable(m_plannedBuilding->getEntityType()))
         {
-            auto selectedWorker = std::find_if(m_workers.begin(), m_workers.end(), [workerID](const auto& worker)
+            auto selectedWorker = std::find_if(m_workers.begin(), m_workers.end(), [workerID](auto& worker)
             {
-                return worker->getID() == workerID;
+                return worker.getID() == workerID;
             });
             assert(selectedWorker != m_workers.cend());
             if (selectedWorker != m_workers.end())
@@ -339,7 +339,7 @@ int FactionPlayer::instructWorkerToBuild(const Map& map, const BaseHandler& base
 				{
                     if (const Base* base = baseHandler.getBase(m_plannedBuilding->getPosition()))
                     {
-                        if ((*selectedWorker)->build(*this, base->getCenteredPosition(), map, m_plannedBuilding->getEntityType()))
+                        if ((*selectedWorker).build(*this, base->getCenteredPosition(), map, m_plannedBuilding->getEntityType()))
                         {
                             m_plannedBuilding.reset();
                         }
@@ -347,7 +347,7 @@ int FactionPlayer::instructWorkerToBuild(const Map& map, const BaseHandler& base
 				}
                 else
                 {
-					if ((*selectedWorker)->build(*this, m_plannedBuilding->getPosition(), map, m_plannedBuilding->getEntityType()))
+					if ((*selectedWorker).build(*this, m_plannedBuilding->getPosition(), map, m_plannedBuilding->getEntityType()))
 					{
 						m_plannedBuilding.reset();
 					}
@@ -405,12 +405,12 @@ void FactionPlayer::moveSingularSelectedEntity(const glm::vec3& destination, con
         }
         else
         {
-            auto selectedEntity = std::find_if(m_entities.cbegin(), m_entities.cend(), 
+            auto selectedEntity = std::find_if(m_allEntities.cbegin(), m_allEntities.cend(), 
                 [&destination, &selectedWorker](const auto& entity)
             {
                 return entity->getAABB().contains(destination) && entity->getID() != selectedWorker.getID();
             });
-            if (selectedEntity != m_entities.cend() &&
+            if (selectedEntity != m_allEntities.cend() &&
                 (*selectedEntity)->getHealth() < (*selectedEntity)->getMaximumHealth())
             {
                 selectedWorker.repairEntity(*(*selectedEntity), map);
@@ -454,12 +454,12 @@ void FactionPlayer::moveMultipleSelectedEntities(const glm::vec3& destination, c
     }
     else
     {
-        auto selectedEntity = std::find_if(m_entities.cbegin(), m_entities.cend(), [&destination](const auto& entity)
+        auto selectedEntity = std::find_if(m_allEntities.cbegin(), m_allEntities.cend(), [&destination](const auto& entity)
         {
             return entity->getAABB().contains(destination);
         });
 
-        if (selectedEntity != m_entities.cend())
+        if (selectedEntity != m_allEntities.cend())
         {
             for (auto& selectedWorker : m_selectedEntities)
             {
@@ -542,7 +542,7 @@ void FactionPlayer::onLeftClick(const sf::Window& window, const Camera& camera, 
         if (!m_laboratories.empty())
         {
             assert(m_laboratories.size() == 1);
-            m_laboratories.front()->setSelected(m_laboratories.front()->getAABB().contains(planeIntersection));
+            m_laboratories.front().setSelected(m_laboratories.front().getAABB().contains(planeIntersection));
         }
     }
 }
@@ -608,21 +608,21 @@ void FactionPlayer::onRightClick(const sf::Window& window, const Camera& camera,
     {
         for (auto& headquarters : m_headquarters)
         {
-            if (headquarters->isSelected())
+            if (headquarters.isSelected())
             {
-                headquarters->setWaypointPosition(position, map);
+                headquarters.setWaypointPosition(position, map);
             }
-            else if (headquarters->getAABB().contains(position))
+            else if (headquarters.getAABB().contains(position))
             {
-                instructWorkerReturnMinerals(map, *headquarters);
+                instructWorkerReturnMinerals(map, headquarters);
             }
         }
 
         for (auto& barracks : m_barracks)
         {
-            if (barracks->isSelected())
+            if (barracks.isSelected())
             {
-                barracks->setWaypointPosition(position, map);
+                barracks.setWaypointPosition(position, map);
             }
         }
 

@@ -64,7 +64,7 @@ private:
 		const BaseHandler& baseHandler, const MiniMap& minimap, const glm::vec3& levelSize);
 
 	template <typename Entity>
-	void selectEntity(std::vector<Entity*>& entities, const glm::vec3& mouseToGroundPosition, bool selectAllEntities = false,
+	void selectEntity(std::vector<Entity>& entities, const glm::vec3& mouseToGroundPosition, bool selectAllEntities = false,
 		int selectEntityID = Globals::INVALID_ENTITY_ID);
 
 	template <typename T>
@@ -75,11 +75,11 @@ private:
 };
 
 template<typename Entity>
-inline void FactionPlayer::selectEntity(std::vector<Entity*>& entities, const glm::vec3& mouseToGroundPosition, bool selectAllEntities, int selectEntityID)
+inline void FactionPlayer::selectEntity(std::vector<Entity>& entities, const glm::vec3& mouseToGroundPosition, bool selectAllEntities, int selectEntityID)
 {
 	auto selectedEntity = std::find_if(entities.begin(), entities.end(), [&mouseToGroundPosition](const auto& entity)
 	{
-		return entity->getAABB().contains(mouseToGroundPosition);
+		return entity.getAABB().contains(mouseToGroundPosition);
 	});
 	if (selectedEntity != entities.end())
 	{
@@ -87,14 +87,14 @@ inline void FactionPlayer::selectEntity(std::vector<Entity*>& entities, const gl
 		{
 			for (auto& entity : entities)
 			{
-				entity->setSelected(true);
+				entity.setSelected(true);
 			}
 		}
 		else
 		{
 			for (auto& entity : entities)
 			{
-				entity->setSelected(entity->getAABB().contains(mouseToGroundPosition));
+				entity.setSelected(entity.getAABB().contains(mouseToGroundPosition));
 			}
 		}
 	}
@@ -102,13 +102,13 @@ inline void FactionPlayer::selectEntity(std::vector<Entity*>& entities, const gl
 	{
 		for (auto& entity : entities)
 		{
-			if (selectEntityID == entity->getID())
+			if (selectEntityID == entity.getID())
 			{
-				entity->setSelected(true);
+				entity.setSelected(true);
 			}
 			else
 			{
-				entity->setSelected(false);
+				entity.setSelected(false);
 			}
 		}
 	}
@@ -119,7 +119,7 @@ void FactionPlayer::selectEntities(std::vector<T>& units)
 {
 	for (auto& unit : units)
 	{
-		unit->setSelected(m_entitySelector.getAABB().contains(unit->getAABB()));
+		unit.setSelected(m_entitySelector.getAABB().contains(unit.getAABB()));
 	}	
 }
 
@@ -128,6 +128,6 @@ void FactionPlayer::deselectEntities(std::vector<T>& entities)
 {
 	for (auto& entity : entities)
 	{
-		entity->setSelected(false);
+		entity.setSelected(false);
 	}
 }

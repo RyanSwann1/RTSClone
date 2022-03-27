@@ -191,7 +191,7 @@
     <ClCompile Include="UIManager.cpp" />
     <ClCompile Include="Entities\TargetEntity.cpp" />
     <ClCompile Include="Entities\Worker.cpp" />
-    <ClCompile Include="EntitySpawnerBuilding.cpp" />
+    <ClCompile Include="Entities\EntitySpawnerBuilding.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Map.cpp" />
     <ClCompile Include="PathFinding.cpp" />
@@ -280,7 +280,7 @@
     <ClInclude Include="Entities\Laboratory.h" />
     <ClInclude Include="MinHeap.h" />
     <ClInclude Include="MiniMap.h" />
-    <ClInclude Include="Movement.h" />
+    <ClInclude Include="Entities\Movement.h" />
     <ClInclude Include="SceneryGameObject.h" />
     <ClInclude Include="Level.h" />
     <ClInclude Include="EntitySelector.h" />
@@ -299,7 +299,7 @@
     <ClInclude Include="Projectile.h" />
     <ClInclude Include="IDGenerator.h" />
     <ClInclude Include="Entities\Worker.h" />
-    <ClInclude Include="EntitySpawnerBuilding.h" />
+    <ClInclude Include="Entities\EntitySpawnerBuilding.h" />
     <ClInclude Include="Map.h" />
     <ClInclude Include="PathFinding.h" />
     <ClInclude Include="Entities\SupplyDepot.h" />

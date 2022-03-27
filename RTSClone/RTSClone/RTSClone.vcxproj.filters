@@ -138,7 +138,7 @@
     <ClCompile Include="..\Shared\Quad.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="EntitySpawnerBuilding.cpp">
+    <ClCompile Include="Entities\EntitySpawnerBuilding.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Entities\Headquarters.cpp">
@@ -443,7 +443,7 @@
     <ClInclude Include="..\Shared\Quad.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="EntitySpawnerBuilding.h">
+    <ClInclude Include="Entities\EntitySpawnerBuilding.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Entities\Headquarters.h">
@@ -476,7 +476,7 @@
     <ClInclude Include="..\Shared\RenderPrimitiveMesh.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Movement.h">
+    <ClInclude Include="Entities\Movement.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\Shared\FactionController.h">

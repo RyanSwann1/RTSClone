@@ -43,14 +43,17 @@ Unit::Unit(Faction & owningFaction, const glm::vec3 & startingPosition, const gl
 
 Unit::~Unit()
 {
-	if (!m_movement.path.empty())
+	if (getID() != INVALID_ENTITY_ID)
 	{
-		broadcast<GameMessages::RemoveUnitPositionFromMap>({ m_movement.path.front(), getID() });
-	}
-	else
-	{
-		assert(Globals::isOnMiddlePosition(m_position));
-		broadcast<GameMessages::RemoveUnitPositionFromMap>({ m_position, getID() });
+		if (!m_movement.path.empty())
+		{
+			broadcast<GameMessages::RemoveUnitPositionFromMap>({ m_movement.path.front(), getID() });
+		}
+		else
+		{
+			assert(Globals::isOnMiddlePosition(m_position));
+			broadcast<GameMessages::RemoveUnitPositionFromMap>({ m_position, getID() });
+		}
 	}
 }
 

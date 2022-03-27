@@ -46,6 +46,8 @@ public:
 	Worker(Faction& owningFaction, const Map& map, const glm::vec3& startingPosition, const glm::vec3& startingRotation);
 	Worker(Faction& owningFaction, const glm::vec3& startingPosition, const glm::vec3& destination, const Map& map, 
 		const glm::vec3& startingRotation);
+	Worker(Worker&&) noexcept = default;
+	Worker& operator=(Worker&&) noexcept = default;
 	
 	const Mineral* getMineralToHarvest() const;
 	const std::deque<WorkerScheduledBuilding>& get_scheduled_buildings() const;

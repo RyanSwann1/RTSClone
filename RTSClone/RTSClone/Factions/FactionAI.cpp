@@ -135,9 +135,9 @@ void FactionAI::setTargetFaction(FactionHandler& factionHandler)
 		{
 			continue;
 		}
-		if (const Headquarters* opposingHeadquarters = opposingFaction->getClosestHeadquarters(m_headquarters.front()->getPosition()))
+		if (const Headquarters* opposingHeadquarters = opposingFaction->getClosestHeadquarters(m_headquarters.front().getPosition()))
 		{
-			float distance = Globals::getSqrDistance(opposingHeadquarters->getPosition(), m_headquarters.front()->getPosition());
+			float distance = Globals::getSqrDistance(opposingHeadquarters->getPosition(), m_headquarters.front().getPosition());
 			if (distance < targetFactionDistance)
 			{
 				m_targetFaction = opposingFaction->getController();
@@ -165,12 +165,12 @@ void FactionAI::handleEvent(const GameEvent& gameEvent, const Map& map, const Fa
 	{
 		assert(gameEvent.data.takeDamage.senderFaction != getController());
 		int targetID = gameEvent.data.takeDamage.targetID;
-		auto entity = std::find_if(m_entities.begin(), m_entities.end(), [targetID](const auto& entity)
+		auto entity = std::find_if(m_allEntities.begin(), m_allEntities.end(), [targetID](const auto& entity)
 		{
 			return entity->getID() == targetID;
 		});
 
-		if (entity != m_entities.end() &&
+		if (entity != m_allEntities.end() &&
 			(*entity)->getEntityType() == eEntityType::Headquarters)
 		{
 			instructWorkersToRepair(*(*entity), map);
@@ -222,7 +222,7 @@ void FactionAI::handleEvent(const GameEvent& gameEvent, const Map& map, const Fa
 
 void FactionAI::selectEntity(const glm::vec3& position)
 {
-	for (auto& entity : m_entities)
+	for (auto& entity : m_allEntities)
 	{
 		entity->setSelected(entity->getAABB().contains(position));
 	}
@@ -460,19 +460,19 @@ Worker* FactionAI::getAvailableWorker(const glm::vec3& position)
 		float closestDistance = std::numeric_limits<float>::max();
 		for (auto& availableWorker : m_workers)
 		{
-			float distance = Globals::getSqrDistance(position, availableWorker->getPosition());
+			float distance = Globals::getSqrDistance(position, availableWorker.getPosition());
 			bool selectWorker = false;
 			if (!selectedWorker)
 			{
 				selectWorker = true;
-				selectedWorker = &(*availableWorker);
+				selectedWorker = &availableWorker;
 			}
-			else if (availableWorker->getCurrentState() == eWorkerState::Idle &&
+			else if (availableWorker.getCurrentState() == eWorkerState::Idle &&
 				selectedWorker->getCurrentState() != eWorkerState::Idle)
 			{
 				selectWorker = true;
 			}
-			else if (availableWorker->getCurrentState() == eWorkerState::Idle &&
+			else if (availableWorker.getCurrentState() == eWorkerState::Idle &&
 				selectedWorker->getCurrentState() == eWorkerState::Idle &&
 				distance < closestDistance)
 			{
@@ -485,7 +485,7 @@ Worker* FactionAI::getAvailableWorker(const glm::vec3& position)
 
 			if (selectWorker)
 			{
-				selectedWorker = &(*availableWorker);
+				selectedWorker = &availableWorker;
 				closestDistance = distance;
 			}
 		}
@@ -535,7 +535,7 @@ Worker* FactionAI::getAvailableWorker(const glm::vec3& position, AIOccupiedBase&
 
 bool FactionAI::isWithinRangeOfBuildings(const glm::vec3& position, float distance) const
 {
-	for (const auto& entity : m_entities)
+	for (const auto& entity : m_allEntities)
 	{
 		switch (entity->getEntityType())
 		{
@@ -686,11 +686,11 @@ bool FactionAI::build(const Map& map, eEntityType entityType, AIOccupiedBase& oc
 	{
 		assert(!worker);
 		const glm::vec3& basePosition = occupiedBase.base.get().getCenteredPosition();
-		auto headquarters = std::find_if(m_headquarters.begin(), m_headquarters.end(), [&basePosition](const auto& headquarters)
+		auto headquarters = std::find_if(m_headquarters.begin(), m_headquarters.end(), [&basePosition](auto& headquarters)
 		{
-			return headquarters->getPosition() == basePosition;
+			return headquarters.getPosition() == basePosition;
 		});
-		return headquarters != m_headquarters.end() ? (*headquarters)->addWorkerToSpawnQueue() : false;
+		return headquarters != m_headquarters.end() ? (*headquarters).addWorkerToSpawnQueue() : false;
 	}
 		break;
 	default:

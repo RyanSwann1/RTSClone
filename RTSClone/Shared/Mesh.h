@@ -31,8 +31,8 @@ struct Mesh
 	Mesh(std::vector<Vertex>&& vertices, std::vector<unsigned int>&& indices, const Material& material);
 	Mesh(const Mesh&) = delete;
 	Mesh& operator=(const Mesh&) = delete;
-	Mesh(Mesh&&) = default;
-	Mesh& operator=(Mesh&&) = default;
+	Mesh(Mesh&&) noexcept = default;
+	Mesh& operator=(Mesh&&) noexcept = default;
 
 	void attachToVAO() const;
 

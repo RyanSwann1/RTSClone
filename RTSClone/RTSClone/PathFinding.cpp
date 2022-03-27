@@ -79,16 +79,16 @@ PathFinding::PathFinding()
 	: m_onNewMapSizeID([this](GameMessages::MapSize&& gameMessage) { return onNewMapSize(std::move(gameMessage)); })
 {}
 
-bool PathFinding::getClosestAvailablePosition(const Worker& worker, const std::vector<Worker*>& workers, const Map& map, glm::vec3& outPosition)
+bool PathFinding::getClosestAvailablePosition(const Worker& worker, const std::vector<Worker>& workers, const Map& map, glm::vec3& outPosition)
 {
 	m_bfsGraph.reset(Globals::convertToGridPosition(worker.getPosition()));
 	bool availablePositionFound = false;
 	int workerID = worker.getID();
 	auto workerCollision = [workerID, &workers](glm::ivec2 position) -> bool
 	{
-		auto worker = std::find_if(workers.cbegin(), workers.cend(), [workerID, position](const auto& worker)
+		auto worker = std::find_if(workers.cbegin(), workers.cend(), [workerID, position](auto& worker)
 		{
-			return worker->getID() != workerID && !worker->getAABB().contains(Globals::convertToWorldPosition(position));
+			return worker.getID() != workerID && !worker.getAABB().contains(Globals::convertToWorldPosition(position));
 		});
 		return worker != workers.cend();
 	};
@@ -96,7 +96,7 @@ bool PathFinding::getClosestAvailablePosition(const Worker& worker, const std::v
 	while (!availablePositionFound && !m_bfsGraph.is_frontier_empty())
 	{
 		glm::ivec2 position = m_bfsGraph.pop_frontier();
-		for (const auto& adjacentPosition : getAdjacentPositions(position, map))// getRandomAdjacentPositions(position, map, unit))
+		for (const auto& adjacentPosition : getAdjacentPositions(position, map))
 		{
 			if (adjacentPosition.valid && workerCollision(adjacentPosition.position))
 			{

@@ -32,6 +32,10 @@ public:
 	Unit(Faction& owningFaction, const glm::vec3& startingPosition, const glm::vec3& startingRotation, const Map& map);
 	Unit(Faction& owningFaction, const glm::vec3& startingPosition, const glm::vec3& startingRotation,
 		const glm::vec3& destination, const Map& map);
+	Unit(const Unit&) = delete;
+	Unit& operator=(const Unit&) = delete;
+	Unit(Unit&&) noexcept = default;
+	Unit& operator=(Unit&&) noexcept = default;
 	~Unit();
 
 	std::optional<TargetEntity> getTargetEntity() const;

@@ -52,7 +52,7 @@ public:
 		return instance;
 	}
 
-	bool getClosestAvailablePosition(const Worker& worker, const std::vector<Worker*>& workers, 
+	bool getClosestAvailablePosition(const Worker& worker, const std::vector<Worker>& workers, 
 		const Map& map, glm::vec3& position);
 
 	bool isBuildingSpawnAvailable(const glm::vec3& startingPosition, eEntityType buildingEntityType, const Map& map,
