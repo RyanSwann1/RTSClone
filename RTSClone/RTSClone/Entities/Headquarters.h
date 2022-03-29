@@ -5,15 +5,11 @@
 class Headquarters : public EntitySpawnerBuilding
 {
 public:
-	Headquarters(const glm::vec3& startingPosition, Faction& owningFaction);
+	Headquarters(const glm::vec3& position, Faction& owningFaction);
 	Headquarters(Headquarters&&) = default;
 	Headquarters& operator=(Headquarters&&) = default;
 	~Headquarters();
 
-	void update(float deltaTime, const Map& map, const FactionHandler& factionHandler);
-	bool addWorkerToSpawnQueue();
-	void renderProgressBar(ShaderHandler& shaderHandler, const Camera& camera, glm::uvec2 windowSize) const;
-
 private:
-	const Entity* spawnEntity(const Map& map, const FactionHandler& factionHandler) const override;
+	const Faction* m_owningFaction = nullptr;
 };

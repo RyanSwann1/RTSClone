@@ -48,7 +48,6 @@ public:
 	void render(ShaderHandler& shaderHandler, eFactionController owningFactionController) const;
 	void renderHealthBar(ShaderHandler& shaderHandler, const Camera& camera, glm::uvec2 windowSize) const;
 	void renderShieldBar(ShaderHandler& shaderHandler, const Camera& camera, glm::uvec2 windowSize) const;
-	void setPosition(const glm::vec3& position);
 
 	int getID() const;
 	const glm::vec3& getRotation() const;
@@ -67,6 +66,7 @@ protected:
 		int health, int shield, glm::vec3 startingRotation = glm::vec3(0.0f));
 	
 	void update(float deltaTime);
+	void setPosition(const glm::vec3& position);
 	
 	Sprite m_statbarSprite;
 	glm::vec3 m_position;

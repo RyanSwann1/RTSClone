@@ -302,7 +302,7 @@ void UIManager::update(const FactionHandler& factionHandler)
 				{
 					const EntitySpawnerBuilding& unitSpawnerBuilding = static_cast<const EntitySpawnerBuilding&>(*targetEntity);
 					m_selectedEntityWidget->set({ m_selectedEntityWidget->factionController, m_selectedEntityWidget->ID, targetEntity->getEntityType(),
-						unitSpawnerBuilding.getHealth(), unitSpawnerBuilding.getShield(), unitSpawnerBuilding.getCurrentSpawnCount() });
+						unitSpawnerBuilding.getHealth(), unitSpawnerBuilding.getShield(), unitSpawnerBuilding.get_current_spawn_count() });
 				}
 				break;
 				case eEntityType::Unit:

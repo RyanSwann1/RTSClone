@@ -231,10 +231,10 @@ void FactionPlayer::handleEvent(const GameEvent& gameEvent, const Map& map, cons
             switch ((*entity)->getEntityType())
             {
             case eEntityType::Barracks:
-                static_cast<Barracks&>(*(*entity)).addUnitToSpawnQueue();
+                static_cast<Barracks&>(*(*entity)).add_entity_to_spawn_queue(*this);
                 break;
             case eEntityType::Headquarters:
-                static_cast<Headquarters&>(*(*entity)).addWorkerToSpawnQueue();
+                static_cast<Headquarters&>(*(*entity)).add_entity_to_spawn_queue(*this);
                 break;
             default:
                 assert(false);
@@ -610,7 +610,7 @@ void FactionPlayer::onRightClick(const sf::Window& window, const Camera& camera,
         {
             if (headquarters.isSelected())
             {
-                headquarters.setWaypointPosition(position, map);
+                headquarters.set_waypoint_position(map, position);
             }
             else if (headquarters.getAABB().contains(position))
             {
@@ -622,7 +622,7 @@ void FactionPlayer::onRightClick(const sf::Window& window, const Camera& camera,
         {
             if (barracks.isSelected())
             {
-                barracks.setWaypointPosition(position, map);
+                barracks.set_waypoint_position(map, position);
             }
         }
 

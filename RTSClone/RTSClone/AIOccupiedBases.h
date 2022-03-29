@@ -40,7 +40,7 @@ struct AIOccupiedBase
 };
 
 class FactionAI;
-class Headquarters;
+class EntitySpawnerBuilding;
 class BaseHandler;
 class AIUnattachedToBaseWorkers;
 struct AIOccupiedBases
@@ -56,7 +56,7 @@ struct AIOccupiedBases
 
 	const std::vector<AIOccupiedBase>& getSortedBases(const glm::vec3& position);
 
-	void addWorker(Worker& worker, const Headquarters& headquarters);
+	void addWorker(Worker& worker, const EntitySpawnerBuilding& spawner);
 	void addWorker(Worker& worker, const Base& base);
 	void removeWorker(const Worker& worker);
 

@@ -1,7 +1,7 @@
 #include "AIOccupiedBases.h"
 #include "Entities/Worker.h"
 #include "Base.h"
-#include "Entities/Headquarters.h"
+#include "Entities/EntitySpawnerBuilding.h"
 #include "Globals.h"
 #include "Entities/Turret.h"
 #include "GameEvents.h"
@@ -215,11 +215,11 @@ const std::vector<AIOccupiedBase>& AIOccupiedBases::getSortedBases(const glm::ve
 	return bases;
 }
 
-void AIOccupiedBases::addWorker(Worker& worker, const Headquarters& headquarters)
+void AIOccupiedBases::addWorker(Worker& worker, const EntitySpawnerBuilding& spawner)
 {
-	auto base = std::find_if(bases.begin(), bases.end(), [&headquarters](const auto& base)
+	auto base = std::find_if(bases.begin(), bases.end(), [&spawner](const auto& base)
 	{
-		return base.base.get().getCenteredPosition() == headquarters.getPosition();
+		return base.base.get().getCenteredPosition() == spawner.getPosition();
 	});
 
 	assert(base != bases.end() && (*base).base.get().owningFactionController == owningFaction);

@@ -301,7 +301,6 @@ void Faction::handleEvent(const GameEvent& gameEvent, const Map& map, const Fact
         }
         break;
     }
-
     case eGameEventType::EntityIdle:
     {
         const int entityID = gameEvent.data.entityIdle.entityID;
@@ -475,7 +474,7 @@ void Faction::update(float deltaTime, const Map& map, const FactionHandler& fact
 
     for (auto& barracks : m_barracks)
     {
-        barracks.update(deltaTime, map, factionHandler);
+        barracks.update(deltaTime, *this, map);
     }
 
     for (auto& turret : m_turrets)
@@ -490,7 +489,7 @@ void Faction::update(float deltaTime, const Map& map, const FactionHandler& fact
 
     for (auto& headquarters : m_headquarters)
     {
-        headquarters.update(deltaTime, map, factionHandler);
+        headquarters.update(deltaTime, *this, map);
     }
 
     for (auto& laboratory : m_laboratories)
@@ -534,6 +533,7 @@ void Faction::render(ShaderHandler& shaderHandler) const
     for (const auto& barracks : m_barracks)
     {
         barracks.render(shaderHandler, m_controller);
+        barracks.render_waypoint(shaderHandler);
     }
 
     for (const auto& turret : m_turrets)
@@ -544,6 +544,7 @@ void Faction::render(ShaderHandler& shaderHandler) const
     for (const auto& headquarters : m_headquarters)
     {
         headquarters.render(shaderHandler, m_controller);
+        headquarters.render_waypoint(shaderHandler);
     }
  
     for (const auto& laboratory : m_laboratories)
@@ -570,10 +571,10 @@ void Faction::renderEntityStatusBars(ShaderHandler& shaderHandler, const Camera&
         switch (entity->getEntityType())
         {
         case eEntityType::Barracks:
-            static_cast<Barracks&>(*entity).renderProgressBar(shaderHandler, camera, windowSize);
+            static_cast<Barracks&>(*entity).render_progress_bar(shaderHandler, camera, windowSize);
             break;
         case eEntityType::Headquarters:
-            static_cast<Headquarters&>(*entity).renderProgressBar(shaderHandler, camera, windowSize);
+            static_cast<Headquarters&>(*entity).render_progress_bar(shaderHandler, camera, windowSize);
             break;
         case eEntityType::Worker:
             static_cast<Worker&>(*entity).renderProgressBar(shaderHandler, camera, windowSize);
@@ -766,20 +767,19 @@ bool Faction::isMineralInUse(const Mineral& mineral) const
     });
 }
 
-Entity* Faction::createUnit(const Map& map, const Barracks& barracks, const FactionHandler& factionHandler)
+Entity* Faction::createUnit(const Map& map, const EntitySpawnerBuilding& spawner)
 {
-    assert(barracks.getCurrentSpawnCount() > 0);
     glm::vec3 startingPosition(0.0f);
     if (m_units.size() < Globals::MAX_UNITS &&
         isAffordable(eEntityType::Unit) && 
         !isExceedPopulationLimit(eEntityType::Unit) &&
-        PathFinding::getInstance().getClosestAvailableEntitySpawnPosition(barracks, map, startingPosition))
+        PathFinding::getInstance().getClosestAvailableEntitySpawnPosition(spawner, map, startingPosition))
     {
-        glm::vec3 startingRotation = { 0.0f, Globals::getAngle(startingPosition, barracks.getPosition()), 0.0f };
+        glm::vec3 startingRotation = { 0.0f, Globals::getAngle(startingPosition, spawner.getPosition()), 0.0f };
         Entity* createdUnit = nullptr;
-        if (barracks.isWaypointActive())
+        if (spawner.get_waypoint())
         {
-            createdUnit = &m_units.emplace_back(*this, startingPosition, startingRotation, barracks.getWaypointPosition(), map);
+            createdUnit = &m_units.emplace_back(*this, startingPosition, startingRotation, *spawner.get_waypoint(), map);
         }
         else
         {
@@ -796,20 +796,19 @@ Entity* Faction::createUnit(const Map& map, const Barracks& barracks, const Fact
     return nullptr;
 }
 
-Entity* Faction::createWorker(const Map& map, const Headquarters& headquarters)
+Entity* Faction::createWorker(const Map& map, const EntitySpawnerBuilding& spawner)
 {
-    assert(headquarters.getCurrentSpawnCount() > 0);
     glm::vec3 startingPosition(0.0f);
     if (m_workers.size() < Globals::MAX_WORKERS &&
         isAffordable(eEntityType::Worker) && 
         !isExceedPopulationLimit(eEntityType::Worker) &&
-        PathFinding::getInstance().getClosestAvailableEntitySpawnPosition(headquarters, map, startingPosition))
+        PathFinding::getInstance().getClosestAvailableEntitySpawnPosition(spawner, map, startingPosition))
     {
-        glm::vec3 startingRotation = { 0.0f, Globals::getAngle(startingPosition, headquarters.getPosition()), 0.0f };
+        glm::vec3 startingRotation = { 0.0f, Globals::getAngle(startingPosition, spawner.getPosition()), 0.0f };
         Entity* createdWorker = nullptr;
-        if (headquarters.isWaypointActive())
+        if (spawner.get_waypoint())
         {
-            createdWorker = &m_workers.emplace_back(*this, startingPosition, headquarters.getWaypointPosition(), map, startingRotation);
+            createdWorker = &m_workers.emplace_back(*this, startingPosition, *spawner.get_waypoint(), map, startingRotation);
         }
         else
         {

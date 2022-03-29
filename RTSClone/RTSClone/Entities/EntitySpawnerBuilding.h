@@ -1,46 +1,46 @@
 #pragma once
 
-#include "Entities/Entity.h"
 #include "Timer.h"
+#include "Entity.h"
 #include <functional>
+#include <queue>
+#include <optional>
 
-enum class eFactionController;
-struct Model;
+struct EntitySpawnerDetails
+{
+	float timeBetweenSpawn		= 0.f;
+	float progressBarWidth		= 0.f;
+	float progressBarYOffset	= 0.f;
+	int maxSpawnCount			= 0;
+	int resourceCost			= 0;
+	int populationCost			= 0;
+};
+
 class Map;
 class Faction;
-class FactionHandler;
-class Unit;
-class Worker;
 class EntitySpawnerBuilding : public Entity
 {
 public:
-	EntitySpawnerBuilding(const glm::vec3& startingPosition, eEntityType entityType, float spawnTimerExpirationTime, int health,
-		Faction& owningFaction, const Model& model, int maxEntityInSpawnQueue);
+	EntitySpawnerBuilding(const glm::vec3& position, const eEntityType type, const int health,
+		const int shield, EntitySpawnerDetails spawnDetails,
+		std::function<Entity*(Faction&, const Map&, const EntitySpawnerBuilding&)> spawnCallback);
 	EntitySpawnerBuilding(EntitySpawnerBuilding&&) noexcept = default;
 	EntitySpawnerBuilding& operator=(EntitySpawnerBuilding&&) noexcept = default;
-	
-	const Timer& getSpawnTimer() const;
-	int getCurrentSpawnCount() const;
-	bool isWaypointActive() const;
-	const glm::vec3& getWaypointPosition() const;
-
-	void setWaypointPosition(const glm::vec3& position, const Map& map);
-	void render(ShaderHandler& shaderHandler, eFactionController owningFactionController) const;
-
-protected:
 	~EntitySpawnerBuilding();
 
-	bool isEntityAddableToSpawnQueue(int maxEntitiesInSpawnQueue, int resourceCost, int populationCost) const;
-	void addEntityToSpawnQueue(eEntityType entityType);
-	virtual const Entity* spawnEntity(const Map& map, const FactionHandler& factionHandler) const = 0;
+	int get_current_spawn_count() const;
+	std::optional<glm::vec3> get_waypoint() const;
 
-	void update(float deltaTime, int resourceCost, int populationCost, 
-		int maxEntityInSpawnQueue, const Map& map, const FactionHandler& factionHandler);
-
-	std::reference_wrapper<Faction> m_owningFaction;
-	std::vector<eEntityType> m_spawnQueue;
-	Timer m_spawnTimer;
+	void update(const float deltaTime, Faction& owningFaction, const Map& map);
+	void render_progress_bar(ShaderHandler& shaderHandler, const Camera& camera, glm::uvec2 windowSize) const;
+	void set_waypoint_position(const Map& map, const glm::vec3& position);
+	bool add_entity_to_spawn_queue(const Faction& owningFaction);
+	void render_waypoint(ShaderHandler& shaderHandler) const;
 
 private:
-	glm::vec3 m_waypointPosition;
+	EntitySpawnerDetails m_details				= {};
+	int m_spawnCount							= 0;
+	Timer m_timer								= {};
+	std::optional<glm::vec3> m_waypoint			= {};
+	std::function<Entity*(Faction&, const Map&, const EntitySpawnerBuilding&)> m_spawnCallback = {};
 };

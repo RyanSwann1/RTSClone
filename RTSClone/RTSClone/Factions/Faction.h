@@ -4,12 +4,13 @@
 #include "Entities/Barracks.h"
 #include "Entities/Worker.h"
 #include "Entities/Unit.h"
+#include "Entities/Turret.h"
+#include "Entities/Laboratory.h"
 #include "PathFinding.h"
 #include "Entities/SupplyDepot.h"
 #include "Mineral.h"
 #include "FactionController.h"
-#include "Entities/Turret.h"
-#include "Entities/Laboratory.h"
+
 #include "GameMessages.h"
 #include "Map.h"
 #include <vector>
@@ -54,8 +55,8 @@ public:
 	const Entity* get_entity(const int id) const;
 
 	virtual Entity* create_building(const Worker& worker, const Map& map);
-	virtual Entity* createUnit(const Map& map, const Barracks& barracks, const FactionHandler& factionHandler);
-	virtual Entity* createWorker(const Map& map, const Headquarters& headquarters);
+	virtual Entity* createUnit(const Map& map, const EntitySpawnerBuilding& spawner);
+	virtual Entity* createWorker(const Map& map, const EntitySpawnerBuilding& spawner);
 	virtual bool increaseShield(const Laboratory& laboratory);
 	virtual void handleEvent(const GameEvent& gameEvent, const Map& map, const FactionHandler& factionHandler, 
 		const BaseHandler& baseHandler);
