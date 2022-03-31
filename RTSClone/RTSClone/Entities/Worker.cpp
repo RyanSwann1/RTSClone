@@ -133,7 +133,7 @@ void Worker::repairEntity(const Entity& entity, const Map& map)
 bool Worker::build(const Faction& owningFaction, const glm::vec3& buildPosition, const Map& map, eEntityType entityType, bool clearBuildQueue)
 {	
 	if (entityType == eEntityType::Laboratory && 
-		(owningFaction.getLaboratoryCount() == Globals::MAX_LABORATORIES || owningFaction.isBuildingInAllWorkersQueue(entityType)))
+		(owningFaction.is_laboratory_built() || owningFaction.isBuildingInAllWorkersQueue(entityType)))
 	{
 		return false;
 	}

@@ -31,6 +31,7 @@ public:
 	Faction& operator=(Faction&&) noexcept = delete;
 	virtual ~Faction() {}
 
+	bool is_laboratory_built() const;
 	bool isMineralInUse(const Mineral& mineral) const;
 	bool isExceedPopulationLimit(int populationAmount) const;
 	bool isExceedPopulationLimit(eEntityType entityType) const;
@@ -42,7 +43,6 @@ public:
 	int getCurrentPopulationAmount() const;
 	int getMaximumPopulationAmount() const;
 	int getCurrentResourceAmount() const;
-	int getLaboratoryCount() const;
 	const Headquarters* getMainHeadquarters() const;
 	const Headquarters* getClosestHeadquarters(const glm::vec3& position) const;
 	eFactionController getController() const;
@@ -89,7 +89,7 @@ protected:
 	std::vector<Barracks> m_barracks;
 	std::vector<Turret> m_turrets;
 	std::vector<Headquarters> m_headquarters;
-	std::vector<Laboratory> m_laboratories;
+	std::optional<Laboratory> m_laboratory;
 
 private:
 	const eFactionController m_controller	= eFactionController::None;

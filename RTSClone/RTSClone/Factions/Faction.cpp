@@ -32,7 +32,6 @@ Faction::Faction(eFactionController factionController, const glm::vec3& hqStarti
     m_supplyDepots.reserve(Globals::MAX_SUPPLY_DEPOTS);
     m_barracks.reserve(Globals::MAX_BARRACKS);
     m_turrets.reserve(Globals::MAX_TURRETS);
-    m_laboratories.reserve(Globals::MAX_LABORATORIES);
 
     Entity& entity = m_headquarters.emplace_back(hqStartingPosition, *this);
     m_allEntities.push_back(&entity);
@@ -56,11 +55,6 @@ int Faction::getMaximumPopulationAmount() const
 int Faction::getCurrentResourceAmount() const
 {
     return m_currentResourceAmount;
-}
-
-int Faction::getLaboratoryCount() const
-{
-    return static_cast<int>(m_laboratories.size());
 }
 
 const Headquarters* Faction::getMainHeadquarters() const
@@ -227,7 +221,7 @@ void Faction::handleEvent(const GameEvent& gameEvent, const Map& map, const Fact
             removeEntity<Turret>(m_turrets, entity);
             break;
         case eEntityType::Laboratory:
-            removeEntity<Laboratory>(m_laboratories, entity);
+            m_laboratory = std::nullopt;
             break;
         default:
             assert(false);
@@ -253,9 +247,9 @@ void Faction::handleEvent(const GameEvent& gameEvent, const Map& map, const Fact
     case eGameEventType::IncreaseFactionShield:
         if (m_currentShieldAmount < Globals::MAX_FACTION_SHIELD_AMOUNT &&
             isAffordable(Globals::FACTION_SHIELD_INCREASE_COST) &&
-            m_laboratories.size() == 1)
+            m_laboratory.has_value())
         {
-            m_laboratories.front().handleEvent(gameEvent.data.increaseFactionShield);
+            m_laboratory->handleEvent(gameEvent.data.increaseFactionShield);
         }
         break;
     case eGameEventType::ForceSelfDestructEntity:
@@ -294,7 +288,7 @@ void Faction::handleEvent(const GameEvent& gameEvent, const Map& map, const Fact
             removeEntity<Turret>(m_turrets, entity);
             break;
         case eEntityType::Laboratory:
-            removeEntity<Laboratory>(m_laboratories, entity);
+            m_laboratory = std::nullopt;
             break;
         default:
             assert(false);
@@ -438,9 +432,9 @@ Entity* Faction::create_building(const Worker& worker, const Map& map)
             }
             break;
         case eEntityType::Laboratory:
-            if (m_laboratories.size() < Globals::MAX_LABORATORIES)
+            if (!m_laboratory.has_value())
             {
-                addedBuilding = &m_laboratories.emplace_back(position, *this);
+                m_laboratory.emplace(position, *this);
             }
             break;
         default:
@@ -492,9 +486,9 @@ void Faction::update(float deltaTime, const Map& map, const FactionHandler& fact
         headquarters.update(deltaTime, *this, map);
     }
 
-    for (auto& laboratory : m_laboratories)
+    if (m_laboratory)
     {
-        laboratory.update(deltaTime);
+        m_laboratory->update(deltaTime);
     }
 }
 
@@ -547,9 +541,9 @@ void Faction::render(ShaderHandler& shaderHandler) const
         headquarters.render_waypoint(shaderHandler);
     }
  
-    for (const auto& laboratory : m_laboratories)
+    if (m_laboratory)
     {
-        laboratory.render(shaderHandler, m_controller);
+        m_laboratory->render(shaderHandler, m_controller);
     }
 }
 
@@ -731,6 +725,11 @@ void Faction::revalidateExistingUnitPaths(const Map& map)
     {
         worker.revalidate_movement_path(map);
     }
+}
+
+bool Faction::is_laboratory_built() const
+{
+    return m_laboratory.has_value();
 }
 
 bool Faction::isMineralInUse(const Mineral& mineral) const
