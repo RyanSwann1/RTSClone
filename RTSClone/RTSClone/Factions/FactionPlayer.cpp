@@ -339,7 +339,7 @@ int FactionPlayer::instructWorkerToBuild(const Map& map, const BaseHandler& base
 				{
                     if (const Base* base = baseHandler.getBase(m_plannedBuilding->getPosition()))
                     {
-                        if ((*selectedWorker).build(*this, base->getCenteredPosition(), map, m_plannedBuilding->getEntityType()))
+                        if ((*selectedWorker).add_to_build_queue(*this, base->getCenteredPosition(), map, m_plannedBuilding->getEntityType()))
                         {
                             m_plannedBuilding.reset();
                         }
@@ -347,7 +347,7 @@ int FactionPlayer::instructWorkerToBuild(const Map& map, const BaseHandler& base
 				}
                 else
                 {
-					if ((*selectedWorker).build(*this, m_plannedBuilding->getPosition(), map, m_plannedBuilding->getEntityType()))
+					if ((*selectedWorker).add_to_build_queue(*this, m_plannedBuilding->getPosition(), map, m_plannedBuilding->getEntityType()))
 					{
 						m_plannedBuilding.reset();
 					}
@@ -423,7 +423,7 @@ void FactionPlayer::moveSingularSelectedEntity(const glm::vec3& destination, con
                 }
                 else
                 { 
-                    selectedWorker.moveTo(destination, map, eWorkerState::Moving);
+                    selectedWorker.moveTo(destination, map);
                 }
             }
         }
