@@ -48,8 +48,8 @@ public:
 	eFactionController getController() const;
 	const std::vector<Entity*>& getEntities() const;
 	const Entity* getEntity(const glm::vec3& position, float maxDistance, bool prioritizeUnits = true) const;
-	const Entity* getEntity(const AABB& aabb, int entityID, eEntityType type) const;
-	const Entity* getEntity(int entityID, eEntityType type) const;
+	const Entity* getEntity(const AABB& aabb, int entityID) const;
+	const Entity* getEntity(int entityID) const;
 	const Entity* getEntity(const glm::vec3& position) const;
 	const Headquarters* get_closest_headquarters(const glm::vec3& position) const;
 	const Entity* get_entity(const int id) const;

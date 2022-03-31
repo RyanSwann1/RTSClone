@@ -127,7 +127,7 @@ void Worker::clear_destinations()
 void Worker::repairEntity(const Entity& entity, const Map& map)
 {
 	moveTo(entity, map, eWorkerState::MovingToRepairPosition);
-	m_repairTargetEntity.emplace(entity.getEntityType(), entity.getID());
+	m_repairTargetEntity = { entity.getID() };
 }
 
 bool Worker::build(const Faction& owningFaction, const glm::vec3& buildPosition, const Map& map, eEntityType entityType, bool clearBuildQueue)
@@ -317,7 +317,7 @@ void Worker::update(float deltaTime, const Map& map, const FactionHandler& facti
 		if (m_taskTimer.isExpired())
 		{
 			m_taskTimer.resetElaspedTime();
-			const Entity* targetEntity = m_owningFaction->get_entity(m_repairTargetEntity->ID);
+			const Entity* targetEntity = m_owningFaction->get_entity(*m_repairTargetEntity);
 			if (targetEntity && targetEntity->getHealth() < targetEntity->getMaximumHealth())
 			{
 				if (Globals::getSqrDistance(targetEntity->getPosition(), m_position) > REPAIR_DISTANCE * REPAIR_DISTANCE)
@@ -328,8 +328,7 @@ void Worker::update(float deltaTime, const Map& map, const FactionHandler& facti
 				{
 					m_rotation.y = Globals::getAngle(targetEntity->getPosition(), m_position);
 
-					Level::add_event(GameEvent::create<RepairEntityEvent>({
-						m_owningFaction->getController(), m_repairTargetEntity->ID, m_repairTargetEntity->type }));
+					Level::add_event(GameEvent::create<RepairEntityEvent>({ m_owningFaction->getController(), *m_repairTargetEntity }));
 				}
 			}
 			else
@@ -354,7 +353,7 @@ void Worker::delayed_update(const Map& map, const FactionHandler& factionHandler
 	
 	case eWorkerState::MovingToRepairPosition:
 	{
-		if (!m_owningFaction->get_entity(m_repairTargetEntity->ID))
+		if (!m_owningFaction->get_entity(*m_repairTargetEntity))
 		{
 			switchTo(eWorkerState::Idle, map);
 		}
@@ -366,7 +365,7 @@ void Worker::delayed_update(const Map& map, const FactionHandler& factionHandler
 			m_repairTargetEntity &&
 			m_taskTimer.isActive());
 
-		const Entity* targetEntity = m_owningFaction->get_entity(m_repairTargetEntity->ID);
+		const Entity* targetEntity = m_owningFaction->get_entity(*m_repairTargetEntity);
 		if (targetEntity && targetEntity->getHealth() < targetEntity->getMaximumHealth())
 		{
 			if (Globals::getSqrDistance(targetEntity->getPosition(), m_position) > REPAIR_DISTANCE * REPAIR_DISTANCE)

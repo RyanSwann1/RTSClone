@@ -140,7 +140,7 @@ const Entity* Faction::getEntity(const glm::vec3& position, float maxDistance, b
     return closestEntity;
 }
 
-const Entity* Faction::getEntity(const AABB& aabb, int entityID, eEntityType type) const
+const Entity* Faction::getEntity(const AABB& aabb, int entityID) const
 {
     const auto entity = std::find_if(m_allEntities.cbegin(), m_allEntities.cend(), [&aabb, entityID](auto entity)
     {
@@ -167,7 +167,7 @@ const Entity* Faction::getEntity(const glm::vec3& position) const
     return nullptr;
 }
 
-const Entity* Faction::getEntity(int entityID, eEntityType type) const
+const Entity* Faction::getEntity(int entityID) const
 {
     const auto entity = std::find_if(m_allEntities.cbegin(), m_allEntities.cend(), [entityID](auto entity)
     {

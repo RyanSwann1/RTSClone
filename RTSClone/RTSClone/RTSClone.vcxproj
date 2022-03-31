@@ -189,7 +189,6 @@
     <ClCompile Include="Sprite.cpp" />
     <ClCompile Include="Entities\Turret.cpp" />
     <ClCompile Include="UIManager.cpp" />
-    <ClCompile Include="Entities\TargetEntity.cpp" />
     <ClCompile Include="Entities\Worker.cpp" />
     <ClCompile Include="Entities\EntitySpawnerBuilding.cpp" />
     <ClCompile Include="main.cpp" />

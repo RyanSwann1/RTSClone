@@ -219,7 +219,7 @@ void Unit::update(float deltaTime, const FactionHandler& factionHandler, const M
 		{
 			if (const Faction* targetFaction = factionHandler.getFaction(m_target->controller))
 			{
-				const Entity* targetEntity = targetFaction->getEntity(m_target->ID, m_target->type);
+				const Entity* targetEntity = targetFaction->getEntity(m_target->ID);
 				if (targetEntity && Globals::getSqrDistance(targetEntity->getPosition(), m_position) <= Globals::UNIT_ATTACK_RANGE * Globals::UNIT_ATTACK_RANGE)
 				{
 					Level::add_event(GameEvent::create<SpawnProjectileEvent>({ m_owningFaction, getID(),
@@ -270,7 +270,7 @@ void Unit::delayed_update(const FactionHandler& factionHandler, const Map& map)
 			const Entity* targetEntity = nullptr;
 			if (targetFaction = factionHandler.getFaction(m_target->controller))
 			{
-				targetEntity = targetFaction->getEntity(m_target->ID, m_target->type);
+				targetEntity = targetFaction->getEntity(m_target->ID);
 			}
 
 			if (targetEntity)
@@ -320,7 +320,7 @@ void Unit::delayed_update(const FactionHandler& factionHandler, const Map& map)
 		{
 			if (const Faction* targetFaction = factionHandler.getFaction(m_target->controller))
 			{
-				const Entity* targetEntity = targetFaction->getEntity(m_target->ID, m_target->type);
+				const Entity* targetEntity = targetFaction->getEntity(m_target->ID);
 				if (!targetEntity)
 				{
 					targetEntity = targetFaction->getEntity(m_position, Globals::UNIT_ATTACK_RANGE);
@@ -331,7 +331,7 @@ void Unit::delayed_update(const FactionHandler& factionHandler, const Map& map)
 					}
 					else
 					{
-						m_target.emplace(targetFaction->getController(), targetEntity->getID(), targetEntity->getEntityType());
+						m_target = { targetFaction->getController(), targetEntity->getID() };
 					}
 				}
 				else
@@ -414,13 +414,13 @@ void Unit::switchToState(eUnitState newState, const Map& map, const Entity* targ
 			m_attackTimer.resetElaspedTime();
 		}
 		assert(targetEntity && targetFaction);
-		m_target.emplace(targetFaction->getController(), targetEntity->getID(), targetEntity->getEntityType());
+		m_target = { targetFaction->getController(), targetEntity->getID() };
 		break;
 	case eUnitState::Moving:
 		assert(!m_movement.path.empty());
 		if (targetEntity && targetFaction)
 		{
-			m_target.emplace(targetFaction->getController(), targetEntity->getID(), targetEntity->getEntityType());
+			m_target = { targetFaction->getController(), targetEntity->getID() };
 		}
 		else
 		{

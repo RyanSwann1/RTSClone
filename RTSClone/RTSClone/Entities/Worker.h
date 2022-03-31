@@ -81,7 +81,7 @@ private:
 	Movement m_movement										= {};
 	eWorkerState m_currentState								= eWorkerState::Idle;
 	std::deque<WorkerScheduledBuilding> m_buildQueue		= {};
-	std::optional<RepairTargetEntity> m_repairTargetEntity	= {};
+	std::optional<int> m_repairTargetEntity					= {};
 	std::optional<int> m_resources							= {};
 	Timer m_taskTimer										= {};
 	const Mineral* m_mineralToHarvest						= nullptr;
