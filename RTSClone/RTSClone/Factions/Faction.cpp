@@ -161,19 +161,6 @@ const Entity* Faction::getEntity(const glm::vec3& position) const
     return nullptr;
 }
 
-const Entity* Faction::getEntity(int entityID) const
-{
-    const auto entity = std::find_if(m_allEntities.cbegin(), m_allEntities.cend(), [entityID](auto entity)
-    {
-        return entity->getID() == entityID;
-    });
-    if (entity != m_allEntities.cend())
-    {
-        return (*entity);
-    }
-    return nullptr;
-}
-
 void Faction::handleEvent(const GameEvent& gameEvent, const Map& map, const FactionHandler& factionHandler, const BaseHandler& baseHandler)
 {
     switch (gameEvent.type)

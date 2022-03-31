@@ -758,7 +758,7 @@ void FactionAI::on_unit_taken_damage(const TakeDamageEvent& gameEvent, Unit& uni
 	{
 		if (const Faction* opposingFaction = factionHandler.getFaction(target->controller))
 		{
-			const Entity* targetEntity = opposingFaction->getEntity(target->ID);
+			const Entity* targetEntity = opposingFaction->get_entity(target->ID);
 			if (!targetEntity)
 			{
 				changeTargetEntity = true;
@@ -779,7 +779,7 @@ void FactionAI::on_unit_taken_damage(const TakeDamageEvent& gameEvent, Unit& uni
 		changeTargetEntity
 		&& (opposingFaction = factionHandler.getFaction(gameEvent.senderFaction)))
 	{
-		const Entity* targetEntity = opposingFaction->getEntity(gameEvent.senderID);
+		const Entity* targetEntity = opposingFaction->get_entity(gameEvent.senderID);
 		if (targetEntity)
 		{
 			AISquad* squad = getSquad(m_squads, unit);

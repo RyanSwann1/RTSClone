@@ -47,7 +47,7 @@ void Turret::update(float deltaTime, const FactionHandler& factionHandler, const
 		if (m_stateHandlerTimer.isExpired()
 			&& opposingFaction)
 		{
-			const Entity* targetEntity = opposingFaction->getEntity(m_target->ID);
+			const Entity* targetEntity = opposingFaction->get_entity(m_target->ID);
 			if (targetEntity &&
 				Globals::getSqrDistance(targetEntity->getPosition(), m_position) <= TURRET_ATTACK_RANGE * TURRET_ATTACK_RANGE &&
 				PathFinding::getInstance().isTargetInLineOfSight(m_position, *targetEntity, map, m_AABB))
@@ -64,7 +64,7 @@ void Turret::update(float deltaTime, const FactionHandler& factionHandler, const
 			&& m_attackTimer.isExpired()
 			&& factionHandler.isFactionActive(m_target->controller))
 		{
-			const Entity* targetEntity = opposingFaction->getEntity(m_target->ID);
+			const Entity* targetEntity = opposingFaction->get_entity(m_target->ID);
 			if (targetEntity &&
 				Globals::getSqrDistance(targetEntity->getPosition(), m_position) <= TURRET_ATTACK_RANGE * TURRET_ATTACK_RANGE &&
 				PathFinding::getInstance().isTargetInLineOfSight(m_position, *targetEntity, map, m_AABB))

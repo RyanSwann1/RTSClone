@@ -219,7 +219,7 @@ void Unit::update(float deltaTime, const FactionHandler& factionHandler, const M
 		{
 			if (const Faction* targetFaction = factionHandler.getFaction(m_target->controller))
 			{
-				const Entity* targetEntity = targetFaction->getEntity(m_target->ID);
+				const Entity* targetEntity = targetFaction->get_entity(m_target->ID);
 				if (targetEntity && Globals::getSqrDistance(targetEntity->getPosition(), m_position) <= Globals::UNIT_ATTACK_RANGE * Globals::UNIT_ATTACK_RANGE)
 				{
 					Level::add_event(GameEvent::create<SpawnProjectileEvent>({ m_owningFaction, getID(),
@@ -270,7 +270,7 @@ void Unit::delayed_update(const FactionHandler& factionHandler, const Map& map)
 			const Entity* targetEntity = nullptr;
 			if (targetFaction = factionHandler.getFaction(m_target->controller))
 			{
-				targetEntity = targetFaction->getEntity(m_target->ID);
+				targetEntity = targetFaction->get_entity(m_target->ID);
 			}
 
 			if (targetEntity)
@@ -320,7 +320,7 @@ void Unit::delayed_update(const FactionHandler& factionHandler, const Map& map)
 		{
 			if (const Faction* targetFaction = factionHandler.getFaction(m_target->controller))
 			{
-				const Entity* targetEntity = targetFaction->getEntity(m_target->ID);
+				const Entity* targetEntity = targetFaction->get_entity(m_target->ID);
 				if (!targetEntity)
 				{
 					targetEntity = targetFaction->getEntity(m_position, Globals::UNIT_ATTACK_RANGE);

@@ -288,7 +288,7 @@ void UIManager::update(const FactionHandler& factionHandler)
 	{
 		if (const Faction* faction = factionHandler.getFaction(m_selectedEntityWidget->factionController))
 		{
-			const Entity* targetEntity = faction->getEntity(m_selectedEntityWidget->ID);
+			const Entity* targetEntity = faction->get_entity(m_selectedEntityWidget->ID);
 			if (!targetEntity)
 			{
 				m_selectedEntityWidget.reset();
