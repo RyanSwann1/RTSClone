@@ -40,7 +40,7 @@ WorkerScheduledBuilding::WorkerScheduledBuilding(const glm::vec3& position, eEnt
 {}
 
 //Worker
-Worker::Worker(Faction& owningFaction, const Map& map, const glm::vec3& startingPosition, const glm::vec3& startingRotation)
+Worker::Worker(Faction& owningFaction, const glm::vec3& startingPosition, const glm::vec3& startingRotation, const Map& map)
 	: Entity(ModelManager::getInstance().getModel(WORKER_MODEL_NAME), startingPosition, eEntityType::Worker, 
 		Globals::WORKER_STARTING_HEALTH, owningFaction.getCurrentShieldAmount(), startingRotation),
 	m_owningFaction(&owningFaction)
@@ -48,8 +48,8 @@ Worker::Worker(Faction& owningFaction, const Map& map, const glm::vec3& starting
 	switchTo(eWorkerState::Idle, map);
 }
 
-Worker::Worker(Faction& owningFaction, const glm::vec3 & startingPosition, const glm::vec3 & destination, const Map & map,
-	const glm::vec3& startingRotation)
+Worker::Worker(Faction& owningFaction, const glm::vec3& startingPosition, const glm::vec3& startingRotation,
+	const glm::vec3& destination, const Map& map)
 	: Entity(ModelManager::getInstance().getModel(WORKER_MODEL_NAME), startingPosition, eEntityType::Worker, Globals::WORKER_STARTING_HEALTH,
 		owningFaction.getCurrentShieldAmount(), startingRotation),
 	m_owningFaction(&owningFaction)

@@ -743,58 +743,10 @@ bool Faction::isMineralInUse(const Mineral& mineral) const
 
 Entity* Faction::createUnit(const Map& map, const EntitySpawnerBuilding& spawner)
 {
-    glm::vec3 startingPosition(0.0f);
-    if (m_units.size() < Globals::MAX_UNITS &&
-        isAffordable(eEntityType::Unit) && 
-        !isExceedPopulationLimit(eEntityType::Unit) &&
-        PathFinding::getInstance().getClosestAvailableEntitySpawnPosition(spawner, map, startingPosition))
-    {
-        glm::vec3 startingRotation = { 0.0f, Globals::getAngle(startingPosition, spawner.getPosition()), 0.0f };
-        Entity* createdUnit = nullptr;
-        if (spawner.get_waypoint())
-        {
-            createdUnit = &m_units.emplace_back(*this, startingPosition, startingRotation, *spawner.get_waypoint(), map);
-        }
-        else
-        {
-            createdUnit = &m_units.emplace_back(*this, startingPosition, startingRotation, map);
-        }
-
-        reduceResources(eEntityType::Unit);
-        increaseCurrentPopulationAmount(eEntityType::Unit);
-        m_allEntities.push_back(createdUnit);
-
-        return createdUnit;
-    }
-
-    return nullptr;
+    return create_entity<Unit>(map, spawner, eEntityType::Unit, m_units, Globals::MAX_UNITS);
 }
 
 Entity* Faction::createWorker(const Map& map, const EntitySpawnerBuilding& spawner)
 {
-    glm::vec3 startingPosition(0.0f);
-    if (m_workers.size() < Globals::MAX_WORKERS &&
-        isAffordable(eEntityType::Worker) && 
-        !isExceedPopulationLimit(eEntityType::Worker) &&
-        PathFinding::getInstance().getClosestAvailableEntitySpawnPosition(spawner, map, startingPosition))
-    {
-        glm::vec3 startingRotation = { 0.0f, Globals::getAngle(startingPosition, spawner.getPosition()), 0.0f };
-        Entity* createdWorker = nullptr;
-        if (spawner.get_waypoint())
-        {
-            createdWorker = &m_workers.emplace_back(*this, startingPosition, *spawner.get_waypoint(), map, startingRotation);
-        }
-        else
-        {
-            createdWorker = &m_workers.emplace_back(*this, map, startingPosition, startingRotation);
-        }
-
-        reduceResources(eEntityType::Worker);
-        increaseCurrentPopulationAmount(eEntityType::Worker);
-        m_allEntities.push_back(createdWorker);
-
-        return createdWorker;
-    }
-
-    return nullptr;
+    return create_entity(map, spawner, eEntityType::Worker, m_workers, Globals::MAX_WORKERS);
 }

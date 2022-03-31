@@ -108,6 +108,10 @@ private:
 	//Presumes entity already found in all entities container
 	template <typename T>
 	void removeEntity(std::vector<T>& entityContainer, std::vector<Entity*>::iterator entity);
+
+	template <typename T>
+	Entity* create_entity(const Map& map, const EntitySpawnerBuilding& spawner, const eEntityType type, 
+		std::vector<T>& entityContainer, const int maxEntityCount);
 };
 
 template <typename T>
@@ -125,4 +129,35 @@ void Faction::removeEntity(std::vector<T>& entityContainer, std::vector<Entity*>
 	onEntityRemoval(*(*entity));
 	m_allEntities.erase(entity);
 	entityContainer.erase(iter);
+}
+
+template<typename T>
+inline Entity* Faction::create_entity(const Map& map, const EntitySpawnerBuilding& spawner, const eEntityType type, 
+	std::vector<T>& entityContainer, const int maxEntityCount)
+{
+	glm::vec3 startingPosition(0.0f);
+	if (entityContainer.size() < maxEntityCount &&
+		isAffordable(type) &&
+		!isExceedPopulationLimit(type) &&
+		PathFinding::getInstance().getClosestAvailableEntitySpawnPosition(spawner, map, startingPosition))
+	{
+		glm::vec3 startingRotation = { 0.0f, Globals::getAngle(startingPosition, spawner.getPosition()), 0.0f };
+		Entity* createdUnit = nullptr;
+		if (spawner.get_waypoint())
+		{
+			createdUnit = &entityContainer.emplace_back(*this, startingPosition, startingRotation, *spawner.get_waypoint(), map);
+		}
+		else
+		{
+			createdUnit = &entityContainer.emplace_back(*this, startingPosition, startingRotation, map);
+		}
+
+		reduceResources(type);
+		increaseCurrentPopulationAmount(type);
+		m_allEntities.push_back(createdUnit);
+
+		return createdUnit;
+	}
+
+	return nullptr;
 }
