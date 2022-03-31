@@ -434,7 +434,7 @@ Entity* Faction::create_building(const Worker& worker, const Map& map)
         case eEntityType::Laboratory:
             if (!m_laboratory.has_value())
             {
-                m_laboratory.emplace(position, *this);
+                addedBuilding = &m_laboratory.emplace(position, *this);
             }
             break;
         default:
