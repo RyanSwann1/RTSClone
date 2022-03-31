@@ -39,7 +39,7 @@ public:
 
 	void unsubscribe(const int id)
 	{
-		auto listener = std::find_if(m_listeners.cbegin(), m_listeners.cend(), [id](auto listener)
+		const auto listener = std::find_if(m_listeners.cbegin(), m_listeners.cend(), [id](auto listener)
 			{
 				return listener.id == id;
 			});
@@ -95,7 +95,7 @@ public:
 	}
 	~BroadcasterSub()
 	{
-		if (!id)
+		if (id)
 		{
 			Broadcaster<Message>::getInstance().unsubscribe(*id);
 		}
