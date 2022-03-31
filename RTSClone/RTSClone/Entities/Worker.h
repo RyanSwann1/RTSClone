@@ -68,6 +68,7 @@ public:
 	void moveTo(const Mineral& mineral, const Map& map);
 	void moveTo(const Entity& target, const Map& map, eWorkerState state);
 	void moveTo(const glm::vec3& destination, const Map& map, eWorkerState state = eWorkerState::Moving);
+	void revalidate_movement_path(const Map& map);
 
 	void render(ShaderHandler& shaderHandler, eFactionController owningFactionController) const;
 	void renderProgressBar(ShaderHandler& shaderHandler, const Camera& camera, glm::uvec2 windowSize) const;

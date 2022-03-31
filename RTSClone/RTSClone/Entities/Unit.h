@@ -49,6 +49,7 @@ public:
 	void moveTo(const glm::vec3& destination, const Map& map, eUnitState state = eUnitState::Moving);
 	void update(float deltaTime, const FactionHandler& factionHandler, const Map& map);
 	void delayed_update(const FactionHandler& factionHandler, const Map& map);
+	void revalidate_movement_path(const Map& map);
 #ifdef RENDER_PATHING
 	void render_path(ShaderHandler& shaderHandler);
 #endif // RENDER_PATHING

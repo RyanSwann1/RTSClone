@@ -455,6 +455,33 @@ void Worker::moveTo(const glm::vec3& destination, const Map& map, eWorkerState s
 	}
 }
 
+void Worker::revalidate_movement_path(const Map& map)
+{
+	if (!m_movement.path.empty())
+	{
+		switch (m_currentState)
+		{
+		case eWorkerState::Moving:
+		case eWorkerState::ReturningMineralsToHeadquarters:
+		case eWorkerState::MovingToBuildingPosition:
+		case eWorkerState::MovingToRepairPosition:
+			moveTo(m_movement.path.front(), map, m_currentState);
+			break;
+		case eWorkerState::MovingToMinerals:
+			assert(m_mineralToHarvest);
+			moveTo(*m_mineralToHarvest, map);
+			break;
+		case eWorkerState::Idle:
+		case eWorkerState::Harvesting:
+		case eWorkerState::Building:
+		case eWorkerState::Repairing:
+			break;
+		default:
+			assert(false);
+		}
+	}
+}
+
 void Worker::render(ShaderHandler& shaderHandler, eFactionController owningFactionController) const
 {
 	if (m_resources && m_currentState != eWorkerState::Harvesting)

@@ -358,6 +358,14 @@ void Unit::delayed_update(const FactionHandler& factionHandler, const Map& map)
 	}
 }
 
+void Unit::revalidate_movement_path(const Map& map)
+{
+	if (!m_movement.path.empty())
+	{
+		moveTo(m_movement.path.front(), map, m_currentState);
+	}
+}
+
 #ifdef RENDER_PATHING
 void Unit::render_path(ShaderHandler& shaderHandler) 
 {

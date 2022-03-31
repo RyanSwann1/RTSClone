@@ -27,8 +27,8 @@ class Faction
 public:
 	Faction(const Faction&) = delete;
 	Faction& operator=(const Faction&) = delete;
-	Faction(Faction&&) = delete;
-	Faction& operator=(Faction&&) = delete;
+	Faction(Faction&&) noexcept = delete;
+	Faction& operator=(Faction&&) noexcept = delete;
 	virtual ~Faction() {}
 
 	bool isMineralInUse(const Mineral& mineral) const;

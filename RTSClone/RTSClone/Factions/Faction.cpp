@@ -724,38 +724,12 @@ void Faction::revalidateExistingUnitPaths(const Map& map)
 {
     for (auto& unit : m_units)
     {
-        if (!unit.getMovementPath().empty())
-        {
-            unit.moveTo(unit.getMovementPath().front(), map, unit.getCurrentState());
-        }
+        unit.revalidate_movement_path(map);
     }
 
     for (auto& worker : m_workers)
     {
-        if (!worker.getMovementPath().empty())
-        {
-            switch (worker.getCurrentState())
-            {
-            case eWorkerState::Moving:
-            case eWorkerState::ReturningMineralsToHeadquarters:
-            case eWorkerState::MovingToBuildingPosition:
-            case eWorkerState::MovingToRepairPosition:
-                assert(!worker.getMovementPath().empty());
-                worker.moveTo(worker.getMovementPath().front(), map, worker.getCurrentState());
-                break;
-            case eWorkerState::MovingToMinerals:
-                assert(worker.getMineralToHarvest());
-                worker.moveTo(*worker.getMineralToHarvest(), map);
-                break;
-            case eWorkerState::Idle:
-            case eWorkerState::Harvesting:
-            case eWorkerState::Building:
-            case eWorkerState::Repairing:
-                break;
-            default:
-                assert(false);
-            }
-        }
+        worker.revalidate_movement_path(map);
     }
 }
 
