@@ -21,6 +21,7 @@ enum class eWorkerState
 	MovingToMinerals,
 	ReturningMineralsToHeadquarters,
 	Harvesting,
+	MovingToBuildingPosition,
 	Building,
 	MovingToRepairPosition,
 	Repairing,
@@ -60,13 +61,13 @@ public:
 	void add_destination(const glm::vec3& position, const Map& map);
 	void clear_destinations();
 	void repairEntity(const Entity& entity, const Map& map);
-	bool add_to_build_queue(const Faction& owningFaction, const glm::vec3& buildPosition, const Map& map, eEntityType entityType,
+	bool build(const Faction& owningFaction, const glm::vec3& buildPosition, const Map& map, eEntityType entityType,
 		bool clearBuildQueue = false);
 	void update(float deltaTime, const Map& map, const FactionHandler& factionHandler);
 	void delayed_update(const Map& map, const FactionHandler& factionHandler);
 	void moveTo(const Mineral& mineral, const Map& map);
 	void moveTo(const Entity& target, const Map& map, eWorkerState state);
-	void moveTo(const glm::vec3& destination, const Map& map);
+	void moveTo(const glm::vec3& destination, const Map& map, eWorkerState state = eWorkerState::Moving);
 	void revalidate_movement_path(const Map& map);
 
 	void render(ShaderHandler& shaderHandler, eFactionController owningFactionController) const;

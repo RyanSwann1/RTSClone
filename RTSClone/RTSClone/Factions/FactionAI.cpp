@@ -329,7 +329,7 @@ void FactionAI::update(float deltaTime, const Map & map, const FactionHandler& f
 					}
 				}	
 
-				availableWorker->add_to_build_queue(*this, availableBase->getCenteredPosition(), map, eEntityType::Headquarters, true);
+				availableWorker->build(*this, availableBase->getCenteredPosition(), map, eEntityType::Headquarters, true);
 				m_unattachedToBaseWorkers.addWorker(*availableWorker);
 			}
 		}
@@ -659,14 +659,14 @@ bool FactionAI::build(const Map& map, eEntityType entityType, AIOccupiedBase& oc
 		{
 			if (worker)
 			{
-				return worker->add_to_build_queue(*this, buildPosition, map, entityType);
+				return worker->build(*this, buildPosition, map, entityType);
 			}
 			else
 			{
 				Worker* availableWorker = getAvailableWorker(buildPosition, occupiedBase);
 				if (availableWorker)
 				{
-					return availableWorker->add_to_build_queue(*this, buildPosition, map, entityType);
+					return availableWorker->build(*this, buildPosition, map, entityType);
 				}
 			}
 		}

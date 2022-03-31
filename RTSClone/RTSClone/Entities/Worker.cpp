@@ -130,7 +130,7 @@ void Worker::repairEntity(const Entity& entity, const Map& map)
 	m_repairTargetEntity = { entity.getID() };
 }
 
-bool Worker::add_to_build_queue(const Faction& owningFaction, const glm::vec3& buildPosition, const Map& map, eEntityType entityType, bool clearBuildQueue)
+bool Worker::build(const Faction& owningFaction, const glm::vec3& buildPosition, const Map& map, eEntityType entityType, bool clearBuildQueue)
 {	
 	if (entityType == eEntityType::Laboratory && 
 		(owningFaction.is_laboratory_built() || owningFaction.isBuildingInAllWorkersQueue(entityType)))
@@ -149,11 +149,18 @@ bool Worker::add_to_build_queue(const Faction& owningFaction, const glm::vec3& b
 		}
 		if (m_buildQueue.empty())
 		{
-			moveTo(buildPosition, map);
+			moveTo(buildPosition, map, eWorkerState::MovingToBuildingPosition);
+			if (m_currentState == eWorkerState::MovingToBuildingPosition)
+			{
+				m_buildQueue.emplace_back(buildPosition, entityType);
+				return true;
+			}
 		}
-
-		m_buildQueue.emplace_back(buildPosition, entityType);
-		return true;
+		else
+		{
+			m_buildQueue.emplace_back(buildPosition, entityType);
+			return true;
+		}
 	}
 
 	return false;
@@ -178,12 +185,7 @@ void Worker::update(float deltaTime, const Map& map, const FactionHandler& facti
 	switch (m_currentState)
 	{
 	case eWorkerState::Idle:
-		assert(m_movement.path.empty() && 
-			!m_mineralToHarvest);
-		if (!m_buildQueue.empty())
-		{
-			switchTo(eWorkerState::Building, map);
-		}
+		assert(m_movement.path.empty());
 		break;
 	case eWorkerState::Moving:
 		if (m_movement.path.empty())
@@ -196,14 +198,7 @@ void Worker::update(float deltaTime, const Map& map, const FactionHandler& facti
 			}
 			else
 			{
-				if (!m_buildQueue.empty())
-				{
-					switchTo(eWorkerState::Building, map);
-				}
-				else
-				{
-					switchTo(eWorkerState::Idle, map);
-				}
+				switchTo(eWorkerState::Idle, map);
 			}
 		}
 		break;
@@ -264,6 +259,13 @@ void Worker::update(float deltaTime, const Map& map, const FactionHandler& facti
 	}
 
 		break;
+	case eWorkerState::MovingToBuildingPosition:
+		assert(!m_buildQueue.empty());
+		if (m_movement.path.empty())
+		{
+			switchTo(eWorkerState::Building, map);
+		}
+		break;
 	case eWorkerState::Building:
 	{
 		assert(m_movement.path.empty() && !m_buildQueue.empty() && m_taskTimer.isActive());
@@ -280,7 +282,7 @@ void Worker::update(float deltaTime, const Map& map, const FactionHandler& facti
 			{
 				if (!m_buildQueue.empty())
 				{
-					moveTo(m_buildQueue.front().position, map, building->getAABB());
+					moveTo(m_buildQueue.front().position, map, building->getAABB(), eWorkerState::MovingToBuildingPosition);
 				}
 				else
 				{
@@ -431,20 +433,20 @@ void Worker::moveTo(const Entity& target, const Map& map, eWorkerState state)
 	}
 }
 
-void Worker::moveTo(const glm::vec3& destination, const Map& map)
+void Worker::moveTo(const glm::vec3& destination, const Map& map, eWorkerState state /*= eWorkerState::Moving*/)
 {
 	glm::vec3 previousDestination = Globals::getNextPathDestination(m_movement.path, m_position);
 	PathFinding::getInstance().getPathToPosition(*this, destination, m_movement.path, map, createAdjacentPositions(map));
 	if (!m_movement.path.empty())
 	{
-		switchTo(eWorkerState::Moving, map);
+		switchTo(state, map);
 	}
 	else
 	{
 		if (previousDestination != m_position)
 		{
 			m_movement.path.push_back(previousDestination);
-			switchTo(eWorkerState::Moving, map);
+			switchTo(state, map);
 		}
 		else
 		{
@@ -461,8 +463,9 @@ void Worker::revalidate_movement_path(const Map& map)
 		{
 		case eWorkerState::Moving:
 		case eWorkerState::ReturningMineralsToHeadquarters:
+		case eWorkerState::MovingToBuildingPosition:
 		case eWorkerState::MovingToRepairPosition:
-			moveTo(m_movement.path.front(), map);
+			moveTo(m_movement.path.front(), map, m_currentState);
 			break;
 		case eWorkerState::MovingToMinerals:
 			assert(m_mineralToHarvest);
@@ -528,10 +531,6 @@ void Worker::switchTo(eWorkerState newState, const Map& map, const Mineral* mine
 		if (m_currentState != newState) 
 		{	
 			m_movement.destinations = {};
-			if (newState != eWorkerState::Building)
-			{
-				m_buildQueue.clear();
-			}
 		}
 	break;
 	case eWorkerState::MovingToMinerals:
@@ -553,8 +552,10 @@ void Worker::switchTo(eWorkerState newState, const Map& map, const Mineral* mine
 			m_taskTimer.resetElaspedTime();
 		}
 		break;
+	case eWorkerState::MovingToBuildingPosition:
 	case eWorkerState::Building:
-		if (newState != eWorkerState::Building)
+		if (newState != eWorkerState::MovingToBuildingPosition &&
+			newState != eWorkerState::Building)
 		{
 			m_buildQueue.clear();
 		}
@@ -596,6 +597,7 @@ void Worker::switchTo(eWorkerState newState, const Map& map, const Mineral* mine
 		break;
 	case eWorkerState::Moving:
 	case eWorkerState::ReturningMineralsToHeadquarters:
+	case eWorkerState::MovingToBuildingPosition:
 		m_taskTimer.setActive(false);
 		break;
 	case eWorkerState::MovingToRepairPosition:
