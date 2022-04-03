@@ -38,6 +38,7 @@ struct WorkerScheduledBuilding
 };
 
 struct Base;
+class Headquarters;
 class Faction;
 class Mineral;
 class Worker : public Entity
@@ -64,10 +65,10 @@ public:
 	bool build(const Faction& owningFaction, const glm::vec3& buildPosition, const Map& map, eEntityType entityType,
 		bool clearBuildQueue = false);
 	void harvest(const Mineral& mineral, const Map& map);
-	void update(float deltaTime, const Map& map, const FactionHandler& factionHandler);
+	void return_minerals_to_headquarters(const Headquarters& headquarters, const Map& map);
+	void move_to(const glm::vec3& position, const Map& map);
 	void delayed_update(const Map& map, const FactionHandler& factionHandler);
-	void moveTo(const Entity& target, const Map& map, eWorkerState state);
-	void moveTo(const glm::vec3& destination, const Map& map, eWorkerState state = eWorkerState::Moving);
+	void update(float deltaTime, const Map& map, const FactionHandler& factionHandler);
 	void revalidate_movement_path(const Map& map);
 
 	void render(ShaderHandler& shaderHandler, eFactionController owningFactionController) const;
@@ -87,6 +88,7 @@ private:
 	Timer m_taskTimer										= {};
 	const Mineral* m_mineralToHarvest						= nullptr;
 
-	void switchTo(eWorkerState newState, const Map& map, const Mineral* mineralToHarvest = nullptr);
-	void moveTo(const glm::vec3& destination, const Map& map, const AABB& ignoreAABB, eWorkerState state = eWorkerState::Moving);
+	void switchTo(eWorkerState newState);
+	void move_to(const glm::vec3& destination, const Map& map, const AABB& ignoreAABB, eWorkerState state);
+	void move_to(const glm::vec3& destination, const Map& map, eWorkerState state);
 };

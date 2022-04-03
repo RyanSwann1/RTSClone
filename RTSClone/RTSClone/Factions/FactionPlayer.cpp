@@ -314,7 +314,7 @@ void FactionPlayer::instructWorkerReturnMinerals(const Map& map, const Headquart
     {
         if (worker.isSelected() && worker.isHoldingResources())
         {
-            worker.moveTo(headquarters, map, eWorkerState::ReturningMineralsToHeadquarters);
+            worker.return_minerals_to_headquarters(headquarters, map);
         }
     }
 }
@@ -423,7 +423,7 @@ void FactionPlayer::moveSingularSelectedEntity(const glm::vec3& destination, con
                 }
                 else
                 { 
-                    selectedWorker.moveTo(destination, map, eWorkerState::Moving);
+                    selectedWorker.move_to(destination, map);
                 }
             }
         }
@@ -506,7 +506,7 @@ void FactionPlayer::moveMultipleSelectedEntities(const glm::vec3& destination, c
                     }
                     else
                     {
-                        worker.moveTo(position, map);
+                        worker.move_to(position, map);
                     }
                 }
                 break;
