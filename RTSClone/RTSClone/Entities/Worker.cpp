@@ -153,6 +153,10 @@ bool Worker::build(const Faction& owningFaction, const glm::vec3& buildPosition,
 			move_to(buildPosition, map, eWorkerState::MovingToBuildingPosition);
 		}
 		m_buildQueue.emplace_back(buildPosition, entityType);
+		if (m_currentState == eWorkerState::Idle)
+		{
+			switchTo(eWorkerState::Building);
+		}
 		return true;
 	}
 

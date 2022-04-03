@@ -36,7 +36,7 @@ namespace
             switch (selectedEntity->getEntityType())
             {
             case eEntityType::Unit:
-                static_cast<Unit&>(*selectedEntity).moveToAttackPosition(targetEntity, targetFaction, map);
+                static_cast<Unit&>(*selectedEntity).attack_target(targetEntity, targetFaction.getController(), map);
                 break;
             case eEntityType::Worker:
                 break;
@@ -377,7 +377,7 @@ void FactionPlayer::moveSingularSelectedEntity(const glm::vec3& destination, con
         }
         else
         {
-            unit.moveTo(destination, map);
+            unit.move_to(destination, map);
         }
     }
         break;
@@ -492,7 +492,7 @@ void FactionPlayer::moveMultipleSelectedEntities(const glm::vec3& destination, c
                     }
                     else
                     {
-                        unit.moveTo(position, map);
+                        unit.move_to(position, map);
                     }
                 }
                 break;
@@ -590,7 +590,7 @@ void FactionPlayer::onRightClick(const sf::Window& window, const Camera& camera,
             switch (m_selectedEntities.back()->getEntityType())
             {
             case eEntityType::Unit:
-                static_cast<Unit&>(*m_selectedEntities.back()).moveToAttackPosition(*targetEntity, *targetFaction, map);
+                static_cast<Unit&>(*m_selectedEntities.back()).attack_target(*targetEntity, targetFaction->getController(), map);
                 break;
             case eEntityType::Worker:
                 break;

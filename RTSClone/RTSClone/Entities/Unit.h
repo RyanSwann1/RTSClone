@@ -45,8 +45,8 @@ public:
 
 	void add_destination(const glm::vec3& position, const Map& map);
 	void clear_destinations();
-	void moveToAttackPosition(const Entity& targetEntity, const Faction& targetFaction, const Map& map);
-	void moveTo(const glm::vec3& destination, const Map& map, eUnitState state = eUnitState::Moving);
+	void attack_target(const Entity& targetEntity, const eFactionController targetController, const Map& map);
+	void move_to(const glm::vec3& destination, const Map& map);
 	void update(float deltaTime, const FactionHandler& factionHandler, const Map& map);
 	void delayed_update(const FactionHandler& factionHandler, const Map& map);
 	void revalidate_movement_path(const Map& map);
@@ -61,5 +61,5 @@ private:
 	Timer m_attackTimer							= {};
 	std::optional<TargetEntity> m_target		= {};
 
-	void switchToState(eUnitState newState, const Map& map, const Entity* targetEntity = nullptr, const Faction* targetFaction = nullptr);
+	void switchToState(eUnitState newState);
 };
