@@ -216,7 +216,7 @@ void Worker::update(float deltaTime, const Map& map, const FactionHandler& facti
 			m_resources = std::nullopt;
 			if (m_mineralToHarvest)
 			{
-				moveTo(*m_mineralToHarvest, map);
+				harvest(*m_mineralToHarvest, map);
 			}
 			else
 			{
@@ -386,7 +386,7 @@ void Worker::delayed_update(const Map& map, const FactionHandler& factionHandler
 	}
 }
 
-void Worker::moveTo(const Mineral& mineral, const Map& map)
+void Worker::harvest(const Mineral& mineral, const Map& map)
 {
 	glm::vec3 previousDestination = Globals::getNextPathDestination(m_movement.path, m_position);
 	glm::vec3 destination = PathFinding::getInstance().getClosestPositionToAABB(m_position, mineral.getAABB(), map);
@@ -469,7 +469,7 @@ void Worker::revalidate_movement_path(const Map& map)
 			break;
 		case eWorkerState::MovingToMinerals:
 			assert(m_mineralToHarvest);
-			moveTo(*m_mineralToHarvest, map);
+			harvest(*m_mineralToHarvest, map);
 			break;
 		case eWorkerState::Idle:
 		case eWorkerState::Harvesting:

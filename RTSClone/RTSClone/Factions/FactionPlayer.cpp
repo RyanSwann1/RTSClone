@@ -400,7 +400,7 @@ void FactionPlayer::moveSingularSelectedEntity(const glm::vec3& destination, con
 
             if (mineralValid)
             {
-                selectedWorker.moveTo(*mineralToHarvest, map);
+                selectedWorker.harvest(*mineralToHarvest, map);
             }
         }
         else
@@ -447,7 +447,7 @@ void FactionPlayer::moveMultipleSelectedEntities(const glm::vec3& destination, c
                 const Mineral* mineral = baseHandler.getNearestAvailableMineralAtBase(*this, *base, selectedUnit->getPosition());
                 if (mineral)
                 {
-                    static_cast<Worker&>(*selectedUnit).moveTo(*mineral, map);
+                    static_cast<Worker&>(*selectedUnit).harvest(*mineral, map);
                 }
             }
         });
