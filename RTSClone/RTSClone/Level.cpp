@@ -429,8 +429,10 @@ void Level::handleEvent(const GameEvent& gameEvent, const Map& map)
 			}
 		});
 		break;
-	case eGameEventType::EliminateFaction:
-		if (m_factionHandler.removeFaction(gameEvent.data.eliminateFaction.factionController))
+	case eGameEventType::HeadquartersDestroyed:
+	{
+		if (m_factionHandler.getFaction(gameEvent.data.headquartersDestroyed.factionController)->get_headquarters_count() == 0
+			&& m_factionHandler.removeFaction(gameEvent.data.headquartersDestroyed.factionController))
 		{
 			std::for_each(m_factionHandler.getFactions().begin(), m_factionHandler.getFactions().end(), [&gameEvent, this](auto& faction)
 			{
@@ -441,6 +443,7 @@ void Level::handleEvent(const GameEvent& gameEvent, const Map& map)
 				}
 			});
 		}
+	}
 		break;
 	case eGameEventType::SpawnProjectile:
 		m_projectiles.emplace_back(gameEvent.data.spawnProjectile);

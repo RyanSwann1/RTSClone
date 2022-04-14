@@ -57,6 +57,11 @@ int Faction::getCurrentResourceAmount() const
     return m_currentResourceAmount;
 }
 
+int Faction::get_headquarters_count() const
+{
+    return m_headquarters.size();
+}
+
 const Headquarters* Faction::getMainHeadquarters() const
 {
     return !m_headquarters.empty() ? &m_headquarters.front() : nullptr;
@@ -199,10 +204,6 @@ void Faction::handleEvent(const GameEvent& gameEvent, const Map& map, const Fact
             break;
         case eEntityType::Headquarters:
             removeEntity<Headquarters>(m_headquarters, entity);
-            if (m_headquarters.empty())
-            {
-                Level::add_event(GameEvent::create<EliminateFactionEvent>({}));
-            }
             break;
         case eEntityType::Turret:
             removeEntity<Turret>(m_turrets, entity);
@@ -271,7 +272,7 @@ void Faction::handleEvent(const GameEvent& gameEvent, const Map& map, const Fact
             removeEntity<Headquarters>(m_headquarters, entity);
             if (m_headquarters.empty())
             {
-                Level::add_event(GameEvent::create<EliminateFactionEvent>({}));
+                Level::add_event(GameEvent::create<HeadquartersDestroyedEvent>({}));
             }
             break;
         case eEntityType::Turret:
@@ -419,7 +420,6 @@ Entity* Faction::create_building(const Worker& worker, const Map& map)
         return create_entity(map, worker, Globals::MAX_HEADQUARTERS, m_headquarters);
     case eEntityType::Laboratory:
         return create_entity(map, worker, Globals::MAX_LABORATORIES, m_laboratories);
-        break;
     default:
         assert(false);
     }

@@ -9,7 +9,7 @@ enum class eGameEventType
 	TakeDamage = 0,
 	SpawnProjectile,
 	RevalidateMovementPaths,
-	EliminateFaction,
+	HeadquartersDestroyed,
 	PlayerSpawnEntity,
 	PlayerActivatePlannedBuilding,
 	RepairEntity,
@@ -47,9 +47,9 @@ struct PlayerActivatePlannedBuildingEvent
 	int targetID;
 };
 
-struct EliminateFactionEvent 
+struct HeadquartersDestroyedEvent 
 {
-	static const eGameEventType type = { eGameEventType::EliminateFaction };
+	static const eGameEventType type = { eGameEventType::HeadquartersDestroyed };
 	eFactionController factionController;
 };
 
@@ -142,7 +142,7 @@ union GameEvents
 	ResetTargetEntityGUIEvent				resetTargetEntityGUI;
 	PlayerSpawnEntity						playerSpawnEntity;
 	PlayerActivatePlannedBuildingEvent		playerActivatePlannedBuilding;
-	EliminateFactionEvent					eliminateFaction;
+	HeadquartersDestroyedEvent				headquartersDestroyed;
 	IncreaseFactionShieldEvent				increaseFactionShield;
 	RepairEntityEvent						repairEntity;
 	SetTargetEntityGUIEvent					setTargetEntityGUI;
@@ -159,7 +159,7 @@ union GameEvents
 	GameEvents(IncreaseFactionShieldEvent gameEvent)			:	increaseFactionShield(gameEvent) {}
 	GameEvents(PlayerSpawnEntity gameEvent)						:	playerSpawnEntity(gameEvent) {}
 	GameEvents(PlayerActivatePlannedBuildingEvent gameEvent)	:	playerActivatePlannedBuilding(gameEvent) {}
-	GameEvents(EliminateFactionEvent gameEvent)					:	eliminateFaction(gameEvent) {}
+	GameEvents(HeadquartersDestroyedEvent gameEvent)			:	headquartersDestroyed(gameEvent) {}
 	GameEvents(const RepairEntityEvent& gameEvent)				:	repairEntity(gameEvent) {}
 	GameEvents(const SetTargetEntityGUIEvent& gameEvent)		:	setTargetEntityGUI(gameEvent) {}
 	GameEvents(const SelfDestructEntityEvent& gameEvent)		:	forceSelfDestructEntity(gameEvent) {}
@@ -176,9 +176,9 @@ struct GameEvent
 	GameEvent() = delete;
 	
 	template <typename T>
-	static GameEvent create(const T& gameEvent)
+	static GameEvent create(T&& gameEvent)
 	{
-		return { gameEvent.type, gameEvent };
+		return { gameEvent.type, std::forward<T>(gameEvent) };
 	}
 
 	eGameEventType type;

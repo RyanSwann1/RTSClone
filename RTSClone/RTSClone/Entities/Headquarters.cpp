@@ -36,5 +36,6 @@ Headquarters::~Headquarters()
 	if (getID() != INVALID_ENTITY_ID)
 	{
 		Level::add_event(GameEvent::create<DetachFactionFromBaseEvent>({ m_owningFaction->getController(), m_position }));
+		Level::add_event(GameEvent::create<HeadquartersDestroyedEvent>({}));
 	}
 }
