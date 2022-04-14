@@ -74,22 +74,8 @@ int main()
 		return -1;
 	}
 
-	Broadcaster<GameMessages::AddAABBToMap>::getInstance();
-	Broadcaster<GameMessages::RemoveAABBFromMap>::getInstance();
-	Broadcaster<GameMessages::AddUnitPositionToMap>::getInstance();
-	Broadcaster<GameMessages::RemoveUnitPositionFromMap>::getInstance();
-	Broadcaster<GameMessages::MapSize>::getInstance();
-
-	Broadcaster<GameMessages::UIClearDisplaySelectedEntity>::getInstance();
-	Broadcaster<GameMessages::UIClearSelectedMineral>::getInstance();
-	Broadcaster<GameMessages::UIClearWinner>::getInstance();
-	Broadcaster<GameMessages::UIDisplayPlayerDetails>::getInstance();
-	Broadcaster<GameMessages::UIDisplaySelectedEntity>::getInstance();
-	Broadcaster<GameMessages::UIDisplaySelectedMineral>::getInstance();
-	Broadcaster<GameMessages::UIDisplayWinner>::getInstance();
-
 	PathFinding::getInstance();
-	
+
 	sf::Clock gameClock;
 	UIManager uiManager;
 	const std::array<std::string, Globals::MAX_LEVELS> levelNames = LevelFileHandler::loadLevelNames();
