@@ -434,14 +434,14 @@ void Level::handleEvent(const GameEvent& gameEvent, const Map& map)
 		if (m_factionHandler.getFaction(gameEvent.data.headquartersDestroyed.factionController)->get_headquarters_count() == 0
 			&& m_factionHandler.removeFaction(gameEvent.data.headquartersDestroyed.factionController))
 		{
-			std::for_each(m_factionHandler.getFactions().begin(), m_factionHandler.getFactions().end(), [&gameEvent, this](auto& faction)
+			for (auto& faction : m_factionHandler.getFactions())
 			{
 				if (faction && faction->getController() != eFactionController::Player)
 				{
 					static_cast<FactionAI&>(*faction).onFactionElimination(
-						m_factionHandler, gameEvent.data.eliminateFaction.factionController);
+						m_factionHandler, gameEvent.data.headquartersDestroyed.factionController);
 				}
-			});
+			}
 		}
 	}
 		break;
