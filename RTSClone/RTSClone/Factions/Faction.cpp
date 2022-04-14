@@ -208,7 +208,7 @@ void Faction::handleEvent(const GameEvent& gameEvent, const Map& map, const Fact
             removeEntity<Turret>(m_turrets, entity);
             break;
         case eEntityType::Laboratory:
-            m_laboratory = std::nullopt;
+            removeEntity<Laboratory>(m_laboratories, entity);
             break;
         default:
             assert(false);
@@ -234,9 +234,12 @@ void Faction::handleEvent(const GameEvent& gameEvent, const Map& map, const Fact
     case eGameEventType::IncreaseFactionShield:
         if (m_currentShieldAmount < Globals::MAX_FACTION_SHIELD_AMOUNT &&
             isAffordable(Globals::FACTION_SHIELD_INCREASE_COST) &&
-            m_laboratory.has_value())
+            !m_laboratories.empty())
         {
-            m_laboratory->handleEvent(gameEvent.data.increaseFactionShield);
+            for (auto& laboratory : m_laboratories)
+            {
+                laboratory.handleEvent(gameEvent.data.increaseFactionShield);
+            }
         }
         break;
     case eGameEventType::ForceSelfDestructEntity:
@@ -275,7 +278,7 @@ void Faction::handleEvent(const GameEvent& gameEvent, const Map& map, const Fact
             removeEntity<Turret>(m_turrets, entity);
             break;
         case eEntityType::Laboratory:
-            m_laboratory = std::nullopt;
+            removeEntity<Laboratory>(m_laboratories, entity);
             break;
         default:
             assert(false);
@@ -352,6 +355,25 @@ void Faction::handleWorkerCollisions(const Map& map)
     handledWorkers.clear();
 }
 
+void Faction::on_entity_creation(Entity& entity)
+{
+    m_currentResourceAmount -= Globals::ENTITY_RESOURCE_COSTS[static_cast<int>(entity.getEntityType())];
+    m_currentPopulationAmount += Globals::ENTITY_POPULATION_COSTS[static_cast<int>(entity.getEntityType())];
+    if (entity.getEntityType() == eEntityType::SupplyDepot)
+    {
+        m_currentPopulationLimit += Globals::POPULATION_INCREMENT;
+    }
+
+    m_allEntities.push_back(&entity);
+}
+
+bool Faction::is_entity_creatable(eEntityType type, const size_t current, const size_t max) const
+{
+    return current < max
+        && isAffordable(type)
+        && !isExceedPopulationLimit(type);
+}
+
 const Headquarters* Faction::get_closest_headquarters(const glm::vec3& position) const
 {
     const Headquarters* closestHeadquarters = nullptr;
@@ -384,58 +406,22 @@ const Entity* Faction::get_entity(const int id) const
 
 Entity* Faction::create_building(const Worker& worker, const Map& map)
 {
-    assert(worker.getCurrentState() == eWorkerState::Building && !worker.get_scheduled_buildings().empty());
-
-    eEntityType entityType = worker.get_scheduled_buildings().front().entityType;
-    const glm::vec3& position = worker.get_scheduled_buildings().front().position;
-    if (isAffordable(entityType) && !map.isPositionOccupied(position))
+    assert(!worker.get_scheduled_buildings().empty());
+    switch (worker.get_scheduled_buildings().front().entityType)
     {
-        Entity* addedBuilding = nullptr;
-        switch (entityType)
-        {
-        case eEntityType::SupplyDepot:
-            if (m_supplyDepots.size() < Globals::MAX_SUPPLY_DEPOTS)
-            {
-                addedBuilding = &m_supplyDepots.emplace_back(position, *this);
-                increasePopulationLimit();
-            }
-            break;
-        case eEntityType::Barracks:
-            if (m_barracks.size() < Globals::MAX_BARRACKS)
-            {
-                addedBuilding = &m_barracks.emplace_back(position, *this);
-            }
-            break;
-        case eEntityType::Turret:
-            if (m_turrets.size() < Globals::MAX_TURRETS)
-            {
-                addedBuilding = &m_turrets.emplace_back(position, *this);
-            }
-            break;
-        case eEntityType::Headquarters:
-            if (m_headquarters.size() < Globals::MAX_HEADQUARTERS)
-            {
-                addedBuilding = &m_headquarters.emplace_back(position, *this);
-            }
-            break;
-        case eEntityType::Laboratory:
-            if (!m_laboratory.has_value())
-            {
-                addedBuilding = &m_laboratory.emplace(position, *this);
-            }
-            break;
-        default:
-            assert(false);
-        }
-
-        if (addedBuilding)
-        {
-            m_allEntities.push_back(addedBuilding);
-            reduceResources(entityType);
-            Level::add_event(GameEvent::create<RevalidateMovementPathsEvent>({}));
-
-            return addedBuilding;
-        }
+    case eEntityType::SupplyDepot:
+        return create_entity(map, worker, Globals::MAX_WORKERS, m_supplyDepots);
+    case eEntityType::Barracks:
+        return create_entity(map, worker, Globals::MAX_BARRACKS, m_barracks);
+    case eEntityType::Turret:
+        return create_entity(map, worker, Globals::MAX_TURRETS, m_turrets);
+    case eEntityType::Headquarters:
+        return create_entity(map, worker, Globals::MAX_HEADQUARTERS, m_headquarters);
+    case eEntityType::Laboratory:
+        return create_entity(map, worker, Globals::MAX_LABORATORIES, m_laboratories);
+        break;
+    default:
+        assert(false);
     }
 
     return nullptr;
@@ -473,9 +459,9 @@ void Faction::update(float deltaTime, const Map& map, const FactionHandler& fact
         headquarters.update(deltaTime, *this, map);
     }
 
-    if (m_laboratory)
+    for (auto& laboratory : m_laboratories)
     {
-        m_laboratory->update(deltaTime);
+        laboratory.update(deltaTime);
     }
 }
 
@@ -528,9 +514,9 @@ void Faction::render(ShaderHandler& shaderHandler) const
         headquarters.render_waypoint(shaderHandler);
     }
  
-    if (m_laboratory)
+    for (const auto& laboratory : m_laboratories)
     {
-        m_laboratory->render(shaderHandler, m_controller);
+        laboratory.render(shaderHandler, m_controller);
     }
 }
 
@@ -676,29 +662,14 @@ bool Faction::increaseShield(const Laboratory& laboratory)
 
         return true;
     }
-    
+
     return false;
-}
-
-void Faction::reduceResources(eEntityType addedEntityType)
-{
-    m_currentResourceAmount -= Globals::ENTITY_RESOURCE_COSTS[static_cast<int>(addedEntityType)];
-}
-
-void Faction::increaseCurrentPopulationAmount(eEntityType entityType)
-{
-    m_currentPopulationAmount += Globals::ENTITY_POPULATION_COSTS[static_cast<int>(entityType)];
 }
 
 void Faction::decreaseCurrentPopulationAmount(const Entity& entity)
 {
     assert(entity.isDead());
     m_currentPopulationAmount -= Globals::ENTITY_POPULATION_COSTS[static_cast<int>(entity.getEntityType())];
-}
-
-void Faction::increasePopulationLimit()
-{
-    m_currentPopulationLimit += Globals::POPULATION_INCREMENT;
 }
 
 void Faction::revalidateExistingUnitPaths(const Map& map)
@@ -716,7 +687,7 @@ void Faction::revalidateExistingUnitPaths(const Map& map)
 
 bool Faction::is_laboratory_built() const
 {
-    return m_laboratory.has_value();
+    return !m_laboratories.empty();
 }
 
 bool Faction::isMineralInUse(const Mineral& mineral) const

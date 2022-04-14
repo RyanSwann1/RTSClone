@@ -25,6 +25,7 @@ Turret::Turret(const glm::vec3& startingPosition, const Faction& owningFaction)
 	m_attackTimer(TIME_BETWEEN_ATTACK, true)
 {
 	broadcast<GameMessages::AddAABBToMap>({ m_AABB });
+	Level::add_event(GameEvent::create<RevalidateMovementPathsEvent>({}));
 }
 
 Turret::~Turret()

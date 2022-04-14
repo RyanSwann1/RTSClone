@@ -7,6 +7,7 @@
 #include "ShaderHandler.h"
 #include "Camera.h"
 #include "GameEvents.h"
+#include "Level.h"
 
 namespace
 {
@@ -22,6 +23,7 @@ Laboratory::Laboratory(const glm::vec3& startingPosition, Faction& owningFaction
 	m_increaseShieldTimer(INCREASE_SHIELD_TIMER_EXPIRATION, false)
 {
 	broadcast<GameMessages::AddAABBToMap>({ m_AABB });
+	Level::add_event(GameEvent::create<RevalidateMovementPathsEvent>({}));
 }
 
 Laboratory::~Laboratory()

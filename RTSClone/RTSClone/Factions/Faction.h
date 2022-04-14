@@ -88,7 +88,7 @@ protected:
 	std::vector<Barracks> m_barracks;
 	std::vector<Turret> m_turrets;
 	std::vector<Headquarters> m_headquarters;
-	std::optional<Laboratory> m_laboratory;
+	std::vector<Laboratory> m_laboratories;
 
 private:
 	const eFactionController m_controller	= eFactionController::None;
@@ -97,12 +97,11 @@ private:
 	int m_currentPopulationLimit			= 0;
 	int m_currentShieldAmount				= 0;
 
-	void reduceResources(eEntityType addedEntityType);
-	void increaseCurrentPopulationAmount(eEntityType entityType);
 	void decreaseCurrentPopulationAmount(const Entity& entity);
-	void increasePopulationLimit();
 	void revalidateExistingUnitPaths(const Map& map);
 	void handleWorkerCollisions(const Map& map);
+	void on_entity_creation(Entity& entity);
+	bool is_entity_creatable(eEntityType type, const size_t current, const size_t max) const;
 
 	//Presumes entity already found in all entities container
 	template <typename T>
@@ -111,6 +110,9 @@ private:
 	template <typename T>
 	Entity* create_entity(const Map& map, const EntitySpawnerBuilding& spawner, const eEntityType type, 
 		std::vector<T>& entityContainer, const int maxEntityCount);
+
+	template <typename T>
+	Entity* create_entity(const Map& map, const Worker& worker, const size_t max, std::vector<T>& container);
 };
 
 template <typename T>
@@ -135,28 +137,41 @@ inline Entity* Faction::create_entity(const Map& map, const EntitySpawnerBuildin
 	std::vector<T>& entityContainer, const int maxEntityCount)
 {
 	glm::vec3 startingPosition(0.0f);
-	if (entityContainer.size() < maxEntityCount &&
-		isAffordable(type) &&
-		!isExceedPopulationLimit(type) &&
-		PathFinding::getInstance().getClosestAvailableEntitySpawnPosition(spawner, map, startingPosition))
+	if (is_entity_creatable(type, entityContainer.size(), maxEntityCount) 
+		&& PathFinding::getInstance().getClosestAvailableEntitySpawnPosition(spawner, map, startingPosition))
 	{
 		glm::vec3 startingRotation = { 0.0f, Globals::getAngle(startingPosition, spawner.getPosition()), 0.0f };
-		Entity* createdUnit = nullptr;
+		Entity* createdEntity = nullptr;
 		if (spawner.get_waypoint())
 		{
-			createdUnit = &entityContainer.emplace_back(*this, startingPosition, startingRotation, *spawner.get_waypoint(), map);
+			createdEntity = &entityContainer.emplace_back(*this, startingPosition, startingRotation, *spawner.get_waypoint(), map);
 		}
 		else
 		{
-			createdUnit = &entityContainer.emplace_back(*this, startingPosition, startingRotation, map);
+			createdEntity = &entityContainer.emplace_back(*this, startingPosition, startingRotation, map);
 		}
 
-		reduceResources(type);
-		increaseCurrentPopulationAmount(type);
-		m_allEntities.push_back(createdUnit);
-
-		return createdUnit;
+		on_entity_creation(*createdEntity);
+		return createdEntity;
 	}
 
 	return nullptr;
+}
+
+template<typename T>
+inline Entity* Faction::create_entity(const Map& map, const Worker& worker, const size_t max, std::vector<T>& container)
+{
+	assert(worker.getCurrentState() == eWorkerState::Building
+		&& !worker.get_scheduled_buildings().empty());
+
+	const eEntityType entityType = worker.get_scheduled_buildings().front().entityType;
+	const glm::vec3& position = worker.get_scheduled_buildings().front().position;
+	Entity* entity = nullptr;
+	if (is_entity_creatable(entityType, container.size(), max))
+	{
+		entity = &container.emplace_back(position, *this);
+		on_entity_creation(*entity);
+	}
+
+	return entity;
 }

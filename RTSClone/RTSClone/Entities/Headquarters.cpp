@@ -28,6 +28,7 @@ Headquarters::Headquarters(const glm::vec3& position, Faction& owningFaction)
 	m_owningFaction(&owningFaction)
 {
 	Level::add_event(GameEvent::create<AttachFactionToBaseEvent>({ owningFaction.getController(), m_position }));
+	Level::add_event(GameEvent::create<RevalidateMovementPathsEvent>({}));
 }
 
 Headquarters::~Headquarters()
