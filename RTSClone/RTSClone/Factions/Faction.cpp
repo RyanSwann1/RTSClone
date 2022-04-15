@@ -278,10 +278,6 @@ void Faction::handleEvent(const GameEvent& gameEvent, const Map& map, const Fact
             break;
         case eEntityType::Headquarters:
             removeEntity<Headquarters>(m_headquarters, entity);
-            if (m_headquarters.empty())
-            {
-                Level::add_event(GameEvent::create<HeadquartersDestroyedEvent>({}));
-            }
             break;
         case eEntityType::Turret:
             removeEntity<Turret>(m_turrets, entity);
@@ -608,12 +604,7 @@ bool Faction::isCollidingWithWorkerBuildQueue(const AABB& AABB) const
 {
     for (const auto& worker : m_workers)
     {
-        auto buildingCommand = std::find_if(worker.get_scheduled_buildings().cbegin(), worker.get_scheduled_buildings().cend(),
-            [&AABB](const auto& buildingCommand)
-        {
-            return AABB.contains(buildingCommand.position);
-        });
-        if (buildingCommand != worker.get_scheduled_buildings().cend())
+        if (worker.is_colliding_with_scheduled_buildings(AABB))
         {
             return true;
         }

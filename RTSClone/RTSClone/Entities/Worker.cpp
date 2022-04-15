@@ -77,6 +77,14 @@ eWorkerState Worker::getCurrentState() const
 	return m_currentState;
 }
 
+bool Worker::is_colliding_with_scheduled_buildings(const AABB& aabb) const
+{
+	return std::any_of(m_buildQueue.cbegin(), m_buildQueue.cend(), [&aabb](auto& buildingCommand)
+	{
+		return aabb.contains(buildingCommand.position);
+	});
+}
+
 bool Worker::isHoldingResources() const
 {
 	return m_resources.has_value();

@@ -54,6 +54,7 @@ public:
 	const std::deque<WorkerScheduledBuilding>& get_scheduled_buildings() const;
 	const std::vector<glm::vec3>& getMovementPath() const;
 	eWorkerState getCurrentState() const;
+	bool is_colliding_with_scheduled_buildings(const AABB& aabb) const;
 	bool isHoldingResources() const;
 	bool isRepairing() const;
 	bool isInBuildQueue(eEntityType entityType) const;
