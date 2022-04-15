@@ -1,0 +1,25 @@
+#pragma once
+
+//Sponza
+//Stanford Bunny
+//Happy Buddha
+//Dragon
+
+//AI
+//https://www.youtube.com/watch?v=V3qASwCM-PE&list=PLdgLYFdStKu03Dv9GUsXBDQMdyJbkDb8i
+//Networking Protocol
+//https://gamedev.stackexchange.com/a/162509/76861
+//OpenGL Debug
+//https://gist.github.com/qookei/76586d33238f0fa918c499dc7fb5ed04
+//A*
+//https://www.youtube.com/watch?v=icZj67PTFhc
+//Pathfinding Article
+//http://striketactics.net/devblog/starcraft-1-pathfinding-technical-analysis
+//Pathfinding Playlist
+//https://www.youtube.com/playlist?list=PLFt_AvWsXl0cq5Umv3pMC9SPnKjfp9eGW
+//Smooth Pathfinding
+//https://gamedev.stackexchange.com/questions/42106/2d-pathfinding-finding-smooth-paths
+//Design Patterns
+//https://www.youtube.com/watch?v=hQE8lQk9ikE
+//Game engine from scratch
+//https://www.gamasutra.com/blogs/MichaelKissner/20151027/257369/Writing_a_Game_Engine_from_Scratch__Part_1_Messaging.php
