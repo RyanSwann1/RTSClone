@@ -336,8 +336,9 @@ void FactionAI::update(float deltaTime, const Map & map, const FactionHandler& f
 	}
 }
 
-void FactionAI::onEntityRemoval(const Entity& entity)
+void FactionAI::on_entity_removal(const Entity& entity)
 {
+	Faction::on_entity_removal(entity);
 	if (entity.getEntityType() == eEntityType::Worker)
 	{
 		m_occupiedBases.removeWorker(static_cast<const Worker&>(entity));
@@ -722,7 +723,6 @@ bool FactionAI::handleAction(const AIAction& action, const Map& map, AIOccupiedB
 			return true;
 		}
 	}
-
 		break;
 	case eAIActionType::IncreaseShield:
 		Level::add_event(GameEvent::create<IncreaseFactionShieldEvent>({ getController() }));

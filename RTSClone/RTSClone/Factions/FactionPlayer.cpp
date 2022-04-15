@@ -289,8 +289,10 @@ void FactionPlayer::renderEntitySelector(const sf::Window& window, ShaderHandler
     m_entitySelector.render(window, shaderHandler);
 }
 
-void FactionPlayer::onEntityRemoval(const Entity& entity)
+void FactionPlayer::on_entity_removal(const Entity& entity)
 {
+    Faction::on_entity_removal(entity);
+
     int entityID = entity.getID();
     auto selectedUnit = std::find_if(m_selectedEntities.begin(), m_selectedEntities.end(), [entityID](const auto& selectedUnit)
     {

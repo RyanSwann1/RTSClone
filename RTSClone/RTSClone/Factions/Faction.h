@@ -10,7 +10,6 @@
 #include "Entities/SupplyDepot.h"
 #include "Mineral.h"
 #include "FactionController.h"
-
 #include "GameMessages.h"
 #include "Map.h"
 #include <vector>
@@ -80,7 +79,7 @@ protected:
 
 	virtual void on_entity_taken_damage(const TakeDamageEvent& gameEvent, Entity& entity, const Map& map, const FactionHandler& factionHandler) {}
 	virtual void on_entity_idle(Entity& entity, const Map& map, const FactionHandler& factionHandler, const BaseHandler& baseHandler) {}
-	virtual void onEntityRemoval(const Entity& entity) {}
+	virtual void on_entity_removal(const Entity& entity);
 
 	std::vector<Entity*> m_allEntities;
 	std::vector<Unit> m_units;
@@ -98,7 +97,6 @@ private:
 	int m_currentPopulationLimit			= 0;
 	int m_currentShieldAmount				= 0;
 
-	void decreaseCurrentPopulationAmount(const Entity& entity);
 	void handleWorkerCollisions(const Map& map);
 	void on_entity_creation(Entity& entity);
 	bool is_entity_creatable(eEntityType type, const size_t current, const size_t max) const;
@@ -127,7 +125,7 @@ void Faction::removeEntity(std::vector<T>& entityContainer, std::vector<Entity*>
 
 	assert(iter != entityContainer.end());
 
-	onEntityRemoval(*(*entity));
+	on_entity_removal(*(*entity));
 	m_allEntities.erase(entity);
 	entityContainer.erase(iter);
 }

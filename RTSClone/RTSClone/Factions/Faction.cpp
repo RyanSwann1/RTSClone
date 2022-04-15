@@ -37,6 +37,12 @@ Faction::Faction(eFactionController factionController, const glm::vec3& hqStarti
     m_allEntities.push_back(&entity);
 }
 
+void Faction::on_entity_removal(const Entity& entity)
+{
+    assert(entity.isDead());
+    m_currentPopulationAmount -= Globals::ENTITY_POPULATION_COSTS[static_cast<int>(entity.getEntityType())];
+}
+
 int Faction::getCurrentShieldAmount() const
 {
     return m_currentShieldAmount;
@@ -638,12 +644,6 @@ bool Faction::increaseShield(const Laboratory& laboratory)
     }
 
     return false;
-}
-
-void Faction::decreaseCurrentPopulationAmount(const Entity& entity)
-{
-    assert(entity.isDead());
-    m_currentPopulationAmount -= Globals::ENTITY_POPULATION_COSTS[static_cast<int>(entity.getEntityType())];
 }
 
 bool Faction::is_laboratory_built() const

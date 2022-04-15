@@ -33,7 +33,7 @@ public:
 	void update(float deltaTime, const Map& map, const FactionHandler& factionHandler, const BaseHandler& baseHandler) override;
 
 protected:
-	void onEntityRemoval(const Entity& entity) override;
+	void on_entity_removal(const Entity& entity) override;
 	void on_entity_taken_damage(const TakeDamageEvent& gameEvent, Entity& entity, const Map& map, const FactionHandler& factionHandler) override;
 	void on_entity_idle(Entity& entity, const Map& map, const FactionHandler& factionHandler, const BaseHandler& baseHandler) override;
 	Entity* create_building(const Worker& worker, const Map& map) override;

@@ -52,7 +52,7 @@ private:
 	bool m_addToDestinationQueue;
 	std::vector<Entity*> m_selectedEntities;
 
-	void onEntityRemoval(const Entity& entity) override;
+	void on_entity_removal(const Entity& entity) override;
 
 	void instructWorkerReturnMinerals(const Map& map, const Headquarters& headquarters);
 	int instructWorkerToBuild(const Map& map, const BaseHandler& baseHandler);
