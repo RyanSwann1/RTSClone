@@ -47,7 +47,7 @@ public:
 private:
 	std::optional<FactionPlayerPlannedBuilding> m_plannedBuilding;
 	EntitySelector m_entitySelector;
-	glm::vec3 m_previousPlaneIntersection;
+	glm::vec3 m_previousMousePosition;
 	bool m_attackMoveSelected;
 	bool m_addToDestinationQueue;
 	std::vector<Entity*> m_selectedEntities;
@@ -55,7 +55,7 @@ private:
 	void on_entity_removal(const Entity& entity) override;
 
 	void instructWorkerReturnMinerals(const Map& map, const Headquarters& headquarters);
-	int instructWorkerToBuild(const Map& map, const BaseHandler& baseHandler);
+	std::optional<int> instructWorkerToBuild(const Map& map, const BaseHandler& baseHandler);
 	void moveSingularSelectedEntity(const glm::vec3& destination, const Map& map, Entity& selectedEntity, const BaseHandler& baseHandler) const;
 	void moveMultipleSelectedEntities(const glm::vec3& destination, const Map& map, const BaseHandler& baseHandler);
 
@@ -63,64 +63,76 @@ private:
 	void onRightClick(const sf::Window& window, const Camera& camera, const FactionHandler& factionHandler, const Map& map, 
 		const BaseHandler& baseHandler, const MiniMap& minimap, const glm::vec3& levelSize);
 
-	template <typename Entity>
-	void selectEntity(std::vector<Entity>& entities, const glm::vec3& mouseToGroundPosition, bool selectAllEntities = false,
-		int selectEntityID = Globals::INVALID_ENTITY_ID);
+	template <typename T>
+	bool selectEntity(std::vector<T>& entities, const glm::vec3& mouseToGroundPosition, bool selectAll = false,
+		std::vector<Entity*>* selectedEntities = nullptr);
 
 	template <typename T>
-	void selectEntities(std::vector<T>& units);
+	bool selectEntities(std::vector<T>& units, std::vector<Entity*>* selectedEntities = nullptr);
 
 	template <typename T>
 	void deselectEntities(std::vector<T>& entities);
 };
 
-template<typename Entity>
-inline void FactionPlayer::selectEntity(std::vector<Entity>& entities, const glm::vec3& mouseToGroundPosition, bool selectAllEntities, int selectEntityID)
+template<typename T>
+inline bool FactionPlayer::selectEntity(std::vector<T>& entities, const glm::vec3& position, bool selectAll, 
+	std::vector<Entity*>* selectedEntities)
 {
-	auto selectedEntity = std::find_if(entities.begin(), entities.end(), [&mouseToGroundPosition](const auto& entity)
+	const auto selectedEntity = std::find_if(entities.begin(), entities.end(), [&position](const auto& entity)
 	{
-		return entity.getAABB().contains(mouseToGroundPosition);
+		return entity.getAABB().contains(position);
 	});
 	if (selectedEntity != entities.end())
 	{
-		if (selectAllEntities)
+		if (selectAll)
 		{
 			for (auto& entity : entities)
 			{
 				entity.setSelected(true);
+				if (selectedEntities)
+				{
+					selectedEntities->push_back(&*selectedEntity);
+				}
 			}
 		}
 		else
 		{
-			for (auto& entity : entities)
+			for (auto& entity : m_allEntities)
 			{
-				entity.setSelected(entity.getAABB().contains(mouseToGroundPosition));
+				entity->setSelected(false);
+			}
+
+			selectedEntity->setSelected(true);
+			if (selectedEntities)
+			{
+				selectedEntities->push_back(&*selectedEntity);
 			}
 		}
+
+		return true;
 	}
-	else
-	{
-		for (auto& entity : entities)
-		{
-			if (selectEntityID == entity.getID())
-			{
-				entity.setSelected(true);
-			}
-			else
-			{
-				entity.setSelected(false);
-			}
-		}
-	}
+
+	return false;
 }
 
 template <typename T>
-void FactionPlayer::selectEntities(std::vector<T>& units)
+bool FactionPlayer::selectEntities(std::vector<T>& entities, std::vector<Entity*>* selectedEntities)
 {
-	for (auto& unit : units)
+	bool selected = false;
+	for (auto& entity : entities)
 	{
-		unit.setSelected(m_entitySelector.getAABB().contains(unit.getAABB()));
-	}	
+		entity.setSelected(m_entitySelector.getAABB().contains(entity.getAABB()));
+		if (entity.isSelected())
+		{
+			selected = true;
+			if (selectedEntities)
+			{
+				selectedEntities->push_back(&entity);
+			}
+		}
+	}
+
+	return selected;
 }
 
 template <typename T>

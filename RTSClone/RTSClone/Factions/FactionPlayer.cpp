@@ -46,27 +46,6 @@ namespace
         }
     }
 
-    void setSelectedEntities(std::vector<Entity*>& selectedUnits, std::vector<Unit>& units, std::vector<Worker>& workers)
-    {
-        selectedUnits.clear();
-
-        for (auto& unit : units)
-        {
-            if (unit.isSelected())
-            {
-                selectedUnits.push_back(&unit);
-            }
-        }
-
-        for (auto& worker : workers)
-        {
-            if (worker.isSelected())
-            {
-                selectedUnits.push_back(&worker);
-            }
-        }
-    }
-
     glm::vec3 getAveragePosition(std::vector<Entity*>& selectedEntities)
     {
         assert(!selectedEntities.empty()); 
@@ -140,7 +119,7 @@ FactionPlayer::FactionPlayer(const glm::vec3& hqStartingPosition, int startingRe
     : Faction(eFactionController::Player, hqStartingPosition, startingResources, startingPopulation),
     m_plannedBuilding(),
     m_entitySelector(),
-    m_previousPlaneIntersection(),
+    m_previousMousePosition(),
     m_attackMoveSelected(false),
     m_addToDestinationQueue(false),
     m_selectedEntities()
@@ -249,26 +228,25 @@ void FactionPlayer::handleEvent(const GameEvent& gameEvent, const Map& map, cons
 void FactionPlayer::update(float deltaTime, const Map& map, const FactionHandler& factionHandler, const BaseHandler& baseHandler)
 {
     Faction::update(deltaTime, map, factionHandler, baseHandler);
+    broadcast<GameMessages::UIDisplayPlayerDetails>(
+        { getCurrentResourceAmount(), getCurrentPopulationAmount(), getMaximumPopulationAmount() });
 
     if (m_entitySelector.isActive())
     {
-        selectEntities<Unit>(m_units);
-        selectEntities<Worker>(m_workers);
-        setSelectedEntities(m_selectedEntities, m_units, m_workers);
-
+        m_selectedEntities.clear();
+        selectEntities<Worker>(m_workers, &m_selectedEntities);
+        selectEntities<Unit>(m_units, &m_selectedEntities);
+        
         if (m_selectedEntities.size() == 1)
         {
             Level::add_event(
                 GameEvent::create<SetTargetEntityGUIEvent>({ getController(), m_selectedEntities.back()->getID(), m_selectedEntities.back()->getEntityType() }));
         }
-        else if (!m_selectedEntities.empty())
+        else if (m_selectedEntities.size() > 1)
         {
             Level::add_event(GameEvent::create<ResetTargetEntityGUIEvent>({}));
         }
     }
-
-    broadcast<GameMessages::UIDisplayPlayerDetails>(
-        { getCurrentResourceAmount(), getCurrentPopulationAmount(), getMaximumPopulationAmount() });
 }
 
 void FactionPlayer::render(ShaderHandler& shaderHandler) const
@@ -321,12 +299,11 @@ void FactionPlayer::instructWorkerReturnMinerals(const Map& map, const Headquart
     }
 }
 
-int FactionPlayer::instructWorkerToBuild(const Map& map, const BaseHandler& baseHandler)
+std::optional<int> FactionPlayer::instructWorkerToBuild(const Map& map, const BaseHandler& baseHandler)
 {
-    int workerID = Globals::INVALID_ENTITY_ID;
     if (m_plannedBuilding)
     {
-        workerID = m_plannedBuilding->getBuilderID();
+        const int workerID = m_plannedBuilding->getBuilderID();
         if (m_plannedBuilding->isOnValidPosition(baseHandler, map) &&
             isAffordable(m_plannedBuilding->getEntityType()))
         {
@@ -360,9 +337,11 @@ int FactionPlayer::instructWorkerToBuild(const Map& map, const BaseHandler& base
         {
             m_plannedBuilding.reset();
         }
+
+        return workerID;
     }
 
-    return workerID;
+    return {};
 }
 
 void FactionPlayer::moveSingularSelectedEntity(const glm::vec3& destination, const Map& map, Entity& selectedEntity, const BaseHandler& baseHandler) const
@@ -522,26 +501,41 @@ void FactionPlayer::moveMultipleSelectedEntities(const glm::vec3& destination, c
 
 void FactionPlayer::onLeftClick(const sf::Window& window, const Camera& camera, const Map& map, const BaseHandler& baseHandler)
 {
-    glm::vec3 planeIntersection = camera.getRayToGroundPlaneIntersection(window);
-    m_entitySelector.setStartingPosition(window, planeIntersection);
+    const glm::vec3 mousePosition = camera.getRayToGroundPlaneIntersection(window);
+    const bool selectAll = mousePosition == m_previousMousePosition;
+    m_previousMousePosition = mousePosition;
+    m_entitySelector.setStartingPosition(window, mousePosition);
+    m_selectedEntities.clear();
 
-    int workerIDSelected = instructWorkerToBuild(map, baseHandler);
-    selectEntity<Unit>(m_units, planeIntersection, planeIntersection == m_previousPlaneIntersection);
-    selectEntity<Worker>(m_workers, planeIntersection, planeIntersection == m_previousPlaneIntersection, workerIDSelected);
-    setSelectedEntities(m_selectedEntities, m_units, m_workers);
-
-    if (planeIntersection != m_previousPlaneIntersection)
+    if (const std::optional<int> workerIDSelected = instructWorkerToBuild(map, baseHandler))
     {
-        m_previousPlaneIntersection = planeIntersection;
+        for (auto& entity : m_allEntities)
+        {
+            if (entity->getID() == *workerIDSelected)
+            {
+                entity->setSelected(true);
+                m_selectedEntities.push_back(entity);
+            }
+            else
+            {
+                entity->setSelected(false);
+            }
+        }
     }
-
-    if (m_selectedEntities.empty())
+    else if(selectEntity<Unit>(m_units, mousePosition, selectAll, &m_selectedEntities) 
+        || selectEntity<Worker>(m_workers, mousePosition, selectAll, &m_selectedEntities)
+        || selectEntity<Barracks>(m_barracks, mousePosition)
+        || selectEntity<Turret>(m_turrets, mousePosition)
+        || selectEntity<SupplyDepot>(m_supplyDepots, mousePosition)
+        || selectEntity<Headquarters>(m_headquarters, mousePosition)
+        || selectEntity<Laboratory>(m_laboratories, mousePosition))
+    {}
+    else
     {
-        selectEntity<Barracks>(m_barracks, planeIntersection);
-        selectEntity<Turret>(m_turrets, planeIntersection);
-        selectEntity<SupplyDepot>(m_supplyDepots, planeIntersection);
-        selectEntity<Headquarters>(m_headquarters, planeIntersection);
-        selectEntity<Laboratory>(m_laboratories, planeIntersection);
+        for (auto& entity : m_allEntities)
+        {
+            entity->setSelected(false);
+        }
     }
 }
 
