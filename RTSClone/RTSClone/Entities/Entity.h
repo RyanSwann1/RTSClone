@@ -35,6 +35,7 @@ public:
 	Entity& operator=(const Entity&) = delete;
 	Entity(Entity&&) noexcept = default;
 	Entity& operator=(Entity&&) noexcept = default;
+	virtual ~Entity() {};
 
 	eEntityType getEntityType() const;
 	int getMaximumHealth() const;
@@ -46,8 +47,7 @@ public:
 	void repair();
 	void increaseMaximumShield(const Faction& owningFaction);
 	void render(ShaderHandler& shaderHandler, eFactionController owningFactionController) const;
-	void renderHealthBar(ShaderHandler& shaderHandler, const Camera& camera, glm::uvec2 windowSize) const;
-	void renderShieldBar(ShaderHandler& shaderHandler, const Camera& camera, glm::uvec2 windowSize) const;
+	virtual void render_status_bars(ShaderHandler& shaderHandler, const Camera& camera, glm::uvec2 windowSize) const;
 
 	int getID() const;
 	const glm::vec3& getRotation() const;
@@ -85,4 +85,6 @@ private:
 	bool m_selected					= false;
 
 	void increaseShield();
+	void renderHealthBar(ShaderHandler& shaderHandler, const Camera& camera, glm::uvec2 windowSize) const;
+	void renderShieldBar(ShaderHandler& shaderHandler, const Camera& camera, glm::uvec2 windowSize) const;
 };

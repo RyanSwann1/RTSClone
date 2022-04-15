@@ -32,15 +32,17 @@ public:
 	std::optional<glm::vec3> get_waypoint() const;
 
 	void update(const float deltaTime, Faction& owningFaction, const Map& map);
-	void render_progress_bar(ShaderHandler& shaderHandler, const Camera& camera, glm::uvec2 windowSize) const;
+	void render_status_bars(ShaderHandler& shaderHandler, const Camera& camera, glm::uvec2 windowSize) const override;
 	void set_waypoint_position(const Map& map, const glm::vec3& position);
 	bool add_entity_to_spawn_queue(const Faction& owningFaction);
 	void render_waypoint(ShaderHandler& shaderHandler) const;
 
+protected:
+	Timer m_timer								= {};
+
 private:
 	EntitySpawnerDetails m_details				= {};
 	int m_spawnCount							= 0;
-	Timer m_timer								= {};
 	std::optional<glm::vec3> m_waypoint			= {};
 	std::function<Entity*(Faction&, const Map&, const EntitySpawnerBuilding&)> m_spawnCallback = {};
 };

@@ -438,8 +438,10 @@ void Worker::render(ShaderHandler& shaderHandler, eFactionController owningFacti
 	Entity::render(shaderHandler, owningFactionController);
 }
 
-void Worker::renderProgressBar(ShaderHandler& shaderHandler, const Camera& camera, glm::uvec2 windowSize) const
+void Worker::render_status_bars(ShaderHandler& shaderHandler, const Camera& camera, glm::uvec2 windowSize) const
 {
+	Entity::render_status_bars(shaderHandler, camera, windowSize);
+
 	if (m_taskTimer.isActive())
 	{
 		float currentTime = m_taskTimer.getElaspedTime() / m_taskTimer.getExpiredTime();

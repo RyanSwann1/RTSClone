@@ -79,14 +79,15 @@ void Laboratory::update(float deltaTime)
 	}
 }
 
-void Laboratory::renderProgressBar(ShaderHandler& shaderHandler, const Camera& camera, glm::uvec2 windowSize) const
+void Laboratory::render_status_bars(ShaderHandler& shaderHandler, const Camera& camera, glm::uvec2 windowSize) const
 {
+	Entity::render_status_bars(shaderHandler, camera, windowSize);
 	if (m_increaseShieldTimer.isActive())
 	{
 		assert(m_shieldUpgradeCounter > 0);
 
 		float currentTime = m_increaseShieldTimer.getElaspedTime() / m_increaseShieldTimer.getExpiredTime();
-		m_statbarSprite.render(m_position, windowSize, Globals::LABORATORY_STAT_BAR_WIDTH, 
+		m_statbarSprite.render(m_position, windowSize, Globals::LABORATORY_STAT_BAR_WIDTH,
 			Globals::LABORATORY_STAT_BAR_WIDTH * currentTime, Globals::DEFAULT_PROGRESS_BAR_HEIGHT,
 			PROGRESS_BAR_YOFFSET, shaderHandler, camera, Globals::PROGRESS_BAR_COLOR);
 	}

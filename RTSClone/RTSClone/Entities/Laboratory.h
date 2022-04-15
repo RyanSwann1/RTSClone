@@ -18,7 +18,7 @@ public:
 
 	void handleEvent(IncreaseFactionShieldEvent gameEvent);
 	void update(float deltaTime);
-	void renderProgressBar(ShaderHandler& shaderHandler, const Camera& camera, glm::uvec2 windowSize) const;
+	void render_status_bars(ShaderHandler& shaderHandler, const Camera& camera, glm::uvec2 windowSize) const override;
 
 private:
 	std::reference_wrapper<Faction> m_owningFaction;

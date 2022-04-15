@@ -72,7 +72,7 @@ public:
 	void revalidate_movement_path(const Map& map);
 
 	void render(ShaderHandler& shaderHandler, eFactionController owningFactionController) const;
-	void renderProgressBar(ShaderHandler& shaderHandler, const Camera& camera, glm::uvec2 windowSize) const;
+	void render_status_bars(ShaderHandler& shaderHandler, const Camera& camera, glm::uvec2 windowSize) const override;
 	void renderBuildingCommands(ShaderHandler& shaderHandler) const;
 #ifdef RENDER_PATHING
 	void render_path(ShaderHandler& shaderHandler);

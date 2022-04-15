@@ -25,6 +25,4 @@ namespace
 Barracks::Barracks(const glm::vec3& position, Faction& owningFaction)
 	: EntitySpawnerBuilding(position, eEntityType::Barracks, Globals::BARRACKS_STARTING_HEALTH, owningFaction.getCurrentShieldAmount(), SPAWN_DETAILS, 
 		[](Faction& owningFaction, const Map& map, const EntitySpawnerBuilding& spawner) { return owningFaction.createUnit(map, spawner); })
-{
-	Level::add_event(GameEvent::create<RevalidateMovementPathsEvent>({}));
-}
+{}

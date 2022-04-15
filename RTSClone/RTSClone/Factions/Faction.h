@@ -99,7 +99,6 @@ private:
 	int m_currentShieldAmount				= 0;
 
 	void decreaseCurrentPopulationAmount(const Entity& entity);
-	void revalidateExistingUnitPaths(const Map& map);
 	void handleWorkerCollisions(const Map& map);
 	void on_entity_creation(Entity& entity);
 	bool is_entity_creatable(eEntityType type, const size_t current, const size_t max) const;

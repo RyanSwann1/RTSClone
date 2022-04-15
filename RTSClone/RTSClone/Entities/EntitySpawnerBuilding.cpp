@@ -8,16 +8,18 @@
 #include "Factions/Faction.h"
 #include "Map.h"
 #include "ShaderHandler.h"
+#include "Level.h"
 
 EntitySpawnerBuilding::EntitySpawnerBuilding(const glm::vec3& position, const eEntityType type, 
 	const int health, const int shield, EntitySpawnerDetails spawnDetails,
 	std::function<Entity* (Faction& owningFaction, const Map&, const EntitySpawnerBuilding&)> spawnCallback)
 	: Entity(ModelManager::getInstance().getModel(type), position, type, health, shield),
 	m_details(spawnDetails),
-	m_timer(m_details.timeBetweenSpawn, false),
+	m_timer(spawnDetails.timeBetweenSpawn, false),
 	m_spawnCallback(spawnCallback)
 {
 	broadcast<GameMessages::AddAABBToMap>({ m_AABB });
+	Level::add_event(GameEvent::create<RevalidateMovementPathsEvent>({}));
 }
 
 EntitySpawnerBuilding::~EntitySpawnerBuilding()
@@ -69,8 +71,9 @@ void EntitySpawnerBuilding::update(const float deltaTime, Faction& owningFaction
 	}
 }
 
-void EntitySpawnerBuilding::render_progress_bar(ShaderHandler& shaderHandler, const Camera& camera, glm::uvec2 windowSize) const
+void EntitySpawnerBuilding::render_status_bars(ShaderHandler& shaderHandler, const Camera& camera, glm::uvec2 windowSize) const
 {
+	Entity::render_status_bars(shaderHandler, camera, windowSize);
 	if (m_timer.isActive())
 	{
 		const float currentTime = m_timer.getElaspedTime() / m_timer.getExpiredTime();

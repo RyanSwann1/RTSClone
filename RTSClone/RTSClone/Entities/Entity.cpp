@@ -230,6 +230,12 @@ void Entity::renderShieldBar(ShaderHandler& shaderHandler, const Camera& camera,
 	}
 }
 
+void Entity::render_status_bars(ShaderHandler& shaderHandler, const Camera& camera, glm::uvec2 windowSize) const
+{
+	renderHealthBar(shaderHandler, camera, windowSize);
+	renderShieldBar(shaderHandler, camera, windowSize);
+}
+
 void Entity::setPosition(const glm::vec3& position)
 {
 	m_position = position;

@@ -217,7 +217,15 @@ void Faction::handleEvent(const GameEvent& gameEvent, const Map& map, const Fact
     }
         break;
     case eGameEventType::RevalidateMovementPaths:
-        revalidateExistingUnitPaths(map);
+        for (auto& unit : m_units)
+        {
+            unit.revalidate_movement_path(map);
+        }
+
+        for (auto& worker : m_workers)
+        {
+            worker.revalidate_movement_path(map);
+        }
         break;
     case eGameEventType::RepairEntity:
     {
@@ -532,30 +540,7 @@ void Faction::renderEntityStatusBars(ShaderHandler& shaderHandler, const Camera&
 {
     for (const auto& entity : m_allEntities)
     {
-        entity->renderHealthBar(shaderHandler, camera, windowSize);
-        entity->renderShieldBar(shaderHandler, camera, windowSize);
-
-        switch (entity->getEntityType())
-        {
-        case eEntityType::Barracks:
-            static_cast<Barracks&>(*entity).render_progress_bar(shaderHandler, camera, windowSize);
-            break;
-        case eEntityType::Headquarters:
-            static_cast<Headquarters&>(*entity).render_progress_bar(shaderHandler, camera, windowSize);
-            break;
-        case eEntityType::Worker:
-            static_cast<Worker&>(*entity).renderProgressBar(shaderHandler, camera, windowSize);
-            break;
-        case eEntityType::Laboratory:
-            static_cast<Laboratory&>(*entity).renderProgressBar(shaderHandler, camera, windowSize);
-            break;
-        case eEntityType::SupplyDepot:
-        case eEntityType::Turret:
-        case eEntityType::Unit:
-            break;
-        default:
-            assert(false);
-        }
+        entity->render_status_bars(shaderHandler, camera, windowSize);
     }
 }
 
@@ -670,19 +655,6 @@ void Faction::decreaseCurrentPopulationAmount(const Entity& entity)
 {
     assert(entity.isDead());
     m_currentPopulationAmount -= Globals::ENTITY_POPULATION_COSTS[static_cast<int>(entity.getEntityType())];
-}
-
-void Faction::revalidateExistingUnitPaths(const Map& map)
-{
-    for (auto& unit : m_units)
-    {
-        unit.revalidate_movement_path(map);
-    }
-
-    for (auto& worker : m_workers)
-    {
-        worker.revalidate_movement_path(map);
-    }
 }
 
 bool Faction::is_laboratory_built() const
