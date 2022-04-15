@@ -46,7 +46,7 @@ public:
 	void takeDamage(const TakeDamageEvent& gameEvent, const Map& map);
 	void repair();
 	void increaseMaximumShield(const Faction& owningFaction);
-	void render(ShaderHandler& shaderHandler, eFactionController owningFactionController) const;
+	virtual void render(ShaderHandler& shaderHandler, eFactionController owningFactionController) const;
 	virtual void render_status_bars(ShaderHandler& shaderHandler, const Camera& camera, glm::uvec2 windowSize) const;
 
 	int getID() const;

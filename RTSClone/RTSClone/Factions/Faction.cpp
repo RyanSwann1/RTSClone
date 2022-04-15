@@ -508,7 +508,6 @@ void Faction::render(ShaderHandler& shaderHandler) const
     for (const auto& barracks : m_barracks)
     {
         barracks.render(shaderHandler, m_controller);
-        barracks.render_waypoint(shaderHandler);
     }
 
     for (const auto& turret : m_turrets)
@@ -519,7 +518,6 @@ void Faction::render(ShaderHandler& shaderHandler) const
     for (const auto& headquarters : m_headquarters)
     {
         headquarters.render(shaderHandler, m_controller);
-        headquarters.render_waypoint(shaderHandler);
     }
  
     for (const auto& laboratory : m_laboratories)

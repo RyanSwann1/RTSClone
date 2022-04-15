@@ -114,8 +114,9 @@ bool EntitySpawnerBuilding::add_entity_to_spawn_queue(const Faction& owningFacti
 	return false;
 }
 
-void EntitySpawnerBuilding::render_waypoint(ShaderHandler& shaderHandler) const
+void EntitySpawnerBuilding::render(ShaderHandler& shaderHandler, eFactionController owningFactionController) const
 {
+	Entity::render(shaderHandler, owningFactionController);
 	if (isSelected() && m_waypoint)
 	{
 		ModelManager::getInstance().getModel(WAYPOINT_MODEL_NAME).render(shaderHandler, *m_waypoint);
