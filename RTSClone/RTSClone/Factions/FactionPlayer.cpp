@@ -116,13 +116,7 @@ bool FactionPlayerPlannedBuilding::isOnValidPosition(const BaseHandler& baseHand
 
 //FactionPlayer
 FactionPlayer::FactionPlayer(const glm::vec3& hqStartingPosition, int startingResources, int startingPopulation)
-    : Faction(eFactionController::Player, hqStartingPosition, startingResources, startingPopulation),
-    m_plannedBuilding(),
-    m_entitySelector(),
-    m_previousMousePosition(),
-    m_attackMoveSelected(false),
-    m_addToDestinationQueue(false),
-    m_selectedEntities()
+    : Faction(eFactionController::Player, hqStartingPosition, startingResources, startingPopulation)
 {}
 
 const std::vector<Entity*>& FactionPlayer::getSelectedEntities() const

@@ -45,12 +45,12 @@ public:
 	void renderEntitySelector(const sf::Window& window, ShaderHandler& shaderHandler) const;
 
 private:
-	std::optional<FactionPlayerPlannedBuilding> m_plannedBuilding;
-	EntitySelector m_entitySelector;
-	glm::vec3 m_previousMousePosition;
-	bool m_attackMoveSelected;
-	bool m_addToDestinationQueue;
-	std::vector<Entity*> m_selectedEntities;
+	std::optional<FactionPlayerPlannedBuilding> m_plannedBuilding	= {};
+	EntitySelector m_entitySelector									= {};
+	glm::vec3 m_previousMousePosition								= {};
+	bool m_attackMoveSelected										= false;
+	bool m_addToDestinationQueue									= false;
+	std::vector<Entity*> m_selectedEntities							= {};
 
 	void on_entity_removal(const Entity& entity) override;
 
