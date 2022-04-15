@@ -1,4 +1,4 @@
-#include "AIAction.h"
+#include "AI/AIAction.h"
 #include "Entities/EntityType.h"
 #include <assert.h>
 

@@ -1,7 +1,7 @@
-#include "AIUnattachedToBaseWorkers.h"
+#include "AI/AIUnattachedToBaseWorkers.h"
 #include <algorithm>
 #include "Entities/Worker.h"
-#include "Globals.h"
+#include "Core/Globals.h"
 
 AIUnattachedToBaseWorkers::AIUnattachedToBaseWorkers()
 	: m_unattachedToBaseWorkers() {}

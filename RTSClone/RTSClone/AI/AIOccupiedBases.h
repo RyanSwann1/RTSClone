@@ -1,7 +1,7 @@
 #pragma once
 
 #include "glm/glm.hpp"
-#include "AIAction.h"
+#include "AI/AIAction.h"
 #include <functional>
 #include <vector>
 #include <deque>

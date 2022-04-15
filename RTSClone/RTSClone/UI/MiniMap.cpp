@@ -1,6 +1,6 @@
-#include "MiniMap.h"
-#include "Camera.h"
-#include "Level.h"
+#include "UI/MiniMap.h"
+#include "Core/Camera.h"
+#include "Core/Level.h"
 #include <iostream>
 
 namespace

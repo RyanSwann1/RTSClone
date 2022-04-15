@@ -1,8 +1,8 @@
 #include "FactionHandler.h"
 #include "FactionPlayer.h"
 #include "Entities/Unit.h"
-#include "Base.h"
-#include "Level.h"
+#include "Core/Base.h"
+#include "Core/Level.h"
 
 namespace
 {

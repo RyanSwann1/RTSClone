@@ -2,12 +2,12 @@
 
 #include "Entity.h"
 #include "Movement.h"
-#include "AdjacentPositions.h"
-#include "Timer.h"
+#include "Model/AdjacentPositions.h"
+#include "Core/Timer.h"
 #include "TargetEntity.h"
-#include "Globals.h"
-#include "ModelManager.h"
-#include "TypeComparison.h"
+#include "Core/Globals.h"
+#include "Graphics/ModelManager.h"
+#include "Core/TypeComparison.h"
 #include <functional>
 #include <vector>
 #include <queue>

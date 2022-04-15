@@ -1,14 +1,14 @@
 #include "EntitySpawnerBuilding.h"
-#include "Camera.h"
-#include "GameMessenger.h"
-#include "GameMessages.h"
-#include "Model.h"
-#include "Globals.h"
-#include "ModelManager.h"
+#include "Core/Camera.h"
+#include "Events/GameMessenger.h"
+#include "Events/GameMessages.h"
+#include "Graphics/Model.h"
+#include "Core/Globals.h"
+#include "Graphics/ModelManager.h"
 #include "Factions/Faction.h"
-#include "Map.h"
-#include "ShaderHandler.h"
-#include "Level.h"
+#include "Core/Map.h"
+#include "Graphics/ShaderHandler.h"
+#include "Core/Level.h"
 
 EntitySpawnerBuilding::EntitySpawnerBuilding(const glm::vec3& position, const eEntityType type, 
 	const int health, const int shield, EntitySpawnerDetails spawnDetails,

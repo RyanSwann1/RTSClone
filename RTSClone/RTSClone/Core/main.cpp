@@ -1,22 +1,22 @@
 #include <iostream>
 
-#include "glad.h"
+#include "glad/glad.h"
 #include <SFML/Graphics.hpp>
-#include "ModelLoader.h"
-#include "ShaderHandler.h"
-#include "Map.h"
+#include "Graphics/ModelLoader.h"
+#include "Graphics/ShaderHandler.h"
+#include "Core/Map.h"
 #include "glm/gtc/matrix_transform.hpp"
 #include "Factions/FactionPlayer.h"
 #include "Factions/FactionAI.h"
-#include "ModelManager.h"
-#include "Mineral.h"
+#include "Graphics/ModelManager.h"
+#include "Core/Mineral.h"
 #include <imgui/imgui.h>
 #include <imgui_impl/imgui_wrapper.h>
-#include "Level.h"
-#include "UIManager.h"
-#include "GameMessenger.h"
-#include "PathFinding.h"
-#include "LevelFileHandler.h"
+#include "Core/Level.h"
+#include "UI/UIManager.h"
+#include "Events/GameMessenger.h"
+#include "Core/PathFinding.h"
+#include "Core/LevelFileHandler.h"
 
 int main()
 {	

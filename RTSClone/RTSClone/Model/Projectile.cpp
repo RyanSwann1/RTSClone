@@ -1,8 +1,8 @@
-#include "Projectile.h"
-#include "ShaderHandler.h"
-#include "Globals.h"
-#include "ModelManager.h"
-#include "Model.h"
+#include "Model/Projectile.h"
+#include "Graphics/ShaderHandler.h"
+#include "Core/Globals.h"
+#include "Graphics/ModelManager.h"
+#include "Graphics/Model.h"
 
 namespace
 {

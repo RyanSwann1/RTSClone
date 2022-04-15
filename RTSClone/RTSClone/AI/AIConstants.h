@@ -1,8 +1,8 @@
 #pragma once
 
-#include "Globals.h"
+#include "Core/Globals.h"
 #include "Entities/EntityType.h"
-#include "AIAction.h"
+#include "AI/AIAction.h"
 #include <array>
 #include <vector>
 

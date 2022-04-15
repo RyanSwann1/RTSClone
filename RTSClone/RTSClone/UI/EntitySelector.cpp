@@ -1,8 +1,8 @@
-#include "EntitySelector.h"
-#include "glad.h"
-#include "Globals.h"
-#include "Camera.h"
-#include "ShaderHandler.h"
+#include "UI/EntitySelector.h"
+#include "glad/glad.h"
+#include "Core/Globals.h"
+#include "Core/Camera.h"
+#include "Graphics/ShaderHandler.h"
 
 namespace
 {

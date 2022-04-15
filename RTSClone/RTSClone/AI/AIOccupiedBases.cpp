@@ -1,10 +1,10 @@
-#include "AIOccupiedBases.h"
+#include "AI/AIOccupiedBases.h"
 #include "Entities/Worker.h"
-#include "Base.h"
+#include "Core/Base.h"
 #include "Entities/EntitySpawnerBuilding.h"
-#include "Globals.h"
+#include "Core/Globals.h"
 #include "Entities/Turret.h"
-#include "GameEvents.h"
+#include "Events/GameEvents.h"
 #include "Factions/FactionAI.h"
 #include <assert.h>
 

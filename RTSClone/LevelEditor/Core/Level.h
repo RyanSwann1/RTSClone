@@ -1,9 +1,9 @@
 #pragma once
 
-#include "GameObjectManager.h"
-#include "Quad.h"
-#include "Globals.h"
-#include "Base.h"
+#include "Scene/GameObjectManager.h"
+#include "Graphics/Quad.h"
+#include "Core/Globals.h"
+#include "Core/Base.h"
 #include <string>
 #include <vector>
 #include <SFML/Graphics.hpp>

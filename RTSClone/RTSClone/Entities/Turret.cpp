@@ -1,12 +1,12 @@
 #include "Turret.h"
-#include "ModelManager.h"
+#include "Graphics/ModelManager.h"
 #include "Factions/FactionHandler.h"
-#include "Globals.h"
-#include "PathFinding.h"
-#include "GameEvents.h"
-#include "GameMessages.h"
-#include "GameMessenger.h"
-#include "Level.h"
+#include "Core/Globals.h"
+#include "Core/PathFinding.h"
+#include "Events/GameEvents.h"
+#include "Events/GameMessages.h"
+#include "Events/GameMessenger.h"
+#include "Core/Level.h"
 
 namespace
 {

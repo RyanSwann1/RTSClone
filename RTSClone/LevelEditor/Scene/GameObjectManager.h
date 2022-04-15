@@ -1,7 +1,7 @@
 #pragma once
 
 #include "glm/glm.hpp"
-#include "GameObject.h"
+#include "Scene/GameObject.h"
 #include <vector>
 #include <memory>
 #include <ostream>

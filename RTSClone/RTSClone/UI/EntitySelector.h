@@ -1,7 +1,7 @@
 #pragma once
 
-#include "AABB.h"
-#include "OpenGLResource.h"
+#include "Core/AABB.h"
+#include "Graphics/OpenGLResource.h"
 #include <SFML/Graphics.hpp>
 
 class ShaderHandler;

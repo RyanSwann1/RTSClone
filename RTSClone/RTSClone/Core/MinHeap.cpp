@@ -1,7 +1,7 @@
 #include "MinHeap.h"
-#include "Globals.h"
-#include "GameMessages.h"
-#include "GameMessenger.h"
+#include "Core/Globals.h"
+#include "Events/GameMessages.h"
+#include "Events/GameMessenger.h"
 
 namespace 
 {

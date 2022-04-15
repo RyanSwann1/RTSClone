@@ -1,8 +1,8 @@
 #pragma once
 
 #include "Entities/EntityType.h"
-#include "FactionController.h"
-#include "Globals.h"
+#include "Core/FactionController.h"
+#include "Core/Globals.h"
 
 class Entity;
 class Mineral;

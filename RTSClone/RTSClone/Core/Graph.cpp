@@ -1,7 +1,7 @@
-#include "Graph.h"
-#include "GameMessages.h"
-#include "GameMessenger.h"
-#include "Map.h"
+#include "Core/Graph.h"
+#include "Events/GameMessages.h"
+#include "Events/GameMessenger.h"
+#include "Core/Map.h"
 #include <algorithm>
 
 Graph::Graph()

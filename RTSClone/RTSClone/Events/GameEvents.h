@@ -1,8 +1,8 @@
 #pragma once
 
-#include "FactionController.h"
+#include "Core/FactionController.h"
 #include "glm/glm.hpp"
-#include "Entities/EntityType.h"
+#include "../RTSClone/Entities/EntityType.h"
 
 enum class eGameEventType
 {

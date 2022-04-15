@@ -1,7 +1,7 @@
 #pragma once
 
 #include "glm/glm.hpp"
-#include "AABB.h"
+#include "Core/AABB.h"
 #include <functional>
 
 struct Model;

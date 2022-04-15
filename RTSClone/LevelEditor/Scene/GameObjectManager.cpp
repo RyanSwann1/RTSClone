@@ -1,7 +1,7 @@
-#include "GameObjectManager.h"
-#include "ModelManager.h"
-#include "Globals.h"
-#include "LevelFileHandler.h"
+#include "Scene/GameObjectManager.h"
+#include "Graphics/ModelManager.h"
+#include "Core/Globals.h"
+#include "Core/LevelFileHandler.h"
 #include <assert.h>
 #include <imgui/imgui.h>
 #include <fstream>

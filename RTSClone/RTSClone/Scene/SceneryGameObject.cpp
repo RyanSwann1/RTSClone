@@ -1,9 +1,9 @@
-#include "SceneryGameObject.h"
-#include "GameMessenger.h"
-#include "GameMessages.h"
-#include "ModelManager.h"
-#include "Globals.h"
-#include "Model.h"
+#include "Scene/SceneryGameObject.h"
+#include "Events/GameMessenger.h"
+#include "Events/GameMessages.h"
+#include "Graphics/ModelManager.h"
+#include "Core/Globals.h"
+#include "Graphics/Model.h"
 
 SceneryGameObject::SceneryGameObject(const Model& model, const glm::vec3& position, const glm::vec3& rotation,
 	const glm::vec3& scale, float left, float right, float forward, float back)

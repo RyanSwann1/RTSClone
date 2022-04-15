@@ -4,7 +4,7 @@
 #include <queue>
 #include <vector>
 #ifdef RENDER_PATHING
-#include "Mesh.h"
+#include "Graphics/Mesh.h"
 #endif // RENDER_PATHING
 
 struct Movement

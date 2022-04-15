@@ -1,13 +1,13 @@
 #pragma once
 
 #include "glm/glm.hpp"
-#include "Globals.h"
+#include "Core/Globals.h"
 #include "Entities/Unit.h"
-#include "Map.h"
-#include "Graph.h"
+#include "Core/Map.h"
+#include "Core/Graph.h"
 #include "Entities/Worker.h"
 #include "MinHeap.h"
-#include "GameMessenger.h"
+#include "Events/GameMessenger.h"
 #include <vector>
 #include <queue>
 #include <array>

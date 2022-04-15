@@ -1,8 +1,8 @@
 #pragma once
 
-#include "Globals.h"
+#include "Core/Globals.h"
 #include "glm/glm.hpp"
-#include "GameMessenger.h"
+#include "Events/GameMessenger.h"
 #include <array>
 #include <vector>
 #include <queue>

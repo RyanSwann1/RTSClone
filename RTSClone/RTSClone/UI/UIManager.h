@@ -1,10 +1,10 @@
 #pragma once
 
 #include "Entities/EntityType.h"
-#include "FactionController.h"
-#include "GameMessages.h"
+#include "Core/FactionController.h"
+#include "Events/GameMessages.h"
 #include "Entities/TargetEntity.h"
-#include "GameMessenger.h"
+#include "Events/GameMessenger.h"
 #include <SFML/Graphics.hpp>
 #include <memory>
 

@@ -1,11 +1,11 @@
-#include "Level.h"
-#include "FactionController.h"
-#include "LevelFileHandler.h"
-#include "Camera.h"
+#include "Core/Level.h"
+#include "Core/FactionController.h"
+#include "Core/LevelFileHandler.h"
+#include "Core/Camera.h"
 #include "imgui/imgui.h"
-#include "ModelManager.h"
-#include "glad.h"
-#include "ShaderHandler.h"
+#include "Graphics/ModelManager.h"
+#include "glad/glad.h"
+#include "Graphics/ShaderHandler.h"
 #include <fstream>
 
 namespace

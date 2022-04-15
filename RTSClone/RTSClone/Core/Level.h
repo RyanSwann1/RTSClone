@@ -1,14 +1,14 @@
 #pragma once
 
-#include "Projectile.h"
+#include "Model/Projectile.h"
 #include "Factions/FactionPlayer.h"
 #include "Factions/FactionAI.h"
-#include "SceneryGameObject.h"
+#include "Scene/SceneryGameObject.h"
 #include "Factions/FactionHandler.h"
-#include "Base.h"
-#include "Quad.h"
-#include "MiniMap.h"
-#include "Camera.h"
+#include "Core/Base.h"
+#include "Graphics/Quad.h"
+#include "UI/MiniMap.h"
+#include "Core/Camera.h"
 #include <string>
 #include <vector>
 #include <memory>

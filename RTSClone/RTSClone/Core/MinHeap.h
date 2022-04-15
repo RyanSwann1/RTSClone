@@ -4,7 +4,7 @@
 
 #include "glm/glm.hpp"
 #include "glm/gtx/hash.hpp"
-#include "GameMessenger.h"
+#include "Events/GameMessenger.h"
 #include <unordered_map>
 #include <vector>
 

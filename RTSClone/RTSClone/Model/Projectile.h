@@ -1,7 +1,7 @@
 #pragma once
 
-#include "GameEvents.h"
-#include "AABB.h"
+#include "Events/GameEvents.h"
+#include "Core/AABB.h"
 #include <functional>
 
 struct Model;

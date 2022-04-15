@@ -1,8 +1,8 @@
-#include "GameObject.h"
-#include "ShaderHandler.h"
-#include "Globals.h"
-#include "Model.h"
-#include "ModelManager.h"
+#include "Scene/GameObject.h"
+#include "Graphics/ShaderHandler.h"
+#include "Core/Globals.h"
+#include "Graphics/Model.h"
+#include "Graphics/ModelManager.h"
 
 GameObject::GameObject(Model& model)
 	: position(0.f),

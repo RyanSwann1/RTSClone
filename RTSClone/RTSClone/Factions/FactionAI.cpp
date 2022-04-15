@@ -1,11 +1,11 @@
 #include "FactionAI.h"
-#include "AdjacentPositions.h"
-#include "ModelManager.h"
-#include "PathFinding.h"
+#include "Model/AdjacentPositions.h"
+#include "Graphics/ModelManager.h"
+#include "Core/PathFinding.h"
 #include "FactionHandler.h"
-#include "Level.h"
-#include "GameMessages.h"
-#include "GameMessenger.h"
+#include "Core/Level.h"
+#include "Events/GameMessages.h"
+#include "Events/GameMessenger.h"
 #include <limits>
 #include <algorithm>
 

@@ -1,14 +1,14 @@
 #include "Entity.h"
-#include "Model.h"
-#include "ShaderHandler.h"
-#include "ModelManager.h"
-#include "Globals.h"
-#include "IDGenerator.h"
-#include "FactionController.h"
+#include "Graphics/Model.h"
+#include "Graphics/ShaderHandler.h"
+#include "Graphics/ModelManager.h"
+#include "Core/Globals.h"
+#include "Core/IDGenerator.h"
+#include "Core/FactionController.h"
 #include "Factions/Faction.h"
-#include "GameEvents.h"
+#include "Events/GameEvents.h"
 #include "glm/gtc/matrix_transform.hpp"
-#include "Camera.h"
+#include "Core/Camera.h"
 
 namespace
 {

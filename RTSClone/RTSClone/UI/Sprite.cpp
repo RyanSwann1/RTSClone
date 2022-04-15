@@ -1,9 +1,9 @@
-#include "Sprite.h"
-#include "glad.h"
-#include "Globals.h"
+#include "UI/Sprite.h"
+#include "glad/glad.h"
+#include "Core/Globals.h"
 #include "Entities/Entity.h"
-#include "Camera.h"
-#include "ShaderHandler.h"
+#include "Core/Camera.h"
+#include "Graphics/ShaderHandler.h"
 
 namespace
 {

@@ -1,18 +1,18 @@
 #include "Unit.h"
-#include "ShaderHandler.h"
-#include "Model.h"
-#include "PathFinding.h"
-#include "ModelManager.h"
+#include "Graphics/ShaderHandler.h"
+#include "Graphics/Model.h"
+#include "Core/PathFinding.h"
+#include "Graphics/ModelManager.h"
 #include "Factions/Faction.h"
-#include "GameEvents.h"
+#include "Events/GameEvents.h"
 #include "Factions/FactionHandler.h"
-#include "PathFinding.h"
+#include "Core/PathFinding.h"
 #include "glm/gtx/vector_angle.hpp"
-#include "GameMessages.h"
-#include "GameMessenger.h"
-#include "Level.h"
+#include "Events/GameMessages.h"
+#include "Events/GameMessenger.h"
+#include "Core/Level.h"
 #ifdef RENDER_PATHING
-#include "RenderPrimitiveMesh.h"
+#include "Graphics/RenderPrimitiveMesh.h"
 #endif // RENDER_PATHING
 
 namespace

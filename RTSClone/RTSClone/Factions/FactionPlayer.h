@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Faction.h"
-#include "EntitySelector.h"
+#include "UI/EntitySelector.h"
 #include <SFML/Graphics.hpp>
 #include <optional>
 

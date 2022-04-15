@@ -71,16 +71,16 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <LinkIncremental>true</LinkIncremental>
+    <LinkIncremental>&lt;different options&gt;</LinkIncremental>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <LinkIncremental>false</LinkIncremental>
+    <LinkIncremental>&lt;different options&gt;</LinkIncremental>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <LinkIncremental>true</LinkIncremental>
+    <LinkIncremental>false</LinkIncremental>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <LinkIncremental>false</LinkIncremental>
+    <LinkIncremental>true</LinkIncremental>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -88,10 +88,14 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <AdditionalIncludeDirectories>$(SolutionDir)Extern/assimp/include;$(SolutionDir)Extern;$(SolutionDir)Extern/SFML-2.5.1/include;</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>$(SolutionDir)Extern/assimp/lib;$(SolutionDir)Extern/SFML-2.5.1/lib;</AdditionalLibraryDirectories>
+      <AdditionalDependencies>shared.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -102,12 +106,16 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <AdditionalIncludeDirectories>$(SolutionDir)Extern/assimp/include;$(SolutionDir)Extern;$(SolutionDir)Extern/SFML-2.5.1/include;</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>$(SolutionDir)Extern/assimp/lib;$(SolutionDir)Extern/SFML-2.5.1/lib;</AdditionalLibraryDirectories>
+      <AdditionalDependencies>shared.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -116,14 +124,15 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>RENDER_PATHING;GAME;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)..\Shared\assimp\include;$(ProjectDir)..\Shared\SFML-2.5.1\include;$(ProjectDir)..\Shared</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)Extern/assimp/include;$(SolutionDir)Extern;$(SolutionDir)Extern/SFML-2.5.1/include;$(ProjectDir);$(ProjectDir)..\Shared\assimp\include;$(ProjectDir)..\Shared\SFML-2.5.1\include;$(ProjectDir)..\Shared</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>assimp.lib;sfml-window-d.lib;sfml-graphics-d.lib;sfml-system-d.lib;sfml-network-d.lib;winmm.lib;opengl32.lib;freetype.lib;vorbis.lib;vorbisenc.lib;vorbisfile.lib;openal32.lib;sfml-audio-d.lib;flac.lib;ogg.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>opengl32.lib;$(ProjectDir)..\Shared\SFML-2.5.1\lib;$(ProjectDir)..\Shared\assimp\lib</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)x64/Debug;$(SolutionDir)Extern/assimp/lib;$(SolutionDir)Extern/SFML-2.5.1/lib;opengl32.lib;$(ProjectDir)..\Shared\SFML-2.5.1\lib;$(ProjectDir)..\Shared\assimp\lib</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -134,102 +143,76 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>RENDER_AABB;RENDER_PATHING;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(ProjectDir)assimp\include;$(ProjectDir)SFML-2.5.1\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)Extern/assimp/include;$(SolutionDir)Extern;$(SolutionDir)Extern/SFML-2.5.1/include;$(ProjectDir)assimp\include;$(ProjectDir)SFML-2.5.1\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>opengl32.lib;$(ProjectDir)SFML-2.5.1\lib;$(ProjectDir)assimp\lib;</AdditionalLibraryDirectories>
-      <AdditionalDependencies>assimp.lib;sfml-window.lib;sfml-graphics.lib;sfml-system.lib;sfml-network.lib;winmm.lib;opengl32.lib;freetype.lib;vorbis.lib;vorbisenc.lib;vorbisfile.lib;openal32.lib;sfml-audio-d.lib;flac.lib;ogg.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)Extern/assimp/lib;$(SolutionDir)Extern/SFML-2.5.1/lib;opengl32.lib;$(ProjectDir)SFML-2.5.1\lib;$(ProjectDir)assimp\lib;</AdditionalLibraryDirectories>
+      <AdditionalDependencies>shared.lib;assimp.lib;sfml-window.lib;sfml-graphics.lib;sfml-system.lib;sfml-network.lib;winmm.lib;opengl32.lib;freetype.lib;vorbis.lib;vorbisenc.lib;vorbisfile.lib;openal32.lib;sfml-audio-d.lib;flac.lib;ogg.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\Shared\AABB.cpp" />
-    <ClCompile Include="..\Shared\Base.cpp" />
-    <ClCompile Include="..\Shared\Camera.cpp" />
-    <ClCompile Include="..\Shared\FactionController.cpp" />
-    <ClCompile Include="..\Shared\glad.c" />
-    <ClCompile Include="..\Shared\imgui\imgui.cpp" />
-    <ClCompile Include="..\Shared\imgui\imgui_demo.cpp" />
-    <ClCompile Include="..\Shared\imgui\imgui_draw.cpp" />
-    <ClCompile Include="..\Shared\imgui\imgui_widgets.cpp" />
-    <ClCompile Include="..\Shared\imgui_impl\imgui_impl_opengl3.cpp" />
-    <ClCompile Include="..\Shared\imgui_impl\imgui_impl_sfml.cpp" />
-    <ClCompile Include="..\Shared\LevelFileHandler.cpp" />
-    <ClCompile Include="..\Shared\Mesh.cpp" />
-    <ClCompile Include="..\Shared\Mineral.cpp" />
-    <ClCompile Include="..\Shared\Model.cpp" />
-    <ClCompile Include="..\Shared\ModelLoader.cpp" />
-    <ClCompile Include="..\Shared\ModelManager.cpp" />
-    <ClCompile Include="..\Shared\OpenGLResource.cpp" />
-    <ClCompile Include="..\Shared\Quad.cpp" />
-    <ClCompile Include="..\Shared\RenderPrimitiveMesh.cpp" />
-    <ClCompile Include="..\Shared\ShaderHandler.cpp" />
-    <ClCompile Include="AdjacentPositions.cpp" />
-    <ClCompile Include="AIAction.cpp" />
-    <ClCompile Include="AIOccupiedBases.cpp" />
-    <ClCompile Include="AIUnattachedToBaseWorkers.cpp" />
+    <ClCompile Include="AI\AIAction.cpp" />
+    <ClCompile Include="AI\AIOccupiedBases.cpp" />
+    <ClCompile Include="AI\AIUnattachedToBaseWorkers.cpp" />
+    <ClCompile Include="Core\AABB.cpp" />
+    <ClCompile Include="Core\Base.cpp" />
+    <ClCompile Include="Core\Camera.cpp" />
+    <ClCompile Include="Core\FactionController.cpp" />
+    <ClCompile Include="Core\Graph.cpp" />
+    <ClCompile Include="Core\Level.cpp" />
+    <ClCompile Include="Core\LevelFileHandler.cpp" />
+    <ClCompile Include="Core\main.cpp" />
+    <ClCompile Include="Core\Map.cpp" />
+    <ClCompile Include="Core\Mineral.cpp" />
+    <ClCompile Include="Core\MinHeap.cpp" />
+    <ClCompile Include="Core\PathFinding.cpp" />
+    <ClCompile Include="Core\Timer.cpp" />
     <ClCompile Include="Entities\Barracks.cpp" />
     <ClCompile Include="Entities\Entity.cpp" />
     <ClCompile Include="Factions\Faction.cpp" />
     <ClCompile Include="Factions\FactionAI.cpp" />
     <ClCompile Include="Factions\FactionHandler.cpp" />
     <ClCompile Include="Factions\FactionPlayer.cpp" />
-    <ClCompile Include="Graph.cpp" />
     <ClCompile Include="Entities\Headquarters.cpp" />
     <ClCompile Include="Entities\Laboratory.cpp" />
-    <ClCompile Include="Level.cpp" />
-    <ClCompile Include="MinHeap.cpp" />
-    <ClCompile Include="MiniMap.cpp" />
-    <ClCompile Include="Projectile.cpp" />
-    <ClCompile Include="SceneryGameObject.cpp" />
-    <ClCompile Include="EntitySelector.cpp" />
-    <ClCompile Include="Sprite.cpp" />
     <ClCompile Include="Entities\Turret.cpp" />
-    <ClCompile Include="UIManager.cpp" />
     <ClCompile Include="Entities\Worker.cpp" />
     <ClCompile Include="Entities\EntitySpawnerBuilding.cpp" />
-    <ClCompile Include="main.cpp" />
-    <ClCompile Include="Map.cpp" />
-    <ClCompile Include="PathFinding.cpp" />
     <ClCompile Include="Entities\SupplyDepot.cpp" />
-    <ClCompile Include="Timer.cpp" />
     <ClCompile Include="Entities\Unit.cpp" />
+    <ClCompile Include="glad\glad.c" />
+    <ClCompile Include="Graphics\Mesh.cpp" />
+    <ClCompile Include="Graphics\Model.cpp" />
+    <ClCompile Include="Graphics\ModelLoader.cpp" />
+    <ClCompile Include="Graphics\ModelManager.cpp" />
+    <ClCompile Include="Graphics\OpenGLResource.cpp" />
+    <ClCompile Include="Graphics\Quad.cpp" />
+    <ClCompile Include="Graphics\RenderPrimitiveMesh.cpp" />
+    <ClCompile Include="Graphics\ShaderHandler.cpp" />
+    <ClCompile Include="imgui\imgui.cpp" />
+    <ClCompile Include="imgui\imgui_demo.cpp" />
+    <ClCompile Include="imgui\imgui_draw.cpp" />
+    <ClCompile Include="imgui\imgui_widgets.cpp" />
+    <ClCompile Include="imgui_impl\imgui_impl_opengl3.cpp" />
+    <ClCompile Include="imgui_impl\imgui_impl_sfml.cpp" />
+    <ClCompile Include="Model\AdjacentPositions.cpp" />
+    <ClCompile Include="Model\Projectile.cpp" />
+    <ClCompile Include="Scene\SceneryGameObject.cpp" />
+    <ClCompile Include="UI\EntitySelector.cpp" />
+    <ClCompile Include="UI\MiniMap.cpp" />
+    <ClCompile Include="UI\Sprite.cpp" />
+    <ClCompile Include="UI\UIManager.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\Shared\AABB.h" />
-    <ClInclude Include="..\Shared\Base.h" />
-    <ClInclude Include="..\Shared\Camera.h" />
-    <ClInclude Include="..\Shared\FactionController.h" />
-    <ClInclude Include="..\Shared\glad.h" />
-    <ClInclude Include="..\Shared\Globals.h" />
-    <ClInclude Include="..\Shared\imgui\imconfig.h" />
-    <ClInclude Include="..\Shared\imgui\imgui.h" />
-    <ClInclude Include="..\Shared\imgui\imgui_internal.h" />
-    <ClInclude Include="..\Shared\imgui\imstb_rectpack.h" />
-    <ClInclude Include="..\Shared\imgui\imstb_textedit.h" />
-    <ClInclude Include="..\Shared\imgui\imstb_truetype.h" />
-    <ClInclude Include="..\Shared\imgui_impl\imgui_impl_opengl3.h" />
-    <ClInclude Include="..\Shared\imgui_impl\imgui_impl_sfml.h" />
-    <ClInclude Include="..\Shared\imgui_impl\imgui_wrapper.h" />
-    <ClInclude Include="..\Shared\khrplatform.h" />
-    <ClInclude Include="..\Shared\LevelFileHandler.h" />
-    <ClInclude Include="..\Shared\Mesh.h" />
-    <ClInclude Include="..\Shared\Mineral.h" />
-    <ClInclude Include="..\Shared\Model.h" />
-    <ClInclude Include="..\Shared\ModelLoader.h" />
-    <ClInclude Include="..\Shared\ModelManager.h" />
-    <ClInclude Include="..\Shared\OpenGLResource.h" />
-    <ClInclude Include="..\Shared\Quad.h" />
-    <ClInclude Include="..\Shared\RenderPrimitiveMesh.h" />
-    <ClInclude Include="..\Shared\ShaderHandler.h" />
-    <ClInclude Include="AdjacentPositions.h" />
-    <ClInclude Include="AIAction.h" />
-    <ClInclude Include="AIConstants.h" />
-    <ClInclude Include="AIOccupiedBases.h" />
-    <ClInclude Include="AIUnattachedToBaseWorkers.h" />
+    <ClInclude Include="AI\AIAction.h" />
+    <ClInclude Include="AI\AIConstants.h" />
+    <ClInclude Include="AI\AIOccupiedBases.h" />
+    <ClInclude Include="AI\AIUnattachedToBaseWorkers.h" />
     <ClInclude Include="assimp\include\ai_assert.h" />
     <ClInclude Include="assimp\include\anim.h" />
     <ClInclude Include="assimp\include\camera.h" />
@@ -269,41 +252,67 @@
     <ClInclude Include="assimp\include\vector2.h" />
     <ClInclude Include="assimp\include\vector3.h" />
     <ClInclude Include="assimp\include\version.h" />
+    <ClInclude Include="Core\AABB.h" />
+    <ClInclude Include="Core\Base.h" />
+    <ClInclude Include="Core\Camera.h" />
+    <ClInclude Include="Core\FactionController.h" />
+    <ClInclude Include="Core\Globals.h" />
+    <ClInclude Include="Core\Graph.h" />
+    <ClInclude Include="Core\IDGenerator.h" />
+    <ClInclude Include="Core\Level.h" />
+    <ClInclude Include="Core\LevelFileHandler.h" />
+    <ClInclude Include="Core\Map.h" />
+    <ClInclude Include="Core\Mineral.h" />
+    <ClInclude Include="Core\MinHeap.h" />
+    <ClInclude Include="Core\PathFinding.h" />
+    <ClInclude Include="Core\Timer.h" />
+    <ClInclude Include="Core\TypeComparison.h" />
     <ClInclude Include="Entities\Barracks.h" />
     <ClInclude Include="Callbacks\MineralCallbacks.h" />
     <ClInclude Include="Callbacks\WorkerCallbacks.h" />
     <ClInclude Include="Entities\Entity.h" />
     <ClInclude Include="Entities\EntityType.h" />
+    <ClInclude Include="Events\GameEvents.h" />
+    <ClInclude Include="Events\GameMessages.h" />
+    <ClInclude Include="Events\GameMessenger.h" />
     <ClInclude Include="Factions\FactionHandler.h" />
     <ClInclude Include="Entities\Headquarters.h" />
     <ClInclude Include="Entities\Laboratory.h" />
-    <ClInclude Include="MinHeap.h" />
-    <ClInclude Include="MiniMap.h" />
     <ClInclude Include="Entities\Movement.h" />
-    <ClInclude Include="SceneryGameObject.h" />
-    <ClInclude Include="Level.h" />
-    <ClInclude Include="EntitySelector.h" />
-    <ClInclude Include="Sprite.h" />
     <ClInclude Include="Entities\Turret.h" />
-    <ClInclude Include="TypeComparison.h" />
-    <ClInclude Include="UIManager.h" />
     <ClInclude Include="Entities\TargetEntity.h" />
     <ClInclude Include="Factions\Faction.h" />
     <ClInclude Include="Factions\FactionAI.h" />
     <ClInclude Include="Factions\FactionPlayer.h" />
-    <ClInclude Include="GameEvents.h" />
-    <ClInclude Include="GameMessenger.h" />
-    <ClInclude Include="GameMessages.h" />
-    <ClInclude Include="Graph.h" />
-    <ClInclude Include="Projectile.h" />
-    <ClInclude Include="IDGenerator.h" />
     <ClInclude Include="Entities\Worker.h" />
     <ClInclude Include="Entities\EntitySpawnerBuilding.h" />
-    <ClInclude Include="Map.h" />
-    <ClInclude Include="PathFinding.h" />
     <ClInclude Include="Entities\SupplyDepot.h" />
-    <ClInclude Include="Timer.h" />
     <ClInclude Include="Entities\Unit.h" />
+    <ClInclude Include="glad\glad.h" />
+    <ClInclude Include="glad\khrplatform.h" />
+    <ClInclude Include="Graphics\Mesh.h" />
+    <ClInclude Include="Graphics\Model.h" />
+    <ClInclude Include="Graphics\ModelLoader.h" />
+    <ClInclude Include="Graphics\ModelManager.h" />
+    <ClInclude Include="Graphics\OpenGLResource.h" />
+    <ClInclude Include="Graphics\Quad.h" />
+    <ClInclude Include="Graphics\RenderPrimitiveMesh.h" />
+    <ClInclude Include="Graphics\ShaderHandler.h" />
+    <ClInclude Include="imgui\imgui.h" />
+    <ClInclude Include="imgui\imgui_internal.h" />
+    <ClInclude Include="imgui\imstb_rectpack.h" />
+    <ClInclude Include="imgui\imstb_textedit.h" />
+    <ClInclude Include="imgui\imstb_truetype.h" />
+    <ClInclude Include="imgui_impl\imgui_impl_opengl3.h" />
+    <ClInclude Include="imgui_impl\imgui_impl_sfml.h" />
+    <ClInclude Include="imgui_impl\imgui_wrapper.h" />
+    <ClInclude Include="Model\AdjacentPositions.h" />
+    <ClInclude Include="Model\Projectile.h" />
+    <ClInclude Include="Scene\SceneryGameObject.h" />
+    <ClInclude Include="UI\EntitySelector.h" />
+    <ClInclude Include="UI\MiniMap.h" />
+    <ClInclude Include="UI\Sprite.h" />
+    <ClInclude Include="UI\UIManager.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="assimp\include\color4.inl" />

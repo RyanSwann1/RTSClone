@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Sprite.h"
-#include "OpenGLResource.h"
+#include "UI/Sprite.h"
+#include "Graphics/OpenGLResource.h"
 #include <SFML/Graphics.hpp>
 
 struct Camera;

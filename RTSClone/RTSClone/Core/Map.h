@@ -1,9 +1,9 @@
 #pragma once
 
-#include "Globals.h"
-#include "GameMessenger.h"
-#include "SceneryGameObject.h"
-#include "Base.h"
+#include "Core/Globals.h"
+#include "Events/GameMessenger.h"
+#include "Scene/SceneryGameObject.h"
+#include "Core/Base.h"
 
 namespace GameMessages
 {

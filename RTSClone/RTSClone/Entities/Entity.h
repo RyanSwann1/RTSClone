@@ -1,11 +1,11 @@
 #pragma once
 
 #include "glm/glm.hpp"
-#include "AABB.h"
+#include "Core/AABB.h"
 #include <functional>
 #include "EntityType.h"
-#include "Sprite.h"
-#include "Timer.h"
+#include "UI/Sprite.h"
+#include "Core/Timer.h"
 
 constexpr int INVALID_ENTITY_ID = -1;
 

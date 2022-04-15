@@ -1,11 +1,11 @@
-#include "Level.h"
-#include "LevelFileHandler.h"
-#include "GameMessenger.h"
-#include "GameMessages.h"
-#include "ModelManager.h"
-#include "UIManager.h"
-#include "Camera.h"
-#include "AIConstants.h"
+#include "Core/Level.h"
+#include "Core/LevelFileHandler.h"
+#include "Events/GameMessenger.h"
+#include "Events/GameMessages.h"
+#include "Graphics/ModelManager.h"
+#include "UI/UIManager.h"
+#include "Core/Camera.h"
+#include "AI/AIConstants.h"
 #include <imgui/imgui.h>
 
 namespace

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "OpenGLResource.h"
+#include "Graphics/OpenGLResource.h"
 #include <array>
 #include "glm/glm.hpp"
 

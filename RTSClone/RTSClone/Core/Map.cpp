@@ -1,10 +1,10 @@
-#include "Map.h"
-#include "GameMessenger.h"
-#include "GameMessages.h"
+#include "Core/Map.h"
+#include "Events/GameMessenger.h"
+#include "Events/GameMessages.h"
 #include "Entities/Entity.h"
-#include "Mineral.h"
-#include "SceneryGameObject.h"
-#include "GameMessenger.h"
+#include "Core/Mineral.h"
+#include "Scene/SceneryGameObject.h"
+#include "Events/GameMessenger.h"
 #include <assert.h>
 
 Map::Map(const std::vector<SceneryGameObject>& sceneryGameObjects, const std::vector<Base>& bases, glm::ivec2 size)
