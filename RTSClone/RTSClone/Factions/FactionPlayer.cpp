@@ -133,7 +133,8 @@ void FactionPlayer::handleInput(const sf::Event& currentSFMLEvent, const sf::Win
     case sf::Event::MouseButtonPressed:
         if (currentSFMLEvent.mouseButton.button == sf::Mouse::Left)
         {
-            onLeftClick(window, camera, map, baseHandler);
+            instructWorkerToBuild(map, baseHandler);
+            select_singular_entity(window, camera);
         }
         else if (currentSFMLEvent.mouseButton.button == sf::Mouse::Right)
         {
@@ -293,7 +294,7 @@ void FactionPlayer::instructWorkerReturnMinerals(const Map& map, const Headquart
     }
 }
 
-std::optional<int> FactionPlayer::instructWorkerToBuild(const Map& map, const BaseHandler& baseHandler)
+void FactionPlayer::instructWorkerToBuild(const Map& map, const BaseHandler& baseHandler)
 {
     if (m_plannedBuilding)
     {
@@ -332,10 +333,10 @@ std::optional<int> FactionPlayer::instructWorkerToBuild(const Map& map, const Ba
             m_plannedBuilding.reset();
         }
 
-        return workerID;
+       // return workerID;
     }
 
-    return {};
+    //return {};
 }
 
 void FactionPlayer::moveSingularSelectedEntity(const glm::vec3& destination, const Map& map, Entity& selectedEntity, const BaseHandler& baseHandler) const
@@ -493,7 +494,7 @@ void FactionPlayer::moveMultipleSelectedEntities(const glm::vec3& destination, c
     }
 }
 
-void FactionPlayer::onLeftClick(const sf::Window& window, const Camera& camera, const Map& map, const BaseHandler& baseHandler)
+void FactionPlayer::select_singular_entity(const sf::Window& window, const Camera& camera)
 {
     const glm::vec3 mousePosition = camera.getRayToGroundPlaneIntersection(window);
     const bool selectAll = mousePosition == m_previousMousePosition;
@@ -501,11 +502,11 @@ void FactionPlayer::onLeftClick(const sf::Window& window, const Camera& camera, 
     m_entitySelector.setStartingPosition(window, mousePosition);
     m_selectedEntities.clear();
 
-    if (const std::optional<int> workerIDSelected = instructWorkerToBuild(map, baseHandler))
+    if (m_plannedBuilding)
     {
         for (auto& entity : m_allEntities)
         {
-            if (entity->getID() == *workerIDSelected)
+            if (entity->getID() == m_plannedBuilding->getBuilderID())
             {
                 entity->setSelected(true);
                 m_selectedEntities.push_back(entity);

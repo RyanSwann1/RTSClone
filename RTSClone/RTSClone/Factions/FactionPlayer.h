@@ -55,11 +55,11 @@ private:
 	void on_entity_removal(const Entity& entity) override;
 
 	void instructWorkerReturnMinerals(const Map& map, const Headquarters& headquarters);
-	std::optional<int> instructWorkerToBuild(const Map& map, const BaseHandler& baseHandler);
+	void instructWorkerToBuild(const Map& map, const BaseHandler& baseHandler);
 	void moveSingularSelectedEntity(const glm::vec3& destination, const Map& map, Entity& selectedEntity, const BaseHandler& baseHandler) const;
 	void moveMultipleSelectedEntities(const glm::vec3& destination, const Map& map, const BaseHandler& baseHandler);
 
-	void onLeftClick(const sf::Window& window, const Camera& camera, const Map& map, const BaseHandler& baseHandler);
+	void select_singular_entity(const sf::Window& window, const Camera& camera);
 	void onRightClick(const sf::Window& window, const Camera& camera, const FactionHandler& factionHandler, const Map& map, 
 		const BaseHandler& baseHandler, const MiniMap& minimap, const glm::vec3& levelSize);
 
