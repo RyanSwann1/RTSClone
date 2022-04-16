@@ -1,12 +1,12 @@
 #pragma once
 
 #include "Faction.h"
-#include "Graph.h"
-#include "Timer.h"
-#include "AIOccupiedBases.h"
-#include "AIAction.h"
-#include "AIConstants.h"
-#include "AIUnattachedToBaseWorkers.h"
+#include "Core/Graph.h"
+#include "Core/Timer.h"
+#include "AI/AIOccupiedBases.h"
+#include "AI/AIAction.h"
+#include "AI/AIConstants.h"
+#include "AI/AIUnattachedToBaseWorkers.h"
 #include <queue>
 #include <vector>
 #include <functional>

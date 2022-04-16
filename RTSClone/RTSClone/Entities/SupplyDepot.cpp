@@ -1,10 +1,10 @@
 #include "SupplyDepot.h"
-#include "GameMessenger.h"
-#include "GameMessages.h"
-#include "Globals.h"
-#include "ModelManager.h"
+#include "Events/GameMessenger.h"
+#include "Events/GameMessages.h"
+#include "Core/Globals.h"
+#include "Graphics/ModelManager.h"
 #include "Factions/Faction.h"
-#include "Level.h"
+#include "Core/Level.h"
 
 SupplyDepot::SupplyDepot(const glm::vec3& startingPosition, const Faction& owningFaction)
 	: Entity(ModelManager::getInstance().getModel(SUPPLY_DEPOT_MODEL_NAME), startingPosition, eEntityType::SupplyDepot, 

@@ -18,6 +18,17 @@
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Core\Level.cpp" />
+    <ClCompile Include="Core\main.cpp" />
+    <ClCompile Include="Scene\GameObject.cpp" />
+    <ClCompile Include="Scene\GameObjectManager.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Core\Level.h" />
+    <ClInclude Include="Scene\GameObject.h" />
+    <ClInclude Include="Scene\GameObjectManager.h" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
@@ -71,16 +82,16 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <LinkIncremental>true</LinkIncremental>
+    <LinkIncremental>$(SolutionDir)Extern/assimp/lib;$(SolutionDir)Extern/SFML-2.5.1/lib;&lt;different options&gt;</LinkIncremental>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <LinkIncremental>false</LinkIncremental>
+    <LinkIncremental>$(SolutionDir)Extern/assimp/lib;$(SolutionDir)Extern/SFML-2.5.1/lib;&lt;different options&gt;</LinkIncremental>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <LinkIncremental>true</LinkIncremental>
+    <LinkIncremental>$(SolutionDir)Extern/assimp/lib;$(SolutionDir)Extern/SFML-2.5.1/lib;&lt;different options&gt;</LinkIncremental>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <LinkIncremental>false</LinkIncremental>
+    <LinkIncremental>$(SolutionDir)Extern/assimp/lib;$(SolutionDir)Extern/SFML-2.5.1/lib;&lt;different options&gt;</LinkIncremental>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -88,6 +99,8 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <AdditionalIncludeDirectories>$(SolutionDir)Extern/assimp/include;$(SolutionDir)Extern;$(SolutionDir)Extern/SFML-2.5.1/include;</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -102,6 +115,8 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <AdditionalIncludeDirectories>$(SolutionDir)Extern/assimp/include;$(SolutionDir)Extern;$(SolutionDir)Extern/SFML-2.5.1/include;</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -116,8 +131,9 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>RENDER_AABB;LEVEL_EDITOR;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)..\Shared\assimp\include;$(ProjectDir)..\Shared\SFML-2.5.1\include;$(ProjectDir)..\Shared</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)Extern/assimp/include;$(SolutionDir)Extern;$(SolutionDir)Extern/SFML-2.5.1/include;$(ProjectDir);$(ProjectDir)..\Shared\assimp\include;$(ProjectDir)..\Shared\SFML-2.5.1\include;$(ProjectDir)..\Shared</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -134,6 +150,8 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <AdditionalIncludeDirectories>$(SolutionDir)Extern/assimp/include;$(SolutionDir)Extern;$(SolutionDir)Extern/SFML-2.5.1/include;</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -142,73 +160,6 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
   </ItemDefinitionGroup>
-  <ItemGroup>
-    <ClCompile Include="..\Shared\AABB.cpp" />
-    <ClCompile Include="..\Shared\Base.cpp" />
-    <ClCompile Include="..\Shared\Camera.cpp" />
-    <ClCompile Include="..\Shared\FactionController.cpp" />
-    <ClCompile Include="..\Shared\glad.c" />
-    <ClCompile Include="..\Shared\imgui\imgui.cpp" />
-    <ClCompile Include="..\Shared\imgui\imgui_demo.cpp" />
-    <ClCompile Include="..\Shared\imgui\imgui_draw.cpp" />
-    <ClCompile Include="..\Shared\imgui\imgui_widgets.cpp" />
-    <ClCompile Include="..\Shared\imgui_impl\imgui_impl_opengl3.cpp" />
-    <ClCompile Include="..\Shared\imgui_impl\imgui_impl_sfml.cpp" />
-    <ClCompile Include="..\Shared\LevelFileHandler.cpp" />
-    <ClCompile Include="..\Shared\Mesh.cpp" />
-    <ClCompile Include="..\Shared\Mineral.cpp" />
-    <ClCompile Include="..\Shared\Model.cpp" />
-    <ClCompile Include="..\Shared\ModelLoader.cpp" />
-    <ClCompile Include="..\Shared\ModelManager.cpp" />
-    <ClCompile Include="..\Shared\OpenGLResource.cpp" />
-    <ClCompile Include="..\Shared\Quad.cpp" />
-    <ClCompile Include="..\Shared\RenderPrimitiveMesh.cpp" />
-    <ClCompile Include="..\Shared\ShaderHandler.cpp" />
-    <ClCompile Include="GameObjectManager.cpp" />
-    <ClCompile Include="GameObject.cpp" />
-    <ClCompile Include="Level.cpp" />
-    <ClCompile Include="main.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="..\Shared\AABB.h" />
-    <ClInclude Include="..\Shared\Base.h" />
-    <ClInclude Include="..\Shared\Camera.h" />
-    <ClInclude Include="..\Shared\FactionController.h" />
-    <ClInclude Include="..\Shared\glad.h" />
-    <ClInclude Include="..\Shared\Globals.h" />
-    <ClInclude Include="..\Shared\imgui\imconfig.h" />
-    <ClInclude Include="..\Shared\imgui\imgui.h" />
-    <ClInclude Include="..\Shared\imgui\imgui_internal.h" />
-    <ClInclude Include="..\Shared\imgui\imstb_rectpack.h" />
-    <ClInclude Include="..\Shared\imgui\imstb_textedit.h" />
-    <ClInclude Include="..\Shared\imgui\imstb_truetype.h" />
-    <ClInclude Include="..\Shared\imgui_impl\imgui_impl_opengl3.h" />
-    <ClInclude Include="..\Shared\imgui_impl\imgui_impl_sfml.h" />
-    <ClInclude Include="..\Shared\imgui_impl\imgui_wrapper.h" />
-    <ClInclude Include="..\Shared\khrplatform.h" />
-    <ClInclude Include="..\Shared\LevelFileHandler.h" />
-    <ClInclude Include="..\Shared\Mesh.h" />
-    <ClInclude Include="..\Shared\Mineral.h" />
-    <ClInclude Include="..\Shared\Model.h" />
-    <ClInclude Include="..\Shared\ModelLoader.h" />
-    <ClInclude Include="..\Shared\ModelManager.h" />
-    <ClInclude Include="..\Shared\OpenGLResource.h" />
-    <ClInclude Include="..\Shared\Quad.h" />
-    <ClInclude Include="..\Shared\RenderPrimitiveMesh.h" />
-    <ClInclude Include="..\Shared\ShaderHandler.h" />
-    <ClInclude Include="GameObjectManager.h" />
-    <ClInclude Include="GameObject.h" />
-    <ClInclude Include="Level.h" />
-    <ClInclude Include="Notes.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="..\Shared\Shaders\DebugFragmentShader.glsl" />
-    <None Include="..\Shared\Shaders\DebugVertexShader.glsl" />
-    <None Include="..\Shared\Shaders\FragmentShader.glsl" />
-    <None Include="..\Shared\Shaders\WidgetFragmentShader.glsl" />
-    <None Include="..\Shared\Shaders\WidgetVertexShader.glsl" />
-    <None Include="..\Shared\Shaders\VertexShader.glsl" />
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

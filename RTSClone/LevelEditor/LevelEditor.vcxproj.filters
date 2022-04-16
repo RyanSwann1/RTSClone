@@ -24,192 +24,28 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\Shared\imgui\imgui_widgets.cpp">
-      <Filter>imgui</Filter>
+    <ClCompile Include="Core\Level.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\Shared\imgui\imgui.cpp">
-      <Filter>imgui</Filter>
+    <ClCompile Include="Core\main.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\Shared\imgui\imgui_demo.cpp">
-      <Filter>imgui</Filter>
+    <ClCompile Include="Scene\GameObject.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\Shared\imgui\imgui_draw.cpp">
-      <Filter>imgui</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Shared\imgui_impl\imgui_impl_opengl3.cpp">
-      <Filter>imgui</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Shared\imgui_impl\imgui_impl_sfml.cpp">
-      <Filter>imgui</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Shared\AABB.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Shared\Camera.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Shared\glad.c">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Shared\LevelFileHandler.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="main.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Shared\Mesh.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Shared\Model.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Shared\ModelLoader.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Shared\ModelManager.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Shared\ShaderHandler.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Shared\FactionController.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="Level.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="GameObject.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="GameObjectManager.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Shared\Quad.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Shared\Mineral.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Shared\Base.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Shared\OpenGLResource.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Shared\RenderPrimitiveMesh.cpp">
-      <Filter>src</Filter>
+    <ClCompile Include="Scene\GameObjectManager.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\Shared\imgui\imstb_truetype.h">
-      <Filter>imgui</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Shared\imgui_impl\imgui_impl_opengl3.h">
-      <Filter>imgui</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Shared\imgui_impl\imgui_impl_sfml.h">
-      <Filter>imgui</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Shared\imgui\imgui_internal.h">
-      <Filter>imgui</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Shared\imgui_impl\imgui_wrapper.h">
-      <Filter>imgui</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Shared\imgui\imstb_rectpack.h">
-      <Filter>imgui</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Shared\imgui\imstb_textedit.h">
-      <Filter>imgui</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Shared\imgui\imgui.h">
-      <Filter>imgui</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Shared\imgui\imconfig.h">
-      <Filter>imgui</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Shared\ShaderHandler.h">
-      <Filter>src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Shared\AABB.h">
-      <Filter>src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Shared\Camera.h">
-      <Filter>src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Shared\glad.h">
-      <Filter>src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Shared\Globals.h">
-      <Filter>src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Shared\khrplatform.h">
-      <Filter>src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Shared\LevelFileHandler.h">
-      <Filter>src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Shared\Mesh.h">
-      <Filter>src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Shared\Model.h">
-      <Filter>src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Shared\ModelLoader.h">
-      <Filter>src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Shared\ModelManager.h">
-      <Filter>src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Shared\FactionController.h">
-      <Filter>src</Filter>
-    </ClInclude>
-    <ClInclude Include="Notes.h">
+    <ClInclude Include="Core\Level.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Level.h">
-      <Filter>src</Filter>
+    <ClInclude Include="Scene\GameObject.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="GameObject.h">
-      <Filter>src</Filter>
+    <ClInclude Include="Scene\GameObjectManager.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="GameObjectManager.h">
-      <Filter>src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Shared\Quad.h">
-      <Filter>src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Shared\Mineral.h">
-      <Filter>src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Shared\Base.h">
-      <Filter>src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Shared\OpenGLResource.h">
-      <Filter>src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Shared\RenderPrimitiveMesh.h">
-      <Filter>src</Filter>
-    </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="..\Shared\Shaders\VertexShader.glsl">
-      <Filter>shaders</Filter>
-    </None>
-    <None Include="..\Shared\Shaders\DebugFragmentShader.glsl">
-      <Filter>shaders</Filter>
-    </None>
-    <None Include="..\Shared\Shaders\DebugVertexShader.glsl">
-      <Filter>shaders</Filter>
-    </None>
-    <None Include="..\Shared\Shaders\FragmentShader.glsl">
-      <Filter>shaders</Filter>
-    </None>
-    <None Include="..\Shared\Shaders\WidgetVertexShader.glsl">
-      <Filter>shaders</Filter>
-    </None>
-    <None Include="..\Shared\Shaders\WidgetFragmentShader.glsl">
-      <Filter>shaders</Filter>
-    </None>
   </ItemGroup>
 </Project>

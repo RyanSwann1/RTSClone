@@ -6,12 +6,12 @@
 #include "Entities/Unit.h"
 #include "Entities/Turret.h"
 #include "Entities/Laboratory.h"
-#include "PathFinding.h"
+#include "Core/PathFinding.h"
 #include "Entities/SupplyDepot.h"
-#include "Mineral.h"
-#include "FactionController.h"
-#include "GameMessages.h"
-#include "Map.h"
+#include "Core/Mineral.h"
+#include "Core/FactionController.h"
+#include "Events/GameMessages.h"
+#include "Core/Map.h"
 #include <vector>
 #include <functional>
 #include <optional>

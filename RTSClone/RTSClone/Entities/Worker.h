@@ -2,8 +2,8 @@
 
 #include "Entity.h"
 #include "Movement.h"
-#include "Timer.h"
-#include "AdjacentPositions.h"
+#include "Core/Timer.h"
+#include "Model/AdjacentPositions.h"
 #include "TargetEntity.h"
 #include <queue>
 #include <vector>

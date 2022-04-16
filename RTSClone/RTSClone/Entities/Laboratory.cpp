@@ -1,13 +1,13 @@
 #include "Laboratory.h"
-#include "ModelManager.h"
-#include "Globals.h"
-#include "GameMessenger.h"
-#include "GameMessages.h"
+#include "Graphics/ModelManager.h"
+#include "Core/Globals.h"
+#include "Events/GameMessenger.h"
+#include "Events/GameMessages.h"
 #include "Factions/Faction.h"
-#include "ShaderHandler.h"
-#include "Camera.h"
-#include "GameEvents.h"
-#include "Level.h"
+#include "Graphics/ShaderHandler.h"
+#include "Core/Camera.h"
+#include "Events/GameEvents.h"
+#include "Core/Level.h"
 
 namespace
 {

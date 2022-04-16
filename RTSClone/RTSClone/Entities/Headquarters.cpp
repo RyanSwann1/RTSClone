@@ -1,8 +1,8 @@
 #include "Headquarters.h"
-#include "ModelManager.h"
-#include "Globals.h"
+#include "Graphics/ModelManager.h"
+#include "Core/Globals.h"
 #include "Factions/Faction.h"
-#include "Level.h"
+#include "Core/Level.h"
 
 namespace
 {

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "FactionController.h"
+#include "Core/FactionController.h"
 
 struct TargetEntity
 {

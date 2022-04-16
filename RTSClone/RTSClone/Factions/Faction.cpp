@@ -1,11 +1,11 @@
 #include "Faction.h"
-#include "ModelManager.h"
-#include "GameEvents.h"
-#include "TypeComparison.h"
+#include "Graphics/ModelManager.h"
+#include "Events/GameEvents.h"
+#include "Core/TypeComparison.h"
 #include "FactionHandler.h"
-#include "Level.h"
-#include "GameMessages.h"
-#include "GameMessenger.h"
+#include "Core/Level.h"
+#include "Events/GameMessages.h"
+#include "Events/GameMessenger.h"
 
 namespace
 {

@@ -1,9 +1,9 @@
 #include "Barracks.h"
-#include "ModelManager.h"
-#include "Globals.h"
+#include "Graphics/ModelManager.h"
+#include "Core/Globals.h"
 #include "Factions/Faction.h"
-#include "Map.h"
-#include "Level.h"
+#include "Core/Map.h"
+#include "Core/Level.h"
 
 namespace
 {
