@@ -307,7 +307,7 @@ void Level::renderPlayerPlannedBuilding(ShaderHandler& shaderHandler) const
 {
 	if (const FactionPlayer* factionPlayer = m_factionHandler.getFactionPlayer())
 	{
-		factionPlayer->renderPlannedBuilding(shaderHandler, m_baseHandler, m_map);
+		factionPlayer->renderPlannedBuilding(shaderHandler, m_map);
 	}
 }
 

@@ -8,7 +8,7 @@
 
 namespace
 {
-	const std::string SHADER_DIRECTORY = "../Shared/Shaders/";
+	const std::string SHADER_DIRECTORY = "../Data/Game/Shaders/";
 	const int INVALID_UNIFORM_LOCATION = -1;
 
 	bool parseShaderFromFile(const std::string& filePath, std::string& shaderSource)

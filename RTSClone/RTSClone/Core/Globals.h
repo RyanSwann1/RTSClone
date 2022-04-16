@@ -16,7 +16,6 @@
 
 namespace Globals
 { 
-	inline const std::string SHARED_FILE_DIRECTORY = "../Shared/";
 	inline const std::string TEXT_HEADER_BEGINNING = "#";
 	inline const std::string TEXT_HEADER_SCENERY = TEXT_HEADER_BEGINNING + "Scenery";
 	inline const std::string TEXT_HEADER_MAP_SIZE = TEXT_HEADER_BEGINNING + "Map Size";

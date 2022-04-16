@@ -21,7 +21,7 @@
 
 namespace
 {
-	const std::string LEVELS_FILE_DIRECTORY = Globals::SHARED_FILE_DIRECTORY + "Levels/";
+	const std::string LEVELS_FILE_DIRECTORY = "../Data/Game/Levels/";
 	const std::string LEVELS_FILE_NAME = "Levels.txt";
 }
 
@@ -283,7 +283,7 @@ glm::ivec2 LevelFileHandler::loadMapSizeFromFile(std::ifstream& file)
 #ifdef GAME
 std::optional<LevelDetailsFromFile> LevelFileHandler::loadLevelFromFile(std::string_view fileName)
 {
-	std::ifstream file(Globals::SHARED_FILE_DIRECTORY + LEVELS_FILE_DIRECTORY + fileName.data());
+	std::ifstream file(LEVELS_FILE_DIRECTORY + fileName.data());
 	if (!file.is_open())
 	{
 		return {};
@@ -306,7 +306,7 @@ std::optional<LevelDetailsFromFile> LevelFileHandler::loadLevelFromFile(std::str
 
 std::array<std::string, Globals::MAX_LEVELS> LevelFileHandler::loadLevelNames()
 {
-	std::ifstream file(Globals::SHARED_FILE_DIRECTORY + LEVELS_FILE_DIRECTORY + LEVELS_FILE_NAME);
+	std::ifstream file(LEVELS_FILE_DIRECTORY + LEVELS_FILE_NAME);
 	assert(file.is_open());
 	if (!file.is_open())
 	{

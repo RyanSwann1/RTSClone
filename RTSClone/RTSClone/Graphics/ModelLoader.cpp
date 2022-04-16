@@ -9,7 +9,7 @@
 
 namespace
 {
-    const std::string MODELS_DIRECTORY = "../Shared/models/";
+    const std::string MODELS_DIRECTORY = "../Data/Game/Models/";
 }
 
 void processNode(aiNode& node, const aiScene& scene, std::vector<Mesh>& meshes, const std::string& directory);
