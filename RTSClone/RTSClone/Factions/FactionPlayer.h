@@ -13,13 +13,13 @@ class FactionPlayerPlannedBuilding
 public:
 	FactionPlayerPlannedBuilding(const PlayerActivatePlannedBuildingEvent& gameEvent, const glm::vec3& position);
 
-	bool isOnValidPosition(const BaseHandler& baseHandler, const Map& map) const;
+	bool isOnValidPosition(const Map& map) const;
 	const glm::vec3& getPosition() const;
 	int getBuilderID() const;
 	eEntityType getEntityType() const;
 
 	void handleInput(const sf::Event& event, const Camera& camera, const sf::Window& window, const Map& map);
-	void render(ShaderHandler& shaderHandler, const BaseHandler& baseHandler, const Map& map) const;
+	void render(ShaderHandler& shaderHandler, const Map& map) const;
 
 private:
 	std::reference_wrapper<const Model> m_model;
@@ -41,7 +41,7 @@ public:
 	void handleEvent(const GameEvent& gameEvent, const Map& map, const FactionHandler& factionHandler, const BaseHandler& baseHandler) override;
 	void update(float deltaTime, const Map& map, const FactionHandler& factionHandler, const BaseHandler& baseHandler) override;
 	void render(ShaderHandler& shaderHandler) const override;
-	void renderPlannedBuilding(ShaderHandler& shaderHandler, const BaseHandler& baseHandler, const Map& map) const;
+	void renderPlannedBuilding(ShaderHandler& shaderHandler, const Map& map) const;
 	void renderEntitySelector(const sf::Window& window, ShaderHandler& shaderHandler) const;
 
 private:
@@ -53,13 +53,11 @@ private:
 	std::vector<Entity*> m_selectedEntities							= {};
 
 	void on_entity_removal(const Entity& entity) override;
-
 	void instructWorkerReturnMinerals(const Map& map, const Headquarters& headquarters);
-	void instructWorkerToBuild(const Map& map, const BaseHandler& baseHandler);
+	void build_planned_building(const Map& map, const BaseHandler& baseHandler);
 	void moveSingularSelectedEntity(const glm::vec3& destination, const Map& map, Entity& selectedEntity, const BaseHandler& baseHandler) const;
 	void moveMultipleSelectedEntities(const glm::vec3& destination, const Map& map, const BaseHandler& baseHandler);
-
-	void select_singular_entity(const sf::Window& window, const Camera& camera);
+	void select_singular_entity(const sf::Window& window, const glm::vec3& position);
 	void onRightClick(const sf::Window& window, const Camera& camera, const FactionHandler& factionHandler, const Map& map, 
 		const BaseHandler& baseHandler, const MiniMap& minimap, const glm::vec3& levelSize);
 

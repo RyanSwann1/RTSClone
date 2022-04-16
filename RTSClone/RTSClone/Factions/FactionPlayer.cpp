@@ -101,13 +101,13 @@ void FactionPlayerPlannedBuilding::handleInput(const sf::Event& event, const Cam
     }
 }
 
-void FactionPlayerPlannedBuilding::render(ShaderHandler& shaderHandler, const BaseHandler& baseHandler, const Map& map) const
+void FactionPlayerPlannedBuilding::render(ShaderHandler& shaderHandler, const Map& map) const
 {
-    glm::vec3 color = (isOnValidPosition(baseHandler, map) ? VALID_PLANNED_BUILDING_COLOR : INVALID_PLANNED_BUILDING_COLOR);
+    glm::vec3 color = (isOnValidPosition(map) ? VALID_PLANNED_BUILDING_COLOR : INVALID_PLANNED_BUILDING_COLOR);
     m_model.get().render(shaderHandler, m_position, color, PLANNED_BUILDING_OPACITY);
 }
 
-bool FactionPlayerPlannedBuilding::isOnValidPosition(const BaseHandler& baseHandler, const Map& map) const
+bool FactionPlayerPlannedBuilding::isOnValidPosition(const Map& map) const
 {
     AABB buildingAABB(m_position, ModelManager::getInstance().getModel(m_entityType));
     assert(Globals::isOnMiddlePosition(m_position) && map.isWithinBounds(buildingAABB));
@@ -133,8 +133,14 @@ void FactionPlayer::handleInput(const sf::Event& currentSFMLEvent, const sf::Win
     case sf::Event::MouseButtonPressed:
         if (currentSFMLEvent.mouseButton.button == sf::Mouse::Left)
         {
-            instructWorkerToBuild(map, baseHandler);
-            select_singular_entity(window, camera);
+            if (m_plannedBuilding)
+            {
+                build_planned_building(map, baseHandler);
+            }
+            else
+            {
+                select_singular_entity(window, camera.getRayToGroundPlaneIntersection(window));
+            }
         }
         else if (currentSFMLEvent.mouseButton.button == sf::Mouse::Right)
         {
@@ -249,11 +255,11 @@ void FactionPlayer::render(ShaderHandler& shaderHandler) const
     Faction::render(shaderHandler);
 }
 
-void FactionPlayer::renderPlannedBuilding(ShaderHandler& shaderHandler, const BaseHandler& baseHandler, const Map& map) const
+void FactionPlayer::renderPlannedBuilding(ShaderHandler& shaderHandler, const Map& map) const
 {
     if (m_plannedBuilding)
     {
-        m_plannedBuilding->render(shaderHandler, baseHandler, map);
+        m_plannedBuilding->render(shaderHandler, map);
     }
 }
 
@@ -294,49 +300,38 @@ void FactionPlayer::instructWorkerReturnMinerals(const Map& map, const Headquart
     }
 }
 
-void FactionPlayer::instructWorkerToBuild(const Map& map, const BaseHandler& baseHandler)
+void FactionPlayer::build_planned_building(const Map& map, const BaseHandler& baseHandler)
 {
-    if (m_plannedBuilding)
+    assert(m_plannedBuilding);
+    if (!m_plannedBuilding->isOnValidPosition(map)
+        || !isAffordable(m_plannedBuilding->getEntityType()))
     {
-        const int workerID = m_plannedBuilding->getBuilderID();
-        if (m_plannedBuilding->isOnValidPosition(baseHandler, map) &&
-            isAffordable(m_plannedBuilding->getEntityType()))
+        m_plannedBuilding.reset();
+        return;
+    }
+
+    const auto selectedWorker = std::find_if(m_workers.begin(), m_workers.end(), [id = m_plannedBuilding->getBuilderID()](auto& worker)
+    {
+        return worker.getID() == id;
+    });
+    assert(selectedWorker != m_workers.cend());
+    if (m_plannedBuilding->getEntityType() == eEntityType::Headquarters)
+    {
+        if (const Base* base = baseHandler.getBase(m_plannedBuilding->getPosition()))
         {
-            auto selectedWorker = std::find_if(m_workers.begin(), m_workers.end(), [workerID](auto& worker)
+            if ((*selectedWorker).build(*this, base->getCenteredPosition(), map, m_plannedBuilding->getEntityType()))
             {
-                return worker.getID() == workerID;
-            });
-            assert(selectedWorker != m_workers.cend());
-            if (selectedWorker != m_workers.end())
-            {
-				if (m_plannedBuilding->getEntityType() == eEntityType::Headquarters)
-				{
-                    if (const Base* base = baseHandler.getBase(m_plannedBuilding->getPosition()))
-                    {
-                        if ((*selectedWorker).build(*this, base->getCenteredPosition(), map, m_plannedBuilding->getEntityType()))
-                        {
-                            m_plannedBuilding.reset();
-                        }
-                    }
-				}
-                else
-                {
-					if ((*selectedWorker).build(*this, m_plannedBuilding->getPosition(), map, m_plannedBuilding->getEntityType()))
-					{
-						m_plannedBuilding.reset();
-					}
-                }
+                m_plannedBuilding.reset();
             }
         }
-        else if (!isAffordable(m_plannedBuilding->getEntityType()))
+    }
+    else
+    {
+        if ((*selectedWorker).build(*this, m_plannedBuilding->getPosition(), map, m_plannedBuilding->getEntityType()))
         {
             m_plannedBuilding.reset();
         }
-
-       // return workerID;
     }
-
-    //return {};
 }
 
 void FactionPlayer::moveSingularSelectedEntity(const glm::vec3& destination, const Map& map, Entity& selectedEntity, const BaseHandler& baseHandler) const
@@ -494,12 +489,11 @@ void FactionPlayer::moveMultipleSelectedEntities(const glm::vec3& destination, c
     }
 }
 
-void FactionPlayer::select_singular_entity(const sf::Window& window, const Camera& camera)
+void FactionPlayer::select_singular_entity(const sf::Window& window, const glm::vec3& position)
 {
-    const glm::vec3 mousePosition = camera.getRayToGroundPlaneIntersection(window);
-    const bool selectAll = mousePosition == m_previousMousePosition;
-    m_previousMousePosition = mousePosition;
-    m_entitySelector.setStartingPosition(window, mousePosition);
+    const bool selectAll = position == m_previousMousePosition;
+    m_previousMousePosition = position;
+    m_entitySelector.setStartingPosition(window, position);
     m_selectedEntities.clear();
 
     if (m_plannedBuilding)
@@ -517,13 +511,13 @@ void FactionPlayer::select_singular_entity(const sf::Window& window, const Camer
             }
         }
     }
-    else if(selectEntity<Unit>(m_units, mousePosition, selectAll, &m_selectedEntities) 
-        || selectEntity<Worker>(m_workers, mousePosition, selectAll, &m_selectedEntities)
-        || selectEntity<Barracks>(m_barracks, mousePosition)
-        || selectEntity<Turret>(m_turrets, mousePosition)
-        || selectEntity<SupplyDepot>(m_supplyDepots, mousePosition)
-        || selectEntity<Headquarters>(m_headquarters, mousePosition)
-        || selectEntity<Laboratory>(m_laboratories, mousePosition))
+    else if(selectEntity<Unit>(m_units, position, selectAll, &m_selectedEntities) 
+        || selectEntity<Worker>(m_workers, position, selectAll, &m_selectedEntities)
+        || selectEntity<Barracks>(m_barracks, position)
+        || selectEntity<Turret>(m_turrets, position)
+        || selectEntity<SupplyDepot>(m_supplyDepots, position)
+        || selectEntity<Headquarters>(m_headquarters, position)
+        || selectEntity<Laboratory>(m_laboratories, position))
     {}
     else
     {
