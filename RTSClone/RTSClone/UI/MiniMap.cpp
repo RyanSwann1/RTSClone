@@ -41,6 +41,19 @@ MiniMap::MiniMap()
 	m_mouseButtonPressed(false)
 {}
 
+glm::vec3 MiniMap::get_relative_intersecting_position(const sf::Window& window, const glm::vec3& levelSize) const
+{
+	assert(isIntersecting(window));
+	glm::vec3 position(0.f);
+	glm::vec2 mousePosition = { sf::Mouse::getPosition(window).x, window.getSize().y - sf::Mouse::getPosition(window).y };
+	position = { mousePosition.y / (getPosition().y + getSize().y) * levelSize.z,
+		Globals::GROUND_HEIGHT, mousePosition.x / (getPosition().x + getSize().x) * levelSize.x };
+	position.x -= getPosition().x;
+	position.z -= getPosition().y;
+
+	return position;
+}
+
 glm::vec2 MiniMap::getPosition() const
 {
 	return m_position;

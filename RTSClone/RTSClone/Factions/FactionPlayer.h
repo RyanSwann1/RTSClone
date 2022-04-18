@@ -58,8 +58,14 @@ private:
 	void moveSingularSelectedEntity(const glm::vec3& destination, const Map& map, Entity& selectedEntity, const BaseHandler& baseHandler) const;
 	void moveMultipleSelectedEntities(const glm::vec3& destination, const Map& map, const BaseHandler& baseHandler);
 	void select_singular_entity(const sf::Window& window, const glm::vec3& position);
-	void onRightClick(const sf::Window& window, const Camera& camera, const FactionHandler& factionHandler, const Map& map, 
-		const BaseHandler& baseHandler, const MiniMap& minimap, const glm::vec3& levelSize);
+	void onRightClick(const glm::vec3& position, const Camera& camera, const FactionHandler& factionHandler, const Map& map, 
+		const BaseHandler& baseHandler);
+
+	void attack_entity(const glm::vec3& position, const FactionHandler& factionHandler, const Map& map);
+	void set_building_waypoints(const glm::vec3& position, const Map& map);
+	void return_selected_workers_to_return_minerals(const glm::vec3& position, const Map& map);
+	void selected_workers_harvest(const glm::vec3& destination, const Map& map, const BaseHandler& baseHandler);
+	void repair_entity(const glm::vec3& position, const Map& map);
 
 	template <typename T>
 	bool selectEntity(std::vector<T>& entities, const glm::vec3& mouseToGroundPosition, bool selectAll = false,

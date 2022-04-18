@@ -16,6 +16,7 @@ public:
 	MiniMap(MiniMap&&) noexcept = default;
 	MiniMap& operator=(MiniMap&&) noexcept = default;
 
+	glm::vec3 get_relative_intersecting_position(const sf::Window& window, const glm::vec3& levelSize) const;
 	glm::vec2 getPosition() const;
 	glm::vec2 getSize() const;
 	bool isIntersecting(const sf::Window& window) const;
