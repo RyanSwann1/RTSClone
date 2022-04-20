@@ -57,7 +57,8 @@ private:
 	void build_planned_building(const Map& map, const BaseHandler& baseHandler);
 	void moveSingularSelectedEntity(const glm::vec3& destination, const Map& map, Entity& selectedEntity, const BaseHandler& baseHandler) const;
 	void moveMultipleSelectedEntities(const glm::vec3& destination, const Map& map, const BaseHandler& baseHandler);
-	void select_singular_entity(const sf::Window& window, const glm::vec3& position);
+	void select_singular_entity(const glm::vec3& position);
+	void select_entity_all_of_type(const glm::vec3& position);
 	void onRightClick(const glm::vec3& position, const Camera& camera, const FactionHandler& factionHandler, const Map& map, 
 		const BaseHandler& baseHandler);
 

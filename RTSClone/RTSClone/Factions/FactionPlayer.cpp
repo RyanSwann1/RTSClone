@@ -20,6 +20,7 @@ namespace
     constexpr float PLANNED_BUILDING_OPACITY = 0.3f;
     constexpr glm::vec3 VALID_PLANNED_BUILDING_COLOR{ 0.0f, 1.0f, 0.0f };
     constexpr glm::vec3 INVALID_PLANNED_BUILDING_COLOR{ 1.0f, 0.0f, 0.0f };
+    const TypeComparison<eEntityType, 2> SELECT_ALL_SELECTABLE_TYPES({ eEntityType::Unit, eEntityType::Worker });
 
     glm::vec3 getAveragePosition(std::vector<Entity*>& selectedEntities)
     {
@@ -108,13 +109,25 @@ void FactionPlayer::handleInput(const sf::Event& currentSFMLEvent, const sf::Win
     case sf::Event::MouseButtonPressed:
         if (currentSFMLEvent.mouseButton.button == sf::Mouse::Left)
         {
+            const glm::vec3 mousePosition = camera.getRayToGroundPlaneIntersection(window);
+            m_entitySelector.setStartingPosition(window, mousePosition);
+            m_selectedEntities.clear();
             if (m_plannedBuilding)
             {
                 build_planned_building(map, baseHandler);
             }
             else
             {
-                select_singular_entity(window, camera.getRayToGroundPlaneIntersection(window));
+                if (mousePosition == m_previousMousePosition)
+                {
+                    select_entity_all_of_type(mousePosition);
+                }
+                else
+                {
+                    select_singular_entity(mousePosition);
+                }
+                
+                m_previousMousePosition = mousePosition;
             }
         }
         else if (currentSFMLEvent.mouseButton.button == sf::Mouse::Right)
@@ -476,42 +489,49 @@ void FactionPlayer::moveMultipleSelectedEntities(const glm::vec3& destination, c
     }
 }
 
-void FactionPlayer::select_singular_entity(const sf::Window& window, const glm::vec3& position)
+void FactionPlayer::select_singular_entity(const glm::vec3& position)
 {
-    const bool selectAll = position == m_previousMousePosition;
-    m_previousMousePosition = position;
-    m_entitySelector.setStartingPosition(window, position);
-    m_selectedEntities.clear();
+    for (auto& entity : m_allEntities)
+    {
+        entity->setSelected(false);
+    }
 
-    if (m_plannedBuilding)
+    auto selectedEntity = std::find_if(m_allEntities.cbegin(), m_allEntities.cend(), [&position](auto& entity)
+    {
+        return entity->getAABB().contains(position);
+    });
+    if (selectedEntity != m_allEntities.cend())
+    {
+        (*selectedEntity)->setSelected(true);
+    }
+}
+
+void FactionPlayer::select_entity_all_of_type(const glm::vec3& position)
+{
+    for (auto& entity : m_allEntities)
+    {
+        entity->setSelected(false);
+    }
+
+    auto selectedEntity = std::find_if(m_allEntities.cbegin(), m_allEntities.cend(), [&position](auto& entity)
+    {
+        return entity->getAABB().contains(position);
+    });
+    if (selectedEntity == m_allEntities.cend())
+    {
+        return;
+    }
+
+    if (SELECT_ALL_SELECTABLE_TYPES.isMatch((*selectedEntity)->getEntityType()))
     {
         for (auto& entity : m_allEntities)
         {
-            if (entity->getID() == m_plannedBuilding->getBuilderID())
-            {
-                entity->setSelected(true);
-                m_selectedEntities.push_back(entity);
-            }
-            else
-            {
-                entity->setSelected(false);
-            }
+            entity->setSelected((*selectedEntity)->getEntityType() == entity->getEntityType());
         }
     }
-    else if(selectEntity<Unit>(m_units, position, selectAll, &m_selectedEntities) 
-        || selectEntity<Worker>(m_workers, position, selectAll, &m_selectedEntities)
-        || selectEntity<Barracks>(m_barracks, position)
-        || selectEntity<Turret>(m_turrets, position)
-        || selectEntity<SupplyDepot>(m_supplyDepots, position)
-        || selectEntity<Headquarters>(m_headquarters, position)
-        || selectEntity<Laboratory>(m_laboratories, position))
-    {}
     else
     {
-        for (auto& entity : m_allEntities)
-        {
-            entity->setSelected(false);
-        }
+        (*selectedEntity)->setSelected(true);
     }
 }
 
@@ -585,11 +605,11 @@ void FactionPlayer::set_building_waypoints(const glm::vec3& position, const Map&
         }
     }
 
-    for (auto& headquarters : m_headquarters)
+    for (auto& barracks : m_barracks)
     {
-        if (headquarters.isSelected())
+        if (barracks.isSelected())
         {
-            headquarters.set_waypoint_position(map, position);
+            barracks.set_waypoint_position(map, position);
         }
     }
 }
