@@ -42,6 +42,7 @@ public:
 	const std::vector<glm::vec3>& getMovementPath() const;
 	float getAttackRange() const;
 	eUnitState getCurrentState() const;
+	bool is_singular_selectable_only() const override;
 
 	void add_destination(const glm::vec3& position, const Map& map);
 	void clear_destinations();

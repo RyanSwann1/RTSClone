@@ -58,6 +58,7 @@ public:
 	bool isHoldingResources() const;
 	bool isRepairing() const;
 	bool isInBuildQueue(eEntityType entityType) const;
+	bool is_singular_selectable_only() const override;
 	int extractResources();	
 
 	void add_destination(const glm::vec3& position, const Map& map);

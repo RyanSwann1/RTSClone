@@ -20,7 +20,6 @@ namespace
     constexpr float PLANNED_BUILDING_OPACITY = 0.3f;
     constexpr glm::vec3 VALID_PLANNED_BUILDING_COLOR{ 0.0f, 1.0f, 0.0f };
     constexpr glm::vec3 INVALID_PLANNED_BUILDING_COLOR{ 1.0f, 0.0f, 0.0f };
-    const TypeComparison<eEntityType, 2> SELECT_ALL_SELECTABLE_TYPES({ eEntityType::Unit, eEntityType::Worker });
 
     glm::vec3 getAveragePosition(std::vector<Entity*>& selectedEntities)
     {
@@ -153,10 +152,10 @@ void FactionPlayer::handleInput(const sf::Event& currentSFMLEvent, const sf::Win
         {
             if (m_entitySelector.isActive() && !m_selectedEntities.empty())
             {
-                deselectEntities<Headquarters>(m_headquarters);
-                deselectEntities<Barracks>(m_barracks);
-                deselectEntities<Turret>(m_turrets);
-                deselectEntities<SupplyDepot>(m_supplyDepots);
+                for (auto& entity : m_allEntities)
+                {
+                    entity->setSelected(!entity->is_singular_selectable_only());
+                }
             }
 
             m_entitySelector.reset();
@@ -235,8 +234,14 @@ void FactionPlayer::update(float deltaTime, const Map& map, const FactionHandler
     if (m_entitySelector.isActive())
     {
         m_selectedEntities.clear();
-        selectEntities<Worker>(m_workers, &m_selectedEntities);
-        selectEntities<Unit>(m_units, &m_selectedEntities);
+        for (auto& entity : m_allEntities)
+        {
+            if (!entity->is_singular_selectable_only() 
+                && entity->setSelected(m_entitySelector.getAABB().contains(entity->getAABB())))
+            {
+                m_selectedEntities.push_back(entity);
+            }
+        }
         
         if (m_selectedEntities.size() == 1)
         {
@@ -522,11 +527,11 @@ void FactionPlayer::select_entity_all_of_type(const glm::vec3& position)
         return;
     }
 
-    if (SELECT_ALL_SELECTABLE_TYPES.isMatch((*selectedEntity)->getEntityType()))
+    if (!(*selectedEntity)->is_singular_selectable_only())
     {
-        for (auto& entity : m_allEntities)
+        for (const auto& entity : m_allEntities)
         {
-            entity->setSelected((*selectedEntity)->getEntityType() == entity->getEntityType());
+            entity->setSelected(entity->getEntityType() == (*selectedEntity)->getEntityType());
         }
     }
     else

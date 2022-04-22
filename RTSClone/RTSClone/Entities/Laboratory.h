@@ -15,6 +15,7 @@ public:
 	~Laboratory();
 
 	int getShieldUpgradeCounter() const;
+	bool is_singular_selectable_only() const override;
 
 	void handleEvent(IncreaseFactionShieldEvent gameEvent);
 	void update(float deltaTime);

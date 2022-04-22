@@ -22,6 +22,11 @@ SupplyDepot::~SupplyDepot()
 	}
 }
 
+bool SupplyDepot::is_singular_selectable_only() const
+{
+	return true;
+}
+
 void SupplyDepot::update(float deltaTime)
 {
 	Entity::update(deltaTime);

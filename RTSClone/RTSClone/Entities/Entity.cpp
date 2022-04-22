@@ -260,7 +260,6 @@ bool Entity::isSelected() const
 bool Entity::setSelected(bool selected)
 {
 	m_selected = selected;
-
 	return m_selected;
 }
 

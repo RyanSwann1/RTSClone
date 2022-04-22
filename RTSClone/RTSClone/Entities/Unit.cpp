@@ -77,6 +77,11 @@ eUnitState Unit::getCurrentState() const
 	return m_currentState;
 }
 
+bool Unit::is_singular_selectable_only() const
+{
+	return false;
+}
+
 void Unit::add_destination(const glm::vec3& position, const Map& map)
 {
 	if (m_movement.path.empty())

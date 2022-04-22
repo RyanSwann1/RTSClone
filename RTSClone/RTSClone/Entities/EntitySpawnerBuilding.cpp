@@ -40,6 +40,11 @@ std::optional<glm::vec3> EntitySpawnerBuilding::get_waypoint() const
 	return m_waypoint;
 }
 
+bool EntitySpawnerBuilding::is_singular_selectable_only() const
+{
+	return true;
+}
+
 void EntitySpawnerBuilding::update(const float deltaTime, Faction& owningFaction, const Map& map)
 {
 	Entity::update(deltaTime);

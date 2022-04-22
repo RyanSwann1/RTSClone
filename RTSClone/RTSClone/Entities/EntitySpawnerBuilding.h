@@ -30,6 +30,7 @@ public:
 
 	int get_current_spawn_count() const;
 	std::optional<glm::vec3> get_waypoint() const;
+	bool is_singular_selectable_only() const override;
 
 	void update(const float deltaTime, Faction& owningFaction, const Map& map);
 	void render_status_bars(ShaderHandler& shaderHandler, const Camera& camera, glm::uvec2 windowSize) const override;

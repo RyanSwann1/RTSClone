@@ -67,39 +67,4 @@ private:
 	void return_selected_workers_to_return_minerals(const glm::vec3& position, const Map& map);
 	void selected_workers_harvest(const glm::vec3& destination, const Map& map, const BaseHandler& baseHandler);
 	void repair_entity(const glm::vec3& position, const Map& map);
-
-	template <typename T>
-	bool selectEntities(std::vector<T>& units, std::vector<Entity*>* selectedEntities = nullptr);
-
-	template <typename T>
-	void deselectEntities(std::vector<T>& entities);
 };
-
-template <typename T>
-bool FactionPlayer::selectEntities(std::vector<T>& entities, std::vector<Entity*>* selectedEntities)
-{
-	bool selected = false;
-	for (auto& entity : entities)
-	{
-		entity.setSelected(m_entitySelector.getAABB().contains(entity.getAABB()));
-		if (entity.isSelected())
-		{
-			selected = true;
-			if (selectedEntities)
-			{
-				selectedEntities->push_back(&entity);
-			}
-		}
-	}
-
-	return selected;
-}
-
-template <typename T>
-void FactionPlayer::deselectEntities(std::vector<T>& entities)
-{
-	for (auto& entity : entities)
-	{
-		entity.setSelected(false);
-	}
-}

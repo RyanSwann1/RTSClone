@@ -103,6 +103,11 @@ bool Worker::isInBuildQueue(eEntityType entityType) const
 	}) != m_buildQueue.cend();
 }
 
+bool Worker::is_singular_selectable_only() const
+{
+	return false;
+}
+
 int Worker::extractResources()
 {
 	assert(isHoldingResources());

@@ -10,5 +10,7 @@ public:
 	SupplyDepot& operator=(SupplyDepot&&) = default;
 	~SupplyDepot();
 
+	bool is_singular_selectable_only() const override;
+
 	void update(float deltaTime);
 };

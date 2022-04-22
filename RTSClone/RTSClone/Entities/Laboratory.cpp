@@ -39,6 +39,11 @@ int Laboratory::getShieldUpgradeCounter() const
 	return m_shieldUpgradeCounter;
 }
 
+bool Laboratory::is_singular_selectable_only() const
+{
+	return true;
+}
+
 void Laboratory::handleEvent(IncreaseFactionShieldEvent gameEvent)
 {
 	assert(m_owningFaction.get().getCurrentShieldAmount() < Globals::MAX_FACTION_SHIELD_AMOUNT &&
