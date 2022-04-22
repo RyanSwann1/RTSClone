@@ -585,18 +585,9 @@ void FactionPlayer::attack_entity(const glm::vec3& position, const FactionHandle
     }
 
     assert(!m_selectedEntities.empty());
-    for (const auto& selectedEntity : m_selectedEntities)
+    for (auto& selectedEntity : m_selectedEntities)
     {
-        switch (selectedEntity->getEntityType())
-        {
-        case eEntityType::Unit:
-            static_cast<Unit&>(*selectedEntity).attack_target(target->entity, target->faction.getController(), map);
-            break;
-        case eEntityType::Worker:
-            break;
-        default:
-            assert(false);
-        }
+        selectedEntity->attack_entity(target->entity, target->faction.getController(), map);
     }
 }
 

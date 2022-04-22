@@ -99,8 +99,10 @@ void Unit::clear_destinations()
 	m_movement.destinations = {};
 }
 
-void Unit::attack_target(const Entity& targetEntity, const eFactionController targetController, const Map& map)
+void Unit::attack_entity(const Entity& targetEntity, const eFactionController targetController, const Map& map)
 {
+	Entity::attack_entity(targetEntity, targetController, map);
+
 	glm::vec3 previousDestination = Globals::getNextPathDestination(m_movement.path, m_position);
 	if (!m_movement.path.empty())
 	{
@@ -264,7 +266,7 @@ void Unit::delayed_update(const FactionHandler& factionHandler, const Map& map)
 			const Entity* targetEntity = opposingFaction->getEntity(m_position, Globals::UNIT_ATTACK_RANGE, true);
 			if (targetEntity)
 			{
-				attack_target(*targetEntity, opposingFaction->getController(), map);
+				attack_entity(*targetEntity, opposingFaction->getController(), map);
 				break;
 			}
 		}
@@ -285,7 +287,7 @@ void Unit::delayed_update(const FactionHandler& factionHandler, const Map& map)
 				if (Globals::getSqrDistance(targetEntity->getPosition(), m_position) <= Globals::UNIT_ATTACK_RANGE * Globals::UNIT_ATTACK_RANGE ||
 					m_movement.path.empty())
 				{
-					attack_target(*targetEntity, targetFaction->getController(), map);
+					attack_entity(*targetEntity, targetFaction->getController(), map);
 				}
 			}
 			else
@@ -313,7 +315,7 @@ void Unit::delayed_update(const FactionHandler& factionHandler, const Map& map)
 			const Entity* targetEntity = opposingFaction->getEntity(m_position, Globals::UNIT_ATTACK_RANGE);
 			if (targetEntity && PathFinding::getInstance().isTargetInLineOfSight(m_position, *targetEntity, map))
 			{
-				attack_target(*targetEntity, opposingFaction->getController(), map);
+				attack_entity(*targetEntity, opposingFaction->getController(), map);
 			}
 		}
 		break;
@@ -345,7 +347,7 @@ void Unit::delayed_update(const FactionHandler& factionHandler, const Map& map)
 					if (Globals::getSqrDistance(targetEntity->getPosition(), m_position) > Globals::UNIT_ATTACK_RANGE * Globals::UNIT_ATTACK_RANGE ||
 						!PathFinding::getInstance().isTargetInLineOfSight(m_position, *targetEntity, map))
 					{
-						attack_target(*targetEntity, targetFaction->getController(), map);
+						attack_entity(*targetEntity, targetFaction->getController(), map);
 					}
 					else if (Globals::getSqrDistance(targetEntity->getPosition(), m_position) <= Globals::UNIT_ATTACK_RANGE * Globals::UNIT_ATTACK_RANGE)
 					{
