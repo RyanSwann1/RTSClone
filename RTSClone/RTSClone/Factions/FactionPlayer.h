@@ -69,56 +69,11 @@ private:
 	void repair_entity(const glm::vec3& position, const Map& map);
 
 	template <typename T>
-	bool selectEntity(std::vector<T>& entities, const glm::vec3& mouseToGroundPosition, bool selectAll = false,
-		std::vector<Entity*>* selectedEntities = nullptr);
-
-	template <typename T>
 	bool selectEntities(std::vector<T>& units, std::vector<Entity*>* selectedEntities = nullptr);
 
 	template <typename T>
 	void deselectEntities(std::vector<T>& entities);
 };
-
-template<typename T>
-inline bool FactionPlayer::selectEntity(std::vector<T>& entities, const glm::vec3& position, bool selectAll, 
-	std::vector<Entity*>* selectedEntities)
-{
-	const auto selectedEntity = std::find_if(entities.begin(), entities.end(), [&position](const auto& entity)
-	{
-		return entity.getAABB().contains(position);
-	});
-	if (selectedEntity != entities.end())
-	{
-		if (selectAll)
-		{
-			for (auto& entity : entities)
-			{
-				entity.setSelected(true);
-				if (selectedEntities)
-				{
-					selectedEntities->push_back(&*selectedEntity);
-				}
-			}
-		}
-		else
-		{
-			for (auto& entity : m_allEntities)
-			{
-				entity->setSelected(false);
-			}
-
-			selectedEntity->setSelected(true);
-			if (selectedEntities)
-			{
-				selectedEntities->push_back(&*selectedEntity);
-			}
-		}
-
-		return true;
-	}
-
-	return false;
-}
 
 template <typename T>
 bool FactionPlayer::selectEntities(std::vector<T>& entities, std::vector<Entity*>* selectedEntities)
