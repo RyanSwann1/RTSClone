@@ -90,7 +90,7 @@ void EntitySpawnerBuilding::render_status_bars(ShaderHandler& shaderHandler, con
 	}
 }
 
-void EntitySpawnerBuilding::set_waypoint_position(const Map& map, const glm::vec3& position)
+void EntitySpawnerBuilding::set_waypoint_position(const glm::vec3& position, const Map& map)
 {
 	if (map.isWithinBounds(position))
 	{

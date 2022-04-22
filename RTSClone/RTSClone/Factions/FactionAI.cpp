@@ -787,7 +787,7 @@ void FactionAI::on_unit_taken_damage(const TakeDamageEvent& gameEvent, Unit& uni
 			{
 				for (auto& unitInSquad : *squad)
 				{
-					unitInSquad.get().attack_target(*targetEntity, opposingFaction->getController(), map);
+					unitInSquad.get().attack_entity(*targetEntity, opposingFaction->getController(), map);
 				}
 			}
 		}
@@ -808,7 +808,7 @@ void FactionAI::on_unit_idle(Unit& unit, const Map& map, const FactionHandler& f
 		{
 			if (const Headquarters* nearestHeadquarters = targetFaction->getClosestHeadquarters(unit.getPosition()))
 			{
-				unit.attack_target(*nearestHeadquarters, targetFaction->getController(), map);
+				unit.attack_entity(*nearestHeadquarters, targetFaction->getController(), map);
 			}
 		}
 		else

@@ -593,19 +593,11 @@ void FactionPlayer::attack_entity(const glm::vec3& position, const FactionHandle
 
 void FactionPlayer::set_building_waypoints(const glm::vec3& position, const Map& map)
 {
-    for (auto& headquarters : m_headquarters)
+    for (auto& entity : m_allEntities)
     {
-        if (headquarters.isSelected())
+        if (entity->isSelected())
         {
-            headquarters.set_waypoint_position(map, position);
-        }
-    }
-
-    for (auto& barracks : m_barracks)
-    {
-        if (barracks.isSelected())
-        {
-            barracks.set_waypoint_position(map, position);
+            entity->set_waypoint_position(position, map);
         }
     }
 }

@@ -34,7 +34,7 @@ public:
 
 	void update(const float deltaTime, Faction& owningFaction, const Map& map);
 	void render_status_bars(ShaderHandler& shaderHandler, const Camera& camera, glm::uvec2 windowSize) const override;
-	void set_waypoint_position(const Map& map, const glm::vec3& position);
+	void set_waypoint_position(const glm::vec3& position, const Map& map) override;
 	bool add_entity_to_spawn_queue(const Faction& owningFaction);
 	void render(ShaderHandler& shaderHandler, eFactionController owningFactionController) const override;
 
