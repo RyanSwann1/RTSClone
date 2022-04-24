@@ -427,23 +427,21 @@ void FactionPlayer::moveMultipleSelectedEntities(const glm::vec3& destination, c
     }
     else
     {
-        auto selectedEntity = std::find_if(m_allEntities.cbegin(), m_allEntities.cend(), [&destination](const auto& entity)
+        auto entityToRepair = std::find_if(m_allEntities.cbegin(), m_allEntities.cend(), [&destination](const auto& entity)
         {
             return entity->getAABB().contains(destination);
         });
-
-        if (selectedEntity != m_allEntities.cend())
+        if (entityToRepair != m_allEntities.cend())
         {
-            for (auto& selectedWorker : m_selectedEntities)
+            for (auto& selectedEntity : m_selectedEntities)
             {
-                if (selectedWorker->getEntityType() == eEntityType::Worker &&
-                    (*selectedEntity)->getID() != selectedWorker->getID() &&
-                    (*selectedEntity)->getHealth() < (*selectedEntity)->getMaximumHealth())
+                if ((*entityToRepair)->getID() != selectedEntity->getID() &&
+                    (*entityToRepair)->getHealth() < (*entityToRepair)->getMaximumHealth())
                 {
-                    glm::vec3 destination = PathFinding::getInstance().getClosestPositionToAABB(selectedWorker->getPosition(),
-                        (*selectedEntity)->getAABB(), map);
+                    glm::vec3 destination = PathFinding::getInstance().getClosestPositionToAABB(selectedEntity->getPosition(),
+                        (*entityToRepair)->getAABB(), map);
 
-                    static_cast<Worker&>(*selectedWorker).repairEntity(*(*selectedEntity), map);
+                    selectedEntity->repairEntity(*(*entityToRepair), map);
                 }
             }
         }

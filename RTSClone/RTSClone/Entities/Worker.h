@@ -63,7 +63,7 @@ public:
 
 	void add_destination(const glm::vec3& position, const Map& map);
 	void clear_destinations();
-	void repairEntity(const Entity& entity, const Map& map);
+	void repairEntity(const Entity& entity, const Map& map) override;
 	bool build(const Faction& owningFaction, const glm::vec3& buildPosition, const Map& map, eEntityType entityType,
 		bool clearBuildQueue = false);
 	void harvest(const Mineral& mineral, const Map& map) override;
