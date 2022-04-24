@@ -28,6 +28,7 @@ enum class eFactionController;
 struct Model;
 class ShaderHandler;
 class Map;
+class Mineral;
 class Entity
 {
 public:
@@ -47,6 +48,7 @@ public:
 	void takeDamage(const TakeDamageEvent& gameEvent, const Map& map);
 	void repair();
 	void increaseMaximumShield(const Faction& owningFaction);
+	virtual void harvest(const Mineral& mineral, const Map& map) {}
 	virtual void set_waypoint_position(const glm::vec3& position, const Map& map) {};
 	virtual void attack_entity(const Entity& targetEntity, const eFactionController targetController, const Map& map) {};
 	virtual void render(ShaderHandler& shaderHandler, eFactionController owningFactionController) const;

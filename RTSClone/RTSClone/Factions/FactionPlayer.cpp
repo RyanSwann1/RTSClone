@@ -416,17 +416,14 @@ void FactionPlayer::moveMultipleSelectedEntities(const glm::vec3& destination, c
     const Base* base = baseHandler.getBaseAtMineral(destination);
     if (base)
     {
-        std::for_each(m_selectedEntities.begin(), m_selectedEntities.end(), [&](auto& selectedUnit)
+        for (auto& selectedEntity : m_selectedEntities)
         {
-            if (selectedUnit->getEntityType() == eEntityType::Worker)
+            const Mineral* mineral = baseHandler.getNearestAvailableMineralAtBase(*this, *base, selectedEntity->getPosition());
+            if (mineral)
             {
-                const Mineral* mineral = baseHandler.getNearestAvailableMineralAtBase(*this, *base, selectedUnit->getPosition());
-                if (mineral)
-                {
-                    static_cast<Worker&>(*selectedUnit).harvest(*mineral, map);
-                }
+                selectedEntity->harvest(*mineral, map);
             }
-        });
+        }
     }
     else
     {
