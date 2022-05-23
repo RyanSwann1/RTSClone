@@ -346,7 +346,15 @@ void FactionPlayer::moveSingularSelectedEntity(const glm::vec3& destination, con
     case eEntityType::Unit:
     {
         eUnitState state = (m_attackMoveSelected ? eUnitState::AttackMoving : eUnitState::Moving);
-        selectedEntity.move_to(destination, map, m_addToDestinationQueue);
+        Unit& unit = static_cast<Unit&>(selectedEntity);
+        if (m_addToDestinationQueue)
+        {
+            unit.add_destination(destination, map);
+        }
+        else
+        {
+            unit.move_to(destination, map);
+        }
     }
         break;
     case eEntityType::Worker:
@@ -373,19 +381,26 @@ void FactionPlayer::moveSingularSelectedEntity(const glm::vec3& destination, con
         }
         else
         {
-            auto entityToRepair = std::find_if(m_allEntities.cbegin(), m_allEntities.cend(), 
+            auto selectedEntity = std::find_if(m_allEntities.cbegin(), m_allEntities.cend(), 
                 [&destination, &selectedWorker](const auto& entity)
             {
                 return entity->getAABB().contains(destination) && entity->getID() != selectedWorker.getID();
             });
-            if (entityToRepair != m_allEntities.cend() &&
-                (*entityToRepair)->getHealth() < (*entityToRepair)->getMaximumHealth())
+            if (selectedEntity != m_allEntities.cend() &&
+                (*selectedEntity)->getHealth() < (*selectedEntity)->getMaximumHealth())
             {
-                selectedWorker.repairEntity(*(*entityToRepair), map);
+                selectedWorker.repairEntity(*(*selectedEntity), map);
             }
             else
             {
-                selectedEntity.move_to(destination, map, m_addToDestinationQueue);
+                if (m_addToDestinationQueue)
+                {
+                    selectedWorker.add_destination(destination, map);
+                }
+                else
+                { 
+                    selectedWorker.move_to(destination, map);
+                }
             }
         }
     }
@@ -433,10 +448,43 @@ void FactionPlayer::moveMultipleSelectedEntities(const glm::vec3& destination, c
         else
         {
             glm::vec3 averagePosition = getAveragePosition(m_selectedEntities);
-            for (auto& selectedEntity : m_selectedEntities)
+            std::for_each(m_selectedEntities.begin(), m_selectedEntities.end(), [&](auto& selectedEntity)
             {
-                selectedEntity->move_to(destination - (averagePosition - selectedEntity->getPosition()), map, m_addToDestinationQueue);
-            }
+                switch (selectedEntity->getEntityType())
+                {
+                case eEntityType::Unit:
+                {
+                    eUnitState state = (m_attackMoveSelected ? eUnitState::AttackMoving : eUnitState::Moving);
+                    glm::vec3 position = destination - (averagePosition - selectedEntity->getPosition());
+                    Unit& unit = static_cast<Unit&>(*selectedEntity);
+                    if (m_addToDestinationQueue)
+                    {
+                        unit.add_destination(position, map);
+                    }
+                    else
+                    {
+                        unit.move_to(position, map);
+                    }
+                }
+                break;
+                case eEntityType::Worker:
+                {
+                    glm::vec3 position = destination - (averagePosition - selectedEntity->getPosition());
+                    Worker& worker = static_cast<Worker&>(*selectedEntity);
+                    if (m_addToDestinationQueue)
+                    {
+                        worker.add_destination(position, map);
+                    }
+                    else
+                    {
+                        worker.move_to(position, map);
+                    }
+                }
+                break;
+                default:
+                    assert(false);
+                }
+            });
         }
     }
 }

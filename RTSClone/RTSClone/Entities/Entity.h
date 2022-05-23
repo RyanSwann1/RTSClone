@@ -48,7 +48,6 @@ public:
 	void takeDamage(const TakeDamageEvent& gameEvent, const Map& map);
 	void repair();
 	void increaseMaximumShield(const Faction& owningFaction);
-	virtual void move_to(const glm::vec3& position, const Map& map, const bool addToDestinations = false) {}
 	virtual void repairEntity(const Entity& entity, const Map& map) {}
 	virtual void harvest(const Mineral& mineral, const Map& map) {}
 	virtual void set_waypoint_position(const glm::vec3& position, const Map& map) {};

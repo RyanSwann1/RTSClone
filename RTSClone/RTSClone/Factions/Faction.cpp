@@ -337,7 +337,7 @@ void Faction::handleWorkerCollisions(const Map& map)
                 glm::vec3 destination(0.f);
                 if (PathFinding::getInstance().getClosestAvailablePosition(worker, m_workers, map, destination))
                 {
-                    worker.move_to(destination, map, false);
+                    worker.move_to(destination, map);
                 }
             }
             else
@@ -352,7 +352,7 @@ void Faction::handleWorkerCollisions(const Map& map)
                         glm::vec3 destination(0.f);
                         if (PathFinding::getInstance().getClosestAvailablePosition(worker, m_workers, map, destination))
                         {
-                            worker.move_to(destination, map, false);
+                            worker.move_to(destination, map);
                             break;
                         }
                     }

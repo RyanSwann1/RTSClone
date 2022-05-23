@@ -54,7 +54,7 @@ Worker::Worker(Faction& owningFaction, const glm::vec3& startingPosition, const 
 		owningFaction.getCurrentShieldAmount(), startingRotation),
 	m_owningFaction(&owningFaction)
 {
-	move_to(destination, map, false);
+	move_to(destination, map);
 }
 
 const Mineral* Worker::getMineralToHarvest() const
@@ -118,6 +118,18 @@ int Worker::extractResources()
 		return resources;
 	}
 	return 0;
+}
+
+void Worker::add_destination(const glm::vec3& position, const Map& map)
+{
+	if (m_movement.path.empty())
+	{
+		move_to(position, map);
+	}
+	else
+	{
+		m_movement.destinations.push(position);
+	}
 }
 
 void Worker::clear_destinations()
@@ -192,7 +204,7 @@ void Worker::update(float deltaTime, const Map& map, const FactionHandler& facti
 			{
 				glm::vec3 destination = m_movement.destinations.front();
 				m_movement.destinations.pop();
-				move_to(destination, map, false);
+				move_to(destination, map);
 			}
 			else
 			{
@@ -396,16 +408,9 @@ void Worker::return_minerals_to_headquarters(const Headquarters& headquarters, c
 	move_to(destination, map, eWorkerState::ReturningMineralsToHeadquarters);
 }
 
-void Worker::move_to(const glm::vec3& position, const Map& map, const bool addToDestinations)
+void Worker::move_to(const glm::vec3& position, const Map& map)
 {
-	if (addToDestinations && !m_movement.destinations.empty())
-	{
-		m_movement.destinations.push(position);
-	}
-	else
-	{
-		move_to(position, map, eWorkerState::Moving);
-	}	
+	move_to(position, map, eWorkerState::Moving);
 }
 
 void Worker::revalidate_movement_path(const Map& map)
