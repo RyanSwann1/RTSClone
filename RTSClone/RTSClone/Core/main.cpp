@@ -62,9 +62,9 @@ int main()
 	const std::array<std::string, Globals::MAX_LEVELS> levelNames = LevelFileHandler::loadLevelNames();
 	std::optional<Level> currentLevel = {};
 
-	std::cout << glGetError() << "\n";
-	std::cout << glGetError() << "\n";
-	std::cout << glGetError() << "\n";
+	//std::cout << glGetError() << "\n";
+	//std::cout << glGetError() << "\n";
+	//std::cout << glGetError() << "\n";
 
 	while (window.isOpen())
 	{
