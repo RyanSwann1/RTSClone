@@ -2,31 +2,9 @@
 
 #include "Faction.h"
 #include "UI/EntitySelector.h"
+#include "FactionPlayerPlannedBuilding.h"
 #include <SFML/Graphics.hpp>
 #include <optional>
-
-class BaseHandler;
-struct Camera;
-struct PlayerActivatePlannedBuildingEvent;
-class FactionPlayerPlannedBuilding
-{	
-public:
-	FactionPlayerPlannedBuilding(const PlayerActivatePlannedBuildingEvent& gameEvent, const glm::vec3& position);
-
-	bool isOnValidPosition(const Map& map) const;
-	const glm::vec3& getPosition() const;
-	int getBuilderID() const;
-	eEntityType getEntityType() const;
-
-	void handleInput(const sf::Event& event, const Camera& camera, const sf::Window& window, const Map& map);
-	void render(ShaderHandler& shaderHandler, const Map& map) const;
-
-private:
-	std::reference_wrapper<const Model> m_model;
-	int m_builderID;
-	eEntityType m_entityType;
-	glm::vec3 m_position;
-};
 
 class MiniMap;
 class FactionPlayer : public Faction
