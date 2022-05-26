@@ -27,13 +27,6 @@ namespace
 	}
 }
 
-MinHeapNode::MinHeapNode()
-	: position(0, 0),
-	cameFrom(0, 0),
-	g(0.f),
-	h(0.f)
-{}
-
 MinHeapNode::MinHeapNode(glm::ivec2 position, glm::ivec2 cameFrom, float g, float h)
 	: position(position),
 	cameFrom(cameFrom),

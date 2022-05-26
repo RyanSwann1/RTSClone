@@ -10,15 +10,15 @@
 
 struct MinHeapNode
 {
-	MinHeapNode();
+	MinHeapNode() = default;
 	MinHeapNode(glm::ivec2 position, glm::ivec2 cameFrom, float g, float h);
 
 	float getCost() const;
 
-	glm::ivec2 position;
-	glm::ivec2 cameFrom;
-	float g;
-	float h;
+	glm::ivec2 position{ 0, 0 };
+	glm::ivec2 cameFrom{ 0, 0 };
+	float g{ 0.f };
+	float h{ 0.f };
 };
 
 namespace GameMessages
