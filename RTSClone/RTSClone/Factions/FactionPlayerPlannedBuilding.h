@@ -1,11 +1,12 @@
 #pragma once
 
 #include "Entities/EntityType.h"
+#include "Graphics/Model.h"
 #include <SFML/Graphics.hpp>
 #include <glm/glm.hpp>
 
 class Map;
-class Model;
+struct Model;
 class ShaderHandler;
 class BaseHandler;
 struct Camera;

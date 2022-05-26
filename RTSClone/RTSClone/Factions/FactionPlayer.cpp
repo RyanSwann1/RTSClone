@@ -76,7 +76,6 @@ void FactionPlayer::handleInput(const sf::Event& currentSFMLEvent, const sf::Win
         }
         else if (currentSFMLEvent.mouseButton.button == sf::Mouse::Right)
         {
-            m_plannedBuilding.reset();
             glm::vec3 position(0.0f);
             if (miniMap.isIntersecting(window))
             {
@@ -86,10 +85,8 @@ void FactionPlayer::handleInput(const sf::Event& currentSFMLEvent, const sf::Win
             {
                 position = camera.getRayToGroundPlaneIntersection(window);
             }
-            attack_entity(position, factionHandler, map);
-            set_building_waypoints(position, map);
+
             onRightClick(position, camera, factionHandler, map, baseHandler);
-            repair_entity(position, map);
         }
         break;
     case sf::Event::MouseButtonReleased:
@@ -484,6 +481,22 @@ void FactionPlayer::select_entity_all_of_type(const glm::vec3& position)
 void FactionPlayer::onRightClick(const glm::vec3& position, const Camera& camera, const FactionHandler& factionHandler, const Map& map,
     const BaseHandler& baseHandler)
 {
+    m_plannedBuilding.reset();
+    if (attack_entity(position, factionHandler, map))
+    {
+        return;
+    }
+
+    if (set_building_waypoints(position, map))
+    {
+        return;
+    }
+
+    if (repair_entity(position, map))
+    {
+        return;
+    }
+
     if (m_selectedEntities.size() == 1)
     {
         moveSingularSelectedEntity(position, map, *m_selectedEntities.front(), baseHandler);
@@ -494,45 +507,31 @@ void FactionPlayer::onRightClick(const glm::vec3& position, const Camera& camera
     }
 }
 
-void FactionPlayer::attack_entity(const glm::vec3& position, const FactionHandler& factionHandler, const Map& map)
+bool FactionPlayer::attack_entity(const glm::vec3& position, const FactionHandler& factionHandler, const Map& map)
 {
-    struct Target
-    {
-        Target(const Faction& faction, const Entity& entity)
-            : faction(faction),
-            entity(entity)
-        {}
-
-        const Faction& faction;
-        const Entity& entity;
-    };
-
-    std::optional<Target> target = {};
     for (const Faction* opposingFaction : factionHandler.getOpposingFactions(getController()))
     {
         if (!opposingFaction)
         {
             continue;
         }
-        else if (const Entity* targetEntity = opposingFaction->getEntity(position))
+
+        const Entity* targetEntity = opposingFaction->getEntity(position);
+        if (targetEntity)
         {
-            target.emplace(*opposingFaction, *targetEntity);
-            break;
+            for (auto& selectedEntity : m_selectedEntities)
+            {
+                selectedEntity->attack_entity(*targetEntity, opposingFaction->getController(), map);
+            }
+
+            return true;
         }
     }
-    if (!target)
-    {
-        return;
-    }
 
-    assert(!m_selectedEntities.empty());
-    for (auto& selectedEntity : m_selectedEntities)
-    {
-        selectedEntity->attack_entity(target->entity, target->faction.getController(), map);
-    }
+    return false;
 }
 
-void FactionPlayer::set_building_waypoints(const glm::vec3& position, const Map& map)
+bool FactionPlayer::set_building_waypoints(const glm::vec3& position, const Map& map)
 {
     for (auto& entity : m_allEntities)
     {
@@ -540,7 +539,11 @@ void FactionPlayer::set_building_waypoints(const glm::vec3& position, const Map&
         {
             entity->set_waypoint_position(position, map);
         }
+
+        return true;
     }
+
+    return false;
 }
 
 void FactionPlayer::return_selected_workers_to_return_minerals(const glm::vec3& position, const Map& map)
@@ -577,26 +580,24 @@ void FactionPlayer::selected_workers_harvest(const glm::vec3& destination, const
     }
 }
 
-void FactionPlayer::repair_entity(const glm::vec3& position, const Map& map)
+bool FactionPlayer::repair_entity(const glm::vec3& position, const Map& map)
 {
-    auto selectedEntity = std::find_if(m_allEntities.cbegin(), m_allEntities.cend(), [&position](const auto& entity)
+    auto entity_to_repair = std::find_if(m_allEntities.cbegin(), m_allEntities.cend(), [&position](const auto& entity)
     {
         return entity->getAABB().contains(position);
     });
-
-    if (selectedEntity != m_allEntities.cend())
+    if (entity_to_repair == m_allEntities.cend())
     {
-        for (auto& selectedWorker : m_selectedEntities)
-        {
-            if (selectedWorker->getEntityType() == eEntityType::Worker &&
-                (*selectedEntity)->getID() != selectedWorker->getID() &&
-                (*selectedEntity)->getHealth() < (*selectedEntity)->getMaximumHealth())
-            {
-                glm::vec3 destination = PathFinding::getInstance().getClosestPositionToAABB(selectedWorker->getPosition(),
-                    (*selectedEntity)->getAABB(), map);
-
-                static_cast<Worker&>(*selectedWorker).repairEntity(*(*selectedEntity), map);
-            }
-        }
+        return false;
     }
+
+    for (auto& selectedEntity : m_selectedEntities)
+    {
+        if (selectedEntity->getID() != (*entity_to_repair)->getID())
+        {
+            selectedEntity->repairEntity((*selectedEntity), map);
+        }
+    }    
+
+    return true;
 }

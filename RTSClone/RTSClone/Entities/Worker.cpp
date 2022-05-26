@@ -137,11 +137,18 @@ void Worker::clear_destinations()
 	m_movement.destinations = {};
 }
 
-void Worker::repairEntity(const Entity& entity, const Map& map)
+bool Worker::repairEntity(const Entity& entity, const Map& map)
 {
+	if (!Entity::repairEntity(entity, map))
+	{
+		return false;
+	}
+
 	m_repairTargetEntity = { entity.getID() };
-	glm::vec3 destination = PathFinding::getInstance().getClosestPositionToAABB(getPosition(), entity.getAABB(), map);
+	glm::vec3 destination = PathFinding::getInstance().getClosestPositionToAABB(entity.getPosition(), entity.getAABB(), map);
 	move_to(destination, map, eWorkerState::MovingToRepairPosition);	
+	
+	return true;
 }
 
 bool Worker::build(const Faction& owningFaction, const glm::vec3& buildPosition, const Map& map, eEntityType entityType, bool clearBuildQueue)

@@ -181,6 +181,12 @@ void Entity::increaseMaximumShield(const Faction& owningFaction)
 	}
 }
 
+bool Entity::repairEntity(const Entity& entity, const Map& map)
+{
+	assert(entity.getID() != getID());
+	return entity.getHealth() < entity.getMaximumHealth();
+}
+
 void Entity::render(ShaderHandler& shaderHandler, eFactionController owningFactionController) const
 {
 	switch (owningFactionController)

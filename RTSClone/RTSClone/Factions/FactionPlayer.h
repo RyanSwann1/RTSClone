@@ -40,9 +40,9 @@ private:
 	void onRightClick(const glm::vec3& position, const Camera& camera, const FactionHandler& factionHandler, const Map& map, 
 		const BaseHandler& baseHandler);
 
-	void attack_entity(const glm::vec3& position, const FactionHandler& factionHandler, const Map& map);
-	void set_building_waypoints(const glm::vec3& position, const Map& map);
+	bool attack_entity(const glm::vec3& position, const FactionHandler& factionHandler, const Map& map);
+	bool set_building_waypoints(const glm::vec3& position, const Map& map);
 	void return_selected_workers_to_return_minerals(const glm::vec3& position, const Map& map);
 	void selected_workers_harvest(const glm::vec3& destination, const Map& map, const BaseHandler& baseHandler);
-	void repair_entity(const glm::vec3& position, const Map& map);
+	bool repair_entity(const glm::vec3& position, const Map& map);
 };

@@ -28,7 +28,7 @@ public:
 	Faction& operator=(const Faction&) = delete;
 	Faction(Faction&&) noexcept = delete;
 	Faction& operator=(Faction&&) noexcept = delete;
-	virtual ~Faction() {}
+	virtual ~Faction() = default;
 
 	bool is_laboratory_built() const;
 	bool isMineralInUse(const Mineral& mineral) const;

@@ -185,6 +185,7 @@
     <ClCompile Include="Entities\EntitySpawnerBuilding.cpp" />
     <ClCompile Include="Entities\SupplyDepot.cpp" />
     <ClCompile Include="Entities\Unit.cpp" />
+    <ClCompile Include="Factions\FactionPlayerPlannedBuilding.cpp" />
     <ClCompile Include="glad\glad.c" />
     <ClCompile Include="Graphics\Mesh.cpp" />
     <ClCompile Include="Graphics\Model.cpp" />
@@ -288,6 +289,7 @@
     <ClInclude Include="Entities\EntitySpawnerBuilding.h" />
     <ClInclude Include="Entities\SupplyDepot.h" />
     <ClInclude Include="Entities\Unit.h" />
+    <ClInclude Include="Factions\FactionPlayerPlannedBuilding.h" />
     <ClInclude Include="glad\glad.h" />
     <ClInclude Include="glad\khrplatform.h" />
     <ClInclude Include="Graphics\Mesh.h" />
