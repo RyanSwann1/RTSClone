@@ -22,9 +22,9 @@ SupplyDepot::~SupplyDepot()
 	}
 }
 
-bool SupplyDepot::is_singular_selectable_only() const
+bool SupplyDepot::is_group_selectable() const
 {
-	return true;
+	return false;
 }
 
 void SupplyDepot::update(float deltaTime)

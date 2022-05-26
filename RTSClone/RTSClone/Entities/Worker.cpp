@@ -103,9 +103,9 @@ bool Worker::isInBuildQueue(eEntityType entityType) const
 	}) != m_buildQueue.cend();
 }
 
-bool Worker::is_singular_selectable_only() const
+bool Worker::is_group_selectable() const
 {
-	return false;
+	return true;
 }
 
 int Worker::extractResources()

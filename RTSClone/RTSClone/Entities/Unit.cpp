@@ -77,9 +77,9 @@ eUnitState Unit::getCurrentState() const
 	return m_currentState;
 }
 
-bool Unit::is_singular_selectable_only() const
+bool Unit::is_group_selectable() const
 {
-	return false;
+	return true;
 }
 
 void Unit::add_destination(const glm::vec3& position, const Map& map)

@@ -43,7 +43,7 @@ public:
 	int getHealth() const;
 	int getShield() const;
 	bool isDead() const;
-	virtual bool is_singular_selectable_only() const = 0;
+	virtual bool is_group_selectable() const = 0;
 
 	void takeDamage(const TakeDamageEvent& gameEvent, const Map& map);
 	void repair();

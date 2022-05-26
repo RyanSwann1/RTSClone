@@ -36,9 +36,9 @@ Turret::~Turret()
 	}
 }
 
-bool Turret::is_singular_selectable_only() const
+bool Turret::is_group_selectable() const
 {
-	return true;
+	return false;
 }
 
 void Turret::update(float deltaTime, const FactionHandler& factionHandler, const Map& map)

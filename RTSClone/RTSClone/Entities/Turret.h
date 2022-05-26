@@ -16,7 +16,7 @@ public:
 	Turret& operator=(Turret&&) noexcept = default;
 	~Turret();
 	
-	bool is_singular_selectable_only() const override;
+	bool is_group_selectable() const override;
 
 	void update(float deltaTime, const FactionHandler& factionHandler, const Map& map);
 

@@ -97,7 +97,10 @@ void FactionPlayer::handleInput(const sf::Event& currentSFMLEvent, const sf::Win
             {
                 for (auto& entity : m_allEntities)
                 {
-                    entity->setSelected(!entity->is_singular_selectable_only());
+                    if (entity->isSelected())
+                    {
+                        entity->setSelected(entity->is_group_selectable());
+                    }
                 }
             }
 
@@ -179,7 +182,7 @@ void FactionPlayer::update(float deltaTime, const Map& map, const FactionHandler
         m_selectedEntities.clear();
         for (auto& entity : m_allEntities)
         {
-            if (!entity->is_singular_selectable_only() 
+            if (entity->is_group_selectable() 
                 && entity->setSelected(m_entitySelector.getAABB().contains(entity->getAABB())))
             {
                 m_selectedEntities.push_back(entity);
@@ -465,7 +468,7 @@ void FactionPlayer::select_entity_all_of_type(const glm::vec3& position)
         return;
     }
 
-    if (!(*selectedEntity)->is_singular_selectable_only())
+    if ((*selectedEntity)->is_group_selectable())
     {
         for (const auto& entity : m_allEntities)
         {
@@ -482,6 +485,7 @@ void FactionPlayer::onRightClick(const glm::vec3& position, const Camera& camera
     const BaseHandler& baseHandler)
 {
     m_plannedBuilding.reset();
+
     if (attack_entity(position, factionHandler, map))
     {
         return;

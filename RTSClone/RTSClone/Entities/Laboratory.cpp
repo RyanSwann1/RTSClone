@@ -39,9 +39,9 @@ int Laboratory::getShieldUpgradeCounter() const
 	return m_shieldUpgradeCounter;
 }
 
-bool Laboratory::is_singular_selectable_only() const
+bool Laboratory::is_group_selectable() const
 {
-	return true;
+	return false;
 }
 
 void Laboratory::handleEvent(IncreaseFactionShieldEvent gameEvent)
