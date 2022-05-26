@@ -90,7 +90,7 @@ void EntitySpawnerBuilding::render_status_bars(ShaderHandler& shaderHandler, con
 	}
 }
 
-void EntitySpawnerBuilding::set_waypoint_position(const glm::vec3& position, const Map& map)
+bool EntitySpawnerBuilding::set_waypoint_position(const glm::vec3& position, const Map& map)
 {
 	if (map.isWithinBounds(position))
 	{
@@ -101,8 +101,11 @@ void EntitySpawnerBuilding::set_waypoint_position(const glm::vec3& position, con
 		else
 		{
 			m_waypoint = position;
+			return true;
 		}
 	}
+
+	return false;
 }
 
 bool EntitySpawnerBuilding::add_entity_to_spawn_queue(const Faction& owningFaction)

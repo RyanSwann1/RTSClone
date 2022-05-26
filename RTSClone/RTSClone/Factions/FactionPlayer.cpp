@@ -533,17 +533,16 @@ bool FactionPlayer::attack_entity(const glm::vec3& position, const FactionHandle
 
 bool FactionPlayer::set_building_waypoints(const glm::vec3& position, const Map& map)
 {
+    bool waypoint_selected = false;
     for (auto& entity : m_allEntities)
     {
-        if (entity->isSelected())
+        if (entity->isSelected() && entity->set_waypoint_position(position, map))
         {
-            entity->set_waypoint_position(position, map);
+            waypoint_selected = true;
         }
-
-        return true;
     }
 
-    return false;
+    return waypoint_selected;
 }
 
 void FactionPlayer::return_selected_workers_to_return_minerals(const glm::vec3& position, const Map& map)
