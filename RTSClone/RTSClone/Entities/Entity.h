@@ -52,6 +52,7 @@ public:
 	virtual void harvest(const Mineral& mineral, const Map& map) {}
 	virtual bool set_waypoint_position(const glm::vec3& position, const Map& map) { return false; };
 	virtual void attack_entity(const Entity& targetEntity, const eFactionController targetController, const Map& map) {};
+	virtual void MoveTo(const glm::vec3& position, const Map& map, const bool add_to_destinations) {};
 	virtual void render(ShaderHandler& shaderHandler, eFactionController owningFactionController) const;
 	virtual void render_status_bars(ShaderHandler& shaderHandler, const Camera& camera, glm::uvec2 windowSize) const;
 

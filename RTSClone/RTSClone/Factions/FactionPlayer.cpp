@@ -292,15 +292,7 @@ void FactionPlayer::moveSingularSelectedEntity(const glm::vec3& destination, con
     case eEntityType::Unit:
     {
         eUnitState state = (m_attackMoveSelected ? eUnitState::AttackMoving : eUnitState::Moving);
-        Unit& unit = static_cast<Unit&>(selectedEntity);
-        if (m_addToDestinationQueue)
-        {
-            unit.add_destination(destination, map);
-        }
-        else
-        {
-            unit.move_to(destination, map);
-        }
+        selectedEntity.MoveTo(destination, map, m_addToDestinationQueue);
     }
         break;
     case eEntityType::Worker:
@@ -339,14 +331,7 @@ void FactionPlayer::moveSingularSelectedEntity(const glm::vec3& destination, con
             }
             else
             {
-                if (m_addToDestinationQueue)
-                {
-                    selectedWorker.add_destination(destination, map);
-                }
-                else
-                { 
-                    selectedWorker.move_to(destination, map);
-                }
+                selectedWorker.MoveTo(destination, map, m_addToDestinationQueue);
             }
         }
     }
@@ -394,43 +379,12 @@ void FactionPlayer::moveMultipleSelectedEntities(const glm::vec3& destination, c
         else
         {
             glm::vec3 averagePosition = getAveragePosition(m_selectedEntities);
-            std::for_each(m_selectedEntities.begin(), m_selectedEntities.end(), [&](auto& selectedEntity)
+            for (auto& selectedEntity : m_selectedEntities)
             {
-                switch (selectedEntity->getEntityType())
-                {
-                case eEntityType::Unit:
-                {
-                    eUnitState state = (m_attackMoveSelected ? eUnitState::AttackMoving : eUnitState::Moving);
-                    glm::vec3 position = destination - (averagePosition - selectedEntity->getPosition());
-                    Unit& unit = static_cast<Unit&>(*selectedEntity);
-                    if (m_addToDestinationQueue)
-                    {
-                        unit.add_destination(position, map);
-                    }
-                    else
-                    {
-                        unit.move_to(position, map);
-                    }
-                }
-                break;
-                case eEntityType::Worker:
-                {
-                    glm::vec3 position = destination - (averagePosition - selectedEntity->getPosition());
-                    Worker& worker = static_cast<Worker&>(*selectedEntity);
-                    if (m_addToDestinationQueue)
-                    {
-                        worker.add_destination(position, map);
-                    }
-                    else
-                    {
-                        worker.move_to(position, map);
-                    }
-                }
-                break;
-                default:
-                    assert(false);
-                }
-            });
+                eUnitState state = (m_attackMoveSelected ? eUnitState::AttackMoving : eUnitState::Moving);
+                glm::vec3 position = destination - (averagePosition - selectedEntity->getPosition());
+                selectedEntity->MoveTo(position, map, m_addToDestinationQueue);
+            }
         }
     }
 }

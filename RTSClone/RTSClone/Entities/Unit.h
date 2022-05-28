@@ -44,10 +44,9 @@ public:
 	eUnitState getCurrentState() const;
 	bool is_group_selectable() const override;
 
-	void add_destination(const glm::vec3& position, const Map& map);
 	void clear_destinations();
 	void attack_entity(const Entity& targetEntity, const eFactionController targetController, const Map& map) override;
-	void move_to(const glm::vec3& destination, const Map& map);
+	void MoveTo(const glm::vec3& destination, const Map& map, const bool add_to_destinations) override;
 	void update(float deltaTime, const FactionHandler& factionHandler, const Map& map);
 	void delayed_update(const FactionHandler& factionHandler, const Map& map);
 	void revalidate_movement_path(const Map& map);
@@ -56,11 +55,11 @@ public:
 #endif // RENDER_PATHING
 
 private:
-	Movement m_movement							= {};
-	eFactionController m_owningFaction			= eFactionController::None;
-	eUnitState m_currentState					= eUnitState::Idle;
-	Timer m_attackTimer							= {};
-	std::optional<TargetEntity> m_target		= {};
+	Movement m_movement						= {};
+	eFactionController m_owningFaction		= eFactionController::None;
+	eUnitState m_currentState				= eUnitState::Idle;
+	Timer m_attackTimer						= {};
+	std::optional<TargetEntity> m_target	= {};
 
 	void switchToState(eUnitState newState);
 };

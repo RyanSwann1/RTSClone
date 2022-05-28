@@ -61,14 +61,13 @@ public:
 	bool is_group_selectable() const override;
 	int extractResources();	
 
-	void add_destination(const glm::vec3& position, const Map& map);
 	void clear_destinations();
 	bool repairEntity(const Entity& entity, const Map& map) override;
 	bool build(const Faction& owningFaction, const glm::vec3& buildPosition, const Map& map, eEntityType entityType,
 		bool clearBuildQueue = false);
 	void harvest(const Mineral& mineral, const Map& map) override;
 	void return_minerals_to_headquarters(const Headquarters& headquarters, const Map& map);
-	void move_to(const glm::vec3& position, const Map& map);
+	void MoveTo(const glm::vec3& position, const Map& map, const bool add_to_destinations) override;
 	void delayed_update(const Map& map, const FactionHandler& factionHandler);
 	void update(float deltaTime, const Map& map, const FactionHandler& factionHandler);
 	void revalidate_movement_path(const Map& map);
@@ -81,14 +80,14 @@ public:
 #endif // RENDER_PATHING
 
 private:
-	Faction* m_owningFaction								= nullptr;
-	Movement m_movement										= {};
-	eWorkerState m_currentState								= eWorkerState::Idle;
-	std::deque<WorkerScheduledBuilding> m_buildQueue		= {};
-	std::optional<int> m_repairTargetEntity					= {};
-	std::optional<int> m_resources							= {};
-	Timer m_taskTimer										= {};
-	const Mineral* m_mineralToHarvest						= nullptr;
+	Faction* m_owningFaction							= nullptr;
+	Movement m_movement									= {};
+	eWorkerState m_currentState							= eWorkerState::Idle;
+	std::deque<WorkerScheduledBuilding> m_buildQueue	= {};
+	std::optional<int> m_repairTargetEntity				= {};
+	std::optional<int> m_resources						= {};
+	Timer m_taskTimer									= {};
+	const Mineral* m_mineralToHarvest					= nullptr;
 
 	void switchTo(eWorkerState newState);
 	void move_to(const glm::vec3& destination, const Map& map, const AABB& ignoreAABB, eWorkerState state);

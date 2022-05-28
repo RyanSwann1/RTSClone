@@ -38,7 +38,7 @@ Unit::Unit(Faction & owningFaction, const glm::vec3 & startingPosition, const gl
 	m_owningFaction(owningFaction.getController()),
 	m_attackTimer(TIME_BETWEEN_ATTACK, true)
 {
-	move_to(destination, map);
+	MoveTo(destination, map, false);
 }
 
 Unit::~Unit()
@@ -80,18 +80,6 @@ eUnitState Unit::getCurrentState() const
 bool Unit::is_group_selectable() const
 {
 	return true;
-}
-
-void Unit::add_destination(const glm::vec3& position, const Map& map)
-{
-	if (m_movement.path.empty())
-	{
-		move_to(position, map);
-	}
-	else
-	{
-		m_movement.destinations.push(position);
-	}
 }
 
 void Unit::clear_destinations()
@@ -145,8 +133,13 @@ void Unit::attack_entity(const Entity& targetEntity, const eFactionController ta
 	}
 }
 
-void Unit::move_to(const glm::vec3& destination, const Map& map)
+void Unit::MoveTo(const glm::vec3& destination, const Map& map, const bool add_to_destinations)
 {
+	if (!m_movement.IsMovableAfterAddingDestination(add_to_destinations, destination))
+	{
+		return;
+	}
+
 	glm::vec3 previousDestination = Globals::getNextPathDestination(m_movement.path, m_position);
 	if (!m_movement.path.empty())
 	{
@@ -203,7 +196,7 @@ void Unit::update(float deltaTime, const FactionHandler& factionHandler, const M
 			{
 				glm::vec3 destination = m_movement.destinations.front();
 				m_movement.destinations.pop();
-				move_to(destination, map);
+				MoveTo(destination, map, false);
 			}
 			else
 			{
@@ -294,7 +287,7 @@ void Unit::delayed_update(const FactionHandler& factionHandler, const Map& map)
 			{
 				if (!m_movement.path.empty())
 				{
-					move_to(m_movement.path.front(), map);
+					MoveTo(m_movement.path.front(), map, false);
 				}
 				else
 				{
@@ -370,7 +363,7 @@ void Unit::revalidate_movement_path(const Map& map)
 {
 	if (!m_movement.path.empty())
 	{
-		move_to(m_movement.path.front(), map);
+		MoveTo(m_movement.path.front(), map, false);
 	}
 }
 
