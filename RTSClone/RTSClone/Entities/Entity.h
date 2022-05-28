@@ -49,7 +49,7 @@ public:
 	void repair();
 	void increaseMaximumShield(const Faction& owningFaction);
 	virtual bool repairEntity(const Entity& entity, const Map& map);
-	virtual void harvest(const Mineral& mineral, const Map& map) {}
+	virtual bool Harvest(const Mineral& mineral, const Map& map) { return false; }
 	virtual bool set_waypoint_position(const glm::vec3& position, const Map& map) { return false; };
 	virtual void attack_entity(const Entity& targetEntity, const eFactionController targetController, const Map& map) {};
 	virtual bool MoveTo(const glm::vec3& position, const Map& map, const bool add_to_destinations) { return false; };

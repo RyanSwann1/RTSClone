@@ -65,7 +65,7 @@ public:
 	bool repairEntity(const Entity& entity, const Map& map) override;
 	bool build(const Faction& owningFaction, const glm::vec3& buildPosition, const Map& map, eEntityType entityType,
 		bool clearBuildQueue = false);
-	void harvest(const Mineral& mineral, const Map& map) override;
+	bool Harvest(const Mineral& mineral, const Map& map) override;
 	void return_minerals_to_headquarters(const Headquarters& headquarters, const Map& map);
 	bool MoveTo(const glm::vec3& position, const Map& map, const bool add_to_destinations) override;
 	void delayed_update(const Map& map, const FactionHandler& factionHandler);

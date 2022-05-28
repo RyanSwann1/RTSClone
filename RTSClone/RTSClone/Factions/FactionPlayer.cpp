@@ -285,90 +285,6 @@ void FactionPlayer::build_planned_building(const Map& map, const BaseHandler& ba
     }
 }
 
-void FactionPlayer::moveSingularSelectedEntity(const glm::vec3& destination, const Map& map, Entity& selectedEntity, const BaseHandler& baseHandler) const
-{
-    switch (selectedEntity.getEntityType())
-    {
-    case eEntityType::Worker:
-    {
-        Worker& selectedWorker = static_cast<Worker&>(selectedEntity);
-        const Mineral* mineralToHarvest = baseHandler.getMineral(destination);
-        if (mineralToHarvest)
-        {
-            bool mineralValid = false;
-            if (!isMineralInUse(*mineralToHarvest))
-            {
-                mineralValid = true;
-            }
-            else
-            {
-                mineralToHarvest = baseHandler.getNearestAvailableMineralAtBase(*this, *mineralToHarvest, selectedWorker.getPosition());
-                mineralValid = mineralToHarvest;
-            }
-
-            if (mineralValid)
-            {
-                selectedWorker.harvest(*mineralToHarvest, map);
-            }
-        }
-        else
-        {
-            auto selectedEntity = std::find_if(m_allEntities.cbegin(), m_allEntities.cend(), 
-                [&destination, &selectedWorker](const auto& entity)
-            {
-                return entity->getAABB().contains(destination) && entity->getID() != selectedWorker.getID();
-            });
-            if (selectedEntity != m_allEntities.cend() &&
-                (*selectedEntity)->getHealth() < (*selectedEntity)->getMaximumHealth())
-            {
-                selectedWorker.repairEntity(*(*selectedEntity), map);
-            }
-        }
-    }
-        break;
-    default:
-        assert(false);
-    }
-}
-
-void FactionPlayer::moveMultipleSelectedEntities(const glm::vec3& destination, const Map& map, const BaseHandler& baseHandler)
-{
-    assert(!m_selectedEntities.empty());
-    const Base* base = baseHandler.getBaseAtMineral(destination);
-    if (base)
-    {
-        for (auto& selectedEntity : m_selectedEntities)
-        {
-            const Mineral* mineral = baseHandler.getNearestAvailableMineralAtBase(*this, *base, selectedEntity->getPosition());
-            if (mineral)
-            {
-                selectedEntity->harvest(*mineral, map);
-            }
-        }
-    }
-    else
-    {
-        auto entityToRepair = std::find_if(m_allEntities.cbegin(), m_allEntities.cend(), [&destination](const auto& entity)
-        {
-            return entity->getAABB().contains(destination);
-        });
-        if (entityToRepair != m_allEntities.cend())
-        {
-            for (auto& selectedEntity : m_selectedEntities)
-            {
-                if ((*entityToRepair)->getID() != selectedEntity->getID() &&
-                    (*entityToRepair)->getHealth() < (*entityToRepair)->getMaximumHealth())
-                {
-                    glm::vec3 destination = PathFinding::getInstance().getClosestPositionToAABB(selectedEntity->getPosition(),
-                        (*entityToRepair)->getAABB(), map);
-
-                    selectedEntity->repairEntity(*(*entityToRepair), map);
-                }
-            }
-        }
-    }
-}
-
 void FactionPlayer::select_singular_entity(const glm::vec3& position)
 {
     for (auto& entity : m_allEntities)
@@ -435,18 +351,14 @@ void FactionPlayer::onRightClick(const glm::vec3& position, const Camera& camera
         return;
     }
 
-    if (MoveSelectedEntities(position, map))
+    if (selected_workers_harvest(position, map, baseHandler))
     {
         return;
     }
 
-    if (m_selectedEntities.size() == 1)
+    if (MoveSelectedEntities(position, map))
     {
-        moveSingularSelectedEntity(position, map, *m_selectedEntities.front(), baseHandler);
-    }
-    else if (!m_selectedEntities.empty())
-    {
-        moveMultipleSelectedEntities(position, map, baseHandler);
+        return;
     }
 }
 
@@ -500,26 +412,21 @@ void FactionPlayer::return_selected_workers_to_return_minerals(const glm::vec3& 
     }
 }
 
-void FactionPlayer::selected_workers_harvest(const glm::vec3& destination, const Map& map, const BaseHandler& baseHandler)
+bool FactionPlayer::selected_workers_harvest(const glm::vec3& destination, const Map& map, const BaseHandler& baseHandler)
 {
-    if (!m_selectedEntities.empty())
+    bool selected_entity_harvested = false;
+    if (const Base* base = baseHandler.getBaseAtMineral(destination))
     {
-        const Base* base = baseHandler.getBaseAtMineral(destination);
-        if (base)
+        for (auto& selectedEntity : m_selectedEntities)
         {
-            for (auto& selectedEntity : m_selectedEntities)
+            if (const Mineral* mineral = baseHandler.getNearestAvailableMineralAtBase(*this, *base, selectedEntity->getPosition()))
             {
-                if (selectedEntity->getEntityType() == eEntityType::Worker)
-                {
-                    const Mineral* mineral = baseHandler.getNearestAvailableMineralAtBase(*this, *base, selectedEntity->getPosition());
-                    if (mineral)
-                    {
-                        static_cast<Worker&>(*selectedEntity).harvest(*mineral, map);
-                    }
-                }
+                selected_entity_harvested = selectedEntity->Harvest(*mineral, map);
             }
         }
     }
+
+    return selected_entity_harvested;
 }
 
 bool FactionPlayer::repair_entity(const glm::vec3& position, const Map& map)

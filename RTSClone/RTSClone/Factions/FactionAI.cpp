@@ -194,7 +194,7 @@ void FactionAI::handleEvent(const GameEvent& gameEvent, const Map& map, const Fa
 				for (const auto& mineral : occupiedBase.base.get().minerals)
 				{
 					Worker& worker = m_unattachedToBaseWorkers.getClosestWorker(mineral.getPosition());
-					worker.harvest(mineral, map);
+					worker.Harvest(mineral, map);
 					occupiedBase.addWorker(worker);
 
 					if (m_unattachedToBaseWorkers.isEmpty())
@@ -831,7 +831,7 @@ void FactionAI::on_worker_idle(Worker& worker, const Map& map, const BaseHandler
 		{
 			if (const Mineral* nearestMineral = baseHandler.getNearestAvailableMineralAtBase(*this, *nearestBase, worker.getPosition()))
 			{
-				worker.harvest(*nearestMineral, map);
+				worker.Harvest(*nearestMineral, map);
 			}
 			else
 			{
@@ -844,7 +844,7 @@ void FactionAI::on_worker_idle(Worker& worker, const Map& map, const BaseHandler
 						{
 							m_occupiedBases.removeWorker(worker);
 							m_occupiedBases.addWorker(worker, base.base);
-							worker.harvest(*nearestMineral, map);
+							worker.Harvest(*nearestMineral, map);
 						}
 					}
 				}

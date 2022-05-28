@@ -33,8 +33,6 @@ private:
 	void on_entity_removal(const Entity& entity) override;
 	void instructWorkerReturnMinerals(const Map& map, const Headquarters& headquarters);
 	void build_planned_building(const Map& map, const BaseHandler& baseHandler);
-	void moveSingularSelectedEntity(const glm::vec3& destination, const Map& map, Entity& selectedEntity, const BaseHandler& baseHandler) const;
-	void moveMultipleSelectedEntities(const glm::vec3& destination, const Map& map, const BaseHandler& baseHandler);
 
 	void select_singular_entity(const glm::vec3& position);
 	void select_entity_all_of_type(const glm::vec3& position);
@@ -44,7 +42,7 @@ private:
 	bool attack_entity(const glm::vec3& position, const FactionHandler& factionHandler, const Map& map);
 	bool set_building_waypoints(const glm::vec3& position, const Map& map);
 	void return_selected_workers_to_return_minerals(const glm::vec3& position, const Map& map);
-	void selected_workers_harvest(const glm::vec3& destination, const Map& map, const BaseHandler& baseHandler);
+	bool selected_workers_harvest(const glm::vec3& destination, const Map& map, const BaseHandler& baseHandler);
 	bool repair_entity(const glm::vec3& position, const Map& map);
-	bool MoveSelectedEntities(const glm::vec3& position, const Map& map)
+	bool MoveSelectedEntities(const glm::vec3& position, const Map& map);
 };
