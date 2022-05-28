@@ -403,12 +403,14 @@ void Worker::return_minerals_to_headquarters(const Headquarters& headquarters, c
 	move_to(destination, map, eWorkerState::ReturningMineralsToHeadquarters);
 }
 
-void Worker::MoveTo(const glm::vec3& position, const Map& map, const bool add_to_destinations)
+bool Worker::MoveTo(const glm::vec3& position, const Map& map, const bool add_to_destinations)
 {
 	if (m_movement.IsMovableAfterAddingDestination(add_to_destinations, position))
 	{
-		move_to(position, map, eWorkerState::Moving);
+		return move_to(position, map, eWorkerState::Moving);
 	}
+
+	return false;
 }
 
 void Worker::revalidate_movement_path(const Map& map)
@@ -592,13 +594,14 @@ void Worker::switchTo(eWorkerState newState)
 	
 }
 
-void Worker::move_to(const glm::vec3& destination, const Map& map, eWorkerState state)
+bool Worker::move_to(const glm::vec3& destination, const Map& map, eWorkerState state)
 {
 	glm::vec3 previousDestination = Globals::getNextPathDestination(m_movement.path, m_position);
 	PathFinding::getInstance().getPathToPosition(*this, destination, m_movement.path, map, createAdjacentPositions(map));
 	if (!m_movement.path.empty())
 	{
 		switchTo(state);
+		return true;
 	}
 	else
 	{
@@ -606,21 +609,25 @@ void Worker::move_to(const glm::vec3& destination, const Map& map, eWorkerState 
 		{
 			m_movement.path.push_back(previousDestination);
 			switchTo(state);
+			return true;
 		}
 		else
 		{
 			switchTo(eWorkerState::Idle);
 		}
 	}
+
+	return false;
 }
 
-void Worker::move_to(const glm::vec3& destination, const Map& map, const AABB& ignoreAABB, eWorkerState state)
+bool Worker::move_to(const glm::vec3& destination, const Map& map, const AABB& ignoreAABB, eWorkerState state)
 {
 	glm::vec3 previousDestination = Globals::getNextPathDestination(m_movement.path, m_position);
 	PathFinding::getInstance().getPathToPosition(*this, destination, m_movement.path, map, createAdjacentPositions(map, ignoreAABB));
 	if (!m_movement.path.empty())
 	{
 		switchTo(state);
+		return true;
 	}
 	else
 	{
@@ -628,10 +635,13 @@ void Worker::move_to(const glm::vec3& destination, const Map& map, const AABB& i
 		{
 			m_movement.path.push_back(previousDestination);
 			switchTo(state);
+			return true;
 		}
 		else
 		{
 			switchTo(eWorkerState::Idle);
 		}
 	}
+
+	return false;
 }

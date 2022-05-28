@@ -289,12 +289,6 @@ void FactionPlayer::moveSingularSelectedEntity(const glm::vec3& destination, con
 {
     switch (selectedEntity.getEntityType())
     {
-    case eEntityType::Unit:
-    {
-        eUnitState state = (m_attackMoveSelected ? eUnitState::AttackMoving : eUnitState::Moving);
-        selectedEntity.MoveTo(destination, map, m_addToDestinationQueue);
-    }
-        break;
     case eEntityType::Worker:
     {
         Worker& selectedWorker = static_cast<Worker&>(selectedEntity);
@@ -328,10 +322,6 @@ void FactionPlayer::moveSingularSelectedEntity(const glm::vec3& destination, con
                 (*selectedEntity)->getHealth() < (*selectedEntity)->getMaximumHealth())
             {
                 selectedWorker.repairEntity(*(*selectedEntity), map);
-            }
-            else
-            {
-                selectedWorker.MoveTo(destination, map, m_addToDestinationQueue);
             }
         }
     }
@@ -374,16 +364,6 @@ void FactionPlayer::moveMultipleSelectedEntities(const glm::vec3& destination, c
 
                     selectedEntity->repairEntity(*(*entityToRepair), map);
                 }
-            }
-        }
-        else
-        {
-            glm::vec3 averagePosition = getAveragePosition(m_selectedEntities);
-            for (auto& selectedEntity : m_selectedEntities)
-            {
-                eUnitState state = (m_attackMoveSelected ? eUnitState::AttackMoving : eUnitState::Moving);
-                glm::vec3 position = destination - (averagePosition - selectedEntity->getPosition());
-                selectedEntity->MoveTo(position, map, m_addToDestinationQueue);
             }
         }
     }
@@ -451,6 +431,11 @@ void FactionPlayer::onRightClick(const glm::vec3& position, const Camera& camera
     }
 
     if (repair_entity(position, map))
+    {
+        return;
+    }
+
+    if (MoveSelectedEntities(position, map))
     {
         return;
     }
@@ -557,4 +542,18 @@ bool FactionPlayer::repair_entity(const glm::vec3& position, const Map& map)
     }    
 
     return true;
+}
+
+bool FactionPlayer::MoveSelectedEntities(const glm::vec3& position, const Map& map)
+{
+    bool selected_entity_moved = false;
+    const glm::vec3 averagePosition = getAveragePosition(m_selectedEntities);
+    for (auto& selectedEntity : m_selectedEntities)
+    {
+        eUnitState state = (m_attackMoveSelected ? eUnitState::AttackMoving : eUnitState::Moving);
+        glm::vec3 destination = position - (averagePosition - selectedEntity->getPosition());
+        selected_entity_moved = selectedEntity->MoveTo(destination, map, m_addToDestinationQueue);
+    }
+
+    return selected_entity_moved;
 }

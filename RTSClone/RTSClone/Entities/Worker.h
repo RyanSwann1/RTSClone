@@ -67,7 +67,7 @@ public:
 		bool clearBuildQueue = false);
 	void harvest(const Mineral& mineral, const Map& map) override;
 	void return_minerals_to_headquarters(const Headquarters& headquarters, const Map& map);
-	void MoveTo(const glm::vec3& position, const Map& map, const bool add_to_destinations) override;
+	bool MoveTo(const glm::vec3& position, const Map& map, const bool add_to_destinations) override;
 	void delayed_update(const Map& map, const FactionHandler& factionHandler);
 	void update(float deltaTime, const Map& map, const FactionHandler& factionHandler);
 	void revalidate_movement_path(const Map& map);
@@ -90,6 +90,6 @@ private:
 	const Mineral* m_mineralToHarvest					= nullptr;
 
 	void switchTo(eWorkerState newState);
-	void move_to(const glm::vec3& destination, const Map& map, const AABB& ignoreAABB, eWorkerState state);
-	void move_to(const glm::vec3& destination, const Map& map, eWorkerState state);
+	bool move_to(const glm::vec3& destination, const Map& map, const AABB& ignoreAABB, eWorkerState state);
+	bool move_to(const glm::vec3& destination, const Map& map, eWorkerState state);
 };

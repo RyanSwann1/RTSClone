@@ -133,11 +133,11 @@ void Unit::attack_entity(const Entity& targetEntity, const eFactionController ta
 	}
 }
 
-void Unit::MoveTo(const glm::vec3& destination, const Map& map, const bool add_to_destinations)
+bool Unit::MoveTo(const glm::vec3& destination, const Map& map, const bool add_to_destinations)
 {
 	if (!m_movement.IsMovableAfterAddingDestination(add_to_destinations, destination))
 	{
-		return;
+		return false;
 	}
 
 	glm::vec3 previousDestination = Globals::getNextPathDestination(m_movement.path, m_position);
@@ -150,6 +150,7 @@ void Unit::MoveTo(const glm::vec3& destination, const Map& map, const bool add_t
 	if (!m_movement.path.empty())
 	{
 		switchToState(eUnitState::Moving);
+		return true;
 	}
 	else
 	{
@@ -159,12 +160,15 @@ void Unit::MoveTo(const glm::vec3& destination, const Map& map, const bool add_t
 				createAdjacentPositions(map, *this));
 
 			switchToState(eUnitState::Moving);
+			return true;
 		}
 		else
 		{
 			switchToState(eUnitState::Idle);
 		}
 	}
+
+	return false;
 }
 
 void Unit::update(float deltaTime, const FactionHandler& factionHandler, const Map& map)

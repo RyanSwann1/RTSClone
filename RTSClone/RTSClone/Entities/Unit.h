@@ -46,7 +46,7 @@ public:
 
 	void clear_destinations();
 	void attack_entity(const Entity& targetEntity, const eFactionController targetController, const Map& map) override;
-	void MoveTo(const glm::vec3& destination, const Map& map, const bool add_to_destinations) override;
+	bool MoveTo(const glm::vec3& destination, const Map& map, const bool add_to_destinations) override;
 	void update(float deltaTime, const FactionHandler& factionHandler, const Map& map);
 	void delayed_update(const FactionHandler& factionHandler, const Map& map);
 	void revalidate_movement_path(const Map& map);
