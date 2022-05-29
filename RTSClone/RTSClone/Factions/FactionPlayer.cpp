@@ -187,16 +187,16 @@ void FactionPlayer::update(float deltaTime, const Map& map, const FactionHandler
                 m_selectedEntities.push_back(entity);
             }
         }
-        
-        if (m_selectedEntities.size() == 1)
-        {
-            Level::add_event(
-                GameEvent::create<SetTargetEntityGUIEvent>({ getController(), m_selectedEntities.back()->getID(), m_selectedEntities.back()->getEntityType() }));
-        }
-        else if (m_selectedEntities.size() > 1)
-        {
-            Level::add_event(GameEvent::create<ResetTargetEntityGUIEvent>({}));
-        }
+    }
+
+    if (m_selectedEntities.size() == 1)
+    {
+        Level::add_event(
+            GameEvent::create<SetTargetEntityGUIEvent>({ getController(), m_selectedEntities.back()->getID(), m_selectedEntities.back()->getEntityType() }));
+    }
+    else if (m_selectedEntities.size() > 1)
+    {
+        Level::add_event(GameEvent::create<ResetTargetEntityGUIEvent>({}));
     }
 }
 
