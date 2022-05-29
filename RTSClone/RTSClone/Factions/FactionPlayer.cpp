@@ -151,17 +151,7 @@ void FactionPlayer::handleEvent(const GameEvent& gameEvent, const Map& map, cons
         });
         if (entity != m_allEntities.end())
         {
-            switch ((*entity)->getEntityType())
-            {
-            case eEntityType::Barracks:
-                static_cast<Barracks&>(*(*entity)).add_entity_to_spawn_queue(*this);
-                break;
-            case eEntityType::Headquarters:
-                static_cast<Headquarters&>(*(*entity)).add_entity_to_spawn_queue(*this);
-                break;
-            default:
-                assert(false);
-            }
+            (*entity)->AddEntityToSpawnQueue(*this);
         }
         break;
     }
@@ -172,6 +162,7 @@ void FactionPlayer::handleEvent(const GameEvent& gameEvent, const Map& map, cons
 void FactionPlayer::update(float deltaTime, const Map& map, const FactionHandler& factionHandler, const BaseHandler& baseHandler)
 {
     Faction::update(deltaTime, map, factionHandler, baseHandler);
+
     broadcast<GameMessages::UIDisplayPlayerDetails>(
         { getCurrentResourceAmount(), getCurrentPopulationAmount(), getMaximumPopulationAmount() });
 

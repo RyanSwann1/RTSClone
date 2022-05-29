@@ -679,7 +679,7 @@ bool FactionAI::build(const Map& map, eEntityType entityType, AIOccupiedBase& oc
 		Entity* barracks = occupiedBase.getBuilding(eEntityType::Barracks);
 		if (barracks)
 		{
-			return static_cast<Barracks&>(*barracks).add_entity_to_spawn_queue(*this);
+			barracks->AddEntityToSpawnQueue(*this);
 		}
 	}
 		break;
@@ -691,7 +691,7 @@ bool FactionAI::build(const Map& map, eEntityType entityType, AIOccupiedBase& oc
 		{
 			return headquarters.getPosition() == basePosition;
 		});
-		return headquarters != m_headquarters.end() ? headquarters->add_entity_to_spawn_queue(*this) : false;
+		return headquarters != m_headquarters.end() ? headquarters->AddEntityToSpawnQueue(*this) : false;
 	}
 		break;
 	default:

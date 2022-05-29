@@ -108,7 +108,7 @@ bool EntitySpawnerBuilding::set_waypoint_position(const glm::vec3& position, con
 	return false;
 }
 
-bool EntitySpawnerBuilding::add_entity_to_spawn_queue(const Faction& owningFaction)
+bool EntitySpawnerBuilding::AddEntityToSpawnQueue(const Faction& owningFaction)
 {
 	if (m_spawnCount < m_details.maxSpawnCount &&
 		owningFaction.isAffordable(m_spawnCount * m_details.resourceCost + m_details.resourceCost) &&
