@@ -137,10 +137,19 @@ void FactionPlayer::handleEvent(const GameEvent& gameEvent, const Map& map, cons
     switch (gameEvent.type)
     {
     case eGameEventType::PlayerActivatePlannedBuilding:
-        assert(m_selectedEntities.size() == 1);
-
-        m_plannedBuilding = 
-            std::optional<FactionPlayerPlannedBuilding>(std::in_place, gameEvent.data.playerActivatePlannedBuilding, m_selectedEntities.front()->getPosition());
+    {
+        const auto entity = std::find_if(m_allEntities.cbegin(), m_allEntities.cend(),
+                [id = gameEvent.data.playerActivatePlannedBuilding.targetID] (const auto& entity)
+        {
+            return entity->getID() == id;
+        });
+        if (entity != m_allEntities.cend())
+        {
+            m_plannedBuilding =
+                std::optional<FactionPlayerPlannedBuilding>(std::in_place, 
+                    gameEvent.data.playerActivatePlannedBuilding, (*entity)->getPosition());
+        }
+    }
         break;
     case eGameEventType::PlayerSpawnEntity:
     {
