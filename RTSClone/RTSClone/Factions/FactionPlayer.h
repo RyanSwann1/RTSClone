@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Faction.h"
-#include "UI/EntitySelector.h"
+#include "UI/EntitySelectorBox.h"
 #include "FactionPlayerPlannedBuilding.h"
 #include <SFML/Graphics.hpp>
 #include <optional>
@@ -24,7 +24,7 @@ public:
 
 private:
 	std::optional<FactionPlayerPlannedBuilding> m_plannedBuilding	= {};
-	EntitySelector m_entitySelector									= {};
+	EntitySelectorBox m_entitySelectorBox							= {};
 	glm::vec3 m_previousMousePosition								= {};
 	bool m_attackMoveSelected										= false;
 	bool m_addToDestinationQueue									= false;
