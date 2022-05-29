@@ -205,7 +205,7 @@
     <ClCompile Include="Model\AdjacentPositions.cpp" />
     <ClCompile Include="Model\Projectile.cpp" />
     <ClCompile Include="Scene\SceneryGameObject.cpp" />
-    <ClCompile Include="UI\EntitySelector.cpp" />
+    <ClCompile Include="UI\EntitySelectorBox.cpp" />
     <ClCompile Include="UI\MiniMap.cpp" />
     <ClCompile Include="UI\Sprite.cpp" />
     <ClCompile Include="UI\UIManager.cpp" />
@@ -312,7 +312,7 @@
     <ClInclude Include="Model\AdjacentPositions.h" />
     <ClInclude Include="Model\Projectile.h" />
     <ClInclude Include="Scene\SceneryGameObject.h" />
-    <ClInclude Include="UI\EntitySelector.h" />
+    <ClInclude Include="UI\EntitySelectorBox.h" />
     <ClInclude Include="UI\MiniMap.h" />
     <ClInclude Include="UI\Sprite.h" />
     <ClInclude Include="UI\UIManager.h" />

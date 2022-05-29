@@ -53,7 +53,7 @@ void FactionPlayer::handleInput(const sf::Event& currentSFMLEvent, const sf::Win
         if (currentSFMLEvent.mouseButton.button == sf::Mouse::Left)
         {
             const glm::vec3 mousePosition = camera.getRayToGroundPlaneIntersection(window);
-            m_entitySelector.setStartingPosition(window, mousePosition);
+            m_entitySelectorBox.setStartingPosition(window, mousePosition);
             m_selectedEntities.clear();
             if (m_plannedBuilding)
             {
@@ -92,7 +92,7 @@ void FactionPlayer::handleInput(const sf::Event& currentSFMLEvent, const sf::Win
         m_attackMoveSelected = false;
         if (currentSFMLEvent.mouseButton.button == sf::Mouse::Left)
         {
-            if (m_entitySelector.isActive() && !m_selectedEntities.empty())
+            if (m_entitySelectorBox.isActive() && !m_selectedEntities.empty())
             {
                 for (auto& entity : m_allEntities)
                 {
@@ -103,11 +103,11 @@ void FactionPlayer::handleInput(const sf::Event& currentSFMLEvent, const sf::Win
                 }
             }
 
-            m_entitySelector.reset();
+            m_entitySelectorBox.reset();
         }
         break;
     case sf::Event::MouseMoved:
-        m_entitySelector.update(camera, window);
+        m_entitySelectorBox.update(camera, window);
         if (m_plannedBuilding)
         {
             m_plannedBuilding->handleInput(currentSFMLEvent, camera, window, map);
@@ -176,13 +176,13 @@ void FactionPlayer::update(float deltaTime, const Map& map, const FactionHandler
     broadcast<GameMessages::UIDisplayPlayerDetails>(
         { getCurrentResourceAmount(), getCurrentPopulationAmount(), getMaximumPopulationAmount() });
 
-    if (m_entitySelector.isActive())
+    if (m_entitySelectorBox.isActive())
     {
         m_selectedEntities.clear();
         for (auto& entity : m_allEntities)
         {
             if (entity->is_group_selectable() 
-                && entity->setSelected(m_entitySelector.getAABB().contains(entity->getAABB())))
+                && entity->setSelected(m_entitySelectorBox.getAABB().contains(entity->getAABB())))
             {
                 m_selectedEntities.push_back(entity);
             }
@@ -215,7 +215,7 @@ void FactionPlayer::renderPlannedBuilding(ShaderHandler& shaderHandler, const Ma
 
 void FactionPlayer::renderEntitySelector(const sf::Window& window, ShaderHandler& shaderHandler) const
 {
-    m_entitySelector.render(window, shaderHandler);
+    m_entitySelectorBox.render(window, shaderHandler);
 }
 
 void FactionPlayer::on_entity_removal(const Entity& entity)
