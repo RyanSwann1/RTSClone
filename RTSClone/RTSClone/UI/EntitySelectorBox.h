@@ -6,7 +6,7 @@
 
 class ShaderHandler;
 struct Camera;
-class EntitySelector 
+class EntitySelectorBox 
 {
 public:
 	const AABB& getAABB() const;

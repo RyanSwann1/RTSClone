@@ -33,30 +33,30 @@ namespace
     }
 };
 
-const AABB& EntitySelector::getAABB() const
+const AABB& EntitySelectorBox::getAABB() const
 {
     return m_AABB;
 }
 
-bool EntitySelector::isActive() const
+bool EntitySelectorBox::isActive() const
 {
     return m_enabled && isMinimumSize();
 }
 
-bool EntitySelector::isMinimumSize() const
+bool EntitySelectorBox::isMinimumSize() const
 {
     return (m_AABB.getRight() - m_AABB.getLeft() >= MINIMUM_SIZE) || 
         (m_AABB.getForward() - m_AABB.getBack() >= MINIMUM_SIZE);
 }
 
-void EntitySelector::setStartingPosition(const sf::Window& window, const glm::vec3& position)
+void EntitySelectorBox::setStartingPosition(const sf::Window& window, const glm::vec3& position)
 {
     m_worldStartingPosition = position;
     m_startingMousePosition = convertMousePositionToNDC(window);
     m_enabled = true;
 }
 
-void EntitySelector::update(const Camera& camera, const sf::Window& window)
+void EntitySelectorBox::update(const Camera& camera, const sf::Window& window)
 {
     if (m_enabled)
     {
@@ -77,13 +77,13 @@ void EntitySelector::update(const Camera& camera, const sf::Window& window)
     }
 }
 
-void EntitySelector::reset()
+void EntitySelectorBox::reset()
 {
     m_enabled = false;
     m_AABB.reset();
 }
 
-void EntitySelector::render(const sf::Window& window, ShaderHandler& shaderHandler) const
+void EntitySelectorBox::render(const sf::Window& window, ShaderHandler& shaderHandler) const
 {
     if (isActive())
     {
