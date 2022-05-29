@@ -18,8 +18,7 @@
 namespace
 {
     glm::vec3 getAveragePosition(std::vector<Entity*>& selectedEntities)
-    {
-        assert(!selectedEntities.empty()); 
+    { 
         std::sort(selectedEntities.begin(), selectedEntities.end(), [](const auto& unitA, const auto& unitB)
         {
             return glm::all(glm::lessThan(unitA->getPosition(), unitB->getPosition()));
@@ -287,18 +286,18 @@ void FactionPlayer::build_planned_building(const Map& map, const BaseHandler& ba
 
 void FactionPlayer::select_singular_entity(const glm::vec3& position)
 {
+    bool entity_selected = false;
     for (auto& entity : m_allEntities)
     {
-        entity->setSelected(false);
-    }
-
-    auto selectedEntity = std::find_if(m_allEntities.cbegin(), m_allEntities.cend(), [&position](auto& entity)
-    {
-        return entity->getAABB().contains(position);
-    });
-    if (selectedEntity != m_allEntities.cend())
-    {
-        (*selectedEntity)->setSelected(true);
+        if (!entity_selected && entity->getAABB().contains(position))
+        {
+            entity->setSelected(true);
+            entity_selected = true;
+        }
+        else
+        {
+            entity->setSelected(false);
+        }
     }
 }
 
