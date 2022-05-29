@@ -36,7 +36,7 @@ public:
 	Entity& operator=(const Entity&) = delete;
 	Entity(Entity&&) noexcept = default;
 	Entity& operator=(Entity&&) noexcept = default;
-	virtual ~Entity() {};
+	virtual ~Entity() = default;
 
 	eEntityType getEntityType() const;
 	int getMaximumHealth() const;

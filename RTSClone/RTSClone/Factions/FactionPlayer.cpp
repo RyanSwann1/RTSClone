@@ -137,8 +137,7 @@ void FactionPlayer::handleEvent(const GameEvent& gameEvent, const Map& map, cons
     switch (gameEvent.type)
     {
     case eGameEventType::PlayerActivatePlannedBuilding:
-        assert(m_selectedEntities.size() == 1 && 
-            m_selectedEntities.front()->getEntityType() == eEntityType::Worker);
+        assert(m_selectedEntities.size() == 1);
 
         m_plannedBuilding = 
             std::optional<FactionPlayerPlannedBuilding>(std::in_place, gameEvent.data.playerActivatePlannedBuilding, m_selectedEntities.front()->getPosition());
@@ -293,6 +292,7 @@ void FactionPlayer::select_singular_entity(const glm::vec3& position)
         {
             entity->setSelected(true);
             entity_selected = true;
+            m_selectedEntities.push_back(entity);
         }
         else
         {
