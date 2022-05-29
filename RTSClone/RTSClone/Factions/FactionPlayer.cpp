@@ -304,30 +304,37 @@ void FactionPlayer::select_singular_entity(const glm::vec3& position)
 
 void FactionPlayer::select_entity_all_of_type(const glm::vec3& position)
 {
+    Entity* selected_entity = nullptr;
     for (auto& entity : m_allEntities)
     {
+        if (entity->getAABB().contains(position))
+        {
+            selected_entity = entity;
+        }
+
         entity->setSelected(false);
     }
 
-    auto selectedEntity = std::find_if(m_allEntities.cbegin(), m_allEntities.cend(), [&position](auto& entity)
-    {
-        return entity->getAABB().contains(position);
-    });
-    if (selectedEntity == m_allEntities.cend())
+    if (!selected_entity)
     {
         return;
     }
 
-    if ((*selectedEntity)->is_group_selectable())
+    if (selected_entity->is_group_selectable())
     {
-        for (const auto& entity : m_allEntities)
+        for (auto& entity : m_allEntities)
         {
-            entity->setSelected(entity->getEntityType() == (*selectedEntity)->getEntityType());
+            if (entity->setSelected(entity->getEntityType() == selected_entity->getEntityType()))
+            {
+                m_selectedEntities.push_back(entity);
+            }
+
         }
     }
     else
     {
-        (*selectedEntity)->setSelected(true);
+        selected_entity->setSelected(true);
+        m_selectedEntities.push_back(selected_entity);
     }
 }
 
