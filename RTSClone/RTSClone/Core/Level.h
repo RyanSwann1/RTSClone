@@ -46,7 +46,7 @@ public:
 	const BaseHandler& getBaseHandler() const;
 	const Camera& getCamera() const;
 	bool isMinimapInteracted() const;
-	const FactionsContainer& getFactions() const;
+	const std::vector<std::unique_ptr<Faction>>& getFactions() const;
 	const glm::vec3& getSize() const;
 	const Faction* getWinningFaction() const;
 

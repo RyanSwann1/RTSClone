@@ -44,7 +44,7 @@ const std::vector<Entity*>& FactionPlayer::getSelectedEntities() const
 }
 
 void FactionPlayer::handleInput(const sf::Event& currentSFMLEvent, const sf::Window& window, const Camera& camera, 
-    const Map& map, const FactionHandler& factionHandler, const BaseHandler& baseHandler, const MiniMap& miniMap, 
+    const Map& map, FactionHandler& factionHandler, const BaseHandler& baseHandler, const MiniMap& miniMap, 
     const glm::vec3& levelSize)
 {
     switch (currentSFMLEvent.type)
@@ -130,7 +130,7 @@ void FactionPlayer::handleInput(const sf::Event& currentSFMLEvent, const sf::Win
     }
 }
 
-void FactionPlayer::handleEvent(const GameEvent& gameEvent, const Map& map, const FactionHandler& factionHandler, const BaseHandler& baseHandler)
+void FactionPlayer::handleEvent(const GameEvent& gameEvent, const Map& map, FactionHandler& factionHandler, const BaseHandler& baseHandler)
 {
     Faction::handleEvent(gameEvent, map, factionHandler, baseHandler);
 
@@ -168,7 +168,7 @@ void FactionPlayer::handleEvent(const GameEvent& gameEvent, const Map& map, cons
     }
 }
 
-void FactionPlayer::update(float deltaTime, const Map& map, const FactionHandler& factionHandler, const BaseHandler& baseHandler)
+void FactionPlayer::update(float deltaTime, const Map& map, FactionHandler& factionHandler, const BaseHandler& baseHandler)
 {
     Faction::update(deltaTime, map, factionHandler, baseHandler);
 
@@ -337,7 +337,7 @@ void FactionPlayer::select_entity_all_of_type(const glm::vec3& position)
     }
 }
 
-void FactionPlayer::onRightClick(const glm::vec3& position, const Camera& camera, const FactionHandler& factionHandler, const Map& map,
+void FactionPlayer::onRightClick(const glm::vec3& position, const Camera& camera, FactionHandler& factionHandler, const Map& map,
     const BaseHandler& baseHandler)
 {
     m_plannedBuilding.reset();
@@ -368,15 +368,10 @@ void FactionPlayer::onRightClick(const glm::vec3& position, const Camera& camera
     }
 }
 
-bool FactionPlayer::attack_entity(const glm::vec3& position, const FactionHandler& factionHandler, const Map& map)
+bool FactionPlayer::attack_entity(const glm::vec3& position, FactionHandler& factionHandler, const Map& map)
 {
-    for (const Faction* opposingFaction : factionHandler.getOpposingFactions(getController()))
+    for (const Faction* opposingFaction : factionHandler.GetOpposingFactions(getController()))
     {
-        if (!opposingFaction)
-        {
-            continue;
-        }
-
         const Entity* targetEntity = opposingFaction->getEntity(position);
         if (targetEntity)
         {

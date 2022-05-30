@@ -68,8 +68,8 @@ public:
 	bool Harvest(const Mineral& mineral, const Map& map) override;
 	void return_minerals_to_headquarters(const Headquarters& headquarters, const Map& map);
 	bool MoveTo(const glm::vec3& position, const Map& map, const bool add_to_destinations) override;
-	void delayed_update(const Map& map, const FactionHandler& factionHandler);
-	void update(float deltaTime, const Map& map, const FactionHandler& factionHandler);
+	void delayed_update(const Map& map, FactionHandler& factionHandler);
+	void update(float deltaTime, const Map& map, FactionHandler& factionHandler);
 	void revalidate_movement_path(const Map& map);
 
 	void render(ShaderHandler& shaderHandler, eFactionController owningFactionController) const;

@@ -13,7 +13,7 @@ namespace
 	constexpr glm::vec3 TERRAIN_COLOR = { 0.9098039f, 0.5176471f, 0.3882353f };
 	std::queue<GameEvent> gameEvents = {};
 
-	bool is_hit_entity(const Projectile& projectile, const FactionHandler& factionHandler)
+	bool is_hit_entity(const Projectile& projectile, FactionHandler& factionHandler)
 	{
 		const Entity* entity = nullptr;
 		if (const Faction* targetFaction = factionHandler.getFaction(projectile.getSenderEvent().targetFaction))
@@ -36,20 +36,17 @@ Level::Level(LevelDetailsFromFile&& levelDetails, glm::ivec2 windowSize)
 {
 	for (auto& faction : m_factionHandler.getFactions())
 	{
-		if (faction)
+		switch (faction->getController())
 		{
-			switch (faction->getController())
-			{
-			case eFactionController::Player:
-				break;
-			case eFactionController::AI_1:
-			case eFactionController::AI_2:
-			case eFactionController::AI_3:
-				static_cast<FactionAI&>(*faction.get()).setTargetFaction(m_factionHandler);
-				break;
-			default:
-				assert(false);
-			}
+		case eFactionController::Player:
+			break;
+		case eFactionController::AI_1:
+		case eFactionController::AI_2:
+		case eFactionController::AI_3:
+			static_cast<FactionAI&>(*faction.get()).setTargetFaction(m_factionHandler);
+			break;
+		default:
+			assert(false);
 		}
 	}
 	
@@ -66,12 +63,9 @@ Level::Level(LevelDetailsFromFile&& levelDetails, glm::ivec2 windowSize)
 	{
 		for (const auto& faction : m_factionHandler.getFactions())
 		{
-			if (faction)
+			if (const Headquarters* mainHeadquarters = faction->getMainHeadquarters())
 			{
-				if (const Headquarters* mainHeadquarters = faction->getMainHeadquarters())
-				{
-					cameraStartingPosition = { mainHeadquarters->getPosition().z, mainHeadquarters->getPosition().x };
-				}
+				cameraStartingPosition = { mainHeadquarters->getPosition().z, mainHeadquarters->getPosition().x };
 			}
 		}
 	}
@@ -111,7 +105,7 @@ bool Level::isMinimapInteracted() const
 	return m_minimap.isUserInteracted();
 }
 
-const FactionsContainer& Level::getFactions() const
+const std::vector<std::unique_ptr<Faction>>& Level::getFactions() const
 {
 	return m_factionHandler.getFactions();
 }
@@ -168,20 +162,17 @@ void Level::handleInput(glm::uvec2 windowSize, const sf::Window& window, const s
 			glm::vec3 position = m_camera.getRayToGroundPlaneIntersection(window);
 			std::for_each(m_factionHandler.getFactions().begin(), m_factionHandler.getFactions().end(), [&position](auto& faction)
 			{
-				if (faction)
+				switch (faction.get()->getController())
 				{
-					switch (faction.get()->getController())
-					{
-					case eFactionController::AI_1:
-					case eFactionController::AI_2:
-					case eFactionController::AI_3:
-						static_cast<FactionAI&>(*faction).selectEntity(position);
-						break;
-					case eFactionController::Player:
-						break;
-					default:
-						assert(false);
-					}
+				case eFactionController::AI_1:
+				case eFactionController::AI_2:
+				case eFactionController::AI_3:
+					static_cast<FactionAI&>(*faction).selectEntity(position);
+					break;
+				case eFactionController::Player:
+					break;
+				default:
+					assert(false);
 				}
 			});
 
@@ -220,10 +211,7 @@ void Level::update(float deltaTime, UIManager& uiManager, glm::uvec2 windowSize,
 
 	for (auto& faction : m_factionHandler.getFactions())
 	{
-		if (faction)
-		{
-			faction->update(deltaTime, m_map, m_factionHandler, m_baseHandler);
-		}
+		faction->update(deltaTime, m_map, m_factionHandler, m_baseHandler);
 	}
 
 	const auto now = std::chrono::high_resolution_clock::now();
@@ -231,10 +219,7 @@ void Level::update(float deltaTime, UIManager& uiManager, glm::uvec2 windowSize,
 	{
 		for (auto& faction : m_factionHandler.getFactions())
 		{
-			if (faction)
-			{
-				faction->delayed_update(m_map, m_factionHandler);
-			}
+			faction->delayed_update(m_map, m_factionHandler);
 		}
 		m_lastDelayedUpdate = now;
 	}
@@ -280,21 +265,15 @@ void Level::renderPlannedBuildings(ShaderHandler& shaderHandler) const
 {
 	std::for_each(m_factionHandler.getFactions().cbegin(), m_factionHandler.getFactions().cend(), [&shaderHandler](auto& faction)
 	{
-		if(faction)
-		{
-			faction->renderPlannedBuildings(shaderHandler);
-		}
+		faction->renderPlannedBuildings(shaderHandler);
 	});
 }
 
 void Level::renderEntityStatusBars(ShaderHandler& shaderHandler, glm::uvec2 windowSize) const
 {
 	std::for_each(m_factionHandler.getFactions().cbegin(), m_factionHandler.getFactions().cend(), [&shaderHandler, windowSize, this](auto& faction)
-	{
-		if (faction)
-		{
-			faction->renderEntityStatusBars(shaderHandler, m_camera, windowSize);
-		}
+	{	
+		faction->renderEntityStatusBars(shaderHandler, m_camera, windowSize);	
 	});
 }
 
@@ -330,7 +309,7 @@ void Level::render(ShaderHandler& shaderHandler) const
 
 	std::for_each(m_factionHandler.getFactions().cbegin(), m_factionHandler.getFactions().cend(), [&shaderHandler](auto& faction)
 	{
-		if (faction) { faction->render(shaderHandler); }
+		faction->render(shaderHandler); 
 	});
 
 	m_baseHandler.renderMinerals(shaderHandler);
@@ -365,10 +344,9 @@ void Level::renderPathing(ShaderHandler& shaderHandler)
 {
 	std::for_each(m_factionHandler.getFactions().cbegin(), m_factionHandler.getFactions().cend(), [&shaderHandler](auto& faction)
 	{
-		if (faction)
-		{
-			faction->renderPathing(shaderHandler);
-		}
+		
+		faction->renderPathing(shaderHandler);
+		
 	});
 }
 #endif // RENDER_PATHING
@@ -423,10 +401,7 @@ void Level::handleEvent(const GameEvent& gameEvent, const Map& map)
 	case eGameEventType::RevalidateMovementPaths:
 		std::for_each(m_factionHandler.getFactions().begin(), m_factionHandler.getFactions().end(), [&gameEvent, &map, this](auto& faction)
 		{
-			if (faction)
-			{
-				faction->handleEvent(gameEvent, map, m_factionHandler, m_baseHandler);
-			}
+			faction->handleEvent(gameEvent, map, m_factionHandler, m_baseHandler);	
 		});
 		break;
 	case eGameEventType::HeadquartersDestroyed:
@@ -436,7 +411,7 @@ void Level::handleEvent(const GameEvent& gameEvent, const Map& map)
 		{
 			for (auto& faction : m_factionHandler.getFactions())
 			{
-				if (faction && faction->getController() != eFactionController::Player)
+				if (faction->getController() != eFactionController::Player)
 				{
 					static_cast<FactionAI&>(*faction).onFactionElimination(
 						m_factionHandler, gameEvent.data.headquartersDestroyed.factionController);

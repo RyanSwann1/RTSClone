@@ -171,7 +171,7 @@ bool Worker::build(const Faction& owningFaction, const glm::vec3& buildPosition,
 	return false;
 }
 
-void Worker::update(float deltaTime, const Map& map, const FactionHandler& factionHandler)
+void Worker::update(float deltaTime, const Map& map, FactionHandler& factionHandler)
 {
 	Entity::update(deltaTime);
 
@@ -350,7 +350,7 @@ void Worker::update(float deltaTime, const Map& map, const FactionHandler& facti
 	}
 }
 
-void Worker::delayed_update(const Map& map, const FactionHandler& factionHandler)
+void Worker::delayed_update(const Map& map, FactionHandler& factionHandler)
 {
 	switch (m_currentState)
 	{

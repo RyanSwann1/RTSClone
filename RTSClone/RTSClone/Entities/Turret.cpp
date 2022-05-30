@@ -41,7 +41,7 @@ bool Turret::is_group_selectable() const
 	return false;
 }
 
-void Turret::update(float deltaTime, const FactionHandler& factionHandler, const Map& map)
+void Turret::update(float deltaTime, FactionHandler& factionHandler, const Map& map)
 {
 	Entity::update(deltaTime);
 	m_stateHandlerTimer.update(deltaTime);
@@ -88,12 +88,8 @@ void Turret::update(float deltaTime, const FactionHandler& factionHandler, const
 	{
 		if (m_stateHandlerTimer.isExpired())
 		{
-			for (const Faction* opposingFaction : factionHandler.getOpposingFactions(m_owningFaction.get().getController()))
+			for (const Faction* opposingFaction : factionHandler.GetOpposingFactions(m_owningFaction.get().getController()))
 			{
-				if (!opposingFaction)
-				{
-					continue;
-				}
 				if (const Entity* targetEntity = opposingFaction->getEntity(m_position, TURRET_ATTACK_RANGE))
 				{
 					m_target = { opposingFaction->getController(), targetEntity->getID() };

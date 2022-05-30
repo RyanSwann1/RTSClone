@@ -171,7 +171,7 @@ bool Unit::MoveTo(const glm::vec3& destination, const Map& map, const bool add_t
 	return false;
 }
 
-void Unit::update(float deltaTime, const FactionHandler& factionHandler, const Map& map)
+void Unit::update(float deltaTime, FactionHandler& factionHandler, const Map& map)
 {
 	Entity::update(deltaTime);
 
@@ -247,19 +247,14 @@ void Unit::update(float deltaTime, const FactionHandler& factionHandler, const M
 	m_attackTimer.update(deltaTime);
 }
 
-void Unit::delayed_update(const FactionHandler& factionHandler, const Map& map)
+void Unit::delayed_update(FactionHandler& factionHandler, const Map& map)
 {
 	switch (m_currentState)
 	{
 	case eUnitState::Idle:
 		assert(m_movement.path.empty() && !m_target);
-		for (const Faction* opposingFaction : factionHandler.getOpposingFactions(m_owningFaction))
+		for (const Faction* opposingFaction : factionHandler.GetOpposingFactions(m_owningFaction))
 		{
-			if (!opposingFaction)
-			{
-				continue;
-			}
-
 			const Entity* targetEntity = opposingFaction->getEntity(m_position, Globals::UNIT_ATTACK_RANGE, true);
 			if (targetEntity)
 			{
@@ -302,13 +297,8 @@ void Unit::delayed_update(const FactionHandler& factionHandler, const Map& map)
 		break;
 	case eUnitState::AttackMoving:
 		assert(!m_target);
-		for (const Faction* opposingFaction : factionHandler.getOpposingFactions(m_owningFaction))
+		for (const Faction* opposingFaction : factionHandler.GetOpposingFactions(m_owningFaction))
 		{
-			if (!opposingFaction)
-			{
-				continue;
-			}
-
 			const Entity* targetEntity = opposingFaction->getEntity(m_position, Globals::UNIT_ATTACK_RANGE);
 			if (targetEntity && PathFinding::getInstance().isTargetInLineOfSight(m_position, *targetEntity, map))
 			{

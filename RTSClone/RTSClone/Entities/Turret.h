@@ -18,7 +18,7 @@ public:
 	
 	bool is_group_selectable() const override;
 
-	void update(float deltaTime, const FactionHandler& factionHandler, const Map& map);
+	void update(float deltaTime, FactionHandler& factionHandler, const Map& map);
 
 private:
 	std::reference_wrapper<const Faction> m_owningFaction;

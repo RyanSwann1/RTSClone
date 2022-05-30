@@ -3,10 +3,6 @@
 #include "Faction.h"
 #include <vector>
 #include <memory>
-#include <functional>
-
-using FactionsContainer = std::array<std::unique_ptr<Faction>, static_cast<size_t>(eFactionController::Max) + 1>;
-using opposing_factions = std::array<const Faction*, static_cast<size_t>(eFactionController::Max) + 1>;
 
 struct LevelDetailsFromFile;
 class BaseHandler;
@@ -15,16 +11,16 @@ class FactionHandler
 {
 public:
 	FactionHandler(const BaseHandler& baseHandler, const LevelDetailsFromFile& levelDetails);
-	FactionHandler(const FactionHandler&) = delete;
-	FactionHandler& operator=(const FactionHandler&) = delete;
+	FactionHandler(FactionHandler&) = delete;
+	FactionHandler& operator=(FactionHandler&) = delete;
 	FactionHandler(FactionHandler&&) noexcept = default;
 	FactionHandler& operator=(FactionHandler&&) noexcept = default;
 
 	bool isFactionActive(eFactionController factionController) const;
-	
-	const FactionsContainer& getFactions() const;
-	FactionsContainer& getFactions();
-	opposing_factions getOpposingFactions(eFactionController controller) const;
+
+	const std::vector<std::unique_ptr<Faction>>& getFactions() const;
+	std::vector<std::unique_ptr<Faction>>& getFactions();
+	const std::vector<const Faction*>& GetOpposingFactions(eFactionController controller);
 	const FactionPlayer* getFactionPlayer() const;
 	FactionPlayer* getFactionPlayer();
 	Faction* getFaction(eFactionController factionController);
@@ -34,5 +30,6 @@ public:
 	bool removeFaction(eFactionController faction);
 
 private:
-	FactionsContainer m_factions = {};
+	std::vector<std::unique_ptr<Faction>> m_factions{};
+	std::vector<const Faction*> m_opposing_factions{};
 };

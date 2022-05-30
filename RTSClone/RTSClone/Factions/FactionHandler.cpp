@@ -6,12 +6,24 @@
 
 namespace
 {
-	int getFactionCount(const FactionsContainer& factions)
+	std::vector<std::unique_ptr<Faction>>::iterator GetFaction(std::vector<std::unique_ptr<Faction>>& factions, 
+		const eFactionController controller)
 	{
-		return static_cast<int>(std::count_if(factions.cbegin(), factions.cend(), [&](const auto& faction)
+		const auto faction = std::find_if(factions.begin(), factions.end(), [controller](const auto& faction)
 		{
-			return faction.get();
-		}));
+			return faction->getController() == controller;
+		});
+		return faction;
+	}
+
+	std::vector<std::unique_ptr<Faction>>::const_iterator GetFaction(const std::vector<std::unique_ptr<Faction>>& factions,
+		const eFactionController controller)
+	{
+		const auto faction = std::find_if(factions.cbegin(), factions.cend(), [controller](const auto& faction)
+		{
+			return faction->getController() == controller;
+		});
+		return faction;
 	}
 }
 
@@ -24,108 +36,124 @@ FactionHandler::FactionHandler(const BaseHandler& baseHandler, const LevelDetail
 		levelDetails.factionCount <= static_cast<int>(baseHandler.getBases().size()));
 	for (int i = 0; i < levelDetails.factionCount; ++i)
 	{
-		assert(!m_factions[i]);
 		switch (eFactionController(i))
 		{
 		case eFactionController::Player:
-			m_factions[i] = std::make_unique<FactionPlayer>(baseHandler.getBases()[i].position,
-				levelDetails.factionStartingResources, levelDetails.factionStartingPopulation);
+			m_factions.emplace_back(std::make_unique<FactionPlayer>(baseHandler.getBases()[i].position,
+				levelDetails.factionStartingResources, levelDetails.factionStartingPopulation));
 			break;
 		case eFactionController::AI_1:
 		case eFactionController::AI_2:
 		case eFactionController::AI_3:
-			m_factions[i] = std::make_unique<FactionAI>(eFactionController(i), baseHandler.getBases()[i].position,
+			m_factions.emplace_back(std::make_unique<FactionAI>(eFactionController(i), baseHandler.getBases()[i].position,
 				levelDetails.factionStartingResources, levelDetails.factionStartingPopulation,
-				static_cast<AIConstants::eBehaviour>(AIBehaviourIndex), baseHandler);
+				static_cast<AIConstants::eBehaviour>(AIBehaviourIndex), baseHandler));
 			AIBehaviourIndex ^= 1;
 			break;
 		default:
 			assert(false);
 		}
 	}
+
+	m_opposing_factions.reserve(m_factions.size());
 }
 
 bool FactionHandler::isFactionActive(eFactionController factionController) const
 {
-	return m_factions[static_cast<int>(factionController)].get();
+	const auto faction = GetFaction(m_factions, factionController);
+	return faction != m_factions.cend();
 }
 
-const FactionsContainer& FactionHandler::getFactions() const
+const std::vector<std::unique_ptr<Faction>>& FactionHandler::getFactions() const
 {
 	return m_factions;
 }
 
-FactionsContainer& FactionHandler::getFactions()
+std::vector<std::unique_ptr<Faction>>& FactionHandler::getFactions()
 {
 	return m_factions;
 }
 
-opposing_factions FactionHandler::getOpposingFactions(eFactionController controller) const
+const std::vector<const Faction*>& FactionHandler::GetOpposingFactions(eFactionController controller)
 {
-	opposing_factions opposingFactions = {};
-	assert(opposingFactions.size() == m_factions.size());
-	std::transform(m_factions.cbegin(), m_factions.cend(), opposingFactions.begin(), [controller](const auto& faction) -> const Faction*
+	m_opposing_factions.clear();
+	for (const auto& faction : m_factions)
 	{
-		if (faction && faction->getController() != controller)
+		if (faction->getController() != controller)
 		{
-			return faction.get();
+			m_opposing_factions.push_back(faction.get());
 		}
-		return nullptr;
-	});
+	}
 
-	return opposingFactions;
+	return m_opposing_factions;
 }
 
 const FactionPlayer* FactionHandler::getFactionPlayer() const
 {
-	Faction* factionPlayer = m_factions[static_cast<int>(eFactionController::Player)].get();
-	return factionPlayer ? static_cast<const FactionPlayer*>(factionPlayer) : nullptr;
+	const auto faction = GetFaction(m_factions, eFactionController::Player);
+	if (faction != m_factions.cend())
+	{
+		return static_cast<const FactionPlayer*>((*faction).get());
+	}
+
+	return nullptr;
 }
 
 FactionPlayer* FactionHandler::getFactionPlayer()
 {
-	Faction* factionPlayer = m_factions[static_cast<int>(eFactionController::Player)].get();
-	return factionPlayer ? static_cast<FactionPlayer*>(factionPlayer) : nullptr;
+	const auto faction = GetFaction(m_factions, eFactionController::Player);
+	if (faction != m_factions.cend())
+	{
+		return static_cast<FactionPlayer*>((*faction).get());
+	}
+
+	return nullptr;
 }
 
 Faction* FactionHandler::getFaction(eFactionController factionController)
 {
-	return m_factions[static_cast<int>(factionController)].get();
+	const auto faction = GetFaction(m_factions, factionController);
+	if (faction != m_factions.end())
+	{
+		return (*faction).get();
+	}
+
+	return nullptr;
 }
 
 const Faction* FactionHandler::getFaction(eFactionController factionController) const
 {
-	return m_factions[static_cast<int>(factionController)].get();
+	const auto faction = GetFaction(m_factions, factionController);
+	if (faction != m_factions.cend())
+	{
+		return (*faction).get();
+	}
+
+	return nullptr;
 }
 
 const Faction* FactionHandler::getRandomOpposingFaction(eFactionController senderFaction) const
 {
-	bool opposingFactionActive = std::any_of(m_factions.cbegin(), m_factions.cend(), [this, senderFaction](const auto& faction)
+	assert(m_factions.size() > 1);
+	const Faction* opposing_faction = nullptr;
+	while (opposing_faction)
 	{
-		return faction.get() && faction->getController() != senderFaction;
-	});
-
-	const Faction* opposingFaction = nullptr;
-	if (opposingFactionActive && getFactionCount(m_factions) > 1)
-	{
-		while (!opposingFaction)
+		int i = Globals::getRandomNumber(0, static_cast<int>(m_factions.size()) - 1);
+		if (m_factions[i]->getController() != senderFaction)
 		{
-			int i = Globals::getRandomNumber(0, static_cast<int>(m_factions.size()) - 1);
-			if (m_factions[i] && m_factions[i]->getController() != senderFaction)
-			{
-				opposingFaction = m_factions[i].get();
-			}
+			opposing_faction = m_factions[i].get();
 		}
 	}
 
-	return opposingFaction;
+	return opposing_faction;
 }
 
-bool FactionHandler::removeFaction(eFactionController faction)
+bool FactionHandler::removeFaction(eFactionController controller)
 {
-	if (m_factions[static_cast<int>(faction)])
+	const auto faction = GetFaction(m_factions, controller);
+	if (faction != m_factions.end())
 	{
-		m_factions[static_cast<int>(faction)].reset();
+		m_factions.erase(faction);
 		return true;
 	}
 

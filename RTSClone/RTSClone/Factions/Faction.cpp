@@ -172,7 +172,7 @@ const Entity* Faction::getEntity(const glm::vec3& position) const
     return nullptr;
 }
 
-void Faction::handleEvent(const GameEvent& gameEvent, const Map& map, const FactionHandler& factionHandler, const BaseHandler& baseHandler)
+void Faction::handleEvent(const GameEvent& gameEvent, const Map& map, FactionHandler& factionHandler, const BaseHandler& baseHandler)
 {
     switch (gameEvent.type)
     {
@@ -437,7 +437,7 @@ Entity* Faction::create_building(const Worker& worker, const Map& map)
     return nullptr;
 }
 
-void Faction::update(float deltaTime, const Map& map, const FactionHandler& factionHandler, const BaseHandler& baseHandler)
+void Faction::update(float deltaTime, const Map& map, FactionHandler& factionHandler, const BaseHandler& baseHandler)
 {
     for (auto& unit : m_units)
     {
@@ -475,7 +475,7 @@ void Faction::update(float deltaTime, const Map& map, const FactionHandler& fact
     }
 }
 
-void Faction::delayed_update(const Map& map, const FactionHandler& factionHandler)
+void Faction::delayed_update(const Map& map, FactionHandler& factionHandler)
 {
     for (auto& unit : m_units)
     {

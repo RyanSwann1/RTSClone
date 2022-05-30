@@ -15,9 +15,9 @@ public:
 	const std::vector<Entity*>& getSelectedEntities() const;
 
 	void handleInput(const sf::Event& currentSFMLEvent, const sf::Window& window, const Camera& camera, const Map& map, 
-		const FactionHandler& factionHandler, const BaseHandler& baseHandler, const MiniMap& miniMap, const glm::vec3& levelSize);
-	void handleEvent(const GameEvent& gameEvent, const Map& map, const FactionHandler& factionHandler, const BaseHandler& baseHandler) override;
-	void update(float deltaTime, const Map& map, const FactionHandler& factionHandler, const BaseHandler& baseHandler) override;
+		FactionHandler& factionHandler, const BaseHandler& baseHandler, const MiniMap& miniMap, const glm::vec3& levelSize);
+	void handleEvent(const GameEvent& gameEvent, const Map& map, FactionHandler& factionHandler, const BaseHandler& baseHandler) override;
+	void update(float deltaTime, const Map& map, FactionHandler& factionHandler, const BaseHandler& baseHandler) override;
 	void render(ShaderHandler& shaderHandler) const override;
 	void renderPlannedBuilding(ShaderHandler& shaderHandler, const Map& map) const;
 	void renderEntitySelector(const sf::Window& window, ShaderHandler& shaderHandler) const;
@@ -36,10 +36,10 @@ private:
 
 	void select_singular_entity(const glm::vec3& position);
 	void select_entity_all_of_type(const glm::vec3& position);
-	void onRightClick(const glm::vec3& position, const Camera& camera, const FactionHandler& factionHandler, const Map& map, 
+	void onRightClick(const glm::vec3& position, const Camera& camera, FactionHandler& factionHandler, const Map& map, 
 		const BaseHandler& baseHandler);
 
-	bool attack_entity(const glm::vec3& position, const FactionHandler& factionHandler, const Map& map);
+	bool attack_entity(const glm::vec3& position, FactionHandler& factionHandler, const Map& map);
 	bool set_building_waypoints(const glm::vec3& position, const Map& map);
 	void return_selected_workers_to_return_minerals(const glm::vec3& position, const Map& map);
 	bool selected_workers_harvest(const glm::vec3& destination, const Map& map, const BaseHandler& baseHandler);

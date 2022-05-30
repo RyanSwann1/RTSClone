@@ -57,10 +57,10 @@ public:
 	virtual Entity* createUnit(const Map& map, const EntitySpawnerBuilding& spawner);
 	virtual Entity* createWorker(const Map& map, const EntitySpawnerBuilding& spawner);
 	virtual bool increaseShield(const Laboratory& laboratory);
-	virtual void handleEvent(const GameEvent& gameEvent, const Map& map, const FactionHandler& factionHandler, 
+	virtual void handleEvent(const GameEvent& gameEvent, const Map& map, FactionHandler& factionHandler, 
 		const BaseHandler& baseHandler);
-	virtual void update(float deltaTime, const Map& map, const FactionHandler& factionHandler, const BaseHandler& baseHandler);
-	void delayed_update(const Map& map, const FactionHandler& factionHandler);
+	virtual void update(float deltaTime, const Map& map, FactionHandler& factionHandler, const BaseHandler& baseHandler);
+	void delayed_update(const Map& map, FactionHandler& factionHandler);
 	virtual void render(ShaderHandler& shaderHandler) const;
 	void renderPlannedBuildings(ShaderHandler& shaderHandler) const;
 	void renderEntityStatusBars(ShaderHandler& shaderHandler, const Camera& camera, glm::uvec2 windowSize) const;
@@ -77,8 +77,8 @@ protected:
 	Faction(eFactionController factionController, const glm::vec3& hqStartingPosition, 
 		int startingResources, int startingPopulationCap);
 
-	virtual void on_entity_taken_damage(const TakeDamageEvent& gameEvent, Entity& entity, const Map& map, const FactionHandler& factionHandler) {}
-	virtual void on_entity_idle(Entity& entity, const Map& map, const FactionHandler& factionHandler, const BaseHandler& baseHandler) {}
+	virtual void on_entity_taken_damage(const TakeDamageEvent& gameEvent, Entity& entity, const Map& map, FactionHandler& factionHandler) {}
+	virtual void on_entity_idle(Entity& entity, const Map& map, FactionHandler& factionHandler, const BaseHandler& baseHandler) {}
 	virtual void on_entity_removal(const Entity& entity);
 
 	std::vector<Entity*> m_allEntities;

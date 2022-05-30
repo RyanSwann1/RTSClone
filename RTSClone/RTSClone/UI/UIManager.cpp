@@ -234,7 +234,7 @@ UIManager::UIManager()
 	m_onClearDisplayWinnerID([this](GameMessages::UIClearWinner&& gameMessage) { return onClearDisplayWinner(std::move(gameMessage)); })
 {}
 	
-void UIManager::handleInput(const sf::Window& window, const FactionHandler& factionHandler, const Camera& camera,
+void UIManager::handleInput(const sf::Window& window, FactionHandler& factionHandler, const Camera& camera,
 	const sf::Event& currentSFMLEvent)
 {
 	if (currentSFMLEvent.type == sf::Event::MouseButtonPressed &&
@@ -244,15 +244,12 @@ void UIManager::handleInput(const sf::Window& window, const FactionHandler& fact
 		const Entity* selectedEntity = nullptr;
 		for (const auto& faction : factionHandler.getFactions())
 		{
-			if (faction)
+			selectedEntity = faction->getEntity(mouseToGroundPosition);
+			if (selectedEntity)
 			{
-				selectedEntity = faction->getEntity(mouseToGroundPosition);
-				if (selectedEntity)
-				{
-					m_selectedEntityWidget = 
-						std::make_unique<SelectedEntityWidget>(faction->getController(), selectedEntity->getID(), selectedEntity->getEntityType());
-					break;
-				}
+				m_selectedEntityWidget =
+					std::make_unique<SelectedEntityWidget>(faction->getController(), selectedEntity->getID(), selectedEntity->getEntityType());
+				break;
 			}
 		}
 
@@ -282,7 +279,7 @@ void UIManager::handleEvent(const GameEvent& gameEvent)
 	}
 }
 
-void UIManager::update(const FactionHandler& factionHandler)
+void UIManager::update(FactionHandler& factionHandler)
 {
 	if (m_selectedEntityWidget)
 	{

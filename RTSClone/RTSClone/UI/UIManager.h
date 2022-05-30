@@ -86,10 +86,10 @@ public:
 	UIManager(UIManager&&) = delete;
 	UIManager& operator=(UIManager&&) = delete;
 
-	void handleInput(const sf::Window& window, const FactionHandler& factionHandler, const Camera& camera,
+	void handleInput(const sf::Window& window, FactionHandler& factionHandler, const Camera& camera,
 		const sf::Event& currentSFMLEvent);
 	void handleEvent(const GameEvent& gameEvent);
-	void update(const FactionHandler& factionHandler);
+	void update(FactionHandler& factionHandler);
 	void render(const sf::Window& window);
 
 private:
