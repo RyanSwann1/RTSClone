@@ -23,8 +23,8 @@ namespace
 }
 
 Unit::Unit(Faction& owningFaction, const glm::vec3& startingPosition, const glm::vec3& startingRotation, const Map& map)
-	: Entity(ModelManager::getInstance().getModel(UNIT_MODEL_NAME), startingPosition, eEntityType::Unit, 
-		Globals::UNIT_STARTING_HEALTH, owningFaction.getCurrentShieldAmount(), false, startingRotation),
+	: Entity(ModelManager::getInstance().getModel(UNIT_MODEL_NAME), { startingPosition, GridLockActive::False}, 
+		eEntityType::Unit, Globals::UNIT_STARTING_HEALTH, owningFaction.getCurrentShieldAmount(), startingRotation),
 	m_owningFaction(owningFaction.getController()),
 	m_attackTimer(TIME_BETWEEN_ATTACK, true)
 {
@@ -33,8 +33,8 @@ Unit::Unit(Faction& owningFaction, const glm::vec3& startingPosition, const glm:
 
 Unit::Unit(Faction & owningFaction, const glm::vec3 & startingPosition, const glm::vec3 & startingRotation, 
 	const glm::vec3 & destination, const Map& map)
-	: Entity(ModelManager::getInstance().getModel(UNIT_MODEL_NAME), startingPosition, eEntityType::Unit,
-		Globals::UNIT_STARTING_HEALTH, owningFaction.getCurrentShieldAmount(), false, startingRotation),
+	: Entity(ModelManager::getInstance().getModel(UNIT_MODEL_NAME), { startingPosition, GridLockActive::False }, eEntityType::Unit,
+		Globals::UNIT_STARTING_HEALTH, owningFaction.getCurrentShieldAmount(), startingRotation),
 	m_owningFaction(owningFaction.getController()),
 	m_attackTimer(TIME_BETWEEN_ATTACK, true)
 {

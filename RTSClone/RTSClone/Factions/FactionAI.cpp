@@ -551,7 +551,7 @@ bool FactionAI::isWithinRangeOfBuildings(const glm::vec3& position, float distan
 		case eEntityType::Worker:
 			for (const auto& buildingCommand : static_cast<Worker&>(*entity).get_scheduled_buildings())
 			{
-				if (Globals::getSqrDistance(buildingCommand.position, position) <= distance * distance)
+				if (Globals::getSqrDistance(buildingCommand.position.Get(), position) <= distance * distance)
 				{
 					return true;
 				}

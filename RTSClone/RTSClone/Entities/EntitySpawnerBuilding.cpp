@@ -13,7 +13,7 @@
 EntitySpawnerBuilding::EntitySpawnerBuilding(const glm::vec3& position, const eEntityType type, 
 	const int health, const int shield, EntitySpawnerDetails spawnDetails,
 	std::function<Entity* (Faction& owningFaction, const Map&, const EntitySpawnerBuilding&)> spawnCallback)
-	: Entity(ModelManager::getInstance().getModel(type), position, type, health, shield, true),
+	: Entity(ModelManager::getInstance().getModel(type), { position, GridLockActive::True }, type, health, shield),
 	m_details(spawnDetails),
 	m_timer(spawnDetails.timeBetweenSpawn, false),
 	m_spawnCallback(spawnCallback)

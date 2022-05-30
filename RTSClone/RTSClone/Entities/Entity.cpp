@@ -56,9 +56,9 @@ namespace
 }
 
 //Entity
-Entity::Entity(const Model& model, const glm::vec3& startingPosition, eEntityType entityType, 
-	int health, int shield, bool grid_locked, const glm::vec3& startingRotation)
-	: m_position(startingPosition, grid_locked),
+Entity::Entity(const Model& model, const Position& position, eEntityType entityType, 
+	int health, int shield, const glm::vec3& startingRotation)
+	: m_position(position),
 	m_rotation(startingRotation),
 	m_maximumShield(shield),
 	m_shield(m_maximumShield),

@@ -18,8 +18,8 @@ namespace
 }
 
 Turret::Turret(const glm::vec3& startingPosition, const Faction& owningFaction)
-	: Entity(ModelManager::getInstance().getModel(TURRET_MODEL_NAME), startingPosition,
-		eEntityType::Turret, TURRET_STARTING_HEALTH, owningFaction.getCurrentShieldAmount(), true),
+	: Entity(ModelManager::getInstance().getModel(TURRET_MODEL_NAME), { startingPosition, GridLockActive::True },
+		eEntityType::Turret, TURRET_STARTING_HEALTH, owningFaction.getCurrentShieldAmount()),
 	m_owningFaction(owningFaction),
 	m_stateHandlerTimer(0.2f, true),
 	m_attackTimer(TIME_BETWEEN_ATTACK, true)

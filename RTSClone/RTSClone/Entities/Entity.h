@@ -71,8 +71,8 @@ public:
 #endif // RENDER_AABB
 
 protected:	
-	Entity(const Model& model, const glm::vec3& startingPosition, eEntityType entityType, 
-		int health, int shield, bool grid_locked, const glm::vec3& startingRotation = glm::vec3(0.0f));
+	Entity(const Model& model, const Position& position, eEntityType entityType, 
+		int health, int shield, const glm::vec3& startingRotation = glm::vec3(0.0f));
 	
 	void update(float deltaTime);
 	void setPosition(const glm::vec3& position);

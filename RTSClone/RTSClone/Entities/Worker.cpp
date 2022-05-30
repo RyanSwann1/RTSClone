@@ -34,15 +34,15 @@ namespace
 
 //BuildingInWorkerQueue
 WorkerScheduledBuilding::WorkerScheduledBuilding(const glm::vec3& position, eEntityType entityType)
-	: position(Globals::convertToMiddleGridPosition(Globals::convertToNodePosition(position))),
+	: position({ position, GridLockActive::True }),
 	entityType(entityType),
 	model(ModelManager::getInstance().getModel(entityType))
 {}
 
 //Worker
 Worker::Worker(Faction& owningFaction, const glm::vec3& startingPosition, const glm::vec3& startingRotation, const Map& map)
-	: Entity(ModelManager::getInstance().getModel(WORKER_MODEL_NAME), startingPosition, eEntityType::Worker, 
-		Globals::WORKER_STARTING_HEALTH, owningFaction.getCurrentShieldAmount(), false, startingRotation),
+	: Entity(ModelManager::getInstance().getModel(WORKER_MODEL_NAME), { startingPosition, GridLockActive::False }, 
+		eEntityType::Worker, Globals::WORKER_STARTING_HEALTH, owningFaction.getCurrentShieldAmount(), startingRotation),
 	m_owningFaction(&owningFaction)
 {
 	switchTo(eWorkerState::Idle);
@@ -50,8 +50,8 @@ Worker::Worker(Faction& owningFaction, const glm::vec3& startingPosition, const 
 
 Worker::Worker(Faction& owningFaction, const glm::vec3& startingPosition, const glm::vec3& startingRotation,
 	const glm::vec3& destination, const Map& map)
-	: Entity(ModelManager::getInstance().getModel(WORKER_MODEL_NAME), startingPosition, eEntityType::Worker, 
-		Globals::WORKER_STARTING_HEALTH, owningFaction.getCurrentShieldAmount(), false, startingRotation),
+	: Entity(ModelManager::getInstance().getModel(WORKER_MODEL_NAME), { startingPosition, GridLockActive::False }, 
+		eEntityType::Worker, Globals::WORKER_STARTING_HEALTH, owningFaction.getCurrentShieldAmount(), startingRotation),
 	m_owningFaction(&owningFaction)
 {
 	MoveTo(destination, map, false);
@@ -81,7 +81,7 @@ bool Worker::is_colliding_with_scheduled_buildings(const AABB& aabb) const
 {
 	return std::any_of(m_buildQueue.cbegin(), m_buildQueue.cend(), [&aabb](auto& buildingCommand)
 	{
-		return aabb.contains(buildingCommand.position);
+		return aabb.contains(buildingCommand.position.Get());
 	});
 }
 
@@ -286,7 +286,7 @@ void Worker::update(float deltaTime, const Map& map, FactionHandler& factionHand
 			{
 				if (!m_buildQueue.empty())
 				{
-					move_to(m_buildQueue.front().position, map, building->getAABB(), eWorkerState::MovingToBuildingPosition);
+					move_to(m_buildQueue.front().position.Get(), map, building->getAABB(), eWorkerState::MovingToBuildingPosition);
 				}
 				else
 				{
@@ -470,7 +470,7 @@ void Worker::renderBuildingCommands(ShaderHandler& shaderHandler) const
 	for (const auto& building : m_buildQueue)
 	{
 		building.model.get().render(
-			shaderHandler, m_owningFaction->getController(), building.position, glm::vec3(0.0f), false);
+			shaderHandler, m_owningFaction->getController(), building.position.Get(), glm::vec3(0.0f), false);
 	}
 }
 

@@ -7,8 +7,8 @@
 #include "Core/Level.h"
 
 SupplyDepot::SupplyDepot(const glm::vec3& startingPosition, const Faction& owningFaction)
-	: Entity(ModelManager::getInstance().getModel(SUPPLY_DEPOT_MODEL_NAME), startingPosition, eEntityType::SupplyDepot, 
-		Globals::SUPPLY_DEPOT_STARTING_HEALTH, owningFaction.getCurrentShieldAmount(), true)
+	: Entity(ModelManager::getInstance().getModel(SUPPLY_DEPOT_MODEL_NAME), { startingPosition, GridLockActive::True }, 
+		eEntityType::SupplyDepot, Globals::SUPPLY_DEPOT_STARTING_HEALTH, owningFaction.getCurrentShieldAmount())
 {
 	broadcast<GameMessages::AddAABBToMap>({ m_AABB });
 	Level::add_event(GameEvent::create<RevalidateMovementPathsEvent>({}));

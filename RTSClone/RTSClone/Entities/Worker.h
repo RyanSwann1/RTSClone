@@ -32,7 +32,7 @@ struct WorkerScheduledBuilding
 {
 	WorkerScheduledBuilding(const glm::vec3& position, eEntityType entityType);
 
-	glm::vec3 position;
+	Position position;
 	eEntityType entityType;
 	std::reference_wrapper<const Model> model;
 };

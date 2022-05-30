@@ -16,8 +16,8 @@ namespace
 }
 
 Laboratory::Laboratory(const glm::vec3& startingPosition, Faction& owningFaction)
-	: Entity(ModelManager::getInstance().getModel(LABORATORY_MODEL_NAME), startingPosition, eEntityType::Laboratory,
-		Globals::LABORATORY_STARTING_HEALTH, owningFaction.getCurrentShieldAmount(), true),
+	: Entity(ModelManager::getInstance().getModel(LABORATORY_MODEL_NAME), { startingPosition, GridLockActive::True }, 
+		eEntityType::Laboratory, Globals::LABORATORY_STARTING_HEALTH, owningFaction.getCurrentShieldAmount()),
 	m_owningFaction(owningFaction),
 	m_shieldUpgradeCounter(0),
 	m_increaseShieldTimer(INCREASE_SHIELD_TIMER_EXPIRATION, false)

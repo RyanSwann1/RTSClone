@@ -163,7 +163,7 @@ inline Entity* Faction::create_entity(const Map& map, const Worker& worker, cons
 		&& !worker.get_scheduled_buildings().empty());
 
 	const eEntityType entityType = worker.get_scheduled_buildings().front().entityType;
-	const glm::vec3& position = worker.get_scheduled_buildings().front().position;
+	const glm::vec3& position = worker.get_scheduled_buildings().front().position.Get();
 	Entity* entity = nullptr;
 	if (is_entity_creatable(entityType, container.size(), max))
 	{
