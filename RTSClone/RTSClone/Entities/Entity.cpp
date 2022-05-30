@@ -12,23 +12,23 @@
 
 namespace
 {
-	const float DEFAULT_STAT_BAR_HEIGHT = 10.0f;
-
-	const float WORKER_HEALTH_BAR_YOFFSET = 35.0f;
-	const float UNIT_HEALTH_BAR_YOFFSET = 50.0f;
-	const float HQ_HEALTH_BAR_YOFFSET = 225.0f;
-	const float SUPPLY_DEPOT_HEALTH_BAR_YOFFSET = 85.0f;
-	const float BARRACKS_HEALTH_BAR_YOFFSET = 85.0f;
-	const float TURRET_HEALTH_BAR_YOFFSET = 60.0f;
-	const float LABORATORY_HEALTH_BAR_YOFFSET = 130.0f;
-
-	const float UNIT_SHIELD_BAR_YOFFSET = 60.0f;
-	const float WORKER_SHIELD_BAR_YOFFSET = 45.0f;
-	const float HQ_SHIELD_BAR_YOFFSET = 235.0f;
-	const float SUPPLY_DEPOT_SHIELD_BAR_YOFFSET = 95.0f;
-	const float BARRACKS_SHIELD_BAR_YOFFSET = 95.0f;
-	const float TURRET_SHIELD_BAR_YOFFSET = 70.0f;
-	const float LABORATORY_SHIELD_BAR_YOFFSET = 140.0f;
+	constexpr float DEFAULT_STAT_BAR_HEIGHT = 10.0f;
+		 
+	constexpr float WORKER_HEALTH_BAR_YOFFSET = 35.0f;
+	constexpr float UNIT_HEALTH_BAR_YOFFSET = 50.0f;
+	constexpr float HQ_HEALTH_BAR_YOFFSET = 225.0f;
+	constexpr float SUPPLY_DEPOT_HEALTH_BAR_YOFFSET = 85.0f;
+	constexpr float BARRACKS_HEALTH_BAR_YOFFSET = 85.0f;
+	constexpr float TURRET_HEALTH_BAR_YOFFSET = 60.0f;
+	constexpr float LABORATORY_HEALTH_BAR_YOFFSET = 130.0f;
+		 
+	constexpr float UNIT_SHIELD_BAR_YOFFSET = 60.0f;
+	constexpr float WORKER_SHIELD_BAR_YOFFSET = 45.0f;
+	constexpr float HQ_SHIELD_BAR_YOFFSET = 235.0f;
+	constexpr float SUPPLY_DEPOT_SHIELD_BAR_YOFFSET = 95.0f;
+	constexpr float BARRACKS_SHIELD_BAR_YOFFSET = 95.0f;
+	constexpr float TURRET_SHIELD_BAR_YOFFSET = 70.0f;
+	constexpr float LABORATORY_SHIELD_BAR_YOFFSET = 140.0f;
 
 	const std::array<float, static_cast<size_t>(eEntityType::Max) + 1> ENTITIES_YOFFSET_HEALTH
 	{
