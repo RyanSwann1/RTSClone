@@ -13,7 +13,7 @@
 EntitySpawnerBuilding::EntitySpawnerBuilding(const glm::vec3& position, const eEntityType type, 
 	const int health, const int shield, EntitySpawnerDetails spawnDetails,
 	std::function<Entity* (Faction& owningFaction, const Map&, const EntitySpawnerBuilding&)> spawnCallback)
-	: Entity(ModelManager::getInstance().getModel(type), position, type, health, shield),
+	: Entity(ModelManager::getInstance().getModel(type), position, type, health, shield, true),
 	m_details(spawnDetails),
 	m_timer(spawnDetails.timeBetweenSpawn, false),
 	m_spawnCallback(spawnCallback)
@@ -85,7 +85,7 @@ void EntitySpawnerBuilding::render_status_bars(ShaderHandler& shaderHandler, con
 		const float width = m_details.progressBarWidth;
 		const float yOffset = m_details.progressBarYOffset;
 
-		m_statbarSprite.render(m_position, windowSize, width, width * currentTime, Globals::DEFAULT_PROGRESS_BAR_HEIGHT, yOffset,
+		m_statbarSprite.render(m_position.Get(), windowSize, width, width * currentTime, Globals::DEFAULT_PROGRESS_BAR_HEIGHT, yOffset,
 			shaderHandler, camera, Globals::PROGRESS_BAR_COLOR);
 	}
 }

@@ -27,7 +27,7 @@ Headquarters::Headquarters(const glm::vec3& position, Faction& owningFaction)
 		[](Faction& owningFaction, const Map& map, const EntitySpawnerBuilding& spawner) { return owningFaction.createWorker(map, spawner); }),
 	m_owningFaction(&owningFaction)
 {
-	Level::add_event(GameEvent::create<AttachFactionToBaseEvent>({ owningFaction.getController(), m_position }));
+	Level::add_event(GameEvent::create<AttachFactionToBaseEvent>({ owningFaction.getController(), m_position.Get() }));
 	Level::add_event(GameEvent::create<RevalidateMovementPathsEvent>({}));
 }
 
@@ -35,7 +35,7 @@ Headquarters::~Headquarters()
 {
 	if (getID() != INVALID_ENTITY_ID)
 	{
-		Level::add_event(GameEvent::create<DetachFactionFromBaseEvent>({ m_owningFaction->getController(), m_position }));
+		Level::add_event(GameEvent::create<DetachFactionFromBaseEvent>({ m_owningFaction->getController(), m_position.Get() }));
 		Level::add_event(GameEvent::create<HeadquartersDestroyedEvent>({}));
 	}
 }

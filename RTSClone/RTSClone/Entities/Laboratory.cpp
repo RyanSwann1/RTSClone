@@ -17,7 +17,7 @@ namespace
 
 Laboratory::Laboratory(const glm::vec3& startingPosition, Faction& owningFaction)
 	: Entity(ModelManager::getInstance().getModel(LABORATORY_MODEL_NAME), startingPosition, eEntityType::Laboratory,
-		Globals::LABORATORY_STARTING_HEALTH, owningFaction.getCurrentShieldAmount()),
+		Globals::LABORATORY_STARTING_HEALTH, owningFaction.getCurrentShieldAmount(), true),
 	m_owningFaction(owningFaction),
 	m_shieldUpgradeCounter(0),
 	m_increaseShieldTimer(INCREASE_SHIELD_TIMER_EXPIRATION, false)
@@ -92,7 +92,7 @@ void Laboratory::render_status_bars(ShaderHandler& shaderHandler, const Camera& 
 		assert(m_shieldUpgradeCounter > 0);
 
 		float currentTime = m_increaseShieldTimer.getElaspedTime() / m_increaseShieldTimer.getExpiredTime();
-		m_statbarSprite.render(m_position, windowSize, Globals::LABORATORY_STAT_BAR_WIDTH,
+		m_statbarSprite.render(m_position.Get(), windowSize, Globals::LABORATORY_STAT_BAR_WIDTH,
 			Globals::LABORATORY_STAT_BAR_WIDTH * currentTime, Globals::DEFAULT_PROGRESS_BAR_HEIGHT,
 			PROGRESS_BAR_YOFFSET, shaderHandler, camera, Globals::PROGRESS_BAR_COLOR);
 	}

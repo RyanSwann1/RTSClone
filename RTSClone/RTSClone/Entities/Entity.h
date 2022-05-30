@@ -6,6 +6,7 @@
 #include "EntityType.h"
 #include "UI/Sprite.h"
 #include "Core/Timer.h"
+#include "Position.h"
 
 constexpr int INVALID_ENTITY_ID = -1;
 
@@ -71,13 +72,13 @@ public:
 
 protected:	
 	Entity(const Model& model, const glm::vec3& startingPosition, eEntityType entityType, 
-		int health, int shield, glm::vec3 startingRotation = glm::vec3(0.0f));
+		int health, int shield, bool grid_locked, const glm::vec3& startingRotation = glm::vec3(0.0f));
 	
 	void update(float deltaTime);
 	void setPosition(const glm::vec3& position);
 	
 	Sprite m_statbarSprite;
-	glm::vec3 m_position;
+	Position m_position;
 	glm::vec3 m_rotation;
 	AABB m_AABB;
 

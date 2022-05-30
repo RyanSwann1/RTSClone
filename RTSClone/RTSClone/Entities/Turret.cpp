@@ -19,7 +19,7 @@ namespace
 
 Turret::Turret(const glm::vec3& startingPosition, const Faction& owningFaction)
 	: Entity(ModelManager::getInstance().getModel(TURRET_MODEL_NAME), startingPosition,
-		eEntityType::Turret, TURRET_STARTING_HEALTH, owningFaction.getCurrentShieldAmount()),
+		eEntityType::Turret, TURRET_STARTING_HEALTH, owningFaction.getCurrentShieldAmount(), true),
 	m_owningFaction(owningFaction),
 	m_stateHandlerTimer(0.2f, true),
 	m_attackTimer(TIME_BETWEEN_ATTACK, true)
@@ -55,10 +55,10 @@ void Turret::update(float deltaTime, FactionHandler& factionHandler, const Map& 
 		{
 			const Entity* targetEntity = opposingFaction->get_entity(m_target->ID);
 			if (targetEntity &&
-				Globals::getSqrDistance(targetEntity->getPosition(), m_position) <= TURRET_ATTACK_RANGE * TURRET_ATTACK_RANGE &&
-				PathFinding::getInstance().isTargetInLineOfSight(m_position, *targetEntity, map, m_AABB))
+				Globals::getSqrDistance(targetEntity->getPosition(), m_position.Get()) <= TURRET_ATTACK_RANGE * TURRET_ATTACK_RANGE &&
+				PathFinding::getInstance().isTargetInLineOfSight(m_position.Get(), *targetEntity, map, m_AABB))
 			{
-				m_rotation.y = Globals::getAngle(targetEntity->getPosition(), m_position, 270.0f);
+				m_rotation.y = Globals::getAngle(targetEntity->getPosition(), m_position.Get(), 270.0f);
 			}
 			else
 			{
@@ -72,13 +72,13 @@ void Turret::update(float deltaTime, FactionHandler& factionHandler, const Map& 
 		{
 			const Entity* targetEntity = opposingFaction->get_entity(m_target->ID);
 			if (targetEntity &&
-				Globals::getSqrDistance(targetEntity->getPosition(), m_position) <= TURRET_ATTACK_RANGE * TURRET_ATTACK_RANGE &&
-				PathFinding::getInstance().isTargetInLineOfSight(m_position, *targetEntity, map, m_AABB))
+				Globals::getSqrDistance(targetEntity->getPosition(), m_position.Get()) <= TURRET_ATTACK_RANGE * TURRET_ATTACK_RANGE &&
+				PathFinding::getInstance().isTargetInLineOfSight(m_position.Get(), *targetEntity, map, m_AABB))
 			{
-				m_rotation.y = Globals::getAngle(targetEntity->getPosition(), m_position, 270.0f);
+				m_rotation.y = Globals::getAngle(targetEntity->getPosition(), m_position.Get(), 270.0f);
 				Level::add_event(GameEvent::create<SpawnProjectileEvent>({ m_owningFaction.get().getController(), getID(),
 					getEntityType(), opposingFaction->getController(), targetEntity->getID(), targetEntity->getEntityType(),
-					TURRET_DAMAGE, m_position, targetEntity->getPosition() }));
+					TURRET_DAMAGE, m_position.Get(), targetEntity->getPosition() }));
 
 				m_attackTimer.resetElaspedTime();
 			}
@@ -90,7 +90,7 @@ void Turret::update(float deltaTime, FactionHandler& factionHandler, const Map& 
 		{
 			for (const Faction* opposingFaction : factionHandler.GetOpposingFactions(m_owningFaction.get().getController()))
 			{
-				if (const Entity* targetEntity = opposingFaction->getEntity(m_position, TURRET_ATTACK_RANGE))
+				if (const Entity* targetEntity = opposingFaction->getEntity(m_position.Get(), TURRET_ATTACK_RANGE))
 				{
 					m_target = { opposingFaction->getController(), targetEntity->getID() };
 					m_attackTimer.resetElaspedTime();

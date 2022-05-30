@@ -8,7 +8,7 @@
 
 SupplyDepot::SupplyDepot(const glm::vec3& startingPosition, const Faction& owningFaction)
 	: Entity(ModelManager::getInstance().getModel(SUPPLY_DEPOT_MODEL_NAME), startingPosition, eEntityType::SupplyDepot, 
-		Globals::SUPPLY_DEPOT_STARTING_HEALTH, owningFaction.getCurrentShieldAmount())
+		Globals::SUPPLY_DEPOT_STARTING_HEALTH, owningFaction.getCurrentShieldAmount(), true)
 {
 	broadcast<GameMessages::AddAABBToMap>({ m_AABB });
 	Level::add_event(GameEvent::create<RevalidateMovementPathsEvent>({}));

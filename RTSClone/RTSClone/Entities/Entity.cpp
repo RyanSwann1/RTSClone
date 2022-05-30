@@ -57,8 +57,8 @@ namespace
 
 //Entity
 Entity::Entity(const Model& model, const glm::vec3& startingPosition, eEntityType entityType, 
-	int health, int shield, glm::vec3 startingRotation)
-	: m_position(startingPosition),
+	int health, int shield, bool grid_locked, const glm::vec3& startingRotation)
+	: m_position(startingPosition, grid_locked),
 	m_rotation(startingRotation),
 	m_maximumShield(shield),
 	m_shield(m_maximumShield),
@@ -68,24 +68,7 @@ Entity::Entity(const Model& model, const glm::vec3& startingPosition, eEntityTyp
 	m_shieldReplenishTimer(SHIELD_REPLENISH_TIMER_EXPIRATION, false),
 	m_model(model)
 {
-	switch (m_type)
-	{
-	case eEntityType::Barracks:
-	case eEntityType::Headquarters:
-	case eEntityType::SupplyDepot:
-	case eEntityType::Unit:
-	case eEntityType::Turret:
-	case eEntityType::Laboratory:
-		m_position = Globals::convertToNodePosition(m_position);
-		m_position = Globals::convertToMiddleGridPosition(m_position);
-		break;
-	case eEntityType::Worker:
-		break;
-	default:
-		assert(false);
-	}
-
-	m_AABB.reset(m_position, m_model);
+	m_AABB.reset(m_position.Get(), m_model);
 	if (m_maximumShield == 1)
 	{
 		m_shieldReplenishTimer.setActive(true);
@@ -192,12 +175,12 @@ void Entity::render(ShaderHandler& shaderHandler, eFactionController owningFacti
 	switch (owningFactionController)
 	{
 	case eFactionController::Player:
-		m_model.get().render(shaderHandler, owningFactionController, m_position, m_rotation, m_selected);
+		m_model.get().render(shaderHandler, owningFactionController, m_position.Get(), m_rotation, m_selected);
 		break;
 	case eFactionController::AI_1:
 	case eFactionController::AI_2:
 	case eFactionController::AI_3:
-		m_model.get().render(shaderHandler, owningFactionController, m_position, m_rotation, false);
+		m_model.get().render(shaderHandler, owningFactionController, m_position.Get(), m_rotation, false);
 		break;
 	default:
 		assert(false);
@@ -211,11 +194,11 @@ void Entity::renderHealthBar(ShaderHandler& shaderHandler, const Camera& camera,
 		float width = Globals::ENTITIES_STAT_BAR_WIDTH[static_cast<int>(getEntityType())];
 		float yOffset = ENTITIES_YOFFSET_HEALTH[static_cast<int>(getEntityType())];
 		
-		m_statbarSprite.render(m_position, windowSize, width, width, DEFAULT_STAT_BAR_HEIGHT, yOffset,
+		m_statbarSprite.render(m_position.Get(), windowSize, width, width, DEFAULT_STAT_BAR_HEIGHT, yOffset,
 			shaderHandler, camera, Globals::BACKGROUND_BAR_COLOR);
 		
 		float currentHealth = static_cast<float>(m_health) / static_cast<float>(m_maximumHealth);
-		m_statbarSprite.render(m_position, windowSize, width, width * currentHealth, DEFAULT_STAT_BAR_HEIGHT, yOffset,
+		m_statbarSprite.render(m_position.Get(), windowSize, width, width * currentHealth, DEFAULT_STAT_BAR_HEIGHT, yOffset,
 			shaderHandler, camera, Globals::HEALTH_BAR_COLOR);
 	}
 }
@@ -227,11 +210,11 @@ void Entity::renderShieldBar(ShaderHandler& shaderHandler, const Camera& camera,
 		float width = Globals::ENTITIES_STAT_BAR_WIDTH[static_cast<int>(getEntityType())];
 		float yOffset = ENTITIES_YOFFSET_SHIELD[static_cast<int>(getEntityType())];
 
-		m_statbarSprite.render(m_position, windowSize, width, width, DEFAULT_STAT_BAR_HEIGHT, yOffset,
+		m_statbarSprite.render(m_position.Get(), windowSize, width, width, DEFAULT_STAT_BAR_HEIGHT, yOffset,
 			shaderHandler, camera, Globals::BACKGROUND_BAR_COLOR);
 
 		float currentShield = static_cast<float>(m_shield) / static_cast<float>(m_maximumShield);
-		m_statbarSprite.render(m_position, windowSize, width, width * currentShield, DEFAULT_STAT_BAR_HEIGHT, yOffset,
+		m_statbarSprite.render(m_position.Get(), windowSize, width, width * currentShield, DEFAULT_STAT_BAR_HEIGHT, yOffset,
 			shaderHandler, camera, Globals::SHIELD_BAR_COLOR);
 	}
 }
@@ -244,13 +227,12 @@ void Entity::render_status_bars(ShaderHandler& shaderHandler, const Camera& came
 
 void Entity::setPosition(const glm::vec3& position)
 {
-	m_position = position;
-	m_AABB.update(position);
+	m_AABB.update(m_position.Set(position));
 }
 
 const glm::vec3& Entity::getPosition() const
 {
-	return m_position;
+	return m_position.Get();
 }
 
 const AABB& Entity::getAABB() const

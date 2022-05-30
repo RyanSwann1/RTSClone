@@ -24,17 +24,17 @@ namespace
 
 Unit::Unit(Faction& owningFaction, const glm::vec3& startingPosition, const glm::vec3& startingRotation, const Map& map)
 	: Entity(ModelManager::getInstance().getModel(UNIT_MODEL_NAME), startingPosition, eEntityType::Unit, 
-		Globals::UNIT_STARTING_HEALTH, owningFaction.getCurrentShieldAmount(), startingRotation),
+		Globals::UNIT_STARTING_HEALTH, owningFaction.getCurrentShieldAmount(), false, startingRotation),
 	m_owningFaction(owningFaction.getController()),
 	m_attackTimer(TIME_BETWEEN_ATTACK, true)
 {
-	broadcast<GameMessages::AddUnitPositionToMap>({ m_position, getID() });
+	broadcast<GameMessages::AddUnitPositionToMap>({ m_position.Get(), getID() });
 }
 
 Unit::Unit(Faction & owningFaction, const glm::vec3 & startingPosition, const glm::vec3 & startingRotation, 
 	const glm::vec3 & destination, const Map& map)
 	: Entity(ModelManager::getInstance().getModel(UNIT_MODEL_NAME), startingPosition, eEntityType::Unit,
-		Globals::UNIT_STARTING_HEALTH, owningFaction.getCurrentShieldAmount(), startingRotation),
+		Globals::UNIT_STARTING_HEALTH, owningFaction.getCurrentShieldAmount(), false, startingRotation),
 	m_owningFaction(owningFaction.getController()),
 	m_attackTimer(TIME_BETWEEN_ATTACK, true)
 {
@@ -51,8 +51,8 @@ Unit::~Unit()
 		}
 		else
 		{
-			assert(Globals::isOnMiddlePosition(m_position));
-			broadcast<GameMessages::RemoveUnitPositionFromMap>({ m_position, getID() });
+			assert(Globals::isOnMiddlePosition(m_position.Get()));
+			broadcast<GameMessages::RemoveUnitPositionFromMap>({ m_position.Get(), getID() });
 		}
 	}
 }
@@ -91,7 +91,7 @@ void Unit::attack_entity(const Entity& targetEntity, const eFactionController ta
 {
 	Entity::attack_entity(targetEntity, targetController, map);
 
-	glm::vec3 previousDestination = Globals::getNextPathDestination(m_movement.path, m_position);
+	glm::vec3 previousDestination = Globals::getNextPathDestination(m_movement.path, m_position.Get());
 	if (!m_movement.path.empty())
 	{
 		broadcast<GameMessages::RemoveUnitPositionFromMap>({ m_movement.path.front(), getID() });
@@ -104,7 +104,7 @@ void Unit::attack_entity(const Entity& targetEntity, const eFactionController ta
 		{
 			switchToState(eUnitState::Moving);
 		}
-		else if(previousDestination != m_position)
+		else if(previousDestination != m_position.Get())
 		{
 			PathFinding::getInstance().getPathToPosition(*this, previousDestination, m_movement.path, map, 
 				createAdjacentPositions(map, *this));
@@ -119,7 +119,7 @@ void Unit::attack_entity(const Entity& targetEntity, const eFactionController ta
 	{
 		if (m_movement.path.empty())
 		{
-			if (previousDestination != m_position)
+			if (previousDestination != m_position.Get())
 			{
 				PathFinding::getInstance().getPathToPosition(*this, previousDestination, m_movement.path, map, 
 					createAdjacentPositions(map, *this));
@@ -140,7 +140,7 @@ bool Unit::MoveTo(const glm::vec3& destination, const Map& map, const bool add_t
 		return false;
 	}
 
-	glm::vec3 previousDestination = Globals::getNextPathDestination(m_movement.path, m_position);
+	glm::vec3 previousDestination = Globals::getNextPathDestination(m_movement.path, m_position.Get());
 	if (!m_movement.path.empty())
 	{
 		broadcast<GameMessages::RemoveUnitPositionFromMap>({ m_movement.path.front(), getID() });
@@ -154,7 +154,7 @@ bool Unit::MoveTo(const glm::vec3& destination, const Map& map, const bool add_t
 	}
 	else
 	{
-		if (previousDestination != m_position)
+		if (previousDestination != m_position.Get())
 		{
 			PathFinding::getInstance().getPathToPosition(*this, previousDestination, m_movement.path, map,
 				createAdjacentPositions(map, *this));
@@ -177,13 +177,13 @@ void Unit::update(float deltaTime, FactionHandler& factionHandler, const Map& ma
 
 	if (!m_movement.path.empty())
 	{
-		glm::vec3 newPosition = Globals::moveTowards(m_position, m_movement.path.back(), MOVEMENT_SPEED * deltaTime);
-		m_rotation.y = Globals::getAngle(newPosition, m_position);
+		glm::vec3 newPosition = Globals::moveTowards(m_position.Get(), m_movement.path.back(), MOVEMENT_SPEED * deltaTime);
+		m_rotation.y = Globals::getAngle(newPosition, m_position.Get());
 		setPosition(newPosition);
 
-		if (m_position == m_movement.path.back())
+		if (m_position.Get() == m_movement.path.back())
 		{
-			assert(Globals::isOnMiddlePosition(m_position));
+			assert(Globals::isOnMiddlePosition(m_position.Get()));
 			m_movement.path.pop_back();
 		}
 	}
@@ -216,7 +216,7 @@ void Unit::update(float deltaTime, FactionHandler& factionHandler, const Map& ma
 		}
 		break;
 	case eUnitState::AttackingTarget:
-		assert(Globals::isOnMiddlePosition(m_position) && 
+		assert(Globals::isOnMiddlePosition(m_position.Get()) && 
 			m_movement.path.empty() && 
 			m_target);
 
@@ -225,11 +225,11 @@ void Unit::update(float deltaTime, FactionHandler& factionHandler, const Map& ma
 			if (const Faction* targetFaction = factionHandler.getFaction(m_target->controller))
 			{
 				const Entity* targetEntity = targetFaction->get_entity(m_target->ID);
-				if (targetEntity && Globals::getSqrDistance(targetEntity->getPosition(), m_position) <= Globals::UNIT_ATTACK_RANGE * Globals::UNIT_ATTACK_RANGE)
+				if (targetEntity && Globals::getSqrDistance(targetEntity->getPosition(), m_position.Get()) <= Globals::UNIT_ATTACK_RANGE * Globals::UNIT_ATTACK_RANGE)
 				{
 					Level::add_event(GameEvent::create<SpawnProjectileEvent>({ m_owningFaction, getID(),
 						getEntityType(), targetFaction->getController(), targetEntity->getID(), targetEntity->getEntityType(),
-						DAMAGE, m_position, targetEntity->getPosition() }));
+						DAMAGE, m_position.Get(), targetEntity->getPosition() }));
 
 					m_attackTimer.resetElaspedTime();
 				}
@@ -255,7 +255,7 @@ void Unit::delayed_update(FactionHandler& factionHandler, const Map& map)
 		assert(m_movement.path.empty() && !m_target);
 		for (const Faction* opposingFaction : factionHandler.GetOpposingFactions(m_owningFaction))
 		{
-			const Entity* targetEntity = opposingFaction->getEntity(m_position, Globals::UNIT_ATTACK_RANGE, true);
+			const Entity* targetEntity = opposingFaction->getEntity(m_position.Get(), Globals::UNIT_ATTACK_RANGE, true);
 			if (targetEntity)
 			{
 				attack_entity(*targetEntity, opposingFaction->getController(), map);
@@ -276,7 +276,7 @@ void Unit::delayed_update(FactionHandler& factionHandler, const Map& map)
 			if (targetEntity)
 			{
 				assert(targetFaction);
-				if (Globals::getSqrDistance(targetEntity->getPosition(), m_position) <= Globals::UNIT_ATTACK_RANGE * Globals::UNIT_ATTACK_RANGE ||
+				if (Globals::getSqrDistance(targetEntity->getPosition(), m_position.Get()) <= Globals::UNIT_ATTACK_RANGE * Globals::UNIT_ATTACK_RANGE ||
 					m_movement.path.empty())
 				{
 					attack_entity(*targetEntity, targetFaction->getController(), map);
@@ -299,15 +299,15 @@ void Unit::delayed_update(FactionHandler& factionHandler, const Map& map)
 		assert(!m_target);
 		for (const Faction* opposingFaction : factionHandler.GetOpposingFactions(m_owningFaction))
 		{
-			const Entity* targetEntity = opposingFaction->getEntity(m_position, Globals::UNIT_ATTACK_RANGE);
-			if (targetEntity && PathFinding::getInstance().isTargetInLineOfSight(m_position, *targetEntity, map))
+			const Entity* targetEntity = opposingFaction->getEntity(m_position.Get(), Globals::UNIT_ATTACK_RANGE);
+			if (targetEntity && PathFinding::getInstance().isTargetInLineOfSight(m_position.Get(), *targetEntity, map))
 			{
 				attack_entity(*targetEntity, opposingFaction->getController(), map);
 			}
 		}
 		break;
 	case eUnitState::AttackingTarget:
-		assert(Globals::isOnMiddlePosition(m_position) &&
+		assert(Globals::isOnMiddlePosition(m_position.Get()) &&
 			m_movement.path.empty() &&
 			m_target);
 
@@ -318,7 +318,7 @@ void Unit::delayed_update(FactionHandler& factionHandler, const Map& map)
 				const Entity* targetEntity = targetFaction->get_entity(m_target->ID);
 				if (!targetEntity)
 				{
-					targetEntity = targetFaction->getEntity(m_position, Globals::UNIT_ATTACK_RANGE);
+					targetEntity = targetFaction->getEntity(m_position.Get(), Globals::UNIT_ATTACK_RANGE);
 					if (!targetEntity)
 					{
 						switchToState(eUnitState::Idle);
@@ -331,14 +331,14 @@ void Unit::delayed_update(FactionHandler& factionHandler, const Map& map)
 				}
 				else
 				{
-					if (Globals::getSqrDistance(targetEntity->getPosition(), m_position) > Globals::UNIT_ATTACK_RANGE * Globals::UNIT_ATTACK_RANGE ||
-						!PathFinding::getInstance().isTargetInLineOfSight(m_position, *targetEntity, map))
+					if (Globals::getSqrDistance(targetEntity->getPosition(), m_position.Get()) > Globals::UNIT_ATTACK_RANGE * Globals::UNIT_ATTACK_RANGE ||
+						!PathFinding::getInstance().isTargetInLineOfSight(m_position.Get(), *targetEntity, map))
 					{
 						attack_entity(*targetEntity, targetFaction->getController(), map);
 					}
-					else if (Globals::getSqrDistance(targetEntity->getPosition(), m_position) <= Globals::UNIT_ATTACK_RANGE * Globals::UNIT_ATTACK_RANGE)
+					else if (Globals::getSqrDistance(targetEntity->getPosition(), m_position.Get()) <= Globals::UNIT_ATTACK_RANGE * Globals::UNIT_ATTACK_RANGE)
 					{
-						m_rotation.y = Globals::getAngle(targetEntity->getPosition(), m_position);
+						m_rotation.y = Globals::getAngle(targetEntity->getPosition(), m_position.Get());
 					}
 				}
 			}
@@ -375,10 +375,10 @@ void Unit::switchToState(eUnitState newState)
 	{
 	case eUnitState::Idle:
 	case eUnitState::AttackingTarget:
-		assert(Globals::isOnMiddlePosition(m_position));
+		assert(Globals::isOnMiddlePosition(m_position.Get()));
 		if (newState == eUnitState::Moving || newState == eUnitState::AttackMoving)
 		{
-			broadcast<GameMessages::RemoveUnitPositionFromMap>({ m_position, getID() });
+			broadcast<GameMessages::RemoveUnitPositionFromMap>({ m_position.Get(), getID() });
 		}
 		else if (newState != eUnitState::AttackMoving)
 		{

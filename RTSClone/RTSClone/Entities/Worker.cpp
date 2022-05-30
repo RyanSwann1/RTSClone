@@ -42,7 +42,7 @@ WorkerScheduledBuilding::WorkerScheduledBuilding(const glm::vec3& position, eEnt
 //Worker
 Worker::Worker(Faction& owningFaction, const glm::vec3& startingPosition, const glm::vec3& startingRotation, const Map& map)
 	: Entity(ModelManager::getInstance().getModel(WORKER_MODEL_NAME), startingPosition, eEntityType::Worker, 
-		Globals::WORKER_STARTING_HEALTH, owningFaction.getCurrentShieldAmount(), startingRotation),
+		Globals::WORKER_STARTING_HEALTH, owningFaction.getCurrentShieldAmount(), false, startingRotation),
 	m_owningFaction(&owningFaction)
 {
 	switchTo(eWorkerState::Idle);
@@ -50,8 +50,8 @@ Worker::Worker(Faction& owningFaction, const glm::vec3& startingPosition, const 
 
 Worker::Worker(Faction& owningFaction, const glm::vec3& startingPosition, const glm::vec3& startingRotation,
 	const glm::vec3& destination, const Map& map)
-	: Entity(ModelManager::getInstance().getModel(WORKER_MODEL_NAME), startingPosition, eEntityType::Worker, Globals::WORKER_STARTING_HEALTH,
-		owningFaction.getCurrentShieldAmount(), startingRotation),
+	: Entity(ModelManager::getInstance().getModel(WORKER_MODEL_NAME), startingPosition, eEntityType::Worker, 
+		Globals::WORKER_STARTING_HEALTH, owningFaction.getCurrentShieldAmount(), false, startingRotation),
 	m_owningFaction(&owningFaction)
 {
 	MoveTo(destination, map, false);
@@ -177,11 +177,11 @@ void Worker::update(float deltaTime, const Map& map, FactionHandler& factionHand
 
 	if (!m_movement.path.empty())
 	{
-		glm::vec3 newPosition = Globals::moveTowards(m_position, m_movement.path.back(), MOVEMENT_SPEED * deltaTime);
-		m_rotation.y = Globals::getAngle(newPosition, m_position);
+		glm::vec3 newPosition = Globals::moveTowards(m_position.Get(), m_movement.path.back(), MOVEMENT_SPEED * deltaTime);
+		m_rotation.y = Globals::getAngle(newPosition, m_position.Get());
 		setPosition(newPosition);
 
-		if (m_position == m_movement.path.back())
+		if (m_position.Get() == m_movement.path.back())
 		{
 			m_movement.path.pop_back();
 		}
@@ -257,7 +257,7 @@ void Worker::update(float deltaTime, const Map& map, FactionHandler& factionHand
 				}
 			}
 		}
-		else if (const Headquarters* headquarters = m_owningFaction->get_closest_headquarters(m_position))
+		else if (const Headquarters* headquarters = m_owningFaction->get_closest_headquarters(m_position.Get()))
 		{
 			return_minerals_to_headquarters(*headquarters, map);
 		}
@@ -324,13 +324,13 @@ void Worker::update(float deltaTime, const Map& map, FactionHandler& factionHand
 			const Entity* targetEntity = m_owningFaction->get_entity(*m_repairTargetEntity);
 			if (targetEntity && targetEntity->getHealth() < targetEntity->getMaximumHealth())
 			{
-				if (Globals::getSqrDistance(targetEntity->getPosition(), m_position) > REPAIR_DISTANCE * REPAIR_DISTANCE)
+				if (Globals::getSqrDistance(targetEntity->getPosition(), m_position.Get()) > REPAIR_DISTANCE * REPAIR_DISTANCE)
 				{
 					repairEntity(*targetEntity, map);
 				}
 				else
 				{
-					m_rotation.y = Globals::getAngle(targetEntity->getPosition(), m_position);
+					m_rotation.y = Globals::getAngle(targetEntity->getPosition(), m_position.Get());
 
 					Level::add_event(GameEvent::create<RepairEntityEvent>({ m_owningFaction->getController(), *m_repairTargetEntity }));
 				}
@@ -372,13 +372,13 @@ void Worker::delayed_update(const Map& map, FactionHandler& factionHandler)
 		const Entity* targetEntity = m_owningFaction->get_entity(*m_repairTargetEntity);
 		if (targetEntity && targetEntity->getHealth() < targetEntity->getMaximumHealth())
 		{
-			if (Globals::getSqrDistance(targetEntity->getPosition(), m_position) > REPAIR_DISTANCE * REPAIR_DISTANCE)
+			if (Globals::getSqrDistance(targetEntity->getPosition(), m_position.Get()) > REPAIR_DISTANCE * REPAIR_DISTANCE)
 			{
 				repairEntity(*targetEntity, map);
 			}
 			else
 			{
-				m_rotation.y = Globals::getAngle(targetEntity->getPosition(), m_position);
+				m_rotation.y = Globals::getAngle(targetEntity->getPosition(), m_position.Get());
 			}
 		}
 		else
@@ -392,7 +392,7 @@ void Worker::delayed_update(const Map& map, FactionHandler& factionHandler)
 
 bool Worker::Harvest(const Mineral& mineral, const Map& map)
 {
-	glm::vec3 destination = PathFinding::getInstance().getClosestPositionToAABB(m_position, mineral.getAABB(), map);
+	glm::vec3 destination = PathFinding::getInstance().getClosestPositionToAABB(m_position.Get(), mineral.getAABB(), map);
 	m_mineralToHarvest = &mineral;
 	move_to(destination, map, eWorkerState::MovingToMinerals);
 	return true;
@@ -446,7 +446,7 @@ void Worker::render(ShaderHandler& shaderHandler, eFactionController owningFacti
 	if (m_resources && m_currentState != eWorkerState::Harvesting)
 	{
 		//ModelManager::getInstance().getModel(eModelName::WorkerMineral).render(
-			//shaderHandler, { m_position.x - 0.5f, m_position.y, m_position.z - 0.5f });
+			//shaderHandler, { m_position.Get().x - 0.5f, m_position.Get().y, m_position.Get().z - 0.5f });
 	}
 
 	Entity::render(shaderHandler, owningFactionController);
@@ -459,7 +459,7 @@ void Worker::render_status_bars(ShaderHandler& shaderHandler, const Camera& came
 	if (m_taskTimer.isActive())
 	{
 		float currentTime = m_taskTimer.getElaspedTime() / m_taskTimer.getExpiredTime();
-		m_statbarSprite.render(m_position, windowSize, WORKER_PROGRESS_BAR_WIDTH,
+		m_statbarSprite.render(m_position.Get(), windowSize, WORKER_PROGRESS_BAR_WIDTH,
 			WORKER_PROGRESS_BAR_WIDTH * currentTime, Globals::DEFAULT_PROGRESS_BAR_HEIGHT,
 			WORKER_PROGRESS_BAR_YOFFSET, shaderHandler, camera, Globals::PROGRESS_BAR_COLOR);
 	}
@@ -597,7 +597,7 @@ void Worker::switchTo(eWorkerState newState)
 
 bool Worker::move_to(const glm::vec3& destination, const Map& map, eWorkerState state)
 {
-	glm::vec3 previousDestination = Globals::getNextPathDestination(m_movement.path, m_position);
+	glm::vec3 previousDestination = Globals::getNextPathDestination(m_movement.path, m_position.Get());
 	PathFinding::getInstance().getPathToPosition(*this, destination, m_movement.path, map, createAdjacentPositions(map));
 	if (!m_movement.path.empty())
 	{
@@ -606,7 +606,7 @@ bool Worker::move_to(const glm::vec3& destination, const Map& map, eWorkerState 
 	}
 	else
 	{
-		if (previousDestination != m_position)
+		if (previousDestination != m_position.Get())
 		{
 			m_movement.path.push_back(previousDestination);
 			switchTo(state);
@@ -623,7 +623,7 @@ bool Worker::move_to(const glm::vec3& destination, const Map& map, eWorkerState 
 
 bool Worker::move_to(const glm::vec3& destination, const Map& map, const AABB& ignoreAABB, eWorkerState state)
 {
-	glm::vec3 previousDestination = Globals::getNextPathDestination(m_movement.path, m_position);
+	glm::vec3 previousDestination = Globals::getNextPathDestination(m_movement.path, m_position.Get());
 	PathFinding::getInstance().getPathToPosition(*this, destination, m_movement.path, map, createAdjacentPositions(map, ignoreAABB));
 	if (!m_movement.path.empty())
 	{
@@ -632,7 +632,7 @@ bool Worker::move_to(const glm::vec3& destination, const Map& map, const AABB& i
 	}
 	else
 	{
-		if (previousDestination != m_position)
+		if (previousDestination != m_position.Get())
 		{
 			m_movement.path.push_back(previousDestination);
 			switchTo(state);
