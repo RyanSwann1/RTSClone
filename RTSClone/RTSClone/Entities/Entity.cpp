@@ -95,7 +95,7 @@ void Entity::increaseShield()
 
 int Entity::getID() const
 {
-	return m_id.id;
+	return m_id.Get();
 }
 
 const glm::vec3& Entity::getRotation() const
@@ -257,18 +257,3 @@ void Entity::renderAABB(ShaderHandler& shaderHandler)
 	m_AABB.render(shaderHandler);
 }
 #endif // RENDER_AABB
-
-EntityID::EntityID()
-	: id(id_generator::gen())
-{}
-
-EntityID::EntityID(EntityID&& rhs) noexcept
-{
-	std::swap(id, rhs.id);
-}
-
-EntityID& EntityID::operator=(EntityID&& rhs) noexcept
-{
-	std::swap(id, rhs.id);
-	return *this;
-}

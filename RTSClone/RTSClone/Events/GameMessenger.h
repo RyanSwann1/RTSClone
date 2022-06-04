@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Core/IDGenerator.h"
+#include "Core/UniqueID.h"
 #include <functional>
 #include <vector>
 #include <assert.h>
@@ -85,14 +86,8 @@ public:
 	{}
 	BroadcasterSub(const BroadcasterSub&) = delete;
 	BroadcasterSub& operator=(const BroadcasterSub&) = delete;
-	BroadcasterSub(BroadcasterSub&& rhs) noexcept
-		: id(rhs.id.swap(id))
-	{}
-	BroadcasterSub& operator=(BroadcasterSub&& rhs) noexcept
-	{
-		rhs.id.swap(id);
-		return *this;
-	}
+	BroadcasterSub(BroadcasterSub&&) noexcept = default;
+	BroadcasterSub& operator=(BroadcasterSub&&) noexcept = default;
 	~BroadcasterSub()
 	{
 		if (id)
@@ -102,5 +97,5 @@ public:
 	}
 
 private:
-	std::optional<int> id = std::nullopt;
+	UniqueID id{};
 };

@@ -7,19 +7,7 @@
 #include "UI/Sprite.h"
 #include "Core/Timer.h"
 #include "Position.h"
-
-constexpr int INVALID_ENTITY_ID = -1;
-
-struct EntityID
-{
-	EntityID();
-	EntityID(const EntityID&) = delete;
-	EntityID& operator=(const EntityID&) = delete;
-	EntityID(EntityID&& rhs) noexcept;
-	EntityID& operator=(EntityID&& rhs) noexcept;
-
-	int id = INVALID_ENTITY_ID;
-};
+#include "Core/UniqueID.h"
 
 struct TakeDamageEvent;
 class FactionHandler;
@@ -83,7 +71,7 @@ protected:
 	AABB m_AABB;
 
 private:
-	EntityID m_id					= {};
+	UniqueID m_id					= {};
 	int m_maximumHealth				= 0;
 	int m_health					= 0;
 	int m_maximumShield				= 0;

@@ -172,6 +172,7 @@
     <ClCompile Include="Core\MinHeap.cpp" />
     <ClCompile Include="Core\PathFinding.cpp" />
     <ClCompile Include="Core\Timer.cpp" />
+    <ClCompile Include="Core\UniqueID.cpp" />
     <ClCompile Include="Entities\Barracks.cpp" />
     <ClCompile Include="Entities\Entity.cpp" />
     <ClCompile Include="Entities\Position.cpp" />
@@ -270,6 +271,7 @@
     <ClInclude Include="Core\PathFinding.h" />
     <ClInclude Include="Core\Timer.h" />
     <ClInclude Include="Core\TypeComparison.h" />
+    <ClInclude Include="Core\UniqueID.h" />
     <ClInclude Include="Entities\Barracks.h" />
     <ClInclude Include="Callbacks\MineralCallbacks.h" />
     <ClInclude Include="Callbacks\WorkerCallbacks.h" />
