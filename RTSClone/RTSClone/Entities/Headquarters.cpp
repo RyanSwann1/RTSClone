@@ -23,8 +23,8 @@ namespace
 }
 
 Headquarters::Headquarters(const Position& position, Faction& owningFaction)
-	: EntitySpawnerBuilding(position, eEntityType::Headquarters, Globals::HQ_STARTING_HEALTH, owningFaction.getCurrentShieldAmount(), SPAWN_DETAILS,
-		[](Faction& owningFaction, const Map& map, const EntitySpawnerBuilding& spawner) { return owningFaction.createWorker(map, spawner); }),
+	: EntitySpawnerBuilding(position, eEntityType::Headquarters, Globals::HQ_STARTING_HEALTH, 
+		owningFaction.getCurrentShieldAmount(), SPAWN_DETAILS),
 	m_owningFaction(&owningFaction)
 {
 	Level::add_event(GameEvent::create<AttachFactionToBaseEvent>({ owningFaction.getController(), m_position.Get() }));
@@ -38,4 +38,16 @@ Headquarters::~Headquarters()
 		Level::add_event(GameEvent::create<DetachFactionFromBaseEvent>({ m_owningFaction->getController(), m_position.Get() }));
 		Level::add_event(GameEvent::create<HeadquartersDestroyedEvent>({}));
 	}
+}
+
+const Entity* Headquarters::CreateEntity(Faction& owning_faction, const Map& map)
+{
+	glm::vec3 position(0.0f);
+	if (PathFinding::getInstance().getClosestAvailableEntitySpawnPosition(*this, map, position))
+	{
+		glm::vec3 rotation = { 0.0f, Globals::getAngle(position, getPosition()), 0.0f };
+		return owning_faction.createWorker({ position, rotation, get_waypoint(), eEntityType::Worker, getPosition() }, map);
+	}
+
+	return nullptr;
 }

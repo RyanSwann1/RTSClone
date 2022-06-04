@@ -572,17 +572,17 @@ bool FactionAI::increaseShield(const Laboratory& laboratory)
 	return true;
 }
 
-Entity* FactionAI::createUnit(const Map& map, const EntitySpawnerBuilding& spawner)
+Entity* FactionAI::createUnit(const EntityToSpawn& entity, const Map& map)
 {
-	Entity* spawnedUnit = Faction::createUnit(map, spawner);
+	Entity* spawnedUnit = Faction::createUnit(entity, map);
 	if (!spawnedUnit)
 	{
-		AIOccupiedBase* occupiedBase = m_occupiedBases.getBase(spawner);
-		if (occupiedBase)
-		{
-			assert(occupiedBase->base.get().owningFactionController == getController());
-			occupiedBase->actionQueue.emplace_back(eAIActionType::SpawnUnit);
-		}
+		//AIOccupiedBase* occupiedBase = m_occupiedBases.getBase(spawner);
+		//if (occupiedBase)
+		//{
+		//	assert(occupiedBase->base.get().owningFactionController == getController());
+		//	occupiedBase->actionQueue.emplace_back(eAIActionType::SpawnUnit);
+		//}
 	}
 	else
 	{
@@ -609,19 +609,19 @@ Entity* FactionAI::createUnit(const Map& map, const EntitySpawnerBuilding& spawn
 	return spawnedUnit;
 }
 
-Entity* FactionAI::createWorker(const Map& map, const EntitySpawnerBuilding& spawner)
+Entity* FactionAI::createWorker(const EntityToSpawn& entity, const Map& map)
 {
-	Entity* spawnedWorker = Faction::createWorker(map, spawner);
+	Entity* spawnedWorker = Faction::createWorker(entity, map);
 	if (!spawnedWorker)
 	{
-		AIOccupiedBase* occupiedBase = m_occupiedBases.getBase(spawner);
+		AIOccupiedBase* occupiedBase = m_occupiedBases.getBase(entity.building_position);
 		assert(occupiedBase);
 		occupiedBase->actionQueue.emplace_back(eAIActionType::SpawnWorker);
 	}
 	else
 	{
 		assert(spawnedWorker->getEntityType() == eEntityType::Worker);
-		m_occupiedBases.addWorker(static_cast<Worker&>(*spawnedWorker), spawner);
+		m_occupiedBases.addWorker(static_cast<Worker&>(*spawnedWorker), entity.building_position);
 	}
 
 	return spawnedWorker;

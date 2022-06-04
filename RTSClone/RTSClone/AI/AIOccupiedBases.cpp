@@ -154,6 +154,11 @@ AIOccupiedBases::AIOccupiedBases(const BaseHandler& baseHandler, eFactionControl
 	bases.reserve(baseHandler.getBases().size());
 }
 
+AIOccupiedBase* AIOccupiedBases::getBase(const int id)
+{
+	return nullptr;
+}
+
 AIOccupiedBase* AIOccupiedBases::getBase(const glm::vec3& position)
 {
 	auto base = std::find_if(bases.begin(), bases.end(), [&position](const auto& base)
@@ -215,11 +220,11 @@ const std::vector<AIOccupiedBase>& AIOccupiedBases::getSortedBases(const glm::ve
 	return bases;
 }
 
-void AIOccupiedBases::addWorker(Worker& worker, const EntitySpawnerBuilding& spawner)
+void AIOccupiedBases::addWorker(Worker& worker, const glm::vec3& position)
 {
-	auto base = std::find_if(bases.begin(), bases.end(), [&spawner](const auto& base)
+	auto base = std::find_if(bases.begin(), bases.end(), [&position](const auto& base)
 	{
-		return base.base.get().getCenteredPosition() == spawner.getPosition();
+		return base.base.get().getCenteredPosition() == position;
 	});
 
 	assert(base != bases.end() && (*base).base.get().owningFactionController == owningFaction);

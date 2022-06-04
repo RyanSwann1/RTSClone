@@ -11,6 +11,7 @@
 #include "Events/GameMessages.h"
 #include "Events/GameMessenger.h"
 #include "Core/Level.h"
+#include "EntitySpawnerBuilding.h"
 #ifdef RENDER_PATHING
 #include "Graphics/RenderPrimitiveMesh.h"
 #endif // RENDER_PATHING
@@ -22,23 +23,21 @@ namespace
 	constexpr int DAMAGE = 1;
 }
 
-Unit::Unit(Faction& owningFaction, const glm::vec3& startingPosition, const glm::vec3& startingRotation, const Map& map)
-	: Entity(ModelManager::getInstance().getModel(UNIT_MODEL_NAME), { startingPosition, GridLockActive::False}, 
-		eEntityType::Unit, Globals::UNIT_STARTING_HEALTH, owningFaction.getCurrentShieldAmount(), startingRotation),
+Unit::Unit(Faction & owningFaction, const EntityToSpawn& entity_to_spawn, const Map& map)
+	: Entity(ModelManager::getInstance().getModel(UNIT_MODEL_NAME), 
+		{ entity_to_spawn.position, GridLockActive::False }, eEntityType::Unit,
+		Globals::UNIT_STARTING_HEALTH, owningFaction.getCurrentShieldAmount(), entity_to_spawn.rotation),
 	m_owningFaction(owningFaction.getController()),
 	m_attackTimer(TIME_BETWEEN_ATTACK, true)
 {
-	broadcast<GameMessages::AddUnitPositionToMap>({ m_position.Get(), getID() });
-}
-
-Unit::Unit(Faction & owningFaction, const glm::vec3 & startingPosition, const glm::vec3 & startingRotation, 
-	const glm::vec3 & destination, const Map& map)
-	: Entity(ModelManager::getInstance().getModel(UNIT_MODEL_NAME), { startingPosition, GridLockActive::False }, eEntityType::Unit,
-		Globals::UNIT_STARTING_HEALTH, owningFaction.getCurrentShieldAmount(), startingRotation),
-	m_owningFaction(owningFaction.getController()),
-	m_attackTimer(TIME_BETWEEN_ATTACK, true)
-{
-	MoveTo(destination, map, false);
+	if (!entity_to_spawn.destination)
+	{
+		broadcast<GameMessages::AddUnitPositionToMap>({ m_position.Get(), getID() });
+	}
+	else
+	{
+		MoveTo(*entity_to_spawn.destination, map, false);
+	}	
 }
 
 Unit::~Unit()

@@ -23,6 +23,18 @@ namespace
 }
 
 Barracks::Barracks(const Position& position, Faction& owningFaction)
-	: EntitySpawnerBuilding(position, eEntityType::Barracks, Globals::BARRACKS_STARTING_HEALTH, owningFaction.getCurrentShieldAmount(), SPAWN_DETAILS, 
-		[](Faction& owningFaction, const Map& map, const EntitySpawnerBuilding& spawner) { return owningFaction.createUnit(map, spawner); })
+	: EntitySpawnerBuilding(position, eEntityType::Barracks, 
+		Globals::BARRACKS_STARTING_HEALTH, owningFaction.getCurrentShieldAmount(), SPAWN_DETAILS)
 {}
+
+const Entity* Barracks::CreateEntity(Faction & owning_faction, const Map & map)
+{
+	glm::vec3 position(0.0f);
+	if (PathFinding::getInstance().getClosestAvailableEntitySpawnPosition(*this, map, position))
+	{
+		glm::vec3 rotation = { 0.0f, Globals::getAngle(position, getPosition()), 0.0f };
+		return owning_faction.createUnit({ position, rotation, get_waypoint(), eEntityType::Unit, getPosition() }, map);
+	}
+
+	return nullptr;
+}

@@ -51,12 +51,13 @@ struct AIOccupiedBases
 	AIOccupiedBases(AIOccupiedBases&&) = delete;
 	AIOccupiedBases& operator=(AIOccupiedBases&&) = delete;
 
+	AIOccupiedBase* getBase(const int id);
 	AIOccupiedBase* getBase(const glm::vec3& position);
 	AIOccupiedBase* getBase(const Entity& entity);
 
 	const std::vector<AIOccupiedBase>& getSortedBases(const glm::vec3& position);
 
-	void addWorker(Worker& worker, const EntitySpawnerBuilding& spawner);
+	void addWorker(Worker& worker, const glm::vec3& spawner);
 	void addWorker(Worker& worker, const Base& base);
 	void removeWorker(const Worker& worker);
 

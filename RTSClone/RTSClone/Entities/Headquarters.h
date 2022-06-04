@@ -12,4 +12,6 @@ public:
 
 private:
 	const Faction* m_owningFaction = nullptr;
+
+	const Entity* CreateEntity(Faction& owning_faction, const Map& map) override;
 };

@@ -11,12 +11,10 @@
 #include "Core/Level.h"
 
 EntitySpawnerBuilding::EntitySpawnerBuilding(const Position& position, const eEntityType type, 
-	const int health, const int shield, EntitySpawnerDetails spawnDetails,
-	std::function<Entity* (Faction& owningFaction, const Map&, const EntitySpawnerBuilding&)> spawnCallback)
+	const int health, const int shield, EntitySpawnerDetails spawnDetails)
 	: Entity(ModelManager::getInstance().getModel(type), position, type, health, shield),
 	m_details(spawnDetails),
-	m_timer(spawnDetails.timeBetweenSpawn, false),
-	m_spawnCallback(spawnCallback)
+	m_timer(spawnDetails.timeBetweenSpawn, false)
 {
 	broadcast<GameMessages::AddAABBToMap>({ m_AABB });
 	Level::add_event(GameEvent::create<RevalidateMovementPathsEvent>({}));
@@ -54,8 +52,8 @@ void EntitySpawnerBuilding::update(const float deltaTime, Faction& owningFaction
 		m_timer.resetElaspedTime();
 		--m_spawnCount;
 
-		const Entity* spawnedEntity = m_spawnCallback(owningFaction, map, *this);
-		if (!spawnedEntity)
+		const Entity* created_entity = CreateEntity(owningFaction, map);
+		if (!created_entity)
 		{
 			m_spawnCount = 0;
 			m_timer.setActive(false);

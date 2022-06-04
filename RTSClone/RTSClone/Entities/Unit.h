@@ -22,6 +22,7 @@ enum class eUnitState
 	Max = AttackingTarget
 };
 
+struct EntityToSpawn;
 class Faction;
 class Map;
 class ShaderHandler;
@@ -29,9 +30,7 @@ class FactionHandler;
 class Unit : public Entity
 {
 public:
-	Unit(Faction& owningFaction, const glm::vec3& startingPosition, const glm::vec3& startingRotation, const Map& map);
-	Unit(Faction& owningFaction, const glm::vec3& startingPosition, const glm::vec3& startingRotation,
-		const glm::vec3& destination, const Map& map);
+	Unit(Faction& owningFaction, const EntityToSpawn& entity_to_spawn, const Map& map);
 	Unit(const Unit&) = delete;
 	Unit& operator=(const Unit&) = delete;
 	Unit(Unit&&) noexcept = default;

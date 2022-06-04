@@ -41,21 +41,19 @@ WorkerScheduledBuilding::WorkerScheduledBuilding(const glm::vec3& position, eEnt
 {}
 
 //Worker
-Worker::Worker(Faction& owningFaction, const glm::vec3& startingPosition, const glm::vec3& startingRotation, const Map& map)
-	: Entity(ModelManager::getInstance().getModel(WORKER_MODEL_NAME), { startingPosition, GridLockActive::False }, 
-		eEntityType::Worker, Globals::WORKER_STARTING_HEALTH, owningFaction.getCurrentShieldAmount(), startingRotation),
+Worker::Worker(Faction& owningFaction, const EntityToSpawn& entity_to_spawn, const Map& map)
+	: Entity(ModelManager::getInstance().getModel(WORKER_MODEL_NAME), { entity_to_spawn.position, GridLockActive::False }, 
+		eEntityType::Worker, Globals::WORKER_STARTING_HEALTH, owningFaction.getCurrentShieldAmount(), entity_to_spawn.rotation),
 	m_owningFaction(&owningFaction)
 {
-	switchTo(eWorkerState::Idle);
-}
-
-Worker::Worker(Faction& owningFaction, const glm::vec3& startingPosition, const glm::vec3& startingRotation,
-	const glm::vec3& destination, const Map& map)
-	: Entity(ModelManager::getInstance().getModel(WORKER_MODEL_NAME), { startingPosition, GridLockActive::False }, 
-		eEntityType::Worker, Globals::WORKER_STARTING_HEALTH, owningFaction.getCurrentShieldAmount(), startingRotation),
-	m_owningFaction(&owningFaction)
-{
-	MoveTo(destination, map, false);
+	if (!entity_to_spawn.destination)
+	{
+		switchTo(eWorkerState::Idle);
+	}
+	else
+	{
+		MoveTo(*entity_to_spawn.destination, map, false);
+	}
 }
 
 const Mineral* Worker::getMineralToHarvest() const

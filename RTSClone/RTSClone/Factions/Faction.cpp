@@ -676,12 +676,12 @@ bool Faction::isMineralInUse(const Mineral& mineral) const
     });
 }
 
-Entity* Faction::createUnit(const Map& map, const EntitySpawnerBuilding& spawner)
+Entity* Faction::createUnit(const EntityToSpawn& entity_to_spawn, const Map& map)
 {
-    return CreateEntityFromBuilding<Unit>(map, spawner, eEntityType::Unit, m_units, Globals::MAX_UNITS);
+    return CreateEntityFromBuilding(map, entity_to_spawn, m_units, Globals::MAX_UNITS);
 }
 
-Entity* Faction::createWorker(const Map& map, const EntitySpawnerBuilding& spawner)
+Entity* Faction::createWorker(const EntityToSpawn& entity_to_spawn, const Map& map)
 {
-    return CreateEntityFromBuilding(map, spawner, eEntityType::Worker, m_workers, Globals::MAX_WORKERS);
+    return CreateEntityFromBuilding(map, entity_to_spawn, m_workers, Globals::MAX_WORKERS);
 }

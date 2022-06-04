@@ -38,6 +38,7 @@ struct WorkerScheduledBuilding
 	std::reference_wrapper<const Model> model;
 };
 
+struct EntityToSpawn;
 struct Base;
 class Headquarters;
 class Faction;
@@ -45,9 +46,7 @@ class Mineral;
 class Worker : public Entity
 {
 public:
-	Worker(Faction& owningFaction, const glm::vec3& startingPosition, const glm::vec3& startingRotation, const Map& map);
-	Worker(Faction& owningFaction, const glm::vec3& startingPosition, const glm::vec3& startingRotation, 
-		const glm::vec3& destination, const Map& map);
+	Worker(Faction& owningFaction, const EntityToSpawn& entity_to_spawn, const Map& map);
 	Worker(Worker&&) noexcept = default;
 	Worker& operator=(Worker&&) noexcept = default;
 	

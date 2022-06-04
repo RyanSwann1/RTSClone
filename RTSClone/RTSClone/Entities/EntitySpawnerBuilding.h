@@ -16,14 +16,23 @@ struct EntitySpawnerDetails
 	int populationCost			= 0;
 };
 
+struct EntityToSpawn
+{
+	glm::vec3 position{};
+	glm::vec3 rotation{};
+	std::optional<glm::vec3> destination{};
+	eEntityType type{};
+	glm::vec3 building_position{};
+};
+
 class Map;
 class Faction;
 class EntitySpawnerBuilding : public Entity
 {
 public:
 	EntitySpawnerBuilding(const Position& position, const eEntityType type, const int health,
-		const int shield, EntitySpawnerDetails spawnDetails,
-		std::function<Entity*(Faction&, const Map&, const EntitySpawnerBuilding&)> spawnCallback);
+		const int shield, EntitySpawnerDetails spawnDetails);
+
 	EntitySpawnerBuilding(EntitySpawnerBuilding&&) noexcept = default;
 	EntitySpawnerBuilding& operator=(EntitySpawnerBuilding&&) noexcept = default;
 	~EntitySpawnerBuilding();
@@ -45,5 +54,6 @@ private:
 	EntitySpawnerDetails m_details				= {};
 	int m_spawnCount							= 0;
 	std::optional<glm::vec3> m_waypoint			= {};
-	std::function<Entity*(Faction&, const Map&, const EntitySpawnerBuilding&)> m_spawnCallback = {};
+
+	virtual const Entity* CreateEntity(Faction& owning_faction, const Map& map) = 0;
 };
