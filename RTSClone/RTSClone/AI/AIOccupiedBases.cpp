@@ -180,7 +180,7 @@ AIOccupiedBase* AIOccupiedBases::getBase(const Entity& entity)
 		}
 		break;
 		case eEntityType::Worker:
-		occupiedBase = getBaseWithWorker(static_cast<const Worker&>(entity));
+			occupiedBase = getBaseWithWorker(entity.getID());
 		break;
 		case eEntityType::SupplyDepot:
 		case eEntityType::Barracks:
@@ -272,9 +272,9 @@ std::vector<std::reference_wrapper<Worker>> AIOccupiedBases::removeBase(const Ba
 	return workers;
 }
 
-void AIOccupiedBases::addBuilding(const Worker& worker, Entity& building)
+void AIOccupiedBases::addBuilding(const int builder_id, Entity& building)
 {
-	AIOccupiedBase* occupiedBase = getBaseWithWorker(worker);
+	AIOccupiedBase* occupiedBase = getBaseWithWorker(builder_id);
 	assert(occupiedBase && occupiedBase->base.get().owningFactionController == owningFaction);
 	if (occupiedBase)
 	{
@@ -348,14 +348,13 @@ void AIOccupiedBases::removeBuilding(const Entity& building)
 	assert(buildingRemoved);
 }
 
-AIOccupiedBase* AIOccupiedBases::getBaseWithWorker(const Worker& worker)
+AIOccupiedBase* AIOccupiedBases::getBaseWithWorker(const int worker_id)
 {
-	int workerID = worker.getID();
 	for (auto& base : bases)
 	{
-		auto iter = std::find_if(base.workers.cbegin(), base.workers.cend(), [workerID](const auto& worker)
+		auto iter = std::find_if(base.workers.cbegin(), base.workers.cend(), [worker_id](const auto& worker)
 		{
-			return worker.get().getID() == workerID;
+			return worker.get().getID() == worker_id;
 		});
 		if (iter != base.workers.cend())
 		{

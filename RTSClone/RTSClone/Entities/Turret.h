@@ -11,7 +11,7 @@ class FactionHandler;
 class Turret : public Entity
 {
 public:
-	Turret(const glm::vec3& startingPosition, const Faction& owningFaction);
+	Turret(const Position& position, const Faction& owningFaction);
 	Turret(Turret&&) noexcept = default;
 	Turret& operator=(Turret&&) noexcept = default;
 	~Turret();

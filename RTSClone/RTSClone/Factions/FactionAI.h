@@ -36,7 +36,12 @@ protected:
 	void on_entity_removal(const Entity& entity) override;
 	void on_entity_taken_damage(const TakeDamageEvent& gameEvent, Entity& entity, const Map& map, FactionHandler& factionHandler) override;
 	void on_entity_idle(Entity& entity, const Map& map, FactionHandler& factionHandler, const BaseHandler& baseHandler) override;
-	Entity* create_building(const Worker& worker, const Map& map) override;
+
+	Barracks* CreateBarracks(const WorkerScheduledBuilding& scheduled_building) override;
+	Turret* CreateTurret(const WorkerScheduledBuilding& scheduled_building) override;
+	Headquarters* CreateHeadquarters(const WorkerScheduledBuilding& scheduled_building) override;
+	Laboratory* CreateLaboratory(const WorkerScheduledBuilding& scheduled_building) override;
+	SupplyDepot* CreateSupplyDepot(const WorkerScheduledBuilding& scheduled_building) override;
 
 private:
 	const AIConstants::eBehaviour m_behaviour;

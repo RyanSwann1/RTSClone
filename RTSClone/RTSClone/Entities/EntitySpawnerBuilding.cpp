@@ -10,10 +10,10 @@
 #include "Graphics/ShaderHandler.h"
 #include "Core/Level.h"
 
-EntitySpawnerBuilding::EntitySpawnerBuilding(const glm::vec3& position, const eEntityType type, 
+EntitySpawnerBuilding::EntitySpawnerBuilding(const Position& position, const eEntityType type, 
 	const int health, const int shield, EntitySpawnerDetails spawnDetails,
 	std::function<Entity* (Faction& owningFaction, const Map&, const EntitySpawnerBuilding&)> spawnCallback)
-	: Entity(ModelManager::getInstance().getModel(type), { position, GridLockActive::True }, type, health, shield),
+	: Entity(ModelManager::getInstance().getModel(type), position, type, health, shield),
 	m_details(spawnDetails),
 	m_timer(spawnDetails.timeBetweenSpawn, false),
 	m_spawnCallback(spawnCallback)

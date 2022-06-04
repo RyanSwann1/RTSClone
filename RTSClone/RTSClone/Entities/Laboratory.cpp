@@ -15,8 +15,8 @@ namespace
 	const float PROGRESS_BAR_YOFFSET = 125.0f;
 }
 
-Laboratory::Laboratory(const glm::vec3& startingPosition, Faction& owningFaction)
-	: Entity(ModelManager::getInstance().getModel(LABORATORY_MODEL_NAME), { startingPosition, GridLockActive::True }, 
+Laboratory::Laboratory(const Position& position, Faction& owningFaction)
+	: Entity(ModelManager::getInstance().getModel(LABORATORY_MODEL_NAME), position, 
 		eEntityType::Laboratory, Globals::LABORATORY_STARTING_HEALTH, owningFaction.getCurrentShieldAmount()),
 	m_owningFaction(owningFaction),
 	m_shieldUpgradeCounter(0),

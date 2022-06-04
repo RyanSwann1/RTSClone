@@ -33,7 +33,7 @@ Faction::Faction(eFactionController factionController, const glm::vec3& hqStarti
     m_barracks.reserve(Globals::MAX_BARRACKS);
     m_turrets.reserve(Globals::MAX_TURRETS);
 
-    Entity& entity = m_headquarters.emplace_back(hqStartingPosition, *this);
+    Entity& entity = m_headquarters.emplace_back(Position{ hqStartingPosition, GridLockActive::True }, *this);
     m_allEntities.push_back(&entity);
 }
 
@@ -41,6 +41,20 @@ void Faction::on_entity_removal(const Entity& entity)
 {
     assert(entity.isDead());
     m_currentPopulationAmount -= Globals::ENTITY_POPULATION_COSTS[static_cast<int>(entity.getEntityType())];
+}
+
+Worker* Faction::GetWorker(const int id)
+{
+    const auto worker = std::find_if(m_workers.begin(), m_workers.end(), [id](const auto& worker)
+    {
+        return worker.getID() == id;
+    });
+    if (worker != m_workers.end())
+    {
+        return &(*worker);
+    }
+
+    return nullptr;
 }
 
 int Faction::getCurrentShieldAmount() const
@@ -415,26 +429,29 @@ const Entity* Faction::get_entity(const int id) const
     return nullptr;
 }
 
-Entity* Faction::create_building(const Worker& worker, const Map& map)
+Barracks* Faction::CreateBarracks(const WorkerScheduledBuilding& scheduled_building)
 {
-    assert(!worker.get_scheduled_buildings().empty());
-    switch (worker.get_scheduled_buildings().front().entityType)
-    {
-    case eEntityType::SupplyDepot:
-        return create_entity(map, worker, Globals::MAX_WORKERS, m_supplyDepots);
-    case eEntityType::Barracks:
-        return create_entity(map, worker, Globals::MAX_BARRACKS, m_barracks);
-    case eEntityType::Turret:
-        return create_entity(map, worker, Globals::MAX_TURRETS, m_turrets);
-    case eEntityType::Headquarters:
-        return create_entity(map, worker, Globals::MAX_HEADQUARTERS, m_headquarters);
-    case eEntityType::Laboratory:
-        return create_entity(map, worker, Globals::MAX_LABORATORIES, m_laboratories);
-    default:
-        assert(false);
-    }
+    return CreateBuilding(m_barracks, scheduled_building, Globals::MAX_BARRACKS);
+}
 
-    return nullptr;
+Turret* Faction::CreateTurret(const WorkerScheduledBuilding& scheduled_building)
+{
+    return CreateBuilding(m_turrets, scheduled_building, Globals::MAX_TURRETS);
+}
+
+Headquarters* Faction::CreateHeadquarters(const WorkerScheduledBuilding& scheduled_building)
+{
+    return CreateBuilding(m_headquarters, scheduled_building, Globals::MAX_HEADQUARTERS);
+}
+
+Laboratory* Faction::CreateLaboratory(const WorkerScheduledBuilding& scheduled_building)
+{
+    return CreateBuilding(m_laboratories, scheduled_building, Globals::MAX_LABORATORIES);
+}
+
+SupplyDepot* Faction::CreateSupplyDepot(const WorkerScheduledBuilding& scheduled_building)
+{
+    return CreateBuilding(m_supplyDepots, scheduled_building, Globals::MAX_SUPPLY_DEPOTS);
 }
 
 void Faction::update(float deltaTime, const Map& map, FactionHandler& factionHandler, const BaseHandler& baseHandler)
@@ -661,10 +678,10 @@ bool Faction::isMineralInUse(const Mineral& mineral) const
 
 Entity* Faction::createUnit(const Map& map, const EntitySpawnerBuilding& spawner)
 {
-    return create_entity<Unit>(map, spawner, eEntityType::Unit, m_units, Globals::MAX_UNITS);
+    return CreateEntityFromBuilding<Unit>(map, spawner, eEntityType::Unit, m_units, Globals::MAX_UNITS);
 }
 
 Entity* Faction::createWorker(const Map& map, const EntitySpawnerBuilding& spawner)
 {
-    return create_entity(map, spawner, eEntityType::Worker, m_workers, Globals::MAX_WORKERS);
+    return CreateEntityFromBuilding(map, spawner, eEntityType::Worker, m_workers, Globals::MAX_WORKERS);
 }

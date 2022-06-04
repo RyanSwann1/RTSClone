@@ -22,7 +22,7 @@ namespace
 	};
 }
 
-Barracks::Barracks(const glm::vec3& position, Faction& owningFaction)
+Barracks::Barracks(const Position& position, Faction& owningFaction)
 	: EntitySpawnerBuilding(position, eEntityType::Barracks, Globals::BARRACKS_STARTING_HEALTH, owningFaction.getCurrentShieldAmount(), SPAWN_DETAILS, 
 		[](Faction& owningFaction, const Map& map, const EntitySpawnerBuilding& spawner) { return owningFaction.createUnit(map, spawner); })
 {}

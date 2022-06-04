@@ -17,8 +17,8 @@ namespace
 	const float TIME_BETWEEN_IDLE_CHECK = 1.0f;
 }
 
-Turret::Turret(const glm::vec3& startingPosition, const Faction& owningFaction)
-	: Entity(ModelManager::getInstance().getModel(TURRET_MODEL_NAME), { startingPosition, GridLockActive::True },
+Turret::Turret(const Position& position, const Faction& owningFaction)
+	: Entity(ModelManager::getInstance().getModel(TURRET_MODEL_NAME), position,
 		eEntityType::Turret, TURRET_STARTING_HEALTH, owningFaction.getCurrentShieldAmount()),
 	m_owningFaction(owningFaction),
 	m_stateHandlerTimer(0.2f, true),

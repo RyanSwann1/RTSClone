@@ -30,8 +30,9 @@ enum class eWorkerState
 
 struct WorkerScheduledBuilding
 {
-	WorkerScheduledBuilding(const glm::vec3& position, eEntityType entityType);
+	WorkerScheduledBuilding(const glm::vec3& position, eEntityType entityType, const int owner_id);
 
+	int owner_id{ INVALID_ENTITY_ID };
 	Position position;
 	eEntityType entityType;
 	std::reference_wrapper<const Model> model;
@@ -92,4 +93,5 @@ private:
 	void switchTo(eWorkerState newState);
 	bool move_to(const glm::vec3& destination, const Map& map, const AABB& ignoreAABB, eWorkerState state);
 	bool move_to(const glm::vec3& destination, const Map& map, eWorkerState state);
+	Entity* CreateBuilding(const WorkerScheduledBuilding& scheduled_building);
 };

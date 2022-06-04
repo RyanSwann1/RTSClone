@@ -9,7 +9,7 @@ struct IncreaseFactionShieldEvent;
 class Laboratory : public Entity
 {
 public:
-	Laboratory(const glm::vec3& startingPosition, Faction& owningFaction);
+	Laboratory(const Position& position, Faction& owningFaction);
 	Laboratory(Laboratory&&) = default;
 	Laboratory& operator=(Laboratory&&) = default;
 	~Laboratory();

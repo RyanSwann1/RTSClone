@@ -21,7 +21,7 @@ class Faction;
 class EntitySpawnerBuilding : public Entity
 {
 public:
-	EntitySpawnerBuilding(const glm::vec3& position, const eEntityType type, const int health,
+	EntitySpawnerBuilding(const Position& position, const eEntityType type, const int health,
 		const int shield, EntitySpawnerDetails spawnDetails,
 		std::function<Entity*(Faction&, const Map&, const EntitySpawnerBuilding&)> spawnCallback);
 	EntitySpawnerBuilding(EntitySpawnerBuilding&&) noexcept = default;

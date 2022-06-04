@@ -22,7 +22,7 @@ namespace
 	};
 }
 
-Headquarters::Headquarters(const glm::vec3& position, Faction& owningFaction)
+Headquarters::Headquarters(const Position& position, Faction& owningFaction)
 	: EntitySpawnerBuilding(position, eEntityType::Headquarters, Globals::HQ_STARTING_HEALTH, owningFaction.getCurrentShieldAmount(), SPAWN_DETAILS,
 		[](Faction& owningFaction, const Map& map, const EntitySpawnerBuilding& spawner) { return owningFaction.createWorker(map, spawner); }),
 	m_owningFaction(&owningFaction)

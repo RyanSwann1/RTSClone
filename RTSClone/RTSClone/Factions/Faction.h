@@ -53,7 +53,11 @@ public:
 	const Headquarters* get_closest_headquarters(const glm::vec3& position) const;
 	const Entity* get_entity(const int id) const;
 
-	virtual Entity* create_building(const Worker& worker, const Map& map);
+	virtual Barracks* CreateBarracks(const WorkerScheduledBuilding& scheduled_building);
+	virtual Turret* CreateTurret(const WorkerScheduledBuilding& scheduled_building);
+	virtual Headquarters* CreateHeadquarters(const WorkerScheduledBuilding& scheduled_building);
+	virtual Laboratory* CreateLaboratory(const WorkerScheduledBuilding& scheduled_building);
+	virtual SupplyDepot* CreateSupplyDepot(const WorkerScheduledBuilding& scheduled_building);
 	virtual Entity* createUnit(const Map& map, const EntitySpawnerBuilding& spawner);
 	virtual Entity* createWorker(const Map& map, const EntitySpawnerBuilding& spawner);
 	virtual bool increaseShield(const Laboratory& laboratory);
@@ -80,6 +84,7 @@ protected:
 	virtual void on_entity_taken_damage(const TakeDamageEvent& gameEvent, Entity& entity, const Map& map, FactionHandler& factionHandler) {}
 	virtual void on_entity_idle(Entity& entity, const Map& map, FactionHandler& factionHandler, const BaseHandler& baseHandler) {}
 	virtual void on_entity_removal(const Entity& entity);
+	Worker* GetWorker(const int id);
 
 	std::vector<Entity*> m_allEntities;
 	std::vector<Unit> m_units;
@@ -106,11 +111,11 @@ private:
 	void removeEntity(std::vector<T>& entityContainer, std::vector<Entity*>::iterator entity);
 
 	template <typename T>
-	Entity* create_entity(const Map& map, const EntitySpawnerBuilding& spawner, const eEntityType type, 
+	Entity* CreateEntityFromBuilding(const Map& map, const EntitySpawnerBuilding& spawner, const eEntityType type, 
 		std::vector<T>& entityContainer, const int maxEntityCount);
 
 	template <typename T>
-	Entity* create_entity(const Map& map, const Worker& worker, const size_t max, std::vector<T>& container);
+	T* CreateBuilding(std::vector<T>& container, const WorkerScheduledBuilding& scheduled_building, const size_t max_size);
 };
 
 template <typename T>
@@ -131,7 +136,7 @@ void Faction::removeEntity(std::vector<T>& entityContainer, std::vector<Entity*>
 }
 
 template<typename T>
-inline Entity* Faction::create_entity(const Map& map, const EntitySpawnerBuilding& spawner, const eEntityType type, 
+inline Entity* Faction::CreateEntityFromBuilding(const Map& map, const EntitySpawnerBuilding& spawner, const eEntityType type, 
 	std::vector<T>& entityContainer, const int maxEntityCount)
 {
 	glm::vec3 startingPosition(0.0f);
@@ -157,19 +162,14 @@ inline Entity* Faction::create_entity(const Map& map, const EntitySpawnerBuildin
 }
 
 template<typename T>
-inline Entity* Faction::create_entity(const Map& map, const Worker& worker, const size_t max, std::vector<T>& container)
+inline T* Faction::CreateBuilding(std::vector<T>& container, const WorkerScheduledBuilding& scheduled_building, const size_t max_size)
 {
-	assert(worker.getCurrentState() == eWorkerState::Building
-		&& !worker.get_scheduled_buildings().empty());
-
-	const eEntityType entityType = worker.get_scheduled_buildings().front().entityType;
-	const glm::vec3& position = worker.get_scheduled_buildings().front().position.Get();
-	Entity* entity = nullptr;
-	if (is_entity_creatable(entityType, container.size(), max))
+	if (is_entity_creatable(scheduled_building.entityType, container.size(), max_size))
 	{
-		entity = &container.emplace_back(position, *this);
-		on_entity_creation(*entity);
+		container.emplace_back(scheduled_building.position, *this);
+		on_entity_creation(container.back());
+		return &container.back();
 	}
 
-	return entity;
+	return nullptr;
 }

@@ -33,8 +33,9 @@ namespace
 }
 
 //BuildingInWorkerQueue
-WorkerScheduledBuilding::WorkerScheduledBuilding(const glm::vec3& position, eEntityType entityType)
-	: position({ position, GridLockActive::True }),
+WorkerScheduledBuilding::WorkerScheduledBuilding(const glm::vec3& position, eEntityType entityType, const int owner_id)
+	: owner_id(owner_id),
+	position({ position, GridLockActive::True }),
 	entityType(entityType),
 	model(ModelManager::getInstance().getModel(entityType))
 {}
@@ -160,7 +161,7 @@ bool Worker::build(const Faction& owningFaction, const glm::vec3& buildPosition,
 		{
 			move_to(buildPosition, map, eWorkerState::MovingToBuildingPosition);
 		}
-		m_buildQueue.emplace_back(buildPosition, entityType);
+		m_buildQueue.emplace_back(buildPosition, entityType, getID());
 		if (m_currentState == eWorkerState::Idle)
 		{
 			switchTo(eWorkerState::Building);
@@ -275,7 +276,7 @@ void Worker::update(float deltaTime, const Map& map, FactionHandler& factionHand
 		assert(m_movement.path.empty() && !m_buildQueue.empty() && m_taskTimer.isActive());
 		if (m_taskTimer.isExpired())
 		{
-			const Entity* building = m_owningFaction->create_building(*this, map);
+			const Entity* building = CreateBuilding(m_buildQueue.front());
 			m_buildQueue.pop_front();
 			if (!building)
 			{
@@ -619,6 +620,28 @@ bool Worker::move_to(const glm::vec3& destination, const Map& map, eWorkerState 
 	}
 
 	return false;
+}
+
+Entity* Worker::CreateBuilding(const WorkerScheduledBuilding& scheduled_building)
+{
+	assert(m_currentState == eWorkerState::Building);
+	switch (scheduled_building.entityType)
+	{
+	case eEntityType::Barracks:
+		return m_owningFaction->CreateBarracks(scheduled_building);
+	case eEntityType::Headquarters:
+		return m_owningFaction->CreateHeadquarters(scheduled_building);
+	case eEntityType::Laboratory:
+		return m_owningFaction->CreateLaboratory(scheduled_building);
+	case eEntityType::SupplyDepot:
+		return m_owningFaction->CreateSupplyDepot(scheduled_building);
+	case eEntityType::Turret:
+		return m_owningFaction->CreateTurret(scheduled_building);
+	default:
+		assert(false);
+	}
+
+	return nullptr;
 }
 
 bool Worker::move_to(const glm::vec3& destination, const Map& map, const AABB& ignoreAABB, eWorkerState state)

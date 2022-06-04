@@ -5,7 +5,7 @@
 class Headquarters : public EntitySpawnerBuilding
 {
 public:
-	Headquarters(const glm::vec3& position, Faction& owningFaction);
+	Headquarters(const Position& position, Faction& owningFaction);
 	Headquarters(Headquarters&&) = default;
 	Headquarters& operator=(Headquarters&&) = default;
 	~Headquarters();

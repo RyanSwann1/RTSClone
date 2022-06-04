@@ -62,10 +62,10 @@ struct AIOccupiedBases
 
 	AIOccupiedBase& addBase(const Base& base);
 	std::vector<std::reference_wrapper<Worker>> removeBase(const Base& base);
-	void addBuilding(const Worker& worker, Entity& building);
+	void addBuilding(const int builder_id, Entity& building);
 	void removeBuilding(const Entity& building);
 
-	AIOccupiedBase* getBaseWithWorker(const Worker& worker);
+	AIOccupiedBase* getBaseWithWorker(const int worker_id);
 	
 	std::vector<AIOccupiedBase> bases;
 	const eFactionController owningFaction;

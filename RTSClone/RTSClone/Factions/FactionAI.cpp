@@ -374,62 +374,53 @@ void FactionAI::on_entity_idle(Entity& entity, const Map& map, FactionHandler& f
 	}
 }
 
-Entity* FactionAI::create_building(const Worker& worker, const Map& map)
+Barracks* FactionAI::CreateBarracks(const WorkerScheduledBuilding& scheduled_building)
 {
-	Entity* spawnedBuilding = Faction::create_building(worker, map);
-	if (spawnedBuilding)
+	if (Barracks* barracks = Faction::CreateBarracks(scheduled_building))
 	{
-		switch (spawnedBuilding->getEntityType())
-		{
-		case eEntityType::SupplyDepot:
-		case eEntityType::Turret:
-		case eEntityType::Barracks:
-			m_occupiedBases.addBuilding(worker, *spawnedBuilding);
-			break;
-		case eEntityType::Laboratory:
-			m_occupiedBases.addBuilding(worker, *spawnedBuilding);
-			if (getCurrentShieldAmount() == 0)
-			{
-				AIOccupiedBase* occupiedBase = m_occupiedBases.getBase(*spawnedBuilding);
-				if (occupiedBase)
-				{
-					occupiedBase->actionQueue.emplace_back(eAIActionType::IncreaseShield);
-				}
-			}
-			break;
-		case eEntityType::Headquarters:
-			break;
-		default:
-			assert(false);
-		}
-	}
-	else
-	{
-		AIOccupiedBase* occupiedBase = m_occupiedBases.getBase(worker);
-		if (occupiedBase)
-		{
-			const glm::vec3& basePosition = occupiedBase->base.get().getCenteredPosition();
-			switch (worker.get_scheduled_buildings().front().entityType)
-			{
-			case eEntityType::SupplyDepot:
-				occupiedBase->actionQueue.emplace_back(eAIActionType::BuildSupplyDepot);
-				break;
-			case eEntityType::Barracks:
-				occupiedBase->actionQueue.emplace_back(eAIActionType::BuildBarracks);
-				break;
-			case eEntityType::Turret:
-				occupiedBase->actionQueue.emplace_back(eAIActionType::BuildTurret);
-				break;
-			case eEntityType::Laboratory:
-				occupiedBase->actionQueue.emplace_back(eAIActionType::BuildLaboratory);
-				break;
-			default:
-				assert(false);
-			}
-		}
+		m_occupiedBases.addBuilding(scheduled_building.owner_id, *barracks);
+		return barracks;
 	}
 
-	return spawnedBuilding;
+	return nullptr;
+}
+
+Turret* FactionAI::CreateTurret(const WorkerScheduledBuilding& scheduled_building)
+{
+	if (Turret* turret = Faction::CreateTurret(scheduled_building))
+	{
+		m_occupiedBases.addBuilding(scheduled_building.owner_id, *turret);
+		return turret;
+	}
+
+	return nullptr;
+}
+
+Headquarters* FactionAI::CreateHeadquarters(const WorkerScheduledBuilding& scheduled_building)
+{
+	return Faction::CreateHeadquarters(scheduled_building);
+}
+
+Laboratory* FactionAI::CreateLaboratory(const WorkerScheduledBuilding& scheduled_building)
+{
+	if (Laboratory* laboratory = Faction::CreateLaboratory(scheduled_building))
+	{
+		m_occupiedBases.addBuilding(scheduled_building.owner_id, *laboratory);
+		return laboratory;
+	}
+
+	return nullptr;
+}
+
+SupplyDepot* FactionAI::CreateSupplyDepot(const WorkerScheduledBuilding& scheduled_building)
+{
+	if (SupplyDepot* supply_depot = Faction::CreateSupplyDepot(scheduled_building))
+	{
+		m_occupiedBases.addBuilding(scheduled_building.owner_id, *supply_depot);
+		return supply_depot;
+	}
+
+	return nullptr;
 }
 
 void FactionAI::instructWorkersToRepair(const Entity& entity, const Map& map)

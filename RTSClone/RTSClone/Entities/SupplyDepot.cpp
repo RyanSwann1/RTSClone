@@ -6,8 +6,8 @@
 #include "Factions/Faction.h"
 #include "Core/Level.h"
 
-SupplyDepot::SupplyDepot(const glm::vec3& startingPosition, const Faction& owningFaction)
-	: Entity(ModelManager::getInstance().getModel(SUPPLY_DEPOT_MODEL_NAME), { startingPosition, GridLockActive::True }, 
+SupplyDepot::SupplyDepot(const Position& position, const Faction& owningFaction)
+	: Entity(ModelManager::getInstance().getModel(SUPPLY_DEPOT_MODEL_NAME), position, 
 		eEntityType::SupplyDepot, Globals::SUPPLY_DEPOT_STARTING_HEALTH, owningFaction.getCurrentShieldAmount())
 {
 	broadcast<GameMessages::AddAABBToMap>({ m_AABB });
