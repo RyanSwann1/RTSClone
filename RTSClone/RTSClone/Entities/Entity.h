@@ -71,6 +71,7 @@ protected:
 	AABB m_AABB;
 
 private:
+	std::reference_wrapper<const Model> m_model;
 	UniqueID m_id					= {};
 	int m_maximumHealth				= 0;
 	int m_health					= 0;
@@ -78,7 +79,6 @@ private:
 	int m_shield					= 0;
 	eEntityType m_type				= {};
 	Timer m_shieldReplenishTimer	= {};
-	std::reference_wrapper<const Model> m_model;
 	bool m_selected					= false;
 
 	void increaseShield();

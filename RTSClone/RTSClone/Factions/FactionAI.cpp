@@ -572,7 +572,7 @@ bool FactionAI::increaseShield(const Laboratory& laboratory)
 	return true;
 }
 
-Entity* FactionAI::createUnit(const EntityToSpawn& entity, const Map& map)
+Entity* FactionAI::createUnit(const EntityToSpawnFromBuilding& entity, const Map& map)
 {
 	Entity* spawnedUnit = Faction::createUnit(entity, map);
 	if (!spawnedUnit)
@@ -609,7 +609,7 @@ Entity* FactionAI::createUnit(const EntityToSpawn& entity, const Map& map)
 	return spawnedUnit;
 }
 
-Entity* FactionAI::createWorker(const EntityToSpawn& entity, const Map& map)
+Entity* FactionAI::createWorker(const EntityToSpawnFromBuilding& entity, const Map& map)
 {
 	Entity* spawnedWorker = Faction::createWorker(entity, map);
 	if (!spawnedWorker)

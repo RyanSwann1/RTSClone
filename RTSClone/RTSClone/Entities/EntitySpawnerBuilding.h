@@ -16,7 +16,7 @@ struct EntitySpawnerDetails
 	int populationCost			= 0;
 };
 
-struct EntityToSpawn
+struct EntityToSpawnFromBuilding
 {
 	glm::vec3 position{};
 	glm::vec3 rotation{};

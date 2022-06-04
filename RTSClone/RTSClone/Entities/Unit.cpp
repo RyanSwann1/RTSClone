@@ -23,7 +23,7 @@ namespace
 	constexpr int DAMAGE = 1;
 }
 
-Unit::Unit(Faction & owningFaction, const EntityToSpawn& entity_to_spawn, const Map& map)
+Unit::Unit(Faction & owningFaction, const EntityToSpawnFromBuilding& entity_to_spawn, const Map& map)
 	: Entity(ModelManager::getInstance().getModel(UNIT_MODEL_NAME), 
 		{ entity_to_spawn.position, GridLockActive::False }, eEntityType::Unit,
 		Globals::UNIT_STARTING_HEALTH, owningFaction.getCurrentShieldAmount(), entity_to_spawn.rotation),

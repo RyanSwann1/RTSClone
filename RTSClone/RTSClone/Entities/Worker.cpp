@@ -41,7 +41,7 @@ WorkerScheduledBuilding::WorkerScheduledBuilding(const glm::vec3& position, eEnt
 {}
 
 //Worker
-Worker::Worker(Faction& owningFaction, const EntityToSpawn& entity_to_spawn, const Map& map)
+Worker::Worker(Faction& owningFaction, const EntityToSpawnFromBuilding& entity_to_spawn, const Map& map)
 	: Entity(ModelManager::getInstance().getModel(WORKER_MODEL_NAME), { entity_to_spawn.position, GridLockActive::False }, 
 		eEntityType::Worker, Globals::WORKER_STARTING_HEALTH, owningFaction.getCurrentShieldAmount(), entity_to_spawn.rotation),
 	m_owningFaction(&owningFaction)

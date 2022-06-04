@@ -58,8 +58,8 @@ public:
 	virtual Headquarters* CreateHeadquarters(const WorkerScheduledBuilding& scheduled_building);
 	virtual Laboratory* CreateLaboratory(const WorkerScheduledBuilding& scheduled_building);
 	virtual SupplyDepot* CreateSupplyDepot(const WorkerScheduledBuilding& scheduled_building);
-	virtual Entity* createUnit(const EntityToSpawn& entity_to_spawn, const Map& map);
-	virtual Entity* createWorker(const EntityToSpawn& entity_to_spawn, const Map& map);
+	virtual Entity* createUnit(const EntityToSpawnFromBuilding& entity_to_spawn, const Map& map);
+	virtual Entity* createWorker(const EntityToSpawnFromBuilding& entity_to_spawn, const Map& map);
 	virtual bool increaseShield(const Laboratory& laboratory);
 	virtual void handleEvent(const GameEvent& gameEvent, const Map& map, FactionHandler& factionHandler, 
 		const BaseHandler& baseHandler);
@@ -111,7 +111,7 @@ private:
 	void removeEntity(std::vector<T>& entityContainer, std::vector<Entity*>::iterator entity);
 
 	template <typename T>
-	Entity* CreateEntityFromBuilding(const Map& map, const EntityToSpawn& entity_to_spawn,
+	Entity* CreateEntityFromBuilding(const Map& map, const EntityToSpawnFromBuilding& entity_to_spawn,
 		std::vector<T>& entityContainer, const int maxEntityCount);
 
 	template <typename T>
@@ -136,7 +136,7 @@ void Faction::removeEntity(std::vector<T>& entityContainer, std::vector<Entity*>
 }
 
 template<typename T>
-inline Entity* Faction::CreateEntityFromBuilding(const Map& map, const EntityToSpawn& entity_to_spawn, 
+inline Entity* Faction::CreateEntityFromBuilding(const Map& map, const EntityToSpawnFromBuilding& entity_to_spawn, 
 	std::vector<T>& entityContainer, const int maxEntityCount)
 {
 	if (is_entity_creatable(entity_to_spawn.type, entityContainer.size(), maxEntityCount))

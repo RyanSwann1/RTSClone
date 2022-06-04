@@ -28,8 +28,8 @@ public:
 	void onFactionElimination(FactionHandler& factionHandler, eFactionController eliminatedFaction);
 	void handleEvent(const GameEvent& gameEvent, const Map& map, FactionHandler& factionHandler, const BaseHandler& baseHandler) override;
 	void selectEntity(const glm::vec3& position);
-	Entity* createUnit(const EntityToSpawn& entity, const Map& map) override;
-	Entity* createWorker(const EntityToSpawn& entity, const Map& map) override;
+	Entity* createUnit(const EntityToSpawnFromBuilding& entity, const Map& map) override;
+	Entity* createWorker(const EntityToSpawnFromBuilding& entity, const Map& map) override;
 	void update(float deltaTime, const Map& map, FactionHandler& factionHandler, const BaseHandler& baseHandler) override;
 
 protected:

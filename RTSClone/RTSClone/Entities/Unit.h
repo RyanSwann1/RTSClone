@@ -22,7 +22,7 @@ enum class eUnitState
 	Max = AttackingTarget
 };
 
-struct EntityToSpawn;
+struct EntityToSpawnFromBuilding;
 class Faction;
 class Map;
 class ShaderHandler;
@@ -30,7 +30,7 @@ class FactionHandler;
 class Unit : public Entity
 {
 public:
-	Unit(Faction& owningFaction, const EntityToSpawn& entity_to_spawn, const Map& map);
+	Unit(Faction& owningFaction, const EntityToSpawnFromBuilding& entity_to_spawn, const Map& map);
 	Unit(const Unit&) = delete;
 	Unit& operator=(const Unit&) = delete;
 	Unit(Unit&&) noexcept = default;
