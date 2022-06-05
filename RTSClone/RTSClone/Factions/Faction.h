@@ -111,7 +111,7 @@ private:
 	void removeEntity(std::vector<T>& entityContainer, std::vector<Entity*>::iterator entity);
 
 	template <typename T>
-	Entity* CreateEntityFromBuilding(const Map& map, const EntityToSpawnFromBuilding& entity_to_spawn,
+	T* CreateEntityFromBuilding(const Map& map, const EntityToSpawnFromBuilding& entity_to_spawn,
 		std::vector<T>& entityContainer, const int maxEntityCount);
 
 	template <typename T>
@@ -136,12 +136,12 @@ void Faction::removeEntity(std::vector<T>& entityContainer, std::vector<Entity*>
 }
 
 template<typename T>
-inline Entity* Faction::CreateEntityFromBuilding(const Map& map, const EntityToSpawnFromBuilding& entity_to_spawn, 
+inline T* Faction::CreateEntityFromBuilding(const Map& map, const EntityToSpawnFromBuilding& entity_to_spawn, 
 	std::vector<T>& entityContainer, const int maxEntityCount)
 {
 	if (is_entity_creatable(entity_to_spawn.type, entityContainer.size(), maxEntityCount))
 	{
-		Entity* created_entity = &entityContainer.emplace_back(*this, entity_to_spawn, map);
+		T* created_entity = &entityContainer.emplace_back(*this, entity_to_spawn, map);
 		on_entity_creation(*created_entity);
 		return created_entity;
 	}
