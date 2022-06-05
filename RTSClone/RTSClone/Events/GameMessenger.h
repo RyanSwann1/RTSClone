@@ -1,6 +1,5 @@
 #pragma once
 
-#include "Core/IDGenerator.h"
 #include "Core/UniqueID.h"
 #include <functional>
 #include <vector>
@@ -14,7 +13,7 @@ class Broadcaster
 {
 	struct Listener
 	{
-		Listener(std::function<void(Message&&)> callback, const int id)
+		Listener(const std::function<void(Message&&)> callback, const int id)
 			: callback(callback),
 			id(id)
 		{}
@@ -30,11 +29,10 @@ public:
 		return instance;
 	}
 
-	[[nodiscard]] int subscribe(std::function<void(Message&&)> callback)
-	{	
-		const int id = id_generator::gen();
-		assert(!is_listener_registered(id));
-		m_listeners.emplace_back(callback, id);
+	[[nodiscard]] UniqueID subscribe(std::function<void(Message&&)> callback)
+	{
+		UniqueID id{};
+		m_listeners.emplace_back(callback, id.Get());
 		return id;
 	}
 
@@ -60,14 +58,6 @@ public:
 private:
 	Broadcaster() {}
 
-	bool is_listener_registered(const int id) const
-	{
-		return std::any_of(m_listeners.cbegin(), m_listeners.cend(), [id](auto listener)
-		{
-			return listener.id == id;
-		});
-	}
-
 	std::vector<Listener> m_listeners = {};
 };
 
@@ -90,9 +80,9 @@ public:
 	BroadcasterSub& operator=(BroadcasterSub&&) noexcept = default;
 	~BroadcasterSub()
 	{
-		if (id)
+		if (id.Get() != UniqueID::INVALID_ID)
 		{
-			Broadcaster<Message>::getInstance().unsubscribe(*id);
+			Broadcaster<Message>::getInstance().unsubscribe(id.Get());
 		}
 	}
 

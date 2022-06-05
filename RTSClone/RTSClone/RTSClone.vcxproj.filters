@@ -368,9 +368,6 @@
     <ClInclude Include="Core\Graph.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Core\IDGenerator.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Core\Level.h">
       <Filter>Header Files</Filter>
     </ClInclude>

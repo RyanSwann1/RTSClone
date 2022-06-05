@@ -32,7 +32,7 @@ struct WorkerScheduledBuilding
 {
 	WorkerScheduledBuilding(const glm::vec3& position, eEntityType entityType, const int owner_id);
 
-	int owner_id{ INVALID_ENTITY_ID };
+	int owner_id{ UniqueID::INVALID_ID };
 	Position position;
 	eEntityType entityType;
 	std::reference_wrapper<const Model> model;

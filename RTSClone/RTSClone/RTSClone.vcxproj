@@ -262,7 +262,6 @@
     <ClInclude Include="Core\FactionController.h" />
     <ClInclude Include="Core\Globals.h" />
     <ClInclude Include="Core\Graph.h" />
-    <ClInclude Include="Core\IDGenerator.h" />
     <ClInclude Include="Core\Level.h" />
     <ClInclude Include="Core\LevelFileHandler.h" />
     <ClInclude Include="Core\Map.h" />

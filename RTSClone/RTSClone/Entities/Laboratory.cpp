@@ -28,7 +28,7 @@ Laboratory::Laboratory(const Position& position, Faction& owningFaction)
 
 Laboratory::~Laboratory()
 {
-	if (getID() != INVALID_ENTITY_ID)
+	if (getID() != UniqueID::INVALID_ID)
 	{
 		broadcast<GameMessages::RemoveAABBFromMap>({ m_AABB });
 	}

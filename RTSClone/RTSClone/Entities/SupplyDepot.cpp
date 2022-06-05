@@ -16,7 +16,7 @@ SupplyDepot::SupplyDepot(const Position& position, const Faction& owningFaction)
 
 SupplyDepot::~SupplyDepot()
 {
-	if (getID() != INVALID_ENTITY_ID)
+	if (getID() != UniqueID::INVALID_ID)
 	{
 		broadcast<GameMessages::RemoveAABBFromMap>({ m_AABB });
 	}

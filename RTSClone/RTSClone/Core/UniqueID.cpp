@@ -1,5 +1,5 @@
 #include "UniqueID.h"
-#include "IDGenerator.h"
+#include <utility>
 
 namespace
 {

@@ -33,7 +33,7 @@ Headquarters::Headquarters(const Position& position, Faction& owningFaction)
 
 Headquarters::~Headquarters()
 {
-	if (getID() != INVALID_ENTITY_ID)
+	if (getID() != UniqueID::INVALID_ID)
 	{
 		Level::add_event(GameEvent::create<DetachFactionFromBaseEvent>({ m_owningFaction->getController(), m_position.Get() }));
 		Level::add_event(GameEvent::create<HeadquartersDestroyedEvent>({}));

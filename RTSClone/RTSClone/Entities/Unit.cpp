@@ -42,7 +42,7 @@ Unit::Unit(Faction & owningFaction, const EntityToSpawnFromBuilding& entity_to_s
 
 Unit::~Unit()
 {
-	if (getID() != INVALID_ENTITY_ID)
+	if (getID() != UniqueID::INVALID_ID)
 	{
 		if (!m_movement.path.empty())
 		{

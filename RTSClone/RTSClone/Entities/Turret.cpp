@@ -30,7 +30,7 @@ Turret::Turret(const Position& position, const Faction& owningFaction)
 
 Turret::~Turret()
 {
-	if (getID() != INVALID_ENTITY_ID)
+	if (getID() != UniqueID::INVALID_ID)
 	{
 		broadcast<GameMessages::RemoveAABBFromMap>({ m_AABB });
 	}

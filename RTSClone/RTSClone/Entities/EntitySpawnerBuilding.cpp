@@ -22,7 +22,7 @@ EntitySpawnerBuilding::EntitySpawnerBuilding(const Position& position, const eEn
 
 EntitySpawnerBuilding::~EntitySpawnerBuilding()
 {
-	if (getID() != INVALID_ENTITY_ID)
+	if (getID() != UniqueID::INVALID_ID)
 	{
 		broadcast<GameMessages::RemoveAABBFromMap>({ m_AABB });
 	}	
