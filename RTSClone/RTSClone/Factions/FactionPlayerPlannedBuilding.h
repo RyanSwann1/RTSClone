@@ -3,6 +3,7 @@
 #include "Entities/EntityType.h"
 #include "Graphics/Model.h"
 #include "Entities/Position.h"
+#include "Core/AABB.h"
 #include <SFML/Graphics.hpp>
 #include <glm/glm.hpp>
 
@@ -30,4 +31,5 @@ private:
 	int m_builderID;
 	eEntityType m_entityType;
 	Position m_position;
+	AABB m_aabb{};
 };

@@ -16,7 +16,8 @@ FactionPlayerPlannedBuilding::FactionPlayerPlannedBuilding(const PlayerActivateP
     : m_model(ModelManager::getInstance().getModel(MODEL_NAMES[static_cast<int>(gameEvent.entityType)])),
     m_builderID(gameEvent.targetID),
     m_entityType(gameEvent.entityType),
-    m_position(position, GridLockActive::True)
+    m_position(position, GridLockActive::True),
+    m_aabb(m_position.Get(), m_model.get())
 {}
 
 const glm::vec3& FactionPlayerPlannedBuilding::getPosition() const
@@ -38,12 +39,12 @@ void FactionPlayerPlannedBuilding::handleInput(const sf::Event& event, const Cam
 {
     if (event.type == sf::Event::MouseMoved)
     {
-        assert(m_builderID != Globals::INVALID_ENTITY_ID);
-        glm::vec3 position =
-            Globals::convertToMiddleGridPosition(Globals::convertToNodePosition(camera.getRayToGroundPlaneIntersection(window)));
-        if (map.isWithinBounds(AABB(position, ModelManager::getInstance().getModel(m_entityType))))
+        Position new_position{ camera.getRayToGroundPlaneIntersection(window), GridLockActive::True };
+        AABB new_aabb{ new_position.Get(), m_model };
+        if (map.isWithinBounds(new_aabb))
         {
-            m_position.Set(position);
+            m_position = new_position;
+            m_aabb = new_aabb;
         }
     }
 }
@@ -56,7 +57,6 @@ void FactionPlayerPlannedBuilding::render(ShaderHandler& shaderHandler, const Ma
 
 bool FactionPlayerPlannedBuilding::isOnValidPosition(const Map& map) const
 {
-    AABB buildingAABB(m_position.Get(), ModelManager::getInstance().getModel(m_entityType));
-    assert(map.isWithinBounds(buildingAABB));
-    return !map.isAABBOccupied(buildingAABB);
+    assert(map.isWithinBounds(m_aabb));
+    return !map.isAABBOccupied(m_aabb);
 }
