@@ -16,12 +16,12 @@ FactionPlayerPlannedBuilding::FactionPlayerPlannedBuilding(const PlayerActivateP
     : m_model(ModelManager::getInstance().getModel(MODEL_NAMES[static_cast<int>(gameEvent.entityType)])),
     m_builderID(gameEvent.targetID),
     m_entityType(gameEvent.entityType),
-    m_position(Globals::convertToMiddleGridPosition(Globals::convertToNodePosition(position)))
+    m_position(position, GridLockActive::True)
 {}
 
 const glm::vec3& FactionPlayerPlannedBuilding::getPosition() const
 {
-    return m_position;
+    return m_position.Get();
 }
 
 int FactionPlayerPlannedBuilding::getBuilderID() const
@@ -43,7 +43,7 @@ void FactionPlayerPlannedBuilding::handleInput(const sf::Event& event, const Cam
             Globals::convertToMiddleGridPosition(Globals::convertToNodePosition(camera.getRayToGroundPlaneIntersection(window)));
         if (map.isWithinBounds(AABB(position, ModelManager::getInstance().getModel(m_entityType))))
         {
-            m_position = position;
+            m_position.Set(position);
         }
     }
 }
@@ -51,12 +51,12 @@ void FactionPlayerPlannedBuilding::handleInput(const sf::Event& event, const Cam
 void FactionPlayerPlannedBuilding::render(ShaderHandler& shaderHandler, const Map& map) const
 {
     glm::vec3 color = (isOnValidPosition(map) ? VALID_PLANNED_BUILDING_COLOR : INVALID_PLANNED_BUILDING_COLOR);
-    m_model.get().render(shaderHandler, m_position, color, PLANNED_BUILDING_OPACITY);
+    m_model.get().render(shaderHandler, m_position.Get(), color, PLANNED_BUILDING_OPACITY);
 }
 
 bool FactionPlayerPlannedBuilding::isOnValidPosition(const Map& map) const
 {
-    AABB buildingAABB(m_position, ModelManager::getInstance().getModel(m_entityType));
-    assert(Globals::isOnMiddlePosition(m_position) && map.isWithinBounds(buildingAABB));
+    AABB buildingAABB(m_position.Get(), ModelManager::getInstance().getModel(m_entityType));
+    assert(map.isWithinBounds(buildingAABB));
     return !map.isAABBOccupied(buildingAABB);
 }

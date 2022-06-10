@@ -2,6 +2,7 @@
 
 #include "Entities/EntityType.h"
 #include "Graphics/Model.h"
+#include "Entities/Position.h"
 #include <SFML/Graphics.hpp>
 #include <glm/glm.hpp>
 
@@ -28,5 +29,5 @@ private:
 	std::reference_wrapper<const Model> m_model;
 	int m_builderID;
 	eEntityType m_entityType;
-	glm::vec3 m_position;
+	Position m_position;
 };

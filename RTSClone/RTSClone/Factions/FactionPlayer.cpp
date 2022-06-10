@@ -263,23 +263,11 @@ void FactionPlayer::build_planned_building(const Map& map, const BaseHandler& ba
     {
         return worker.getID() == id;
     });
+
     assert(selectedWorker != m_workers.cend());
-    if (m_plannedBuilding->getEntityType() == eEntityType::Headquarters)
+    if ((*selectedWorker).build(*this, m_plannedBuilding->getPosition(), map, m_plannedBuilding->getEntityType()))
     {
-        if (const Base* base = baseHandler.getBase(m_plannedBuilding->getPosition()))
-        {
-            if ((*selectedWorker).build(*this, base->getCenteredPosition(), map, m_plannedBuilding->getEntityType()))
-            {
-                m_plannedBuilding.reset();
-            }
-        }
-    }
-    else
-    {
-        if ((*selectedWorker).build(*this, m_plannedBuilding->getPosition(), map, m_plannedBuilding->getEntityType()))
-        {
-            m_plannedBuilding.reset();
-        }
+        m_plannedBuilding.reset();
     }
 }
 
