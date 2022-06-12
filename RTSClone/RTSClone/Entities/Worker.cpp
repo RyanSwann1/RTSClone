@@ -258,7 +258,7 @@ void Worker::update(float deltaTime, const Map& map, FactionHandler& factionHand
 		}
 		else if (const Headquarters* headquarters = m_owningFaction->get_closest_headquarters(m_position.Get()))
 		{
-			return_minerals_to_headquarters(*headquarters, map);
+			ReturnMineralsToHeadquarters(*headquarters, map);
 		}
 	}
 		break;
@@ -397,10 +397,13 @@ bool Worker::Harvest(const Mineral& mineral, const Map& map)
 	return true;
 }
 
-void Worker::return_minerals_to_headquarters(const Headquarters& headquarters, const Map& map)
+void Worker::ReturnMineralsToHeadquarters(const Headquarters& headquarters, const Map& map)
 {
-	glm::vec3 destination = PathFinding::getInstance().getClosestPositionToAABB(getPosition(), headquarters.getAABB(), map);
-	move_to(destination, map, eWorkerState::ReturningMineralsToHeadquarters);
+	if (isHoldingResources())
+	{
+		glm::vec3 destination = PathFinding::getInstance().getClosestPositionToAABB(getPosition(), headquarters.getAABB(), map);
+		move_to(destination, map, eWorkerState::ReturningMineralsToHeadquarters);
+	}
 }
 
 bool Worker::MoveTo(const glm::vec3& position, const Map& map, const bool add_to_destinations)

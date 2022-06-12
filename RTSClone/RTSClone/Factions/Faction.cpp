@@ -109,6 +109,11 @@ eFactionController Faction::getController() const
     return m_controller;
 }
 
+const std::vector<Headquarters>& Faction::GetHeadquarters() const
+{
+    return m_headquarters;
+}
+
 const std::vector<Entity*>& Faction::getEntities() const
 {
     return m_allEntities;

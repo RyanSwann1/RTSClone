@@ -3,6 +3,7 @@
 #include "Faction.h"
 #include "UI/EntitySelectorBox.h"
 #include "FactionPlayerPlannedBuilding.h"
+#include "FactionPlayerSelectedEntities.h"
 #include <SFML/Graphics.hpp>
 #include <optional>
 
@@ -23,26 +24,9 @@ public:
 	void renderEntitySelector(const sf::Window& window, ShaderHandler& shaderHandler) const;
 
 private:
-	std::optional<FactionPlayerPlannedBuilding> m_plannedBuilding	= {};
-	EntitySelectorBox m_entitySelectorBox							= {};
-	glm::vec3 m_previousMousePosition								= {};
-	bool m_attackMoveSelected										= false;
-	bool m_addToDestinationQueue									= false;
-	std::vector<Entity*> m_selectedEntities							= {};
+	FactionPlayerSelectedEntities m_selected_entities;
+	std::optional<FactionPlayerPlannedBuilding> m_plannedBuilding{};
 
 	void on_entity_removal(const Entity& entity) override;
-	void instructWorkerReturnMinerals(const Map& map, const Headquarters& headquarters);
 	void build_planned_building(const Map& map, const BaseHandler& baseHandler);
-
-	void select_singular_entity(const glm::vec3& position);
-	void select_entity_all_of_type(const glm::vec3& position);
-	void onRightClick(const glm::vec3& position, const Camera& camera, FactionHandler& factionHandler, const Map& map, 
-		const BaseHandler& baseHandler);
-
-	bool attack_entity(const glm::vec3& position, FactionHandler& factionHandler, const Map& map);
-	bool set_building_waypoints(const glm::vec3& position, const Map& map);
-	void return_selected_workers_to_return_minerals(const glm::vec3& position, const Map& map);
-	bool selected_workers_harvest(const glm::vec3& destination, const Map& map, const BaseHandler& baseHandler);
-	bool repair_entity(const glm::vec3& position, const Map& map);
-	bool MoveSelectedEntities(const glm::vec3& position, const Map& map);
 };

@@ -180,6 +180,9 @@
     <ClCompile Include="Core\UniqueID.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Factions\FactionPlayerSelectedEntities.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="assimp\include\Compiler\poppack1.h">
@@ -498,6 +501,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Core\UniqueID.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Factions\FactionPlayerSelectedEntities.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

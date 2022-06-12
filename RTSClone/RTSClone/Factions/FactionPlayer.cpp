@@ -15,117 +15,43 @@
 #include <array>
 #include <algorithm>
 
-namespace
-{
-    glm::vec3 getAveragePosition(std::vector<Entity*>& selectedEntities)
-    { 
-        std::sort(selectedEntities.begin(), selectedEntities.end(), [](const auto& unitA, const auto& unitB)
-        {
-            return glm::all(glm::lessThan(unitA->getPosition(), unitB->getPosition()));
-        });
-
-        glm::vec3 total(0.0f, 0.0f, 0.0f);
-        for (const auto& selectedUnit : selectedEntities)
-        {
-            total += selectedUnit->getPosition();
-        }
-    
-        return { total.x / selectedEntities.size(), total.y / selectedEntities.size(), total.z / selectedEntities.size() };
-    }
-}
-
 FactionPlayer::FactionPlayer(const glm::vec3& hqStartingPosition, int startingResources, int startingPopulation)
-    : Faction(eFactionController::Player, hqStartingPosition, startingResources, startingPopulation)
+    : Faction(eFactionController::Player, hqStartingPosition, startingResources, startingPopulation),
+    m_selected_entities(this)
 {}
 
 const std::vector<Entity*>& FactionPlayer::getSelectedEntities() const
 {
-    return m_selectedEntities;
+    return m_selected_entities.SelectedEntities();
 }
 
 void FactionPlayer::handleInput(const sf::Event& currentSFMLEvent, const sf::Window& window, const Camera& camera, 
     const Map& map, FactionHandler& factionHandler, const BaseHandler& baseHandler, const MiniMap& miniMap, 
     const glm::vec3& levelSize)
 {
+    m_selected_entities.HandleInput(baseHandler, camera, currentSFMLEvent, window, 
+        miniMap, factionHandler, levelSize, map);
+
     switch (currentSFMLEvent.type)
     {
     case sf::Event::MouseButtonPressed:
         if (currentSFMLEvent.mouseButton.button == sf::Mouse::Left)
         {
-            const glm::vec3 mousePosition = camera.getRayToGroundPlaneIntersection(window);
-            m_entitySelectorBox.setStartingPosition(window, mousePosition);
-            m_selectedEntities.clear();
             if (m_plannedBuilding)
             {
                 build_planned_building(map, baseHandler);
             }
-            else
-            {
-                if (mousePosition == m_previousMousePosition)
-                {
-                    select_entity_all_of_type(mousePosition);
-                }
-                else
-                {
-                    select_singular_entity(mousePosition);
-                }
-                
-                m_previousMousePosition = mousePosition;
-            }
         }
         else if (currentSFMLEvent.mouseButton.button == sf::Mouse::Right)
         {
-            glm::vec3 position(0.0f);
-            if (miniMap.isIntersecting(window))
-            {
-                position = miniMap.get_relative_intersecting_position(window, levelSize);
-            }
-            else
-            {
-                position = camera.getRayToGroundPlaneIntersection(window);
-            }
-
-            onRightClick(position, camera, factionHandler, map, baseHandler);
-        }
-        break;
-    case sf::Event::MouseButtonReleased:
-        m_attackMoveSelected = false;
-        if (currentSFMLEvent.mouseButton.button == sf::Mouse::Left)
-        {
-            if (m_entitySelectorBox.isActive() && !m_selectedEntities.empty())
-            {
-                for (auto& entity : m_allEntities)
-                {
-                    if (entity->isSelected())
-                    {
-                        entity->setSelected(entity->is_group_selectable());
-                    }
-                }
-            }
-
-            m_entitySelectorBox.reset();
+            m_plannedBuilding.reset();
         }
         break;
     case sf::Event::MouseMoved:
-        m_entitySelectorBox.update(camera, window);
         if (m_plannedBuilding)
         {
             m_plannedBuilding->handleInput(currentSFMLEvent, camera, window, map);
         }
-        break;
-    case sf::Event::KeyPressed:
-        switch (currentSFMLEvent.key.code)
-        {
-        case sf::Keyboard::A:
-            m_attackMoveSelected = true;
-            break;
-        case sf::Keyboard::LShift:
-            m_addToDestinationQueue = true;
-            break;
-        }
-        break;
-    case sf::Event::KeyReleased:
-        m_addToDestinationQueue = false;
         break;
     }
 }
@@ -175,28 +101,7 @@ void FactionPlayer::update(float deltaTime, const Map& map, FactionHandler& fact
     broadcast<GameMessages::UIDisplayPlayerDetails>(
         { getCurrentResourceAmount(), getCurrentPopulationAmount(), getMaximumPopulationAmount() });
 
-    if (m_entitySelectorBox.isActive())
-    {
-        m_selectedEntities.clear();
-        for (auto& entity : m_allEntities)
-        {
-            if (entity->is_group_selectable() 
-                && entity->setSelected(m_entitySelectorBox.getAABB().contains(entity->getAABB())))
-            {
-                m_selectedEntities.push_back(entity);
-            }
-        }
-    }
-
-    if (m_selectedEntities.size() == 1)
-    {
-        Level::add_event(
-            GameEvent::create<SetTargetEntityGUIEvent>({ getController(), m_selectedEntities.back()->getID(), m_selectedEntities.back()->getEntityType() }));
-    }
-    else if (m_selectedEntities.size() > 1)
-    {
-        Level::add_event(GameEvent::create<ResetTargetEntityGUIEvent>({}));
-    }
+    m_selected_entities.Update();
 }
 
 void FactionPlayer::render(ShaderHandler& shaderHandler) const
@@ -214,38 +119,19 @@ void FactionPlayer::renderPlannedBuilding(ShaderHandler& shaderHandler, const Ma
 
 void FactionPlayer::renderEntitySelector(const sf::Window& window, ShaderHandler& shaderHandler) const
 {
-    m_entitySelectorBox.render(window, shaderHandler);
+    m_selected_entities.render(window, shaderHandler);
 }
 
 void FactionPlayer::on_entity_removal(const Entity& entity)
 {
     Faction::on_entity_removal(entity);
 
-    int entityID = entity.getID();
-    auto selectedUnit = std::find_if(m_selectedEntities.begin(), m_selectedEntities.end(), [entityID](const auto& selectedUnit)
-    {
-        return selectedUnit->getID() == entityID;
-    });
-    if (selectedUnit != m_selectedEntities.end())
-    {
-        m_selectedEntities.erase(selectedUnit);
-    }
+    m_selected_entities.OnEntityRemoval(entity.getID());
 
     if (m_plannedBuilding &&
-        m_plannedBuilding->getBuilderID() == entityID)
+        m_plannedBuilding->getBuilderID() == entity.getID())
     {
         m_plannedBuilding.reset();
-    }
-}
-
-void FactionPlayer::instructWorkerReturnMinerals(const Map& map, const Headquarters& headquarters)
-{
-    for (auto& worker : m_workers)
-    {
-        if (worker.isSelected() && worker.isHoldingResources())
-        {
-            worker.return_minerals_to_headquarters(headquarters, map);
-        }
     }
 }
 
@@ -269,187 +155,4 @@ void FactionPlayer::build_planned_building(const Map& map, const BaseHandler& ba
     {
         m_plannedBuilding.reset();
     }
-}
-
-void FactionPlayer::select_singular_entity(const glm::vec3& position)
-{
-    bool entity_selected = false;
-    for (auto& entity : m_allEntities)
-    {
-        if (!entity_selected && entity->getAABB().contains(position))
-        {
-            entity->setSelected(true);
-            entity_selected = true;
-            m_selectedEntities.push_back(entity);
-        }
-        else
-        {
-            entity->setSelected(false);
-        }
-    }
-}
-
-void FactionPlayer::select_entity_all_of_type(const glm::vec3& position)
-{
-    Entity* selected_entity = nullptr;
-    for (auto& entity : m_allEntities)
-    {
-        if (entity->getAABB().contains(position))
-        {
-            selected_entity = entity;
-        }
-
-        entity->setSelected(false);
-    }
-
-    if (!selected_entity)
-    {
-        return;
-    }
-
-    if (selected_entity->is_group_selectable())
-    {
-        for (auto& entity : m_allEntities)
-        {
-            if (entity->setSelected(entity->getEntityType() == selected_entity->getEntityType()))
-            {
-                m_selectedEntities.push_back(entity);
-            }
-
-        }
-    }
-    else
-    {
-        selected_entity->setSelected(true);
-        m_selectedEntities.push_back(selected_entity);
-    }
-}
-
-void FactionPlayer::onRightClick(const glm::vec3& position, const Camera& camera, FactionHandler& factionHandler, const Map& map,
-    const BaseHandler& baseHandler)
-{
-    m_plannedBuilding.reset();
-
-    if (attack_entity(position, factionHandler, map))
-    {
-        return;
-    }
-
-    if (set_building_waypoints(position, map))
-    {
-        return;
-    }
-
-    if (repair_entity(position, map))
-    {
-        return;
-    }
-
-    if (selected_workers_harvest(position, map, baseHandler))
-    {
-        return;
-    }
-
-    if (MoveSelectedEntities(position, map))
-    {
-        return;
-    }
-}
-
-bool FactionPlayer::attack_entity(const glm::vec3& position, FactionHandler& factionHandler, const Map& map)
-{
-    for (const Faction* opposingFaction : factionHandler.GetOpposingFactions(getController()))
-    {
-        const Entity* targetEntity = opposingFaction->getEntity(position);
-        if (targetEntity)
-        {
-            for (auto& selectedEntity : m_selectedEntities)
-            {
-                selectedEntity->attack_entity(*targetEntity, opposingFaction->getController(), map);
-            }
-
-            return true;
-        }
-    }
-
-    return false;
-}
-
-bool FactionPlayer::set_building_waypoints(const glm::vec3& position, const Map& map)
-{
-    bool waypoint_selected = false;
-    for (auto& entity : m_allEntities)
-    {
-        if (entity->isSelected() && entity->set_waypoint_position(position, map))
-        {
-            waypoint_selected = true;
-        }
-    }
-
-    return waypoint_selected;
-}
-
-void FactionPlayer::return_selected_workers_to_return_minerals(const glm::vec3& position, const Map& map)
-{
-    for (auto& headquarters : m_headquarters)
-    {
-        if (headquarters.getAABB().contains(position))
-        {
-            instructWorkerReturnMinerals(map, headquarters);
-            break;
-        }
-    }
-}
-
-bool FactionPlayer::selected_workers_harvest(const glm::vec3& destination, const Map& map, const BaseHandler& baseHandler)
-{
-    bool selected_entity_harvested = false;
-    if (const Base* base = baseHandler.getBaseAtMineral(destination))
-    {
-        for (auto& selectedEntity : m_selectedEntities)
-        {
-            if (const Mineral* mineral = baseHandler.getNearestAvailableMineralAtBase(*this, *base, selectedEntity->getPosition()))
-            {
-                selected_entity_harvested = selectedEntity->Harvest(*mineral, map);
-            }
-        }
-    }
-
-    return selected_entity_harvested;
-}
-
-bool FactionPlayer::repair_entity(const glm::vec3& position, const Map& map)
-{
-    auto entity_to_repair = std::find_if(m_allEntities.cbegin(), m_allEntities.cend(), [&position](const auto& entity)
-    {
-        return entity->getAABB().contains(position);
-    });
-    if (entity_to_repair == m_allEntities.cend())
-    {
-        return false;
-    }
-
-    for (auto& selectedEntity : m_selectedEntities)
-    {
-        if (selectedEntity->getID() != (*entity_to_repair)->getID())
-        {
-            selectedEntity->repairEntity((*selectedEntity), map);
-        }
-    }    
-
-    return true;
-}
-
-bool FactionPlayer::MoveSelectedEntities(const glm::vec3& position, const Map& map)
-{
-    bool selected_entity_moved = false;
-    const glm::vec3 averagePosition = getAveragePosition(m_selectedEntities);
-    for (auto& selectedEntity : m_selectedEntities)
-    {
-        eUnitState state = (m_attackMoveSelected ? eUnitState::AttackMoving : eUnitState::Moving);
-        glm::vec3 destination = position - (averagePosition - selectedEntity->getPosition());
-        selected_entity_moved = selectedEntity->MoveTo(destination, map, m_addToDestinationQueue);
-    }
-
-    return selected_entity_moved;
 }
