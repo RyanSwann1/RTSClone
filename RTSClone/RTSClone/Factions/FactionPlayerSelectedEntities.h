@@ -39,8 +39,8 @@ private:
 	void SelectSingle(const glm::vec3& position);
 	
 	const FactionPlayer* m_owning_faction	{};
-	EntitySelectorBox selection_box			{};
-	std::vector<Entity*> entities			{};
+	EntitySelectorBox m_selection_box		{};
+	std::vector<Entity*> m_entities			{};
 	glm::vec3 m_previous_mouse_position		{};
 	bool m_add_to_destinations_on_move		{ false };
 	bool m_attack_move						{ false };
