@@ -6,17 +6,20 @@
 #include "Core/Level.h"
 #include "Events/GameMessages.h"
 #include "Events/GameMessenger.h"
+#include <numeric>
 
 namespace
 {
-    constexpr size_t MAX_ENTITIES =
-        Globals::MAX_UNITS +
-        Globals::MAX_WORKERS +
-        Globals::MAX_HEADQUARTERS +
-        Globals::MAX_SUPPLY_DEPOTS +
-        Globals::MAX_BARRACKS +
-        Globals::MAX_TURRETS +
-        Globals::MAX_LABORATORIES;
+    constexpr std::array<size_t, static_cast<int>(eEntityType::Max) + 1> MAX_ENTITY_QUANTITIES
+    {
+        Globals::MAX_UNITS,
+        Globals::MAX_WORKERS, 
+        Globals::MAX_HEADQUARTERS,
+        Globals::MAX_SUPPLY_DEPOTS,
+        Globals::MAX_BARRACKS,
+        Globals::MAX_TURRETS,
+        Globals::MAX_LABORATORIES
+    };
 };
 
 Faction::Faction(eFactionController factionController, const glm::vec3& hqStartingPosition,
@@ -25,7 +28,7 @@ Faction::Faction(eFactionController factionController, const glm::vec3& hqStarti
     m_currentResourceAmount(startingResources),
     m_currentPopulationLimit(startingPopulationCap)
 {
-    m_allEntities.reserve(MAX_ENTITIES);
+    m_allEntities.reserve(std::accumulate(MAX_ENTITY_QUANTITIES.cbegin(), MAX_ENTITY_QUANTITIES.cend(), 0));
     m_units.reserve(Globals::MAX_UNITS);
     m_workers.reserve(Globals::MAX_WORKERS);
     m_headquarters.reserve(Globals::MAX_HEADQUARTERS);
@@ -647,6 +650,19 @@ bool Faction::isBuildingInAllWorkersQueue(eEntityType entityType) const
     {
         return worker.isInBuildQueue(entityType);
     }) != m_workers.cend();
+}
+
+bool Faction::IsEntityCreatable(const eEntityType type) const
+{
+    const int entity_count = std::count_if(m_allEntities.cbegin(), m_allEntities.cend(), [type](const auto& entity)
+    {
+        return entity->getEntityType() == type;
+    });
+
+    return
+        entity_count < MAX_ENTITY_QUANTITIES[static_cast<int>(type)] 
+        && isAffordable(type) 
+        && !isExceedPopulationLimit(type);
 }
 
 bool Faction::increaseShield(const Laboratory& laboratory)

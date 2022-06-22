@@ -38,6 +38,7 @@ public:
 	bool isAffordable(int resourceAmount) const;
 	bool isCollidingWithWorkerBuildQueue(const AABB& AABB) const;
 	bool isBuildingInAllWorkersQueue(eEntityType entityType) const;
+	bool IsEntityCreatable(const eEntityType type) const;
 	int getCurrentShieldAmount() const;
 	int getCurrentPopulationAmount() const;
 	int getMaximumPopulationAmount() const;

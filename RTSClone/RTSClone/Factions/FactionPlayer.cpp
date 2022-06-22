@@ -37,10 +37,7 @@ void FactionPlayer::handleInput(const sf::Event& currentSFMLEvent, const sf::Win
     case sf::Event::MouseButtonPressed:
         if (currentSFMLEvent.mouseButton.button == sf::Mouse::Left)
         {
-            if (m_plannedBuilding)
-            {
-                build_planned_building(map, baseHandler);
-            }
+            build_planned_building(map, baseHandler);
         }
         else if (currentSFMLEvent.mouseButton.button == sf::Mouse::Right)
         {
@@ -73,7 +70,7 @@ void FactionPlayer::handleEvent(const GameEvent& gameEvent, const Map& map, Fact
         {
             m_plannedBuilding =
                 std::optional<FactionPlayerPlannedBuilding>(std::in_place, 
-                    gameEvent.data.playerActivatePlannedBuilding, (*entity)->getPosition());
+                    gameEvent.data.playerActivatePlannedBuilding, (*entity)->getPosition(), this);
         }
     }
         break;
@@ -137,11 +134,8 @@ void FactionPlayer::on_entity_removal(const Entity& entity)
 
 void FactionPlayer::build_planned_building(const Map& map, const BaseHandler& baseHandler)
 {
-    assert(m_plannedBuilding);
-    if (!m_plannedBuilding->isOnValidPosition(map)
-        || !isAffordable(m_plannedBuilding->getEntityType()))
+    if (!m_plannedBuilding)
     {
-        m_plannedBuilding.reset();
         return;
     }
 
@@ -149,8 +143,13 @@ void FactionPlayer::build_planned_building(const Map& map, const BaseHandler& ba
     {
         return worker.getID() == id;
     });
+    if (selectedWorker == m_workers.cend()
+        || !m_plannedBuilding->IsBuildingCreatable(map))
+    {
+        m_plannedBuilding.reset();
+        return;
+    }
 
-    assert(selectedWorker != m_workers.cend());
     if ((*selectedWorker).build(*this, m_plannedBuilding->getPosition(), map, m_plannedBuilding->getEntityType()))
     {
         m_plannedBuilding.reset();

@@ -13,12 +13,14 @@ class ShaderHandler;
 class BaseHandler;
 struct Camera;
 struct PlayerActivatePlannedBuildingEvent;
+class FactionPlayer;
 class FactionPlayerPlannedBuilding
 {
 public:
-	FactionPlayerPlannedBuilding(const PlayerActivatePlannedBuildingEvent& gameEvent, const glm::vec3& position);
+	FactionPlayerPlannedBuilding(const PlayerActivatePlannedBuildingEvent& gameEvent, const glm::vec3& position, 
+		const FactionPlayer* owning_faction);
 
-	bool isOnValidPosition(const Map& map) const;
+	bool IsBuildingCreatable(const Map& map) const;
 	const glm::vec3& getPosition() const;
 	int getBuilderID() const;
 	eEntityType getEntityType() const;
@@ -27,9 +29,12 @@ public:
 	void render(ShaderHandler& shaderHandler, const Map& map) const;
 
 private:
+	const FactionPlayer* m_owning_faction{};
 	std::reference_wrapper<const Model> m_model;
 	int m_builderID;
 	eEntityType m_entityType;
 	Position m_position;
 	AABB m_aabb{};
+
+	bool isOnValidPosition(const Map& map) const;
 };

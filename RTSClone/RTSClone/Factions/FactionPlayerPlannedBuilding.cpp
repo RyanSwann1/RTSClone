@@ -4,6 +4,7 @@
 #include "Core/Globals.h"
 #include "Core/Map.h"
 #include "Core/Camera.h"
+#include "FactionPlayer.h"
 
 namespace
 {
@@ -12,13 +13,21 @@ namespace
     constexpr glm::vec3 INVALID_PLANNED_BUILDING_COLOR{ 1.0f, 0.0f, 0.0f };
 }
 
-FactionPlayerPlannedBuilding::FactionPlayerPlannedBuilding(const PlayerActivatePlannedBuildingEvent& gameEvent, const glm::vec3& position)
-    : m_model(ModelManager::getInstance().getModel(MODEL_NAMES[static_cast<int>(gameEvent.entityType)])),
+FactionPlayerPlannedBuilding::FactionPlayerPlannedBuilding(const PlayerActivatePlannedBuildingEvent& gameEvent, 
+    const glm::vec3& position, const FactionPlayer* owning_faction)
+    : m_owning_faction(owning_faction),
+    m_model(ModelManager::getInstance().getModel(MODEL_NAMES[static_cast<int>(gameEvent.entityType)])),
     m_builderID(gameEvent.targetID),
     m_entityType(gameEvent.entityType),
     m_position(position, GridLockActive::True),
     m_aabb(m_position.Get(), m_model.get())
 {}
+
+bool FactionPlayerPlannedBuilding::IsBuildingCreatable(const Map& map) const
+{
+    return m_owning_faction->IsEntityCreatable(m_entityType) 
+        && isOnValidPosition(map);
+}
 
 const glm::vec3& FactionPlayerPlannedBuilding::getPosition() const
 {
