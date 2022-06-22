@@ -19,7 +19,6 @@ public:
 		FactionHandler& factionHandler, const BaseHandler& baseHandler, const MiniMap& miniMap, const glm::vec3& levelSize);
 	void handleEvent(const GameEvent& gameEvent, const Map& map, FactionHandler& factionHandler, const BaseHandler& baseHandler) override;
 	void update(float deltaTime, const Map& map, FactionHandler& factionHandler, const BaseHandler& baseHandler) override;
-	void render(ShaderHandler& shaderHandler) const override;
 	void renderPlannedBuilding(ShaderHandler& shaderHandler, const Map& map) const;
 	void renderEntitySelector(const sf::Window& window, ShaderHandler& shaderHandler) const;
 

@@ -101,11 +101,6 @@ void FactionPlayer::update(float deltaTime, const Map& map, FactionHandler& fact
     m_selected_entities.Update();
 }
 
-void FactionPlayer::render(ShaderHandler& shaderHandler) const
-{
-    Faction::render(shaderHandler);
-}
-
 void FactionPlayer::renderPlannedBuilding(ShaderHandler& shaderHandler, const Map& map) const
 {
     if (m_plannedBuilding)

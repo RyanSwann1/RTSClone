@@ -67,7 +67,7 @@ public:
 		const BaseHandler& baseHandler);
 	virtual void update(float deltaTime, const Map& map, FactionHandler& factionHandler, const BaseHandler& baseHandler);
 	void delayed_update(const Map& map, FactionHandler& factionHandler);
-	virtual void render(ShaderHandler& shaderHandler) const;
+	void render(ShaderHandler& shaderHandler) const;
 	void renderPlannedBuildings(ShaderHandler& shaderHandler) const;
 	void renderEntityStatusBars(ShaderHandler& shaderHandler, const Camera& camera, glm::uvec2 windowSize) const;
 
