@@ -106,7 +106,6 @@ private:
 
 	void handleWorkerCollisions(const Map& map);
 	void on_entity_creation(Entity& entity);
-	bool is_entity_creatable(eEntityType type, const size_t current, const size_t max) const;
 
 	//Presumes entity already found in all entities container
 	template <typename T>
@@ -114,10 +113,10 @@ private:
 
 	template <typename T>
 	T* CreateEntityFromBuilding(const Map& map, const EntityToSpawnFromBuilding& entity_to_spawn,
-		std::vector<T>& entityContainer, const int maxEntityCount);
+		std::vector<T>& entityContainer);
 
 	template <typename T>
-	T* CreateBuilding(std::vector<T>& container, const WorkerScheduledBuilding& scheduled_building, const size_t max_size);
+	T* CreateBuilding(std::vector<T>& container, const WorkerScheduledBuilding& scheduled_building);
 };
 
 template <typename T>
@@ -139,9 +138,9 @@ void Faction::removeEntity(std::vector<T>& entityContainer, std::vector<Entity*>
 
 template<typename T>
 inline T* Faction::CreateEntityFromBuilding(const Map& map, const EntityToSpawnFromBuilding& entity_to_spawn, 
-	std::vector<T>& entityContainer, const int maxEntityCount)
+	std::vector<T>& entityContainer)
 {
-	if (is_entity_creatable(entity_to_spawn.type, entityContainer.size(), maxEntityCount))
+	if (IsEntityCreatable(entity_to_spawn.type))
 	{
 		T* created_entity = &entityContainer.emplace_back(*this, entity_to_spawn, map);
 		on_entity_creation(*created_entity);
@@ -152,13 +151,13 @@ inline T* Faction::CreateEntityFromBuilding(const Map& map, const EntityToSpawnF
 }
 
 template<typename T>
-inline T* Faction::CreateBuilding(std::vector<T>& container, const WorkerScheduledBuilding& scheduled_building, const size_t max_size)
+inline T* Faction::CreateBuilding(std::vector<T>& container, const WorkerScheduledBuilding& scheduled_building)
 {
-	if (is_entity_creatable(scheduled_building.entityType, container.size(), max_size))
+	if (IsEntityCreatable(scheduled_building.entityType))
 	{
-		container.emplace_back(scheduled_building.position, *this);
-		on_entity_creation(container.back());
-		return &container.back();
+		T* created_entity = &container.emplace_back(scheduled_building.position, *this);
+		on_entity_creation(*created_entity);
+		return created_entity;
 	}
 
 	return nullptr;

@@ -400,13 +400,6 @@ void Faction::on_entity_creation(Entity& entity)
     m_allEntities.push_back(&entity);
 }
 
-bool Faction::is_entity_creatable(eEntityType type, const size_t current, const size_t max) const
-{
-    return current < max
-        && isAffordable(type)
-        && !isExceedPopulationLimit(type);
-}
-
 const Headquarters* Faction::get_closest_headquarters(const glm::vec3& position) const
 {
     const Headquarters* closestHeadquarters = nullptr;
@@ -439,27 +432,27 @@ const Entity* Faction::get_entity(const int id) const
 
 Barracks* Faction::CreateBarracks(const WorkerScheduledBuilding& scheduled_building)
 {
-    return CreateBuilding(m_barracks, scheduled_building, Globals::MAX_BARRACKS);
+    return CreateBuilding(m_barracks, scheduled_building);
 }
 
 Turret* Faction::CreateTurret(const WorkerScheduledBuilding& scheduled_building)
 {
-    return CreateBuilding(m_turrets, scheduled_building, Globals::MAX_TURRETS);
+    return CreateBuilding(m_turrets, scheduled_building);
 }
 
 Headquarters* Faction::CreateHeadquarters(const WorkerScheduledBuilding& scheduled_building)
 {
-    return CreateBuilding(m_headquarters, scheduled_building, Globals::MAX_HEADQUARTERS);
+    return CreateBuilding(m_headquarters, scheduled_building);
 }
 
 Laboratory* Faction::CreateLaboratory(const WorkerScheduledBuilding& scheduled_building)
 {
-    return CreateBuilding(m_laboratories, scheduled_building, Globals::MAX_LABORATORIES);
+    return CreateBuilding(m_laboratories, scheduled_building);
 }
 
 SupplyDepot* Faction::CreateSupplyDepot(const WorkerScheduledBuilding& scheduled_building)
 {
-    return CreateBuilding(m_supplyDepots, scheduled_building, Globals::MAX_SUPPLY_DEPOTS);
+    return CreateBuilding(m_supplyDepots, scheduled_building);
 }
 
 void Faction::update(float deltaTime, const Map& map, FactionHandler& factionHandler, const BaseHandler& baseHandler)
@@ -699,10 +692,10 @@ bool Faction::isMineralInUse(const Mineral& mineral) const
 
 Entity* Faction::createUnit(const EntityToSpawnFromBuilding& entity_to_spawn, const Map& map)
 {
-    return CreateEntityFromBuilding(map, entity_to_spawn, m_units, Globals::MAX_UNITS);
+    return CreateEntityFromBuilding(map, entity_to_spawn, m_units);
 }
 
 Entity* Faction::createWorker(const EntityToSpawnFromBuilding& entity_to_spawn, const Map& map)
 {
-    return CreateEntityFromBuilding(map, entity_to_spawn, m_workers, Globals::MAX_WORKERS);
+    return CreateEntityFromBuilding(map, entity_to_spawn, m_workers);
 }
