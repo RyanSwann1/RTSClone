@@ -111,12 +111,8 @@ private:
 	template <typename T>
 	void removeEntity(std::vector<T>& entityContainer, std::vector<Entity*>::iterator entity);
 
-	template <typename T>
-	T* CreateEntityFromBuilding(const Map& map, const EntityToSpawnFromBuilding& entity_to_spawn,
-		std::vector<T>& entityContainer);
-
-	template <typename T>
-	T* CreateBuilding(std::vector<T>& container, const WorkerScheduledBuilding& scheduled_building);
+	template <typename T, typename ...EntityConstructParams>
+	T* CreateEntity(std::vector<T>& container, const eEntityType type, EntityConstructParams&&... construct_params);
 };
 
 template <typename T>
@@ -136,26 +132,12 @@ void Faction::removeEntity(std::vector<T>& entityContainer, std::vector<Entity*>
 	entityContainer.erase(iter);
 }
 
-template<typename T>
-inline T* Faction::CreateEntityFromBuilding(const Map& map, const EntityToSpawnFromBuilding& entity_to_spawn, 
-	std::vector<T>& entityContainer)
+template <typename T, typename ...EntityConstructParams>
+T* Faction::CreateEntity(std::vector<T>& container, const eEntityType type, EntityConstructParams&&... construct_params)
 {
-	if (IsEntityCreatable(entity_to_spawn.type))
+	if (IsEntityCreatable(type))
 	{
-		T* created_entity = &entityContainer.emplace_back(*this, entity_to_spawn, map);
-		on_entity_creation(*created_entity);
-		return created_entity;
-	}
-
-	return nullptr;
-}
-
-template<typename T>
-inline T* Faction::CreateBuilding(std::vector<T>& container, const WorkerScheduledBuilding& scheduled_building)
-{
-	if (IsEntityCreatable(scheduled_building.entityType))
-	{
-		T* created_entity = &container.emplace_back(scheduled_building.position, *this);
+		T* created_entity{ &container.emplace_back(std::forward<EntityConstructParams>(construct_params)...) };
 		on_entity_creation(*created_entity);
 		return created_entity;
 	}
