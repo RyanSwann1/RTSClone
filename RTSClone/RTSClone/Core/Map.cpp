@@ -7,7 +7,8 @@
 #include "Events/GameMessenger.h"
 #include <assert.h>
 
-Map::Map(const std::vector<SceneryGameObject>& sceneryGameObjects, const std::vector<Base>& bases, glm::ivec2 size)
+Map::Map(const std::vector<SceneryGameObject>& sceneryGameObjects, 
+	const std::vector<HarvestLocation>& harvest_locations, glm::ivec2 size)
 	: m_size(size),
 	m_map(static_cast<size_t>(m_size.x)* static_cast<size_t>(m_size.y), false),
 	m_unitMap(static_cast<size_t>(m_size.x)* static_cast<size_t>(m_size.y), Globals::INVALID_ENTITY_ID),
@@ -22,9 +23,9 @@ Map::Map(const std::vector<SceneryGameObject>& sceneryGameObjects, const std::ve
 		editMap(gameObject.AABB, true);
 	}
 
-	for (const auto& base : bases)
+	for (const auto& harvest_locations : harvest_locations)
 	{
-		for (const auto& mineral : base.getMinerals())
+		for (const auto& mineral : harvest_locations.minerals)
 		{
 			editMap(mineral.getAABB(), true);
 		}

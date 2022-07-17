@@ -55,8 +55,9 @@ public:
 	bool getClosestAvailablePosition(const Worker& worker, const std::vector<Worker>& workers, 
 		const Map& map, glm::vec3& position);
 
-	bool isBuildingSpawnAvailable(const glm::vec3& startingPosition, eEntityType buildingEntityType, const Map& map,
-		glm::vec3& buildPosition, const FactionAI& owningFaction, const BaseHandler& baseHandler);
+	//TODO:
+	//bool isBuildingSpawnAvailable(const glm::vec3& startingPosition, eEntityType buildingEntityType, const Map& map,
+	//	glm::vec3& buildPosition, const FactionAI& owningFaction, const BaseHandler& baseHandler);
 
 	bool isPositionInLineOfSight(glm::ivec2 startingPositionOnGrid, glm::ivec2 targetPositionOnGrid, const Map& map, const Entity& entity) const;
 	bool isTargetInLineOfSight(const glm::vec3& startingPosition, const Entity& targetEntity, const Map& map) const;

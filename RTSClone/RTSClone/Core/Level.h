@@ -19,12 +19,12 @@
 struct LevelDetailsFromFile
 {
 	std::vector<SceneryGameObject> scenery	= {};
-	std::vector<Base> bases					= {};
-	int factionStartingResources			= 0;
-	int factionStartingPopulation			= 0;
-	int factionCount						= 0;
-	glm::vec3 size							= {};
-	glm::ivec2 gridSize						= {};
+	std::vector<HarvestLocation> harvest_locations = {};
+	int factionStartingResources = 0;
+	int factionStartingPopulation = 0;
+	int factionCount = 0;
+	glm::vec3 size = {};
+	glm::ivec2 gridSize = {};
 };
 
 class UIManager;
@@ -43,7 +43,7 @@ public:
 	static void add_event(const GameEvent& gameEvent);
 
 	const std::vector<SceneryGameObject>& getSceneryGameObjects() const;
-	const BaseHandler& getBaseHandler() const;
+	const HarvestLocationManager GetHarvestLocationManager() const { return m_harvest_location_manager; }
 	const Camera& getCamera() const;
 	bool isMinimapInteracted() const;
 	const std::vector<std::unique_ptr<Faction>>& getFactions() const;
@@ -57,7 +57,6 @@ public:
 	void renderEntityStatusBars(ShaderHandler& shaderHandler, glm::uvec2 windowSize) const;
 	void renderTerrain(ShaderHandler& shaderHandler) const;
 	void renderPlayerPlannedBuilding(ShaderHandler& shaderHandler) const;
-	void renderBasePositions(ShaderHandler& shaderHandler) const;
 	void renderMinimap(ShaderHandler& shaderHandler, glm::uvec2 windowSize, const sf::Window& window) const;
 	void render(ShaderHandler& shaderHandler) const;
 
@@ -70,7 +69,7 @@ public:
 #endif // RENDER_PATHING
 
 private:
-	BaseHandler m_baseHandler;
+	HarvestLocationManager m_harvest_location_manager;
 	std::vector<SceneryGameObject> m_scenery;
 	Map m_map;
 	std::vector<Projectile> m_projectiles;

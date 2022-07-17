@@ -26,10 +26,10 @@ const std::vector<Entity*>& FactionPlayer::getSelectedEntities() const
 }
 
 void FactionPlayer::handleInput(const sf::Event& currentSFMLEvent, const sf::Window& window, const Camera& camera, 
-    const Map& map, FactionHandler& factionHandler, const BaseHandler& baseHandler, const MiniMap& miniMap, 
+    const Map& map, FactionHandler& factionHandler, const HarvestLocationManager& harvest_locations, const MiniMap& miniMap, 
     const glm::vec3& levelSize)
 {
-    m_selected_entities.HandleInput(baseHandler, camera, currentSFMLEvent, window, 
+    m_selected_entities.HandleInput(harvest_locations, camera, currentSFMLEvent, window, 
         miniMap, factionHandler, levelSize, map);
 
     switch (currentSFMLEvent.type)
@@ -37,7 +37,7 @@ void FactionPlayer::handleInput(const sf::Event& currentSFMLEvent, const sf::Win
     case sf::Event::MouseButtonPressed:
         if (currentSFMLEvent.mouseButton.button == sf::Mouse::Left)
         {
-            build_planned_building(map, baseHandler);
+            build_planned_building(map);
         }
         else if (currentSFMLEvent.mouseButton.button == sf::Mouse::Right)
         {
@@ -53,9 +53,9 @@ void FactionPlayer::handleInput(const sf::Event& currentSFMLEvent, const sf::Win
     }
 }
 
-void FactionPlayer::handleEvent(const GameEvent& gameEvent, const Map& map, FactionHandler& factionHandler, const BaseHandler& baseHandler)
+void FactionPlayer::handleEvent(const GameEvent& gameEvent, const Map& map, FactionHandler& factionHandler)
 {
-    Faction::handleEvent(gameEvent, map, factionHandler, baseHandler);
+    Faction::handleEvent(gameEvent, map, factionHandler);
 
     switch (gameEvent.type)
     {
@@ -91,9 +91,9 @@ void FactionPlayer::handleEvent(const GameEvent& gameEvent, const Map& map, Fact
     }
 }
 
-void FactionPlayer::update(float deltaTime, const Map& map, FactionHandler& factionHandler, const BaseHandler& baseHandler)
+void FactionPlayer::update(float deltaTime, const Map& map, FactionHandler& factionHandler)
 {
-    Faction::update(deltaTime, map, factionHandler, baseHandler);
+    Faction::update(deltaTime, map, factionHandler);
 
     broadcast<GameMessages::UIDisplayPlayerDetails>(
         { getCurrentResourceAmount(), getCurrentPopulationAmount(), getMaximumPopulationAmount() });
@@ -127,7 +127,7 @@ void FactionPlayer::on_entity_removal(const Entity& entity)
     }
 }
 
-void FactionPlayer::build_planned_building(const Map& map, const BaseHandler& baseHandler)
+void FactionPlayer::build_planned_building(const Map& map)
 {
     if (!m_plannedBuilding)
     {

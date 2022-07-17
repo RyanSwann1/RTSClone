@@ -27,27 +27,27 @@ namespace
 	}
 }
 
-FactionHandler::FactionHandler(const BaseHandler& baseHandler, const LevelDetailsFromFile& levelDetails)
+FactionHandler::FactionHandler(const HarvestLocationManager& harvest_location_manager, const LevelDetailsFromFile& levelDetails)
 {
 	static_assert(static_cast<int>(AIConstants::eBehaviour::Max) == 1, "Current assigning of AI behaviour relies on only two behaviours");
 	int AIBehaviourIndex = 0;
 
 	assert(levelDetails.factionCount < static_cast<int>(eFactionController::Max) + 1 &&
-		levelDetails.factionCount <= static_cast<int>(baseHandler.getBases().size()));
+		levelDetails.factionCount <= static_cast<int>(harvest_location_manager.HarvestLocations().size()));
 	for (int i = 0; i < levelDetails.factionCount; ++i)
 	{
 		switch (eFactionController(i))
 		{
 		case eFactionController::Player:
-			m_factions.emplace_back(std::make_unique<FactionPlayer>(baseHandler.getBases()[i].position,
+			m_factions.emplace_back(std::make_unique<FactionPlayer>(harvest_location_manager.HarvestLocations()[i].position,
 				levelDetails.factionStartingResources, levelDetails.factionStartingPopulation));
 			break;
 		case eFactionController::AI_1:
 		case eFactionController::AI_2:
 		case eFactionController::AI_3:
-			m_factions.emplace_back(std::make_unique<FactionAI>(eFactionController(i), baseHandler.getBases()[i].position,
+			m_factions.emplace_back(std::make_unique<FactionAI_NEW>(eFactionController(i), harvest_location_manager.HarvestLocations()[i].position,
 				levelDetails.factionStartingResources, levelDetails.factionStartingPopulation,
-				static_cast<AIConstants::eBehaviour>(AIBehaviourIndex), baseHandler));
+				static_cast<AIConstants::eBehaviour>(AIBehaviourIndex), harvest_location_manager));
 			AIBehaviourIndex ^= 1;
 			break;
 		default:

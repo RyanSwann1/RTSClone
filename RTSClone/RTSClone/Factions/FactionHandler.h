@@ -5,12 +5,12 @@
 #include <memory>
 
 struct LevelDetailsFromFile;
-class BaseHandler;
+class HarvestLocationManager;
 class FactionPlayer;
 class FactionHandler
 {
 public:
-	FactionHandler(const BaseHandler& baseHandler, const LevelDetailsFromFile& levelDetails);
+	FactionHandler(const HarvestLocationManager& harvest_location_manager, const LevelDetailsFromFile& levelDetails);
 	FactionHandler(FactionHandler&) = delete;
 	FactionHandler& operator=(FactionHandler&) = delete;
 	FactionHandler(FactionHandler&&) noexcept = default;

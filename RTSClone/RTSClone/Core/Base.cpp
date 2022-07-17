@@ -15,71 +15,6 @@ namespace
 #endif // GAME
 }
 
-#ifdef GAME
-Base::Base(const glm::vec3& position, std::vector<Mineral>&& minerals)
-	: position(position),
-	minerals(std::move(minerals)),
-	quad(position, MAIN_BASE_QUAD_SIZE, MAIN_BASE_QUAD_COLOR, QUAD_OPACITY),
-	owningFactionController(eFactionController::None)
-{}
-
-Base::Base(Base&& rhs) noexcept
-	: position(std::move(rhs.position)),
-	minerals(std::move(rhs.minerals)),
-	quad(std::move(quad)),
-	owningFactionController(rhs.owningFactionController)
-{
-	std::swap(owningFactionController, rhs.owningFactionController);
-}
-
-Base& Base::operator=(Base&& rhs) noexcept
-{
-	position	= std::move(rhs.position);
-	minerals	= std::move(rhs.minerals);
-	quad		= std::move(rhs.quad);
-	std::swap(owningFactionController, rhs.owningFactionController);
-	return *this;
-}
-
-glm::vec3 Base::getCenteredPosition() const
-{
-	return Globals::convertToMiddleGridPosition(Globals::convertToNodePosition(position));
-}
-
-const std::vector<Mineral>& Base::getMinerals() const
-{
-	return minerals;
-}
-
-#endif // GAME
-
-#ifdef LEVEL_EDITOR
-Base::Base()
-	: quad(glm::vec3(0.f), MAIN_BASE_QUAD_SIZE, MAIN_BASE_QUAD_COLOR),
-	position(0.f),
-	minerals(Globals::MAX_MINERALS)
-{}
-
-Base::Base(const glm::vec3& position, std::vector<Mineral>&& minerals)
-	: quad(position, MAIN_BASE_QUAD_SIZE, MAIN_BASE_QUAD_COLOR),
-	position(position),
-	minerals(std::move(minerals))
-{}
-
-void Base::setPosition(const glm::vec3 & _position)
-{
-	glm::vec3 oldPosition = position;
-	position = _position;
-	quad.setPosition(position);
-
-	for (auto& mineral : minerals)
-	{
-		mineral.setPosition(position + (mineral.getPosition() - oldPosition));
-	}
-}
-#endif // LEVEL_EDITOR
-
-#ifdef GAME
 namespace
 {
 	std::array<const Mineral*, Globals::MAX_MINERALS> getClosestMinerals(const std::vector<Mineral>& minerals, const glm::vec3& position)
@@ -102,73 +37,37 @@ namespace
 	}
 }
 
-BaseHandler::BaseHandler(std::vector<Base>&& m_bases)
-	: m_bases(std::move(m_bases))
+HarvestLocationManager::HarvestLocationManager(std::vector<HarvestLocation>&& locations)
+	: m_locations(std::move(locations))
 {}
 
-bool BaseHandler::isWithinRangeOfMinerals(const glm::vec3& position, float distance) const
+const std::vector<HarvestLocation>& HarvestLocationManager::HarvestLocations() const
 {
-	for (const auto& base : m_bases)
-	{
-		for (const auto& mineral : base.minerals)
-		{
-			if (Globals::getSqrDistance(mineral.getPosition(), position) <= distance * distance)
-			{
-				return true;
-			}
-		}
-	}
-	
-	return false;
+	return m_locations;
 }
 
-const std::vector<Base>& BaseHandler::getBases() const
+const HarvestLocation& HarvestLocationManager::ClosestHarvestLocation(const glm::vec3& position) const
 {
-	return m_bases;
-}
-
-const Mineral* BaseHandler::getNearestAvailableMineralAtBase(const Faction& faction, const Base& base,
-	const glm::vec3& position) const
-{
-	std::array<const Mineral*, Globals::MAX_MINERALS> minerals = getClosestMinerals(base.minerals, position);
-	for (const auto& mineral : minerals)
+	const HarvestLocation* closest_harvest_location{ nullptr };
+	float distance = std::numeric_limits<float>::max();
+	for (auto& harvest_location : m_locations)
 	{
-		assert(mineral);
-		if (!faction.isMineralInUse(*mineral))
+		const float new_distance{ glm::distance(position, harvest_location.position) };
+		if (new_distance < distance)
 		{
-			return mineral;
+			closest_harvest_location = &harvest_location;
+			distance = new_distance;
 		}
 	}
 
-	return nullptr;
+	return *closest_harvest_location;
 }
 
-const Mineral* BaseHandler::getNearestAvailableMineralAtBase(const Faction& faction, const Mineral& _mineral,
-	const glm::vec3& position) const
+const Mineral* HarvestLocationManager::MineralAtPosition(const glm::vec3& position) const
 {
-	assert(faction.isMineralInUse(_mineral));
-	if (const Base* base = getBase(_mineral))
+	for (const auto& location : m_locations)
 	{
-		std::array<const Mineral*, Globals::MAX_MINERALS> minerals = getClosestMinerals(base->minerals, position);
-		for (const auto& mineral : minerals)
-		{
-			assert(mineral);
-			if (&(*mineral) != &_mineral &&
-				!faction.isMineralInUse(*mineral))
-			{
-				return mineral;
-			}
-		}
-	}
-
-	return nullptr;
-}
-
-const Mineral* BaseHandler::getMineral(const glm::vec3 & position) const
-{
-	for (const auto& base : m_bases)
-	{
-		for (const auto& mineral : base.minerals)
+		for (const auto& mineral : location.minerals)
 		{
 			if (mineral.getAABB().contains(position))
 			{
@@ -180,137 +79,18 @@ const Mineral* BaseHandler::getMineral(const glm::vec3 & position) const
 	return nullptr;
 }
 
-const Base* BaseHandler::getBaseAtMineral(const glm::vec3& position) const
+void HarvestLocationManager::Render(ShaderHandler& shader_handler) const
 {
-	for (const auto& base : m_bases)
+	for (const auto& location : m_locations)
 	{
-		for (const auto& mineral : base.minerals)
+		for (const auto& mineral : location.minerals)
 		{
-			if (mineral.getAABB().contains(position))
-			{
-				return &base;
-			}
-		}
-	}
-
-	return nullptr;
-}
-
-const Base* BaseHandler::getNearestBase(const glm::vec3& position) const
-{
-	const Base* closestBase = nullptr;
-	std::for_each(m_bases.cbegin(), m_bases.cend(), 
-		[&, closestDistance = std::numeric_limits<float>::max()](const auto& base) mutable
-	{
-		float distance = Globals::getSqrDistance(base.position, position);
-		if (distance < closestDistance)
-		{
-			closestBase = &base;
-			closestDistance = distance;
-		}
-	});
-
-	return closestBase;
-}
-
-const Base* BaseHandler::getNearestUnusedBase(const glm::vec3& position) const
-{
-	float closestDistance = std::numeric_limits<float>::max();
-	const Base* closestBase = nullptr;
-	for (const auto& base : m_bases)
-	{
-		float distance = Globals::getSqrDistance(base.position, position);
-		if (distance < closestDistance && 
-			base.owningFactionController == eFactionController::None)
-		{
-			closestBase = &base;
-			closestDistance = distance;
-		}
-	}
-
-	return closestBase;
-}
-
-const Base* BaseHandler::getBase(const glm::vec3& position) const
-{
-	auto base = std::find_if(m_bases.cbegin(), m_bases.cend(), [&position](const auto& base)
-	{
-		return base.getCenteredPosition() == position;	
-	});
-	if (base != m_bases.cend())
-	{
-		return &(*base);
-	}
-
-	return nullptr;
-}
-
-const Base* BaseHandler::getBase(const Mineral& _mineral) const
-{
-	for (const auto& base : m_bases)
-	{
-		for (const auto& mineral : base.minerals)
-		{
-			if (&mineral == &_mineral)
-			{
-				return &base;
-			}
-		}
-	}
-
-	return nullptr;
-}
-
-Base& BaseHandler::getBase(const glm::vec3& position)
-{
-	auto base = std::find_if(m_bases.begin(), m_bases.end(), [&position](const auto& base)
-	{
-		return base.getCenteredPosition() == position;
-	});
-	assert(base != m_bases.end());
-	return (*base);
-}
-
-void BaseHandler::handleEvent(const GameEvent& gameEvent)
-{
-	switch (gameEvent.type)
-	{
-	case eGameEventType::AttachFactionToBase:
-	{
-		Base& base = getBase(gameEvent.data.attachFactionToBase.position);
-		assert(base.owningFactionController == eFactionController::None);
-		base.owningFactionController = gameEvent.data.attachFactionToBase.factionController;
-	}
-		break;
-	case eGameEventType::DetachFactionFromBase:
-	{
-		Base& base = getBase(gameEvent.data.attachFactionToBase.position);
-		assert(base.owningFactionController == gameEvent.data.detachFactionFromBase.factionController);
-		base.owningFactionController = eFactionController::None;
-	}
-		break;
-	}
-}
-
-void BaseHandler::renderMinerals(ShaderHandler& shaderHandler) const
-{
-	for (const auto& base : m_bases)
-	{
-		for (const auto& mineral : base.minerals)
-		{
-			mineral.render(shaderHandler);
+			mineral.render(shader_handler);
 		}
 	}
 }
 
-void BaseHandler::renderBasePositions(ShaderHandler& shaderHandler) const
-{
-	for (const auto& base : m_bases)
-	{
-		if (base.owningFactionController == eFactionController::None)
-		{
-			base.quad.render(shaderHandler);
-		}
-	}
-}
-#endif // GAME
+HarvestLocation::HarvestLocation(const glm::vec3& position, std::vector<Mineral>&& minerals)
+	: position(position),
+	minerals(std::move(minerals))
+{}

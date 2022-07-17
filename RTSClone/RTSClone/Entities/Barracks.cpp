@@ -33,7 +33,7 @@ const Entity* Barracks::CreateEntity(Faction & owning_faction, const Map & map)
 	if (PathFinding::getInstance().getClosestAvailableEntitySpawnPosition(*this, map, position))
 	{
 		glm::vec3 rotation = { 0.0f, Globals::getAngle(position, getPosition()), 0.0f };
-		return owning_faction.createUnit({ position, rotation, get_waypoint(), eEntityType::Unit, getPosition() }, map);
+		return owning_faction.createUnit({ position, rotation, get_waypoint(), eEntityType::Unit, getPosition(), getID() }, map);
 	}
 
 	return nullptr;

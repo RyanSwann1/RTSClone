@@ -194,7 +194,7 @@ const Entity* Faction::getEntity(const glm::vec3& position) const
     return nullptr;
 }
 
-void Faction::handleEvent(const GameEvent& gameEvent, const Map& map, FactionHandler& factionHandler, const BaseHandler& baseHandler)
+void Faction::handleEvent(const GameEvent& gameEvent, const Map& map, FactionHandler& factionHandler)
 {
     switch (gameEvent.type)
     {
@@ -318,18 +318,6 @@ void Faction::handleEvent(const GameEvent& gameEvent, const Map& map, FactionHan
         }
         break;
     }
-    case eGameEventType::EntityIdle:
-    {
-        const int entityID = gameEvent.data.entityIdle.entityID;
-        auto entity = std::find_if(m_allEntities.begin(), m_allEntities.end(), [entityID](const auto& entity)
-        {
-            return entity->getID() == entityID;
-        });
-        if (entity != m_allEntities.cend())
-        {
-            on_entity_idle(*(*entity), map, factionHandler, baseHandler);
-        }
-    }
         break;
     case eGameEventType::AddFactionResources:
         m_currentResourceAmount += gameEvent.data.addFactionResources.quantity;
@@ -388,7 +376,7 @@ void Faction::handleWorkerCollisions(const Map& map)
     handledWorkers.clear();
 }
 
-void Faction::on_entity_creation(Entity& entity)
+void Faction::on_entity_creation(Entity& entity, const std::optional<int> spawner_id)
 {
     m_currentResourceAmount -= Globals::ENTITY_RESOURCE_COSTS[static_cast<int>(entity.getEntityType())];
     m_currentPopulationAmount += Globals::ENTITY_POPULATION_COSTS[static_cast<int>(entity.getEntityType())];
@@ -432,30 +420,30 @@ const Entity* Faction::get_entity(const int id) const
 
 Barracks* Faction::CreateBarracks(const WorkerScheduledBuilding& scheduled_building)
 {
-    return CreateEntity(m_barracks, scheduled_building.entityType, scheduled_building.position, *this);
+    return CreateEntity(m_barracks, scheduled_building.entityType, std::nullopt, scheduled_building.position, *this);
 }
 
 Turret* Faction::CreateTurret(const WorkerScheduledBuilding& scheduled_building)
 {
-    return CreateEntity(m_turrets, scheduled_building.entityType, scheduled_building.position, *this);
+    return CreateEntity(m_turrets, scheduled_building.entityType, std::nullopt, scheduled_building.position, *this);
 }
 
 Headquarters* Faction::CreateHeadquarters(const WorkerScheduledBuilding& scheduled_building)
 {
-    return CreateEntity(m_headquarters, scheduled_building.entityType, scheduled_building.position, *this);
+    return CreateEntity(m_headquarters, scheduled_building.entityType, std::nullopt, scheduled_building.position, *this);
 }
 
 Laboratory* Faction::CreateLaboratory(const WorkerScheduledBuilding& scheduled_building)
 {
-    return CreateEntity(m_laboratories, scheduled_building.entityType, scheduled_building.position, *this);
+    return CreateEntity(m_laboratories, scheduled_building.entityType, std::nullopt, scheduled_building.position, *this);
 }
 
 SupplyDepot* Faction::CreateSupplyDepot(const WorkerScheduledBuilding& scheduled_building)
 {
-    return CreateEntity(m_supplyDepots, scheduled_building.entityType, scheduled_building.position, *this);
+    return CreateEntity(m_supplyDepots, scheduled_building.entityType, std::nullopt, scheduled_building.position, *this);
 }
 
-void Faction::update(float deltaTime, const Map& map, FactionHandler& factionHandler, const BaseHandler& baseHandler)
+void Faction::update(float deltaTime, const Map& map, FactionHandler& factionHandler)
 {
     for (auto& unit : m_units)
     {
@@ -647,7 +635,7 @@ bool Faction::isBuildingInAllWorkersQueue(eEntityType entityType) const
 
 bool Faction::IsEntityCreatable(const eEntityType type) const
 {
-    const int entity_count = std::count_if(m_allEntities.cbegin(), m_allEntities.cend(), [type](const auto& entity)
+    const size_t entity_count = std::count_if(m_allEntities.cbegin(), m_allEntities.cend(), [type](const auto& entity)
     {
         return entity->getEntityType() == type;
     });
@@ -692,10 +680,10 @@ bool Faction::isMineralInUse(const Mineral& mineral) const
 
 Entity* Faction::createUnit(const EntityToSpawnFromBuilding& entity_to_spawn, const Map& map)
 {
-    return CreateEntity(m_units, entity_to_spawn.type, *this, entity_to_spawn, map);
+    return CreateEntity(m_units, entity_to_spawn.type, entity_to_spawn.spawner_id, *this, entity_to_spawn, map);
 }
 
 Entity* Faction::createWorker(const EntityToSpawnFromBuilding& entity_to_spawn, const Map& map)
 {
-    return CreateEntity(m_workers, entity_to_spawn.type, *this, entity_to_spawn, map);
+    return CreateEntity(m_workers, entity_to_spawn.type, entity_to_spawn.spawner_id, *this, entity_to_spawn, map);
 }

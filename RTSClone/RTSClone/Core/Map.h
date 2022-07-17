@@ -16,7 +16,8 @@ class AABB;
 class Map 
 {
 public:
-	Map(const std::vector<SceneryGameObject>& sceneryGameObjects, const std::vector<Base>& bases, glm::ivec2 size);
+	Map(const std::vector<SceneryGameObject>& sceneryGameObjects, 
+		const std::vector<HarvestLocation>& harvest_locations, glm::ivec2 size);
 
 	bool isCollidable(const glm::vec3& position) const;
 	const glm::ivec2& getSize() const;

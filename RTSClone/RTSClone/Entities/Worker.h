@@ -16,7 +16,8 @@
 
 enum class eWorkerState
 {
-	Idle = 0,
+	Spawning = 0,
+	Idle,
 	Moving,
 	MovingToMinerals,
 	ReturningMineralsToHeadquarters,
@@ -82,7 +83,7 @@ public:
 private:
 	Faction* m_owningFaction							= nullptr;
 	Movement m_movement									= {};
-	eWorkerState m_currentState							= eWorkerState::Idle;
+	eWorkerState m_currentState							= eWorkerState::Spawning;
 	std::deque<WorkerScheduledBuilding> m_buildQueue	= {};
 	std::optional<int> m_repairTargetEntity				= {};
 	std::optional<int> m_resources						= {};

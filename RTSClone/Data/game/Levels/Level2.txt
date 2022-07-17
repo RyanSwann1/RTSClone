@@ -1,5 +1,5 @@
 #Faction Count
-3
+2
 #Main Base Quantity
 4
 #Main Base Location_1

@@ -59,7 +59,7 @@ void FactionPlayerSelectedEntities::Update()
     }
 }
 
-void FactionPlayerSelectedEntities::HandleInput(const BaseHandler& base_handler, const Camera& camera,    
+void FactionPlayerSelectedEntities::HandleInput(const HarvestLocationManager& harvest_locations, const Camera& camera,    
     const sf::Event& sfml_event, const sf::Window& window, const MiniMap& minimap,
     FactionHandler& faction_handler, const glm::vec3& level_size, const Map& map)
 {
@@ -111,7 +111,7 @@ void FactionPlayerSelectedEntities::HandleInput(const BaseHandler& base_handler,
                 break;
             }
 
-            if (Harvest(position, map, base_handler))
+            if (Harvest(position, map, harvest_locations))
             {
                 break;
             }
@@ -218,17 +218,14 @@ bool FactionPlayerSelectedEntities::SetWaypoints(const glm::vec3& position, cons
 }
 
 bool FactionPlayerSelectedEntities::Harvest(const glm::vec3& destination, 
-    const Map& map, const BaseHandler& baseHandler)
+    const Map& map, const HarvestLocationManager& harvest_locations)
 {
-    bool selected_entity_harvested = false;
-    if (const Base* base = baseHandler.getBaseAtMineral(destination))
+    bool selected_entity_harvested{ false };
+    if (const Mineral * mineral{ harvest_locations.MineralAtPosition(destination) })
     {
-        for (auto& selectedEntity : m_entities)
+        for (auto& selected_entity : m_entities)
         {
-            if (const Mineral* mineral = baseHandler.getNearestAvailableMineralAtBase(*m_owning_faction, *base, selectedEntity->getPosition()))
-            {
-                selected_entity_harvested = selectedEntity->Harvest(*mineral, map);
-            }
+            selected_entity_harvested = selected_entity->Harvest(*mineral, map);
         }
     }
 

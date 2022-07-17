@@ -23,6 +23,7 @@ struct EntityToSpawnFromBuilding
 	std::optional<glm::vec3> destination{};
 	eEntityType type{};
 	glm::vec3 building_position{};
+	int spawner_id{UniqueID::INVALID_ID};
 };
 
 class Map;

@@ -16,6 +16,11 @@
 #include <functional>
 #include <optional>
 
+struct Entities
+{
+
+};
+
 struct Camera;
 struct GameEvent;
 class FactionHandler;
@@ -55,17 +60,16 @@ public:
 	const Headquarters* get_closest_headquarters(const glm::vec3& position) const;
 	const Entity* get_entity(const int id) const;
 
-	virtual Barracks* CreateBarracks(const WorkerScheduledBuilding& scheduled_building);
-	virtual Turret* CreateTurret(const WorkerScheduledBuilding& scheduled_building);
-	virtual Headquarters* CreateHeadquarters(const WorkerScheduledBuilding& scheduled_building);
-	virtual Laboratory* CreateLaboratory(const WorkerScheduledBuilding& scheduled_building);
-	virtual SupplyDepot* CreateSupplyDepot(const WorkerScheduledBuilding& scheduled_building);
-	virtual Entity* createUnit(const EntityToSpawnFromBuilding& entity_to_spawn, const Map& map);
-	virtual Entity* createWorker(const EntityToSpawnFromBuilding& entity_to_spawn, const Map& map);
+	Barracks* CreateBarracks(const WorkerScheduledBuilding& scheduled_building);
+	Turret* CreateTurret(const WorkerScheduledBuilding& scheduled_building);
+	Headquarters* CreateHeadquarters(const WorkerScheduledBuilding& scheduled_building);
+	Laboratory* CreateLaboratory(const WorkerScheduledBuilding& scheduled_building);
+	SupplyDepot* CreateSupplyDepot(const WorkerScheduledBuilding& scheduled_building);
+	Entity* createUnit(const EntityToSpawnFromBuilding& entity_to_spawn, const Map& map);
+	Entity* createWorker(const EntityToSpawnFromBuilding& entity_to_spawn, const Map& map);
 	virtual bool increaseShield(const Laboratory& laboratory);
-	virtual void handleEvent(const GameEvent& gameEvent, const Map& map, FactionHandler& factionHandler, 
-		const BaseHandler& baseHandler);
-	virtual void update(float deltaTime, const Map& map, FactionHandler& factionHandler, const BaseHandler& baseHandler);
+	virtual void handleEvent(const GameEvent& gameEvent, const Map& map, FactionHandler& factionHandler);
+	virtual void update(float deltaTime, const Map& map, FactionHandler& factionHandler);
 	void delayed_update(const Map& map, FactionHandler& factionHandler);
 	void render(ShaderHandler& shaderHandler) const;
 	void renderPlannedBuildings(ShaderHandler& shaderHandler) const;
@@ -84,8 +88,8 @@ protected:
 		int startingResources, int startingPopulationCap);
 
 	virtual void on_entity_taken_damage(const TakeDamageEvent& gameEvent, Entity& entity, const Map& map, FactionHandler& factionHandler) {}
-	virtual void on_entity_idle(Entity& entity, const Map& map, FactionHandler& factionHandler, const BaseHandler& baseHandler) {}
 	virtual void on_entity_removal(const Entity& entity);
+	void on_entity_creation(Entity& entity, const std::optional<int> spawner_id);
 	Worker* GetWorker(const int id);
 
 	std::vector<Entity*> m_allEntities;
@@ -105,14 +109,15 @@ private:
 	int m_currentShieldAmount				= 0;
 
 	void handleWorkerCollisions(const Map& map);
-	void on_entity_creation(Entity& entity);
+	
 
 	//Presumes entity already found in all entities container
 	template <typename T>
 	void removeEntity(std::vector<T>& entityContainer, std::vector<Entity*>::iterator entity);
 
 	template <typename T, typename ...EntityConstructParams>
-	T* CreateEntity(std::vector<T>& container, const eEntityType type, EntityConstructParams&&... construct_params);
+	T* CreateEntity(std::vector<T>& container, const eEntityType type, 
+		const std::optional<int> spawner_id, EntityConstructParams&&... construct_params);
 };
 
 template <typename T>
@@ -133,12 +138,13 @@ void Faction::removeEntity(std::vector<T>& entityContainer, std::vector<Entity*>
 }
 
 template <typename T, typename ...EntityConstructParams>
-T* Faction::CreateEntity(std::vector<T>& container, const eEntityType type, EntityConstructParams&&... construct_params)
+T* Faction::CreateEntity(std::vector<T>& container, const eEntityType type, 
+	const std::optional<int> spawner_id, EntityConstructParams&&... construct_params)
 {
 	if (IsEntityCreatable(type))
 	{
 		T* created_entity{ &container.emplace_back(std::forward<EntityConstructParams>(construct_params)...) };
-		on_entity_creation(*created_entity);
+		on_entity_creation(*created_entity, spawner_id);
 		return created_entity;
 	}
 

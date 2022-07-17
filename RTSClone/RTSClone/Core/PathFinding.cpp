@@ -114,49 +114,50 @@ bool PathFinding::getClosestAvailablePosition(const Worker& worker, const std::v
 	return availablePositionFound;
 }
 
-bool PathFinding::isBuildingSpawnAvailable(const glm::vec3& startingPosition, eEntityType buildingEntityType, const Map& map, 
-	glm::vec3& buildPosition, const FactionAI& owningFaction, const BaseHandler& baseHandler)
-{
-	m_sharedContainer.clear();
-	AABB buildingAABB(startingPosition, ModelManager::getInstance().getModel(buildingEntityType));
-	for (int i = 0; i < 5; ++i)
-	{
-		m_bfsGraph.reset(Globals::convertToGridPosition(startingPosition));
-		bool buildPositionFound = false;
-		while (!m_bfsGraph.is_frontier_empty() && !buildPositionFound)
-		{
-			glm::ivec2 position = m_bfsGraph.pop_frontier();
-			for (const auto& adjacentPosition : getAllAdjacentPositions(position, map))
-			{
-				if (adjacentPosition.valid)
-				{
-					buildingAABB.update(Globals::convertToWorldPosition(adjacentPosition.position));
-					if (!map.isAABBOccupied(buildingAABB) &&
-						!owningFaction.isWithinRangeOfBuildings(Globals::convertToWorldPosition(adjacentPosition.position), Globals::NODE_SIZE * 6.0f) && 
-						!baseHandler.isWithinRangeOfMinerals(Globals::convertToWorldPosition(adjacentPosition.position), Globals::NODE_SIZE * 8.0f) &&
-						!isWithinBuildingPositionsRange(m_sharedContainer, Globals::convertToWorldPosition(adjacentPosition.position)))
-					{
-						buildPositionFound = true;
-						m_sharedContainer.emplace_back(Globals::convertToWorldPosition(adjacentPosition.position));
-						break;
-					}
-				}
-				if (!m_bfsGraph.is_position_visited(adjacentPosition.position, map))
-				{
-					m_bfsGraph.add(adjacentPosition.position, position, map);
-				}
-			}
-		}
-	}
-
-	if (!m_sharedContainer.empty())
-	{
-		buildPosition = m_sharedContainer[Globals::getRandomNumber(0, static_cast<int>(m_sharedContainer.size()) - 1)];
-		return true;
-	}
-
-	return false;
-}
+//TODO:
+//bool PathFinding::isBuildingSpawnAvailable(const glm::vec3& startingPosition, eEntityType buildingEntityType, const Map& map, 
+//	glm::vec3& buildPosition, const FactionAI& owningFaction, const BaseHandler& baseHandler)
+//{
+//	m_sharedContainer.clear();
+//	AABB buildingAABB(startingPosition, ModelManager::getInstance().getModel(buildingEntityType));
+//	for (int i = 0; i < 5; ++i)
+//	{
+//		m_bfsGraph.reset(Globals::convertToGridPosition(startingPosition));
+//		bool buildPositionFound = false;
+//		while (!m_bfsGraph.is_frontier_empty() && !buildPositionFound)
+//		{
+//			glm::ivec2 position = m_bfsGraph.pop_frontier();
+//			for (const auto& adjacentPosition : getAllAdjacentPositions(position, map))
+//			{
+//				if (adjacentPosition.valid)
+//				{
+//					buildingAABB.update(Globals::convertToWorldPosition(adjacentPosition.position));
+//					if (!map.isAABBOccupied(buildingAABB) &&
+//						!owningFaction.isWithinRangeOfBuildings(Globals::convertToWorldPosition(adjacentPosition.position), Globals::NODE_SIZE * 6.0f) && 
+//						!baseHandler.isWithinRangeOfMinerals(Globals::convertToWorldPosition(adjacentPosition.position), Globals::NODE_SIZE * 8.0f) &&
+//						!isWithinBuildingPositionsRange(m_sharedContainer, Globals::convertToWorldPosition(adjacentPosition.position)))
+//					{
+//						buildPositionFound = true;
+//						m_sharedContainer.emplace_back(Globals::convertToWorldPosition(adjacentPosition.position));
+//						break;
+//					}
+//				}
+//				if (!m_bfsGraph.is_position_visited(adjacentPosition.position, map))
+//				{
+//					m_bfsGraph.add(adjacentPosition.position, position, map);
+//				}
+//			}
+//		}
+//	}
+//
+//	if (!m_sharedContainer.empty())
+//	{
+//		buildPosition = m_sharedContainer[Globals::getRandomNumber(0, static_cast<int>(m_sharedContainer.size()) - 1)];
+//		return true;
+//	}
+//
+//	return false;
+//}
 
 bool PathFinding::isPositionInLineOfSight(glm::ivec2 startingPositionOnGrid, glm::ivec2 targetPositionOnGrid, const Map& map, const Entity& entity) const
 {

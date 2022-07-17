@@ -46,7 +46,7 @@ const Entity* Headquarters::CreateEntity(Faction& owning_faction, const Map& map
 	if (PathFinding::getInstance().getClosestAvailableEntitySpawnPosition(*this, map, position))
 	{
 		glm::vec3 rotation = { 0.0f, Globals::getAngle(position, getPosition()), 0.0f };
-		return owning_faction.createWorker({ position, rotation, get_waypoint(), eEntityType::Worker, getPosition() }, map);
+		return owning_faction.createWorker({ position, rotation, get_waypoint(), eEntityType::Worker, getPosition(), getID() }, map);
 	}
 
 	return nullptr;

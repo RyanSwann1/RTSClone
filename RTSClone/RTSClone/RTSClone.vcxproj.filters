@@ -183,6 +183,15 @@
     <ClCompile Include="Factions\FactionPlayerSelectedEntities.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Factions\FactionAIActionHandler.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Factions\FactionAIBase.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Factions\FactionAIEntityHandler.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="assimp\include\Compiler\poppack1.h">
@@ -504,6 +513,21 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Factions\FactionPlayerSelectedEntities.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Factions\FactionAIActionHandler.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Factions\FactionAIBase.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\MathUtility.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Factions\FactionAIEntityHandler.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Factions\FactionEntities.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

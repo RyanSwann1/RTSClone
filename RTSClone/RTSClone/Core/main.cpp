@@ -179,7 +179,6 @@ int main()
 			currentLevel->renderPlayerPlannedBuilding(*shaderHandler);
 			currentLevel->renderPlannedBuildings(*shaderHandler);
 			shaderHandler->switchToShader(eShaderType::Debug);
-			currentLevel->renderBasePositions(*shaderHandler);
 
 			shaderHandler->switchToShader(eShaderType::Widjet);
 			currentLevel->renderEntityStatusBars(*shaderHandler, windowSize);

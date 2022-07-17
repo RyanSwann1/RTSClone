@@ -33,7 +33,8 @@ namespace
 }
 
 //BuildingInWorkerQueue
-WorkerScheduledBuilding::WorkerScheduledBuilding(const glm::vec3& position, eEntityType entityType, const int owner_id)
+WorkerScheduledBuilding::WorkerScheduledBuilding(const glm::vec3& position, eEntityType entityType, 
+	const int owner_id)
 	: owner_id(owner_id),
 	position({ position, GridLockActive::True }),
 	entityType(entityType),
@@ -488,6 +489,7 @@ void Worker::switchTo(eWorkerState newState)
 	//On Exit Current State
 	switch (m_currentState)
 	{
+	case eWorkerState::Spawning:
 	case eWorkerState::Idle:
 	break;
 	case eWorkerState::Moving:
@@ -549,6 +551,8 @@ void Worker::switchTo(eWorkerState newState)
 	m_currentState = newState;
 	switch (newState)
 	{
+	case eWorkerState::Spawning:
+		break;
 	case eWorkerState::Idle:
 		assert(m_buildQueue.empty());
 		m_taskTimer.setActive(false);

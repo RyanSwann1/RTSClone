@@ -179,6 +179,9 @@
     <ClCompile Include="Entities\Movement.cpp" />
     <ClCompile Include="Factions\Faction.cpp" />
     <ClCompile Include="Factions\FactionAI.cpp" />
+    <ClCompile Include="Factions\FactionAIActionHandler.cpp" />
+    <ClCompile Include="Factions\FactionAIBase.cpp" />
+    <ClCompile Include="Factions\FactionAIEntityHandler.cpp" />
     <ClCompile Include="Factions\FactionHandler.cpp" />
     <ClCompile Include="Factions\FactionPlayer.cpp" />
     <ClCompile Include="Entities\Headquarters.cpp" />
@@ -266,6 +269,7 @@
     <ClInclude Include="Core\Level.h" />
     <ClInclude Include="Core\LevelFileHandler.h" />
     <ClInclude Include="Core\Map.h" />
+    <ClInclude Include="Core\MathUtility.h" />
     <ClInclude Include="Core\Mineral.h" />
     <ClInclude Include="Core\MinHeap.h" />
     <ClInclude Include="Core\PathFinding.h" />
@@ -281,6 +285,10 @@
     <ClInclude Include="Events\GameEvents.h" />
     <ClInclude Include="Events\GameMessages.h" />
     <ClInclude Include="Events\GameMessenger.h" />
+    <ClInclude Include="Factions\FactionAIActionHandler.h" />
+    <ClInclude Include="Factions\FactionAIBase.h" />
+    <ClInclude Include="Factions\FactionAIEntityHandler.h" />
+    <ClInclude Include="Factions\FactionEntities.h" />
     <ClInclude Include="Factions\FactionHandler.h" />
     <ClInclude Include="Entities\Headquarters.h" />
     <ClInclude Include="Entities\Laboratory.h" />

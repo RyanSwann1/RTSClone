@@ -121,9 +121,9 @@ void MiniMap::render(ShaderHandler& shaderHandler, glm::uvec2 windowSize, const 
 
 	m_background.render(m_position, m_size, BACKGROUND_COLOR, shaderHandler, windowSize, OPACITY);
 
-	for (const auto& base : level.getBaseHandler().getBases())
+	for (const auto& harvest_location : level.GetHarvestLocationManager().HarvestLocations())
 	{
-		for (const auto& mineral : base.getMinerals())
+		for (const auto& mineral : harvest_location.minerals)
 		{
 			glm::vec2 convertedMineralPosition((mineral.getPosition().z / level.getSize().x) * m_size.x, (mineral.getPosition().x / level.getSize().z) * m_size.y);
 			convertedMineralPosition += m_position;

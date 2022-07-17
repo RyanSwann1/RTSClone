@@ -3,68 +3,26 @@
 #include "Core/Mineral.h"
 #include <vector>
 #include "Graphics/Quad.h"
-#ifdef GAME
-#include "Core/FactionController.h"
-#endif // GAME
 
-struct Base
+struct HarvestLocation
 {
-#ifdef LEVEL_EDITOR
-	Base();
-#endif // LEVEL_EDITOR
-	Base(const glm::vec3& position, std::vector<Mineral>&& minerals);
-	Base(Base&&) noexcept;
-	Base& operator=(Base&&) noexcept;
+	HarvestLocation(const glm::vec3& position, std::vector<Mineral>&& minerals);
 
-#ifdef GAME
-	glm::vec3 getCenteredPosition() const;
-	const std::vector<Mineral>& getMinerals() const;
-#endif // GAME
-
-#ifdef LEVEL_EDITOR
-	void setPosition(const glm::vec3& position);
-	Quad quad;
-#endif // LEVEL_EDITOR
-
-	glm::vec3 position;
-	std::vector<Mineral> minerals;
-#ifdef GAME
-	Quad quad;
-	eFactionController owningFactionController = eFactionController::None;
-#endif // GAME
+	glm::vec3 position{ 0.f };
+	std::vector<Mineral> minerals{};
 };
 
-#ifdef GAME
-class ShaderHandler;
-class Faction;
-struct GameEvent;
-class BaseHandler 
+class HarvestLocationManager
 {
 public:
-	BaseHandler(std::vector<Base>&& m_bases);
-	BaseHandler(const BaseHandler&) = delete;
-	BaseHandler& operator=(const BaseHandler&) = delete;
-	BaseHandler(BaseHandler&&) noexcept = default;
-	BaseHandler& operator=(BaseHandler&&) noexcept = default;
+	HarvestLocationManager(std::vector<HarvestLocation>&& locations);
 
-	bool isWithinRangeOfMinerals(const glm::vec3& position, float distance) const;
-	const std::vector<Base>& getBases() const;
-	const Mineral* getNearestAvailableMineralAtBase(const Faction& faction, const Base& base, const glm::vec3& position) const;
-	const Mineral* getNearestAvailableMineralAtBase(const Faction& faction, const Mineral& mineral, const glm::vec3& position) const;
-	const Mineral* getMineral(const glm::vec3& position) const;
-	const Base* getBaseAtMineral(const glm::vec3& position) const;
-	const Base* getNearestBase(const glm::vec3& position) const;
-	const Base* getNearestUnusedBase(const glm::vec3& position) const;
-	const Base* getBase(const glm::vec3& position) const;
-	const Base* getBase(const Mineral& mineral) const;
+	const std::vector<HarvestLocation>& HarvestLocations() const;
+	const HarvestLocation& ClosestHarvestLocation(const glm::vec3& position) const;
+	const Mineral* MineralAtPosition(const glm::vec3& position) const;
 
-	void handleEvent(const GameEvent& gameEvent);
-	void renderMinerals(ShaderHandler& shaderHandler) const;
-	void renderBasePositions(ShaderHandler& shaderHandler) const;
+	void Render(ShaderHandler& shader_handler) const;
 
 private:
-	std::vector<Base> m_bases;
-
-	Base& getBase(const glm::vec3& position);
+	std::vector<HarvestLocation> m_locations;
 };
-#endif // GAME

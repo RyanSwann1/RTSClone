@@ -7,11 +7,11 @@
 struct Camera;
 class Entity;
 class Map;
-class BaseHandler;
 class FactionPlayer;
 class FactionHandler;
 class Headquarters;
 class MiniMap;
+class HarvestLocationManager;
 class FactionPlayerSelectedEntities
 {
 public:
@@ -22,7 +22,7 @@ public:
 	void OnEntityRemoval(const int id);
 	void Update();
 
-	void HandleInput(const BaseHandler& base_handler, const Camera& camera, 
+	void HandleInput(const HarvestLocationManager& harvest_locations, const Camera& camera, 
 		const sf::Event& sfml_event, const sf::Window& window, const MiniMap& minimap,
 		FactionHandler& faction_handler, const glm::vec3& level_size,
 		const Map& map);
@@ -32,7 +32,7 @@ private:
 	bool Move(const glm::vec3& position, const Map& map);
 	bool Repair(const glm::vec3& position, const Map& map);
 	bool SetWaypoints(const glm::vec3& position, const Map& map);
-	bool Harvest(const glm::vec3& destination, const Map& map, const BaseHandler& baseHandler);
+	bool Harvest(const glm::vec3& destination, const Map& map, const HarvestLocationManager& baseHandler);
 	bool Attack(const glm::vec3& position, FactionHandler& factionHandler, const Map& map);
 	bool ReturnMinerals(const glm::vec3& position, const Map& map);
 	void SelectAllOfType(const glm::vec3& position);

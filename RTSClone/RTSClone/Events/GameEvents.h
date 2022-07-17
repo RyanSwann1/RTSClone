@@ -6,7 +6,7 @@
 
 enum class eGameEventType
 {
-	TakeDamage = 0,
+ 	TakeDamage = 0,
 	SpawnProjectile,
 	RevalidateMovementPaths,
 	HeadquartersDestroyed,

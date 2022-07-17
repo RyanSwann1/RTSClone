@@ -120,7 +120,7 @@ int LevelFileHandler::loadFactionStartingPopulation(std::ifstream& file)
 	return factionStartingPopulation;
 }
 
-void LevelFileHandler::loadAllMainBases(std::ifstream& file, std::vector<Base>& mainBases, int mineralQuantity)
+void LevelFileHandler::loadAllMainBases(std::ifstream& file, std::vector<HarvestLocation>& mainBases, int mineralQuantity)
 {
 	assert(file.is_open());
 
@@ -136,7 +136,7 @@ void LevelFileHandler::loadAllMainBases(std::ifstream& file, std::vector<Base>& 
 	}
 }
 
-void LevelFileHandler::loadAllSecondaryBases(std::ifstream& file, std::vector<Base>& secondaryBases, int mineralQuantity)
+void LevelFileHandler::loadAllSecondaryBases(std::ifstream& file, std::vector<HarvestLocation>& secondaryBases, int mineralQuantity)
 {
 	assert(file.is_open());
 
@@ -298,8 +298,8 @@ std::optional<LevelDetailsFromFile> LevelFileHandler::loadLevelFromFile(std::str
 	levelDetails.factionStartingPopulation = loadFactionStartingPopulation(file);
 	levelDetails.factionCount = loadFactionCount(file);
 	int mineralQuantity = loadMineralQuantity(file);
-	loadAllMainBases(file, levelDetails.bases, mineralQuantity);
-	loadAllSecondaryBases(file, levelDetails.bases, mineralQuantity);
+	loadAllMainBases(file, levelDetails.harvest_locations, mineralQuantity);
+	loadAllSecondaryBases(file, levelDetails.harvest_locations, mineralQuantity);
 
 	return levelDetails;
 }
