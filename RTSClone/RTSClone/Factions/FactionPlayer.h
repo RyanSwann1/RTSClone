@@ -14,7 +14,7 @@ class FactionPlayer : public Faction
 public:
 	FactionPlayer(const glm::vec3& hqStartingPosition, int startingResources, int startingPopulation);
 
-	const std::vector<Entity*>& getSelectedEntities() const;
+	const std::vector<ConstSafePTR<Entity>>& getSelectedEntities() const;
 
 	void handleInput(const sf::Event& currentSFMLEvent, const sf::Window& window, const Camera& camera, const Map& map, 
 		FactionHandler& factionHandler, const HarvestLocationManager& harvest_locations, const MiniMap& miniMap, const glm::vec3& levelSize);

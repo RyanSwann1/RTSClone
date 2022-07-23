@@ -530,6 +530,9 @@
     <ClInclude Include="Factions\FactionEntities.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Core\ConstSafePTR.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="assimp\include\color4.inl">

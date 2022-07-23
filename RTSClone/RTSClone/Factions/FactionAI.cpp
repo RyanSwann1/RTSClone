@@ -34,7 +34,7 @@ FactionAI_NEW::FactionAI_NEW(eFactionController factionController, const glm::ve
 {
 	m_action_queue.emplace(FactionAIAction::BuildWorker);
 
-	for (auto& headquarters : m_headquarters)
+	for (auto& headquarters : m_entities.headquarters)
 	{
 		m_occupied_base_manager.RegisterBase(
 			m_harvest_location_manager.ClosestHarvestLocation(headquarters.getPosition()), headquarters);
@@ -49,18 +49,19 @@ void FactionAI_NEW::handleEvent(const GameEvent& gameEvent, const Map& map, Fact
 	{
 	case eGameEventType::EntityIdle:
 	{
-		auto entity = std::find_if(m_allEntities.begin(), m_allEntities.end(), [entityID = gameEvent.data.entityIdle.entityID](const auto& entity)
+		auto entity = std::find_if(m_entities.all.begin(), m_entities.all.end(), [entityID = gameEvent.data.entityIdle.entityID](const auto& entity)
 		{
 			return entity->getID() == entityID;
 		});
-		if (entity != m_allEntities.cend())
+		if (entity != m_entities.all.cend())
 		{
 			switch ((*entity)->getEntityType())
 			{
 			case eEntityType::Unit:
 				break;
 			case eEntityType::Worker:
-				OnWorkerIdle(static_cast<Worker&>(*(*entity)), map);
+				//TODO:
+				OnWorkerIdle(static_cast<Worker&>((***entity)), map);
 				break;
 			}
 		}
@@ -90,13 +91,13 @@ void FactionAI_NEW::update(float deltaTime, const Map& map, FactionHandler& fact
 
 bool FactionAI_NEW::RequestWorkerCreation()
 {
-	if (m_headquarters.empty() 
+	if (m_entities.headquarters.empty() 
 		|| !IsEntityCreatable(eEntityType::Worker))
 	{
 		return false;
 	}
 	
-	return m_headquarters.back().AddEntityToSpawnQueue(*this);
+	return m_entities.headquarters.back().AddEntityToSpawnQueue(*this);
 }
 
 void FactionAI_NEW::OnWorkerIdle(Worker& worker, const Map& map)

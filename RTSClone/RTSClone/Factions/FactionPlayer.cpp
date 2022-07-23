@@ -20,7 +20,7 @@ FactionPlayer::FactionPlayer(const glm::vec3& hqStartingPosition, int startingRe
     m_selected_entities(this)
 {}
 
-const std::vector<Entity*>& FactionPlayer::getSelectedEntities() const
+const std::vector<ConstSafePTR<Entity>>& FactionPlayer::getSelectedEntities() const
 {
     return m_selected_entities.SelectedEntities();
 }
@@ -30,7 +30,7 @@ void FactionPlayer::handleInput(const sf::Event& currentSFMLEvent, const sf::Win
     const glm::vec3& levelSize)
 {
     m_selected_entities.HandleInput(harvest_locations, camera, currentSFMLEvent, window, 
-        miniMap, factionHandler, levelSize, map);
+        miniMap, factionHandler, levelSize, map, m_entities);
 
     switch (currentSFMLEvent.type)
     {
@@ -61,12 +61,12 @@ void FactionPlayer::handleEvent(const GameEvent& gameEvent, const Map& map, Fact
     {
     case eGameEventType::PlayerActivatePlannedBuilding:
     {
-        const auto entity = std::find_if(m_allEntities.cbegin(), m_allEntities.cend(),
+        const auto entity = std::find_if(m_entities.all.cbegin(), m_entities.all.cend(),
                 [id = gameEvent.data.playerActivatePlannedBuilding.targetID] (const auto& entity)
         {
             return entity->getID() == id;
         });
-        if (entity != m_allEntities.cend())
+        if (entity != m_entities.all.cend())
         {
             m_plannedBuilding =
                 std::optional<FactionPlayerPlannedBuilding>(std::in_place, 
@@ -77,11 +77,11 @@ void FactionPlayer::handleEvent(const GameEvent& gameEvent, const Map& map, Fact
     case eGameEventType::PlayerSpawnEntity:
     {
         int targetEntityID = gameEvent.data.playerSpawnEntity.targetID;
-        auto entity = std::find_if(m_allEntities.begin(), m_allEntities.end(), [targetEntityID](const auto& entity)
+        auto entity = std::find_if(m_entities.all.begin(), m_entities.all.end(), [targetEntityID](const auto& entity)
         {
             return entity->getID() == targetEntityID;
         });
-        if (entity != m_allEntities.end())
+        if (entity != m_entities.all.end())
         {
             (*entity)->AddEntityToSpawnQueue(*this);
         }
@@ -98,7 +98,7 @@ void FactionPlayer::update(float deltaTime, const Map& map, FactionHandler& fact
     broadcast<GameMessages::UIDisplayPlayerDetails>(
         { getCurrentResourceAmount(), getCurrentPopulationAmount(), getMaximumPopulationAmount() });
 
-    m_selected_entities.Update();
+    m_selected_entities.Update(m_entities);
 }
 
 void FactionPlayer::renderPlannedBuilding(ShaderHandler& shaderHandler, const Map& map) const
@@ -134,11 +134,12 @@ void FactionPlayer::build_planned_building(const Map& map)
         return;
     }
 
-    const auto selectedWorker = std::find_if(m_workers.begin(), m_workers.end(), [id = m_plannedBuilding->getBuilderID()](auto& worker)
+    const auto selectedWorker = std::find_if(
+        m_entities.workers.begin(), m_entities.workers.end(), [id = m_plannedBuilding->getBuilderID()](auto& worker)
     {
         return worker.getID() == id;
     });
-    if (selectedWorker == m_workers.cend()
+    if (selectedWorker == m_entities.workers.cend()
         || !m_plannedBuilding->IsBuildingCreatable(map))
     {
         m_plannedBuilding.reset();

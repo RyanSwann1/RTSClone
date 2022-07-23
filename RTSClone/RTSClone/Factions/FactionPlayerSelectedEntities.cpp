@@ -3,10 +3,11 @@
 #include "FactionPlayer.h"
 #include "FactionHandler.h"
 #include "Core/Level.h"
+#include "FactionEntities.h"
 
 namespace
 {
-    glm::vec3 getAveragePosition(std::vector<Entity*>& selectedEntities)
+    glm::vec3 getAveragePosition(std::vector<ConstSafePTR<Entity>>& selectedEntities)
     {
         std::sort(selectedEntities.begin(), selectedEntities.end(), [](const auto& unitA, const auto& unitB)
         {
@@ -27,22 +28,22 @@ FactionPlayerSelectedEntities::FactionPlayerSelectedEntities(const FactionPlayer
     : m_owning_faction(owning_faction)
 {}
 
-const std::vector<Entity*>& FactionPlayerSelectedEntities::SelectedEntities() const
+const std::vector<ConstSafePTR<Entity>>& FactionPlayerSelectedEntities::SelectedEntities() const
 {
     return m_entities;
 }
 
-void FactionPlayerSelectedEntities::Update()
+void FactionPlayerSelectedEntities::Update(FactionEntities& faction_entities)
 {
     if (m_selection_box.isActive())
     {
         m_entities.clear();
-        for (auto& entity : m_owning_faction->getEntities())
+        for (auto& entity : faction_entities.all)
         {
             if (entity->is_group_selectable()
                 && entity->setSelected(m_selection_box.getAABB().contains(entity->getAABB())))
             {
-                m_entities.push_back(entity);
+                m_entities.emplace_back(*entity);
             }
         }
     }
@@ -61,7 +62,7 @@ void FactionPlayerSelectedEntities::Update()
 
 void FactionPlayerSelectedEntities::HandleInput(const HarvestLocationManager& harvest_locations, const Camera& camera,    
     const sf::Event& sfml_event, const sf::Window& window, const MiniMap& minimap,
-    FactionHandler& faction_handler, const glm::vec3& level_size, const Map& map)
+    FactionHandler& faction_handler, const glm::vec3& level_size, const Map& map, FactionEntities& faction_entities)
 {
     switch (sfml_event.type)
     {
@@ -75,11 +76,11 @@ void FactionPlayerSelectedEntities::HandleInput(const HarvestLocationManager& ha
 
             if (mouse_position == m_previous_mouse_position)
             {
-                SelectSingle(mouse_position);
+                SelectSingle(mouse_position, faction_entities);
             }
             else
             {
-                SelectAllOfType(mouse_position);
+                SelectAllOfType(mouse_position, faction_entities);
             }
 
             m_previous_mouse_position = mouse_position;
@@ -129,7 +130,7 @@ void FactionPlayerSelectedEntities::HandleInput(const HarvestLocationManager& ha
         {
             if (m_selection_box.isActive() && !m_entities.empty())
             {
-                for (auto& entity : m_owning_faction->getEntities())
+                for (auto& entity : faction_entities.all)
                 {
                     if (entity->isSelected())
                     {
@@ -196,7 +197,7 @@ bool FactionPlayerSelectedEntities::Repair(const glm::vec3& position, const Map&
     {
         if (selectedEntity->getID() != (*entity_to_repair)->getID())
         {
-            selectedEntity->repairEntity((*selectedEntity), map);
+            selectedEntity->repairEntity(*(*selectedEntity), map);
         }
     }
 
@@ -271,14 +272,14 @@ bool FactionPlayerSelectedEntities::ReturnMinerals(const glm::vec3& position, co
     return true;
 }
 
-void FactionPlayerSelectedEntities::SelectAllOfType(const glm::vec3& position)
+void FactionPlayerSelectedEntities::SelectAllOfType(const glm::vec3& position, FactionEntities& faction_entities)
 {
-    Entity* selected_entity = nullptr;
-    for (auto& entity : m_owning_faction->getEntities())
+    ConstSafePTR<Entity> selected_entity = nullptr;
+    for (auto& entity : faction_entities.all)
     {
         if (entity->getAABB().contains(position))
         {
-            selected_entity = entity;
+            selected_entity = *entity;
         }
 
         entity->setSelected(false);
@@ -291,11 +292,11 @@ void FactionPlayerSelectedEntities::SelectAllOfType(const glm::vec3& position)
 
     if (selected_entity->is_group_selectable())
     {
-        for (auto& entity : m_owning_faction->getEntities())
+        for (auto& entity : faction_entities.all)
         {
             if (entity->setSelected(entity->getEntityType() == selected_entity->getEntityType()))
             {
-                m_entities.push_back(entity);
+                m_entities.emplace_back(*entity);
             }
 
         }
@@ -303,20 +304,20 @@ void FactionPlayerSelectedEntities::SelectAllOfType(const glm::vec3& position)
     else
     {
         selected_entity->setSelected(true);
-        m_entities.push_back(selected_entity);
+        m_entities.emplace_back(*selected_entity);
     }
 }
 
-void FactionPlayerSelectedEntities::SelectSingle(const glm::vec3& position)
+void FactionPlayerSelectedEntities::SelectSingle(const glm::vec3& position, FactionEntities& faction_entities)
 {
     bool entity_selected = false;
-    for (auto& entity : m_owning_faction->getEntities())
+    for (auto& entity : faction_entities.all)
     {
         if (!entity_selected && entity->getAABB().contains(position))
         {
             entity->setSelected(true);
             entity_selected = true;
-            m_entities.push_back(entity);
+            m_entities.emplace_back(*entity);
         }
         else
         {

@@ -1,25 +1,14 @@
 #pragma once
 
-#include "Entities/Headquarters.h"
-#include "Entities/Barracks.h"
-#include "Entities/Worker.h"
-#include "Entities/Unit.h"
-#include "Entities/Turret.h"
-#include "Entities/Laboratory.h"
 #include "Core/PathFinding.h"
-#include "Entities/SupplyDepot.h"
 #include "Core/Mineral.h"
 #include "Core/FactionController.h"
 #include "Events/GameMessages.h"
 #include "Core/Map.h"
+#include "FactionEntities.h"
 #include <vector>
 #include <functional>
 #include <optional>
-
-struct Entities
-{
-
-};
 
 struct Camera;
 struct GameEvent;
@@ -53,7 +42,7 @@ public:
 	const Headquarters* getClosestHeadquarters(const glm::vec3& position) const;
 	eFactionController getController() const;
 	const std::vector<Headquarters>& GetHeadquarters() const;
-	const std::vector<Entity*>& getEntities() const;
+	const std::vector<ConstSafePTR<Entity>>& getEntities() const;
 	const Entity* getEntity(const glm::vec3& position, float maxDistance, bool prioritizeUnits = true) const;
 	const Entity* getEntity(const AABB& aabb, int entityID) const;
 	const Entity* getEntity(const glm::vec3& position) const;
@@ -92,14 +81,7 @@ protected:
 	void on_entity_creation(Entity& entity, const std::optional<int> spawner_id);
 	Worker* GetWorker(const int id);
 
-	std::vector<Entity*> m_allEntities;
-	std::vector<Unit> m_units;
-	std::vector<Worker> m_workers;
-	std::vector<SupplyDepot> m_supplyDepots;
-	std::vector<Barracks> m_barracks;
-	std::vector<Turret> m_turrets;
-	std::vector<Headquarters> m_headquarters;
-	std::vector<Laboratory> m_laboratories;
+	FactionEntities m_entities{};
 
 private:
 	const eFactionController m_controller	= eFactionController::None;
@@ -113,7 +95,7 @@ private:
 
 	//Presumes entity already found in all entities container
 	template <typename T>
-	void removeEntity(std::vector<T>& entityContainer, std::vector<Entity*>::iterator entity);
+	void removeEntity(std::vector<T>& entityContainer, std::vector<ConstSafePTR<Entity>>::iterator entity);
 
 	template <typename T, typename ...EntityConstructParams>
 	T* CreateEntity(std::vector<T>& container, const eEntityType type, 
@@ -121,9 +103,9 @@ private:
 };
 
 template <typename T>
-void Faction::removeEntity(std::vector<T>& entityContainer, std::vector<Entity*>::iterator entity)
+void Faction::removeEntity(std::vector<T>& entityContainer, std::vector<ConstSafePTR<Entity>>::iterator entity)
 {
-	assert((*entity) && entity != m_allEntities.cend());
+	assert(*(*entity) && entity != m_entities.all.cend());
 
 	const auto iter = std::find_if(entityContainer.begin(), entityContainer.end(), [entity](auto& _entity)
 	{
@@ -132,8 +114,8 @@ void Faction::removeEntity(std::vector<T>& entityContainer, std::vector<Entity*>
 
 	assert(iter != entityContainer.end());
 
-	on_entity_removal(*(*entity));
-	m_allEntities.erase(entity);
+	on_entity_removal(**(*entity));
+	m_entities.all.erase(entity);
 	entityContainer.erase(iter);
 }
 

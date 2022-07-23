@@ -263,6 +263,7 @@
     <ClInclude Include="Core\AABB.h" />
     <ClInclude Include="Core\Base.h" />
     <ClInclude Include="Core\Camera.h" />
+    <ClInclude Include="Core\ConstSafePTR.h" />
     <ClInclude Include="Core\FactionController.h" />
     <ClInclude Include="Core\Globals.h" />
     <ClInclude Include="Core\Graph.h" />
