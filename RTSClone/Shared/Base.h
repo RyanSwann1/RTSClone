@@ -13,8 +13,8 @@ struct Base
 	Base();
 #endif // LEVEL_EDITOR
 	Base(const glm::vec3& position, std::vector<Mineral>&& minerals);
-	Base(Base&&) noexcept;
-	Base& operator=(Base&&) noexcept;
+	Base(Base&&) = default;
+	Base& operator=(Base&&) = default;
 
 #ifdef GAME
 	glm::vec3 getCenteredPosition() const;
