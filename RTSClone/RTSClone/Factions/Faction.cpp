@@ -17,6 +17,8 @@ namespace
         Globals::MAX_BARRACKS +
         Globals::MAX_TURRETS +
         Globals::MAX_LABORATORIES;
+
+    static constexpr int MAXIMUM_ALLOWED_WORKERS_TO_HARVEST_MINERAL = 3;
 };
 
 Faction::Faction(eFactionController factionController, const glm::vec3& hqStartingPosition,
@@ -651,12 +653,15 @@ bool Faction::is_laboratory_built() const
     return !m_laboratories.empty();
 }
 
-bool Faction::isMineralInUse(const Mineral& mineral) const
+bool Faction::IsMineralReachedHarvestingCapacity(const Mineral& mineral) const
 {
-    return std::any_of(m_workers.cbegin(), m_workers.cend(), [&mineral](auto& worker)
+    const int maximum_count_harvesting = std::count_if(m_workers.cbegin(), m_workers.cend(), [&mineral](auto& worker)
     {
         return worker.getMineralToHarvest() && worker.getMineralToHarvest()->getPosition() == mineral.getPosition();
     });
+
+    assert(maximum_count_harvesting <= MAXIMUM_ALLOWED_WORKERS_TO_HARVEST_MINERAL);
+    return maximum_count_harvesting == MAXIMUM_ALLOWED_WORKERS_TO_HARVEST_MINERAL;
 }
 
 Entity* Faction::createUnit(const Map& map, const EntitySpawnerBuilding& spawner)

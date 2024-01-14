@@ -390,7 +390,7 @@ void FactionPlayer::moveSingularSelectedEntity(const glm::vec3& destination, con
         if (mineralToHarvest)
         {
             bool mineralValid = false;
-            if (!isMineralInUse(*mineralToHarvest))
+            if (!IsMineralReachedHarvestingCapacity(*mineralToHarvest))
             {
                 mineralValid = true;
             }

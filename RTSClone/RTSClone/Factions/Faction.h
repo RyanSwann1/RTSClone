@@ -31,7 +31,7 @@ public:
 	virtual ~Faction() {}
 
 	bool is_laboratory_built() const;
-	bool isMineralInUse(const Mineral& mineral) const;
+	bool IsMineralReachedHarvestingCapacity(const Mineral& mineral) const;
 	bool isExceedPopulationLimit(int populationAmount) const;
 	bool isExceedPopulationLimit(eEntityType entityType) const;
 	bool isAffordable(eEntityType entityType) const;

@@ -116,7 +116,7 @@ const Mineral* BaseHandler::getNearestAvailableMineralAtBase(const Faction& fact
 	for (const auto& mineral : minerals)
 	{
 		assert(mineral);
-		if (!faction.isMineralInUse(*mineral))
+		if (!faction.IsMineralReachedHarvestingCapacity(*mineral))
 		{
 			return mineral;
 		}
@@ -128,7 +128,7 @@ const Mineral* BaseHandler::getNearestAvailableMineralAtBase(const Faction& fact
 const Mineral* BaseHandler::getNearestAvailableMineralAtBase(const Faction& faction, const Mineral& _mineral,
 	const glm::vec3& position) const
 {
-	assert(faction.isMineralInUse(_mineral));
+	assert(faction.IsMineralReachedHarvestingCapacity(_mineral));
 	if (const Base* base = getBase(_mineral))
 	{
 		std::array<const Mineral*, Globals::MAX_MINERALS> minerals = getClosestMinerals(base->minerals, position);
@@ -136,7 +136,7 @@ const Mineral* BaseHandler::getNearestAvailableMineralAtBase(const Faction& fact
 		{
 			assert(mineral);
 			if (&(*mineral) != &_mineral &&
-				!faction.isMineralInUse(*mineral))
+				!faction.IsMineralReachedHarvestingCapacity(*mineral))
 			{
 				return mineral;
 			}
